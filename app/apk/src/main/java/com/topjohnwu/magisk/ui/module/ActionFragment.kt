@@ -8,6 +8,7 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewTreeObserver
 import android.widget.Toast
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
@@ -16,8 +17,6 @@ import com.topjohnwu.magisk.arch.BaseFragment
 import com.topjohnwu.magisk.arch.viewModel
 import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.databinding.FragmentActionMd2Binding
-import com.topjohnwu.magisk.ui.flash.FlashViewModel
-import timber.log.Timber
 import com.topjohnwu.magisk.core.R as CoreR
 
 class ActionFragment : BaseFragment<FragmentActionMd2Binding>(), MenuProvider {
@@ -37,39 +36,32 @@ class ActionFragment : BaseFragment<FragmentActionMd2Binding>(), MenuProvider {
         super.onStart()
         activity?.setTitle(viewModel.args.name)
         binding.closeBtn.setOnClickListener {
-            activity?.onBackPressed();
+            activity?.onBackPressed()
         }
 
         viewModel.state.observe(this) {
-            activity?.supportActionBar?.setSubtitle(
-                when (it) {
-                    ActionViewModel.State.RUNNING -> CoreR.string.running
-                    ActionViewModel.State.SUCCESS -> CoreR.string.done
-                    ActionViewModel.State.FAILED -> CoreR.string.failure
+            if (it != ActionViewModel.State.RUNNING) {
+                binding.closeBtn.apply {
+                    if (!this.isVisible) this.show()
+                    if (!this.isFocused) this.requestFocus()
+                }
+            }
+            if (it != ActionViewModel.State.SUCCESS) return@observe
+            view?.viewTreeObserver?.addOnWindowFocusChangeListener(
+                object : ViewTreeObserver.OnWindowFocusChangeListener {
+                    override fun onWindowFocusChanged(hasFocus: Boolean) {
+                        if (hasFocus) return
+                        view?.viewTreeObserver?.removeOnWindowFocusChangeListener(this)
+                        view?.context?.apply {
+                            toast(
+                                getString(CoreR.string.done_action, viewModel.args.name),
+                                Toast.LENGTH_SHORT
+                            )
+                        }
+                        viewModel.back()
+                    }
                 }
             )
-            when (it) {
-                ActionViewModel.State.SUCCESS -> {
-                    activity?.apply {
-                        toast(
-                            getString(
-                                com.topjohnwu.magisk.core.R.string.done_action,
-                                this@ActionFragment.viewModel.args.name
-                            ), Toast.LENGTH_LONG
-                        )
-                        onBackPressed()
-                    }
-                }
-
-                ActionViewModel.State.FAILED -> {
-                    binding.closeBtn.apply {
-                        if (!this.isVisible) this.show()
-                        if (!this.isFocused) this.requestFocus()
-                    }
-                }
-
-                else -> {}
-            }
         }
     }
 
