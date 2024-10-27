@@ -147,7 +147,7 @@
     <string name="settings_hosts_title">Sistemsiz ana makineler (systemless hosts)</string>
     <string name="settings_hosts_summary">Reklam engelleme uygulamaları için sistemsiz ana makineler (systemless hosts) desteği</string>
     <string name="settings_hosts_toast">Sistemsiz ana makineler (systemless hosts) modülü eklendi</string>
-    <string name="settings_app_name_hint">Yeni ad</string>
+    <string name="settings_app_name_label_hint">Yeni ad</string>
     <string name="settings_app_name_helper">Uygulama bu isimle yeniden paketlenecek</string>
     <string name="settings_app_name_error">Geçersiz format</string>
     <string name="settings_su_app_adb">Uygulamalar ve ADB</string>

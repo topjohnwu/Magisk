@@ -142,7 +142,7 @@
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Υποστήριξη Systemless hosts για εφαρμογές Adblock</string>
     <string name="settings_hosts_toast">Προσθήκη αρθρώματος systemless hosts</string>
-    <string name="settings_app_name_hint">Νέο όνομα</string>
+    <string name="settings_app_name_label_hint">Νέο όνομα</string>
     <string name="settings_app_name_helper">Η εφαρμογή θα επανασυσκευαστεί με αυτό το όνομα</string>
     <string name="settings_app_name_error">Μη έγκυρη μορφή</string>
     <string name="settings_su_app_adb">Εφαρμογές και ADB</string>

@@ -143,7 +143,7 @@
     <string name="settings_hosts_title">Внесистемный hosts файл</string>
     <string name="settings_hosts_summary">Поддержка внесистемного hosts файла для приложений, блокирующих рекламу</string>
     <string name="settings_hosts_toast">Модуль для внесистемного hosts файла установлен</string>
-    <string name="settings_app_name_hint">Введите имя</string>
+    <string name="settings_app_name_label_hint">Введите имя</string>
     <string name="settings_app_name_helper">Приложение будет пересобрано с этим именем</string>
     <string name="settings_app_name_error">Некорректный формат</string>
     <string name="settings_su_app_adb">Приложения и ADB</string>

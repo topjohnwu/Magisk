@@ -124,7 +124,7 @@
     <string name="settings_hosts_title">Systemless ਹੋਸਟ</string>
     <string name="settings_hosts_summary">Adblock ਐਪਸ ਲਈ Systemless ਹੋਸਟ ਦੀ ਸਹਿਯੋਗ</string>
     <string name="settings_hosts_toast">Systemless ਹੋਸਟ ਮੋਡੀਊਲ ਸ਼ਾਮਲ ਕੀਤਾ ਗਿਆ</string>
-    <string name="settings_app_name_hint">ਨਵਾਂ ਨਾਮ</string>
+    <string name="settings_app_name_label_hint">ਨਵਾਂ ਨਾਮ</string>
     <string name="settings_app_name_helper">ਇਸ ਨਾਮ ਨਾਲ ਐਪ ਦੁਬਾਰਾ ਇੰਸਟਾਲ ਕੀਤਾ ਜਾਵੇਗਾ</string>
     <string name="settings_app_name_error">ਗਲਤ ਫਾਰਮੈਟ</string>
     <string name="settings_su_app_adb">ਐਪਸ ਅਤੇ ਐਡਬੀ</string>

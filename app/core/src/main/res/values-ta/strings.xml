@@ -130,7 +130,7 @@
     <string name="settings_hosts_title">கணினி இல்லாத ஹோஸ்ட்கள்</string>
     <string name="settings_hosts_summary">கணினி இல்லாத ஹோஸ்ட்கள் Adblock பயன்பாடுகளுக்கு ஆதரவளிக்கின்றன</string>
     <string name="settings_hosts_toast">கணினி இல்லாத ஹோஸ்ட்கள் தொகுதி சேர்க்கப்பட்டது</string>
-    <string name="settings_app_name_hint">புதிய பெயர்</string>
+    <string name="settings_app_name_label_hint">புதிய பெயர்</string>
     <string name="settings_app_name_helper">பயன்பாடு இந்த பெயருக்கு மீண்டும் தொகுக்கப்படும்</string>
     <string name="settings_app_name_error">தவறான வடிவம்</string>
     <string name="settings_su_app_adb">பயன்பாடுகள் மற்றும் ADB</string>

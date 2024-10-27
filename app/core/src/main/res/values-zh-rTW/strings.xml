@@ -143,7 +143,7 @@
     <string name="settings_hosts_title">主機（hosts）模組化</string>
     <string name="settings_hosts_summary">為廣告阻擋程式提供主機模組</string>
     <string name="settings_hosts_toast">已安裝主機模組</string>
-    <string name="settings_app_name_hint">新的名稱</string>
+    <string name="settings_app_name_label_hint">新的名稱</string>
     <string name="settings_app_name_helper">應用程式將以此名稱重新封裝</string>
     <string name="settings_app_name_error">無效的格式</string>
     <string name="settings_su_app_adb">應用程式及 ADB</string>

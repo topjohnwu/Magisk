@@ -144,7 +144,7 @@
     <string name="settings_hosts_title">Hosts sem sistema</string>
     <string name="settings_hosts_summary">Suporte de hosts sem sistema para apps AdBlock</string>
     <string name="settings_hosts_toast">Adicionado módulo de hosts sem sistema</string>
-    <string name="settings_app_name_hint">Novo nome</string>
+    <string name="settings_app_name_label_hint">Novo nome</string>
     <string name="settings_app_name_helper">O app do Magisk será reinstalado com este nome</string>
     <string name="settings_app_name_error">Formato inválido</string>
     <string name="settings_su_app_adb">Apps e ADB</string>

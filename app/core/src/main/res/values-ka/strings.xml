@@ -130,7 +130,7 @@
     <string name="settings_hosts_title">გარესისტემური ჰოსტები</string>
     <string name="settings_hosts_summary">გარესისტემური ჰოსტები Adblock-ებისთვის</string>
     <string name="settings_hosts_toast">გარესისტემური ჰოსტების მოდული დამატებულია</string>
-    <string name="settings_app_name_hint">ახალი სახელი</string>
+    <string name="settings_app_name_label_hint">ახალი სახელი</string>
     <string name="settings_app_name_helper">პროგრამას ეს პაკეტის სახელი ექნება</string>
     <string name="settings_app_name_error">არასწორი ფორმატი</string>
     <string name="settings_su_app_adb">აპები და ADB</string>

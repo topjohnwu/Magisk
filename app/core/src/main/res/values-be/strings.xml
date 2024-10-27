@@ -120,7 +120,7 @@
     <string name="settings_hosts_title">Пазасістэмны файл hosts</string>
     <string name="settings_hosts_summary">Падтрымка пазасістэмнага файла hosts для праграм, якія блакуюць рэкламу</string>
     <string name="settings_hosts_toast">Дададзены модуль пазасістэмнага файла hosts</string>
-    <string name="settings_app_name_hint">Новая назва</string>
+    <string name="settings_app_name_label_hint">Новая назва</string>
     <string name="settings_app_name_helper">Праграма будзе перапакаваная з гэтай назвай</string>
     <string name="settings_app_name_error">Хібны фармат</string>
     <string name="settings_su_app_adb">Праграмы і ADB</string>

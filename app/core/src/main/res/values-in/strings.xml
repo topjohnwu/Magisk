@@ -143,7 +143,7 @@
     <string name="settings_hosts_title">Host systemless</string>
     <string name="settings_hosts_summary">Dukungan host secara systemless untuk aplikasi pemblokir iklan</string>
     <string name="settings_hosts_toast">Menambahkan modul host systemless</string>
-    <string name="settings_app_name_hint">Nama baru</string>
+    <string name="settings_app_name_label_hint">Nama baru</string>
     <string name="settings_app_name_helper">Aplikasi akan dikemas dengan nama tersebut</string>
     <string name="settings_app_name_error">Format tidak valid</string>
     <string name="settings_su_app_adb">Apl dan ADB</string>

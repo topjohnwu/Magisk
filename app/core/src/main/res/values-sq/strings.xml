@@ -144,7 +144,7 @@
     <string name="settings_hosts_title">Pritësit pa sistem</string>
     <string name="settings_hosts_summary">Pritësit pa sistem mbështesin aplikacionet Adblock</string>
     <string name="settings_hosts_toast">Moduli i hosteve pa sistem u shtua</string>
-    <string name="settings_app_name_hint">Emri i ri</string>
+    <string name="settings_app_name_label_hint">Emri i ri</string>
     <string name="settings_app_name_helper">Aplikacioni do të ripaketohet me këtë emër</string>
     <string name="settings_app_name_error">Format i pavlefshëm</string>
     <string name="settings_su_app_adb">Aplikacionet dhe ADB</string>

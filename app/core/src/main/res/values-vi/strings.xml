@@ -122,7 +122,6 @@
     <string name="settings_download_path_title">Đường dẫn tải xuống</string>
     <string name="settings_download_path_message">Các tệp sẽ được lưu vào %1$s</string>
     <string name="settings_hide_app_title">Ẩn ứng dụng Magisk</string>
-    <string name="settings_hide_app_summary">Cài đặt ứng dụng proxy với ID gói ngẫu nhiên và nhãn ứng dụng tùy chỉnh</string>
     <string name="settings_restore_app_title">Khôi phục ứng dụng Magisk</string>
     <string name="settings_restore_app_summary">Bỏ ẩn ứng dụng và khôi phục nó về APK ban đầu</string>
     <string name="language">Ngôn ngữ</string>
@@ -142,7 +141,7 @@
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Hỗ trợ systemless hosts cho các ứng dụng chặn quảng cáo</string>
     <string name="settings_hosts_toast">Đã thêm mô-đun systemless hosts</string>
-    <string name="settings_app_name_hint">Tên mới</string>
+    <string name="settings_app_name_label_hint">Tên mới</string>
     <string name="settings_app_name_helper">Ứng dụng sẽ được đóng gói lại với tên này</string>
     <string name="settings_app_name_error">Định dạng không hợp lệ</string>
     <string name="settings_su_app_adb">Ứng dụng và ADB</string>

@@ -123,7 +123,7 @@
     <string name="settings_hosts_title">موانع الاعلانات</string>
     <string name="settings_hosts_summary">حجب الاعلانات دون تعديل النظام</string>
     <string name="settings_hosts_toast">تم تمكين خاصية حجب الاعلانات</string>
-    <string name="settings_app_name_hint">الإسم الجديد</string>
+    <string name="settings_app_name_label_hint">الإسم الجديد</string>
     <string name="settings_app_name_helper">التطبيق الجديد سوف يملك هذا الإسم</string>
     <string name="settings_app_name_error">الصيغة غير مقبولة</string>
     <string name="settings_su_app_adb">التطبيقات و ADB</string>

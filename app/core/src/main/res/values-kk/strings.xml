@@ -147,7 +147,7 @@
     <string name="settings_hosts_title">Жүйеден тыс hosts</string>
     <string name="settings_hosts_summary">Жарнама өшіретін қолданбалар үшін /system бөлімінен тыс hosts файлын қолдану</string>
     <string name="settings_hosts_toast">Жүйеден тыс hosts модулі қосылды</string>
-    <string name="settings_app_name_hint">Жаңа атау</string>
+    <string name="settings_app_name_label_hint">Жаңа атау</string>
     <string name="settings_app_name_helper">Қолданбаның қайта құрылған нұсқасы осы атауға ие болады</string>
     <string name="settings_app_name_error">Жарамсыз пішім</string>
     <string name="settings_su_app_adb">Қолданбалар мен ADB</string>

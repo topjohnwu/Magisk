@@ -147,7 +147,7 @@
     <string name="settings_hosts_title">Fișier hosts în afara partiției system</string>
     <string name="settings_hosts_summary">Suport pentru fișierul hosts în afara partiției system, în cazul aplicațiilor care blochează reclame</string>
     <string name="settings_hosts_toast">Modulul pentru fișierul hosts în afara partiției system, adăugat</string>
-    <string name="settings_app_name_hint">Nume nou</string>
+    <string name="settings_app_name_label_hint">Nume nou</string>
     <string name="settings_app_name_helper">Aplicația va fi reîmpachetată cu acest nume</string>
     <string name="settings_app_name_error">Format nevalid</string>
     <string name="settings_su_app_adb">Aplicații și ADB</string>

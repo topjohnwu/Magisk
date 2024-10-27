@@ -139,7 +139,7 @@
     <string name="settings_hosts_title">Süsteemivaba hosts</string>
     <string name="settings_hosts_summary">Süsteemivaba hosts-tugi reklaamiblokeerijatest rakendustele</string>
     <string name="settings_hosts_toast">Süsteemivaba hostsi moodul lisatud</string>
-    <string name="settings_app_name_hint">Uus nimi</string>
+    <string name="settings_app_name_label_hint">Uus nimi</string>
     <string name="settings_app_name_helper">Rakendus taaspakitakse selle nimega</string>
     <string name="settings_app_name_error">Sobimatu vorming</string>
     <string name="settings_su_app_adb">Rakendused ja ADB</string>

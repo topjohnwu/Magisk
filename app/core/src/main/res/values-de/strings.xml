@@ -146,7 +146,7 @@
     <string name="settings_hosts_title">Systemlose Hosts-Datei</string>
     <string name="settings_hosts_summary">Systemlose Unterstützung für Werbeblocker</string>
     <string name="settings_hosts_toast">Systemloses Hosts-Modul hinzugefügt</string>
-    <string name="settings_app_name_hint">Neuer Name</string>
+    <string name="settings_app_name_label_hint">Neuer Name</string>
     <string name="settings_app_name_helper">App wird unter diesem Namen neu gepackt</string>
     <string name="settings_app_name_error">Ungültiges Format</string>
     <string name="settings_su_app_adb">Apps und ADB</string>

@@ -145,7 +145,7 @@
     <string name="settings_hosts_title">Sistemsiz hostlar</string>
     <string name="settings_hosts_summary">Reklam əngəlləyici tətbiqlər üçün host faylları</string>
     <string name="settings_hosts_toast">Sistemsiz hostların əlavəsi quruldu</string>
-    <string name="settings_app_name_hint">Yeni Ad</string>
+    <string name="settings_app_name_label_hint">Yeni Ad</string>
     <string name="settings_app_name_helper">Tətbiq bu adla yenidən paketlənəcək</string>
     <string name="settings_app_name_error">Keçərsiz Format</string>
     <string name="settings_su_app_adb">Tətbiqlər və ADB</string>

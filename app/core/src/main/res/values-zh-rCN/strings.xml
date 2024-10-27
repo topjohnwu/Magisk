@@ -148,7 +148,7 @@
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">为广告屏蔽应用提供 Systemless hosts 支持</string>
     <string name="settings_hosts_toast">已添加 systemless hosts 模块</string>
-    <string name="settings_app_name_hint">新的应用名称</string>
+    <string name="settings_app_name_label_hint">新的应用名称</string>
     <string name="settings_app_name_helper">将使用新名称重新安装本应用</string>
     <string name="settings_app_name_error">无效输入</string>
     <string name="settings_su_app_adb">应用和 ADB</string>

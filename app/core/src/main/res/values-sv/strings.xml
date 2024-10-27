@@ -129,7 +129,7 @@
     <string name="settings_hosts_title">Systemfri hosts</string>
     <string name="settings_hosts_summary">Stöd för Adblock-appar med systemfri hosts-fil</string>
     <string name="settings_hosts_toast">Lagt till modul för systemfri hosts-fil</string>
-    <string name="settings_app_name_hint">Nytt namn</string>
+    <string name="settings_app_name_label_hint">Nytt namn</string>
     <string name="settings_app_name_helper">Appen kommer att pacakas om till detta namn</string>
     <string name="settings_app_name_error">Ogiltigt format</string>
     <string name="settings_su_app_adb">Appar och ADB</string>

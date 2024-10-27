@@ -144,7 +144,7 @@
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Prepara al archivo hosts para que los bloqueadores de anuncios puedan modificarlo sin alterar el sistema</string>
     <string name="settings_hosts_toast">El módulo se instaló correctamente, reinicia para aplicar los cambios.</string>
-    <string name="settings_app_name_hint">Nuevo nombre de la app</string>
+    <string name="settings_app_name_label_hint">Nuevo nombre de la app</string>
     <string name="settings_app_name_helper">La app de Magisk será reempaquetada con este nombre</string>
     <string name="settings_app_name_error">El nombre es inválido</string>
     <string name="settings_su_app_adb">Permitir tanto a las apps como a ADB</string>

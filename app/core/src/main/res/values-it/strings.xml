@@ -141,7 +141,7 @@
     <string name="settings_hosts_title">File hosts systemless</string>
     <string name="settings_hosts_summary">Supporto al file hosts systemless per le app che bloccano le pubblicità</string>
     <string name="settings_hosts_toast">Aggiunto modulo per il supporto al file hosts systemless</string>
-    <string name="settings_app_name_hint">Nuovo nome</string>
+    <string name="settings_app_name_label_hint">Nuovo nome</string>
     <string name="settings_app_name_helper">L\'app sarà ricreata con questo nome</string>
     <string name="settings_app_name_error">Formato non valido</string>
     <string name="settings_su_app_adb">App e ADB</string>

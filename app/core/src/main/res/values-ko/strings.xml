@@ -139,7 +139,7 @@
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">광고 차단 앱에서 사용하는 systemless hosts를 지원합니다.</string>
     <string name="settings_hosts_toast">Systemless hosts 모듈 추가됨</string>
-    <string name="settings_app_name_hint">새 이름</string>
+    <string name="settings_app_name_label_hint">새 이름</string>
     <string name="settings_app_name_helper">이 이름으로 앱을 다시 패키징합니다.</string>
     <string name="settings_app_name_error">올바르지 않은 형식</string>
     <string name="settings_su_app_adb">앱 및 ADB</string>
