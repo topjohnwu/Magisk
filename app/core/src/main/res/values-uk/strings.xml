@@ -137,7 +137,7 @@
     <string name="settings_hosts_summary">Підтримка позасистемних хостів для застосунків блокування реклами</string>
     <string name="settings_hosts_toast">Додано модуль позасистемних хостів</string>
     <string name="settings_app_name_label_hint">Нове ім\’я</string>
-    <string name="settings_app_name_helper">Застосунок буде перезібрано з цим ім\’ям</string>
+    <string name="settings_app_name_label_helper">Застосунок буде перезібрано з цим ім\’ям</string>
     <string name="settings_app_name_error">Неправильний формат</string>
     <string name="settings_su_app_adb">Застосунки і ADB</string>
     <string name="settings_su_app">Застосунки</string>

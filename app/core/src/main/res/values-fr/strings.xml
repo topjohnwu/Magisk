@@ -148,7 +148,7 @@
     <string name="settings_hosts_summary">Utilisation d’un fichier d’hôtes hors de la partition système pour les applications de blocage de publicité.</string>
     <string name="settings_hosts_toast">Ajout d’un module pour fichier hosts hors système</string>
     <string name="settings_app_name_label_hint">Nouveau nom</string>
-    <string name="settings_app_name_helper">L’application sera réempaquetée sous ce nom</string>
+    <string name="settings_app_name_label_helper">L’application sera réempaquetée sous ce nom</string>
     <string name="settings_app_name_error">Format incorrect</string>
     <string name="settings_su_app_adb">Applications et ADB</string>
     <string name="settings_su_app">Applications uniquement</string>

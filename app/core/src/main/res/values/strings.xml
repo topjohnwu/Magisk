@@ -150,7 +150,7 @@
     <string name="settings_hosts_summary">Systemless hosts support for ad blocking apps</string>
     <string name="settings_hosts_toast">Added systemless hosts module</string>
     <string name="settings_app_name_label_hint">New name</string>
-    <string name="settings_app_name_label_helper">Name for hidden app in your launcher</string>
+    <string name="settings_app_name_label_helper">App will be repackaged with this name</string>
     <string name="settings_app_name_pkg_hint_focused">Package Name</string>
     <string name="settings_app_name_pkg_hint">(random)</string>
     <string name="settings_app_name_pkg_helper">App will be repackaged with this package name. Leave blank to randomly generate. DO NOT use the name of another package in the system!</string>

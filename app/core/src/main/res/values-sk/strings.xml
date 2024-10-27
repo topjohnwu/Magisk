@@ -148,7 +148,7 @@
     <string name="settings_hosts_summary">Podpora pre aplikácie na blokovanie reklamy so systemless hosts</string>
     <string name="settings_hosts_toast">Pridaný modul systemless hosts</string>
     <string name="settings_app_name_label_hint">Nový názov</string>
-    <string name="settings_app_name_helper">Aplikácia bude prebalená s týmto názvom</string>
+    <string name="settings_app_name_label_helper">Aplikácia bude prebalená s týmto názvom</string>
     <string name="settings_app_name_error">Neplatný formát</string>
     <string name="settings_su_app_adb">Aplikácie a ADB</string>
     <string name="settings_su_app">Iba aplikácie</string>

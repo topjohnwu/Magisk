@@ -144,7 +144,7 @@
     <string name="settings_hosts_summary">Basisteminis hosts palaiko reklamų blokatorių programėlėms</string>
     <string name="settings_hosts_toast">Pridėtas besisteminio hosts modulis</string>
     <string name="settings_app_name_label_hint">Naujas pavadinimas</string>
-    <string name="settings_app_name_helper">Programėlė bus perpakuota su šiuo pavadinimu</string>
+    <string name="settings_app_name_label_helper">Programėlė bus perpakuota su šiuo pavadinimu</string>
     <string name="settings_app_name_error">Netinkamas formatas</string>
     <string name="settings_su_app_adb">Programėlės ir ADB</string>
     <string name="settings_su_app">Tik programėlės</string>

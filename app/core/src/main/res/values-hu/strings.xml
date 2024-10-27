@@ -142,7 +142,7 @@
     <string name="settings_hosts_summary">Systemless hosts támogatás a hirdetésblokkoló alkalmazásokhoz</string>
     <string name="settings_hosts_toast">Systemless hosts modul hozzáadva</string>
     <string name="settings_app_name_label_hint">Új név</string>
-    <string name="settings_app_name_helper">Az alkalmazás ezzel a névvel lesz újracsomagolva</string>
+    <string name="settings_app_name_label_helper">Az alkalmazás ezzel a névvel lesz újracsomagolva</string>
     <string name="settings_app_name_error">Érvénytelen formátum</string>
     <string name="settings_su_app_adb">Appok és ADB</string>
     <string name="settings_su_app">Csak Appok</string>

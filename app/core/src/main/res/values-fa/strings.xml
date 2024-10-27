@@ -120,7 +120,7 @@
     <string name="settings_hosts_summary">نصب بدون حذف یا تغییر در فایل ها رای ساپورت از برنامه های Adblock</string>
     <string name="settings_hosts_toast">ماژول نصب بدون حذف یا تغییر در فایل ها اضافه شد</string>
     <string name="settings_app_name_label_hint">اسم جدید</string>
-    <string name="settings_app_name_helper">برنامه به این نام تغییر خواهد کرد</string>
+    <string name="settings_app_name_label_helper">برنامه به این نام تغییر خواهد کرد</string>
     <string name="settings_app_name_error">فرمت نامعتبر</string>
     <string name="settings_su_app_adb">برنامه ها و ADB</string>
     <string name="settings_su_app">فقط برنامه ها</string>

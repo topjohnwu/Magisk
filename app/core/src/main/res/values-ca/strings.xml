@@ -131,7 +131,7 @@
     <string name="settings_hosts_summary">Suport per aplicacions tipus Adblock fora de la partició del sistema</string>
     <string name="settings_hosts_toast">Agregat el mòdul Systemless Hosts</string>
     <string name="settings_app_name_label_hint">Nou nom</string>
-    <string name="settings_app_name_helper">Es refarà l\'aplicació amb aquest nom</string>
+    <string name="settings_app_name_label_helper">Es refarà l\'aplicació amb aquest nom</string>
     <string name="settings_app_name_error">Format invàlid</string>
     <string name="settings_su_app_adb">Aplicacions i ADB</string>
     <string name="settings_su_app">Només aplicacions</string>

@@ -147,7 +147,7 @@
     <string name="settings_hosts_summary">Přidá modul pro podporu nesystémových hostitelů v aplikaci AdBlock</string>
     <string name="settings_hosts_toast">Modul nesystémových hostitelů přidán</string>
     <string name="settings_app_name_label_hint">Nový název</string>
-    <string name="settings_app_name_helper">Název aplikace bude nahrazen tímto názvem</string>
+    <string name="settings_app_name_label_helper">Název aplikace bude nahrazen tímto názvem</string>
     <string name="settings_app_name_error">Neplatný formát</string>
     <string name="settings_su_app_adb">Aplikace a ADB</string>
     <string name="settings_su_app">Pouze aplikace</string>

@@ -142,7 +142,7 @@
     <string name="settings_hosts_summary">പരസ്യം തടയുന്ന ആപ്പുകൾക്കായി സിസ്റ്റംലെസ്സ് ഹോസ്റ്റ്</string>
     <string name="settings_hosts_toast">സിസ്റ്റംലെസ്സ് ഹോസ്റ്റ് മൊഡ്യൂൾ ചേർത്തു</string>
     <string name="settings_app_name_label_hint">പുതിയ പേര്</string>
-    <string name="settings_app_name_helper">ആപ്പ് ഈ പേരിൽ വീണ്ടും പാക്ക് ചെയ്യും</string>
+    <string name="settings_app_name_label_helper">ആപ്പ് ഈ പേരിൽ വീണ്ടും പാക്ക് ചെയ്യും</string>
     <string name="settings_app_name_error">അസാധുവായ ഫോർമാറ്റ്</string>
     <string name="settings_su_app_adb">ആപ്പുകളും ADB</string>
     <string name="settings_su_app">ആപ്പുകൾ മാത്രം</string>

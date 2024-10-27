@@ -142,7 +142,7 @@
     <string name="settings_hosts_summary">広告ブロックアプリのための Systemless hosts サポートを有効化します</string>
     <string name="settings_hosts_toast">Systemless hosts モジュールを追加しました</string>
     <string name="settings_app_name_label_hint">アプリ名</string>
-    <string name="settings_app_name_helper">プロキシアプリはこのアプリ名でインストールされます</string>
+    <string name="settings_app_name_label_helper">プロキシアプリはこのアプリ名でインストールされます</string>
     <string name="settings_app_name_error">不正な形式</string>
     <string name="settings_su_app_adb">アプリと ADB</string>
     <string name="settings_su_app">アプリのみ</string>

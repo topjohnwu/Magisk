@@ -142,7 +142,7 @@
     <string name="settings_hosts_summary">Hỗ trợ systemless hosts cho các ứng dụng chặn quảng cáo</string>
     <string name="settings_hosts_toast">Đã thêm mô-đun systemless hosts</string>
     <string name="settings_app_name_label_hint">Tên mới</string>
-    <string name="settings_app_name_helper">Ứng dụng sẽ được đóng gói lại với tên này</string>
+    <string name="settings_app_name_label_helper">Ứng dụng sẽ được đóng gói lại với tên này</string>
     <string name="settings_app_name_error">Định dạng không hợp lệ</string>
     <string name="settings_su_app_adb">Ứng dụng và ADB</string>
     <string name="settings_su_app">Chỉ ứng dụng</string>

@@ -124,7 +124,7 @@
     <string name="settings_hosts_summary">Podrška za hostove bez sistema za Adblock aplikacije</string>
     <string name="settings_hosts_toast">Dodan je modul hosta bez sistema</string>
     <string name="settings_app_name_label_hint">Novi naziv</string>
-    <string name="settings_app_name_helper">Aplikacija će se prepakirati na ovaj naziv</string>
+    <string name="settings_app_name_label_helper">Aplikacija će se prepakirati na ovaj naziv</string>
     <string name="settings_app_name_error">Nevažeći format</string>
     <string name="settings_su_app_adb">Aplikacije i ADB</string>
     <string name="settings_su_app">Samo aplikacije</string>

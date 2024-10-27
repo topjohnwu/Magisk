@@ -123,7 +123,7 @@
     <string name="settings_hosts_summary">Systeemloze hosts-ondersteuning voor advertentieblokkeringsapps.</string>
     <string name="settings_hosts_toast">De systeemloze hosts-module is toegevoegd</string>
     <string name="settings_app_name_label_hint">Nieuwe naam</string>
-    <string name="settings_app_name_helper">De app wordt opnieuw ingepakt onder deze naam</string>
+    <string name="settings_app_name_label_helper">De app wordt opnieuw ingepakt onder deze naam</string>
     <string name="settings_app_name_error">Onjuiste opmaak</string>
     <string name="settings_su_app_adb">Apps en ADB</string>
     <string name="settings_su_app">Alleen apps</string>

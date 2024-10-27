@@ -141,7 +141,7 @@
     <string name="settings_hosts_summary">বিজ্ঞাপন ব্লকিং অ্যাপের জন্য সিস্টেমলেস হোস্ট</string>
     <string name="settings_hosts_toast">সিস্টেমহীন হোস্ট মডিউল যোগ করা হয়েছে</string>
     <string name="settings_app_name_label_hint">নতুন নাম</string>
-    <string name="settings_app_name_helper">অ্যাপটি এই নামের সাথে পুনরায় প্যাকেজ করা হবে</string>
+    <string name="settings_app_name_label_helper">অ্যাপটি এই নামের সাথে পুনরায় প্যাকেজ করা হবে</string>
     <string name="settings_app_name_error">ভুল ফরম্যাট</string>
     <string name="settings_su_app_adb">অ্যাপস এবং এডিবি</string>
     <string name="settings_su_app">শুধুমাত্র অ্যাপস</string>

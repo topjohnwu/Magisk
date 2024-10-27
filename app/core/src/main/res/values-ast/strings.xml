@@ -132,7 +132,7 @@
     <string name="settings_hosts_summary">Un módulu pa les aplicaciones que bloquien anuncios</string>
     <string name="settings_hosts_toast">Amestóse\'l módulu «Systemless Hosts»</string>
     <string name="settings_app_name_label_hint">Nome nuevu</string>
-    <string name="settings_app_name_helper">L\'aplicación va volver empaquetase con esti nome</string>
+    <string name="settings_app_name_label_helper">L\'aplicación va volver empaquetase con esti nome</string>
     <string name="settings_app_name_error">El formatu nun ye válidu</string>
     <string name="settings_su_app_adb">Aplicaciones y ADB</string>
     <string name="settings_su_app">Namás aplicaciones</string>

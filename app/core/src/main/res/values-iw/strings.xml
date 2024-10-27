@@ -146,7 +146,7 @@
     <string name="settings_hosts_summary">מארחים חסרי מערכת תומכים ביישומים חוסמי פרסומות</string>
     <string name="settings_hosts_toast">הוספת מודול מארחים חסרי מערכת</string>
     <string name="settings_app_name_label_hint">שם חדש</string>
-    <string name="settings_app_name_helper">היישום יארז מחדש בשם זה</string>
+    <string name="settings_app_name_label_helper">היישום יארז מחדש בשם זה</string>
     <string name="settings_app_name_error">פורמט לא חוקי</string>
     <string name="settings_su_app_adb">יישומים ו-ADB</string>
     <string name="settings_su_app">יישומים בלבד</string>

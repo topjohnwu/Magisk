@@ -144,7 +144,7 @@
     <string name="settings_hosts_summary">Поддръжка на безсистемни хостове, ползвани от приложения за спиране на реклами</string>
     <string name="settings_hosts_toast">Модулът за безсистемни хостове е добавен</string>
     <string name="settings_app_name_label_hint">Ново име</string>
-    <string name="settings_app_name_helper">Приложението ще бъде пакетирано с това име</string>
+    <string name="settings_app_name_label_helper">Приложението ще бъде пакетирано с това име</string>
     <string name="settings_app_name_error">Форматът е недействителен</string>
     <string name="settings_su_app_adb">Приложения и ADB</string>
     <string name="settings_su_app">Само приложения</string>

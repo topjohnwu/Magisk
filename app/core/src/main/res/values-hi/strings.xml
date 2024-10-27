@@ -142,7 +142,7 @@
     <string name="settings_hosts_summary">विज्ञापन ब्लॉक ऐप्स के लिए सिस्टमलेस होस्ट समर्थन:</string>
     <string name="settings_hosts_toast">सिस्टमलेस होस्ट मॉड्यूल जोड़ा गया</string>
     <string name="settings_app_name_label_hint">नया नाम</string>
-    <string name="settings_app_name_helper">इस नाम से ऐप को फिर से इंस्टॉल किया जाएगा</string>
+    <string name="settings_app_name_label_helper">इस नाम से ऐप को फिर से इंस्टॉल किया जाएगा</string>
     <string name="settings_app_name_error">अवैध प्रारूप</string>
     <string name="settings_su_app_adb">ऐप्स और एडीबी</string>
     <string name="settings_su_app">केवल ऐप्स</string>
