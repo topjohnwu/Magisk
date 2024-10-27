@@ -221,8 +221,8 @@ object AppMigration {
             val isPkgIdInUse = pkgCheckResult.out.contains("package:$pkg")
             if(isPkgIdInUse) {
                 android.app.AlertDialog.Builder(activity)
-                    .setTitle("Package ID Collision")
-                    .setMessage("Package with ID $pkg already exists on system. Please choose another.")
+                    .setTitle(R.string.hide_app_package_collision_dialog_title)
+                    .setMessage(activity.getString(R.string.hide_app_package_collision_dialog_message, pkg))
                     .setPositiveButton(R.string.close) { dialog, _ ->
                         dialog.dismiss()
                     }
@@ -232,8 +232,8 @@ object AppMigration {
         } else {
             Timber.e("Error running $listPkgsCmd. err=${pkgCheckResult.err}")
             android.app.AlertDialog.Builder(activity)
-                .setTitle("Package ID Check Failed")
-                .setMessage("An error occurred when looking for packages with id $pkg. Please try again.")
+                .setTitle(R.string.hide_app_package_error_dialog_title)
+                .setMessage(activity.getString(R.string.hide_app_package_error_dialog_message, pkg))
                 .setPositiveButton(R.string.close) { dialog, _ ->
                     dialog.dismiss()
                 }

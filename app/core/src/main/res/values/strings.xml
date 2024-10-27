@@ -223,6 +223,10 @@
     <string name="done_action">Done running action of %1$s</string>
     <string name="failure">Failed!</string>
     <string name="hide_app_title">Hiding the Magisk app…</string>
+    <string name="hide_app_package_collision_dialog_title">Package ID Collision</string>
+    <string name="hide_app_package_collision_dialog_message">Package with ID %s already exists on system. Please choose another.</string>
+    <string name="hide_app_package_error_dialog_title">Package ID Check Failed</string>
+    <string name="hide_app_package_error_dialog_message">An error occurred when looking for packages with id %s. Please try again.</string>
     <string name="open_link_failed_toast">No app found to open the link</string>
     <string name="complete_uninstall">Complete Uninstall</string>
     <string name="restore_img">Restore Images</string>
