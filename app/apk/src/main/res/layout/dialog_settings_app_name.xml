@@ -47,7 +47,6 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- TODO Fix the label/hint to say what the field is, not just (random) -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/dialog_app_name_pkg_textinputlayout"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
