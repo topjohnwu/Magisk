@@ -122,7 +122,6 @@
     <string name="settings_download_path_title">Letöltési útvonal</string>
     <string name="settings_download_path_message">A fájlok a következő helyre kerülnek: %1$s</string>
     <string name="settings_hide_app_title">A Magisk app elrejtése</string>
-    <string name="settings_hide_app_summary">Telepíts egy proxyalkalmazást véletlenszerű csomagazonosítóval és egyéni alkalmazáscímkével</string>
     <string name="settings_restore_app_title">A Magisk app visszaállítása</string>
     <string name="settings_restore_app_summary">Oldja fel az app elrejtését, és állítsa vissza az eredeti APK-t</string>
     <string name="language">Nyelv</string>

@@ -120,7 +120,6 @@
     <string name="settings_download_path_title">Allalaadimise failitee</string>
     <string name="settings_download_path_message">Failid salvestatakse kausta %1$s</string>
     <string name="settings_hide_app_title">Peida Magiski rakendus</string>
-    <string name="settings_hide_app_summary">Paigalda juhusliku paketi-ID ja kohandatud nimega puhverrakendus</string>
     <string name="settings_restore_app_title">Taasta Magiski rakendus</string>
     <string name="settings_restore_app_summary">Too rakendus peidust välja, taastades originaalse APK</string>
     <string name="language">Keel</string>

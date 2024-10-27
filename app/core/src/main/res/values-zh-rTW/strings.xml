@@ -124,7 +124,6 @@
     <string name="settings_download_path_title">下載路徑</string>
     <string name="settings_download_path_message">檔案將被儲存在：%1$s</string>
     <string name="settings_hide_app_title">隱藏 Magisk</string>
-    <string name="settings_hide_app_summary">安裝一個隨機套件名稱和客製化應用程式名稱的代理應用程式</string>
     <string name="settings_restore_app_title">還原 Magisk</string>
     <string name="settings_restore_app_summary">取消隱藏並還原為原始套件</string>
     <string name="language">語言</string>

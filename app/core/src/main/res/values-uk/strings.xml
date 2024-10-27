@@ -117,7 +117,6 @@
     <string name="settings_download_path_title">Шлях завантаження</string>
     <string name="settings_download_path_message">Файли зберігатимуться в %1$s</string>
     <string name="settings_hide_app_title">Сховати застосунок Magisk</string>
-    <string name="settings_hide_app_summary">Встановити проксі-застосунок з довільним ID пакунку та назвою</string>
     <string name="settings_restore_app_title">Відновити застосунок Magisk</string>
     <string name="settings_restore_app_summary">Відновити застосунок з оригінального APK та показати його</string>
     <string name="language">Мова</string>

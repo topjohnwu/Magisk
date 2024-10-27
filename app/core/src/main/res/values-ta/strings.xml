@@ -116,7 +116,6 @@
     <string name="settings_download_path_title">பதிவிறக்க இடம்</string>
     <string name="settings_download_path_message">%1$s ல் கோப்புகள் சேமிக்கப்படும்</string>
     <string name="settings_hide_app_title">மேஜிஸ்க் செயலியை மறைக்கவும்</string>
-    <string name="settings_hide_app_summary">சீரற்ற தொகுப்பு ஐடி மற்றும் தனிப்பயன் பயன்பாட்டு லேபிளுடன் ப்ராக்ஸி பயன்பாட்டை நிறுவவும்</string>
     <string name="settings_restore_app_title">மேஜிஸ்க் பயன்பாட்டை மீட்டமை</string>
     <string name="settings_restore_app_summary">பயன்பாட்டை மறைத்து, அசல் APK க்கு மீண்டும் மீட்டமைக்கவும்</string>
     <string name="language">மொழி</string>

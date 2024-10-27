@@ -120,7 +120,6 @@
     <string name="settings_download_path_title">Download path</string>
     <string name="settings_download_path_message">Files will be saved to %1$s</string>
     <string name="settings_hide_app_title">Hide the Magisk app</string>
-    <string name="settings_hide_app_summary">Install a proxy app with a random package ID and custom app label</string>
     <string name="settings_restore_app_title">Restore the Magisk app</string>
     <string name="settings_restore_app_summary">Unhide the app and restore the original APK</string>
     <string name="language">Language</string>

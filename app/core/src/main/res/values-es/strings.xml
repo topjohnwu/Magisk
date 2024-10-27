@@ -125,7 +125,6 @@
     <string name="settings_download_path_title">Ruta de descarga</string>
     <string name="settings_download_path_message">Los archivos serán guardados en la siguiente ruta:\n%1$s</string>
     <string name="settings_hide_app_title">Ocultar la app de Magisk</string>
-    <string name="settings_hide_app_summary">Instalar una versión proxy de la app con un nombre de paquete aleatorio y una etiqueta personalizada</string>
     <string name="settings_restore_app_title">Restaurar la app</string>
     <string name="settings_restore_app_summary">Desoculta la app y la reemplaza por la original</string>
     <string name="language">Idioma</string>

@@ -121,7 +121,6 @@
     <string name="settings_download_path_title">পাথ ডাউনলোড করুন</string>
     <string name="settings_download_path_message">ফাইলগুলি %1$s এ সংরক্ষণ করা হবে৷</string>
     <string name="settings_hide_app_title">ম্যাজিস্ক অ্যাপটি লুকান</string>
-    <string name="settings_hide_app_summary">একটি র্যান্ডম প্যাকেজ আইডি এবং কাস্টম অ্যাপ লেব সহ একটি প্রক্সি অ্যাপ ইনস্টল করুনl</string>
     <string name="settings_restore_app_title">ম্যাজিস্ক অ্যাপটি পুনরুদ্ধার করুন</string>
     <string name="settings_restore_app_summary">অ্যাপটি আড়াল করুন এবং আসলটি পুনরুদ্ধার করুন</string>
     <string name="language">ভাষা</string>

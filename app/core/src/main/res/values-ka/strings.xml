@@ -116,7 +116,6 @@
     <string name="settings_download_path_title">გადმოწერის ლოკაცია</string>
     <string name="settings_download_path_message">ფაილები შეინახება %1$s-ში</string>
     <string name="settings_hide_app_title">Magisk-ის აპის დამალვა</string>
-    <string name="settings_hide_app_summary">დაყენდეს ამოუცნობელი აპი შემთხვევითი პაკეტის ID-ით და განსხვავებული სახელით</string>
     <string name="settings_restore_app_title">Magisk-ის აპის დაბრუნება</string>
     <string name="settings_restore_app_summary">აპის თავდაპირველ მდგომარეობაზე დაბრუნება</string>
     <string name="language">ენა</string>

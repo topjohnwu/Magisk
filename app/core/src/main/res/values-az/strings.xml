@@ -126,7 +126,6 @@
     <string name="settings_download_path_title">Endirmə yolu</string>
     <string name="settings_download_path_message">Fayllar %1$s\'a yerləşdiriləcək</string>
     <string name="settings_hide_app_title">Magisk tətbiqini gizlət</string>
-    <string name="settings_hide_app_summary">Təsadüfi paket ID\'si ilə proxy yüklə və özəl tətbiq adı yaz</string>
     <string name="settings_restore_app_title">Magisk tətbiqini bərpa et</string>
     <string name="settings_restore_app_summary">Tətbiqi üzə çıxar və orijinal APKnı bərpa et</string>
     <string name="language">Dil</string>

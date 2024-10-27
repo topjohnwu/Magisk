@@ -124,7 +124,6 @@
     <string name="settings_download_path_title">Папка за изтегляния</string>
     <string name="settings_download_path_message">Файловете ще бъдат запазвани в %1$s</string>
     <string name="settings_hide_app_title">Скриване на приложението на Magisk</string>
-    <string name="settings_hide_app_summary">Инсталира междинно приложение с произволен идестификатор и име</string>
     <string name="settings_restore_app_title">Възстановяване на приложението на Magisk</string>
     <string name="settings_restore_app_summary">Показва и възстановява оригиналното приложение</string>
     <string name="language">Език</string>

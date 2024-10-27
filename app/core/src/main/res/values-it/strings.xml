@@ -122,7 +122,6 @@
     <string name="settings_download_path_title">Percorso di download</string>
     <string name="settings_download_path_message">I file verranno salvati in %1$s</string>
     <string name="settings_hide_app_title">Nascondi l\'app di Magisk</string>
-    <string name="settings_hide_app_summary">Installa un\'app \"proxy\" con un ID pacchetto casuale e un nome personalizzato</string>
     <string name="settings_restore_app_title">Ripristina l\'app di Magisk</string>
     <string name="settings_restore_app_summary">Rendi l\'app nuovamente rilevabile e ripristina l\'APK originale</string>
     <string name="language">Lingua</string>

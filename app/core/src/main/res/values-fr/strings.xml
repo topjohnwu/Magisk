@@ -128,7 +128,6 @@
     <string name="settings_download_path_title">Répertoire de téléchargement</string>
     <string name="settings_download_path_message">Les fichiers seront enregistrés sous %1$s</string>
     <string name="settings_hide_app_title">Masquer l’application Magisk</string>
-    <string name="settings_hide_app_summary">Installer une application intermédiaire avec un identifiant de paquet aléatoire et un nom personnalisé</string>
     <string name="settings_restore_app_title">Restaurer l’application Magisk</string>
     <string name="settings_restore_app_summary">Démasquer l’application et la restaurer comme son APK d’origine.</string>
     <string name="language">Langue</string>

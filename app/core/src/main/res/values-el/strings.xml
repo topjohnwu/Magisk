@@ -122,7 +122,7 @@
     <string name="settings_download_path_title">Διαδρομή λήψης</string>
     <string name="settings_download_path_message">Τα αρχεία θα αποθηκευτούν στο %1$s</string>
     <string name="settings_hide_app_title">Απόκρυψη της εφαρμογής Magisk</string>
-    <string name="settings_hide_app_summary">Εγκαταστήστε μια εφαρμογή με τυχαίο αναγνωριστικό πακέτου και προσαρμοσμένη ετικέτα εφαρμογής</string>
+    <string name="settings_hide_app_summary">" "</string>
     <string name="settings_restore_app_title">Επαναφέρετε την εφαρμογή Magisk</string>
     <string name="settings_restore_app_summary">Καταργήστε την απόκρυψη της εφαρμογής και επαναφέρετέ την στο αρχικό APK</string>
     <string name="language">Γλώσσα</string>

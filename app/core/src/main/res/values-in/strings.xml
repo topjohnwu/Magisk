@@ -124,7 +124,6 @@
     <string name="settings_download_path_title">Lokasi unduhan</string>
     <string name="settings_download_path_message">File akan disimpan ke %1$s</string>
     <string name="settings_hide_app_title">Sembunyikan aplikasi Magisk</string>
-    <string name="settings_hide_app_summary">Pasang aplikasi proxy dengan ID paket acak dan label aplikasi khusus</string>
     <string name="settings_restore_app_title">Pulihkan aplikasi Magisk</string>
     <string name="settings_restore_app_summary">Tampilkan aplikasi and pulihkan APK asli</string>
     <string name="language">Bahasa</string>

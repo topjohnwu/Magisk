@@ -126,7 +126,6 @@
     <string name="settings_download_path_title">נתיב הורדה</string>
     <string name="settings_download_path_message">הקבצים ישמרו אל %1$s</string>
     <string name="settings_hide_app_title">הסתרת היישום Magisk</string>
-    <string name="settings_hide_app_summary">התקנת יישום מתווך עם מזהה חבילה אקראי ותווית שם מותאמת אישית</string>
     <string name="settings_restore_app_title">שיחזור היישום Magisk</string>
     <string name="settings_restore_app_summary">יש לבטל את הסתרת היישום ולשחזור אותו ל-APK המקורי</string>
     <string name="language">שפה</string>

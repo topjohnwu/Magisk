@@ -122,7 +122,6 @@
     <string name="settings_download_path_title">डाउनलोड पथ</string>
     <string name="settings_download_path_message">फ़ाइलों को %1$s में सहेजा जाएगा</string>
     <string name="settings_hide_app_title">मैजिस्क ऐप को छिपाएं</string>
-    <string name="settings_hide_app_summary">रैंडम पैकेज आईडी और कस्टम ऐप लेबल के साथ प्रॉक्सी ऐप इंस्टॉल करें</string>
     <string name="settings_restore_app_title">मैजिस्क ऐप को पुनर्स्थापित करें</string>
     <string name="settings_restore_app_summary">ऐप को उनहीदे करें और मूल एपीके को पुनर्स्थापित करें</string>
     <string name="language">भाषा</string>

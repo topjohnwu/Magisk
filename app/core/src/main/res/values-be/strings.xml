@@ -106,7 +106,6 @@
     <string name="settings_download_path_title">Каталог спамповак</string>
     <string name="settings_download_path_message">Файлы будуць спампоўвацца ў %1$s</string>
     <string name="settings_hide_app_title">Схаваць праграму Magisk</string>
-    <string name="settings_hide_app_summary">Усталяваць проксі-праграму з выпадковым ідэнтыфікатарам пакунка і адвольным значком</string>
     <string name="settings_restore_app_title">Аднавіць праграму Magisk</string>
     <string name="settings_restore_app_summary">Вярнуць праграму да зыходнага стану</string>
     <string name="language">Мова</string>

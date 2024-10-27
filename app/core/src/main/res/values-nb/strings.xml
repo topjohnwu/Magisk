@@ -116,7 +116,6 @@
     <string name="settings_download_path_title">Nedlastingssti</string>
     <string name="settings_download_path_message">Filer vil lagres i %1$s</string>
     <string name="settings_hide_app_title">Skjul Magisk-programmet</string>
-    <string name="settings_hide_app_summary">Installer et mellomtjenerprogram med tilfeldig pakke-ID og egendefinert program-etikett</string>
     <string name="settings_restore_app_title">Gjenopprett Magisk-programmet</string>
     <string name="settings_restore_app_summary">Opphev skjuling av programmet og gjenopprett det tilbake til opprinnelig APK</string>
     <string name="language">Språk</string>

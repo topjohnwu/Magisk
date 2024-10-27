@@ -127,7 +127,6 @@
     <string name="settings_download_path_title">Složka pro stahování</string>
     <string name="settings_download_path_message">Soubory budou uloženy do %1$s.</string>
     <string name="settings_hide_app_title">Skrýt aplikaci Magisk</string>
-    <string name="settings_hide_app_summary">Skryje aplikaci náhodným ID balíčku a vlastním názvem aplikace</string>
     <string name="settings_restore_app_title">Obnovit aplikaci Magisk</string>
     <string name="settings_restore_app_summary">Obnoví aplikaci zpět do původního APK</string>
     <string name="language">Jazyk</string>

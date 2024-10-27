@@ -128,7 +128,6 @@
     <string name="settings_download_path_title">Cesta na sťahovanie</string>
     <string name="settings_download_path_message">Súbory budú uložené do %1$s</string>
     <string name="settings_hide_app_title">Skryť aplikáciu Magisk</string>
-    <string name="settings_hide_app_summary">Inštalovať proxy aplikáciu s náhodným ID balíčka a vlastným názvom aplikácie</string>
     <string name="settings_restore_app_title">Obnoviť aplikáciu Magisk</string>
     <string name="settings_restore_app_summary">Odkryť aplikáciu a obnoviť pôvodný súbor APK</string>
     <string name="language">Jazyk</string>

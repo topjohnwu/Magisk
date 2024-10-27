@@ -122,7 +122,6 @@
     <string name="settings_download_path_title">ഡൗൺലോഡ് സ്ഥലം</string>
     <string name="settings_download_path_message">ഫയലുകൾ %1$s-ലേക്ക് സേവ് ചെയ്യപ്പെടും</string>
     <string name="settings_hide_app_title">മജിസ്‌ക് ആപ്പ് മറയ്ക്കുക</string>
-    <string name="settings_hide_app_summary">ക്രമരഹിതമായ പാക്കേജ് ഐഡിയും ഇഷ്‌ടാനുസൃത ആപ്പ് ലേബലും ഉള്ള ഒരു പ്രോക്‌സി ആപ്പ് ഇൻസ്‌റ്റാൾ ചെയ്യുക</string>
     <string name="settings_restore_app_title">മജിസ്‌ക് ആപ്പ് പുനഃസ്ഥാപിക്കുക</string>
     <string name="settings_restore_app_summary">ആപ്പ് മറച്ചത് മാറ്റി യഥാർത്ഥ APK പുനഃസ്ഥാപിക്കുക</string>
     <string name="language">ഭാഷ</string>

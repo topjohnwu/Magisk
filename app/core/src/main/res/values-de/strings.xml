@@ -127,7 +127,6 @@
     <string name="settings_download_path_title">Download-Verzeichnis</string>
     <string name="settings_download_path_message">Dateien werden in %1$s gespeichert</string>
     <string name="settings_hide_app_title">Magisk-App verstecken</string>
-    <string name="settings_hide_app_summary">Proxy-App mit zufälliger Paket-ID und benutzerdefiniertem App-Label installieren</string>
     <string name="settings_restore_app_title">Magisk-App wiederherstellen</string>
     <string name="settings_restore_app_summary">App wieder einblenden und original APK wiederherstellen</string>
     <string name="language">Sprache</string>

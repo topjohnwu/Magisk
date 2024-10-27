@@ -120,7 +120,6 @@
     <string name="settings_download_path_title">다운로드 경로</string>
     <string name="settings_download_path_message">파일이 %1$s에 저장됩니다</string>
     <string name="settings_hide_app_title">Magisk 앱 숨기기</string>
-    <string name="settings_hide_app_summary">랜덤 패키지 ID와 커스텀 앱 이름으로 Magisk 프록시 앱을 설치합니다.</string>
     <string name="settings_restore_app_title">Magisk 앱 복원</string>
     <string name="settings_restore_app_summary">앱 숨기기를 해제하고 원래 APK로 복원합니다.</string>
     <string name="language">언어</string>

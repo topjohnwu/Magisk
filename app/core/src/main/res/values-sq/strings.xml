@@ -1,7 +1,6 @@
 <resources>
 
     <!--Sections-->
-    <string name="modules">Modulet</string>
     <string name="superuser">Super-përdoruesi</string>
     <string name="logs">Regjistrat</string>
     <string name="settings">Cilësimet</string>
@@ -126,7 +125,6 @@
     <string name="settings_download_path_title">Vendodhje e shkarkimit</string>
     <string name="settings_download_path_message">Shkarkimet do të ruhen në %1$s</string>
     <string name="settings_hide_app_title">Fsheh aplikacionin Magisk</string>
-    <string name="settings_hide_app_summary">Instaloni një aplikacion përfaqësues me ID të paketës të rastësishme dhe etiketë të personalizuar të aplikacionitl</string>
     <string name="settings_restore_app_title">Rivendosni aplikacionin Magisk</string>
     <string name="settings_restore_app_summary">un-fsheh aplikacionin dhe riktheni atë në APK origjinale</string>
     <string name="language">Gjuha</string>

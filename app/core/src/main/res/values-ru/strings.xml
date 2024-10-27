@@ -124,7 +124,6 @@
     <string name="settings_download_path_title">Папка для загрузок</string>
     <string name="settings_download_path_message">Файлы будут загружаться в %1$s</string>
     <string name="settings_hide_app_title">Скрытие приложения Magisk</string>
-    <string name="settings_hide_app_summary">Пересобрать приложение Magisk с другим названием и случайным именем пакета</string>
     <string name="settings_restore_app_title">Восстановление приложения Magisk</string>
     <string name="settings_restore_app_summary">Восстановить приложение Magisk к исходному состоянию</string>
     <string name="language">Язык</string>

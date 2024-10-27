@@ -115,7 +115,6 @@
     <string name="settings_download_path_title">Nedladdningsmapp</string>
     <string name="settings_download_path_message">Filer kommer att spara till %1$s</string>
     <string name="settings_hide_app_title">Göm Magisk-appen</string>
-    <string name="settings_hide_app_summary">Installera en proxy-app med ett slumpmässigt paket-ID och appnamn</string>
     <string name="settings_restore_app_title">Återställ Magisk-appen</string>
     <string name="settings_restore_app_summary">Ta bort proxy-appen och återställ den ursprungliga APK filen</string>
     <string name="language">Språk</string>

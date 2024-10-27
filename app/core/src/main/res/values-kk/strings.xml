@@ -128,7 +128,6 @@
     <string name="settings_download_path_title">Жүктеу бумасы</string>
     <string name="settings_download_path_message">Файлдар %1$s бумасына сақталады</string>
     <string name="settings_hide_app_title">Magisk қолданбасын жасыру</string>
-    <string name="settings_hide_app_summary">Қолданба атауын өзгертіп, кездейсоқ десте атауы бар APK файлын құрастыру</string>
     <string name="settings_restore_app_title">Magisk қолданбасын қалпына келтіру</string>
     <string name="settings_restore_app_summary">Қолданбаны жасырын күйден шығарып, түпнұсқа APK орнату</string>
     <string name="language">Тіл</string>

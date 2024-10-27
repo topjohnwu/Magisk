@@ -112,7 +112,6 @@
     <string name="settings_download_path_title">Camín de les descargues</string>
     <string name="settings_download_path_message">Los ficheros van guardase en «%1$s»</string>
     <string name="settings_hide_app_title">Anubrir Magisk</string>
-    <string name="settings_hide_app_summary">Instala una aplicación intermedia con una ID y una etiqueta al debalu</string>
     <string name="settings_restore_app_title">Restaurar el mou visible</string>
     <string name="settings_restore_app_summary">Fai que l\'aplicación orixinal vuelva ser visible</string>
     <string name="language">Llingua</string>

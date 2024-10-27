@@ -122,7 +122,6 @@
     <string name="settings_download_path_title">ファイルの保存場所</string>
     <string name="settings_download_path_message">ファイルは %1$s に保存されます</string>
     <string name="settings_hide_app_title">Magisk アプリを隠す</string>
-    <string name="settings_hide_app_summary">ランダムなパッケージ ID と任意のアプリ名のプロキシアプリをインストールします</string>
     <string name="settings_restore_app_title">Magisk アプリを復元する</string>
     <string name="settings_restore_app_summary">隠すのを止めて、元の APK をインストールします</string>
     <string name="language">言語 (Language)</string>

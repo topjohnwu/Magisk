@@ -129,7 +129,6 @@
     <string name="settings_download_path_title">下载路径</string>
     <string name="settings_download_path_message">文件将保存到 %1$s</string>
     <string name="settings_hide_app_title">隐藏 Magisk 应用</string>
-    <string name="settings_hide_app_summary">安装具有随机包名和自定义应用名称的代理应用</string>
     <string name="settings_restore_app_title">还原 Magisk 应用</string>
     <string name="settings_restore_app_summary">取消隐藏，恢复到原始应用</string>
     <string name="language">语言</string>

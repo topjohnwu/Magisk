@@ -128,7 +128,6 @@
     <string name="settings_download_path_title">Cale de descărcare</string>
     <string name="settings_download_path_message">Fișierele vor fi salvate în %1$s</string>
     <string name="settings_hide_app_title">Ascunde aplicația Magisk</string>
-    <string name="settings_hide_app_summary">Instalează o aplicație proxy cu ID aleatoriu pentru pachet și etichetă personalizată pentru aplicație</string>
     <string name="settings_restore_app_title">Restaurează aplicația Magisk</string>
     <string name="settings_restore_app_summary">Dezvăluie aplicația și restaurează APK-ul original</string>
     <string name="language">Limbă</string>

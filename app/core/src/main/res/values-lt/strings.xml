@@ -124,7 +124,6 @@
     <string name="settings_download_path_title">Atsisiuntimo kelias</string>
     <string name="settings_download_path_message">Failai bus išsaugoti %1$s</string>
     <string name="settings_hide_app_title">Slėpti Magisk programėlę</string>
-    <string name="settings_hide_app_summary">Įdiegti įgaliotąją programėlę su atsitiktiniu paketo ID ir kitu pavadinimu</string>
     <string name="settings_restore_app_title">Atkurti Magisk programėlę</string>
     <string name="settings_restore_app_summary">Atkurti programėlę ir originalų APK</string>
     <string name="language">Kalba</string>

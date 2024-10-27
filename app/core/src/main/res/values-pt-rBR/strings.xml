@@ -125,7 +125,6 @@
     <string name="settings_download_path_title">Caminho para baixar</string>
     <string name="settings_download_path_message">Os arquivos serão salvos em %1$s</string>
     <string name="settings_hide_app_title">Ocultar app do Magisk</string>
-    <string name="settings_hide_app_summary">Instala o app oculto com ID aleatório e nome personalizado</string>
     <string name="settings_restore_app_title">Restaurar app do Magisk</string>
     <string name="settings_restore_app_summary">Desoculta o app do Magisk e restaura o APK original</string>
     <string name="language">Idioma</string>
