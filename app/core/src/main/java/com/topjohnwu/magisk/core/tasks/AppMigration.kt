@@ -188,7 +188,6 @@ object AppMigration {
 
         // Generate a new package name and signature
         val repack = File(activity.cacheDir, "patched.apk")
-        // TODO: Add some checks that a non-null pkg is a valid package name!
         val pkgToUse = pkg ?: genPackageName()
         Config.keyStoreRaw = ""
 
@@ -215,8 +214,40 @@ object AppMigration {
         return true
     }
 
+    private fun isPkgIdInUse(activity: Activity, pkg: String) : Boolean {
+        val listPkgsCmd = "pm list packages $pkg"
+        val pkgCheckResult = Shell.cmd(listPkgsCmd).exec()
+        return if (pkgCheckResult.isSuccess) {
+            val isPkgIdInUse = pkgCheckResult.out.contains("package:$pkg")
+            if(isPkgIdInUse) {
+                android.app.AlertDialog.Builder(activity)
+                    .setTitle("Package ID Collision")
+                    .setMessage("Package with ID $pkg already exists on system. Please choose another.")
+                    .setPositiveButton(R.string.close) { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    .show()
+            }
+            isPkgIdInUse
+        } else {
+            Timber.e("Error running $listPkgsCmd. err=${pkgCheckResult.err}")
+            android.app.AlertDialog.Builder(activity)
+                .setTitle("Package ID Check Failed")
+                .setMessage("An error occurred when looking for packages with id $pkg. Please try again.")
+                .setPositiveButton(R.string.close) { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .show()
+            false
+        }
+    }
+
     @Suppress("DEPRECATION")
     suspend fun hide(activity: Activity, label: String, pkg: String?) {
+        if(pkg != null && isPkgIdInUse(activity, pkg)) {
+            return
+        }
+
         val dialog = android.app.ProgressDialog(activity).apply {
             setTitle(activity.getString(R.string.hide_app_title))
             isIndeterminate = true
