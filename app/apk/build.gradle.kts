@@ -1,3 +1,6 @@
+import com.android.build.api.instrumentation.FramesComputationMode.COMPUTE_FRAMES_FOR_INSTRUMENTED_METHODS
+import com.android.build.api.instrumentation.InstrumentationScope
+
 plugins {
     id("com.android.application")
     kotlin("android")
@@ -45,6 +48,14 @@ android {
 
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
+    }
+
+    androidComponents {
+        onVariants {
+            it.instrumentation.setAsmFramesComputationMode(COMPUTE_FRAMES_FOR_INSTRUMENTED_METHODS)
+            it.instrumentation.transformClassesWith(
+                DesugarClassVisitorFactory::class.java, InstrumentationScope.ALL) {}
+        }
     }
 }
 
