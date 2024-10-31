@@ -236,6 +236,9 @@ bool check_two_stage() {
         return true;
     if (access("/system/bin/init", F_OK) == 0)
         return true;
+    // Use the apex folder to determine whether 2SI (Android 10+)
+    if (access("/apex", F_OK) == 0)
+        return true;
     // If we still have no indication, parse the original init and see what's up
     mmap_data init(backup_init());
     return init.contains("selinux_setup");
