@@ -2,7 +2,7 @@
 
 ### v28.0
 
-- [General] Support 16k page size
+- [General] Support 16k page 
 - [General] Add basic support for RISC-V (not built in releases)
 - [General] Use a minimal libc to build static executables (`magiskinit` and `magiskboot`) for smaller sizes
 - [Core] Remove unnecessary mirror for magic mount
