@@ -827,7 +827,8 @@
 - Add systemless host support for AdBlock Apps (enabled by default)
 - Add support for new root disable method
 - Remove sepolicy patches that uses SuperSU's supolicy tool; it is now using a minimal set of modifications
-- Removed Magisk Manager in Magisk patch, it is now included in Magisk phh's superuser only
+- Removed Magisk Man![1000005027](https://github.com/user-attachments/assets/3f33553c-12de-40a6-8aa4-246106525c84)
+ager in Magisk patch, it is now included in Magisk phh's superuser only
 
 ### v1
 
