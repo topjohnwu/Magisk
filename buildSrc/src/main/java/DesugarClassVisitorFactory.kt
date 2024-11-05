@@ -7,7 +7,7 @@ import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Opcodes.ASM9
 
-private const val DESUGAR_CLASS_NAME = "com/topjohnwu/magisk/core/utils/Desugar"
+private const val DESUGAR_CLASS_NAME = "com.topjohnwu.magisk.core.utils.Desugar"
 private const val ZIP_ENTRY_GET_TIME_DESC = "()Ljava/nio/file/attribute/FileTime;"
 private const val DESUGAR_GET_TIME_DESC = "(Ljava/util/zip/ZipEntry;)Ljava/nio/file/attribute/FileTime;"
 
@@ -19,7 +19,7 @@ abstract class DesugarClassVisitorFactory : AsmClassVisitorFactory<Instrumentati
         return DesugarClassVisitor(nextClassVisitor)
     }
 
-    override fun isInstrumentable(classData: ClassData) = true
+    override fun isInstrumentable(classData: ClassData) = classData.className != DESUGAR_CLASS_NAME
 
     class DesugarClassVisitor(cv: ClassVisitor) : ClassVisitor(ASM9, cv) {
         override fun visitMethod(
@@ -53,7 +53,7 @@ abstract class DesugarClassVisitorFactory : AsmClassVisitorFactory<Instrumentati
                 "getLastModifiedTime", "getLastAccessTime", "getCreationTime" -> {
                     mv.visitMethodInsn(
                         Opcodes.INVOKESTATIC,
-                        DESUGAR_CLASS_NAME,
+                        DESUGAR_CLASS_NAME.replace('.', '/'),
                         name,
                         DESUGAR_GET_TIME_DESC,
                         false
