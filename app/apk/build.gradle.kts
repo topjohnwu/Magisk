@@ -1,6 +1,3 @@
-import com.android.build.api.instrumentation.FramesComputationMode.COMPUTE_FRAMES_FOR_INSTRUMENTED_METHODS
-import com.android.build.api.instrumentation.InstrumentationScope
-
 plugins {
     id("com.android.application")
     kotlin("android")
@@ -9,7 +6,7 @@ plugins {
     id("androidx.navigation.safeargs.kotlin")
 }
 
-setupAppCommon()
+setupMainApk()
 
 kapt {
     correctErrorTypes = true
@@ -21,41 +18,12 @@ kapt {
 }
 
 android {
-    namespace = "com.topjohnwu.magisk"
-
-    defaultConfig {
-        applicationId = "com.topjohnwu.magisk"
-        vectorDrawables.useSupportLibrary = true
-        versionName = Config.version
-        versionCode = Config.versionCode
-        ndk {
-            abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64", "riscv64")
-            debugSymbolLevel = "FULL"
-        }
-    }
-
-    buildTypes {
-        release {
-            isMinifyEnabled = true
-            isShrinkResources = true
-            proguardFiles("proguard-rules.pro")
-        }
-    }
-
     buildFeatures {
         dataBinding = true
     }
 
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
-    }
-
-    androidComponents {
-        onVariants {
-            it.instrumentation.setAsmFramesComputationMode(COMPUTE_FRAMES_FOR_INSTRUMENTED_METHODS)
-            it.instrumentation.transformClassesWith(
-                DesugarClassVisitorFactory::class.java, InstrumentationScope.ALL) {}
-        }
     }
 }
 
