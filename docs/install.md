@@ -126,7 +126,7 @@ Having KnoxGuard active will prevent you from installing/running Magisk regardle
 - Start the installation, and copy the patched tar file to your PC using ADB:<br>
   `adb pull /sdcard/Download/magisk_patched_[random_strings].tar`<br>
   **DO NOT USE MTP** as it is known to corrupt large files.
-- Reboot to download mode. Open Odin on your PC, and flash `magisk_patched.tar` as `AP`, together with `BL`, `CP`, and `CSC` (**NOT** `HOME_CSC` because we want to **wipe data**) from the original firmware.
+- Reboot to download mode. Open Odin on your PC, and flash `magisk_patched.tar` as `AP`, together with `BL`, `CP`, and `CSC` (**NOT** `USERDATA` because we want to **wipe data**) from the original firmware.
 - Your device should reboot automatically once Odin finished flashing. **Agree to do a factory reset if asked.**
 - If your device does **NOT** have boot ramdisk, reboot to recovery now to enable Magisk (reason stated in [Magisk in Recovery](#magisk-in-recovery)).
 - Install the Magisk app you've already downloaded and launch the app. It should show a dialog asking for additional setup.
@@ -134,7 +134,7 @@ Having KnoxGuard active will prevent you from installing/running Magisk regardle
 
 ### Upgrading the OS
 
-Once you have rooted your Samsung device, you can no longer upgrade your Android OS through OTA. To upgrade your device's OS, you have to manually download the new firmware zip file and go through the same `AP` patching process written in the previous section. **The only difference here is in the Odin flashing step: do NOT use the `CSC` tar, but instead use the `HOME_CSC` tar as we are performing an upgrade, not the initial install**.
+Once you have rooted your Samsung device, you can no longer upgrade your Android OS through OTA. To upgrade your device's OS, you have to manually download the new firmware zip file and go through the same `AP` patching process written in the previous section. **The only difference here is in the Odin flashing step: do NOT use the `CSC` tar, but instead use the `USERDATA` tar as we are performing an upgrade, not the initial install**.
 
 ### Important Notes
 
