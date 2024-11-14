@@ -1,3 +1,5 @@
+![IMG_20240930_070923](https://github.com/user-attachments/assets/4b275896-9f25-4fe7-b31b-c54b51521df0)
+![1731613829560508219913694039831](https://github.com/user-attachments/assets/0f089c92-7044-490b-9ef3-831d6780ab14)
 # Magisk Changelog
 
 ### v28.0
