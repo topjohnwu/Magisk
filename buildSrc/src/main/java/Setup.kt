@@ -315,10 +315,6 @@ fun Project.setupAppCommon() {
                     else signingConfigs["debug"]
                 }
             }
-            release {
-                isMinifyEnabled = true
-                isShrinkResources = true
-            }
         }
 
         lint {

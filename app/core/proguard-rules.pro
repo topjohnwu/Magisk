@@ -34,12 +34,8 @@
 -keep,allowobfuscation,allowshrinking class kotlin.coroutines.Continuation
 
 # Excessive obfuscation
--repackageclasses 'a'
+-flattenpackagehierarchy
 -allowaccessmodification
-
--obfuscationdictionary ../dict.txt
--classobfuscationdictionary ../dict.txt
--packageobfuscationdictionary ../dict.txt
 
 -dontwarn org.bouncycastle.jsse.BCSSLParameters
 -dontwarn org.bouncycastle.jsse.BCSSLSocket

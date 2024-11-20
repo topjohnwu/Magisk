@@ -25,6 +25,13 @@ android {
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
     }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
+        }
+    }
 }
 
 dependencies {
