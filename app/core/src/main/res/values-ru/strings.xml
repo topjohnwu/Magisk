@@ -87,6 +87,9 @@
     <string name="logs_cleared">Логи успешно очищены</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Целевой UID: %1$d</string>
+    <string name="target_pid">Целевой PID пространства имён: %s</string>
+    <string name="selinux_context">Контекст SELinux: %s</string>
+    <string name="supp_group">Дополнительная группа: %s</string>
 
     <!--SafetyNet-->
 
@@ -164,11 +167,16 @@
     <string name="settings_su_reauth_title">Повторная аутентификация</string>
     <string name="settings_su_reauth_summary">Повторный запрос прав суперпользователя после обновления приложений</string>
     <string name="settings_su_tapjack_title">Защита от перехвата нажатий</string>
+    <string name="settings_su_auth_title">Аутентификация пользователя</string>
+    <string name="settings_su_auth_summary">Требовать аутентификацию пользователя при запросах Superuser</string>
+    <string name="settings_su_auth_insecure">На устройстве не настроен метод аутентификации</string>
     <string name="settings_su_tapjack_summary">Окно запроса прав суперпользователя будет неактивно пока активированы наложения экрана</string>
     <string name="settings_customization">Персонализация</string>
     <string name="setting_add_shortcut_summary">Добавить ярлык на рабочий стол для удобного восприятия приложения после его скрытия</string>
     <string name="settings_doh_title">DNS поверх HTTPS</string>
     <string name="settings_doh_description">Активировать DoH (используйте при проблемах с подключением к сети)</string>
+    <string name="settings_random_name_title">Случайное имя образа</string>
+    <string name="settings_random_name_description">Генерировать случайные имена для патченных образов и tar-файлов для предотвращения обнаружения</string>
 
     <string name="multiuser_mode">Многопользовательский режим</string>
     <string name="settings_owner_only">Только администратор</string>
