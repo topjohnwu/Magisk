@@ -1,3 +1,4 @@
+![Screenshot_2024-11-26-20-47-39-458_com wmods wppenhacer](https://github.com/user-attachments/assets/eddfd87a-52be-46d7-94ca-9ea68341c299)
 # Magisk Changelog
 
 ### v28.0
