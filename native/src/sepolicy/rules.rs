@@ -101,9 +101,8 @@ impl SepolicyMagisk for sepolicy {
                 "system_app", "priv_app", "untrusted_app", "untrusted_app_all"],
                 [proc], ["unix_stream_socket"], ["connectto", "getopt"]);
 
-            // Let selected domains access tmpfs files
-            // For tmpfs overlay on 2SI, Zygisk on lower Android versions and AVD scripts
-            allow(["init", "zygote", "shell"], ["tmpfs"], ["file"], all);
+            // For tmpfs overlay on 2SI. We allow all domains to access tmpfs files.
+            allow(["domain"], ["tmpfs"], ["file"], all);
 
             // Allow magiskinit daemon to handle mock selinuxfs
             allow(["kernel"], ["tmpfs"], ["fifo_file"], ["write"]);
