@@ -1,67 +1,67 @@
-# Magisk Changelog
+#Magisk Changelog
 
-### v28.0
+###v28.0
 
-- [General] Support 16k page size
-- [General] Add basic support for RISC-V (not built in releases)
-- [General] Use a minimal libc to build static executables (`magiskinit` and `magiskboot`) for smaller sizes
-- [Core] Remove unnecessary mirror for magic mount
-- [Core] Update boot image detection logic to support more devices
-- [MagiskInit] Rewrite 2SI logic for injecting `magiskinit` as `init`
-- [MagiskInit] Update preinit partition detection
-- [Zygisk] Update internal JNI hooking implementation
-- [MagiskPolicy] Preserve sepolicy config flag after patching
-- [MagiskPolicy] Optimize patching rules to reduce the amount of new rules being injected
-- [DenyList] Support enforcing denylist when Zygisk is disabled
-- [Resetprop] Improve implementation to workaround several property modification detections
-- [Resetprop] Update to properly work with property overlays
-- [App] Major internal code refactoring
-- [App] Support patching Samsung firmware with images larger than 8GiB
-- [App] Use user-initiated job instead of foreground services on Android 14
-- [App] Support Android 13+ built-in per-app language preferences
-- [App] Add `action.sh` support to allow modules to define an action triggered from UI
-- [MagiskBoot] Support spliting kernel images without decompression
-- [MagiskBoot] Properly support vendor boot images
-- [MagiskBoot] Disable Samsung PROCA from kernel image
+- [一般的]支持16k页面大小
+- [一般的]添加对RISC-V(非内置版本)的基本支持
+- [一般的]使用最小的libc来构建静态可执行文件(`magiskinit`和`magiskboot`)对于较小尺寸
+- [核心]为魔术安装拆下不必要的镜子
+- [核心]更新启动映像检测逻辑以支持更多设备
+- [MagiskInit]重写2Si注入逻辑`magiskinit`作为`init`
+- [MagiskInit]更新preinit分区检测
+- [Zygisk]更新内部JNI挂钩实现
+- [MagiskPolicy]修补后保留sepolicy配置标志
+- [MagiskPolicy]优化修补规则以减少注入的新规则数量
+- [DenyList]Zygisk停用时支援强制执行Denylist
+- [Resetprop]解决多个属性修改检测的改进实现
+- [Resetprop]更新以正确使用特性覆盖
+--[App]主要内部代码重构[App] Major internal code refactoring
+--【应用程序】支持为大于8GiB图像的三星固件打补丁[App] Support patching Samsung firmware with images larger than 8GiB
+--[App]在Android14上使用用户发起的作业而不是前台服务[App] Use user-initiated job instead of foreground services on Android 14
+--[App]支持Android13+内置的每个App语言首选项[App] Support Android 13+ built-in per-app language preferences
+--[App]新增'action.sh'支援，允许模组定义UI触发的动作[App] Add `action.sh` support to allow modules to define an action triggered from UI
+--[MagiskBoot]支持无解压缩拆分内核映像[MagiskBoot] Support spliting kernel images without decompression
+--[MagiskBoot]正确支持供应商启动映像[MagiskBoot] Properly support vendor boot images
+--[MagiskBoot]从内核映像禁用Samsung Proca[MagiskBoot] Disable Samsung PROCA from kernel image
 
 ### v27.0
 
-- [Zygisk] Introduce new code injection mechanism
-- [Zygisk] Support new signature introduced in U QPR2
-- [SEPolicy] Update libsepol to properly set some policy config bits
-- [MagiskBoot] Support compressing `init` so Magisk is installable on devices with small boot partitions
-- [ResetProp] Add new wait for property feature `resetprop -w`
+--[Zygisk]引入新的代码注入机制[Zygisk] Introduce new code injection mechanism
+--[Zygisk]支持U QPR2中引入的新签名[Zygisk] Support new signature introduced in U QPR2
+--[Sepolicy]更新libspol以正确设置某些策略配置位[SEPolicy] Update libsepol to properly set some policy config bits
+--[MagiskBoot]支持压缩“init”，使Magisk可安装在具有小引导分区的设备上[MagiskBoot] Support compressing `init` so Magisk is installable on devices with small boot partitions
+--[ResetProp]添加新的等待属性功能“resetprop-w”[ResetProp] Add new wait for property feature `resetprop -w`
 
 ### v26.4
 
-- [MagiskBoot] Don't pad zeros if signed boot image is larger
-- [MagiskPolicy] Fix `genfscon` and `filename_trans`
-- [MagiskPolicy] Fix bug in `libsepol`
-- [Zygisk] Fix and simplify file descriptor sanitization logic
-- [App] Prevent OOM when patching AP tarfiles
-- [App] Fix bug in device configuration detection
-- [Daemon] Fix certificate parsing of APKs
-- [General] Fix logging errors from C++ code being ignored
+--[MagiskBoot]如果签名启动映像较大，请勿填充0[MagiskBoot] Don't pad zeros if signed boot image is larger
+--[MagiskPolicy]修复'genfscon'和'filename_trans'[MagiskPolicy] Fix `genfscon` and `filename_trans`
+--[MagiskPolicy]修复“libsepol”中的错误[MagiskPolicy] Fix bug in `libsepol`
+--[Zygisk]修复并简化文件描述符清理逻辑[Zygisk] Fix and simplify file descriptor sanitization logic
+--[App]在修补AP tarfile时防止OOM[App] Prevent OOM when patching AP tarfiles
+--[App]修复设备配置检测中的bug[App] Fix bug in device configuration detection
+--[Daemon]修复安装包的证书解析[Daemon] Fix certificate parsing of APKs
+--[常规]修复忽略的C++代码中的日志错误[General] Fix logging errors from C++ code being ignored
 
 ### v26.3
 
-- [General] Fix device information detection script
-- [General] Update BusyBox to 1.36.1
-- [General] Update toolchain that produces broken arm32 executables
-- [App] Fix root service unable to bind on OnePlus devices
+--[常规]修复设备信息检测脚本[General] Fix device information detection script
+--[常规]将BusyBox更新为1.36.1[General] Update BusyBox to 1.36.1
+--[常规]更新工具链，以生成损坏的arm32可执行文件[General] Update toolchain that produces broken arm32 executables
+--[App]修复根服务无法绑定到OnePlus设备[App] Fix root service unable to bind on OnePlus devices
 
 ### v26.2
 
-- [MagiskBoot] Support extracting boot image from `payload.bin`
-- [MagiskBoot] Support cpio files containing character files
-- [MagiskBoot] Support listing cpio content
-- [MagiskBoot] Directly handle AVB 1.0 signing and verification without going through Java implementation
-- [Daemon] Make daemon socket a fixed path in MAGISKTMP
-- [resetprop] Support printing property context
-- [resetprop] Support only printing persistent properties from storage
-- [resetprop] Properly support setting persistent properties bypassing property_service
-- [MagiskSU] Support `-g` and `-G` options
-- [MagiskSU] Support switching mount namespace to PID with `-t`
+--[MagiskBoot]支持从'payload.bin'提取启动映像[MagiskBoot] Support extracting boot image from `payload.bin`
+--[MagiskBoot]支持包含字符文件的cpio文件[MagiskBoot] Support cpio files containing character files
+--[MagiskBoot]支持列出cpio内容[MagiskBoot] Support listing cpio content
+--[MagiskBoot]直接处理AVB1.0签名和验证，无需经过Java实现[MagiskBoot] Directly handle AVB 1.0 signing and verification without going through Java implementation
+--[守护程序]在MAGISKTMP中将守护程序套接字设置为固定路径[Daemon] Make daemon socket a fixed path in MAGISKTMP
+--[resetprop]支持打印属性上下文[resetprop] Support printing property context
+--[resetprop]仅支持从存储打印永久属性[resetprop] Support only printing persistent properties from storage
+--[resetprop]正确支持设置永久属性绕过property_service[resetprop] Properly support setting persistent properties bypassing property_service
+--[MagiskSU]支持'-g'和'-G'选项[MagiskSU] Support `-g` and `-G` options
+--[MagiskSU]支持使用“-t”将装载命名空间切换到PID[MagiskSU] Support switching mount namespace to PID with `-t`
 - [MagiskPolicy] Fix patching extended permissions
 - [MagiskPolicy] Support more syntax for extended permissions
 - [MagiskPolicy] Support printing out the loaded sepolicy rules
