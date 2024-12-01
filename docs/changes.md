@@ -1,3 +1,4 @@
+[Uploading Magisk-v27.0.zip…]()
 # Magisk Changelog
 
 ### v28.0
