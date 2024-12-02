@@ -1,0 +1,89 @@
+#include <iostream>
+#include <string>
+#include <regex>
+#include <openssl/sha.h>
+#include <iomanip>
+#include <sstream>
+
+class CyberSecurityAwareness {
+public:
+    // Function to check password strength
+    static bool isPasswordStrong(const std::string& password) {
+        // Password must be at least 8 characters long and contain a mix of upper, lower, digit, and special characters
+        std::regex passwordPattern("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$");
+        return std::regex_match(password, passwordPattern);
+    }
+
+    // Function to hash a password using SHA-256
+    static std::string hashPassword(const std::string& password) {
+        unsigned char hash[SHA256_DIGEST_LENGTH];
+        SHA256(reinterpret_cast<const unsigned char*>(password.c_str()), password.size(), hash);
+        
+        std::ostringstream oss;
+        for (int i = 0; i < SHA256_DIGEST_LENGTH; ++i) {
+            oss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(hash[i]);
+        }
+        return oss.str();
+    }
+
+    // Function to provide tips for password security
+    static void displayPasswordSecurityTips() {
+        std::cout << "Password Security Tips:\n";
+        std::cout << "1. Use at least 12 characters.\n";
+        std::cout << "2. Include uppercase and lowercase letters, numbers, and special characters.\n";
+        std::cout << "3. Avoid common words and phrases.\n";
+        std::cout << "4. Use a password manager to keep track of your passwords.\n";
+        std::cout << "5. Enable two-factor authentication wherever possible.\n";
+    }
+
+    // Function to demonstrate basic encryption (Caesar Cipher)
+    static std::string encryptMessage(const std::string& message, int shift) {
+        std::string encryptedMessage;
+        for (char c : message) {
+            if (isalpha(c)) {
+                char base = islower(c) ? 'a' : 'A';
+                encryptedMessage += (c - base + shift) % 26 + base;
+            } else {
+                encryptedMessage += c; // Non-alphabetic characters are not changed
+            }
+        }
+        return encryptedMessage;
+    }
+
+    // Function to decrypt a message (Caesar Cipher)
+    static std::string decryptMessage(const std::string& encryptedMessage, int shift) {
+        return encryptMessage(encryptedMessage, 26 - shift); // Decrypt by shifting in the opposite direction
+    }
+};
+
+int main() {
+    std::string password;
+    std::cout << "Enter a password to check its strength: ";
+    std::cin >> password;
+
+    if (CyberSecurityAwareness::isPasswordStrong(password)) {
+        std::cout << "Password is strong!\n";
+        std::cout << "Hashed Password: " << CyberSecurityAwareness::hashPassword(password) << "\n";
+    } else {
+        std::cout << "Password is weak. Please improve it.\n";
+    }
+
+    CyberSecurityAwareness::displayPasswordSecurityTips();
+
+    std::string message;
+    std::cout << "Enter a message to encrypt: ";
+    std::cin.ignore(); // Clear the newline character from the input buffer
+    std::getline(std::cin, message);
+
+    int shift;
+    std::cout << "Enter shift value for encryption (1-25): ";
+    std::cin >> shift;
+
+    std::string encrypted = CyberSecurityAwareness::encryptMessage(message, shift);
+    std::cout << "Encrypted Message: " << encrypted << "\n";
+
+    std::string decrypted = CyberSecurityAwareness::decryptMessage(encrypted, shift);
+    std::cout << "Decrypted Message: " << decrypted << "\n";
+
+    return 0;
+}
