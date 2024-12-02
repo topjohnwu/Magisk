@@ -8,7 +8,7 @@ lsposed_url='https://github.com/LSPosed/LSPosed/releases/download/v1.9.2/LSPosed
 emu_pid=
 
 atd_min_api=30
-atd_max_api=34
+atd_max_api=35
 lsposed_min_api=27
 lsposed_max_api=34
 huge_ram_min_api=26
@@ -25,6 +25,7 @@ cleanup() {
 }
 
 wait_for_bootanim() {
+  set -e
   adb wait-for-device
   while true; do
     local result="$(adb exec-out getprop init.svc.bootanim)"
@@ -38,6 +39,7 @@ wait_for_bootanim() {
 }
 
 wait_for_boot() {
+  set -e
   adb wait-for-device
   while true; do
     local result="$(adb exec-out getprop sys.boot_completed)"
@@ -79,8 +81,15 @@ test_emu() {
 
   test_setup $variant
 
-  # Install LSPosed
+  local lsposed
   if [ $api -ge $lsposed_min_api -a $api -le $lsposed_max_api ]; then
+    lsposed=true
+  else
+    lsposed=false
+  fi
+
+  # Install LSPosed
+  if $lsposed; then
     adb push out/lsposed.zip /data/local/tmp/lsposed.zip
     echo 'PATH=$PATH:/debug_ramdisk magisk --install-module /data/local/tmp/lsposed.zip' | adb shell /system/xbin/su
   fi
@@ -91,7 +100,7 @@ test_emu() {
   test_app
 
   # Try to launch LSPosed
-  if [ $api -ge $lsposed_min_api -a $api -le $atd_max_api ]; then
+  if $lsposed; then
     adb shell rm -f /data/local/tmp/window_dump.xml
     adb shell am start -c org.lsposed.manager.LAUNCH_MANAGER com.android.shell/.BugreportWarningActivity
     while adb shell '[ ! -f /data/local/tmp/window_dump.xml ]'; do
@@ -113,6 +122,7 @@ run_test() {
     TiramisuPrivacySandbox) api=33 ;;
     UpsideDownCakePrivacySandbox) api=34 ;;
     VanillaIceCream) api=35 ;;
+    Baklava) api=36 ;;
     *)
       print_error "! Unknown system image version '$ver'"
       exit 1
@@ -211,11 +221,11 @@ curl -L $lsposed_url -o out/lsposed.zip
 if [ -n "$1" ]; then
   run_test $1 $2
 else
-  for api in $(seq 23 34); do
+  for api in $(seq 23 35); do
     run_test $api
   done
-  # Android 15 Beta
-  run_test 35 google_apis
+  # Android 16 Beta
+  run_test Baklava google_apis
   # Run 16k page tests
   run_test 35 google_apis_ps16k
 fi
