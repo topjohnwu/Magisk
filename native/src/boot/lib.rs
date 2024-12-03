@@ -49,6 +49,7 @@ pub mod ffi {
     }
 
     #[namespace = "rust"]
+    #[allow(unused_unsafe)]
     extern "Rust" {
         unsafe fn extract_boot_from_payload(
             partition: *const c_char,

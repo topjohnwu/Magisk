@@ -3,6 +3,12 @@
 version = 3
 
 [[package]]
+name = "anstyle"
+version = "1.0.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "55cc3b69f167a1ef2e161439aa98aed94e6028e5f9a59be9a6ffb47aef1651f9"
+
+[[package]]
 name = "argh"
 version = "0.1.12"
 source = "git+https://github.com/google/argh.git?rev=1c632b046d084e7bde86b82dfc969b30b4647c8c#1c632b046d084e7bde86b82dfc969b30b4647c8c"
@@ -112,6 +118,32 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
+name = "clap"
+version = "4.5.22"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "69371e34337c4c984bbe322360c2547210bf632eb2814bbe78a6e87a2935bd2b"
+dependencies = [
+ "clap_builder",
+]
+
+[[package]]
+name = "clap_builder"
+version = "4.5.22"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6e24c1b4099818523236a8ca881d2b45db98dadfb4625cf6608c12069fcbbde1"
+dependencies = [
+ "anstyle",
+ "clap_lex",
+ "strsim",
+]
+
+[[package]]
+name = "clap_lex"
+version = "0.7.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "afb84c814227b90d6895e01398aee0d8033c00e7466aca416fb6a8e0eb19d8a7"
+
+[[package]]
 name = "codespan-reporting"
 version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -182,16 +214,18 @@ dependencies = [
 
 [[package]]
 name = "cxx"
-version = "1.0.124"
+version = "1.0.133"
 dependencies = [
  "cc",
+ "cxxbridge-cmd",
  "cxxbridge-flags",
  "cxxbridge-macro",
+ "foldhash",
 ]
 
 [[package]]
 name = "cxx-gen"
-version = "0.7.124"
+version = "0.7.133"
 dependencies = [
  "codespan-reporting",
  "proc-macro2",
@@ -200,15 +234,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "cxxbridge-cmd"
+version = "1.0.133"
+dependencies = [
+ "clap",
+ "codespan-reporting",
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "cxxbridge-flags"
-version = "1.0.124"
+version = "1.0.133"
 
 [[package]]
 name = "cxxbridge-macro"
-version = "1.0.124"
+version = "1.0.133"
 dependencies = [
  "proc-macro2",
  "quote",
+ "rustversion",
  "syn",
 ]
 
@@ -304,6 +350,12 @@ name = "flagset"
 version = "0.4.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b3ea1ec5f8307826a5b71094dd91fc04d4ae75d5709b20ad351c7fb4815c86ec"
+
+[[package]]
+name = "foldhash"
+version = "0.1.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f81ec6369c545a7d40e4589b5597581fa1c441fe1cce96dd1de43159910a36a2"
 
 [[package]]
 name = "getrandom"
@@ -710,6 +762,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "rustversion"
+version = "1.0.18"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0e819f2bc632f285be6d7cd36e25940d45b2391dd6d9b939e79de557f7014248"
+
+[[package]]
 name = "sec1"
 version = "0.8.0-rc.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -802,6 +860,12 @@ dependencies = [
  "base64ct",
  "der",
 ]
+
+[[package]]
+name = "strsim"
+version = "0.11.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7da8b5736845d9f2fcb837ea5d9e2628564b3b043a70948a3f0b778838c5fb4f"
 
 [[package]]
 name = "subtle"
