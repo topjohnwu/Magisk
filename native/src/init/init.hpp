@@ -6,16 +6,19 @@
 using kv_pairs = std::vector<std::pair<std::string, std::string>>;
 
 struct BootConfig {
-    bool skip_initramfs;
-    bool force_normal_boot;
-    bool rootwait;
-    bool emulator;
-    char slot[3];
-    char dt_dir[64];
-    char fstab_suffix[32];
-    char hardware[32];
-    char hardware_plat[32];
+    bool skip_initramfs = false;
+    bool force_normal_boot = false;
+    bool rootwait = false;
+    bool emulator = false;
+    char slot[3]{};
+    char dt_dir[64]{};
+    char fstab_suffix[32]{};
+    char hardware[32]{};
+    char hardware_plat[32]{};
+    kv_pairs partition_map;
 
+    BootConfig();
+private:
     void set(const kv_pairs &);
     void print();
 };
@@ -28,8 +31,6 @@ extern std::vector<std::string> mount_list;
 
 int magisk_proxy_main(int argc, char *argv[]);
 bool unxz(out_stream &strm, rust::Slice<const uint8_t> bytes);
-void load_kernel_info(BootConfig *config);
-kv_pairs load_partition_map();
 bool check_two_stage();
 const char *backup_init();
 void restore_ramdisk_init();
@@ -40,13 +41,15 @@ void restore_ramdisk_init();
 
 class BaseInit {
 protected:
-    BootConfig *config = nullptr;
-    char **argv = nullptr;
+    BootConfig *config;
+    char **argv;
 
     [[noreturn]] void exec_init();
     void prepare_data();
+    dev_t find_block(const char *partname);
+    void collect_devices();
 public:
-    BaseInit(char *argv[], BootConfig *config = nullptr) : config(config), argv(argv) {}
+    BaseInit(char *argv[], BootConfig *config) : config(config), argv(argv) {}
     virtual ~BaseInit() = default;
     virtual void start() = 0;
 };
@@ -59,6 +62,7 @@ private:
     void patch_sepolicy(const char *in, const char *out);
     bool hijack_sepolicy();
     void setup_tmp(const char *path);
+    void mount_preinit_dir();
 protected:
     void patch_rw_root();
     void patch_ro_root();
@@ -87,7 +91,7 @@ class SecondStageInit : public MagiskInit {
 private:
     bool prepare();
 public:
-    SecondStageInit(char *argv[]) : MagiskInit(argv) {
+    SecondStageInit(char *argv[], BootConfig *config) : MagiskInit(argv, config) {
         LOGD("%s\n", __FUNCTION__);
     };
 

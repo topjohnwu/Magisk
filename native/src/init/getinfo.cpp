@@ -148,6 +148,12 @@ void BootConfig::set(const kv_pairs &kv) {
             strscpy(fstab_suffix, value.data(), sizeof(fstab_suffix));
         } else if (key == "qemu") {
             emulator = true;
+        } else if (key == "androidboot.partition_map") {
+            // androidboot.partition_map allows mapping a partition name to a raw block device.
+            // For example, "androidboot.partition_map=vdb,metadata;vdc,userdata" maps
+            // "vdb" to "metadata", and "vdc" to "userdata".
+            // https://android.googlesource.com/platform/system/core/+/refs/heads/android13-release/init/devices.cpp#191
+            partition_map = parse_partition_map(value);
         }
     }
 }
@@ -165,41 +171,44 @@ void BootConfig::print() {
 }
 
 #define read_dt(name, key)                                          \
-ssprintf(file_name, sizeof(file_name), "%s/" name, config->dt_dir); \
+ssprintf(file_name, sizeof(file_name), "%s/" name, dt_dir);         \
 if (access(file_name, R_OK) == 0) {                                 \
     string data = full_read(file_name);                             \
     if (!data.empty()) {                                            \
         data.pop_back();                                            \
-        strscpy(config->key, data.data(), sizeof(config->key));     \
+        strscpy(key, data.data(), sizeof(key));                     \
     }                                                               \
 }
 
-void load_kernel_info(BootConfig *config) {
+BootConfig::BootConfig() {
     // Get kernel data using procfs and sysfs
-    xmkdir("/proc", 0755);
-    xmount("proc", "/proc", "proc", 0, nullptr);
-    xmkdir("/sys", 0755);
-    xmount("sysfs", "/sys", "sysfs", 0, nullptr);
-
-    mount_list.emplace_back("/proc");
-    mount_list.emplace_back("/sys");
+    if (access("/proc/cmdline", F_OK) != 0) {
+        xmkdir("/proc", 0755);
+        xmount("proc", "/proc", "proc", 0, nullptr);
+        mount_list.emplace_back("/proc");
+    }
+    if (access("/sys/block", F_OK) != 0) {
+        xmkdir("/sys", 0755);
+        xmount("sysfs", "/sys", "sysfs", 0, nullptr);
+        mount_list.emplace_back("/sys");
+    }
 
     // Log to kernel
     rust::setup_klog();
 
-    config->set(parse_cmdline(full_read("/proc/cmdline")));
-    config->set(parse_bootconfig(full_read("/proc/bootconfig")));
+    set(parse_cmdline(full_read("/proc/cmdline")));
+    set(parse_bootconfig(full_read("/proc/bootconfig")));
 
-    parse_prop_file("/.backup/.magisk", [=](auto key, auto value) -> bool {
+    parse_prop_file("/.backup/.magisk", [&](auto key, auto value) -> bool {
         if (key == "RECOVERYMODE" && value == "true") {
-            config->skip_initramfs = config->emulator || !check_key_combo();
+            skip_initramfs = emulator || !check_key_combo();
             return false;
         }
         return true;
     });
 
-    if (config->dt_dir[0] == '\0')
-        strscpy(config->dt_dir, DEFAULT_DT_DIR, sizeof(config->dt_dir));
+    if (dt_dir[0] == '\0')
+        strscpy(dt_dir, DEFAULT_DT_DIR, sizeof(dt_dir));
 
     char file_name[128];
     read_dt("fstab_suffix", fstab_suffix)
@@ -207,26 +216,7 @@ void load_kernel_info(BootConfig *config) {
     read_dt("hardware.platform", hardware_plat)
 
     LOGD("Device config:\n");
-    config->print();
-}
-
-// `androidboot.partition_map` allows associating a partition name for a raw block device
-// through a comma separated and semicolon deliminated list. For example,
-// `androidboot.partition_map=vdb,metadata;vdc,userdata` maps `vdb` to `metadata` and `vdc` to
-// `userdata`.
-// https://android.googlesource.com/platform/system/core/+/refs/heads/android13-release/init/devices.cpp#191
-
-kv_pairs load_partition_map() {
-    const string_view kPartitionMapKey = "androidboot.partition_map";
-    for (const auto &[key, value] : parse_cmdline(full_read("/proc/cmdline"))) {
-        if (key == kPartitionMapKey)
-            return parse_partition_map(value);
-    }
-    for (const auto &[key, value] : parse_bootconfig(full_read("/proc/bootconfig"))) {
-        if (key == kPartitionMapKey)
-            return parse_partition_map(value);
-    }
-    return {};
+    print();
 }
 
 bool check_two_stage() {
