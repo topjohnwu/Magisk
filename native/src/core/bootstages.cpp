@@ -148,8 +148,8 @@ static bool check_safe_mode() {
  * Boot Stage Handlers *
  ***********************/
 
-bool MagiskD::post_fs_data() const {
-    as_rust().setup_logfile();
+bool MagiskD::post_fs_data() const noexcept {
+    setup_logfile();
 
     LOGI("** post-fs-data mode running\n");
 
@@ -194,8 +194,8 @@ bool MagiskD::post_fs_data() const {
     return safe_mode;
 }
 
-void MagiskD::late_start() const {
-    as_rust().setup_logfile();
+void MagiskD::late_start() const noexcept {
+    setup_logfile();
 
     LOGI("** late_start service mode running\n");
 
@@ -203,8 +203,8 @@ void MagiskD::late_start() const {
     exec_module_scripts("service");
 }
 
-void MagiskD::boot_complete() const {
-    as_rust().setup_logfile();
+void MagiskD::boot_complete() const noexcept {
+    setup_logfile();
 
     LOGI("** boot-complete triggered\n");
 

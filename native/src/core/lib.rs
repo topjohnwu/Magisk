@@ -74,12 +74,6 @@ pub mod ffi {
         fn resolve_preinit_dir(base_dir: Utf8CStrRef) -> String;
 
         fn switch_mnt_ns(pid: i32) -> i32;
-
-        #[cxx_name = "MagiskD"]
-        type CxxMagiskD;
-        fn post_fs_data(self: &CxxMagiskD) -> bool;
-        fn late_start(self: &CxxMagiskD);
-        fn boot_complete(self: &CxxMagiskD);
     }
 
     extern "Rust" {
@@ -99,18 +93,28 @@ pub mod ffi {
         unsafe fn persist_get_props(prop_cb: Pin<&mut PropCb>);
         unsafe fn persist_delete_prop(name: Utf8CStrRef) -> bool;
         unsafe fn persist_set_prop(name: Utf8CStrRef, value: Utf8CStrRef) -> bool;
+
+        #[namespace = "rust"]
+        fn daemon_entry();
     }
 
-    #[namespace = "rust"]
+    // FFI for MagiskD
     extern "Rust" {
-        fn daemon_entry();
-
         type MagiskD;
-        fn get_magiskd() -> &'static MagiskD;
         fn setup_logfile(self: &MagiskD);
         fn is_emulator(self: &MagiskD) -> bool;
         fn is_recovery(self: &MagiskD) -> bool;
         fn boot_stage_handler(self: &MagiskD, client: i32, code: i32);
+
+        #[cxx_name = "MagiskD"]
+        fn get_magiskd() -> &'static MagiskD;
+    }
+    unsafe extern "C++" {
+        #[allow(dead_code)]
+        fn reboot(self: &MagiskD);
+        fn post_fs_data(self: &MagiskD) -> bool;
+        fn late_start(self: &MagiskD);
+        fn boot_complete(self: &MagiskD);
     }
 }
 

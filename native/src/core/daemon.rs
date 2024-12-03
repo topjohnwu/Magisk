@@ -1,7 +1,7 @@
 use std::fs::File;
+use std::io;
 use std::io::BufReader;
 use std::sync::{Mutex, OnceLock};
-use std::{io, mem};
 
 use base::libc::{O_CLOEXEC, O_RDONLY};
 use base::{
@@ -10,7 +10,7 @@ use base::{
 };
 
 use crate::consts::MAIN_CONFIG;
-use crate::ffi::{get_magisk_tmp, CxxMagiskD, RequestCode};
+use crate::ffi::{get_magisk_tmp, RequestCode};
 use crate::get_prop;
 use crate::logging::magisk_logging;
 
@@ -64,7 +64,7 @@ impl MagiskD {
         match code {
             RequestCode::POST_FS_DATA => {
                 if check_data() && !state.contains(BootState::PostFsDataDone) {
-                    if self.as_cxx().post_fs_data() {
+                    if self.post_fs_data() {
                         state.set(BootState::SafeMode);
                     }
                     state.set(BootState::PostFsDataDone);
@@ -75,7 +75,7 @@ impl MagiskD {
                 unsafe { libc::close(client) };
                 if state.contains(BootState::PostFsDataDone) && !state.contains(BootState::SafeMode)
                 {
-                    self.as_cxx().late_start();
+                    self.late_start();
                     state.set(BootState::LateStartDone);
                 }
             }
@@ -83,18 +83,13 @@ impl MagiskD {
                 unsafe { libc::close(client) };
                 if state.contains(BootState::PostFsDataDone) {
                     state.set(BootState::BootComplete);
-                    self.as_cxx().boot_complete()
+                    self.boot_complete()
                 }
             }
             _ => {
                 unsafe { libc::close(client) };
             }
         }
-    }
-
-    #[inline(always)]
-    fn as_cxx(&self) -> &CxxMagiskD {
-        unsafe { mem::transmute(self) }
     }
 }
 
