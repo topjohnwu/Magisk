@@ -45,7 +45,7 @@ static void parse_device(devinfo *dev, const char *uevent) {
     });
 }
 
-void BaseInit::collect_devices() {
+void MagiskInit::collect_devices() {
     char path[PATH_MAX];
     devinfo dev{};
     if (auto dir = xopen_dir("/sys/dev/block"); dir) {
@@ -59,9 +59,9 @@ void BaseInit::collect_devices() {
                 auto name = rtrim(full_read(path));
                 strscpy(dev.dmname, name.data(), sizeof(dev.dmname));
             }
-            if (auto it = std::ranges::find_if(config->partition_map, [&](const auto &i) {
+            if (auto it = std::ranges::find_if(config.partition_map, [&](const auto &i) {
                 return i.first == dev.devname;
-            }); dev.partname[0] == '\0' && it != config->partition_map.end()) {
+            }); dev.partname[0] == '\0' && it != config.partition_map.end()) {
                 // use androidboot.partition_map as partname fallback.
                 strscpy(dev.partname, it->second.data(), sizeof(dev.partname));
             }
@@ -72,7 +72,7 @@ void BaseInit::collect_devices() {
     }
 }
 
-dev_t BaseInit::find_block(const char *partname) {
+dev_t MagiskInit::find_block(const char *partname) {
     if (dev_list.empty())
         collect_devices();
 
@@ -143,7 +143,7 @@ void MagiskInit::mount_preinit_dir() {
     }
 }
 
-bool LegacySARInit::mount_system_root() {
+bool MagiskInit::mount_system_root() {
     LOGD("Mounting system_root\n");
 
     // there's no /dev in stub cpio
@@ -163,13 +163,13 @@ bool LegacySARInit::mount_system_root() {
 
         // Try normal partname
         char sys_part[32];
-        sprintf(sys_part, "system%s", config->slot);
+        sprintf(sys_part, "system%s", config.slot);
         dev = find_block(sys_part);
         if (dev > 0)
             goto mount_root;
 
         // Poll forever if rootwait was given in cmdline
-    } while (config->rootwait);
+    } while (config.rootwait);
 
     // We don't really know what to do at this point...
     LOGE("Cannot find root partition, abort\n");
@@ -198,7 +198,7 @@ mount_root:
 
     // For API 28 AVD, it uses legacy SAR setup that requires
     // special hacks in magiskinit to work properly.
-    if (!is_two_stage && config->emulator) {
+    if (!is_two_stage && config.emulator) {
         avd_hack = true;
         // These values are hardcoded for API 28 AVD
         auto vendor_dev = find_block("vendor");
@@ -210,7 +210,7 @@ mount_root:
     return is_two_stage;
 }
 
-void BaseInit::exec_init() {
+void MagiskInit::exec_init() {
     // Unmount in reverse order
     for (auto &p : reversed(mount_list)) {
         if (xumount2(p.data(), MNT_DETACH) == 0)
@@ -220,12 +220,12 @@ void BaseInit::exec_init() {
     exit(1);
 }
 
-void BaseInit::prepare_data() {
+void MagiskInit::prepare_data() {
     LOGD("Setup data tmp\n");
     xmkdir("/data", 0755);
     xmount("magisk", "/data", "tmpfs", 0, "mode=755");
 
-    cp_afc("/init", "/data/magiskinit");
+    cp_afc("/init", REDIR_PATH);
     cp_afc("/.backup", "/data/.backup");
     cp_afc("/overlay.d", "/data/overlay.d");
 }

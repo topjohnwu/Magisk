@@ -11,8 +11,6 @@
 
 using namespace std;
 
-vector<string> mount_list;
-
 template<char... cs> using chars = integer_sequence<char, cs...>;
 
 // If quoted, parsing ends when we find char in [breaks]
@@ -180,22 +178,7 @@ if (access(file_name, R_OK) == 0) {                                 \
     }                                                               \
 }
 
-BootConfig::BootConfig() {
-    // Get kernel data using procfs and sysfs
-    if (access("/proc/cmdline", F_OK) != 0) {
-        xmkdir("/proc", 0755);
-        xmount("proc", "/proc", "proc", 0, nullptr);
-        mount_list.emplace_back("/proc");
-    }
-    if (access("/sys/block", F_OK) != 0) {
-        xmkdir("/sys", 0755);
-        xmount("sysfs", "/sys", "sysfs", 0, nullptr);
-        mount_list.emplace_back("/sys");
-    }
-
-    // Log to kernel
-    rust::setup_klog();
-
+void BootConfig::init() {
     set(parse_cmdline(full_read("/proc/cmdline")));
     set(parse_bootconfig(full_read("/proc/bootconfig")));
 
@@ -234,7 +217,7 @@ bool check_two_stage() {
     return init.contains("selinux_setup");
 }
 
-void unxz_init(const char *init_xz, const char *init) {
+static void unxz_init(const char *init_xz, const char *init) {
     LOGD("unxz %s -> %s\n", init_xz, init);
     int fd = xopen(init, O_WRONLY | O_CREAT, 0777);
     fd_stream ch(fd);

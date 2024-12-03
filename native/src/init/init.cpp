@@ -60,16 +60,67 @@ void restore_ramdisk_init() {
     }
 }
 
-class RecoveryInit : public BaseInit {
-public:
-    using BaseInit::BaseInit;
-    void start() override {
-        LOGD("Ramdisk is recovery, abort\n");
-        restore_ramdisk_init();
-        rm_rf("/.backup");
-        exec_init();
+MagiskInit::MagiskInit(char **argv) : argv(argv), config{} {
+    // Get kernel data using procfs and sysfs
+    if (access("/proc/cmdline", F_OK) != 0) {
+        xmkdir("/proc", 0755);
+        xmount("proc", "/proc", "proc", 0, nullptr);
+        mount_list.emplace_back("/proc");
     }
-};
+    if (access("/sys/block", F_OK) != 0) {
+        xmkdir("/sys", 0755);
+        xmount("sysfs", "/sys", "sysfs", 0, nullptr);
+        mount_list.emplace_back("/sys");
+    }
+
+    // Log to kernel
+    rust::setup_klog();
+
+    // Load kernel configs
+    config.init();
+}
+
+static void recovery() {
+    LOGI("Ramdisk is recovery, abort\n");
+    restore_ramdisk_init();
+    rm_rf("/.backup");
+}
+
+void MagiskInit::legacy_system_as_root() {
+    LOGI("Legacy SAR Init\n");
+    prepare_data();
+    bool is_two_stage = mount_system_root();
+    if (is_two_stage)
+        redirect_second_stage();
+    else
+        patch_ro_root();
+}
+
+void MagiskInit::rootfs() {
+    LOGI("RootFS Init\n");
+    prepare_data();
+    LOGD("Restoring /init\n");
+    rename(backup_init(), "/init");
+    patch_rw_root();
+}
+
+void MagiskInit::start() {
+    if (argv[1] != nullptr && argv[1] == "selinux_setup"sv)
+        second_stage();
+    else if (config.skip_initramfs)
+        legacy_system_as_root();
+    else if (config.force_normal_boot)
+        first_stage();
+    else if (access("/sbin/recovery", F_OK) == 0 || access("/system/bin/recovery", F_OK) == 0)
+        recovery();
+    else if (check_two_stage())
+        first_stage();
+    else
+        rootfs();
+
+    // Finally execute the original init
+    exec_init();
+}
 
 int main(int argc, char *argv[]) {
     umask(0);
@@ -81,23 +132,6 @@ int main(int argc, char *argv[]) {
     if (getpid() != 1)
         return 1;
 
-    BaseInit *init;
-    BootConfig config;
-
-    if (argc > 1 && argv[1] == "selinux_setup"sv)
-        init = new SecondStageInit(argv, &config);
-    else if (config.skip_initramfs)
-        init = new LegacySARInit(argv, &config);
-    else if (config.force_normal_boot)
-        init = new FirstStageInit(argv, &config);
-    else if (access("/sbin/recovery", F_OK) == 0 || access("/system/bin/recovery", F_OK) == 0)
-        init = new RecoveryInit(argv, &config);
-    else if (check_two_stage())
-        init = new FirstStageInit(argv, &config);
-    else
-        init = new RootFSInit(argv, &config);
-
-    // Run the main routine
-    init->start();
-    exit(1);
+    MagiskInit init(argv);
+    init.start();
 }

@@ -347,12 +347,6 @@ void MagiskInit::patch_ro_root() {
     chdir("/");
 }
 
-void RootFSInit::prepare() {
-    prepare_data();
-    LOGD("Restoring /init\n");
-    rename(backup_init(), "/init");
-}
-
 #define PRE_TMPSRC "/magisk"
 #define PRE_TMPDIR PRE_TMPSRC "/tmp"
 
