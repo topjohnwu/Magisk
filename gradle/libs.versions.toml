@@ -1,6 +1,6 @@
 [versions]
 kotlin = "2.0.21"
-android = "8.7.2"
+android = "8.7.3"
 ksp = "2.0.21-1.0.28"
 rikka = "1.3.0"
 navigation = "2.8.4"
