@@ -130,8 +130,8 @@
     <string name="settings_update_custom">Власний</string>
     <string name="settings_update_custom_msg">Вставте власний URL</string>
     <string name="settings_zygisk_summary">Запускати частини Magisk в сервісі zygote</string>
-    <string name="settings_denylist_title">Enforce DenyList</string>
-    <string name="settings_denylist_summary">Processes on the denylist will have all Magisk modifications reverted</string>
+    <string name="settings_denylist_title">Увімкнути DenyList</string>
+    <string name="settings_denylist_summary">Всі зміни, внесені Magisk, будуть приховані від процесів, позначених у DenyList</string>
     <string name="settings_denylist_config_title">Налаштувати DenyList</string>
     <string name="settings_denylist_config_summary">Вибрати процеси, які будуть додані до denylist</string>
     <string name="settings_hosts_title">Позасистемні хости</string>
@@ -156,7 +156,7 @@
     <string name="superuser_notification">Сповіщення суперкористувача</string>
     <string name="settings_su_reauth_title">Повторна автентифікація</string>
     <string name="settings_su_reauth_summary">Перевидача прав суперкористувача після оновлення застосунку</string>
-    <string name="settings_su_tapjack_title">Увімкнути захист від Tapjack</string>
+    <string name="settings_su_tapjack_title">Увімкнути захист від підміни натискань</string>
     <string name="settings_su_tapjack_summary">Діалогове вікно суперкористувача не буде отримувати ввід від користувача, коли вікно перекрито іншим застосунком чи вікном</string>
     <string name="settings_customization">Оформлення</string>
     <string name="setting_add_shortcut_summary">Додати ярлик на домашній екран для зручного сприйняття застосунку після його приховування</string>
