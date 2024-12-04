@@ -7,10 +7,13 @@ import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Opcodes.ASM9
 
+private const val ZIP_ENTRY_CLASS_NAME = "java.util.zip.ZipEntry"
 private const val DESUGAR_CLASS_NAME = "com.topjohnwu.magisk.core.utils.Desugar"
 private const val ZIP_ENTRY_GET_TIME_DESC = "()Ljava/nio/file/attribute/FileTime;"
 private const val DESUGAR_GET_TIME_DESC =
     "(Ljava/util/zip/ZipEntry;)Ljava/nio/file/attribute/FileTime;"
+
+private fun ClassData.isTypeOf(name: String) = className == name || superClasses.contains(name)
 
 abstract class DesugarClassVisitorFactory : AsmClassVisitorFactory<InstrumentationParameters.None> {
     override fun createClassVisitor(
@@ -45,14 +48,15 @@ abstract class DesugarClassVisitorFactory : AsmClassVisitorFactory<Instrumentati
                 descriptor: String,
                 isInterface: Boolean
             ) {
-                if (!classContext.loadClassData(owner.replace("/", "."))?.superClasses.orEmpty()
-                        .contains("java.util.zip.ZipEntry") || !process(name, descriptor)
-                ) {
+                if (!process(owner, name, descriptor)) {
                     super.visitMethodInsn(opcode, owner, name, descriptor, isInterface)
                 }
             }
 
-            private fun process(name: String, descriptor: String): Boolean {
+            private fun process(owner: String, name: String, descriptor: String): Boolean {
+                val classData = classContext.loadClassData(owner.replace("/", ".")) ?: return false
+                if (!classData.isTypeOf(ZIP_ENTRY_CLASS_NAME))
+                    return false
                 if (descriptor != ZIP_ENTRY_GET_TIME_DESC)
                     return false
                 return when (name) {
