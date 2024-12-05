@@ -177,26 +177,23 @@ void tmpfs_node::mount() {
 class magisk_node : public node_entry {
 public:
     explicit magisk_node(const char *name) : node_entry(name, DT_REG, this) {}
+    explicit magisk_node(const char *name, const char *target)
+    : node_entry(name, DT_LNK, this), target(target)  {}
 
     void mount() override {
-        const string src = get_magisk_tmp() + "/"s + name();
-        if (access(src.data(), F_OK))
-            return;
-
-        const string dir_name = isa<tmpfs_node>(parent()) ? parent()->worker_path() : parent()->node_path();
-        if (name() == "magisk") {
-            for (int i = 0; applet_names[i]; ++i) {
-                string dest = dir_name + "/" + applet_names[i];
-                VLOGD("create", "./magisk", dest.data());
-                xsymlink("./magisk", dest.data());
-            }
+        if (target) {
+            string dest = isa<tmpfs_node>(parent()) ? worker_path() : node_path();
+            VLOGD("create", target, dest.data());
+            xsymlink(target, dest.data());
         } else {
-            string dest = dir_name + "/supolicy";
-            VLOGD("create", "./magiskpolicy", dest.data());
-            xsymlink("./magiskpolicy", dest.data());
+            string src = get_magisk_tmp() + "/"s + name();
+            if (access(src.data(), F_OK) == 0)
+                create_and_mount("magisk", src, true);
         }
-        create_and_mount("magisk", src, true);
     }
+
+private:
+    const char *target = nullptr;
 };
 
 class zygisk_node : public node_entry {
@@ -231,10 +228,10 @@ static void inject_magisk_bins(root_node *system) {
     bin->insert(new magisk_node("magisk"));
     bin->insert(new magisk_node("magiskpolicy"));
 
-    // Also delete all applets to make sure no modules can override it
+    // Also insert all applets to make sure no one can override it
     for (int i = 0; applet_names[i]; ++i)
-        delete bin->extract(applet_names[i]);
-    delete bin->extract("supolicy");
+        bin->insert(new magisk_node(applet_names[i], "./magisk"));
+    bin->insert(new magisk_node("supolicy", "./magiskpolicy"));
 }
 
 static void inject_zygisk_libs(root_node *system) {
