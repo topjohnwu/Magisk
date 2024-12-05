@@ -9,6 +9,7 @@ import com.topjohnwu.magisk.core.ktx.cachedFile
 import com.topjohnwu.magisk.core.ktx.deviceProtectedContext
 import com.topjohnwu.magisk.core.ktx.writeTo
 import com.topjohnwu.superuser.Shell
+import com.topjohnwu.superuser.ShellUtils.fastCmdResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import java.io.File
@@ -16,7 +17,7 @@ import java.util.jar.JarFile
 
 class ShellInit : Shell.Initializer() {
     override fun onInit(context: Context, shell: Shell): Boolean {
-        if (shell.isRoot) {
+        if (shell.isRoot && fastCmdResult(shell, "magisk")) {
             Info.isRooted = true
             RootUtils.bindTask?.let { shell.execTask(it) }
             RootUtils.bindTask = null
