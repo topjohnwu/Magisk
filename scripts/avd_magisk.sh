@@ -37,7 +37,7 @@ if [ -z "$FIRST_STAGE" ]; then
   export ASH_STANDALONE=1
   if [ $(./busybox id -u) -ne 0 ]; then
     # Re-exec script with root
-    exec /system/xbin/su 0 ./busybox sh $0
+    exec /system/xbin/su 0 /data/local/tmp/busybox sh $0
   else
     # Re-exec script with busybox
     exec ./busybox sh $0
@@ -66,7 +66,7 @@ fi
 
 # Stop zygote (and previous setup if exists)
 magisk --stop 2>/dev/null
-stop
+stop zygote
 if [ -d /debug_ramdisk ]; then
   umount -l /debug_ramdisk 2>/dev/null
 fi
@@ -141,16 +141,17 @@ ln -s ./magisk $MAGISKTMP/resetprop
 ln -s ./magiskpolicy $MAGISKTMP/supolicy
 
 mkdir -p $MAGISKTMP/.magisk/device
+mkdir -p $MAGISKTMP/.magisk/worker
+mount -t tmpfs -o 'mode=0755' magisk $MAGISKTMP/.magisk/worker
+mount --make-private $MAGISKTMP/.magisk/worker
 touch $MAGISKTMP/.magisk/config
 
 export MAGISKTMP
 MAKEDEV=1 $MAGISKTMP/magisk --preinit-device 2>&1
 
 RULESCMD=""
-for r in $MAGISKTMP/.magisk/preinit/*/sepolicy.rule; do
-  [ -f "$r" ] || continue
-  RULESCMD="$RULESCMD --apply $r"
-done
+rule="$MAGISKTMP/.magisk/preinit/sepolicy.rule"
+[ -f "$rule" ] && RULESCMD="--apply $rule"
 
 # SELinux stuffs
 if [ -d /sys/fs/selinux ]; then
@@ -165,5 +166,8 @@ fi
 
 # Boot up
 $MAGISKTMP/magisk --post-fs-data
-start
+start zygote
 $MAGISKTMP/magisk --service
+# Make sure reset nb prop after zygote starts
+sleep 2
+$MAGISKTMP/magisk --boot-complete
