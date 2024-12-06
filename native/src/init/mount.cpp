@@ -253,7 +253,7 @@ void MagiskInit::setup_tmp(const char *path) {
     chdir(path);
 
     // Prepare worker
-    xmount(WORKERDIR, WORKERDIR, nullptr, MS_BIND, nullptr);
+    xmount("magisk", WORKERDIR, "tmpfs", 0, "mode=755");
 
     // Use isolated devpts if kernel support
     if (access("/dev/pts/ptmx", F_OK) == 0) {
