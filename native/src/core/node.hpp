@@ -37,6 +37,7 @@ public:
     bool is_dir() const { return file_type() == DT_DIR; }
     bool is_lnk() const { return file_type() == DT_LNK; }
     bool is_reg() const { return file_type() == DT_REG; }
+    bool is_wht() const { return file_type() == DT_WHT; }
     const string &name() const { return _name; }
     dir_node *parent() const { return _parent; }
 
