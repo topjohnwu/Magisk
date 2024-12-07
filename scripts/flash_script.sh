@@ -67,7 +67,7 @@ $BOOTMODE || remove_system_su
 ui_print "- Constructing environment"
 
 # Copy required files
-rm -rf $MAGISKBIN/* 2>/dev/null
+rm -rf $MAGISKBIN 2>/dev/null
 mkdir -p $MAGISKBIN 2>/dev/null
 cp -af $BINDIR/. $COMMONDIR/. $BBBIN $MAGISKBIN
 
