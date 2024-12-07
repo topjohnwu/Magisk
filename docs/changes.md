@@ -1,5 +1,13 @@
 # Magisk Changelog
 
+### v28.1
+
+- [App] Fix stub APK download link
+- [App] Fix support for Android lower than 8.0
+- [General] Fix support for MTK Samsung devices
+- [MagiskInit] Fix a regression for 2SI devices
+- [MagiskPolicy] Fix a regression causing `overlay.d` replaced files to be not accessible
+
 ### v28.0
 
 - [General] Support 16k page size
