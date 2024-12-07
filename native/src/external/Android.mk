@@ -162,10 +162,6 @@ LOCAL_SRC_FILES := \
     selinux/libsepol/src/handle.c \
     selinux/libsepol/src/hashtab.c \
     selinux/libsepol/src/hierarchy.c \
-    selinux/libsepol/src/ibendport_record.c \
-    selinux/libsepol/src/ibendports.c \
-    selinux/libsepol/src/ibpkey_record.c \
-    selinux/libsepol/src/ibpkeys.c \
     selinux/libsepol/src/iface_record.c \
     selinux/libsepol/src/interfaces.c \
     selinux/libsepol/src/kernel_to_cil.c \
@@ -192,10 +188,12 @@ LOCAL_SRC_FILES := \
     selinux/libsepol/src/users.c \
     selinux/libsepol/src/util.c \
     selinux/libsepol/src/write.c \
-    selinux/libsepol/cil/src/cil.c \
+    selinux/libsepol/cil/src/android.c \
     selinux/libsepol/cil/src/cil_binary.c \
     selinux/libsepol/cil/src/cil_build_ast.c \
+    selinux/libsepol/cil/src/cil.c \
     selinux/libsepol/cil/src/cil_copy_ast.c \
+    selinux/libsepol/cil/src/cil_deny.c \
     selinux/libsepol/cil/src/cil_find.c \
     selinux/libsepol/cil/src/cil_fqn.c \
     selinux/libsepol/cil/src/cil_lexer.c \
