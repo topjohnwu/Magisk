@@ -173,7 +173,7 @@ jobs:
         include:
           - branch: "aosp-main"
             device: "aosp_cf_x86_64_phone"
-          - branch: "aosp-main-throttled"
+          - branch: "git_aosp-main-with-phones-throttled"
             device: "aosp_cf_x86_64_phone_pgagnostic"
 
     steps:
