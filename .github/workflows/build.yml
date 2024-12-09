@@ -86,6 +86,8 @@ jobs:
         version: [23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]
         type: [""]
         include:
+          - version: "35"
+            type: "google_apis_ps16k"
           - version: "Baklava"
             type: "google_apis"
 
@@ -173,8 +175,6 @@ jobs:
         include:
           - branch: "aosp-main"
             device: "aosp_cf_x86_64_phone"
-          - branch: "aosp-main-throttled"
-            device: "aosp_cf_x86_64_phone_pgagnostic"
 
     steps:
       - name: Check out
