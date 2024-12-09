@@ -128,7 +128,7 @@ impl Verifier {
 
     fn verify(mut self, signature: &[u8]) -> LoggedResult<()> {
         let hash = self.digest.finalize_reset();
-        return match &self.key {
+        match &self.key {
             VerifyingKey::SHA256withRSA(key) => {
                 let sig = RsaSignature::try_from(signature)?;
                 key.verify_prehash(hash.as_ref(), &sig).log()
@@ -145,7 +145,7 @@ impl Verifier {
                 let sig = P521Signature::from_slice(signature)?;
                 key.verify_prehash(hash.as_ref(), &sig).log()
             }
-        };
+        }
     }
 }
 
@@ -241,8 +241,8 @@ impl BootSignature {
         }
         let mut verifier = Verifier::from_public_key(
             self.certificate
-                .tbs_certificate
-                .subject_public_key_info
+                .tbs_certificate()
+                .subject_public_key_info()
                 .owned_to_ref(),
         )?;
         verifier.update(payload);
@@ -329,7 +329,7 @@ pub fn sign_boot_image(
         let sig = signer.sign()?;
 
         // Create BootSignature DER
-        let alg_id = cert.signature_algorithm.clone();
+        let alg_id = cert.signature_algorithm().clone();
         let sig = BootSignature {
             format_version: 1,
             certificate: cert,
