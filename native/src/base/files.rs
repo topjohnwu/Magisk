@@ -333,7 +333,7 @@ impl Directory {
         unsafe {
             let entry = &*e;
             let d_name = CStr::from_ptr(entry.d_name.as_ptr());
-            return if d_name == cstr!(".") || d_name == cstr!("..") {
+            if d_name == cstr!(".") || d_name == cstr!("..") {
                 self.read()
             } else {
                 let e = DirEntry {
@@ -342,7 +342,7 @@ impl Directory {
                     d_name_len: d_name.to_bytes_with_nul().len(),
                 };
                 Ok(Some(e))
-            };
+            }
         }
     }
 
