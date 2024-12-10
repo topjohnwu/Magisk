@@ -23,7 +23,6 @@ rsa = "0.10.0-pre.3"
 x509-cert = "0.3.0-pre.0"
 der = "0.8.0-rc.1"
 bytemuck = "1.16"
-fdt = "0.1"
 const_format = "0.2"
 
 [workspace.dependencies.argh]
