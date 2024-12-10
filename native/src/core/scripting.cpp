@@ -202,10 +202,9 @@ static void abort(FILE *fp, const char *fmt, ...) {
 }
 
 constexpr char install_module_script[] = R"EOF(
-exec %s sh -c '
 . /data/adb/magisk/util_functions.sh
 install_module
-exit 0'
+exit 0
 )EOF";
 
 void install_module(const char *file) {
@@ -229,10 +228,7 @@ void install_module(const char *file) {
     xdup2(fd, STDERR_FILENO);
     close(fd);
 
-    char cmds[256];
-    ssprintf(cmds, sizeof(cmds), install_module_script, bbpath());
-
-    const char *argv[] = { "/system/bin/sh", "-c", cmds, nullptr };
+    const char *argv[] = { BBEXEC_CMD, "-c", install_module_script, nullptr };
     execve(argv[0], (char **) argv, environ);
     abort(stdout, "Failed to execute BusyBox shell");
 }
