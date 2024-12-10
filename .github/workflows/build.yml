@@ -88,6 +88,8 @@ jobs:
         include:
           - version: "Baklava"
             type: "google_apis"
+          - version: "Baklava"
+            type: "google_apis_ps16k"
 
     steps:
       - name: Check out
@@ -173,8 +175,6 @@ jobs:
         include:
           - branch: "aosp-main"
             device: "aosp_cf_x86_64_phone"
-          - branch: "aosp-main-throttled"
-            device: "aosp_cf_x86_64_phone_pgagnostic"
 
     steps:
       - name: Check out
