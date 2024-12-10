@@ -227,7 +227,7 @@ else
   # Android 16 Beta
   run_test Baklava google_apis
   # Run 16k page tests
-  run_test 35 google_apis_ps16k
+  run_test Baklava google_apis_ps16k
 fi
 
 "$avd" delete avd -n test
