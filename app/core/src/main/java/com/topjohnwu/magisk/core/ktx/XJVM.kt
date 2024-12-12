@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
+import java.io.Closeable
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
@@ -17,24 +18,14 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Collections
 import java.util.Locale
-import java.util.zip.ZipEntry
-import java.util.zip.ZipInputStream
 
-inline fun ZipInputStream.forEach(callback: (ZipEntry) -> Unit) {
-    var entry: ZipEntry? = nextEntry
-    while (entry != null) {
-        callback(entry)
-        entry = nextEntry
-    }
-}
-
-inline fun <In : InputStream, Out : OutputStream> withStreams(
-    inStream: In,
-    outStream: Out,
+inline fun <In : Closeable, Out : Closeable> withInOut(
+    input: In,
+    output: Out,
     withBoth: (In, Out) -> Unit
 ) {
-    inStream.use { reader ->
-        outStream.use { writer ->
+    input.use { reader ->
+        output.use { writer ->
             withBoth(reader, writer)
         }
     }
@@ -64,7 +55,7 @@ suspend inline fun InputStream.copyAndClose(
     out: OutputStream,
     bufferSize: Int = DEFAULT_BUFFER_SIZE,
     dispatcher: CoroutineDispatcher = Dispatchers.IO
-) = withStreams(this, out) { i, o -> i.copyAll(o, bufferSize, dispatcher) }
+) = withInOut(this, out) { i, o -> i.copyAll(o, bufferSize, dispatcher) }
 
 @Throws(IOException::class)
 suspend inline fun InputStream.writeTo(

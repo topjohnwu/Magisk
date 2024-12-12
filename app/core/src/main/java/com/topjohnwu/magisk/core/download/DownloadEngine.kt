@@ -29,9 +29,8 @@ import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.ktx.cachedFile
 import com.topjohnwu.magisk.core.ktx.copyAll
 import com.topjohnwu.magisk.core.ktx.copyAndClose
-import com.topjohnwu.magisk.core.ktx.forEach
 import com.topjohnwu.magisk.core.ktx.set
-import com.topjohnwu.magisk.core.ktx.withStreams
+import com.topjohnwu.magisk.core.ktx.withInOut
 import com.topjohnwu.magisk.core.ktx.writeTo
 import com.topjohnwu.magisk.core.tasks.AppMigration
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
@@ -43,14 +42,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import okhttp3.ResponseBody
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
+import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream
+import org.apache.commons.compress.archivers.zip.ZipFile
 import timber.log.Timber
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
-import java.util.zip.ZipEntry
-import java.util.zip.ZipFile
-import java.util.zip.ZipInputStream
-import java.util.zip.ZipOutputStream
 
 /**
  * This class drives the execution of file downloads and notification management.
@@ -99,33 +97,35 @@ class DownloadEngine(
             }
         }
 
-        private fun createIntent(context: Context, subject: Subject) =
-            if (Build.VERSION.SDK_INT >= 34) {
-                context.intent<com.topjohnwu.magisk.core.Receiver>()
-                    .setAction(ACTION)
-                    .putExtra(SUBJECT_KEY, subject)
-            } else {
-                context.intent<com.topjohnwu.magisk.core.Service>()
-                    .setAction(ACTION)
-                    .putExtra(SUBJECT_KEY, subject)
-            }
+        private fun createBroadcastIntent(context: Context, subject: Subject) =
+            context.intent<com.topjohnwu.magisk.core.Receiver>()
+                .setAction(ACTION)
+                .putExtra(SUBJECT_KEY, subject)
+
+        private fun createServiceIntent(context: Context, subject: Subject) =
+            context.intent<com.topjohnwu.magisk.core.Service>()
+                .setAction(ACTION)
+                .putExtra(SUBJECT_KEY, subject)
 
         @SuppressLint("InlinedApi")
         fun getPendingIntent(context: Context, subject: Subject): PendingIntent {
             val flag = PendingIntent.FLAG_IMMUTABLE or
                 PendingIntent.FLAG_UPDATE_CURRENT or
                 PendingIntent.FLAG_ONE_SHOT
-            val intent = createIntent(context, subject)
             return if (Build.VERSION.SDK_INT >= 34) {
                 // On API 34+, download tasks are handled with a user-initiated job.
                 // However, there is no way to schedule a new job directly with a pending intent.
                 // As a workaround, we send the subject to a broadcast receiver and have it
                 // schedule the job for us.
+                val intent = createBroadcastIntent(context, subject)
                 PendingIntent.getBroadcast(context, REQUEST_CODE, intent, flag)
-            } else if (Build.VERSION.SDK_INT >= 26) {
-                PendingIntent.getForegroundService(context, REQUEST_CODE, intent, flag)
             } else {
-                PendingIntent.getService(context, REQUEST_CODE, intent, flag)
+                val intent = createServiceIntent(context, subject)
+                if (Build.VERSION.SDK_INT >= 26) {
+                    PendingIntent.getForegroundService(context, REQUEST_CODE, intent, flag)
+                } else {
+                    PendingIntent.getService(context, REQUEST_CODE, intent, flag)
+                }
             }
         }
 
@@ -152,10 +152,13 @@ class DownloadEngine(
                     .setTransientExtras(extras)
                     .build()
                 scheduler.schedule(info)
-            } else if (Build.VERSION.SDK_INT >= 26) {
-                context.startForegroundService(createIntent(context, subject))
             } else {
-                context.startService(createIntent(context, subject))
+                val intent = createServiceIntent(context, subject)
+                if (Build.VERSION.SDK_INT >= 26) {
+                    context.startForegroundService(intent)
+                } else {
+                    context.startService(intent)
+                }
             }
         }
     }
@@ -285,11 +288,11 @@ class DownloadEngine(
                 }
 
                 // Extract stub
-                val zf = ZipFile(updateApk)
                 val apk = context.cachedFile("stub.apk")
-                apk.delete()
-                zf.getInputStream(zf.getEntry("assets/stub.apk")).writeTo(apk)
-                zf.close()
+                ZipFile.Builder().setFile(updateApk).get().use { zf ->
+                    apk.delete()
+                    zf.getInputStream(zf.getEntry("assets/stub.apk")).writeTo(apk)
+                }
 
                 // Patch and install
                 subject.intent = AppMigration.upgradeStub(context, apk)
@@ -308,29 +311,36 @@ class DownloadEngine(
     }
 
     private suspend fun handleModule(src: InputStream, file: Uri) {
-        val input = ZipInputStream(src)
-        val output = ZipOutputStream(file.outputStream())
+        val tmp = context.cachedFile("module.zip")
+        try {
+            // First download the entire zip into cache so we can process it
+            src.writeTo(tmp)
 
-        withStreams(input, output) { zin, zout ->
-            zout.putNextEntry(ZipEntry("META-INF/"))
-            zout.putNextEntry(ZipEntry("META-INF/com/"))
-            zout.putNextEntry(ZipEntry("META-INF/com/google/"))
-            zout.putNextEntry(ZipEntry("META-INF/com/google/android/"))
-            zout.putNextEntry(ZipEntry("META-INF/com/google/android/update-binary"))
-            context.assets.open("module_installer.sh").use { it.copyAll(zout) }
+            val input = ZipFile.Builder().setFile(tmp).get()
+            val output = ZipArchiveOutputStream(file.outputStream())
+            withInOut(input, output) { zin, zout ->
+                zout.putArchiveEntry(ZipArchiveEntry("META-INF/"))
+                zout.closeArchiveEntry()
+                zout.putArchiveEntry(ZipArchiveEntry("META-INF/com/"))
+                zout.closeArchiveEntry()
+                zout.putArchiveEntry(ZipArchiveEntry("META-INF/com/google/"))
+                zout.closeArchiveEntry()
+                zout.putArchiveEntry(ZipArchiveEntry("META-INF/com/google/android/"))
+                zout.closeArchiveEntry()
 
-            zout.putNextEntry(ZipEntry("META-INF/com/google/android/updater-script"))
-            zout.write("#MAGISK\n".toByteArray())
+                zout.putArchiveEntry(ZipArchiveEntry("META-INF/com/google/android/update-binary"))
+                context.assets.open("module_installer.sh").use { it.copyAll(zout) }
+                zout.closeArchiveEntry()
 
-            zin.forEach { entry ->
-                val path = entry.name
-                if (path.isNotEmpty() && !path.startsWith("META-INF")) {
-                    zout.putNextEntry(ZipEntry(path))
-                    if (!entry.isDirectory) {
-                        zin.copyAll(zout)
-                    }
-                }
+                zout.putArchiveEntry(ZipArchiveEntry("META-INF/com/google/android/updater-script"))
+                zout.write("#MAGISK\n".toByteArray())
+                zout.closeArchiveEntry()
+
+                // Then simply copy all entries to output
+                zin.copyRawEntries(zout) { entry -> !entry.name.startsWith("META-INF") }
             }
+        } finally {
+            tmp.delete()
         }
     }
 
