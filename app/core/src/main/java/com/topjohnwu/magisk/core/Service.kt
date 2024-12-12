@@ -7,9 +7,10 @@ import androidx.core.app.ServiceCompat
 import androidx.core.content.IntentCompat
 import com.topjohnwu.magisk.core.base.BaseService
 import com.topjohnwu.magisk.core.download.DownloadEngine
+import com.topjohnwu.magisk.core.download.DownloadSession
 import com.topjohnwu.magisk.core.download.Subject
 
-class Service : BaseService(), DownloadEngine.Session {
+class Service : BaseService(), DownloadSession {
 
     private var mEngine: DownloadEngine? = null
     override val context get() = this
