@@ -11,6 +11,7 @@ import androidx.core.content.getSystemService
 import com.topjohnwu.magisk.core.base.BaseJobService
 import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.download.DownloadEngine
+import com.topjohnwu.magisk.core.download.DownloadSession
 import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.view.Notifications
 import kotlinx.coroutines.Dispatchers
@@ -25,7 +26,7 @@ class JobService : BaseJobService() {
     @TargetApi(value = 34)
     inner class Session(
         private var params: JobParameters
-    ) : DownloadEngine.Session {
+    ) : DownloadSession {
 
         override val context get() = this@JobService
         val engine = DownloadEngine(this)
