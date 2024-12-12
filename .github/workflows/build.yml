@@ -1,15 +1,6 @@
 name: Magisk Build
 
 on:
-  push:
-    branches: [master]
-    paths:
-      - "app/**"
-      - "native/**"
-      - "buildSrc/**"
-      - "build.py"
-      - "gradle.properties"
-      - ".github/workflows/build.yml"
   pull_request:
     branches: [master]
   workflow_dispatch:
@@ -163,7 +154,7 @@ jobs:
             kernel.log
             logcat.log
 
-  cf_test:
+  cf-test:
     name: Test ${{ matrix.device }}
     runs-on: ubuntu-24.04
     needs: build
