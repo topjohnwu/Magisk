@@ -9,7 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.IOException
-import java.util.*
+import java.util.Locale
 
 data class LocalModule(
     private val path: String,

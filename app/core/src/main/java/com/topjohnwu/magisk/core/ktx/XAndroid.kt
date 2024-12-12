@@ -2,7 +2,11 @@ package com.topjohnwu.magisk.core.ktx
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.*
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.ContextWrapper
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
@@ -23,7 +27,6 @@ import com.topjohnwu.magisk.core.utils.RootUtils
 import com.topjohnwu.magisk.utils.APKInstall
 import com.topjohnwu.superuser.internal.UiThreadHandler
 import java.io.File
-import kotlin.String
 
 fun Context.getBitmap(id: Int): Bitmap {
     var drawable = getDrawable(id)!!

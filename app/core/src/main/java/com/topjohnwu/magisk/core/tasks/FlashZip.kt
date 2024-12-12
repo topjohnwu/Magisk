@@ -7,7 +7,6 @@ import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.ktx.writeTo
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.displayName
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.inputStream
-import com.topjohnwu.magisk.core.utils.unzip
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
