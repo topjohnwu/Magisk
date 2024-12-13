@@ -11,13 +11,10 @@ import android.net.NetworkRequest
 import android.os.PowerManager
 import androidx.collection.ArraySet
 import androidx.core.content.getSystemService
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ProcessLifecycleOwner
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.ktx.registerRuntimeReceiver
 
-class NetworkObserver(context: Context): DefaultLifecycleObserver {
+class NetworkObserver(context: Context) {
     private val manager = context.getSystemService<ConnectivityManager>()!!
 
     private val networkCallback = object : ConnectivityManager.NetworkCallback() {
@@ -55,16 +52,13 @@ class NetworkObserver(context: Context): DefaultLifecycleObserver {
         manager.registerNetworkCallback(request, networkCallback)
         val filter = IntentFilter(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED)
         context.applicationContext.registerRuntimeReceiver(receiver, filter)
-        ProcessLifecycleOwner.get().lifecycle.addObserver(this)
     }
 
-    override fun onStart(owner: LifecycleOwner) {
-        postCurrentState()
-    }
-
-    private fun postCurrentState() {
-        postValue(manager.getNetworkCapabilities(manager.activeNetwork)
-            ?.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) ?: false)
+    fun postCurrentState() {
+        postValue(
+            manager.getNetworkCapabilities(manager.activeNetwork)
+                ?.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) == true
+        )
     }
 
     private fun postValue(b: Boolean) {
