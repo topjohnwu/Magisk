@@ -60,5 +60,4 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.collection.ktx)
     implementation(libs.profileinstaller)
-    implementation(libs.lifecycle.process)
 }

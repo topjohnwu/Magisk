@@ -16,7 +16,6 @@ import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.base.UntrackedActivity
 import com.topjohnwu.magisk.core.utils.LocaleSetting
 import com.topjohnwu.magisk.core.utils.NetworkObserver
-import com.topjohnwu.magisk.core.utils.ProcessLifecycle
 import com.topjohnwu.magisk.core.utils.RootUtils
 import com.topjohnwu.magisk.core.utils.ShellInit
 import com.topjohnwu.superuser.Shell
@@ -40,6 +39,7 @@ object AppContext : ContextWrapper(null),
 
     private var ref = WeakReference<Activity>(null)
     private lateinit var application: Application
+    private lateinit var networkObserver: NetworkObserver
 
     init {
         // Always log full stack trace with Timber
@@ -54,6 +54,10 @@ object AppContext : ContextWrapper(null),
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         LocaleSetting.instance.updateResource(resources)
+    }
+
+    override fun onActivityStarted(activity: Activity) {
+        networkObserver.postCurrentState()
     }
 
     override fun onActivityResumed(activity: Activity) {
@@ -102,8 +106,7 @@ object AppContext : ContextWrapper(null),
             val lm = getSystemService(LocaleManager::class.java)
             lm.overrideLocaleConfig = LocaleSetting.localeConfig
         }
-        ProcessLifecycle.init(this)
-        NetworkObserver.init(this)
+        networkObserver = NetworkObserver.init(this)
         if (!BuildConfig.DEBUG && !isRunningAsStub) {
             GlobalScope.launch(Dispatchers.IO) {
                 ProfileInstaller.writeProfile(this@AppContext)
@@ -120,7 +123,6 @@ object AppContext : ContextWrapper(null),
     }
 
     override fun onActivityCreated(activity: Activity, bundle: Bundle?) {}
-    override fun onActivityStarted(activity: Activity) {}
     override fun onActivityStopped(activity: Activity) {}
     override fun onActivitySaveInstanceState(activity: Activity, bundle: Bundle) {}
     override fun onActivityDestroyed(activity: Activity) {}
