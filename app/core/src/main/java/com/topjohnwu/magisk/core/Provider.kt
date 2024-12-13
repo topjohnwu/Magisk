@@ -3,7 +3,6 @@ package com.topjohnwu.magisk.core
 import android.os.Bundle
 import com.topjohnwu.magisk.core.base.BaseProvider
 import com.topjohnwu.magisk.core.su.SuCallbackHandler
-import com.topjohnwu.magisk.core.su.TestHandler
 
 class Provider : BaseProvider() {
 
@@ -13,7 +12,7 @@ class Provider : BaseProvider() {
                 SuCallbackHandler.run(context!!, method, extras)
                 Bundle.EMPTY
             }
-            else -> TestHandler.run(method)
+            else -> Bundle.EMPTY
         }
     }
 }

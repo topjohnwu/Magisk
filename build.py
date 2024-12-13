@@ -426,19 +426,20 @@ def build_apk(module: str):
     source = Path(*paths, "build", "outputs", "apk", build_type, apk)
     target = config["outdir"] / apk
     mv(source, target)
-    header(f"Output: {target}")
+    return target
 
 
 def build_app():
     header("* Building the Magisk app")
-    build_apk(":app:apk")
+    apk = build_apk(":app:apk")
 
     build_type = "release" if args.release else "debug"
 
     # Rename apk-variant.apk to app-variant.apk
-    source = config["outdir"] / f"apk-{build_type}.apk"
-    target = config["outdir"] / f"app-{build_type}.apk"
+    source = apk
+    target = apk.parent / apk.name.replace("apk-", "app-")
     mv(source, target)
+    header(f"Output: {target}")
 
     # Stub building is directly integrated into the main app
     # build process. Copy the stub APK into output directory.
@@ -449,7 +450,14 @@ def build_app():
 
 def build_stub():
     header("* Building the stub app")
-    build_apk(":app:stub")
+    apk = build_apk(":app:stub")
+    header(f"Output: {apk}")
+
+
+def build_test():
+    header("* Building the test app")
+    apk = build_apk(":app:test")
+    header(f"Output: {apk}")
 
 
 ################
@@ -491,6 +499,7 @@ def cleanup():
 def build_all():
     build_native()
     build_app()
+    build_test()
 
 
 ############
@@ -719,6 +728,8 @@ def parse_args():
 
     stub_parser = subparsers.add_parser("stub", help="build the stub app")
 
+    test_parser = subparsers.add_parser("test", help="build the test app")
+
     clean_parser = subparsers.add_parser("clean", help="cleanup")
     clean_parser.add_argument(
         "targets", nargs="*", help="native, cpp, rust, java, or empty to clean all"
@@ -757,6 +768,7 @@ def parse_args():
     rustup_parser.set_defaults(func=setup_rustup)
     app_parser.set_defaults(func=build_app)
     stub_parser.set_defaults(func=build_stub)
+    test_parser.set_defaults(func=build_test)
     emu_parser.set_defaults(func=setup_avd)
     avd_patch_parser.set_defaults(func=patch_avd_file)
     clean_parser.set_defaults(func=cleanup)
