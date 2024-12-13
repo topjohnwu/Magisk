@@ -7,6 +7,7 @@ export PATH="$PATH:$ANDROID_HOME/platform-tools"
 emu="$ANDROID_HOME/emulator/emulator"
 sdk="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
 avd="$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager"
+test_pkg='com.topjohnwu.magisk.test'
 
 boot_timeout=600
 
@@ -23,17 +24,12 @@ print_error() {
   echo -e "\n\033[41;39m${1}\033[0m\n"
 }
 
-run_content_cmd() {
-  while true; do
-    local out=$(adb shell /system/xbin/su 0 content call --uri content://com.topjohnwu.magisk.provider --method $1 | tee /dev/fd/2)
-    if ! grep -q 'Bundle\[' <<< "$out"; then
-      # The call failed, wait a while and retry later
-      sleep 30
-    else
-      grep -q 'result=true' <<< "$out"
-      return $?
-    fi
-  done
+run_instrument_tests() {
+  local out=$(adb shell am instrument -w \
+    --user 0 \
+    -e class "$1" \
+    com.topjohnwu.magisk.test/androidx.test.runner.AndroidJUnitRunner)
+  grep -q 'OK (' <<< "$out"
 }
 
 test_setup() {
@@ -43,12 +39,18 @@ test_setup() {
   # Install the Magisk app
   adb install -r -g out/app-${variant}.apk
 
-  # Use the app to run setup and reboot
-  run_content_cmd setup
+  # Install the test app
+  adb install -r -g out/test-${variant}.apk
+
+  # Run setup through the test app
+  run_instrument_tests "$test_pkg.Environment#setupMagisk"
 }
 
 test_app() {
   # Run app tests
-  run_content_cmd test
+  run_instrument_tests "$test_pkg.MagiskAppTest"
+
+  # Test shell su request
+  run_instrument_tests "$test_pkg.Environment#setupShellGrantTest"
   adb shell /system/xbin/su 2000 su -c id | tee /dev/fd/2 | grep -q 'uid=0'
 }

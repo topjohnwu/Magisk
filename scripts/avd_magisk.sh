@@ -66,7 +66,7 @@ fi
 
 # Stop zygote (and previous setup if exists)
 magisk --stop 2>/dev/null
-stop zygote
+stop
 if [ -d /debug_ramdisk ]; then
   umount -l /debug_ramdisk 2>/dev/null
 fi
@@ -166,7 +166,7 @@ fi
 
 # Boot up
 $MAGISKTMP/magisk --post-fs-data
-start zygote
+start
 $MAGISKTMP/magisk --service
 # Make sure reset nb prop after zygote starts
 sleep 2
