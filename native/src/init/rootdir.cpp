@@ -1,8 +1,6 @@
 #include <sys/mount.h>
 #include <libgen.h>
 #include <sys/sysmacros.h>
-#include <syscall.h>
-#include <sys/xattr.h>
 
 #include <sepolicy.hpp>
 #include <consts.hpp>
@@ -15,13 +13,6 @@ using namespace std;
 
 static vector<string> rc_list;
 static string magic_mount_list;
-
-struct FileContext {
-    std::string path;
-    std::string con;
-};
-
-static std::vector<FileContext> mount_contexts;
 
 #define NEW_INITRC_DIR  "/system/etc/init/hw"
 #define INIT_RC         "init.rc"
@@ -47,46 +38,6 @@ static void magic_mount(const string &sdir, const string &ddir = "") {
                 magic_mount_list += '\n';
             }
         }
-    }
-}
-
-static int setfilecon(const char* path, const char* con) {
-    int ret = syscall(__NR_setxattr, path, XATTR_NAME_SELINUX, con, strlen(con) + 1, 0);
-    if (ret == -1) PLOGE("setfilecon %s %s", path, con);
-    return ret;
-}
-
-static std::string getfilecon(const char* path) {
-    char buf[1024];
-    ssize_t sz = syscall(__NR_getxattr, path, XATTR_NAME_SELINUX, buf, sizeof(buf));
-    if (sz == -1) {
-        PLOGE("getfilecon %s", path);
-        return "";
-    }
-    return buf;
-}
-
-static void collect_overlay_contexts(const string &sdir, const string &ddir = "") {
-    auto dir = xopen_dir(sdir.data());
-    if (!dir) return;
-    for (dirent *entry; (entry = xreaddir(dir.get()));) {
-        string src = sdir + "/" + entry->d_name;
-        string dest = ddir + "/" + entry->d_name;
-        if (access(dest.data(), F_OK) == 0) {
-            if (entry->d_type == DT_DIR) {
-                // Recursive
-                collect_overlay_contexts(src, dest);
-            } else {
-                mount_contexts.emplace_back(dest, getfilecon(dest.data()));
-            }
-        }
-    }
-}
-
-void reset_overlay_contexts() {
-    for (auto &attr: mount_contexts) {
-        LOGD("set %s -> %s", attr.path.c_str(), attr.con.c_str());
-        setfilecon(attr.path.c_str(), attr.con.c_str());
     }
 }
 
@@ -380,7 +331,7 @@ void MagiskInit::patch_ro_root() {
     // Extract overlay archives
     extract_files(false);
 
-    collect_overlay_contexts(ROOTOVL);
+    rust::collect_overlay_contexts(ROOTOVL);
 
     // Oculus Go will use a special sepolicy if unlocked
     if (access("/sepolicy.unlocked", F_OK) == 0) {
