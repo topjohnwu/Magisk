@@ -13,6 +13,7 @@ import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.core.AppContext
 import com.topjohnwu.magisk.core.BuildConfig
+import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.R
@@ -93,6 +94,7 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Handler {
             UpdateChecker -> withPostNotificationPermission(doAction)
             Authentication -> AuthEvent(doAction).publish()
             Hide, Restore -> withInstallPermission(doAction)
+            AutomaticResponse -> if (Config.suAuth) AuthEvent(doAction).publish() else doAction()
             else -> doAction()
         }
     }
