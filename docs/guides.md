@@ -138,7 +138,7 @@ If your module requires some additional sepolicy patches, please add those rules
 
 ## Magisk Module Installer
 
-A Magisk module installer is a Magisk module packaged in a zip file that can be flashed in the Magisk app or custom recoveries such as TWRP. The simplest Magisk module installer is just a Magisk module packed as a zip file, in addition to the following files:
+A Magisk module installer is a Magisk module packaged in a zip file that can be flashed in the Magisk app or custom recoveries such as TWRP. The simplest Magisk module installer is just a Magisk module packed as a zip file, in addition to the following files only if the module supports flashing in recovery:
 
 - `update-binary`: Download the latest [module_installer.sh](https://github.com/topjohnwu/Magisk/blob/master/scripts/module_installer.sh) and rename/copy that script as `update-binary`
 - `updater-script`: This file should only contain the string `#MAGISK`
@@ -148,7 +148,7 @@ The module installer script will setup the environment, extract the module files
 ```
 module.zip
 │
-├── META-INF
+├── META-INF                           <--- Only needed for flashing in recovery
 │   └── com
 │       └── google
 │           └── android
