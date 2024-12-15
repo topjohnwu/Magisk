@@ -111,6 +111,8 @@ impl SepolicyMagisk for sepolicy {
             // For relabelling files
             allow(["rootfs"], ["labeledfs", "tmpfs"], ["filesystem"], ["associate"]);
             allow([file], ["pipefs", "devpts"], ["filesystem"], ["associate"]);
+            allow(["kernel"], all, ["file"], ["relabelto"]);
+            allow(["kernel"], ["tmpfs"], ["file"], ["relabelfrom"]);
 
             // Let init transit to SEPOL_PROC_DOMAIN
             allow(["kernel"], ["kernel"], ["process"], ["setcurrent"]);
