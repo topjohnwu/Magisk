@@ -13,7 +13,6 @@ import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.R
 import com.topjohnwu.magisk.core.ktx.await
-import com.topjohnwu.magisk.core.ktx.copyAndClose
 import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.ktx.writeTo
 import com.topjohnwu.magisk.core.signing.JarMap
@@ -23,7 +22,6 @@ import com.topjohnwu.magisk.core.utils.Keygen
 import com.topjohnwu.magisk.utils.APKInstall
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
@@ -172,7 +170,7 @@ object AppMigration {
         activity.finish()
     }
 
-    private suspend fun patchAndHide(activity: Activity, label: String, onFailure: Runnable): Boolean {
+    private suspend fun patchAndHide(activity: Activity, label: String): Boolean {
         val stub = File(activity.cacheDir, "stub.apk")
         try {
             activity.assets.open("stub.apk").writeTo(stub)
@@ -190,23 +188,15 @@ object AppMigration {
             return false
 
         // Install and auto launch app
-        val session = APKInstall.startSession(activity, pkg, onFailure) {
+        val cmd = "adb_pm_install $repack $pkg"
+        if (Shell.cmd(cmd).exec().isSuccess) {
             Config.suManager = pkg
             Shell.cmd("touch $AppApkPath").exec()
             launchApp(activity, pkg)
-        }
-
-        val cmd = "adb_pm_install $repack $pkg"
-        if (Shell.cmd(cmd).exec().isSuccess) return true
-
-        try {
-            repack.inputStream().copyAndClose(session.openStream(activity))
-        } catch (e: IOException) {
-            Timber.e(e)
+            return true
+        } else {
             return false
         }
-        session.waitIntent()?.let { activity.startActivity(it) } ?: return false
-        return true
     }
 
     @Suppress("DEPRECATION")
@@ -217,14 +207,13 @@ object AppMigration {
             setCancelable(false)
             show()
         }
-        val onFailure = Runnable {
+        val success = withContext(Dispatchers.IO) {
+            patchAndHide(activity, label)
+        }
+        if (!success) {
             dialog.dismiss()
             activity.toast(R.string.failure, Toast.LENGTH_LONG)
         }
-        val success = withContext(Dispatchers.IO) {
-            patchAndHide(activity, label, onFailure)
-        }
-        if (!success) onFailure.run()
     }
 
     @Suppress("DEPRECATION")
@@ -235,30 +224,16 @@ object AppMigration {
             setCancelable(false)
             show()
         }
-        val onFailure = Runnable {
-            dialog.dismiss()
-            activity.toast(R.string.failure, Toast.LENGTH_LONG)
-        }
         val apk = StubApk.current(activity)
-        val session = APKInstall.startSession(activity, APP_PACKAGE_NAME, onFailure) {
+        val cmd = "adb_pm_install $apk $APP_PACKAGE_NAME"
+        if (Shell.cmd(cmd).await().isSuccess) {
             Config.suManager = ""
             Shell.cmd("touch $AppApkPath").exec()
             launchApp(activity, APP_PACKAGE_NAME)
-            dialog.dismiss()
+        } else {
+            activity.toast(R.string.failure, Toast.LENGTH_LONG)
         }
-        val cmd = "adb_pm_install $apk $APP_PACKAGE_NAME"
-        if (Shell.cmd(cmd).await().isSuccess) return
-        val success = withContext(Dispatchers.IO) {
-            try {
-                apk.inputStream().copyAndClose(session.openStream(activity))
-            } catch (e: IOException) {
-                Timber.e(e)
-                return@withContext false
-            }
-            session.waitIntent()?.let { activity.startActivity(it) } ?: return@withContext false
-            return@withContext true
-        }
-        if (!success) onFailure.run()
+        dialog.dismiss()
     }
 
     suspend fun upgradeStub(context: Context, apk: File): Intent? {
