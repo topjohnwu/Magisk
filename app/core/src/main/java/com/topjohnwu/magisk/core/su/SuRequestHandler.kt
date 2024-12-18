@@ -62,7 +62,7 @@ class SuRequestHandler(
             return false
         }
         output = File(fifo)
-        policy = SuPolicy(uid)
+        policy = policyDB.fetch(uid) ?: SuPolicy(uid)
         try {
             pkgInfo = pm.getPackageInfo(uid, pid) ?: PackageInfo().apply {
                 val name = pm.getNameForUid(uid) ?: throw PackageManager.NameNotFoundException()
