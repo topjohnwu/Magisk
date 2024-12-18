@@ -29,7 +29,7 @@ class AXML(b: ByteArray) {
      * Followed by an array of uint32_t with size = number of strings
      * Each entry points to an offset into the string data
      */
-    fun patchStrings(patchFn: (Array<String>) -> Unit): Boolean {
+    fun patchStrings(mapFn: (String) -> String): Boolean {
         val buffer = ByteBuffer.wrap(bytes).order(LITTLE_ENDIAN)
 
         fun findStringPool(): Int {
@@ -65,7 +65,9 @@ class AXML(b: ByteArray) {
         }
 
         val strArr = strList.toTypedArray()
-        patchFn(strArr)
+        for (i in strArr.indices) {
+            strArr[i] = mapFn(strArr[i])
+        }
 
         // Write everything before string data, will patch values later
         val baos = RawByteStream()

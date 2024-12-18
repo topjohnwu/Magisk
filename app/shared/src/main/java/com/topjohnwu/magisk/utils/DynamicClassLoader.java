@@ -12,7 +12,7 @@ import dalvik.system.BaseDexClassLoader;
 public class DynamicClassLoader extends BaseDexClassLoader {
 
     public DynamicClassLoader(File apk) {
-        this(apk, getSystemClassLoader());
+        this(apk, DynamicClassLoader.class.getClassLoader());
     }
 
     public DynamicClassLoader(File apk, ClassLoader parent) {

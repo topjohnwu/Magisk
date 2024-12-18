@@ -9,7 +9,7 @@
     </application>
 
     <instrumentation
-        android:name="androidx.test.runner.AndroidJUnitRunner"
+        android:name="com.topjohnwu.magisk.test.TestRunner"
         android:targetPackage="com.topjohnwu.magisk"
         android:label="Tests for Magisk" />
 
