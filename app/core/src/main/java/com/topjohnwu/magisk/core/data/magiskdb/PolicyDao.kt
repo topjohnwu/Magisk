@@ -20,7 +20,7 @@ class PolicyDao : MagiskDB() {
     }
 
     suspend fun fetch(uid: Int): SuPolicy? {
-        val query = "SELECT * FROM ${Table.POLICY} WHERE uid == $uid LIMIT = 1"
+        val query = "SELECT * FROM ${Table.POLICY} WHERE uid == $uid LIMIT 1"
         return exec(query, ::toPolicy).firstOrNull()
     }
 
