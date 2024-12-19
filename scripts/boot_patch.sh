@@ -195,18 +195,6 @@ rm -f ramdisk.cpio.orig config *.xz
 # Binary Patches
 #################
 
-for dt in dtb kernel_dtb extra; do
-  if [ -f $dt ]; then
-    if ! ./magiskboot dtb $dt test; then
-      ui_print "! Boot image $dt was patched by old (unsupported) Magisk"
-      abort "! Please try again with *unpatched* boot image"
-    fi
-    if ./magiskboot dtb $dt patch; then
-      ui_print "- Patch fstab in boot image $dt"
-    fi
-  fi
-done
-
 if [ -f kernel ]; then
   PATCHEDKERNEL=false
   # Remove Samsung RKP

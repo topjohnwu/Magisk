@@ -27,6 +27,5 @@ p521 = { workspace = true }
 rsa = { workspace = true, features = ["sha2"] }
 x509-cert = { workspace = true }
 der = { workspace = true, features = ["derive", "pem"] }
-fdt = { workspace = true }
 bytemuck = { workspace = true, features = ["derive", "min_const_generics"] }
 num-traits = { workspace = true }
