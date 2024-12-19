@@ -144,6 +144,8 @@ string resolve_preinit_dir(const char *base_dir) {
         dir += "/unencrypted/magisk";
     } else if (access((dir + "/adb").data(), F_OK) == 0) {
         dir += "/adb/modules";
+    } else if (access((dir + "/watchdog").data(), F_OK) == 0) {
+        dir += "/watchdog/magisk";
     } else {
         dir += "/magisk";
     }
