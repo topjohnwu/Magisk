@@ -29,9 +29,9 @@ print_error() {
 
 # $1 = TestClass#method
 # $2: boolean = isRepackaged
-run_instrument_test() {
+am_instrument() {
   local test_pkg
-  if [ -n "$2" -a $2 ]; then
+  if [ -n "$2" -a "$2" ]; then
     test_pkg="repackaged.com.topjohnwu.magisk.test"
   else
     test_pkg=com.topjohnwu.magisk.test
@@ -48,7 +48,7 @@ wait_for_pm() {
   adb shell pm uninstall $1 || true
 }
 
-test_setup() {
+run_setup() {
   local variant=$1
   adb shell 'PATH=$PATH:/debug_ramdisk magisk -v'
 
@@ -59,34 +59,34 @@ test_setup() {
   adb install -r -g out/test-${variant}.apk
 
   # Run setup through the test app
-  run_instrument_test 'Environment#setupMagisk'
+  am_instrument 'Environment#setupMagisk'
 }
 
-test_app() {
+run_tests() {
   # Run app tests
-  run_instrument_test 'MagiskAppTest'
+  am_instrument 'MagiskAppTest'
 
   # Test shell su request
-  run_instrument_test 'Environment#setupShellGrantTest'
+  am_instrument 'Environment#setupShellGrantTest'
   adb shell /system/xbin/su 2000 su -c id | tee /dev/fd/2 | grep -q 'uid=0'
   adb shell am force-stop com.topjohnwu.magisk
 
   # Test app hiding
-  run_instrument_test 'Environment#setupAppHide'
+  am_instrument 'Environment#setupAppHide'
   wait_for_pm com.topjohnwu.magisk
 
   # Make sure it still works
-  run_instrument_test 'MagiskAppTest' true
+  am_instrument 'MagiskAppTest' true
 
   # Test shell su request
-  run_instrument_test 'Environment#setupShellGrantTest' true
+  am_instrument 'Environment#setupShellGrantTest' true
   adb shell /system/xbin/su 2000 su -c id | tee /dev/fd/2 | grep -q 'uid=0'
   adb shell am force-stop repackaged.com.topjohnwu.magisk
 
   # Test app restore
-  run_instrument_test 'Environment#setupAppRestore' true
+  am_instrument 'Environment#setupAppRestore' true
   wait_for_pm repackaged.com.topjohnwu.magisk
 
   # Make sure it still works
-  run_instrument_test 'MagiskAppTest'
+  am_instrument 'MagiskAppTest'
 }

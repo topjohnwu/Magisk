@@ -14,7 +14,7 @@ lsposed_max_api=34
 huge_ram_min_api=26
 
 cleanup() {
-  print_error "! An error occurred when testing $pkg"
+  print_error "! An error occurred"
 
   rm -f magisk_patched.img
   "$avd" delete avd -n test
@@ -68,7 +68,7 @@ test_emu() {
   local variant=$1
   local api=$2
 
-  print_title "* Testing $pkg ($variant)"
+  print_title "* Testing $avd_pkg ($variant)"
 
   if [ -n "$AVD_TEST_LOG" ]; then
     "$emu" @test $emu_args > kernel.log 2>&1 &
@@ -79,7 +79,7 @@ test_emu() {
   emu_pid=$!
   wait_emu wait_for_boot
 
-  test_setup $variant
+  run_setup $variant
 
   local lsposed
   if [ $api -ge $lsposed_min_api -a $api -le $lsposed_max_api ]; then
@@ -97,7 +97,7 @@ test_emu() {
   adb reboot
   wait_emu wait_for_boot
 
-  test_app
+  run_tests
 
   # Try to launch LSPosed
   if $lsposed; then
@@ -108,10 +108,11 @@ test_emu() {
       adb shell uiautomator dump /data/local/tmp/window_dump.xml
     done
     adb shell grep -q org.lsposed.manager /data/local/tmp/window_dump.xml
+    adb pull /data/local/tmp/window_dump.xml
   fi
 }
 
-run_test() {
+test_main() {
   local ver=$1
   local type=$2
 
@@ -140,7 +141,7 @@ run_test() {
   fi
 
   # System image variable and paths
-  local pkg="system-images;android-$ver;$type;$arch"
+  local avd_pkg="system-images;android-$ver;$type;$arch"
   local sys_img_dir="$ANDROID_HOME/system-images/android-$ver/$type/$arch"
   local ramdisk="$sys_img_dir/ramdisk.img"
 
@@ -155,11 +156,11 @@ run_test() {
   emu_args="$emu_args_base -memory $memory"
 
   # Setup emulator
-  "$sdk" --channel=3 $pkg
-  echo no | "$avd" create avd -f -n test -k $pkg
+  "$sdk" --channel=3 $avd_pkg
+  echo no | "$avd" create avd -f -n test -k $avd_pkg
 
   # Launch stock emulator
-  print_title "* Launching $pkg"
+  print_title "* Launching $avd_pkg"
   "$emu" @test $emu_args >/dev/null 2>&1 &
   emu_pid=$!
   wait_emu wait_for_bootanim
@@ -222,15 +223,15 @@ adb kill-server
 adb start-server
 
 if [ -n "$1" ]; then
-  run_test $1 $2
+  test_main $1 $2
 else
   for api in $(seq 23 35); do
-    run_test $api
+    test_main $api
   done
   # Android 16 Beta
-  run_test Baklava google_apis
+  test_main Baklava google_apis
   # Run 16k page tests
-  run_test Baklava google_apis_ps16k
+  test_main Baklava google_apis_ps16k
 fi
 
 "$avd" delete avd -n test

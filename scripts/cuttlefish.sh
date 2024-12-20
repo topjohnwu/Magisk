@@ -67,7 +67,7 @@ test_cf() {
   print_title "* Testing $variant builds"
   timeout $boot_timeout bash -c "run_cvd_bin launch_cvd $cvd_args $magisk_args -resume=false"
   adb wait-for-device
-  test_setup $variant
+  run_setup $variant
 
   adb reboot
   sleep 5
@@ -75,10 +75,10 @@ test_cf() {
 
   timeout $boot_timeout bash -c "run_cvd_bin launch_cvd $cvd_args $magisk_args"
   adb wait-for-device
-  test_app
+  run_tests
 }
 
-run_test() {
+test_main() {
   # Launch stock cuttlefish
   run_cvd_bin launch_cvd $cvd_args -resume=false
   adb wait-for-device
@@ -111,7 +111,7 @@ case "$1" in
   test )
     trap cleanup EXIT
     export -f run_cvd_bin
-    run_test
+    test_main
     trap - EXIT
     ;;
   * )
