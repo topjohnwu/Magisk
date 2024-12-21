@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import copy
 import glob
 import lzma
 import multiprocessing
@@ -455,9 +456,18 @@ def build_stub():
 
 
 def build_test():
-    header("* Building the test app")
-    apk = build_apk(":app:test")
-    header(f"Output: {apk}")
+    global args
+    args_bak = copy.copy(args)
+    # Test APK has to be built as release to prevent classname clash
+    args.release = True
+    try:
+        header("* Building the test app")
+        source = build_apk(":app:test")
+        target = source.parent / "test.apk"
+        mv(source, target)
+        header(f"Output: {target}")
+    finally:
+        args = args_bak
 
 
 ################

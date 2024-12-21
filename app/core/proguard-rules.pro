@@ -22,6 +22,9 @@
   int mActivityHandlesConfigFlags;
 }
 
+# Keep all test classes
+-keep class com.topjohnwu.magisk.test.** { *; }
+
 # Strip Timber verbose and debug logging
 -assumenosideeffects class timber.log.Timber$Tree {
   public void v(**);
