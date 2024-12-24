@@ -8,7 +8,7 @@ on:
 jobs:
   build:
     name: Build Magisk artifacts
-    runs-on: macos-14
+    runs-on: macos-15
     strategy:
       fail-fast: false
     steps:
@@ -51,7 +51,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, ubuntu-latest]
+        os: [windows-2025, ubuntu-24.04]
     steps:
       - name: Check out
         uses: actions/checkout@v4
@@ -69,7 +69,7 @@ jobs:
 
   avd-test:
     name: Test API ${{ matrix.version }} (x86_64)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: build
     strategy:
       fail-fast: false
@@ -115,7 +115,7 @@ jobs:
 
   avd-test-32:
     name: Test API ${{ matrix.version }} (x86)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: build
     strategy:
       fail-fast: false
