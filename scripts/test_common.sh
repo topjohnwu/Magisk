@@ -2,6 +2,10 @@ if [ -z $ANDROID_HOME ]; then
   export ANDROID_HOME=$ANDROID_SDK_ROOT
 fi
 
+# Make sure paths are consistent
+export ANDROID_USER_HOME="$HOME/.android"
+export ANDROID_EMULATOR_HOME="$ANDROID_USER_HOME"
+export ANDROID_AVD_HOME="$ANDROID_EMULATOR_HOME/avd"
 export PATH="$PATH:$ANDROID_HOME/platform-tools"
 
 emu="$ANDROID_HOME/emulator/emulator"

@@ -27,7 +27,9 @@ setup_env() {
   sudo udevadm trigger
   sudo usermod -aG kvm,cvdnetwork,render $USER
   yes | "$sdk" --licenses > /dev/null
-  "$sdk" --channel=3 tools platform-tools
+  "$sdk" --channel=3 platform-tools
+  adb kill-server
+  adb start-server
 }
 
 download_cf() {
