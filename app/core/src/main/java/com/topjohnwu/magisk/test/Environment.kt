@@ -1,12 +1,10 @@
 package com.topjohnwu.magisk.test
 
 import android.app.Notification
-import android.content.Context
 import android.os.Build
 import androidx.annotation.Keep
 import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
 import com.topjohnwu.magisk.core.BuildConfig.APP_PACKAGE_NAME
 import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.download.DownloadNotifier
@@ -15,13 +13,10 @@ import com.topjohnwu.magisk.core.ktx.cachedFile
 import com.topjohnwu.magisk.core.tasks.AppMigration
 import com.topjohnwu.magisk.core.tasks.FlashZip
 import com.topjohnwu.magisk.core.tasks.MagiskInstaller
-import com.topjohnwu.magisk.core.utils.RootUtils
 import com.topjohnwu.superuser.CallbackList
-import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeTrue
-import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,16 +24,12 @@ import timber.log.Timber
 
 @Keep
 @RunWith(AndroidJUnit4::class)
-class Environment {
+class Environment : BaseTest {
 
     companion object {
         @BeforeClass
         @JvmStatic
-        fun before() {
-            assertTrue("Should have root access", Shell.getShell().isRoot)
-            // Make sure the root service is running
-            RootUtils.Connection.await()
-        }
+        fun before() = BaseTest.prerequisite()
 
         fun lsposed(): Boolean {
             return Build.VERSION.SDK_INT >= 27 && Build.VERSION.SDK_INT <= 34
@@ -52,13 +43,6 @@ class Environment {
         override fun onAddElement(e: String) {
             Timber.i(e)
         }
-    }
-
-    private lateinit var mContext: Context
-
-    @Before
-    fun setup() {
-        mContext = InstrumentationRegistry.getInstrumentation().targetContext
     }
 
     @Test
@@ -76,11 +60,11 @@ class Environment {
         assumeTrue(lsposed())
 
         val notify = object : DownloadNotifier {
-            override val context = mContext
+            override val context = this@Environment.context
             override fun notifyUpdate(id: Int, editor: (Notification.Builder) -> Unit) {}
         }
         val processor = DownloadProcessor(notify)
-        val zip = mContext.cachedFile("lsposed.zip")
+        val zip = context.cachedFile("lsposed.zip")
         runBlocking {
             ServiceLocator.networkService.fetchFile(LSPOSED_URL).byteStream().use {
                 processor.handleModule(it, zip.toUri())
@@ -98,7 +82,7 @@ class Environment {
             assertTrue(
                 "App hiding failed",
                 AppMigration.patchAndHide(
-                    context = mContext,
+                    context = context,
                     label = "Settings",
                     pkg = "repackaged.$APP_PACKAGE_NAME"
                 )
@@ -111,7 +95,7 @@ class Environment {
         runBlocking {
             assertTrue(
                 "App restoration failed",
-                AppMigration.restoreApp(mContext)
+                AppMigration.restoreApp(context)
             )
         }
     }

@@ -1,12 +1,11 @@
 package com.topjohnwu.magisk.test
 
-import android.app.Instrumentation
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
+import android.os.ParcelFileDescriptor.AutoCloseInputStream
 import androidx.annotation.Keep
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.di.ServiceLocator
@@ -15,29 +14,19 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
-import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.io.FileInputStream
 import java.util.concurrent.TimeUnit
 
 @Keep
 @RunWith(AndroidJUnit4::class)
-class MagiskAppTest {
+class MagiskAppTest : BaseTest {
 
     companion object {
         @BeforeClass
         @JvmStatic
-        fun before() = Environment.before()
-    }
-
-    private lateinit var inst: Instrumentation
-    private val uiAutomation get() = inst.uiAutomation
-
-    @Before
-    fun setup() {
-        inst = InstrumentationRegistry.getInstrumentation()
+        fun before() = BaseTest.prerequisite()
     }
 
     @Test
@@ -64,7 +53,7 @@ class MagiskAppTest {
 
         val filter = IntentFilter(Intent.ACTION_VIEW)
         filter.addCategory(Intent.CATEGORY_DEFAULT)
-        val monitor = inst.addMonitor(filter, null, false)
+        val monitor = instrumentation.addMonitor(filter, null, false)
 
         // Try to call su from ADB shell
         val cmd = if (Build.VERSION.SDK_INT < 24) {
@@ -80,10 +69,10 @@ class MagiskAppTest {
         assertNotNull("SuRequestActivity is not launched", suRequest)
 
         // Check that the request went through
-        FileInputStream(pfd.fileDescriptor).use {
+        AutoCloseInputStream(pfd).reader().use {
             assertTrue(
                 "Cannot grant root permission from shell",
-                it.reader().readText().contains("uid=0")
+                it.readText().contains("uid=0")
             )
         }
 
