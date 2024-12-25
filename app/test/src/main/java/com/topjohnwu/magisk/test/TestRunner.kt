@@ -6,6 +6,17 @@ import androidx.test.runner.AndroidJUnitRunner
 
 class TestRunner : AndroidJUnitRunner() {
     override fun onCreate(arguments: Bundle) {
+        // Support short-hand ".ClassName"
+        arguments.getString("class")?.let {
+            val classArg = it.split(",").joinToString(separator = ",") { clz ->
+                if (clz.startsWith(".")) {
+                    "com.topjohnwu.magisk.test$clz"
+                } else {
+                    clz
+                }
+            }
+            arguments.putString("class", classArg)
+        }
         // Force using the target context's classloader to run tests
         arguments.putString("classLoader", TestClassLoader::class.java.name)
         super.onCreate(arguments)
