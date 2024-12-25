@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnitRunner
 
-class TestRunner : AndroidJUnitRunner() {
+open class TestRunner : AndroidJUnitRunner() {
     override fun onCreate(arguments: Bundle) {
         // Support short-hand ".ClassName"
         arguments.getString("class")?.let {
@@ -17,6 +17,12 @@ class TestRunner : AndroidJUnitRunner() {
             }
             arguments.putString("class", classArg)
         }
+        super.onCreate(arguments)
+    }
+}
+
+class AppTestRunner : TestRunner() {
+    override fun onCreate(arguments: Bundle) {
         // Force using the target context's classloader to run tests
         arguments.putString("classLoader", TestClassLoader::class.java.name)
         super.onCreate(arguments)
