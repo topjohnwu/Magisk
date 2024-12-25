@@ -59,9 +59,10 @@ run_setup() {
 }
 
 run_tests() {
-  local self='com.topjohnwu.magisk.test/com.topjohnwu.magisk.test.TestRunner'
-  local app='com.topjohnwu.magisk.test/com.topjohnwu.magisk.test.AppTestRunner'
-  local stub='repackaged.com.topjohnwu.magisk.test/com.topjohnwu.magisk.test.AppTestRunner'
+  local pkg='com.topjohnwu.magisk.test'
+  local self="$pkg/$pkg.TestRunner"
+  local app="$pkg/$pkg.AppTestRunner"
+  local stub="repackaged.$pkg/$pkg.AppTestRunner"
 
   # Run app tests
   am_instrument '.MagiskAppTest,.AdditionalTest' $app
