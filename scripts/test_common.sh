@@ -28,16 +28,9 @@ print_error() {
 }
 
 # $1 = TestClass#method
-# $2: boolean = isRepackaged
+# $2 = component
 am_instrument() {
-  local test_pkg
-  if [ -n "$2" -a "$2" ]; then
-    test_pkg="repackaged.com.topjohnwu.magisk.test"
-  else
-    test_pkg=com.topjohnwu.magisk.test
-  fi
-  local out=$(adb shell am instrument -w --user 0 -e class "$1" \
-    "$test_pkg/com.topjohnwu.magisk.test.TestRunner")
+  local out=$(adb shell am instrument -w --user 0 -e class "$1" "$2")
   grep -q 'OK (' <<< "$out"
 }
 
@@ -57,27 +50,31 @@ run_setup() {
   # Install the test app
   adb install -r -g out/test.apk
 
+  local app='com.topjohnwu.magisk.test/com.topjohnwu.magisk.test.AppTestRunner'
+
   # Run setup through the test app
-  am_instrument '.Environment#setupMagisk'
+  am_instrument '.Environment#setupMagisk' $app
   # Install LSPosed
-  am_instrument '.Environment#setupLsposed'
+  am_instrument '.Environment#setupLsposed' $app
 }
 
 run_tests() {
+  local self='com.topjohnwu.magisk.test/com.topjohnwu.magisk.test.TestRunner'
+  local app='com.topjohnwu.magisk.test/com.topjohnwu.magisk.test.AppTestRunner'
+  local stub='repackaged.com.topjohnwu.magisk.test/com.topjohnwu.magisk.test.AppTestRunner'
+
   # Run app tests
-  am_instrument '.MagiskAppTest,.AdditionalTest'
+  am_instrument '.MagiskAppTest,.AdditionalTest' $app
 
   # Test app hiding
-  am_instrument '.Environment#setupAppHide'
-  wait_for_pm com.topjohnwu.magisk
+  am_instrument '.AppMigrationTest#testAppHide' $self
 
   # Make sure it still works
-  am_instrument '.MagiskAppTest' true
+  am_instrument '.MagiskAppTest' $stub
 
   # Test app restore
-  am_instrument '.Environment#setupAppRestore' true
-  wait_for_pm repackaged.com.topjohnwu.magisk
+  am_instrument '.AppMigrationTest#testAppRestore' $self
 
   # Make sure it still works
-  am_instrument '.MagiskAppTest'
+  am_instrument '.MagiskAppTest' $app
 }
