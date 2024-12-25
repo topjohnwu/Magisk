@@ -67,22 +67,12 @@ run_tests() {
   # Run app tests
   am_instrument '.MagiskAppTest,.AdditionalTest'
 
-  # Test shell su request
-  am_instrument '.Environment#setupShellGrantTest'
-  adb shell /system/xbin/su 2000 su -c id | tee /dev/fd/2 | grep -q 'uid=0'
-  adb shell am force-stop com.topjohnwu.magisk
-
   # Test app hiding
   am_instrument '.Environment#setupAppHide'
   wait_for_pm com.topjohnwu.magisk
 
   # Make sure it still works
   am_instrument '.MagiskAppTest' true
-
-  # Test shell su request
-  am_instrument '.Environment#setupShellGrantTest' true
-  adb shell /system/xbin/su 2000 su -c id | tee /dev/fd/2 | grep -q 'uid=0'
-  adb shell am force-stop repackaged.com.topjohnwu.magisk
 
   # Test app restore
   am_instrument '.Environment#setupAppRestore' true

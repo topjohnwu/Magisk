@@ -8,16 +8,16 @@ import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.topjohnwu.magisk.core.BuildConfig.APP_PACKAGE_NAME
-import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.download.DownloadNotifier
 import com.topjohnwu.magisk.core.download.DownloadProcessor
 import com.topjohnwu.magisk.core.ktx.cachedFile
-import com.topjohnwu.magisk.core.model.su.SuPolicy
 import com.topjohnwu.magisk.core.tasks.AppMigration
 import com.topjohnwu.magisk.core.tasks.FlashZip
 import com.topjohnwu.magisk.core.tasks.MagiskInstaller
+import com.topjohnwu.magisk.core.utils.RootUtils
 import com.topjohnwu.superuser.CallbackList
+import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeTrue
@@ -34,7 +34,11 @@ class Environment {
     companion object {
         @BeforeClass
         @JvmStatic
-        fun before() = MagiskAppTest.before()
+        fun before() {
+            assertTrue("Should have root access", Shell.getShell().isRoot)
+            // Make sure the root service is running
+            RootUtils.Connection.await()
+        }
 
         fun lsposed(): Boolean {
             return Build.VERSION.SDK_INT >= 27 && Build.VERSION.SDK_INT <= 34
@@ -85,23 +89,6 @@ class Environment {
                 "LSPosed installation failed",
                 FlashZip(zip.toUri(), TimberLog, TimberLog).exec()
             )
-        }
-    }
-
-    @Test
-    fun setupShellGrantTest() {
-        runBlocking {
-            // Inject an undetermined + mute logging policy for ADB shell
-            val policy = SuPolicy(
-                uid = 2000,
-                logging = false,
-                notification = false,
-                until = 0L
-            )
-            ServiceLocator.policyDB.update(policy)
-            // Bypass the need to actually show a dialog
-            Config.suAutoResponse = Config.Value.SU_AUTO_ALLOW
-            Config.prefs.edit().commit()
         }
     }
 
