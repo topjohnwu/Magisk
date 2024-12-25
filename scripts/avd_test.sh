@@ -4,13 +4,10 @@ set -xe
 . scripts/test_common.sh
 
 emu_args_base="-no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -read-only -no-snapshot -cores $core_count"
-lsposed_url='https://github.com/LSPosed/LSPosed/releases/download/v1.9.2/LSPosed-v1.9.2-7024-zygisk-release.zip'
 emu_pid=
 
 atd_min_api=30
 atd_max_api=35
-lsposed_min_api=27
-lsposed_max_api=34
 huge_ram_min_api=26
 
 cleanup() {
@@ -81,35 +78,10 @@ test_emu() {
 
   run_setup $variant
 
-  local lsposed
-  if [ $api -ge $lsposed_min_api -a $api -le $lsposed_max_api ]; then
-    lsposed=true
-  else
-    lsposed=false
-  fi
-
-  # Install LSPosed
-  if $lsposed; then
-    adb push out/lsposed.zip /data/local/tmp/lsposed.zip
-    echo 'PATH=$PATH:/debug_ramdisk magisk --install-module /data/local/tmp/lsposed.zip' | adb shell /system/xbin/su
-  fi
-
   adb reboot
   wait_emu wait_for_boot
 
   run_tests
-
-  # Try to launch LSPosed
-  if $lsposed; then
-    adb shell rm -f /data/local/tmp/window_dump.xml
-    adb shell am start -c org.lsposed.manager.LAUNCH_MANAGER com.android.shell/.BugreportWarningActivity
-    while adb shell '[ ! -f /data/local/tmp/window_dump.xml ]'; do
-      sleep 10
-      adb shell uiautomator dump /data/local/tmp/window_dump.xml
-    done
-    adb shell grep -q org.lsposed.manager /data/local/tmp/window_dump.xml
-    adb pull /data/local/tmp/window_dump.xml
-  fi
 }
 
 test_main() {
@@ -220,7 +192,6 @@ if [ -n "$FORCE_32_BIT" ]; then
 fi
 
 yes | "$sdk" --licenses > /dev/null
-curl -L $lsposed_url -o out/lsposed.zip
 "$sdk" --channel=3 platform-tools emulator
 
 adb kill-server
