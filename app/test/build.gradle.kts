@@ -10,14 +10,19 @@ android {
         applicationId = "com.topjohnwu.magisk.test"
         versionCode = 1
         versionName = "1.0"
+        proguardFile("proguard-rules.pro")
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = true
+        }
     }
 }
 
 setupAppCommon()
 
 dependencies {
-    compileOnly(project(":app:core"))
-
     implementation(libs.test.runner)
     implementation(libs.test.rules)
     implementation(libs.test.junit)

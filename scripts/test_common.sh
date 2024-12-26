@@ -56,7 +56,7 @@ run_setup() {
   adb install -r -g out/app-${variant}.apk
 
   # Install the test app
-  adb install -r -g out/test-${variant}.apk
+  adb install -r -g out/test.apk
 
   # Run setup through the test app
   am_instrument 'Environment#setupMagisk'

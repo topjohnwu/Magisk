@@ -2,8 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission tools:node="removeAll" />
-
     <application tools:node="replace">
         <uses-library android:name="android.test.runner" />
     </application>
