@@ -13,6 +13,24 @@ using rust::Vec;
 // so performance is absolutely critical. Most operations should either have its result cached
 // or simply skipped unless necessary.
 
+struct file_info {
+    const string path;
+
+    file_info() = default;
+    file_info(string path, const struct stat *st) : path(std::move(path)) {
+        memcpy(&timestamp, &st->st_ctim, sizeof(timestamp));
+    }
+
+    bool is_same() const {
+        if (path.empty()) return false;
+        struct stat st{};
+        if (stat(path.data(), &st) != 0) return false;
+        return timestamp.tv_sec == st.st_ctim.tv_sec && timestamp.tv_nsec == st.st_ctim.tv_nsec;
+    }
+private:
+    timespec timestamp{};
+};
+
 static pthread_mutex_t pkg_lock = PTHREAD_MUTEX_INITIALIZER;
 // pkg_lock protects all following variables
 static int stub_apk_fd = -1;
@@ -20,10 +38,10 @@ static int repackaged_app_id = -1; // Only used by dyn
 static string repackaged_pkg;
 static Vec<uint8_t> repackaged_cert;
 static Vec<uint8_t> trusted_cert;
-static map<int, pair<string, time_t>> user_to_check;
+static map<int, file_info> tracked_files;
 enum status {
     INSTALLED,
-    NO_INSTALLED,
+    NOT_INSTALLED,
     CERT_MISMATCH,
 };
 
@@ -93,7 +111,7 @@ static status check_dyn(int user, string &pkg) {
     int dyn = open(apk, O_RDONLY | O_CLOEXEC);
     if (dyn < 0) {
         LOGW("pkg: no dyn APK, ignore\n");
-        return NO_INSTALLED;
+        return NOT_INSTALLED;
     }
     auto cert = read_certificate(dyn, MAGISK_VER_CODE);
     fstat(dyn, &st);
@@ -108,7 +126,8 @@ static status check_dyn(int user, string &pkg) {
     }
 
     repackaged_app_id = to_app_id(st.st_uid);
-    user_to_check[user] = make_pair(apk, st.st_ctim.tv_sec);
+    tracked_files.erase(user);
+    tracked_files.try_emplace(user, apk, &st);
     return INSTALLED;
 }
 
@@ -119,7 +138,7 @@ static status check_stub(int user, string &pkg) {
     string apk((const char *) buf.buf(), buf.sz());
     int fd = xopen(apk.data(), O_RDONLY | O_CLOEXEC);
     if (fd < 0)
-        return NO_INSTALLED;
+        return NOT_INSTALLED;
     auto cert = read_certificate(fd, -1);
     fstat(fd, &st);
     close(fd);
@@ -132,7 +151,8 @@ static status check_stub(int user, string &pkg) {
 
     repackaged_pkg.swap(pkg);
     repackaged_cert.swap(cert);
-    user_to_check[user] = make_pair(apk, st.st_ctim.tv_sec);
+    tracked_files.erase(user);
+    tracked_files.try_emplace(user, apk, &st);
 
     return INSTALLED;
 }
@@ -144,7 +164,7 @@ static status check_orig(int user) {
     string apk((const char *) buf.buf(), buf.sz());
     int fd = xopen(apk.data(), O_RDONLY | O_CLOEXEC);
     if (fd < 0)
-        return NO_INSTALLED;
+        return NOT_INSTALLED;
     auto cert = read_certificate(fd, MAGISK_VER_CODE);
     fstat(fd, &st);
     close(fd);
@@ -157,7 +177,8 @@ static status check_orig(int user) {
 #endif
     }
 
-    user_to_check[user] = make_pair(apk, st.st_ctim.tv_sec);
+    tracked_files.erase(user);
+    tracked_files.try_emplace(user, apk, &st);
     return INSTALLED;
 }
 
@@ -174,17 +195,25 @@ static int get_pkg_uid(int user, const char *pkg) {
 int get_manager(int user, string *pkg, bool install) {
     mutex_guard g(pkg_lock);
 
-    struct stat st{};
-    const auto &[path, time] = user_to_check[user];
-    if (stat(path.data(), &st) == 0 && st.st_ctim.tv_sec == time) {
+    db_strings str;
+    get_db_strings(str, SU_MANAGER);
+    string db_pkg(std::move(str[SU_MANAGER]));
+
+    // If database changed, always re-check files
+    if (db_pkg != repackaged_pkg) {
+        tracked_files.erase(user);
+    }
+
+    const auto &file = tracked_files[user];
+    if (file.is_same()) {
         // no APK
-        if (path == "/data/system/packages.xml") {
+        if (file.path == "/data/system/packages.xml") {
             if (install) install_stub();
             if (pkg) pkg->clear();
             return -1;
         }
         // dyn APK is still the same
-        if (path.starts_with(APP_DATA_DIR)) {
+        if (file.path.starts_with(APP_DATA_DIR)) {
             if (pkg) *pkg = repackaged_pkg;
             return user * AID_USER_OFFSET + repackaged_app_id;
         }
@@ -209,11 +238,8 @@ int get_manager(int user, string *pkg, bool install) {
         }
     }
 
-    db_strings str;
-    get_db_strings(str, SU_MANAGER);
-
-    if (!str[SU_MANAGER].empty()) {
-        switch (check_stub(user, str[SU_MANAGER])) {
+    if (!db_pkg.empty()) {
+        switch (check_stub(user, db_pkg)) {
             case INSTALLED:
                 if (check_dyn(user, repackaged_pkg) == INSTALLED) {
                     if (pkg) *pkg = repackaged_pkg;
@@ -224,7 +250,8 @@ int get_manager(int user, string *pkg, bool install) {
                 }
             case CERT_MISMATCH:
                 install = true;
-            case NO_INSTALLED:
+            case NOT_INSTALLED:
+                rm_db_strings(SU_MANAGER);
                 break;
         }
     }
@@ -244,13 +271,15 @@ int get_manager(int user, string *pkg, bool install) {
         }
         case CERT_MISMATCH:
             install = true;
-        case NO_INSTALLED:
+        case NOT_INSTALLED:
             break;
     }
 
     auto xml = "/data/system/packages.xml";
+    struct stat st{};
     stat(xml, &st);
-    user_to_check[user] = make_pair(xml, st.st_ctim.tv_sec);
+    tracked_files.erase(user);
+    tracked_files.try_emplace(user, xml, &st);
 
     if (install) install_stub();
     if (pkg) pkg->clear();

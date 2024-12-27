@@ -4,17 +4,14 @@ set -xe
 . scripts/test_common.sh
 
 emu_args_base="-no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -read-only -no-snapshot -cores $core_count"
-lsposed_url='https://github.com/LSPosed/LSPosed/releases/download/v1.9.2/LSPosed-v1.9.2-7024-zygisk-release.zip'
 emu_pid=
 
 atd_min_api=30
 atd_max_api=35
-lsposed_min_api=27
-lsposed_max_api=34
 huge_ram_min_api=26
 
 cleanup() {
-  print_error "! An error occurred when testing $pkg"
+  print_error "! An error occurred"
 
   rm -f magisk_patched.img
   "$avd" delete avd -n test
@@ -68,7 +65,7 @@ test_emu() {
   local variant=$1
   local api=$2
 
-  print_title "* Testing $pkg ($variant)"
+  print_title "* Testing $avd_pkg ($variant)"
 
   if [ -n "$AVD_TEST_LOG" ]; then
     "$emu" @test $emu_args > kernel.log 2>&1 &
@@ -79,39 +76,15 @@ test_emu() {
   emu_pid=$!
   wait_emu wait_for_boot
 
-  test_setup $variant
-
-  local lsposed
-  if [ $api -ge $lsposed_min_api -a $api -le $lsposed_max_api ]; then
-    lsposed=true
-  else
-    lsposed=false
-  fi
-
-  # Install LSPosed
-  if $lsposed; then
-    adb push out/lsposed.zip /data/local/tmp/lsposed.zip
-    echo 'PATH=$PATH:/debug_ramdisk magisk --install-module /data/local/tmp/lsposed.zip' | adb shell /system/xbin/su
-  fi
+  run_setup $variant
 
   adb reboot
   wait_emu wait_for_boot
 
-  test_app
-
-  # Try to launch LSPosed
-  if $lsposed; then
-    adb shell rm -f /data/local/tmp/window_dump.xml
-    adb shell am start -c org.lsposed.manager.LAUNCH_MANAGER com.android.shell/.BugreportWarningActivity
-    while adb shell '[ ! -f /data/local/tmp/window_dump.xml ]'; do
-      sleep 10
-      adb shell uiautomator dump /data/local/tmp/window_dump.xml
-    done
-    adb shell grep -q org.lsposed.manager /data/local/tmp/window_dump.xml
-  fi
+  run_tests
 }
 
-run_test() {
+test_main() {
   local ver=$1
   local type=$2
 
@@ -140,7 +113,7 @@ run_test() {
   fi
 
   # System image variable and paths
-  local pkg="system-images;android-$ver;$type;$arch"
+  local avd_pkg="system-images;android-$ver;$type;$arch"
   local sys_img_dir="$ANDROID_HOME/system-images/android-$ver/$type/$arch"
   local ramdisk="$sys_img_dir/ramdisk.img"
 
@@ -155,11 +128,11 @@ run_test() {
   emu_args="$emu_args_base -memory $memory"
 
   # Setup emulator
-  "$sdk" --channel=3 $pkg
-  echo no | "$avd" create avd -f -n test -k $pkg
+  "$sdk" --channel=3 $avd_pkg
+  echo no | "$avd" create avd -f -n test -k $avd_pkg
 
   # Launch stock emulator
-  print_title "* Launching $pkg"
+  print_title "* Launching $avd_pkg"
   "$emu" @test $emu_args >/dev/null 2>&1 &
   emu_pid=$!
   wait_emu wait_for_bootanim
@@ -170,17 +143,21 @@ run_test() {
     emu_args="$emu_args -show-kernel -logcat '' -logcat-output logcat.log"
   fi
 
-  # Patch and test debug build
-  ./build.py avd_patch -s "$ramdisk" magisk_patched.img
-  kill -INT $emu_pid
-  wait $emu_pid
-  test_emu debug $api
+  if [ -z "$AVD_TEST_SKIP_DEBUG" ]; then
+    # Patch and test debug build
+    ./build.py avd_patch -s "$ramdisk" magisk_patched.img
+    kill -INT $emu_pid
+    wait $emu_pid
+    test_emu debug $api
+  fi
 
-  # Patch and test release build
-  ./build.py -r avd_patch -s "$ramdisk" magisk_patched.img
-  kill -INT $emu_pid
-  wait $emu_pid
-  test_emu release $api
+  if [ -z "$AVD_TEST_SKIP_RELEASE" ]; then
+    # Patch and test release build
+    ./build.py -r avd_patch -s "$ramdisk" magisk_patched.img
+    kill -INT $emu_pid
+    wait $emu_pid
+    test_emu release $api
+  fi
 
   # Cleanup
   kill -INT $emu_pid
@@ -215,19 +192,21 @@ if [ -n "$FORCE_32_BIT" ]; then
 fi
 
 yes | "$sdk" --licenses > /dev/null
-curl -L $lsposed_url -o out/lsposed.zip
 "$sdk" --channel=3 platform-tools emulator
 
+adb kill-server
+adb start-server
+
 if [ -n "$1" ]; then
-  run_test $1 $2
+  test_main $1 $2
 else
   for api in $(seq 23 35); do
-    run_test $api
+    test_main $api
   done
   # Android 16 Beta
-  run_test Baklava google_apis
+  test_main Baklava google_apis
   # Run 16k page tests
-  run_test Baklava google_apis_ps16k
+  test_main Baklava google_apis_ps16k
 fi
 
 "$avd" delete avd -n test

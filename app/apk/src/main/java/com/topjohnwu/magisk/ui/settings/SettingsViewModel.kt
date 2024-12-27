@@ -93,7 +93,6 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Handler {
             DownloadPath -> withExternalRW(doAction)
             UpdateChecker -> withPostNotificationPermission(doAction)
             Authentication -> AuthEvent(doAction).publish()
-            Hide, Restore -> withInstallPermission(doAction)
             AutomaticResponse -> if (Config.suAuth) AuthEvent(doAction).publish() else doAction()
             else -> doAction()
         }

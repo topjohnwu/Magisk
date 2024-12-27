@@ -124,6 +124,8 @@ If you place a file named `.replace` in any of the folders, instead of merging i
 
 If you want to replace files in `/vendor`, `/product`, or `/system_ext`, please place them under `system/vendor`, `system/product`, and `system/system_ext` respectively. Magisk will transparently handle whether these partitions are in a separate partition or not.
 
+If you want to remove a specific file or folder, please place a dummy character device with major number 0 and minor number 0 in the same path. For example, if you want to remove `/system/app/GoogleCamera`, you can `mknod GoogleCamera c 0 0` in `$MODDIR/system/app`.
+
 #### Zygisk
 
 Zygisk is a feature of Magisk that allows advanced module developers to run code directly in every Android applications' processes before they are specialized and running. For more details about the Zygisk API and building a Zygisk module, please checkout the [Zygisk Module Sample](https://github.com/topjohnwu/zygisk-module-sample) project.
@@ -138,7 +140,7 @@ If your module requires some additional sepolicy patches, please add those rules
 
 ## Magisk Module Installer
 
-A Magisk module installer is a Magisk module packaged in a zip file that can be flashed in the Magisk app or custom recoveries such as TWRP. The simplest Magisk module installer is just a Magisk module packed as a zip file, in addition to the following files:
+A Magisk module installer is a Magisk module packaged in a zip file that can be flashed in the Magisk app or custom recoveries such as TWRP. The simplest Magisk module installer is just a Magisk module packed as a zip file, in addition to the following files only if the module supports flashing in recovery:
 
 - `update-binary`: Download the latest [module_installer.sh](https://github.com/topjohnwu/Magisk/blob/master/scripts/module_installer.sh) and rename/copy that script as `update-binary`
 - `updater-script`: This file should only contain the string `#MAGISK`
@@ -148,7 +150,7 @@ The module installer script will setup the environment, extract the module files
 ```
 module.zip
 │
-├── META-INF
+├── META-INF                           <--- Only needed for flashing in recovery
 │   └── com
 │       └── google
 │           └── android
@@ -212,7 +214,7 @@ set_perm_recursive <directory> <owner> <group> <dirpermission> <filepermission> 
 
 For convenience, you can also declare a list of folders you want to replace in the variable name `REPLACE`. The module installer script will create the `.replace` file into the folders listed in `REPLACE`. For example:
 
-```
+```sh
 REPLACE="
 /system/app/YouTube
 /system/app/Bloatware
@@ -220,6 +222,17 @@ REPLACE="
 ```
 
 The list above will result in the following files being created: `$MODPATH/system/app/YouTube/.replace` and `$MODPATH/system/app/Bloatware/.replace`.
+
+For convenience, you can also declare a list of files/folders you want to remove in the variable name `REMOVE`. The module installer script will create the corresponding dummy devices. For example:
+
+```sh
+REMOVE="
+/system/app/YouTube
+/system/fonts/Roboto.ttf
+"
+```
+
+The list above will result in the following dummy devices being created: `$MODPATH/system/app/YouTube` and `$MODPATH/system/fonts/Roboto.ttf`.
 
 #### Notes
 

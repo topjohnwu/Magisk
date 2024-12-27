@@ -29,6 +29,10 @@ static void magic_mount(const string &sdir, const string &ddir = "") {
                 magic_mount(src, dest);
             } else {
                 LOGD("Mount [%s] -> [%s]\n", src.data(), dest.data());
+                struct stat st;
+                xstat(dest.data(), &st);
+                chmod(src.data(), st.st_mode & 0777);
+                chown(src.data(), st.st_uid, st.st_gid);
                 xmount(src.data(), dest.data(), nullptr, MS_BIND, nullptr);
                 magic_mount_list += dest;
                 magic_mount_list += '\n';
@@ -326,6 +330,8 @@ void MagiskInit::patch_ro_root() {
 
     // Extract overlay archives
     extract_files(false);
+
+    rust::collect_overlay_contexts(ROOTOVL);
 
     // Oculus Go will use a special sepolicy if unlocked
     if (access("/sepolicy.unlocked", F_OK) == 0) {
