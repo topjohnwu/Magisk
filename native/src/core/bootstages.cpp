@@ -154,7 +154,6 @@ bool MagiskD::post_fs_data() const noexcept {
     LOGI("** post-fs-data mode running\n");
 
     preserve_stub_apk();
-    prune_su_access();
 
     bool safe_mode = false;
 
@@ -167,6 +166,8 @@ bool MagiskD::post_fs_data() const noexcept {
             return safe_mode;
         }
     }
+
+    prune_su_access();
 
     if (!magisk_env()) {
         LOGE("* Magisk environment incomplete, abort\n");
