@@ -129,6 +129,7 @@ struct owned_fd;
 struct db_result {
     db_result() = default;
     db_result(const char *s) : err(s) {}
+    db_result(int code);
     bool check_err();
     operator bool() { return err.empty(); }
 private:
