@@ -36,11 +36,13 @@ struct PropFlags {
     void setContext() { flags |= (1 << 2); }
     void setPersistOnly() { flags |= (1 << 3); setPersist(); }
     void setWait() { flags |= (1 << 4); }
+    void setSkipWait() { flags |= (1 << 5); }
     bool isSkipSvc() const { return flags & 1; }
     bool isPersist() const { return flags & (1 << 1); }
     bool isContext() const { return flags & (1 << 2); }
     bool isPersistOnly() const { return flags & (1 << 3); }
     bool isWait() const { return flags & (1 << 4); }
+    bool isSkipWait() const { return flags & (1 << 5); }
 private:
     uint32_t flags = 0;
 };
@@ -77,6 +79,8 @@ Read mode flags:
 
 Write mode flags:
    -n      set properties bypassing property_service
+   -s      set properties bypassing property_service and avoid triggering
+           system_property_wait
    -p      always write persistent prop changes to storage
 
 )EOF", arg0);
@@ -167,6 +171,8 @@ static int set_prop(const char *name, const char *value, PropFlags flags) {
     if (pi != nullptr) {
         if (flags.isSkipSvc()) {
             ret = __system_property_update(pi, value, strlen(value));
+        } else if (flags.isSkipWait()) {
+            ret = __system_property_update(pi, value, strlen(value), true);
         } else {
             ret = system_property_set(name, value);
         }
@@ -357,6 +363,9 @@ int resetprop_main(int argc, char *argv[]) {
                 continue;
             case 'P':
                 flags.setPersistOnly();
+                continue;
+            case 's':
+                flags.setSkipWait();
                 continue;
             case 'v':
                 set_log_level_state(LogLevel::Debug, true);
