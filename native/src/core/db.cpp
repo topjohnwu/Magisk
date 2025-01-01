@@ -11,40 +11,8 @@
 
 using namespace std;
 
-static sqlite3 *mDB = nullptr;
-
 #define DBLOGV(...)
 //#define DBLOGV(...) LOGD("magiskdb: " __VA_ARGS__)
-
-int db_strings::get_idx(string_view key) const {
-    int idx = 0;
-    for (const char *k : DB_STRING_KEYS) {
-        if (key == k)
-            break;
-        ++idx;
-    }
-    return idx;
-}
-
-db_settings::db_settings() {
-    // Default settings
-    data[ROOT_ACCESS] = ROOT_ACCESS_APPS_AND_ADB;
-    data[SU_MULTIUSER_MODE] = MULTIUSER_MODE_OWNER_ONLY;
-    data[SU_MNT_NS] = NAMESPACE_MODE_REQUESTER;
-    data[DENYLIST_CONFIG] = false;
-    data[ZYGISK_CONFIG] = MagiskD().is_emulator();
-    data[BOOTLOOP_COUNT] = 0;
-}
-
-int db_settings::get_idx(string_view key) const {
-    int idx = 0;
-    for (const char *k : DB_SETTING_KEYS) {
-        if (key == k)
-            break;
-        ++idx;
-    }
-    return idx;
-}
 
 struct db_result {
     db_result() = default;
@@ -61,11 +29,11 @@ private:
     string err;
 };
 
-static int sql_exec(sqlite3 *db, const char *sql, sqlite_row_callback callback = nullptr, void *v = nullptr) {
-    return sql_exec(db, sql, {}, callback, v);
+static int sql_exec(sqlite3 *db, const char *sql, sql_exec_callback callback = nullptr, void *v = nullptr) {
+    return sql_exec(db, sql, nullptr, nullptr, callback, v);
 }
 
-static db_result open_and_init_db() {
+static db_result open_and_init_db_impl(sqlite3 **dbOut) {
     if (!load_sqlite())
         return "Cannot load libsqlite.so";
 
@@ -79,8 +47,8 @@ static db_result open_and_init_db() {
 
     int ver = 0;
     bool upgrade = false;
-    auto ver_cb = [](void *ver, auto, StringSlice data) {
-        *((int *) ver) = parse_int(data[0].c_str());
+    auto ver_cb = [](void *ver, auto, DbValues &data) {
+        *static_cast<int *>(ver) = data.get_int(0);
     };
     fn_run_ret(sql_exec, db.get(), "PRAGMA user_version", ver_cb, &ver);
     if (ver > DB_VERSION) {
@@ -190,40 +158,48 @@ static db_result open_and_init_db() {
         sprintf(query, "PRAGMA user_version=%d", ver);
         fn_run_ret(sql_exec, db.get(), query);
     }
-    mDB = db.release();
+
+    *dbOut = db.release();
     return {};
 }
 
-static db_result ensure_db() {
-    if (mDB == nullptr) {
-        db_result res = open_and_init_db();
-        if (!res) {
-            // Open fails, remove and reconstruct
+sqlite3 *open_and_init_db() {
+    sqlite3 *db = nullptr;
+    if (!open_and_init_db_impl(&db))
+        return nullptr;
+    return db;
+}
+
+static sqlite3 *get_db() {
+    static sqlite3 *db = nullptr;
+    if (db == nullptr) {
+        db = open_and_init_db();
+        if (db == nullptr) {
+            // Open failed, remove and reconstruct
             unlink(MAGISKDB);
-            return open_and_init_db();
+            db = open_and_init_db();
         }
     }
-    return {};
+    return db;
 }
 
-bool db_exec(const char *sql) {
-    if (ensure_db() && mDB) {
-        db_result res = sql_exec(mDB, sql);
-        return res;
-    }
-    return false;
-}
-
-bool db_exec(const char *sql, const db_row_cb &fn) {
-    if (ensure_db() && mDB) {
-        auto convert = [](void *cb, StringSlice columns, StringSlice data) {
-            auto &func = *static_cast<const db_row_cb*>(cb);
-            db_row row;
-            for (int i = 0; i < columns.size(); ++i)
-                row[columns[i].c_str()] = data[i].c_str();
-            func(row);
-        };
-        db_result res = sql_exec(mDB, sql, convert, (void *) &fn);
+bool db_exec(const char *sql, db_bind_callback bind_fn, db_exec_callback exec_fn) {
+    if (sqlite3 *db = get_db()) {
+        sql_bind_callback bind_cb = nullptr;
+        if (bind_fn) {
+            bind_cb = [](void *v, int index, DbStatement &stmt) {
+                auto fn = static_cast<db_bind_callback*>(v);
+                fn->operator()(index, stmt);
+            };
+        }
+        sql_exec_callback exec_cb = nullptr;
+        if (exec_fn) {
+            exec_cb = [](void *v, StringSlice columns, DbValues &data) {
+                auto fn = static_cast<db_exec_callback*>(v);
+                fn->operator()(columns, data);
+            };
+        }
+        db_result res = sql_exec(db, sql, bind_cb, &bind_fn, exec_cb, &exec_fn);
         return res;
     }
     return false;
@@ -231,17 +207,12 @@ bool db_exec(const char *sql, const db_row_cb &fn) {
 
 int get_db_settings(db_settings &cfg, int key) {
     bool res;
-    auto settings_cb = [&](db_row &row) -> bool {
-        cfg[row["key"]] = parse_int(row["value"]);
-        DBLOGV("query %s=[%s]\n", row["key"].data(), row["value"].data());
-        return true;
-    };
     if (key >= 0) {
         char query[128];
         ssprintf(query, sizeof(query), "SELECT * FROM settings WHERE key='%s'", DB_SETTING_KEYS[key]);
-        res = db_exec(query, settings_cb);
+        res = db_exec(query, cfg);
     } else {
-        res = db_exec("SELECT * FROM settings", settings_cb);
+        res = db_exec("SELECT * FROM settings", cfg);
     }
     return res ? 0 : 1;
 }
@@ -255,17 +226,12 @@ int set_db_settings(int key, int value) {
 
 int get_db_strings(db_strings &str, int key) {
     bool res;
-    auto string_cb = [&](db_row &row) -> bool {
-        str[row["key"]] = row["value"];
-        DBLOGV("query %s=[%s]\n", row["key"].data(), row["value"].data());
-        return true;
-    };
     if (key >= 0) {
         char query[128];
         ssprintf(query, sizeof(query), "SELECT * FROM strings WHERE key='%s'", DB_STRING_KEYS[key]);
-        res = db_exec(query, string_cb);
+        res = db_exec(query, str);
     } else {
-        res = db_exec("SELECT * FROM strings", string_cb);
+        res = db_exec("SELECT * FROM strings", str);
     }
     return res ? 0 : 1;
 }
@@ -278,18 +244,65 @@ void rm_db_strings(int key) {
 
 void exec_sql(owned_fd client) {
     string sql = read_string(client);
-    db_exec(sql.data(), [fd = (int) client](db_row &row) -> bool {
+    db_exec(sql.data(), [fd = (int) client](StringSlice columns, DbValues &data) {
         string out;
-        bool first = true;
-        for (auto it : row) {
-            if (first) first = false;
-            else out += '|';
-            out += it.first;
+        for (int i = 0; i < columns.size(); ++i) {
+            if (i != 0) out += '|';
+            out += columns[i].c_str();
             out += '=';
-            out += it.second;
+            out += data.get_text(i);
         }
         write_string(fd, out);
-        return true;
     });
     write_int(client, 0);
+}
+
+db_settings::db_settings() :
+    root_access(ROOT_ACCESS_APPS_AND_ADB),
+    multiuser_mode(MULTIUSER_MODE_OWNER_ONLY),
+    mnt_ns(NAMESPACE_MODE_REQUESTER),
+    bootloop(0),
+    denylist(false),
+    zygisk(MagiskD().is_emulator()) {}
+
+void db_settings::operator()(StringSlice columns, DbValues &data) {
+    string_view key;
+    int val;
+    for (int i = 0; i < columns.size(); ++i) {
+        const auto &name = columns[i];
+        if (name == "key") {
+            key = data.get_text(i);
+        } else if (name == "value") {
+            val = data.get_int(i);
+        }
+    }
+    if (key == DB_SETTING_KEYS[ROOT_ACCESS]) {
+        root_access = val;
+    } else if (key == DB_SETTING_KEYS[SU_MULTIUSER_MODE]) {
+        multiuser_mode = val;
+    } else if (key == DB_SETTING_KEYS[SU_MNT_NS]) {
+        mnt_ns = val;
+    } else if (key == DB_SETTING_KEYS[BOOTLOOP_COUNT]) {
+        bootloop = val;
+    } else if (key == DB_SETTING_KEYS[DENYLIST_CONFIG]) {
+        denylist = val;
+    } else if (key == DB_SETTING_KEYS[ZYGISK_CONFIG]) {
+        zygisk = val;
+    }
+}
+
+void db_strings::operator()(StringSlice columns, DbValues &data) {
+    string_view key;
+    const char *val;
+    for (int i = 0; i < columns.size(); ++i) {
+        const auto &name = columns[i];
+        if (name == "key") {
+            key = data.get_text(i);
+        } else if (name == "value") {
+            val = data.get_text(i);
+        }
+    }
+    if (key == DB_STRING_KEYS[SU_MANAGER]) {
+        su_manager = val;
+    }
 }
