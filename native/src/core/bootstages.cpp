@@ -137,7 +137,7 @@ static bool check_safe_mode() {
     int bootloop_cnt;
     db_settings dbs;
     get_db_settings(dbs, BOOTLOOP_COUNT);
-    bootloop_cnt = dbs[BOOTLOOP_COUNT];
+    bootloop_cnt = dbs.bootloop;
     // Increment the bootloop counter
     set_db_settings(BOOTLOOP_COUNT, bootloop_cnt + 1);
     return bootloop_cnt >= 2 || get_prop("persist.sys.safemode", true) == "1" ||
@@ -187,7 +187,7 @@ bool MagiskD::post_fs_data() const noexcept {
     exec_common_scripts("post-fs-data");
     db_settings dbs;
     get_db_settings(dbs, ZYGISK_CONFIG);
-    zygisk_enabled = dbs[ZYGISK_CONFIG];
+    zygisk_enabled = dbs.zygisk;
     initialize_denylist();
     setup_mounts();
     handle_modules();

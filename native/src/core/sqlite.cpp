@@ -9,16 +9,18 @@ using namespace std;
 
 int (*sqlite3_open_v2)(const char *filename, sqlite3 **ppDb, int flags, const char *zVfs);
 int (*sqlite3_close)(sqlite3 *db);
-int (*sqlite3_prepare_v2)(sqlite3 *db, const char *zSql, int nByte, sqlite3_stmt **ppStmt, const char **pzTail);
-int (*sqlite3_bind_parameter_count)(sqlite3_stmt*);
-int (*sqlite3_bind_int)(sqlite3_stmt*, int, int);
-int (*sqlite3_bind_text)(sqlite3_stmt*,int,const char*,int,void(*)(void*));
-int (*sqlite3_column_count)(sqlite3_stmt *pStmt);
-const char *(*sqlite3_column_name)(sqlite3_stmt*, int N);
-const char *(*sqlite3_column_text)(sqlite3_stmt*, int iCol);
-int (*sqlite3_step)(sqlite3_stmt*);
-int (*sqlite3_finalize)(sqlite3_stmt *pStmt);
 const char *(*sqlite3_errstr)(int);
+
+static int (*sqlite3_prepare_v2)(sqlite3 *db, const char *zSql, int nByte, sqlite3_stmt **ppStmt, const char **pzTail);
+static int (*sqlite3_bind_parameter_count)(sqlite3_stmt*);
+static int (*sqlite3_bind_int64)(sqlite3_stmt*, int, int64_t);
+static int (*sqlite3_bind_text)(sqlite3_stmt*,int,const char*,int,void(*)(void*));
+static int (*sqlite3_column_count)(sqlite3_stmt *pStmt);
+static const char *(*sqlite3_column_name)(sqlite3_stmt*, int N);
+static const char *(*sqlite3_column_text)(sqlite3_stmt*, int iCol);
+static int (*sqlite3_column_int)(sqlite3_stmt*, int iCol);
+static int (*sqlite3_step)(sqlite3_stmt*);
+static int (*sqlite3_finalize)(sqlite3_stmt *pStmt);
 
 // Internal Android linker APIs
 
@@ -72,24 +74,28 @@ bool load_sqlite() {
 
     DLOAD(sqlite, sqlite3_open_v2);
     DLOAD(sqlite, sqlite3_close);
+    DLOAD(sqlite, sqlite3_errstr);
     DLOAD(sqlite, sqlite3_prepare_v2);
     DLOAD(sqlite, sqlite3_bind_parameter_count);
-    DLOAD(sqlite, sqlite3_bind_int);
+    DLOAD(sqlite, sqlite3_bind_int64);
     DLOAD(sqlite, sqlite3_bind_text);
     DLOAD(sqlite, sqlite3_step);
     DLOAD(sqlite, sqlite3_column_count);
     DLOAD(sqlite, sqlite3_column_name);
     DLOAD(sqlite, sqlite3_column_text);
+    DLOAD(sqlite, sqlite3_column_int);
     DLOAD(sqlite, sqlite3_finalize);
-    DLOAD(sqlite, sqlite3_errstr);
 
     dl_init = 1;
     return true;
 }
 
-int sql_exec(sqlite3 *db, rust::Str zSql, StrSlice args, sqlite_row_callback callback, void *v) {
+using StringVec = rust::Vec<rust::String>;
+using sql_exec_callback_real = void(*)(void*, StringSlice, sqlite3_stmt*);
+using sql_bind_callback_real = void(*)(void*, int, sqlite3_stmt*);
+
+int sql_exec(sqlite3 *db, rust::Str zSql, sql_bind_callback bind_cb, void *bind_cookie, sql_exec_callback exec_cb, void *exec_cookie) {
     const char *sql = zSql.begin();
-    auto arg_it = args.begin();
     unique_ptr<sqlite3_stmt, decltype(sqlite3_finalize)> stmt(nullptr, sqlite3_finalize);
 
     while (sql != zSql.end()) {
@@ -102,9 +108,12 @@ int sql_exec(sqlite3 *db, rust::Str zSql, StrSlice args, sqlite_row_callback cal
         }
 
         // Step 2: bind arguments
-        if (int count = sqlite3_bind_parameter_count(stmt.get())) {
-            for (int i = 1; i <= count && arg_it != args.end(); ++i, ++arg_it) {
-                fn_run_ret(sqlite3_bind_text, stmt.get(), i, arg_it->data(), arg_it->size(), nullptr);
+        if (bind_cb) {
+            if (int count = sqlite3_bind_parameter_count(stmt.get())) {
+                auto real_cb = reinterpret_cast<sql_bind_callback_real>(bind_cb);
+                for (int i = 1; i <= count; ++i) {
+                    real_cb(bind_cookie, i, stmt.get());
+                }
             }
         }
 
@@ -115,7 +124,7 @@ int sql_exec(sqlite3 *db, rust::Str zSql, StrSlice args, sqlite_row_callback cal
             int rc = sqlite3_step(stmt.get());
             if (rc == SQLITE_DONE) break;
             if (rc != SQLITE_ROW) return rc;
-            if (callback == nullptr) continue;
+            if (exec_cb == nullptr) continue;
             if (first) {
                 int count = sqlite3_column_count(stmt.get());
                 for (int i = 0; i < count; ++i) {
@@ -123,13 +132,30 @@ int sql_exec(sqlite3 *db, rust::Str zSql, StrSlice args, sqlite_row_callback cal
                 }
                 first = false;
             }
-            StringVec data;
-            for (int i = 0; i < columns.size(); ++i) {
-                data.emplace_back(sqlite3_column_text(stmt.get(), i));
-            }
-            callback(v, StringSlice(columns), StringSlice(data));
+            auto real_cb = reinterpret_cast<sql_exec_callback_real>(exec_cb);
+            real_cb(exec_cookie, StringSlice(columns), stmt.get());
         }
     }
 
     return SQLITE_OK;
+}
+
+int DbValues::get_int(int index) {
+    return sqlite3_column_int(reinterpret_cast<sqlite3_stmt*>(this), index);
+}
+
+const char *DbValues::get_text(int index) {
+    return sqlite3_column_text(reinterpret_cast<sqlite3_stmt*>(this), index);
+}
+
+int DbStatement::bind_int64(int index, int64_t val) {
+    return sqlite3_bind_int64(reinterpret_cast<sqlite3_stmt*>(this), index, val);
+}
+
+int DbStatement::bind_text(int index, rust::Str val) {
+    return sqlite3_bind_text(reinterpret_cast<sqlite3_stmt*>(this), index, val.data(), val.size(), nullptr);
+}
+
+int DbStatement::bind_text(int index, const char *val) {
+    return sqlite3_bind_text(reinterpret_cast<sqlite3_stmt*>(this), index, val, -1, nullptr);
 }

@@ -222,9 +222,18 @@ static bool ensure_data() {
     LOGI("denylist: initializing internal data structures\n");
 
     default_new(pkg_to_procs_);
-    bool res = db_exec("SELECT * FROM denylist", [](db_row &row) -> bool {
-        add_hide_set(row["package_name"].data(), row["process"].data());
-        return true;
+    bool res = db_exec("SELECT * FROM denylist", [](StringSlice columns, DbValues &data) {
+        const char *package_name;
+        const char *process;
+        for (int i = 0; i < columns.size(); ++i) {
+            const auto &name = columns[i];
+            if (name == "package_name") {
+                package_name = data.get_text(i);
+            } else if (name == "process") {
+                process = data.get_text(i);
+            }
+        }
+        add_hide_set(package_name, process);
     });
     if (!res)
         goto error;
@@ -392,7 +401,7 @@ void initialize_denylist() {
     if (!denylist_enforced) {
         db_settings dbs;
         get_db_settings(dbs, DENYLIST_CONFIG);
-        if (dbs[DENYLIST_CONFIG])
+        if (dbs.denylist)
             enable_deny();
     }
 }

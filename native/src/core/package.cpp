@@ -197,7 +197,7 @@ int get_manager(int user, string *pkg, bool install) {
 
     db_strings str;
     get_db_strings(str, SU_MANAGER);
-    string db_pkg(std::move(str[SU_MANAGER]));
+    string db_pkg(std::move(str.su_manager));
 
     // If database changed, always re-check files
     if (db_pkg != repackaged_pkg) {

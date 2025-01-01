@@ -18,8 +18,7 @@ static pthread_mutex_t cache_lock = PTHREAD_MUTEX_INITIALIZER;
 static shared_ptr<su_info> cached;
 
 su_info::su_info(int uid) :
-uid(uid), eval_uid(-1), access(DEFAULT_SU_ACCESS), mgr_uid(-1),
-timestamp(0), _lock(PTHREAD_MUTEX_INITIALIZER) {}
+uid(uid), eval_uid(-1), mgr_uid(-1), timestamp(0), _lock(PTHREAD_MUTEX_INITIALIZER) {}
 
 su_info::~su_info() {
     pthread_mutex_destroy(&_lock);
@@ -42,16 +41,30 @@ void su_info::refresh() {
     timestamp = ts.tv_sec * 1000L + ts.tv_nsec / 1000000L;
 }
 
+void su_access::operator()(StringSlice columns, DbValues &data) {
+    for (int i = 0; i < columns.size(); ++i) {
+        const auto &name = columns[i];
+        if (name == "policy") {
+            policy = (policy_t) data.get_int(i);
+        } else if (name == "logging") {
+            log = data.get_int(i);
+        } else if (name == "notification") {
+            notify = data.get_int(i);
+        }
+    }
+    LOGD("magiskdb: query policy=[%d] log=[%d] notify=[%d]\n", policy, log, notify);
+}
+
 void su_info::check_db() {
     eval_uid = uid;
     get_db_settings(cfg);
 
     // Check multiuser settings
-    switch (cfg[SU_MULTIUSER_MODE]) {
+    switch (cfg.multiuser_mode) {
     case MULTIUSER_MODE_OWNER_ONLY:
         if (to_user_id(uid) != 0) {
             eval_uid = -1;
-            access = NO_SU_ACCESS;
+            access.silent_deny();
         }
         break;
     case MULTIUSER_MODE_OWNER_MANAGED:
@@ -67,15 +80,7 @@ void su_info::check_db() {
         ssprintf(query, sizeof(query),
             "SELECT policy, logging, notification FROM policies "
             "WHERE uid=%d AND (until=0 OR until>%li)", eval_uid, time(nullptr));
-        bool res = db_exec(query, [&](db_row &row) -> bool {
-            access.policy = (policy_t) parse_int(row["policy"]);
-            access.log = parse_int(row["logging"]);
-            access.notify = parse_int(row["notification"]);
-            LOGD("magiskdb: query policy=[%d] log=[%d] notify=[%d]\n",
-                 access.policy, access.log, access.notify);
-            return true;
-        });
-        if (!res)
+        if (!db_exec(query, access))
             return;
     }
 
@@ -93,7 +98,7 @@ bool uid_granted_root(int uid) {
     get_db_settings(cfg);
 
     // Check user root access settings
-    switch (cfg[ROOT_ACCESS]) {
+    switch (cfg.root_access) {
     case ROOT_ACCESS_DISABLED:
         return false;
     case ROOT_ACCESS_APPS_ONLY:
@@ -109,7 +114,7 @@ bool uid_granted_root(int uid) {
     }
 
     // Check multiuser settings
-    switch (cfg[SU_MULTIUSER_MODE]) {
+    switch (cfg.multiuser_mode) {
     case MULTIUSER_MODE_OWNER_ONLY:
         if (to_user_id(uid) != 0)
             return false;
@@ -122,28 +127,31 @@ bool uid_granted_root(int uid) {
         break;
     }
 
-    bool granted = false;
-
     char query[256];
     ssprintf(query, sizeof(query),
         "SELECT policy FROM policies WHERE uid=%d AND (until=0 OR until>%li)",
         uid, time(nullptr));
-    bool res = db_exec(query, [&](db_row &row) -> bool {
-        granted = parse_int(row["policy"]) == ALLOW;
-        return true;
-    });
-    if (!res)
+    su_access access;
+    access.policy = QUERY;
+    if (!db_exec(query, access))
         return false;
-
-    return granted;
+    return access.policy == ALLOW;
 }
+
+struct policy_uid_list : public vector<int> {
+    void operator()(StringSlice, DbValues &data) {
+        push_back(data.get_int(0));
+    }
+};
 
 void prune_su_access() {
     cached.reset();
+    policy_uid_list uids;
+    if (!db_exec("SELECT uid FROM policies", uids))
+        return;
     vector<bool> app_no_list = get_app_no_list();
     vector<int> rm_uids;
-    bool res = db_exec("SELECT uid FROM policies", [&](db_row &row) -> bool {
-        int uid = parse_int(row["uid"]);
+    for (int uid : uids) {
         int app_id = to_app_id(uid);
         if (app_id >= AID_APP_START && app_id <= AID_APP_END) {
             int app_no = app_id - AID_APP_START;
@@ -152,11 +160,7 @@ void prune_su_access() {
                 rm_uids.push_back(uid);
             }
         }
-        return true;
-    });
-    if (!res)
-        return;
-
+    }
     for (int uid : rm_uids) {
         char query[256];
         ssprintf(query, sizeof(query), "DELETE FROM policies WHERE uid == %d", uid);
@@ -167,7 +171,7 @@ void prune_su_access() {
 static shared_ptr<su_info> get_su_info(unsigned uid) {
     if (uid == AID_ROOT) {
         auto info = make_shared<su_info>(uid);
-        info->access = SILENT_SU_ACCESS;
+        info->access.silent_allow();
         return info;
     }
 
@@ -188,26 +192,26 @@ static shared_ptr<su_info> get_su_info(unsigned uid) {
 
         // If it's the manager, allow it silently
         if (to_app_id(info->uid) == to_app_id(info->mgr_uid)) {
-            info->access = SILENT_SU_ACCESS;
+            info->access.silent_allow();
             return info;
         }
 
         // Check su access settings
-        switch (info->cfg[ROOT_ACCESS]) {
+        switch (info->cfg.root_access) {
             case ROOT_ACCESS_DISABLED:
                 LOGW("Root access is disabled!\n");
-                info->access = NO_SU_ACCESS;
+                info->access.silent_deny();
                 break;
             case ROOT_ACCESS_ADB_ONLY:
                 if (info->uid != AID_SHELL) {
                     LOGW("Root access limited to ADB only!\n");
-                    info->access = NO_SU_ACCESS;
+                    info->access.silent_deny();
                 }
                 break;
             case ROOT_ACCESS_APPS_ONLY:
                 if (info->uid == AID_SHELL) {
                     LOGW("Root access is disabled for ADB!\n");
-                    info->access = NO_SU_ACCESS;
+                    info->access.silent_deny();
                 }
                 break;
             case ROOT_ACCESS_APPS_AND_ADB:
@@ -220,7 +224,7 @@ static shared_ptr<su_info> get_su_info(unsigned uid) {
 
         // If still not determined, check if manager exists
         if (info->mgr_uid < 0) {
-            info->access = NO_SU_ACCESS;
+            info->access.silent_deny();
             return info;
         }
     }
@@ -396,10 +400,10 @@ void su_daemon_handler(int client, const sock_cred *cred) {
     if (ctx.req.target == -1)
         ctx.req.target = ctx.pid;
     else if (ctx.req.target == 0)
-        ctx.info->cfg[SU_MNT_NS] = NAMESPACE_MODE_GLOBAL;
-    else if (ctx.info->cfg[SU_MNT_NS] == NAMESPACE_MODE_GLOBAL)
-        ctx.info->cfg[SU_MNT_NS] = NAMESPACE_MODE_REQUESTER;
-    switch (ctx.info->cfg[SU_MNT_NS]) {
+        ctx.info->cfg.mnt_ns = NAMESPACE_MODE_GLOBAL;
+    else if (ctx.info->cfg.mnt_ns == NAMESPACE_MODE_GLOBAL)
+        ctx.info->cfg.mnt_ns = NAMESPACE_MODE_REQUESTER;
+    switch (ctx.info->cfg.mnt_ns) {
         case NAMESPACE_MODE_GLOBAL:
             LOGD("su: use global namespace\n");
             break;

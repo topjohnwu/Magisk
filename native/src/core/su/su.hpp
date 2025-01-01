@@ -14,6 +14,32 @@
 #define ATTY_OUT   (1 << 1)
 #define ATTY_ERR   (1 << 2)
 
+typedef enum {
+    QUERY = 0,
+    DENY = 1,
+    ALLOW = 2,
+} policy_t;
+
+struct su_access {
+    policy_t policy;
+    int log;
+    int notify;
+
+    su_access() : policy(QUERY), log(1), notify(1) {}
+
+    void operator()(StringSlice columns, DbValues &data);
+    void silent_deny() {
+        policy = DENY;
+        log = 0;
+        notify = 0;
+    }
+    void silent_allow() {
+        policy = ALLOW;
+        log = 0;
+        notify = 0;
+    }
+};
+
 class su_info {
 public:
     // Unique key
