@@ -7,41 +7,30 @@
 #include <sqlite.hpp>
 #include <core.hpp>
 
-#define DB_VERSION 12
+#define DB_VERSION     12
+#define DB_VERSION_STR "12"
 
 using namespace std;
 
 #define DBLOGV(...)
 //#define DBLOGV(...) LOGD("magiskdb: " __VA_ARGS__)
 
-struct db_result {
-    db_result() = default;
-    db_result(const char *s) : err(s) {}
-    db_result(int code) : err(code == SQLITE_OK ? "" : (sqlite3_errstr(code) ?: "")) {}
-    operator bool() {
-        if (!err.empty()) {
-            LOGE("sqlite3: %s\n", err.data());
-            return false;
-        }
-        return true;
-    }
-private:
-    string err;
-};
-
-static int sql_exec(sqlite3 *db, const char *sql, sql_exec_callback callback = nullptr, void *v = nullptr) {
-    return sql_exec(db, sql, nullptr, nullptr, callback, v);
+#define sql_chk_log(fn, ...) if (int rc = fn(__VA_ARGS__); rc != SQLITE_OK) { \
+    LOGE("sqlite3(db.cpp:%d): %s\n", __LINE__, sqlite3_errstr(rc));           \
+    return false;                                                             \
 }
 
-static db_result open_and_init_db_impl(sqlite3 **dbOut) {
-    if (!load_sqlite())
-        return "Cannot load libsqlite.so";
+static bool open_and_init_db_impl(sqlite3 **dbOut) {
+    if (!load_sqlite()) {
+        LOGE("sqlite3: Cannot load libsqlite.so\n");
+        return false;
+    }
 
     unique_ptr<sqlite3, decltype(sqlite3_close)> db(nullptr, sqlite3_close);
     {
         sqlite3 *sql;
-        fn_run_ret(sqlite3_open_v2, MAGISKDB, &sql,
-                   SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX, nullptr);
+        sql_chk_log(sqlite3_open_v2, MAGISKDB, &sql,
+                    SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX, nullptr);
         db.reset(sql);
     }
 
@@ -50,10 +39,11 @@ static db_result open_and_init_db_impl(sqlite3 **dbOut) {
     auto ver_cb = [](void *ver, auto, DbValues &data) {
         *static_cast<int *>(ver) = data.get_int(0);
     };
-    fn_run_ret(sql_exec, db.get(), "PRAGMA user_version", ver_cb, &ver);
+    sql_chk_log(sql_exec, db.get(), "PRAGMA user_version", nullptr, nullptr, ver_cb, &ver);
     if (ver > DB_VERSION) {
         // Don't support downgrading database
-        return "Downgrading database is not supported";
+        LOGE("sqlite3: Downgrading database is not supported\n");
+        return false;
     }
 
     auto create_policy = [&] {
@@ -90,17 +80,17 @@ static db_result open_and_init_db_impl(sqlite3 **dbOut) {
     // 12: rebuild table `policies` to drop column `package_name`
 
     if (/* 0, 1, 2, 3, 4, 5, 6 */ ver <= 6) {
-        fn_run_ret(create_policy);
-        fn_run_ret(create_settings);
-        fn_run_ret(create_strings);
-        fn_run_ret(create_denylist);
+        sql_chk_log(create_policy);
+        sql_chk_log(create_settings);
+        sql_chk_log(create_strings);
+        sql_chk_log(create_denylist);
 
         // Directly jump to latest
         ver = DB_VERSION;
         upgrade = true;
     }
     if (ver == 7) {
-        fn_run_ret(sql_exec, db.get(),
+        sql_chk_log(sql_exec, db.get(),
                 "BEGIN TRANSACTION;"
                 "ALTER TABLE hidelist RENAME TO hidelist_tmp;"
                 "CREATE TABLE IF NOT EXISTS hidelist "
@@ -113,7 +103,7 @@ static db_result open_and_init_db_impl(sqlite3 **dbOut) {
         upgrade = true;
     }
     if (ver == 8) {
-        fn_run_ret(sql_exec, db.get(),
+        sql_chk_log(sql_exec, db.get(),
                 "BEGIN TRANSACTION;"
                 "ALTER TABLE hidelist RENAME TO hidelist_tmp;"
                 "CREATE TABLE IF NOT EXISTS hidelist "
@@ -125,20 +115,20 @@ static db_result open_and_init_db_impl(sqlite3 **dbOut) {
         upgrade = true;
     }
     if (ver == 9) {
-        fn_run_ret(sql_exec, db.get(), "DROP TABLE IF EXISTS logs", nullptr, nullptr);
+        sql_chk_log(sql_exec, db.get(), "DROP TABLE IF EXISTS logs", nullptr, nullptr);
         ver = 10;
         upgrade = true;
     }
     if (ver == 10) {
-        fn_run_ret(sql_exec, db.get(),
+        sql_chk_log(sql_exec, db.get(),
                 "DROP TABLE IF EXISTS hidelist;"
                 "DELETE FROM settings WHERE key='magiskhide';");
-        fn_run_ret(create_denylist);
+        sql_chk_log(create_denylist);
         ver = 11;
         upgrade = true;
     }
     if (ver == 11) {
-        fn_run_ret(sql_exec, db.get(),
+        sql_chk_log(sql_exec, db.get(),
                 "BEGIN TRANSACTION;"
                 "ALTER TABLE policies RENAME TO policies_tmp;"
                 "CREATE TABLE IF NOT EXISTS policies "
@@ -154,20 +144,16 @@ static db_result open_and_init_db_impl(sqlite3 **dbOut) {
 
     if (upgrade) {
         // Set version
-        char query[32];
-        sprintf(query, "PRAGMA user_version=%d", ver);
-        fn_run_ret(sql_exec, db.get(), query);
+        sql_chk_log(sql_exec, db.get(), "PRAGMA user_version=" DB_VERSION_STR);
     }
 
     *dbOut = db.release();
-    return {};
+    return true;
 }
 
 sqlite3 *open_and_init_db() {
     sqlite3 *db = nullptr;
-    if (!open_and_init_db_impl(&db))
-        return nullptr;
-    return db;
+    return open_and_init_db_impl(&db) ? db : nullptr;
 }
 
 static sqlite3 *get_db() {
@@ -183,13 +169,17 @@ static sqlite3 *get_db() {
     return db;
 }
 
-bool db_exec(const char *sql, db_bind_callback bind_fn, db_exec_callback exec_fn) {
+bool db_exec(const char *sql, DbArgs args, db_exec_callback exec_fn) {
+    using db_bind_callback = std::function<int(int, DbStatement&)>;
+
     if (sqlite3 *db = get_db()) {
+        db_bind_callback bind_fn = {};
         sql_bind_callback bind_cb = nullptr;
-        if (bind_fn) {
-            bind_cb = [](void *v, int index, DbStatement &stmt) {
+        if (!args.empty()) {
+            bind_fn = std::ref(args);
+            bind_cb = [](void *v, int index, DbStatement &stmt) -> int {
                 auto fn = static_cast<db_bind_callback*>(v);
-                fn->operator()(index, stmt);
+                return fn->operator()(index, stmt);
             };
         }
         sql_exec_callback exec_cb = nullptr;
@@ -199,52 +189,41 @@ bool db_exec(const char *sql, db_bind_callback bind_fn, db_exec_callback exec_fn
                 fn->operator()(columns, data);
             };
         }
-        db_result res = sql_exec(db, sql, bind_cb, &bind_fn, exec_cb, &exec_fn);
-        return res;
+        sql_chk_log(sql_exec, db, sql, bind_cb, &bind_fn, exec_cb, &exec_fn);
+        return true;
     }
     return false;
 }
 
-int get_db_settings(db_settings &cfg, int key) {
-    bool res;
+bool get_db_settings(db_settings &cfg, int key) {
     if (key >= 0) {
-        char query[128];
-        ssprintf(query, sizeof(query), "SELECT * FROM settings WHERE key='%s'", DB_SETTING_KEYS[key]);
-        res = db_exec(query, cfg);
+        return db_exec("SELECT * FROM settings WHERE key=?", { DB_SETTING_KEYS[key] }, cfg);
     } else {
-        res = db_exec("SELECT * FROM settings", cfg);
+        return db_exec("SELECT * FROM settings", {}, cfg);
     }
-    return res ? 0 : 1;
 }
 
-int set_db_settings(int key, int value) {
-    char sql[128];
-    ssprintf(sql, sizeof(sql), "INSERT OR REPLACE INTO settings VALUES ('%s', %d)",
-             DB_SETTING_KEYS[key], value);
-    return db_exec(sql) ? 0 : 1;
+bool set_db_settings(int key, int value) {
+    return db_exec(
+            "INSERT OR REPLACE INTO settings (key,value) VALUES(?,?)",
+            { DB_SETTING_KEYS[key], value });
 }
 
-int get_db_strings(db_strings &str, int key) {
-    bool res;
+bool get_db_strings(db_strings &str, int key) {
     if (key >= 0) {
-        char query[128];
-        ssprintf(query, sizeof(query), "SELECT * FROM strings WHERE key='%s'", DB_STRING_KEYS[key]);
-        res = db_exec(query, str);
+        return db_exec("SELECT * FROM strings WHERE key=?", { DB_STRING_KEYS[key] }, str);
     } else {
-        res = db_exec("SELECT * FROM strings", str);
+        return db_exec("SELECT * FROM strings", {}, str);
     }
-    return res ? 0 : 1;
 }
 
-void rm_db_strings(int key) {
-    char query[128];
-    ssprintf(query, sizeof(query), "DELETE FROM strings WHERE key == '%s'", DB_STRING_KEYS[key]);
-    db_exec(query);
+bool rm_db_strings(int key) {
+    return db_exec("DELETE FROM strings WHERE key=?", { DB_STRING_KEYS[key] });
 }
 
 void exec_sql(owned_fd client) {
     string sql = read_string(client);
-    db_exec(sql.data(), [fd = (int) client](StringSlice columns, DbValues &data) {
+    db_exec(sql.data(), {}, [fd = (int) client](StringSlice columns, DbValues &data) {
         string out;
         for (int i = 0; i < columns.size(); ++i) {
             if (i != 0) out += '|';
@@ -305,4 +284,17 @@ void db_strings::operator()(StringSlice columns, DbValues &data) {
     if (key == DB_STRING_KEYS[SU_MANAGER]) {
         su_manager = val;
     }
+}
+
+int DbArgs::operator()(int index, DbStatement &stmt) {
+    if (curr < args.size()) {
+        const auto &arg = args[curr++];
+        switch (arg.type) {
+            case DbArg::INT:
+                return stmt.bind_int64(index, arg.int_val);
+            case DbArg::TEXT:
+                return stmt.bind_text(index, arg.str_val);
+        }
+    }
+    return SQLITE_OK;
 }

@@ -88,23 +88,41 @@ struct db_strings {
  ********************/
 
 using db_exec_callback = std::function<void(StringSlice, DbValues&)>;
-using db_bind_callback = std::function<void(int, DbStatement&)>;
 
-int get_db_settings(db_settings &cfg, int key = -1);
-int set_db_settings(int key, int value);
-int get_db_strings(db_strings &str, int key = -1);
-void rm_db_strings(int key);
+struct DbArg {
+    enum {
+        INT,
+        TEXT,
+    } type;
+    union {
+        int64_t int_val;
+        rust::Str str_val;
+    };
+    DbArg(int64_t v) : type(INT), int_val(v) {}
+    DbArg(const char *v) : type(TEXT), str_val(v) {}
+};
+
+struct DbArgs {
+    DbArgs() : curr(0) {}
+    DbArgs(std::initializer_list<DbArg> list) : args(list), curr(0) {}
+    int operator()(int index, DbStatement &stmt);
+    bool empty() const { return args.empty(); }
+private:
+    std::vector<DbArg> args;
+    size_t curr;
+};
+
+bool get_db_settings(db_settings &cfg, int key = -1);
+bool set_db_settings(int key, int value);
+bool get_db_strings(db_strings &str, int key = -1);
+bool rm_db_strings(int key);
 void exec_sql(owned_fd client);
-bool db_exec(const char *sql, db_bind_callback bind_fn = {}, db_exec_callback exec_fn = {});
-
-static inline bool db_exec(const char *sql, db_exec_callback exec_fn) {
-    return db_exec(sql, {}, std::move(exec_fn));
-}
+bool db_exec(const char *sql, DbArgs args = {}, db_exec_callback exec_fn = {});
 
 template<typename T>
 concept DbData = requires(T t, StringSlice s, DbValues &v) { t(s, v); };
 
 template<DbData T>
-bool db_exec(const char *sql, T &data) {
-    return db_exec(sql, (db_exec_callback) std::ref(data));
+bool db_exec(const char *sql, DbArgs args, T &data) {
+    return db_exec(sql, std::move(args), (db_exec_callback) std::ref(data));
 }

@@ -222,7 +222,7 @@ static bool ensure_data() {
     LOGI("denylist: initializing internal data structures\n");
 
     default_new(pkg_to_procs_);
-    bool res = db_exec("SELECT * FROM denylist", [](StringSlice columns, DbValues &data) {
+    bool res = db_exec("SELECT * FROM denylist", {}, [](StringSlice columns, DbValues &data) {
         const char *package_name;
         const char *process;
         for (int i = 0; i < columns.size(); ++i) {

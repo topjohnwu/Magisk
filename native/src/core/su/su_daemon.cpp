@@ -76,11 +76,10 @@ void su_info::check_db() {
     }
 
     if (eval_uid > 0) {
-        char query[256];
-        ssprintf(query, sizeof(query),
-            "SELECT policy, logging, notification FROM policies "
-            "WHERE uid=%d AND (until=0 OR until>%li)", eval_uid, time(nullptr));
-        if (!db_exec(query, access))
+        bool res = db_exec(
+                "SELECT policy, logging, notification FROM policies "
+                "WHERE uid=? AND (until=0 OR until>?)", { eval_uid, time(nullptr) }, access);
+        if (!res)
             return;
     }
 
@@ -127,15 +126,11 @@ bool uid_granted_root(int uid) {
         break;
     }
 
-    char query[256];
-    ssprintf(query, sizeof(query),
-        "SELECT policy FROM policies WHERE uid=%d AND (until=0 OR until>%li)",
-        uid, time(nullptr));
-    su_access access;
-    access.policy = QUERY;
-    if (!db_exec(query, access))
-        return false;
-    return access.policy == ALLOW;
+    bool granted = false;
+    db_exec("SELECT policy FROM policies WHERE uid=? AND (until=0 OR until>?)",
+            { uid, time(nullptr) },
+            [&](auto, DbValues &data) { granted = data.get_int(0) == ALLOW; });
+    return granted;
 }
 
 struct policy_uid_list : public vector<int> {
@@ -147,7 +142,7 @@ struct policy_uid_list : public vector<int> {
 void prune_su_access() {
     cached.reset();
     policy_uid_list uids;
-    if (!db_exec("SELECT uid FROM policies", uids))
+    if (!db_exec("SELECT uid FROM policies", {}, uids))
         return;
     vector<bool> app_no_list = get_app_no_list();
     vector<int> rm_uids;
