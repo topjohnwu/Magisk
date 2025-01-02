@@ -169,10 +169,10 @@ static int set_prop(const char *name, const char *value, PropFlags flags) {
 
     int ret;
     if (pi != nullptr) {
-        if (flags.isSkipSvc()) {
-            ret = __system_property_update(pi, value, strlen(value));
-        } else if (flags.isSkipWait()) {
+        if (flags.isSkipWait()) {
             ret = __system_property_update(pi, value, strlen(value), true);
+        } else if (flags.isSkipSvc()) {
+            ret = __system_property_update(pi, value, strlen(value));
         } else {
             ret = system_property_set(name, value);
         }
