@@ -91,8 +91,10 @@ bool load_sqlite() {
 }
 
 using StringVec = rust::Vec<rust::String>;
+using sql_bind_callback_real = int(*)(void*, int, sqlite3_stmt*);
 using sql_exec_callback_real = void(*)(void*, StringSlice, sqlite3_stmt*);
-using sql_bind_callback_real = void(*)(void*, int, sqlite3_stmt*);
+
+#define sql_chk(fn, ...) if (int rc = fn(__VA_ARGS__); rc != SQLITE_OK) return rc
 
 int sql_exec(sqlite3 *db, rust::Str zSql, sql_bind_callback bind_cb, void *bind_cookie, sql_exec_callback exec_cb, void *exec_cookie) {
     const char *sql = zSql.begin();
@@ -102,7 +104,7 @@ int sql_exec(sqlite3 *db, rust::Str zSql, sql_bind_callback bind_cb, void *bind_
         // Step 1: prepare statement
         {
             sqlite3_stmt *st = nullptr;
-            fn_run_ret(sqlite3_prepare_v2, db, sql, zSql.end() - sql, &st, &sql);
+            sql_chk(sqlite3_prepare_v2, db, sql, zSql.end() - sql, &st, &sql);
             if (st == nullptr) continue;
             stmt.reset(st);
         }
@@ -112,7 +114,7 @@ int sql_exec(sqlite3 *db, rust::Str zSql, sql_bind_callback bind_cb, void *bind_
             if (int count = sqlite3_bind_parameter_count(stmt.get())) {
                 auto real_cb = reinterpret_cast<sql_bind_callback_real>(bind_cb);
                 for (int i = 1; i <= count; ++i) {
-                    real_cb(bind_cookie, i, stmt.get());
+                    sql_chk(real_cb, bind_cookie, i, stmt.get());
                 }
             }
         }
@@ -154,8 +156,4 @@ int DbStatement::bind_int64(int index, int64_t val) {
 
 int DbStatement::bind_text(int index, rust::Str val) {
     return sqlite3_bind_text(reinterpret_cast<sqlite3_stmt*>(this), index, val.data(), val.size(), nullptr);
-}
-
-int DbStatement::bind_text(int index, const char *val) {
-    return sqlite3_bind_text(reinterpret_cast<sqlite3_stmt*>(this), index, val, -1, nullptr);
 }
