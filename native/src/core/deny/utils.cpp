@@ -8,7 +8,7 @@
 
 #include <consts.hpp>
 #include <base.hpp>
-#include <db.hpp>
+#include <sqlite.hpp>
 #include <core.hpp>
 
 #include "deny.hpp"
@@ -385,7 +385,7 @@ int enable_deny() {
         }
     }
 
-    set_db_settings(DENYLIST_CONFIG, true);
+    MagiskD().set_db_setting(DbEntryKey::DenylistConfig, true);
     return DenyResponse::OK;
 }
 
@@ -393,15 +393,13 @@ int disable_deny() {
     if (denylist_enforced.exchange(false)) {
         LOGI("* Disable DenyList\n");
     }
-    set_db_settings(DENYLIST_CONFIG, false);
+    MagiskD().set_db_setting(DbEntryKey::DenylistConfig, false);
     return DenyResponse::OK;
 }
 
 void initialize_denylist() {
     if (!denylist_enforced) {
-        db_settings dbs;
-        get_db_settings(dbs, DENYLIST_CONFIG);
-        if (dbs.denylist)
+        if (MagiskD().get_db_setting(DbEntryKey::DenylistConfig))
             enable_deny();
     }
 }

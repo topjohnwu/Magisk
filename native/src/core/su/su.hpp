@@ -4,7 +4,7 @@
 #include <sys/stat.h>
 #include <memory>
 
-#include <db.hpp>
+#include <sqlite.hpp>
 #include <core.hpp>
 
 #define DEFAULT_SHELL "/system/bin/sh"
@@ -47,7 +47,7 @@ public:
 
     // These should be guarded with internal lock
     int eval_uid;  // The effective UID, taking multiuser settings into consideration
-    db_settings cfg;
+    struct DbSettings cfg;
     su_access access;
     std::string mgr_pkg;
     int mgr_uid;

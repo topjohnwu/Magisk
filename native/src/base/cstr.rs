@@ -340,6 +340,11 @@ impl Utf8CStr {
         Self::from_cstr(unsafe { CStr::from_ptr(ptr) })
     }
 
+    pub unsafe fn from_ptr_unchecked<'a>(ptr: *const c_char) -> &'a Utf8CStr {
+        let cstr = CStr::from_ptr(ptr);
+        Self::from_bytes_unchecked(cstr.to_bytes_with_nul())
+    }
+
     #[inline(always)]
     pub fn as_bytes_with_nul(&self) -> &[u8] {
         &self.0

@@ -18,7 +18,8 @@ static pthread_mutex_t cache_lock = PTHREAD_MUTEX_INITIALIZER;
 static shared_ptr<su_info> cached;
 
 su_info::su_info(int uid) :
-uid(uid), eval_uid(-1), mgr_uid(-1), timestamp(0), _lock(PTHREAD_MUTEX_INITIALIZER) {}
+uid(uid), eval_uid(-1), cfg(DbSettings()),
+mgr_uid(-1), timestamp(0), _lock(PTHREAD_MUTEX_INITIALIZER) {}
 
 su_info::~su_info() {
     pthread_mutex_destroy(&_lock);
@@ -57,20 +58,20 @@ void su_access::operator()(StringSlice columns, DbValues &data) {
 
 void su_info::check_db() {
     eval_uid = uid;
-    get_db_settings(cfg);
+    MagiskD().get_db_settings(cfg);
 
     // Check multiuser settings
     switch (cfg.multiuser_mode) {
-    case MULTIUSER_MODE_OWNER_ONLY:
+    case MultiuserMode::OwnerOnly:
         if (to_user_id(uid) != 0) {
             eval_uid = -1;
             access.silent_deny();
         }
         break;
-    case MULTIUSER_MODE_OWNER_MANAGED:
+    case MultiuserMode::OwnerManaged:
         eval_uid = to_app_id(uid);
         break;
-    case MULTIUSER_MODE_USER:
+    case MultiuserMode::User:
     default:
         break;
     }
@@ -93,35 +94,35 @@ bool uid_granted_root(int uid) {
     if (uid == AID_ROOT)
         return true;
 
-    db_settings cfg;
-    get_db_settings(cfg);
+    auto cfg = DbSettings();
+    MagiskD().get_db_settings(cfg);
 
     // Check user root access settings
     switch (cfg.root_access) {
-    case ROOT_ACCESS_DISABLED:
+    case RootAccess::Disabled:
         return false;
-    case ROOT_ACCESS_APPS_ONLY:
+    case RootAccess::AppsOnly:
         if (uid == AID_SHELL)
             return false;
         break;
-    case ROOT_ACCESS_ADB_ONLY:
+    case RootAccess::AdbOnly:
         if (uid != AID_SHELL)
             return false;
         break;
-    case ROOT_ACCESS_APPS_AND_ADB:
+    case RootAccess::AppsAndAdb:
         break;
     }
 
     // Check multiuser settings
     switch (cfg.multiuser_mode) {
-    case MULTIUSER_MODE_OWNER_ONLY:
+    case MultiuserMode::OwnerOnly:
         if (to_user_id(uid) != 0)
             return false;
         break;
-    case MULTIUSER_MODE_OWNER_MANAGED:
+    case MultiuserMode::OwnerManaged:
         uid = to_app_id(uid);
         break;
-    case MULTIUSER_MODE_USER:
+    case MultiuserMode::User:
     default:
         break;
     }
@@ -193,23 +194,23 @@ static shared_ptr<su_info> get_su_info(unsigned uid) {
 
         // Check su access settings
         switch (info->cfg.root_access) {
-            case ROOT_ACCESS_DISABLED:
+            case RootAccess::Disabled:
                 LOGW("Root access is disabled!\n");
                 info->access.silent_deny();
                 break;
-            case ROOT_ACCESS_ADB_ONLY:
+            case RootAccess::AdbOnly:
                 if (info->uid != AID_SHELL) {
                     LOGW("Root access limited to ADB only!\n");
                     info->access.silent_deny();
                 }
                 break;
-            case ROOT_ACCESS_APPS_ONLY:
+            case RootAccess::AppsOnly:
                 if (info->uid == AID_SHELL) {
                     LOGW("Root access is disabled for ADB!\n");
                     info->access.silent_deny();
                 }
                 break;
-            case ROOT_ACCESS_APPS_AND_ADB:
+            case RootAccess::AppsAndAdb:
             default:
                 break;
         }
@@ -395,19 +396,19 @@ void su_daemon_handler(int client, const sock_cred *cred) {
     if (ctx.req.target == -1)
         ctx.req.target = ctx.pid;
     else if (ctx.req.target == 0)
-        ctx.info->cfg.mnt_ns = NAMESPACE_MODE_GLOBAL;
-    else if (ctx.info->cfg.mnt_ns == NAMESPACE_MODE_GLOBAL)
-        ctx.info->cfg.mnt_ns = NAMESPACE_MODE_REQUESTER;
+        ctx.info->cfg.mnt_ns = MntNsMode::Global;
+    else if (ctx.info->cfg.mnt_ns == MntNsMode::Global)
+        ctx.info->cfg.mnt_ns = MntNsMode::Requester;
     switch (ctx.info->cfg.mnt_ns) {
-        case NAMESPACE_MODE_GLOBAL:
+        case MntNsMode::Global:
             LOGD("su: use global namespace\n");
             break;
-        case NAMESPACE_MODE_REQUESTER:
+        case MntNsMode::Requester:
             LOGD("su: use namespace of pid=[%d]\n", ctx.req.target);
             if (switch_mnt_ns(ctx.req.target))
                 LOGD("su: setns failed, fallback to global\n");
             break;
-        case NAMESPACE_MODE_ISOLATE:
+        case MntNsMode::Isolate:
             LOGD("su: use new isolated namespace\n");
             switch_mnt_ns(ctx.req.target);
             xunshare(CLONE_NEWNS);

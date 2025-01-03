@@ -1,7 +1,7 @@
 #include <base.hpp>
 #include <consts.hpp>
 #include <core.hpp>
-#include <db.hpp>
+#include <sqlite.hpp>
 #include <flags.h>
 
 using namespace std;
@@ -195,9 +195,7 @@ static int get_pkg_uid(int user, const char *pkg) {
 int get_manager(int user, string *pkg, bool install) {
     mutex_guard g(pkg_lock);
 
-    db_strings str;
-    get_db_strings(str, SU_MANAGER);
-    string db_pkg(std::move(str.su_manager));
+    string db_pkg = (string) MagiskD().get_db_string(DbEntryKey::SuManager);
 
     // If database changed, always re-check files
     if (db_pkg != repackaged_pkg) {
@@ -251,7 +249,7 @@ int get_manager(int user, string *pkg, bool install) {
             case CERT_MISMATCH:
                 install = true;
             case NOT_INSTALLED:
-                rm_db_strings(SU_MANAGER);
+                MagiskD().rm_db_string(DbEntryKey::SuManager);
                 break;
         }
     }
