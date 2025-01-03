@@ -1,15 +1,16 @@
-use std::fs::File;
-use std::io;
-use std::io::BufReader;
-use std::sync::{Mutex, OnceLock};
-
 use base::libc::{O_CLOEXEC, O_RDONLY};
 use base::{
-    cstr, libc, open_fd, BufReadExt, Directory, FsPathBuf, ResultExt, Utf8CStr, Utf8CStrBuf,
-    Utf8CStrBufArr, Utf8CStrBufRef, WalkResult,
+    cstr, libc, open_fd, BufReadExt, Directory, FsPathBuf, ReadExt, ResultExt, Utf8CStr,
+    Utf8CStrBuf, Utf8CStrBufArr, Utf8CStrBufRef, WalkResult,
 };
+use bytemuck::bytes_of;
+use std::fs::File;
+use std::io;
+use std::io::{BufReader, Read, Write};
+use std::sync::{Mutex, OnceLock};
 
 use crate::consts::MAIN_CONFIG;
+use crate::db::Sqlite3;
 use crate::ffi::{get_magisk_tmp, RequestCode};
 use crate::get_prop;
 use crate::logging::magisk_logging;
@@ -42,6 +43,7 @@ impl BootStateFlags {
 #[derive(Default)]
 pub struct MagiskD {
     pub logd: Mutex<Option<File>>,
+    pub sql_connection: Mutex<Option<Sqlite3>>,
     boot_stage_lock: Mutex<BootStateFlags>,
     is_emulator: bool,
     is_recovery: bool,
@@ -186,4 +188,40 @@ pub fn find_apk_path(pkg: &Utf8CStr, data: &mut [u8]) -> usize {
     inner(pkg, &mut Utf8CStrBufRef::from(data))
         .log()
         .unwrap_or(0)
+}
+
+pub trait IpcRead {
+    fn ipc_read_int(&mut self) -> io::Result<i32>;
+    fn ipc_read_string(&mut self) -> io::Result<String>;
+}
+
+impl<T: Read> IpcRead for T {
+    fn ipc_read_int(&mut self) -> io::Result<i32> {
+        let mut val: i32 = 0;
+        self.read_pod(&mut val)?;
+        Ok(val)
+    }
+
+    fn ipc_read_string(&mut self) -> io::Result<String> {
+        let len = self.ipc_read_int()?;
+        let mut val = "".to_string();
+        self.take(len as u64).read_to_string(&mut val)?;
+        Ok(val)
+    }
+}
+
+pub trait IpcWrite {
+    fn ipc_write_int(&mut self, val: i32) -> io::Result<()>;
+    fn ipc_write_string(&mut self, val: &str) -> io::Result<()>;
+}
+
+impl<T: Write> IpcWrite for T {
+    fn ipc_write_int(&mut self, val: i32) -> io::Result<()> {
+        self.write_all(bytes_of(&val))
+    }
+
+    fn ipc_write_string(&mut self, val: &str) -> io::Result<()> {
+        self.ipc_write_int(val.len() as i32)?;
+        self.write_all(val.as_bytes())
+    }
 }

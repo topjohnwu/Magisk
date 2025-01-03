@@ -18,8 +18,8 @@ static pthread_mutex_t cache_lock = PTHREAD_MUTEX_INITIALIZER;
 static shared_ptr<su_info> cached;
 
 su_info::su_info(int uid) :
-uid(uid), eval_uid(-1), access(DEFAULT_SU_ACCESS), mgr_uid(-1),
-timestamp(0), _lock(PTHREAD_MUTEX_INITIALIZER) {}
+uid(uid), eval_uid(-1), cfg(DbSettings()),
+mgr_uid(-1), timestamp(0), _lock(PTHREAD_MUTEX_INITIALIZER) {}
 
 su_info::~su_info() {
     pthread_mutex_destroy(&_lock);
@@ -42,40 +42,45 @@ void su_info::refresh() {
     timestamp = ts.tv_sec * 1000L + ts.tv_nsec / 1000000L;
 }
 
+void su_access::operator()(StringSlice columns, DbValues &data) {
+    for (int i = 0; i < columns.size(); ++i) {
+        const auto &name = columns[i];
+        if (name == "policy") {
+            policy = (policy_t) data.get_int(i);
+        } else if (name == "logging") {
+            log = data.get_int(i);
+        } else if (name == "notification") {
+            notify = data.get_int(i);
+        }
+    }
+    LOGD("magiskdb: query policy=[%d] log=[%d] notify=[%d]\n", policy, log, notify);
+}
+
 void su_info::check_db() {
     eval_uid = uid;
-    get_db_settings(cfg);
+    MagiskD().get_db_settings(cfg);
 
     // Check multiuser settings
-    switch (cfg[SU_MULTIUSER_MODE]) {
-    case MULTIUSER_MODE_OWNER_ONLY:
+    switch (cfg.multiuser_mode) {
+    case MultiuserMode::OwnerOnly:
         if (to_user_id(uid) != 0) {
             eval_uid = -1;
-            access = NO_SU_ACCESS;
+            access.silent_deny();
         }
         break;
-    case MULTIUSER_MODE_OWNER_MANAGED:
+    case MultiuserMode::OwnerManaged:
         eval_uid = to_app_id(uid);
         break;
-    case MULTIUSER_MODE_USER:
+    case MultiuserMode::User:
     default:
         break;
     }
 
     if (eval_uid > 0) {
-        char query[256];
-        ssprintf(query, sizeof(query),
-            "SELECT policy, logging, notification FROM policies "
-            "WHERE uid=%d AND (until=0 OR until>%li)", eval_uid, time(nullptr));
-        auto res = db_exec(query, [&](db_row &row) -> bool {
-            access.policy = (policy_t) parse_int(row["policy"]);
-            access.log = parse_int(row["logging"]);
-            access.notify = parse_int(row["notification"]);
-            LOGD("magiskdb: query policy=[%d] log=[%d] notify=[%d]\n",
-                 access.policy, access.log, access.notify);
-            return true;
-        });
-        if (res.check_err())
+        bool res = db_exec(
+                "SELECT policy, logging, notification FROM policies "
+                "WHERE uid=? AND (until=0 OR until>?)", { eval_uid, time(nullptr) }, access);
+        if (!res)
             return;
     }
 
@@ -89,61 +94,60 @@ bool uid_granted_root(int uid) {
     if (uid == AID_ROOT)
         return true;
 
-    db_settings cfg;
-    get_db_settings(cfg);
+    auto cfg = DbSettings();
+    MagiskD().get_db_settings(cfg);
 
     // Check user root access settings
-    switch (cfg[ROOT_ACCESS]) {
-    case ROOT_ACCESS_DISABLED:
+    switch (cfg.root_access) {
+    case RootAccess::Disabled:
         return false;
-    case ROOT_ACCESS_APPS_ONLY:
+    case RootAccess::AppsOnly:
         if (uid == AID_SHELL)
             return false;
         break;
-    case ROOT_ACCESS_ADB_ONLY:
+    case RootAccess::AdbOnly:
         if (uid != AID_SHELL)
             return false;
         break;
-    case ROOT_ACCESS_APPS_AND_ADB:
+    case RootAccess::AppsAndAdb:
         break;
     }
 
     // Check multiuser settings
-    switch (cfg[SU_MULTIUSER_MODE]) {
-    case MULTIUSER_MODE_OWNER_ONLY:
+    switch (cfg.multiuser_mode) {
+    case MultiuserMode::OwnerOnly:
         if (to_user_id(uid) != 0)
             return false;
         break;
-    case MULTIUSER_MODE_OWNER_MANAGED:
+    case MultiuserMode::OwnerManaged:
         uid = to_app_id(uid);
         break;
-    case MULTIUSER_MODE_USER:
+    case MultiuserMode::User:
     default:
         break;
     }
 
     bool granted = false;
-
-    char query[256];
-    ssprintf(query, sizeof(query),
-        "SELECT policy FROM policies WHERE uid=%d AND (until=0 OR until>%li)",
-        uid, time(nullptr));
-    auto res = db_exec(query, [&](db_row &row) -> bool {
-        granted = parse_int(row["policy"]) == ALLOW;
-        return true;
-    });
-    if (res.check_err())
-        return false;
-
+    db_exec("SELECT policy FROM policies WHERE uid=? AND (until=0 OR until>?)",
+            { uid, time(nullptr) },
+            [&](auto, DbValues &data) { granted = data.get_int(0) == ALLOW; });
     return granted;
 }
 
+struct policy_uid_list : public vector<int> {
+    void operator()(StringSlice, DbValues &data) {
+        push_back(data.get_int(0));
+    }
+};
+
 void prune_su_access() {
     cached.reset();
+    policy_uid_list uids;
+    if (!db_exec("SELECT uid FROM policies", {}, uids))
+        return;
     vector<bool> app_no_list = get_app_no_list();
     vector<int> rm_uids;
-    auto res = db_exec("SELECT uid FROM policies", [&](db_row &row) -> bool {
-        int uid = parse_int(row["uid"]);
+    for (int uid : uids) {
         int app_id = to_app_id(uid);
         if (app_id >= AID_APP_START && app_id <= AID_APP_END) {
             int app_no = app_id - AID_APP_START;
@@ -152,22 +156,18 @@ void prune_su_access() {
                 rm_uids.push_back(uid);
             }
         }
-        return true;
-    });
-    if (res.check_err())
-        return;
-
+    }
     for (int uid : rm_uids) {
         char query[256];
         ssprintf(query, sizeof(query), "DELETE FROM policies WHERE uid == %d", uid);
-        db_exec(query).check_err();
+        db_exec(query);
     }
 }
 
 static shared_ptr<su_info> get_su_info(unsigned uid) {
     if (uid == AID_ROOT) {
         auto info = make_shared<su_info>(uid);
-        info->access = SILENT_SU_ACCESS;
+        info->access.silent_allow();
         return info;
     }
 
@@ -188,29 +188,29 @@ static shared_ptr<su_info> get_su_info(unsigned uid) {
 
         // If it's the manager, allow it silently
         if (to_app_id(info->uid) == to_app_id(info->mgr_uid)) {
-            info->access = SILENT_SU_ACCESS;
+            info->access.silent_allow();
             return info;
         }
 
         // Check su access settings
-        switch (info->cfg[ROOT_ACCESS]) {
-            case ROOT_ACCESS_DISABLED:
+        switch (info->cfg.root_access) {
+            case RootAccess::Disabled:
                 LOGW("Root access is disabled!\n");
-                info->access = NO_SU_ACCESS;
+                info->access.silent_deny();
                 break;
-            case ROOT_ACCESS_ADB_ONLY:
+            case RootAccess::AdbOnly:
                 if (info->uid != AID_SHELL) {
                     LOGW("Root access limited to ADB only!\n");
-                    info->access = NO_SU_ACCESS;
+                    info->access.silent_deny();
                 }
                 break;
-            case ROOT_ACCESS_APPS_ONLY:
+            case RootAccess::AppsOnly:
                 if (info->uid == AID_SHELL) {
                     LOGW("Root access is disabled for ADB!\n");
-                    info->access = NO_SU_ACCESS;
+                    info->access.silent_deny();
                 }
                 break;
-            case ROOT_ACCESS_APPS_AND_ADB:
+            case RootAccess::AppsAndAdb:
             default:
                 break;
         }
@@ -220,7 +220,7 @@ static shared_ptr<su_info> get_su_info(unsigned uid) {
 
         // If still not determined, check if manager exists
         if (info->mgr_uid < 0) {
-            info->access = NO_SU_ACCESS;
+            info->access.silent_deny();
             return info;
         }
     }
@@ -396,19 +396,19 @@ void su_daemon_handler(int client, const sock_cred *cred) {
     if (ctx.req.target == -1)
         ctx.req.target = ctx.pid;
     else if (ctx.req.target == 0)
-        ctx.info->cfg[SU_MNT_NS] = NAMESPACE_MODE_GLOBAL;
-    else if (ctx.info->cfg[SU_MNT_NS] == NAMESPACE_MODE_GLOBAL)
-        ctx.info->cfg[SU_MNT_NS] = NAMESPACE_MODE_REQUESTER;
-    switch (ctx.info->cfg[SU_MNT_NS]) {
-        case NAMESPACE_MODE_GLOBAL:
+        ctx.info->cfg.mnt_ns = MntNsMode::Global;
+    else if (ctx.info->cfg.mnt_ns == MntNsMode::Global)
+        ctx.info->cfg.mnt_ns = MntNsMode::Requester;
+    switch (ctx.info->cfg.mnt_ns) {
+        case MntNsMode::Global:
             LOGD("su: use global namespace\n");
             break;
-        case NAMESPACE_MODE_REQUESTER:
+        case MntNsMode::Requester:
             LOGD("su: use namespace of pid=[%d]\n", ctx.req.target);
             if (switch_mnt_ns(ctx.req.target))
                 LOGD("su: setns failed, fallback to global\n");
             break;
-        case NAMESPACE_MODE_ISOLATE:
+        case MntNsMode::Isolate:
             LOGD("su: use new isolated namespace\n");
             switch_mnt_ns(ctx.req.target);
             xunshare(CLONE_NEWNS);
