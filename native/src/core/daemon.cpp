@@ -7,7 +7,7 @@
 #include <base.hpp>
 #include <core.hpp>
 #include <selinux.hpp>
-#include <db.hpp>
+#include <sqlite.hpp>
 #include <flags.h>
 
 using namespace std;
@@ -151,7 +151,7 @@ static void handle_request_async(int client, int code, const sock_cred &cred) {
         close(client);
         break;
     case +RequestCode::SQLITE_CMD:
-        exec_sql(client);
+        MagiskD().db_exec(client);
         break;
     case +RequestCode::REMOVE_MODULES: {
         int do_reboot = read_int(client);

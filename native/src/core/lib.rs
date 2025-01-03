@@ -1,21 +1,24 @@
 #![feature(format_args_nl)]
 #![feature(try_blocks)]
 #![feature(let_chains)]
+#![feature(fn_traits)]
 #![allow(clippy::missing_safety_doc)]
 
 use base::Utf8CStr;
 use cert::read_certificate;
 use daemon::{daemon_entry, find_apk_path, get_magiskd, MagiskD};
+use db::get_default_db_settings;
 use logging::{
     android_logging, magisk_logging, zygisk_close_logd, zygisk_get_logd, zygisk_logging,
 };
-use mount::{find_preinit_device, revert_unmount, setup_mounts, clean_mounts};
+use mount::{clean_mounts, find_preinit_device, revert_unmount, setup_mounts};
 use resetprop::{persist_delete_prop, persist_get_prop, persist_get_props, persist_set_prop};
 
 mod cert;
 #[path = "../include/consts.rs"]
 mod consts;
 mod daemon;
+mod db;
 mod logging;
 mod mount;
 mod resetprop;
@@ -76,6 +79,67 @@ pub mod ffi {
         fn switch_mnt_ns(pid: i32) -> i32;
     }
 
+    enum DbEntryKey {
+        RootAccess,
+        SuMultiuserMode,
+        SuMntNs,
+        DenylistConfig,
+        ZygiskConfig,
+        BootloopCount,
+        SuManager,
+    }
+
+    #[repr(i32)]
+    enum RootAccess {
+        Disabled,
+        AppsOnly,
+        AdbOnly,
+        AppsAndAdb,
+    }
+
+    #[repr(i32)]
+    enum MultiuserMode {
+        OwnerOnly,
+        OwnerManaged,
+        User,
+    }
+
+    #[repr(i32)]
+    enum MntNsMode {
+        Global,
+        Requester,
+        Isolate,
+    }
+
+    #[derive(Default)]
+    struct DbSettings {
+        root_access: RootAccess,
+        multiuser_mode: MultiuserMode,
+        mnt_ns: MntNsMode,
+        boot_count: i32,
+        denylist: bool,
+        zygisk: bool,
+    }
+
+    unsafe extern "C++" {
+        include!("include/sqlite.hpp");
+
+        fn sqlite3_errstr(code: i32) -> *const c_char;
+
+        type sqlite3;
+        fn open_and_init_db() -> *mut sqlite3;
+
+        type DbValues;
+        type DbStatement;
+
+        fn get_int(self: &DbValues, index: i32) -> i32;
+        #[cxx_name = "get_str"]
+        fn get_text(self: &DbValues, index: i32) -> &str;
+
+        fn bind_text(self: Pin<&mut DbStatement>, index: i32, val: &str) -> i32;
+        fn bind_int64(self: Pin<&mut DbStatement>, index: i32, val: i64) -> i32;
+    }
+
     extern "Rust" {
         fn rust_test_entry();
         fn android_logging();
@@ -102,9 +166,21 @@ pub mod ffi {
     extern "Rust" {
         type MagiskD;
         fn setup_logfile(self: &MagiskD);
-        fn is_emulator(self: &MagiskD) -> bool;
         fn is_recovery(self: &MagiskD) -> bool;
         fn boot_stage_handler(self: &MagiskD, client: i32, code: i32);
+
+        #[cxx_name = "get_db_settings"]
+        fn get_db_settings_for_cxx(self: &MagiskD, cfg: &mut DbSettings) -> bool;
+        fn get_db_setting(&self, key: DbEntryKey) -> i32;
+        #[cxx_name = "set_db_setting"]
+        fn set_db_setting_for_cxx(&self, key: DbEntryKey, value: i32) -> bool;
+        fn get_db_string(&self, key: DbEntryKey) -> String;
+        #[cxx_name = "rm_db_string"]
+        fn rm_db_string_for_cxx(&self, key: DbEntryKey) -> bool;
+        #[cxx_name = "db_exec"]
+        fn db_exec_for_cxx(&self, client_fd: i32);
+        #[cxx_name = "DbSettings"]
+        fn get_default_db_settings() -> DbSettings;
 
         #[cxx_name = "MagiskD"]
         fn get_magiskd() -> &'static MagiskD;

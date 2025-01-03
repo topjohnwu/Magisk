@@ -18,3 +18,4 @@ num-traits = { workspace = true }
 num-derive = { workspace = true }
 quick-protobuf = { workspace = true }
 bytemuck = { workspace = true, features = ["derive"] }
+thiserror = { workspace = true }

@@ -7,7 +7,7 @@
 #include <string>
 
 #include <consts.hpp>
-#include <db.hpp>
+#include <sqlite.hpp>
 #include <base.hpp>
 #include <core.hpp>
 #include <selinux.hpp>
@@ -133,17 +133,6 @@ static bool check_key_combo() {
     return true;
 }
 
-static bool check_safe_mode() {
-    int bootloop_cnt;
-    db_settings dbs;
-    get_db_settings(dbs, BOOTLOOP_COUNT);
-    bootloop_cnt = dbs.bootloop;
-    // Increment the bootloop counter
-    set_db_settings(BOOTLOOP_COUNT, bootloop_cnt + 1);
-    return bootloop_cnt >= 2 || get_prop("persist.sys.safemode", true) == "1" ||
-           get_prop("ro.sys.safemode") == "1" || check_key_combo();
-}
-
 /***********************
  * Boot Stage Handlers *
  ***********************/
@@ -155,15 +144,12 @@ bool MagiskD::post_fs_data() const noexcept {
 
     preserve_stub_apk();
 
-    bool safe_mode = false;
-
     if (access(SECURE_DIR, F_OK) != 0) {
         if (SDK_INT < 24) {
             xmkdir(SECURE_DIR, 0700);
         } else {
             LOGE(SECURE_DIR " is not present, abort\n");
-            safe_mode = true;
-            return safe_mode;
+            return true;
         }
     }
 
@@ -171,28 +157,31 @@ bool MagiskD::post_fs_data() const noexcept {
 
     if (!magisk_env()) {
         LOGE("* Magisk environment incomplete, abort\n");
-        safe_mode = true;
-        return safe_mode;
+        return true;
     }
 
-    if (check_safe_mode()) {
+    // Check safe mode
+    int bootloop_cnt = get_db_setting(DbEntryKey::BootloopCount);
+    // Increment the boot counter
+    set_db_setting(DbEntryKey::BootloopCount, bootloop_cnt + 1);
+    bool safe_mode = bootloop_cnt >= 2 || get_prop("persist.sys.safemode", true) == "1" ||
+           get_prop("ro.sys.safemode") == "1" || check_key_combo();
+
+    if (safe_mode) {
         LOGI("* Safe mode triggered\n");
-        safe_mode = true;
         // Disable all modules and zygisk so next boot will be clean
         disable_modules();
-        set_db_settings(ZYGISK_CONFIG, false);
-        return safe_mode;
+        set_db_setting(DbEntryKey::ZygiskConfig, false);
+        return true;
     }
 
     exec_common_scripts("post-fs-data");
-    db_settings dbs;
-    get_db_settings(dbs, ZYGISK_CONFIG);
-    zygisk_enabled = dbs.zygisk;
+    zygisk_enabled = get_db_setting(DbEntryKey::ZygiskConfig);
     initialize_denylist();
     setup_mounts();
     handle_modules();
     load_modules();
-    return safe_mode;
+    return false;
 }
 
 void MagiskD::late_start() const noexcept {
@@ -210,7 +199,7 @@ void MagiskD::boot_complete() const noexcept {
     LOGI("** boot-complete triggered\n");
 
     // Reset the bootloop counter once we have boot-complete
-    set_db_settings(BOOTLOOP_COUNT, 0);
+    set_db_setting(DbEntryKey::BootloopCount, 0);
 
     // At this point it's safe to create the folder
     if (access(SECURE_DIR, F_OK) != 0)

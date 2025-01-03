@@ -449,6 +449,7 @@ dependencies = [
  "num-traits",
  "pb-rs",
  "quick-protobuf",
+ "thiserror",
 ]
 
 [[package]]

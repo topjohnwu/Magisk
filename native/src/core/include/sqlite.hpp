@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include <cxx.h>
 
 #define SQLITE_OPEN_READWRITE        0x00000002  /* Ok for sqlite3_open_v2() */
@@ -13,14 +15,13 @@
 struct sqlite3;
 struct sqlite3_stmt;
 
-extern int (*sqlite3_open_v2)(const char *filename, sqlite3 **ppDb, int flags, const char *zVfs);
-extern int (*sqlite3_close)(sqlite3 *db);
 extern const char *(*sqlite3_errstr)(int);
 
 // Transparent wrappers of sqlite3_stmt
 struct DbValues {
-    const char *get_text(int index);
-    int get_int(int index);
+    const char *get_text(int index) const;
+    rust::Str get_str(int index) const { return get_text(index); }
+    int get_int(int index) const;
     ~DbValues() = delete;
 };
 struct DbStatement {
@@ -33,8 +34,43 @@ using StringSlice = rust::Slice<rust::String>;
 using sql_bind_callback = int(*)(void*, int, DbStatement&);
 using sql_exec_callback = void(*)(void*, StringSlice, DbValues&);
 
-bool load_sqlite();
 sqlite3 *open_and_init_db();
-int sql_exec(sqlite3 *db, rust::Str zSql,
-             sql_bind_callback bind_cb = nullptr, void *bind_cookie = nullptr,
-             sql_exec_callback exec_cb = nullptr, void *exec_cookie = nullptr);
+
+/************
+ * C++ APIs *
+ ************/
+
+using db_exec_callback = std::function<void(StringSlice, DbValues&)>;
+
+struct DbArg {
+    enum {
+        INT,
+        TEXT,
+    } type;
+    union {
+        int64_t int_val;
+        rust::Str str_val;
+    };
+    DbArg(int64_t v) : type(INT), int_val(v) {}
+    DbArg(const char *v) : type(TEXT), str_val(v) {}
+};
+
+struct DbArgs {
+    DbArgs() : curr(0) {}
+    DbArgs(std::initializer_list<DbArg> list) : args(list), curr(0) {}
+    int operator()(int index, DbStatement &stmt);
+    bool empty() const { return args.empty(); }
+private:
+    std::vector<DbArg> args;
+    size_t curr;
+};
+
+bool db_exec(const char *sql, DbArgs args = {}, db_exec_callback exec_fn = {});
+
+template<typename T>
+concept DbData = requires(T t, StringSlice s, DbValues &v) { t(s, v); };
+
+template<DbData T>
+bool db_exec(const char *sql, DbArgs args, T &data) {
+    return db_exec(sql, std::move(args), (db_exec_callback) std::ref(data));
+}

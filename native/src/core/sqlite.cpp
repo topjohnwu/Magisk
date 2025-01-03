@@ -1,16 +1,22 @@
 #include <dlfcn.h>
 
+#include <consts.hpp>
 #include <base.hpp>
 #include <sqlite.hpp>
 
 using namespace std;
 
+#define DB_VERSION     12
+#define DB_VERSION_STR "12"
+
+#define DBLOGV(...)
+//#define DBLOGV(...) LOGD("magiskdb: " __VA_ARGS__)
+
 // SQLite APIs
 
-int (*sqlite3_open_v2)(const char *filename, sqlite3 **ppDb, int flags, const char *zVfs);
-int (*sqlite3_close)(sqlite3 *db);
+static int (*sqlite3_open_v2)(const char *filename, sqlite3 **ppDb, int flags, const char *zVfs);
+static int (*sqlite3_close)(sqlite3 *db);
 const char *(*sqlite3_errstr)(int);
-
 static int (*sqlite3_prepare_v2)(sqlite3 *db, const char *zSql, int nByte, sqlite3_stmt **ppStmt, const char **pzTail);
 static int (*sqlite3_bind_parameter_count)(sqlite3_stmt*);
 static int (*sqlite3_bind_int64)(sqlite3_stmt*, int, int64_t);
@@ -44,7 +50,7 @@ constexpr char apex_path[] = "/apex/com.android.runtime/lib64:/apex/com.android.
 constexpr char apex_path[] = "/apex/com.android.runtime/lib:/apex/com.android.art/lib:/apex/com.android.i18n/lib:";
 #endif
 
-bool load_sqlite() {
+static bool load_sqlite() {
     static int dl_init = 0;
     if (dl_init)
         return dl_init > 0;
@@ -96,7 +102,11 @@ using sql_exec_callback_real = void(*)(void*, StringSlice, sqlite3_stmt*);
 
 #define sql_chk(fn, ...) if (int rc = fn(__VA_ARGS__); rc != SQLITE_OK) return rc
 
-int sql_exec(sqlite3 *db, rust::Str zSql, sql_bind_callback bind_cb, void *bind_cookie, sql_exec_callback exec_cb, void *exec_cookie) {
+// Exports to Rust
+extern "C" int sql_exec_impl(
+        sqlite3 *db, rust::Str zSql,
+        sql_bind_callback bind_cb = nullptr, void *bind_cookie = nullptr,
+        sql_exec_callback exec_cb = nullptr, void *exec_cookie = nullptr) {
     const char *sql = zSql.begin();
     unique_ptr<sqlite3_stmt, decltype(sqlite3_finalize)> stmt(nullptr, sqlite3_finalize);
 
@@ -142,12 +152,12 @@ int sql_exec(sqlite3 *db, rust::Str zSql, sql_bind_callback bind_cb, void *bind_
     return SQLITE_OK;
 }
 
-int DbValues::get_int(int index) {
-    return sqlite3_column_int(reinterpret_cast<sqlite3_stmt*>(this), index);
+int DbValues::get_int(int index) const {
+    return sqlite3_column_int((sqlite3_stmt*) this, index);
 }
 
-const char *DbValues::get_text(int index) {
-    return sqlite3_column_text(reinterpret_cast<sqlite3_stmt*>(this), index);
+const char *DbValues::get_text(int index) const {
+    return sqlite3_column_text((sqlite3_stmt*) this, index);
 }
 
 int DbStatement::bind_int64(int index, int64_t val) {
@@ -156,4 +166,187 @@ int DbStatement::bind_int64(int index, int64_t val) {
 
 int DbStatement::bind_text(int index, rust::Str val) {
     return sqlite3_bind_text(reinterpret_cast<sqlite3_stmt*>(this), index, val.data(), val.size(), nullptr);
+}
+
+#define sql_chk_log(fn, ...) if (int rc = fn(__VA_ARGS__); rc != SQLITE_OK) { \
+    LOGE("sqlite3(db.cpp:%d): %s\n", __LINE__, sqlite3_errstr(rc));           \
+    return false;                                                             \
+}
+
+static bool open_and_init_db_impl(sqlite3 **dbOut) {
+    if (!load_sqlite()) {
+        LOGE("sqlite3: Cannot load libsqlite.so\n");
+        return false;
+    }
+
+    unique_ptr<sqlite3, decltype(sqlite3_close)> db(nullptr, sqlite3_close);
+    {
+        sqlite3 *sql;
+        sql_chk_log(sqlite3_open_v2, MAGISKDB, &sql,
+                    SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX, nullptr);
+        db.reset(sql);
+    }
+
+    int ver = 0;
+    bool upgrade = false;
+    auto ver_cb = [](void *ver, auto, DbValues &data) {
+        *static_cast<int *>(ver) = data.get_int(0);
+    };
+    sql_chk_log(sql_exec_impl, db.get(), "PRAGMA user_version", nullptr, nullptr, ver_cb, &ver);
+    if (ver > DB_VERSION) {
+        // Don't support downgrading database
+        LOGE("sqlite3: Downgrading database is not supported\n");
+        return false;
+    }
+
+    auto create_policy = [&] {
+        return sql_exec_impl(db.get(),
+                "CREATE TABLE IF NOT EXISTS policies "
+                "(uid INT, policy INT, until INT, logging INT, "
+                "notification INT, PRIMARY KEY(uid))");
+    };
+    auto create_settings = [&] {
+        return sql_exec_impl(db.get(),
+                "CREATE TABLE IF NOT EXISTS settings "
+                "(key TEXT, value INT, PRIMARY KEY(key))");
+    };
+    auto create_strings = [&] {
+        return sql_exec_impl(db.get(),
+                "CREATE TABLE IF NOT EXISTS strings "
+                "(key TEXT, value TEXT, PRIMARY KEY(key))");
+    };
+    auto create_denylist = [&] {
+        return sql_exec_impl(db.get(),
+                "CREATE TABLE IF NOT EXISTS denylist "
+                "(package_name TEXT, process TEXT, PRIMARY KEY(package_name, process))");
+    };
+
+    // Database changelog:
+    //
+    // 0 - 6: DB stored in app private data. There are no longer any code in the project to
+    //        migrate these data, so no need to take any of these versions into consideration.
+    // 7 : create table `hidelist` (process TEXT, PRIMARY KEY(process))
+    // 8 : add new column (package_name TEXT) to table `hidelist`
+    // 9 : rebuild table `hidelist` to change primary key (PRIMARY KEY(package_name, process))
+    // 10: remove table `logs`
+    // 11: remove table `hidelist` and create table `denylist` (same data structure)
+    // 12: rebuild table `policies` to drop column `package_name`
+
+    if (/* 0, 1, 2, 3, 4, 5, 6 */ ver <= 6) {
+        sql_chk_log(create_policy);
+        sql_chk_log(create_settings);
+        sql_chk_log(create_strings);
+        sql_chk_log(create_denylist);
+
+        // Directly jump to latest
+        ver = DB_VERSION;
+        upgrade = true;
+    }
+    if (ver == 7) {
+        sql_chk_log(sql_exec_impl, db.get(),
+                "BEGIN TRANSACTION;"
+                "ALTER TABLE hidelist RENAME TO hidelist_tmp;"
+                "CREATE TABLE IF NOT EXISTS hidelist "
+                "(package_name TEXT, process TEXT, PRIMARY KEY(package_name, process));"
+                "INSERT INTO hidelist SELECT process as package_name, process FROM hidelist_tmp;"
+                "DROP TABLE hidelist_tmp;"
+                "COMMIT;");
+        // Directly jump to version 9
+        ver = 9;
+        upgrade = true;
+    }
+    if (ver == 8) {
+        sql_chk_log(sql_exec_impl, db.get(),
+                "BEGIN TRANSACTION;"
+                "ALTER TABLE hidelist RENAME TO hidelist_tmp;"
+                "CREATE TABLE IF NOT EXISTS hidelist "
+                "(package_name TEXT, process TEXT, PRIMARY KEY(package_name, process));"
+                "INSERT INTO hidelist SELECT * FROM hidelist_tmp;"
+                "DROP TABLE hidelist_tmp;"
+                "COMMIT;");
+        ver = 9;
+        upgrade = true;
+    }
+    if (ver == 9) {
+        sql_chk_log(sql_exec_impl, db.get(), "DROP TABLE IF EXISTS logs", nullptr, nullptr);
+        ver = 10;
+        upgrade = true;
+    }
+    if (ver == 10) {
+        sql_chk_log(sql_exec_impl, db.get(),
+                "DROP TABLE IF EXISTS hidelist;"
+                "DELETE FROM settings WHERE key='magiskhide';");
+        sql_chk_log(create_denylist);
+        ver = 11;
+        upgrade = true;
+    }
+    if (ver == 11) {
+        sql_chk_log(sql_exec_impl, db.get(),
+                "BEGIN TRANSACTION;"
+                "ALTER TABLE policies RENAME TO policies_tmp;"
+                "CREATE TABLE IF NOT EXISTS policies "
+                "(uid INT, policy INT, until INT, logging INT, "
+                "notification INT, PRIMARY KEY(uid));"
+                "INSERT INTO policies "
+                "SELECT uid, policy, until, logging, notification FROM policies_tmp;"
+                "DROP TABLE policies_tmp;"
+                "COMMIT;");
+        ver = 12;
+        upgrade = true;
+    }
+
+    if (upgrade) {
+        // Set version
+        sql_chk_log(sql_exec_impl, db.get(), "PRAGMA user_version=" DB_VERSION_STR);
+    }
+
+    *dbOut = db.release();
+    return true;
+}
+
+sqlite3 *open_and_init_db() {
+    sqlite3 *db = nullptr;
+    return open_and_init_db_impl(&db) ? db : nullptr;
+}
+
+// Exported from Rust
+extern "C" int sql_exec_rs(
+        rust::Str zSql,
+        sql_bind_callback bind_cb, void *bind_cookie,
+        sql_exec_callback exec_cb, void *exec_cookie);
+
+bool db_exec(const char *sql, DbArgs args, db_exec_callback exec_fn) {
+    using db_bind_callback = std::function<int(int, DbStatement&)>;
+
+    db_bind_callback bind_fn = {};
+    sql_bind_callback bind_cb = nullptr;
+    if (!args.empty()) {
+        bind_fn = std::ref(args);
+        bind_cb = [](void *v, int index, DbStatement &stmt) -> int {
+            auto fn = static_cast<db_bind_callback*>(v);
+            return fn->operator()(index, stmt);
+        };
+    }
+    sql_exec_callback exec_cb = nullptr;
+    if (exec_fn) {
+        exec_cb = [](void *v, StringSlice columns, DbValues &data) {
+            auto fn = static_cast<db_exec_callback*>(v);
+            fn->operator()(columns, data);
+        };
+    }
+    sql_chk_log(sql_exec_rs, sql, bind_cb, &bind_fn, exec_cb, &exec_fn);
+    return true;
+}
+
+int DbArgs::operator()(int index, DbStatement &stmt) {
+    if (curr < args.size()) {
+        const auto &arg = args[curr++];
+        switch (arg.type) {
+            case DbArg::INT:
+                return stmt.bind_int64(index, arg.int_val);
+            case DbArg::TEXT:
+                return stmt.bind_text(index, arg.str_val);
+        }
+    }
+    return SQLITE_OK;
 }
