@@ -7,7 +7,6 @@
 #include <string>
 
 #include <consts.hpp>
-#include <sqlite.hpp>
 #include <base.hpp>
 #include <core.hpp>
 #include <selinux.hpp>

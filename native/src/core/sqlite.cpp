@@ -9,9 +9,6 @@ using namespace std;
 #define DB_VERSION     12
 #define DB_VERSION_STR "12"
 
-#define DBLOGV(...)
-//#define DBLOGV(...) LOGD("magiskdb: " __VA_ARGS__)
-
 // SQLite APIs
 
 static int (*sqlite3_open_v2)(const char *filename, sqlite3 **ppDb, int flags, const char *zVfs);
@@ -169,7 +166,7 @@ int DbStatement::bind_text(int index, rust::Str val) {
 }
 
 #define sql_chk_log(fn, ...) if (int rc = fn(__VA_ARGS__); rc != SQLITE_OK) { \
-    LOGE("sqlite3(db.cpp:%d): %s\n", __LINE__, sqlite3_errstr(rc));           \
+    LOGE("sqlite3(line:%d): %s\n", __LINE__, sqlite3_errstr(rc));             \
     return false;                                                             \
 }
 
@@ -182,15 +179,16 @@ static bool open_and_init_db_impl(sqlite3 **dbOut) {
     unique_ptr<sqlite3, decltype(sqlite3_close)> db(nullptr, sqlite3_close);
     {
         sqlite3 *sql;
+        // We open the connection with SQLITE_OPEN_NOMUTEX because we are guarding it ourselves
         sql_chk_log(sqlite3_open_v2, MAGISKDB, &sql,
-                    SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX, nullptr);
+                    SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_NOMUTEX, nullptr);
         db.reset(sql);
     }
 
     int ver = 0;
     bool upgrade = false;
-    auto ver_cb = [](void *ver, auto, DbValues &data) {
-        *static_cast<int *>(ver) = data.get_int(0);
+    auto ver_cb = [](void *ver, auto, const DbValues &values) {
+        *static_cast<int *>(ver) = values.get_int(0);
     };
     sql_chk_log(sql_exec_impl, db.get(), "PRAGMA user_version", nullptr, nullptr, ver_cb, &ver);
     if (ver > DB_VERSION) {
@@ -329,9 +327,9 @@ bool db_exec(const char *sql, DbArgs args, db_exec_callback exec_fn) {
     }
     sql_exec_callback exec_cb = nullptr;
     if (exec_fn) {
-        exec_cb = [](void *v, StringSlice columns, DbValues &data) {
+        exec_cb = [](void *v, StringSlice columns, const DbValues &values) {
             auto fn = static_cast<db_exec_callback*>(v);
-            fn->operator()(columns, data);
+            fn->operator()(columns, values);
         };
     }
     sql_chk_log(sql_exec_rs, sql, bind_cb, &bind_fn, exec_cb, &exec_fn);

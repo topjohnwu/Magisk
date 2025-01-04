@@ -42,7 +42,7 @@ void su_info::refresh() {
     timestamp = ts.tv_sec * 1000L + ts.tv_nsec / 1000000L;
 }
 
-void su_access::operator()(StringSlice columns, DbValues &data) {
+void su_access::operator()(StringSlice columns, const DbValues &data) {
     for (int i = 0; i < columns.size(); ++i) {
         const auto &name = columns[i];
         if (name == "policy") {
@@ -130,13 +130,13 @@ bool uid_granted_root(int uid) {
     bool granted = false;
     db_exec("SELECT policy FROM policies WHERE uid=? AND (until=0 OR until>?)",
             { uid, time(nullptr) },
-            [&](auto, DbValues &data) { granted = data.get_int(0) == ALLOW; });
+            [&](auto, const DbValues &values) { granted = values.get_int(0) == ALLOW; });
     return granted;
 }
 
 struct policy_uid_list : public vector<int> {
-    void operator()(StringSlice, DbValues &data) {
-        push_back(data.get_int(0));
+    void operator()(StringSlice, const DbValues &values) {
+        push_back(values.get_int(0));
     }
 };
 

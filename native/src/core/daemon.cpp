@@ -7,7 +7,6 @@
 #include <base.hpp>
 #include <core.hpp>
 #include <selinux.hpp>
-#include <sqlite.hpp>
 #include <flags.h>
 
 using namespace std;

@@ -6,7 +6,7 @@
 
 #define SQLITE_OPEN_READWRITE        0x00000002  /* Ok for sqlite3_open_v2() */
 #define SQLITE_OPEN_CREATE           0x00000004  /* Ok for sqlite3_open_v2() */
-#define SQLITE_OPEN_FULLMUTEX        0x00010000  /* Ok for sqlite3_open_v2() */
+#define SQLITE_OPEN_NOMUTEX          0x00008000  /* Ok for sqlite3_open_v2() */
 
 #define SQLITE_OK           0   /* Successful result */
 #define SQLITE_ROW         100  /* sqlite3_step() has another row ready */
@@ -32,7 +32,7 @@ struct DbStatement {
 
 using StringSlice = rust::Slice<rust::String>;
 using sql_bind_callback = int(*)(void*, int, DbStatement&);
-using sql_exec_callback = void(*)(void*, StringSlice, DbValues&);
+using sql_exec_callback = void(*)(void*, StringSlice, const DbValues&);
 
 sqlite3 *open_and_init_db();
 
@@ -40,7 +40,7 @@ sqlite3 *open_and_init_db();
  * C++ APIs *
  ************/
 
-using db_exec_callback = std::function<void(StringSlice, DbValues&)>;
+using db_exec_callback = std::function<void(StringSlice, const DbValues&)>;
 
 struct DbArg {
     enum {

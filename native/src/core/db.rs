@@ -42,15 +42,15 @@ impl SqliteReturn for i32 {
 }
 
 trait SqlTable {
-    fn on_row(&mut self, columns: &[String], data: &DbValues);
+    fn on_row(&mut self, columns: &[String], values: &DbValues);
 }
 
 impl<T> SqlTable for T
 where
     T: FnMut(&[String], &DbValues),
 {
-    fn on_row(&mut self, columns: &[String], data: &DbValues) {
-        self.call_mut((columns, data))
+    fn on_row(&mut self, columns: &[String], values: &DbValues) {
+        self.call_mut((columns, values))
     }
 }
 
@@ -92,14 +92,14 @@ impl DbEntryKey {
 }
 
 impl SqlTable for DbSettings {
-    fn on_row(&mut self, columns: &[String], data: &DbValues) {
+    fn on_row(&mut self, columns: &[String], values: &DbValues) {
         let mut key = "";
         let mut value = 0;
         for (i, column) in columns.iter().enumerate() {
             if column == "key" {
-                key = data.get_text(i as i32);
+                key = values.get_text(i as i32);
             } else if column == "value" {
-                value = data.get_int(i as i32);
+                value = values.get_int(i as i32);
             }
         }
         match key {
