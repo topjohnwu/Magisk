@@ -32,7 +32,7 @@
     <string name="uninstall_magisk_msg">هەموو زیادکراوەکان دەسڕێنەوە، ڕۆت دەسڕێتەوە، و هەر ڕەمزێنراوێک بەهۆی ماجیسک کرابێ لادەچێت!</string>
 
     <!--Install-->
-    <string name="keep_force_encryption">ڕەمزاندنی بەزۆر</string>
+    <string name="keep_force_encryption">ڕەمزاندنی بەزۆر بهێڵەوە</string>
     <string name="keep_dm_verity">بهێڵەوە AVB 2.0/dm-verity</string>
     <string name="recovery_mode">دۆخی ڕیکەڤەڕی</string>
     <string name="install_options_title">هەڵبژاردنەکان</string>
@@ -51,10 +51,10 @@
 
     <!--Superuser-->
     <string name="su_request_title">داواکاری سوپەریوسەر</string>
-    <string name="touch_filtered_warning">ئەپێک بە سەرەوەی ماجیسکە، ناتوانین دڵنیا بینەوەstring>
+    <string name="touch_filtered_warning">ئەپێک لە سەر شاشەکەیە، ناتوانین دڵنیا بینەوەstring>
     <string name="deny">ڕەتکردنەوە</string>
     <string name="prompt">داواکاری</string>
-    <string name="grant">ڕێگەپێدام</string>
+    <string name="grant">ڕێگەپێدان</string>
     <string name="su_warning">ڕێگەپێدان بۆ تەواوی ئامێرەکەت، گەر دڵنیا نیت ڕەتی بکەوەstring>
     <string name="forever">بۆ هەمیشە</string>
     <string name="once">بۆ یەکجار</string>
@@ -70,7 +70,7 @@
     <string name="su_snack_notif_off">ئاگەدارکردنەوەکانی %1$s کوژاوەتەوە</string>
     <string name="su_snack_log_on">تۆمارەکانی %1$s کراوەتەوە</string>
     <string name="su_snack_log_off">تۆمارەکانی %1$s کوژاوەتەوە</string>
-    <string name="su_revoke_title">لابردن?</string>
+    <string name="su_revoke_title">لابردن؟</string>
     <string name="su_revoke_msg">دڵنیابەوە بۆ لابردنی سوپەریوسەر بۆ %1$s </string>
     <string name="toast">هێنانەسەر</string>
     <string name="none">هیچ</string>
@@ -94,8 +94,8 @@
     <!--SafetyNet-->
 
     <!--MagiskHide-->
-    <string name="show_system_app">پیشانیانی ئەپەکانی سیستەم</string>
-    <string name="show_os_app">پیشانیانی ئەپەکان</string>
+    <string name="show_system_app">پیشاندانی ئەپەکانی سیستەم</string>
+    <string name="show_os_app">پیشاندانی ئەپەکان</string>
     <string name="hide_filter_hint">پاڵاوتنی بەپێی ناو</string>
     <string name="hide_search">گەڕان</string>
 
@@ -113,7 +113,7 @@
     <string name="module_state_restore">گەڕاندنەوە</string>
     <string name="module_action_install_external">لە بیرگەکەتەوە ڕێکی بخە</string>
     <string name="update_available">وەشانی نوێ بەردەستە</string>
-    <string name="suspend_text_riru">زیاۆکراوەکە کار ناکات چونکە %1$s کراوەتەوە</string>
+    <string name="suspend_text_riru">زیادکراوەکە کار ناکات چونکە %1$s کراوەتەوە</string>
     <string name="suspend_text_zygisk">زیادکراوەکە کارناکات چونکە %1$s نەکراوەتەوە</string>
     <string name="zygisk_module_unloaded">زیادکراوی Zygisk بەهۆی نەگونجان کارناکات</string>
     <string name="module_empty">هیچ زیادکراوێک دانەبەزیوە</string>
@@ -155,7 +155,7 @@
     <string name="settings_su_app_adb">ئەپەکان و ADB</string>
     <string name="settings_su_app">تەنها ئەپەکان</string>
     <string name="settings_su_adb">ADB تەنها</string>
-    <string name="settings_su_disable">Disabled</string>
+    <string name="settings_su_disable">ناچالاک کراوە</string>
     <string name="settings_su_request_10">10 چرکە</string>
     <string name="settings_su_request_15">15 چرکە</string>
     <string name="settings_su_request_20">20 چرکە</string>
@@ -169,12 +169,12 @@
     <string name="settings_su_reauth_title">پرسیاربکەوە دوای هەر نوێکردنەوەیەک</string>
     <string name="settings_su_reauth_summary">دوای نوێکردنەوەی ئەپەکان دووبارە پرسیار بکەوە بۆ دەسەڵاتی سوپەریوسەر</string>
     <string name="settings_su_tapjack_title">پارێزگاری کردن لە ئەگەری دەستلێدانی تر</string>
-    <string name="settings_su_tapjack_summary">کاتێک ئەپێکی تر بەسەر شاشەکەوەیە، سوپەر یوسەر وەڵام ناداتەوە لە کردنی هەر بژاردەیەک</string>
+    <string name="settings_su_tapjack_summary"> کاتێک ئەپێکی تر بەسەر شاشەکەوەیە، سوپەر یوسەر وەڵام ناداتەوە لە کردنی هەر بژاردەیەک لەبەر پارێزراوی</string>
     <string name="settings_su_auth_title">دڵنیاکردنەوەی کەسی</string>
     <string name="settings_su_auth_summary">داواکاری بکە بۆ دڵنیاکردنەوەی کەسی لەکاتی داواکاری سوپەریوسەر</string>
     <string name="settings_su_auth_insecure">هیچ دڵنیاکردنەوەیەک نییە</string>
     <string name="settings_customization">دەستکاریکردن</string>
-    <string name="setting_add_shortcut_summary">یەک ئایکۆنی جوان و ناسک زیادبکە بۆ سەر شاشەکە ئەگەر قورس بوو بیدۆزیتەوە</string>
+    <string name="setting_add_shortcut_summary">یەک ئایکۆنی جوان و ناسک زیادبکە بۆ سەر شاشەکە ئەگەر قورس بوو ئەوەی خۆی بدۆزیتەوە</string>
     <string name="settings_doh_title">DNS بەسەر HTTPS</string>
     <string name="settings_doh_description">Workaround DNS خراپە لە هەندێک شوێن</string>
     <string name="settings_random_name_title">ناوێک لەخۆیەوە</string>
@@ -244,7 +244,7 @@
     <string name="post_notifications_denied">ڕەزامەندی ئاگاداری بکە تاوەکوو ئەمە کار بکات</string>
     <string name="install_unknown_denied">ڕەزامەندی "install unknown apps" تاوەکوو کار بکات</string>
     <string name="add_shortcut_title">زیادی بکە بۆ سەر شاشە</string>
-    <string name="add_shortcut_msg">دوای شاردنەوەی ئەم ئەپە، ئەتەوێت یەک ئایکۆنی جوان و ناسک زیادبکەیت بۆ سەر شاشەکە ئەگەر قورس بوو بۆ دۆزینەوە؟</string>
+    <string name="add_shortcut_msg">دوای شاردنەوەی ئەم ئەپە، ئەتەوێت یەک ئایکۆنی جوان و ناسک زیادبکەیت بۆ سەر شاشەکە ئەگەر قورس بوو ئەوەی خۆی بدۆزیتەوە؟</string>
     <string name="app_not_found">هیچ ئەپێک نەدۆزرایەوە تاوەکوو ئەمەی پێ بکرێت</string>
     <string name="reboot_apply_change">ڕێستارت بکە تاوەکوو کاریگەریەکان کار بکەن</string>
     <string name="restore_app_confirmation">ئەمە ئەپە ڕەسەنەکە ئەهێنێتەوە، دڵنیای بیکەیت؟</string>
