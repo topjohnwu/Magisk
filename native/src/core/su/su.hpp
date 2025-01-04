@@ -27,7 +27,7 @@ struct su_access {
 
     su_access() : policy(QUERY), log(1), notify(1) {}
 
-    void operator()(StringSlice columns, DbValues &data);
+    void operator()(StringSlice columns, const DbValues &data);
     void silent_deny() {
         policy = DENY;
         log = 0;
