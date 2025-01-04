@@ -1,5 +1,5 @@
 # Magisk Changelog
-
+#
 ### v28.1
 
 - [App] Fix stub APK download link
