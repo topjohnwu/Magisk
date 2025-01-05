@@ -175,7 +175,7 @@ void app_log(const su_context &ctx) {
         extras.emplace_back("from.uid", ctx.info->uid);
         extras.emplace_back("to.uid", static_cast<int>(ctx.req.uid));
         extras.emplace_back("pid", ctx.pid);
-        extras.emplace_back("policy", ctx.info->access.policy);
+        extras.emplace_back("policy", +ctx.info->access.policy);
         extras.emplace_back("target", ctx.req.target);
         extras.emplace_back("context", ctx.req.context.data());
         extras.emplace_back("gids", &ctx.req.gids);
@@ -193,7 +193,7 @@ void app_notify(const su_context &ctx) {
         extras.reserve(3);
         extras.emplace_back("from.uid", ctx.info->uid);
         extras.emplace_back("pid", ctx.pid);
-        extras.emplace_back("policy", ctx.info->access.policy);
+        extras.emplace_back("policy", +ctx.info->access.policy);
 
         exec_cmd("notify", extras, ctx.info);
         exit(0);

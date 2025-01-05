@@ -13,6 +13,7 @@ use logging::{
 };
 use mount::{clean_mounts, find_preinit_device, revert_unmount, setup_mounts};
 use resetprop::{persist_delete_prop, persist_get_prop, persist_get_props, persist_set_prop};
+use su::get_default_root_settings;
 
 mod cert;
 #[path = "../include/consts.rs"]
@@ -22,6 +23,7 @@ mod db;
 mod logging;
 mod mount;
 mod resetprop;
+mod su;
 
 #[cxx::bridge]
 pub mod ffi {
@@ -121,6 +123,19 @@ pub mod ffi {
         zygisk: bool,
     }
 
+    #[repr(i32)]
+    enum SuPolicy {
+        Query,
+        Deny,
+        Allow,
+    }
+
+    struct RootSettings {
+        policy: SuPolicy,
+        log: bool,
+        notify: bool,
+    }
+
     unsafe extern "C++" {
         include!("include/sqlite.hpp");
 
@@ -165,12 +180,12 @@ pub mod ffi {
     // FFI for MagiskD
     extern "Rust" {
         type MagiskD;
-        fn setup_logfile(self: &MagiskD);
-        fn is_recovery(self: &MagiskD) -> bool;
-        fn boot_stage_handler(self: &MagiskD, client: i32, code: i32);
+        fn setup_logfile(&self);
+        fn is_recovery(&self) -> bool;
+        fn boot_stage_handler(&self, client: i32, code: i32);
 
         #[cxx_name = "get_db_settings"]
-        fn get_db_settings_for_cxx(self: &MagiskD, cfg: &mut DbSettings) -> bool;
+        fn get_db_settings_for_cxx(&self, cfg: &mut DbSettings) -> bool;
         fn get_db_setting(&self, key: DbEntryKey) -> i32;
         #[cxx_name = "set_db_setting"]
         fn set_db_setting_for_cxx(&self, key: DbEntryKey, value: i32) -> bool;
@@ -179,9 +194,13 @@ pub mod ffi {
         fn rm_db_string_for_cxx(&self, key: DbEntryKey) -> bool;
         #[cxx_name = "db_exec"]
         fn db_exec_for_cxx(&self, client_fd: i32);
+        #[cxx_name = "get_root_settings"]
+        fn get_root_settings_for_cxx(&self, uid: i32, settings: &mut RootSettings) -> bool;
+
         #[cxx_name = "DbSettings"]
         fn get_default_db_settings() -> DbSettings;
-
+        #[cxx_name = "RootSettings"]
+        fn get_default_root_settings() -> RootSettings;
         #[cxx_name = "MagiskD"]
         fn get_magiskd() -> &'static MagiskD;
     }
