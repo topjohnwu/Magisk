@@ -111,9 +111,8 @@ bool uid_granted_root(int uid) {
     }
 
     bool granted = false;
-    db_exec("SELECT policy FROM policies WHERE uid=? AND (until=0 OR until>?)",
-            { uid, time(nullptr) },
-            [&](auto, const DbValues &values) { granted = values.get_int(0) == +SuPolicy::Allow; });
+    db_exec("SELECT policy FROM policies WHERE uid=? AND (until=0 OR until>strftime('%s', 'now'))",
+            { uid }, [&](auto, const DbValues &v) { granted = v.get_int(0) == +SuPolicy::Allow; });
     return granted;
 }
 
@@ -141,9 +140,7 @@ void prune_su_access() {
         }
     }
     for (int uid : rm_uids) {
-        char query[256];
-        ssprintf(query, sizeof(query), "DELETE FROM policies WHERE uid == %d", uid);
-        db_exec(query);
+        db_exec("DELETE FROM policies WHERE uid=?", { uid });
     }
 }
 

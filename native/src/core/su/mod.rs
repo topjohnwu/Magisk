@@ -2,8 +2,7 @@ use crate::daemon::MagiskD;
 use crate::db::DbArg::Integer;
 use crate::db::{SqlTable, SqliteResult, SqliteReturn};
 use crate::ffi::{DbValues, RootSettings, SuPolicy};
-use base::{libc, ResultExt};
-use std::ptr;
+use base::ResultExt;
 
 impl Default for SuPolicy {
     fn default() -> Self {
@@ -40,11 +39,8 @@ impl MagiskD {
     fn get_root_settings(&self, uid: i32, settings: &mut RootSettings) -> SqliteResult {
         self.db_exec_with_rows(
             "SELECT policy, logging, notification FROM policies \
-             WHERE uid=? AND (until=0 OR until>?)",
-            &[
-                Integer(uid as i64),
-                Integer(unsafe { libc::time(ptr::null_mut()).into() }),
-            ],
+             WHERE uid=? AND (until=0 OR until>strftime('%s', 'now'))",
+            &[Integer(uid as i64)],
             settings,
         )
         .sql_result()

@@ -81,15 +81,13 @@ class SuRequestHandler(
         return true
     }
 
-    suspend fun respond(action: Int, time: Int) {
-        val until = if (time > 0)
-            TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()) +
-                TimeUnit.MINUTES.toSeconds(time.toLong())
-        else
-            time.toLong()
-
+    suspend fun respond(action: Int, time: Long) {
         policy.policy = action
-        policy.until = until
+        if (time >= 0) {
+            policy.remain = TimeUnit.MINUTES.toSeconds(time)
+        } else {
+            policy.remain = time
+        }
 
         withContext(Dispatchers.IO) {
             try {
@@ -100,7 +98,7 @@ class SuRequestHandler(
             } catch (e: IOException) {
                 Timber.e(e)
             }
-            if (until >= 0) {
+            if (time >= 0) {
                 policyDB.update(policy)
             }
         }

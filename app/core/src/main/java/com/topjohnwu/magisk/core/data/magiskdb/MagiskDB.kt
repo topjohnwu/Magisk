@@ -7,9 +7,13 @@ import kotlinx.coroutines.withContext
 
 open class MagiskDB {
 
-    suspend fun <R> exec(
+    class Literal(
+        val str: String
+    )
+
+    suspend inline fun <R> exec(
         query: String,
-        mapper: suspend (Map<String, String>) -> R
+        crossinline mapper: (Map<String, String>) -> R
     ): List<R> {
         return withContext(Dispatchers.IO) {
             val out = Shell.cmd("magisk --sqlite '$query'").await().out
@@ -18,13 +22,15 @@ open class MagiskDB {
                     .map { it.split("=", limit = 2) }
                     .filter { it.size == 2 }
                     .associate { it[0] to it[1] }
-                    .let { mapper(it) }
+                    .let(mapper)
             }
         }
     }
 
-    suspend inline fun exec(query: String) {
-        exec(query) {}
+    suspend fun exec(query: String) {
+        withContext(Dispatchers.IO) {
+            Shell.cmd("magisk --sqlite '$query'").await()
+        }
     }
 
     fun Map<String, Any>.toQuery(): String {
@@ -33,6 +39,7 @@ open class MagiskDB {
             when (it) {
                 is Boolean -> if (it) "1" else "0"
                 is Number -> it.toString()
+                is Literal -> it.str
                 else -> "\"$it\""
             }
         }

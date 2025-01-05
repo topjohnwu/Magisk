@@ -45,7 +45,7 @@ class MagiskAppTest : BaseTest {
             uid = 2000,
             logging = false,
             notification = false,
-            until = 0L
+            remain = 0L
         )
         runBlocking {
             ServiceLocator.policyDB.update(policy)
