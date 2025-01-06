@@ -219,8 +219,6 @@ def run_ndk_build(cmds: list):
 
 
 def build_cpp_src(targets: set):
-    dump_flag_header()
-
     cmds = []
     clean = False
 
@@ -336,7 +334,11 @@ def dump_flag_header():
     flag_txt += f"#define MAGISK_DEBUG        {0 if args.release else 1}\n"
 
     native_gen_path.mkdir(mode=0o755, parents=True, exist_ok=True)
-    write_if_diff(Path(native_gen_path, "flags.h"), flag_txt)
+    write_if_diff(native_gen_path / "flags.h", flag_txt)
+
+    rust_flag_txt = f'pub const MAGISK_VERSION: &str = "{config["version"]}";\n'
+    rust_flag_txt += f'pub const MAGISK_VER_CODE: i32 = {config["versionCode"]};\n'
+    write_if_diff(native_gen_path / "flags.rs", rust_flag_txt)
 
 
 def build_native():
@@ -363,6 +365,7 @@ def build_native():
     if ccache := shutil.which("ccache"):
         os.environ["NDK_CCACHE"] = ccache
 
+    dump_flag_header()
     build_rust_src(targets)
     build_cpp_src(targets)
 

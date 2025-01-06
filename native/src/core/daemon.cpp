@@ -328,8 +328,7 @@ static void daemon_entry() {
     setcon(MAGISK_PROC_CON);
 
     rust::daemon_entry();
-
-    LOGI(NAME_WITH_VER(Magisk) " daemon started\n");
+    SDK_INT = MagiskD().sdk_int();
 
     // Escape from cgroup
     int pid = getpid();
@@ -343,23 +342,6 @@ static void daemon_entry() {
     // Get self stat
     xstat("/proc/self/exe", &self_st);
 
-    // Get API level
-    parse_prop_file("/system/build.prop", [](auto key, auto val) -> bool {
-        if (key == "ro.build.version.sdk") {
-            SDK_INT = parse_int(val);
-            return false;
-        }
-        return true;
-    });
-    if (SDK_INT < 0) {
-        // In case some devices do not store this info in build.prop, fallback to getprop
-        auto sdk = get_prop("ro.build.version.sdk");
-        if (!sdk.empty()) {
-            SDK_INT = parse_int(sdk);
-        }
-    }
-    LOGI("* Device API level: %d\n", SDK_INT);
-    
     // Samsung workaround  #7887
     if (access("/system_ext/app/mediatek-res/mediatek-res.apk", F_OK) == 0) {
         set_prop("ro.vendor.mtk_model", "0");

@@ -232,7 +232,7 @@ impl MagiskD {
             DbEntryKey::SuMultiuserMode => MultiuserMode::default().repr,
             DbEntryKey::SuMntNs => MntNsMode::default().repr,
             DbEntryKey::DenylistConfig => 0,
-            DbEntryKey::ZygiskConfig => self.is_emulator() as i32,
+            DbEntryKey::ZygiskConfig => self.is_emulator as i32,
             DbEntryKey::BootloopCount => 0,
             _ => -1,
         };
@@ -251,7 +251,7 @@ impl MagiskD {
     }
 
     pub fn get_db_settings(&self, cfg: &mut DbSettings) -> SqliteResult {
-        cfg.zygisk = self.is_emulator();
+        cfg.zygisk = self.is_emulator;
         self.db_exec_with_rows("SELECT * FROM settings", &[], cfg)
             .sql_result()
     }
