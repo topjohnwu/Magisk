@@ -1,19 +1,18 @@
+use crate::consts::{MAGISK_FULL_VER, MAIN_CONFIG};
+use crate::db::Sqlite3;
+use crate::ffi::{get_magisk_tmp, RequestCode};
+use crate::get_prop;
+use crate::logging::magisk_logging;
 use base::libc::{O_CLOEXEC, O_RDONLY};
 use base::{
-    cstr, libc, open_fd, BufReadExt, Directory, FsPathBuf, ReadExt, ResultExt, Utf8CStr,
-    Utf8CStrBuf, Utf8CStrBufArr, Utf8CStrBufRef, WalkResult,
+    cstr, info, libc, open_fd, BufReadExt, Directory, FsPath, FsPathBuf, ReadExt, ResultExt,
+    Utf8CStr, Utf8CStrBuf, Utf8CStrBufArr, Utf8CStrBufRef, WalkResult,
 };
 use bytemuck::bytes_of;
 use std::fs::File;
 use std::io;
 use std::io::{BufReader, Read, Write};
 use std::sync::{Mutex, OnceLock};
-
-use crate::consts::MAIN_CONFIG;
-use crate::db::Sqlite3;
-use crate::ffi::{get_magisk_tmp, RequestCode};
-use crate::get_prop;
-use crate::logging::magisk_logging;
 
 // Global magiskd singleton
 pub static MAGISKD: OnceLock<MagiskD> = OnceLock::new();
@@ -45,17 +44,18 @@ pub struct MagiskD {
     pub logd: Mutex<Option<File>>,
     pub sql_connection: Mutex<Option<Sqlite3>>,
     boot_stage_lock: Mutex<BootStateFlags>,
-    is_emulator: bool,
+    sdk_int: i32,
+    pub is_emulator: bool,
     is_recovery: bool,
 }
 
 impl MagiskD {
-    pub fn is_emulator(&self) -> bool {
-        self.is_emulator
-    }
-
     pub fn is_recovery(&self) -> bool {
         self.is_recovery
+    }
+
+    pub fn sdk_int(&self) -> i32 {
+        self.sdk_int
     }
 
     pub fn boot_stage_handler(&self, client: i32, code: i32) {
@@ -117,7 +117,26 @@ pub fn daemon_entry() {
         });
     }
 
+    let mut sdk_int = -1;
+    if let Ok(file) = FsPath::from(cstr!("/system/build.prop")).open(O_RDONLY | O_CLOEXEC) {
+        let mut file = BufReader::new(file);
+        file.foreach_props(|key, val| {
+            if key == "ro.build.version.sdk" {
+                sdk_int = val.parse::<i32>().unwrap_or(-1);
+                return false;
+            }
+            true
+        });
+    }
+    if sdk_int < 0 {
+        // In case some devices do not store this info in build.prop, fallback to getprop
+        sdk_int = get_prop(cstr!("ro.build.version.sdk"), false)
+            .parse::<i32>()
+            .unwrap_or(-1);
+    }
+
     let magiskd = MagiskD {
+        sdk_int,
         is_emulator,
         is_recovery,
         ..Default::default()
@@ -125,6 +144,9 @@ pub fn daemon_entry() {
     magiskd.start_log_daemon();
     MAGISKD.set(magiskd).ok();
     magisk_logging();
+
+    info!("Magisk {} daemon started", MAGISK_FULL_VER);
+    info!("* Device API level: {}", sdk_int);
 }
 
 fn check_data() -> bool {

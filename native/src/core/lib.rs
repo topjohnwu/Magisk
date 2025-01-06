@@ -182,6 +182,7 @@ pub mod ffi {
         type MagiskD;
         fn setup_logfile(&self);
         fn is_recovery(&self) -> bool;
+        fn sdk_int(&self) -> i32;
         fn boot_stage_handler(&self, client: i32, code: i32);
 
         #[cxx_name = "get_db_settings"]
