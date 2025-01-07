@@ -2,7 +2,7 @@ use base::libc::{
     makedev, mknod, syscall, SYS_dup3, O_CLOEXEC, O_RDWR, O_WRONLY, STDERR_FILENO, STDIN_FILENO,
     STDOUT_FILENO, S_IFCHR,
 };
-use base::{cstr, exit_on_error, open_fd, raw_cstr, FsPath, LogLevel, Logger, Utf8CStr, LOGGER};
+use base::{cstr, open_fd, raw_cstr, FsPath, LogLevel, Logger, Utf8CStr, LOGGER};
 use std::fs::File;
 use std::io::{IoSlice, Write};
 use std::mem;
@@ -60,7 +60,6 @@ pub fn setup_klog() {
         write: kmsg_log_write,
         flags: 0,
     };
-    exit_on_error(false);
     unsafe {
         LOGGER = logger;
     }

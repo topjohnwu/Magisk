@@ -8,9 +8,7 @@ use base::Utf8CStr;
 use cert::read_certificate;
 use daemon::{daemon_entry, find_apk_path, get_magiskd, MagiskD};
 use db::get_default_db_settings;
-use logging::{
-    android_logging, magisk_logging, zygisk_close_logd, zygisk_get_logd, zygisk_logging,
-};
+use logging::{android_logging, setup_logfile, zygisk_close_logd, zygisk_get_logd, zygisk_logging};
 use mount::{clean_mounts, find_preinit_device, revert_unmount, setup_mounts};
 use resetprop::{persist_delete_prop, persist_get_prop, persist_get_props, persist_set_prop};
 use su::get_default_root_settings;
@@ -158,10 +156,10 @@ pub mod ffi {
     extern "Rust" {
         fn rust_test_entry();
         fn android_logging();
-        fn magisk_logging();
         fn zygisk_logging();
         fn zygisk_close_logd();
         fn zygisk_get_logd() -> i32;
+        fn setup_logfile();
         fn find_apk_path(pkg: Utf8CStrRef, data: &mut [u8]) -> usize;
         fn read_certificate(fd: i32, version: i32) -> Vec<u8>;
         fn setup_mounts();
@@ -180,7 +178,6 @@ pub mod ffi {
     // FFI for MagiskD
     extern "Rust" {
         type MagiskD;
-        fn setup_logfile(&self);
         fn is_recovery(&self) -> bool;
         fn sdk_int(&self) -> i32;
         fn boot_stage_handler(&self, client: i32, code: i32);
