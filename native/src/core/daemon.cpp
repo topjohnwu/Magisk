@@ -183,7 +183,7 @@ static void handle_request_sync(int client, int code) {
         write_int(client, MAGISK_VER_CODE);
         break;
     case +RequestCode::START_DAEMON:
-        MagiskD().setup_logfile();
+        setup_logfile();
         break;
     case +RequestCode::STOP_DAEMON: {
         // Unmount all overlays

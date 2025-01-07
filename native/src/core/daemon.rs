@@ -2,7 +2,7 @@ use crate::consts::{MAGISK_FULL_VER, MAIN_CONFIG};
 use crate::db::Sqlite3;
 use crate::ffi::{get_magisk_tmp, RequestCode};
 use crate::get_prop;
-use crate::logging::magisk_logging;
+use crate::logging::{magisk_logging, start_log_daemon};
 use base::libc::{O_CLOEXEC, O_RDONLY};
 use base::{
     cstr, info, libc, open_fd, BufReadExt, Directory, FsPath, FsPathBuf, ReadExt, ResultExt,
@@ -41,7 +41,6 @@ impl BootStateFlags {
 
 #[derive(Default)]
 pub struct MagiskD {
-    pub logd: Mutex<Option<File>>,
     pub sql_connection: Mutex<Option<Sqlite3>>,
     boot_stage_lock: Mutex<BootStateFlags>,
     sdk_int: i32,
@@ -96,6 +95,10 @@ impl MagiskD {
 }
 
 pub fn daemon_entry() {
+    start_log_daemon();
+    magisk_logging();
+    info!("Magisk {} daemon started", MAGISK_FULL_VER);
+
     let is_emulator = get_prop(cstr!("ro.kernel.qemu"), false) == "1"
         || get_prop(cstr!("ro.boot.qemu"), false) == "1"
         || get_prop(cstr!("ro.product.device"), false).contains("vsoc");
@@ -134,6 +137,7 @@ pub fn daemon_entry() {
             .parse::<i32>()
             .unwrap_or(-1);
     }
+    info!("* Device API level: {}", sdk_int);
 
     let magiskd = MagiskD {
         sdk_int,
@@ -141,12 +145,7 @@ pub fn daemon_entry() {
         is_recovery,
         ..Default::default()
     };
-    magiskd.start_log_daemon();
     MAGISKD.set(magiskd).ok();
-    magisk_logging();
-
-    info!("Magisk {} daemon started", MAGISK_FULL_VER);
-    info!("* Device API level: {}", sdk_int);
 }
 
 fn check_data() -> bool {
