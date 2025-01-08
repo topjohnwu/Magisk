@@ -51,11 +51,11 @@
 
     <!--Superuser-->
     <string name="su_request_title">داواکاری سوپەریوسەر</string>
-    <string name="touch_filtered_warning">ئەپێک لە سەر شاشەکەیە، ناتوانین دڵنیا بینەوەstring>
+    <string name="touch_filtered_warning">ئەپێک لە سەر شاشەکەیە، ناتوانین دڵنیا بینەوە</string>
     <string name="deny">ڕەتکردنەوە</string>
     <string name="prompt">داواکاری</string>
     <string name="grant">ڕێگەپێدان</string>
-    <string name="su_warning">ڕێگەپێدان بۆ تەواوی ئامێرەکەت، گەر دڵنیا نیت ڕەتی بکەوەstring>
+    <string name="su_warning">ڕێگەپێدان بۆ تەواوی ئامێرەکەت، گەر دڵنیا نیت ڕەتی بکەوە</string>
     <string name="forever">بۆ هەمیشە</string>
     <string name="once">بۆ یەکجار</string>
     <string name="tenmin">بۆ ١٠ خولەک</string>
@@ -146,9 +146,9 @@
     <string name="settings_denylist_summary">هەر ئەپێک لە پێڕستی نەرێنییەکان کاریگەریەکانی ماجیسکی لەسەر نییە</string>
     <string name="settings_denylist_config_title">دەستکاریکردنی پێڕستی نەرێنیکراوەکان</string>
     <string name="settings_denylist_config_summary">ئەو ئەپە هەڵبژێرە کە دەتەوێت نەرێنیی بکەیت</string>
-    <string name="settings_hosts_title">Systemless hosts</string>
-    <string name="settings_hosts_summary">Systemless hosts بۆ لابردنی ڕیکلامەکان</string>
-    <string name="settings_hosts_toast"> systemless hosts زیادکرا</string>
+    <string name="settings_hosts_title">هۆستی ناسیستەمی</string>
+    <string name="settings_hosts_summary"> هۆستی ناسیستەمی بۆ لابردنی ڕیکلامەکان</string>
+    <string name="settings_hosts_toast"> هۆستی ناسیستەمی زیادکرا</string>
     <string name="settings_app_name_hint">ناوی نوێ</string>
     <string name="settings_app_name_helper">ئەپەکە بەم ناوەوە دروست دەکرێتەوە</string>
     <string name="settings_app_name_error">هەڵەیە</string>
@@ -229,8 +229,7 @@
     <string name="setup_fail">ڕێکخستن شکستی هێنا</string>
     <string name="env_fix_title">پێویستی بە ڕێکخستنی زیاترە</string>
     <string name="env_fix_msg">مۆبایلەکەت پێویستی بە ڕێکخستنی زیاترە، ئایا ئەتەوێت بەردەوام بیت و ڕێستارتی بکەیتەوە؟</string>
-    <string name="env_full_fix_msg">Your device needs reflash Magisk to work properly. Please reinstall Magisk within app, recovery mode cannot get correct device info.
-    گوڵم پێویستە دوبارە ماجیسک دابگریتەوە بۆ ئەوەی بەباشی کاربکات تکایە ماجیسک دابگرەوە لەناو ئەپەکە خۆی چونکە لە ڕیکەڤەرییەوە ناتوانرێ زانیاری تەواو دەستبخرێت </string>
+    <string name="env_full_fix_msg"> پێویستە دوبارە ماجیسک دابگریتەوە بۆ ئەوەی بەباشی کاربکات تکایە ماجیسک دابگرەوە لەناو ئەپەکە خۆی چونکە لە ڕیکەڤەرییەوە ناتوانرێ زانیاری تەواو لەسەر ئامێرەکە دەستبخرێت </string>
     <string name="setup_msg">دەستپێکردن....</string>
     <string name="unsupport_magisk_title">وەشانی ماجیسک پاڵپشتینەکراوە</string>
     <string name="unsupport_magisk_msg">وەشانی ماجیسکەکەت زۆر کۆنە وەک ئەوە وایە هەر نەبێت، تکایە نوێی بکەوە بە زوترین کات</string>
