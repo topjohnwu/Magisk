@@ -3,11 +3,9 @@ use crate::db::Sqlite3;
 use crate::ffi::{get_magisk_tmp, RequestCode};
 use crate::get_prop;
 use crate::logging::{magisk_logging, start_log_daemon};
+use crate::package::ManagerInfo;
 use base::libc::{O_CLOEXEC, O_RDONLY};
-use base::{
-    cstr, info, libc, open_fd, BufReadExt, Directory, FsPath, FsPathBuf, ReadExt, ResultExt,
-    Utf8CStr, Utf8CStrBuf, Utf8CStrBufArr, Utf8CStrBufRef, WalkResult,
-};
+use base::{cstr, info, libc, open_fd, BufReadExt, FsPath, FsPathBuf, ReadExt, Utf8CStrBufArr};
 use bytemuck::bytes_of;
 use std::fs::File;
 use std::io;
@@ -39,9 +37,16 @@ impl BootStateFlags {
     }
 }
 
+pub const AID_USER_OFFSET: i32 = 100000;
+
+pub const fn to_app_id(uid: i32) -> i32 {
+    uid % AID_USER_OFFSET
+}
+
 #[derive(Default)]
 pub struct MagiskD {
     pub sql_connection: Mutex<Option<Sqlite3>>,
+    pub manager_info: Mutex<ManagerInfo>,
     boot_stage_lock: Mutex<BootStateFlags>,
     sdk_int: i32,
     pub is_emulator: bool,
@@ -55,6 +60,14 @@ impl MagiskD {
 
     pub fn sdk_int(&self) -> i32 {
         self.sdk_int
+    }
+
+    pub fn app_data_dir(&self) -> &'static str {
+        if self.sdk_int >= 24 {
+            "/data/user_de"
+        } else {
+            "/data/user"
+        }
     }
 
     pub fn boot_stage_handler(&self, client: i32, code: i32) {
@@ -181,34 +194,6 @@ fn check_data() -> bool {
 
 pub fn get_magiskd() -> &'static MagiskD {
     unsafe { MAGISKD.get().unwrap_unchecked() }
-}
-
-pub fn find_apk_path(pkg: &Utf8CStr, data: &mut [u8]) -> usize {
-    use WalkResult::*;
-    fn inner(pkg: &Utf8CStr, buf: &mut dyn Utf8CStrBuf) -> io::Result<usize> {
-        Directory::open(cstr!("/data/app"))?.pre_order_walk(|e| {
-            if !e.is_dir() {
-                return Ok(Skip);
-            }
-            let d_name = e.d_name().to_bytes();
-            if d_name.starts_with(pkg.as_bytes()) && d_name[pkg.len()] == b'-' {
-                // Found the APK path, we can abort now
-                e.path(buf)?;
-                return Ok(Abort);
-            }
-            if d_name.starts_with(b"~~") {
-                return Ok(Continue);
-            }
-            Ok(Skip)
-        })?;
-        if !buf.is_empty() {
-            buf.push_str("/base.apk");
-        }
-        Ok(buf.len())
-    }
-    inner(pkg, &mut Utf8CStrBufRef::from(data))
-        .log()
-        .unwrap_or(0)
 }
 
 pub trait IpcRead {
