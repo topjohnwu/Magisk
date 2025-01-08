@@ -159,10 +159,10 @@ appops set %s REQUEST_INSTALL_PACKAGES allow
 rm -f $APK
 )EOF";
 
-void install_apk(const char *apk) {
-    setfilecon(apk, MAGISK_FILE_CON);
+void install_apk(rust::Utf8CStr apk) {
+    setfilecon(apk.c_str(), MAGISK_FILE_CON);
     char cmds[sizeof(install_script) + 4096];
-    ssprintf(cmds, sizeof(cmds), install_script, apk, JAVA_PACKAGE_NAME);
+    ssprintf(cmds, sizeof(cmds), install_script, apk.c_str(), JAVA_PACKAGE_NAME);
     exec_command_async("/system/bin/sh", "-c", cmds);
 }
 
@@ -172,9 +172,9 @@ log -t Magisk "pm_uninstall: $PKG"
 log -t Magisk "pm_uninstall: $(pm uninstall $PKG 2>&1)"
 )EOF";
 
-void uninstall_pkg(const char *pkg) {
+void uninstall_pkg(rust::Utf8CStr pkg) {
     char cmds[sizeof(uninstall_script) + 256];
-    ssprintf(cmds, sizeof(cmds), uninstall_script, pkg);
+    ssprintf(cmds, sizeof(cmds), uninstall_script, pkg.c_str());
     exec_command_async("/system/bin/sh", "-c", cmds);
 }
 

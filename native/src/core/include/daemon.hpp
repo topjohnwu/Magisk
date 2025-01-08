@@ -3,6 +3,8 @@
 #include <base.hpp>
 
 const char *get_magisk_tmp();
+void install_apk(rust::Utf8CStr apk);
+void uninstall_pkg(rust::Utf8CStr pkg);
 
 // Rust bindings
 static inline rust::Utf8CStr get_magisk_tmp_rs() { return get_magisk_tmp(); }

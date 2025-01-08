@@ -5,21 +5,20 @@
 #![allow(clippy::missing_safety_doc)]
 
 use base::Utf8CStr;
-use cert::read_certificate;
-use daemon::{daemon_entry, find_apk_path, get_magiskd, MagiskD};
+use daemon::{daemon_entry, get_magiskd, MagiskD};
 use db::get_default_db_settings;
 use logging::{android_logging, setup_logfile, zygisk_close_logd, zygisk_get_logd, zygisk_logging};
 use mount::{clean_mounts, find_preinit_device, revert_unmount, setup_mounts};
 use resetprop::{persist_delete_prop, persist_get_prop, persist_get_props, persist_set_prop};
 use su::get_default_root_settings;
 
-mod cert;
 #[path = "../include/consts.rs"]
 mod consts;
 mod daemon;
 mod db;
 mod logging;
 mod mount;
+mod package;
 mod resetprop;
 mod su;
 
@@ -75,6 +74,8 @@ pub mod ffi {
         fn get_magisk_tmp() -> Utf8CStrRef<'static>;
         #[cxx_name = "resolve_preinit_dir_rs"]
         fn resolve_preinit_dir(base_dir: Utf8CStrRef) -> String;
+        fn install_apk(apk: Utf8CStrRef);
+        fn uninstall_pkg(apk: Utf8CStrRef);
 
         fn switch_mnt_ns(pid: i32) -> i32;
     }
@@ -160,8 +161,6 @@ pub mod ffi {
         fn zygisk_close_logd();
         fn zygisk_get_logd() -> i32;
         fn setup_logfile();
-        fn find_apk_path(pkg: Utf8CStrRef, data: &mut [u8]) -> usize;
-        fn read_certificate(fd: i32, version: i32) -> Vec<u8>;
         fn setup_mounts();
         fn clean_mounts();
         fn find_preinit_device() -> String;
@@ -181,6 +180,9 @@ pub mod ffi {
         fn is_recovery(&self) -> bool;
         fn sdk_int(&self) -> i32;
         fn boot_stage_handler(&self, client: i32, code: i32);
+        fn preserve_stub_apk(&self);
+        #[cxx_name = "get_manager"]
+        unsafe fn get_manager_for_cxx(&self, user: i32, ptr: *mut CxxString, install: bool) -> i32;
 
         #[cxx_name = "get_db_settings"]
         fn get_db_settings_for_cxx(&self, cfg: &mut DbSettings) -> bool;

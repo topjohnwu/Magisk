@@ -61,9 +61,7 @@ void su_daemon_handler(int client, const sock_cred *cred);
 void zygisk_handler(int client, const sock_cred *cred);
 
 // Package
-void preserve_stub_apk();
 std::vector<bool> get_app_no_list();
-int get_manager(int user, std::string *pkg = nullptr, bool install = false);
 void prune_su_access();
 
 // Module stuffs
@@ -77,8 +75,6 @@ void exec_module_scripts(const char *stage);
 void exec_script(const char *script);
 void exec_common_scripts(const char *stage);
 void exec_module_scripts(const char *stage, const std::vector<std::string_view> &modules);
-void install_apk(const char *apk);
-void uninstall_pkg(const char *pkg);
 void clear_pkg(const char *pkg, int user_id);
 [[noreturn]] void install_module(const char *file);
 

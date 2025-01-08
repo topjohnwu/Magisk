@@ -132,7 +132,7 @@ static void get_process_info(int client, const sock_cred *cred) {
     if (is_deny_target(uid, process)) {
         flags |= PROCESS_ON_DENYLIST;
     }
-    if (get_manager(to_user_id(uid)) == uid) {
+    if (MagiskD().get_manager(to_user_id(uid), nullptr, false) == uid) {
         flags |= PROCESS_IS_MAGISK_APP;
     }
     if (denylist_enforced) {

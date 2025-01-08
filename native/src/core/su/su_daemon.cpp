@@ -69,7 +69,7 @@ void su_info::check_db() {
 
     // We need to check our manager
     if (access.policy == SuPolicy::Query || access.log || access.notify) {
-        mgr_uid = get_manager(to_user_id(eval_uid), &mgr_pkg, true);
+        mgr_uid = MagiskD().get_manager(to_user_id(eval_uid), &mgr_pkg, true);
     }
 }
 
