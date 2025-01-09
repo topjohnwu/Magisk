@@ -3,7 +3,7 @@ package com.topjohnwu.magisk.core.data.magiskdb
 class SettingsDao : MagiskDB() {
 
     suspend fun delete(key: String) {
-        val query = "DELETE FROM ${Table.SETTINGS} WHERE key == \"$key\""
+        val query = "DELETE FROM ${Table.SETTINGS} WHERE key=\"$key\""
         exec(query)
     }
 
@@ -14,7 +14,7 @@ class SettingsDao : MagiskDB() {
     }
 
     suspend fun fetch(key: String, default: Int = -1): Int {
-        val query = "SELECT value FROM ${Table.SETTINGS} WHERE key == \"$key\" LIMIT 1"
+        val query = "SELECT value FROM ${Table.SETTINGS} WHERE key=\"$key\" LIMIT 1"
         return exec(query) { it["value"]?.toInt() }.firstOrNull() ?: default
     }
 }

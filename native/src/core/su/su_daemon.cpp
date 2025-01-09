@@ -18,7 +18,7 @@ static pthread_mutex_t cache_lock = PTHREAD_MUTEX_INITIALIZER;
 static shared_ptr<su_info> cached;
 
 su_info::su_info(int uid) :
-uid(uid), eval_uid(-1), cfg(DbSettings()),
+uid(uid), eval_uid(-1), cfg(DbSettings()), access(RootSettings()),
 mgr_uid(-1), timestamp(0), _lock(PTHREAD_MUTEX_INITIALIZER) {}
 
 su_info::~su_info() {
@@ -42,20 +42,6 @@ void su_info::refresh() {
     timestamp = ts.tv_sec * 1000L + ts.tv_nsec / 1000000L;
 }
 
-void su_access::operator()(StringSlice columns, const DbValues &data) {
-    for (int i = 0; i < columns.size(); ++i) {
-        const auto &name = columns[i];
-        if (name == "policy") {
-            policy = (policy_t) data.get_int(i);
-        } else if (name == "logging") {
-            log = data.get_int(i);
-        } else if (name == "notification") {
-            notify = data.get_int(i);
-        }
-    }
-    LOGD("magiskdb: query policy=[%d] log=[%d] notify=[%d]\n", policy, log, notify);
-}
-
 void su_info::check_db() {
     eval_uid = uid;
     MagiskD().get_db_settings(cfg);
@@ -65,7 +51,7 @@ void su_info::check_db() {
     case MultiuserMode::OwnerOnly:
         if (to_user_id(uid) != 0) {
             eval_uid = -1;
-            access.silent_deny();
+            access = SILENT_DENY;
         }
         break;
     case MultiuserMode::OwnerManaged:
@@ -77,15 +63,12 @@ void su_info::check_db() {
     }
 
     if (eval_uid > 0) {
-        bool res = db_exec(
-                "SELECT policy, logging, notification FROM policies "
-                "WHERE uid=? AND (until=0 OR until>?)", { eval_uid, time(nullptr) }, access);
-        if (!res)
+        if (!MagiskD().get_root_settings(eval_uid, access))
             return;
     }
 
     // We need to check our manager
-    if (access.policy == QUERY || access.log || access.notify) {
+    if (access.policy == SuPolicy::Query || access.log || access.notify) {
         mgr_uid = get_manager(to_user_id(eval_uid), &mgr_pkg, true);
     }
 }
@@ -128,9 +111,8 @@ bool uid_granted_root(int uid) {
     }
 
     bool granted = false;
-    db_exec("SELECT policy FROM policies WHERE uid=? AND (until=0 OR until>?)",
-            { uid, time(nullptr) },
-            [&](auto, const DbValues &values) { granted = values.get_int(0) == ALLOW; });
+    db_exec("SELECT policy FROM policies WHERE uid=? AND (until=0 OR until>strftime('%s', 'now'))",
+            { uid }, [&](auto, const DbValues &v) { granted = v.get_int(0) == +SuPolicy::Allow; });
     return granted;
 }
 
@@ -158,16 +140,14 @@ void prune_su_access() {
         }
     }
     for (int uid : rm_uids) {
-        char query[256];
-        ssprintf(query, sizeof(query), "DELETE FROM policies WHERE uid == %d", uid);
-        db_exec(query);
+        db_exec("DELETE FROM policies WHERE uid=?", { uid });
     }
 }
 
 static shared_ptr<su_info> get_su_info(unsigned uid) {
     if (uid == AID_ROOT) {
         auto info = make_shared<su_info>(uid);
-        info->access.silent_allow();
+        info->access = SILENT_ALLOW;
         return info;
     }
 
@@ -182,13 +162,13 @@ static shared_ptr<su_info> get_su_info(unsigned uid) {
 
     mutex_guard lock = info->lock();
 
-    if (info->access.policy == QUERY) {
+    if (info->access.policy == SuPolicy::Query) {
         // Not cached, get data from database
         info->check_db();
 
         // If it's the manager, allow it silently
         if (to_app_id(info->uid) == to_app_id(info->mgr_uid)) {
-            info->access.silent_allow();
+            info->access = SILENT_ALLOW;
             return info;
         }
 
@@ -196,18 +176,18 @@ static shared_ptr<su_info> get_su_info(unsigned uid) {
         switch (info->cfg.root_access) {
             case RootAccess::Disabled:
                 LOGW("Root access is disabled!\n");
-                info->access.silent_deny();
+                info->access = SILENT_DENY;
                 break;
             case RootAccess::AdbOnly:
                 if (info->uid != AID_SHELL) {
                     LOGW("Root access limited to ADB only!\n");
-                    info->access.silent_deny();
+                    info->access = SILENT_DENY;
                 }
                 break;
             case RootAccess::AppsOnly:
                 if (info->uid == AID_SHELL) {
                     LOGW("Root access is disabled for ADB!\n");
-                    info->access.silent_deny();
+                    info->access = SILENT_DENY;
                 }
                 break;
             case RootAccess::AppsAndAdb:
@@ -215,12 +195,12 @@ static shared_ptr<su_info> get_su_info(unsigned uid) {
                 break;
         }
 
-        if (info->access.policy != QUERY)
+        if (info->access.policy != SuPolicy::Query)
             return info;
 
         // If still not determined, check if manager exists
         if (info->mgr_uid < 0) {
-            info->access.silent_deny();
+            info->access = SILENT_DENY;
             return info;
         }
     }
@@ -266,19 +246,19 @@ void su_daemon_handler(int client, const sock_cred *cred) {
         || !read_vector(client, ctx.req.gids)) {
         LOGW("su: remote process probably died, abort\n");
         ctx.info.reset();
-        write_int(client, DENY);
+        write_int(client, +SuPolicy::Deny);
         close(client);
         return;
     }
 
     // If still not determined, ask manager
-    if (ctx.info->access.policy == QUERY) {
+    if (ctx.info->access.policy == SuPolicy::Query) {
         int fd = app_request(ctx);
         if (fd < 0) {
-            ctx.info->access.policy = DENY;
+            ctx.info->access.policy = SuPolicy::Deny;
         } else {
             int ret = read_int_be(fd);
-            ctx.info->access.policy = ret < 0 ? DENY : static_cast<policy_t>(ret);
+            ctx.info->access.policy = ret < 0 ? SuPolicy::Deny : static_cast<SuPolicy>(ret);
             close(fd);
         }
     }
@@ -289,10 +269,10 @@ void su_daemon_handler(int client, const sock_cred *cred) {
         app_notify(ctx);
 
     // Fail fast
-    if (ctx.info->access.policy == DENY) {
+    if (ctx.info->access.policy == SuPolicy::Deny) {
         LOGW("su: request rejected (%u)\n", ctx.info->uid);
         ctx.info.reset();
-        write_int(client, DENY);
+        write_int(client, +SuPolicy::Deny);
         close(client);
         return;
     }

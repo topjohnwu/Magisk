@@ -1,9 +1,11 @@
 package com.topjohnwu.magisk.core.model.su
 
+import com.topjohnwu.magisk.core.data.magiskdb.MagiskDB
+
 class SuPolicy(
     val uid: Int,
     var policy: Int = INTERACTIVE,
-    var until: Long = -1L,
+    var remain: Long = -1L,
     var logging: Boolean = true,
     var notification: Boolean = true,
 ) {
@@ -13,11 +15,18 @@ class SuPolicy(
         const val ALLOW = 2
     }
 
-    fun toMap(): MutableMap<String, Any> = mutableMapOf(
-        "uid" to uid,
-        "policy" to policy,
-        "until" to until,
-        "logging" to logging,
-        "notification" to notification
-    )
+    fun toMap(): MutableMap<String, Any> {
+        val until = if (remain <= 0) {
+            remain
+        } else {
+            MagiskDB.Literal("(strftime(\"%s\", \"now\") + $remain)")
+        }
+        return mutableMapOf(
+            "uid" to uid,
+            "policy" to policy,
+            "until" to until,
+            "logging" to logging,
+            "notification" to notification
+        )
+    }
 }

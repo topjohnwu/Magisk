@@ -27,7 +27,7 @@ pub struct SqliteError(i32);
 
 pub type SqliteResult = Result<(), SqliteError>;
 
-trait SqliteReturn {
+pub trait SqliteReturn {
     fn sql_result(self) -> SqliteResult;
 }
 
@@ -41,7 +41,7 @@ impl SqliteReturn for i32 {
     }
 }
 
-trait SqlTable {
+pub trait SqlTable {
     fn on_row(&mut self, columns: &[String], values: &DbValues);
 }
 
@@ -132,7 +132,7 @@ extern "C" {
     ) -> i32;
 }
 
-enum DbArg<'a> {
+pub enum DbArg<'a> {
     Text(&'a str),
     Integer(i64),
 }
@@ -178,7 +178,13 @@ impl MagiskD {
         }
     }
 
-    fn db_exec_with_output<T: SqlTable>(&self, sql: &str, args: &[DbArg], out: &mut T) -> i32 {
+    fn db_exec_impl(
+        &self,
+        sql: &str,
+        args: &[DbArg],
+        exec_callback: SqlExecCallback,
+        exec_cookie: *mut c_void,
+    ) -> i32 {
         let mut bind_callback: SqlBindCallback = None;
         let mut bind_cookie: *mut c_void = ptr::null_mut();
         let mut db_args = DbArgs { args, curr: 0 };
@@ -186,32 +192,29 @@ impl MagiskD {
             bind_callback = Some(bind_arguments);
             bind_cookie = (&mut db_args) as *mut DbArgs as *mut c_void;
         }
-        let out_ptr: *mut T = out;
-
         self.with_db(|db| unsafe {
             sql_exec_impl(
                 db,
                 sql,
                 bind_callback,
                 bind_cookie,
-                Some(read_db_row::<T>),
-                out_ptr.cast(),
+                exec_callback,
+                exec_cookie,
             )
         })
     }
 
-    fn db_exec(&self, sql: &str, args: &[DbArg]) -> i32 {
-        let mut bind_callback: SqlBindCallback = None;
-        let mut bind_cookie: *mut c_void = ptr::null_mut();
-        let mut db_args = DbArgs { args, curr: 0 };
-        if !args.is_empty() {
-            bind_callback = Some(bind_arguments);
-            bind_cookie = (&mut db_args) as *mut DbArgs as *mut c_void;
-        }
+    pub fn db_exec_with_rows<T: SqlTable>(&self, sql: &str, args: &[DbArg], out: &mut T) -> i32 {
+        self.db_exec_impl(
+            sql,
+            args,
+            Some(read_db_row::<T>),
+            out as *mut T as *mut c_void,
+        )
+    }
 
-        self.with_db(|db| unsafe {
-            sql_exec_impl(db, sql, bind_callback, bind_cookie, None, ptr::null_mut())
-        })
+    fn db_exec(&self, sql: &str, args: &[DbArg]) -> i32 {
+        self.db_exec_impl(sql, args, None, ptr::null_mut())
     }
 
     pub fn set_db_setting(&self, key: DbEntryKey, value: i32) -> SqliteResult {
@@ -236,7 +239,7 @@ impl MagiskD {
         let mut func = |_: &[String], values: &DbValues| {
             val = values.get_int(0);
         };
-        self.db_exec_with_output(
+        self.db_exec_with_rows(
             "SELECT value FROM settings WHERE key=?",
             &[Text(key.to_str())],
             &mut func,
@@ -249,7 +252,7 @@ impl MagiskD {
 
     pub fn get_db_settings(&self, cfg: &mut DbSettings) -> SqliteResult {
         cfg.zygisk = self.is_emulator();
-        self.db_exec_with_output("SELECT * FROM settings", &[], cfg)
+        self.db_exec_with_rows("SELECT * FROM settings", &[], cfg)
             .sql_result()
     }
 
@@ -258,7 +261,7 @@ impl MagiskD {
         let mut func = |_: &[String], values: &DbValues| {
             val.push_str(values.get_text(0));
         };
-        self.db_exec_with_output(
+        self.db_exec_with_rows(
             "SELECT value FROM strings WHERE key=?",
             &[Text(key.to_str())],
             &mut func,
@@ -291,7 +294,7 @@ impl MagiskD {
             }
             writer.ipc_write_string(&out).log().ok();
         };
-        self.db_exec_with_output(&sql, &[], &mut output_fn);
+        self.db_exec_with_rows(&sql, &[], &mut output_fn);
         writer.ipc_write_string("").log()
     }
 }
