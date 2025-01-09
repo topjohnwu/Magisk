@@ -174,7 +174,7 @@
     <string name="settings_su_auth_summary">داواکاری بکە بۆ دڵنیاکردنەوەی کەسی لەکاتی داواکاری سوپەریوسەر</string>
     <string name="settings_su_auth_insecure">هیچ دڵنیاکردنەوەیەک نییە</string>
     <string name="settings_customization">دەستکاریکردن</string>
-    <string name="setting_add_shortcut_summary">یەک ئایکۆنی جوان و ناسک زیادبکە بۆ سەر شاشەکە ئەگەر قورس بوو ئەوەی خۆی بدۆزیتەوە</string>
+    <string name="setting_add_shortcut_summary">یەک ئایکۆنی جوان زیادبکە بۆ سەر شاشەکە ئەگەر قورس بوو ئەوەی خۆی بدۆزیتەوە</string>
     <string name="settings_doh_title">DNS بەسەر HTTPS</string>
     <string name="settings_doh_description">Workaround DNS خراپە لە هەندێک شوێن</string>
     <string name="settings_random_name_title">ناوێک لەخۆیەوە</string>
@@ -188,7 +188,7 @@
     <string name="owner_manage_summary">تەنها خاوەنەکە دەسەڵاتی بەکارهێنانی ڕۆتی هەیە</string>
     <string name="user_independent_summary">هەر بەکارهێنەرێک یاسای جیاوازی هەیە</string>
 
-    <string name="mount_namespace_mode">چونە دۆخی Namespace</string>
+    <string name="mount_namespace_mode">چونە دۆخی بۆشایی ناو</string>
     <string name="settings_ns_global">بۆشاییناوی گشتی</string>
     <string name="settings_ns_requester">بۆشایی ناوی خۆیی</string>
     <string name="settings_ns_isolate">بۆشایی ناوی جیا</string>
@@ -235,7 +235,7 @@
     <string name="unsupport_magisk_msg">وەشانی ماجیسکەکەت زۆر کۆنە وەک ئەوە وایە هەر نەبێت، تکایە نوێی بکەوە بە زوترین کات</string>
     <string name="unsupport_general_title">باری نائاسایی</string>
     <string name="unsupport_system_app_msg">ئەم ئەپە وەکو ئەپی سیستەم کارناکات، تکایە بیگۆڕەوە بۆ ئەپی ئاسایی</string>
-    <string name="unsupport_other_su_msg"> \"su\" binary یەکی بێگانە دۆزرایەوە، تکایە ئەپێکی ڕۆتی ناماجیسکی بەکارمەهێنە</string>
+    <string name="unsupport_other_su_msg"> \"su\" binary یەکی بێگانە دۆزرایەوە، تکایە جگە لە ماجیسک ئەپی تر بەکارمەهێنە بۆ ڕۆت کردن  </string>
     <string name="unsupport_external_storage_msg">ماجیسک لە بیرگەی دەرەکی داگیراوە، تکایە بیبەوە بۆ ناوەکی</string>
     <string name="unsupport_nonroot_stub_msg">ئەپە شاراوەکە کار ناکات چونکە ڕۆتەکە نەماوە، تکایە ئەپە ڕەسەنەکە بگەڕێنەوە</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
@@ -243,10 +243,10 @@
     <string name="post_notifications_denied">ڕەزامەندی ئاگاداری بکە تاوەکوو ئەمە کار بکات</string>
     <string name="install_unknown_denied">ڕەزامەندی "install unknown apps" تاوەکوو کار بکات</string>
     <string name="add_shortcut_title">زیادی بکە بۆ سەر شاشە</string>
-    <string name="add_shortcut_msg">دوای شاردنەوەی ئەم ئەپە، ئەتەوێت یەک ئایکۆنی جوان و ناسک زیادبکەیت بۆ سەر شاشەکە ئەگەر قورس بوو ئەوەی خۆی بدۆزیتەوە؟</string>
-    <string name="app_not_found">هیچ ئەپێک نەدۆزرایەوە تاوەکوو ئەمەی پێ بکرێت</string>
+    <string name="add_shortcut_msg">دوای شاردنەوەی ئەم ئەپە، ئەتەوێت یەک ئایکۆنی جوان زیادبکەیت بۆ سەر شاشەکە ئەگەر قورس بوو ئەوەی خۆی بدۆزیتەوە؟</string>
+    <string name="app_not_found">هیچ ئەپێک نەدۆزرایەوە تاوەکوو ئەم کارەی پێ بکرێت</string>
     <string name="reboot_apply_change">ڕێستارت بکە تاوەکوو کاریگەریەکان کار بکەن</string>
-    <string name="restore_app_confirmation">ئەمە ئەپە ڕەسەنەکە ئەهێنێتەوە، دڵنیای بیکەیت؟</string>
+    <string name="restore_app_confirmation">ئەمە ئەپە ڕەسەنەکە ئەهێنێتەوە، دڵنیایت لە کردنی؟</string>
 
 </resources>
       
