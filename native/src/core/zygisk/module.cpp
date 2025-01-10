@@ -78,6 +78,7 @@ bool ZygiskModule::valid() const {
 
 int ZygiskModule::connectCompanion() const {
     if (int fd = zygisk_request(ZygiskRequest::CONNECT_COMPANION); fd >= 0) {
+        write_int(fd, sizeof(void*) == 8 ? 1 : 0);
         write_int(fd, id);
         return fd;
     }
