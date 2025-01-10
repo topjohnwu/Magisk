@@ -251,8 +251,10 @@ impl MagiskD {
     }
 
     pub fn get_db_settings(&self) -> SqliteResult<DbSettings> {
-        let mut cfg = DbSettings::default();
-        cfg.zygisk = self.is_emulator;
+        let mut cfg = DbSettings {
+            zygisk: self.is_emulator,
+            ..Default::default()
+        };
         self.db_exec_with_rows("SELECT * FROM settings", &[], &mut cfg)
             .sql_result()?;
         Ok(cfg)

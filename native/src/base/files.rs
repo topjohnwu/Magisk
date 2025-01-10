@@ -1031,8 +1031,9 @@ pub fn parse_mount_info(pid: &str) -> Vec<MountInfo> {
     res
 }
 
-#[derive(Clone)]
+#[derive(Default, Clone)]
 pub enum SharedFd {
+    #[default]
     None,
     Shared(Arc<OwnedFd>),
 }
@@ -1056,11 +1057,5 @@ impl SharedFd {
             SharedFd::None => None,
             SharedFd::Shared(arc) => Some(ManuallyDrop::new(File::from_raw_fd(arc.as_raw_fd()))),
         }
-    }
-}
-
-impl Default for SharedFd {
-    fn default() -> Self {
-        SharedFd::None
     }
 }

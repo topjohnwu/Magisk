@@ -247,20 +247,19 @@ impl ManagerInfo {
             .join(pkg)
             .join("dyn")
             .join("current.apk");
-        let cert: Vec<u8>;
         let uid: i32;
-        match apk.open(O_RDONLY | O_CLOEXEC) {
+        let cert = match apk.open(O_RDONLY | O_CLOEXEC) {
             Ok(mut fd) => {
                 uid = fd_get_attr(fd.as_raw_fd())
                     .map(|attr| attr.st.st_uid as i32)
                     .unwrap_or(-1);
-                cert = read_certificate(&mut fd, MAGISK_VER_CODE)
+                read_certificate(&mut fd, MAGISK_VER_CODE)
             }
             Err(_) => {
                 warn!("pkg: no dyn APK, ignore");
                 return Status::NotInstalled;
             }
-        }
+        };
 
         if cert.is_empty() || cert != self.trusted_cert {
             error!("pkg: dyn APK signature mismatch: {}", apk);
@@ -282,11 +281,10 @@ impl ManagerInfo {
         }
         let apk = FsPath::from(&arr);
 
-        let cert: Vec<u8>;
-        match apk.open(O_RDONLY | O_CLOEXEC) {
-            Ok(mut fd) => cert = read_certificate(&mut fd, -1),
+        let cert = match apk.open(O_RDONLY | O_CLOEXEC) {
+            Ok(mut fd) => read_certificate(&mut fd, -1),
             Err(_) => return Status::NotInstalled,
-        }
+        };
 
         if cert.is_empty() || (pkg == self.repackaged_pkg && cert != self.repackaged_cert) {
             error!("pkg: repackaged APK signature invalid: {}", apk);
@@ -308,11 +306,10 @@ impl ManagerInfo {
         }
         let apk = FsPath::from(&arr);
 
-        let cert: Vec<u8>;
-        match apk.open(O_RDONLY | O_CLOEXEC) {
-            Ok(mut fd) => cert = read_certificate(&mut fd, MAGISK_VER_CODE),
+        let cert = match apk.open(O_RDONLY | O_CLOEXEC) {
+            Ok(mut fd) => read_certificate(&mut fd, MAGISK_VER_CODE),
             Err(_) => return Status::NotInstalled,
-        }
+        };
 
         if cert.is_empty() || cert != self.trusted_cert {
             error!("pkg: APK signature mismatch: {}", apk);

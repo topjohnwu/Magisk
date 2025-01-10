@@ -6,8 +6,8 @@ use crate::logging::{magisk_logging, start_log_daemon};
 use crate::package::ManagerInfo;
 use base::libc::{O_CLOEXEC, O_RDONLY};
 use base::{
-    cstr, info, libc, open_fd, BufReadExt, DirEntry, Directory, FsPath, FsPathBuf, LoggedResult,
-    ReadExt, Utf8CStr, Utf8CStrBufArr,
+    cstr, info, libc, open_fd, BufReadExt, Directory, FsPath, FsPathBuf, LoggedResult, ReadExt,
+    Utf8CStr, Utf8CStrBufArr,
 };
 use bit_set::BitSet;
 use bytemuck::bytes_of;
@@ -87,26 +87,27 @@ impl MagiskD {
     pub fn get_app_no_list(&self) -> BitSet {
         let mut list = BitSet::new();
         let _: LoggedResult<()> = try {
-            let mut dir = Directory::open(self.app_data_dir())?;
+            let mut app_data_dir = Directory::open(self.app_data_dir())?;
             // For each user
             loop {
-                let entry: DirEntry;
-                match dir.read()? {
+                let entry = match app_data_dir.read()? {
                     None => break,
-                    Some(e) => entry = e,
-                }
-                if let Ok(mut dir) = entry.open_as_dir() {
-                    // For each package
-                    loop {
-                        match dir.read()? {
-                            None => break,
-                            Some(e) => {
-                                let attr = e.get_attr()?;
-                                let app_id = to_app_id(attr.st.st_uid as i32);
-                                if app_id >= AID_APP_START && app_id <= AID_APP_END {
-                                    let app_no = app_id - AID_APP_START;
-                                    list.insert(app_no as usize);
-                                }
+                    Some(e) => e,
+                };
+                let mut user_dir = match entry.open_as_dir() {
+                    Err(_) => continue,
+                    Ok(dir) => dir,
+                };
+                // For each package
+                loop {
+                    match user_dir.read()? {
+                        None => break,
+                        Some(e) => {
+                            let attr = e.get_attr()?;
+                            let app_id = to_app_id(attr.st.st_uid as i32);
+                            if (AID_APP_START..=AID_APP_END).contains(&app_id) {
+                                let app_no = app_id - AID_APP_START;
+                                list.insert(app_no as usize);
                             }
                         }
                     }

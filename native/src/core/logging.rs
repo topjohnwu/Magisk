@@ -143,13 +143,10 @@ static MAGISK_LOGD_FD: Mutex<SharedFd> = Mutex::new(SharedFd::new());
 fn with_logd_fd<F: FnOnce(&mut File) -> io::Result<()>>(f: F) {
     let fd = MAGISK_LOGD_FD.lock().unwrap().clone();
     // SAFETY: writing less than PIPE_BUF bytes is guaranteed to be atomic on Linux
-    match unsafe { fd.as_file() } {
-        None => return,
-        Some(mut logd) => {
-            if f(&mut logd).is_err() {
-                // If any error occurs, shut down the logd pipe
-                *MAGISK_LOGD_FD.lock().unwrap() = SharedFd::default();
-            }
+    if let Some(mut logd) = unsafe { fd.as_file() } {
+        if f(&mut logd).is_err() {
+            // If any error occurs, shut down the logd pipe
+            *MAGISK_LOGD_FD.lock().unwrap() = SharedFd::default();
         }
     }
 }
