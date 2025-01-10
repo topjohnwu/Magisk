@@ -76,7 +76,7 @@ impl MagiskD {
 
         for uid in list.0 {
             let app_id = to_app_id(uid);
-            if app_id >= AID_APP_START && app_id <= AID_APP_END {
+            if (AID_APP_START..=AID_APP_END).contains(&app_id) {
                 let app_no = app_id - AID_APP_START;
                 if !app_list.contains(app_no as usize) {
                     // The app_id is no longer installed
