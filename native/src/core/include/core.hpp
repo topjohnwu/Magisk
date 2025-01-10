@@ -12,8 +12,6 @@
 
 #define AID_ROOT   0
 #define AID_SHELL  2000
-#define AID_APP_START 10000
-#define AID_APP_END 19999
 #define AID_USER_OFFSET 100000
 
 #define to_app_id(uid)  (uid % AID_USER_OFFSET)
@@ -59,10 +57,6 @@ void boot_stage_handler(int client, int code);
 void denylist_handler(int client, const sock_cred *cred);
 void su_daemon_handler(int client, const sock_cred *cred);
 void zygisk_handler(int client, const sock_cred *cred);
-
-// Package
-std::vector<bool> get_app_no_list();
-void prune_su_access();
 
 // Module stuffs
 void handle_modules();

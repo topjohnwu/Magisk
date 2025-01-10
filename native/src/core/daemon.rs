@@ -5,7 +5,11 @@ use crate::get_prop;
 use crate::logging::{magisk_logging, start_log_daemon};
 use crate::package::ManagerInfo;
 use base::libc::{O_CLOEXEC, O_RDONLY};
-use base::{cstr, info, libc, open_fd, BufReadExt, FsPath, FsPathBuf, ReadExt, Utf8CStrBufArr};
+use base::{
+    cstr, info, libc, open_fd, BufReadExt, DirEntry, Directory, FsPath, FsPathBuf, LoggedResult,
+    ReadExt, Utf8CStr, Utf8CStrBufArr,
+};
+use bit_set::BitSet;
 use bytemuck::bytes_of;
 use std::fs::File;
 use std::io;
@@ -37,6 +41,8 @@ impl BootStateFlags {
     }
 }
 
+pub const AID_APP_START: i32 = 10000;
+pub const AID_APP_END: i32 = 19999;
 pub const AID_USER_OFFSET: i32 = 100000;
 
 pub const fn to_app_id(uid: i32) -> i32 {
@@ -62,12 +68,46 @@ impl MagiskD {
         self.sdk_int
     }
 
-    pub fn app_data_dir(&self) -> &'static str {
+    pub fn app_data_dir(&self) -> &'static Utf8CStr {
         if self.sdk_int >= 24 {
-            "/data/user_de"
+            cstr!("/data/user_de")
         } else {
-            "/data/user"
+            cstr!("/data/user")
         }
+    }
+
+    // app_id = app_no + AID_APP_START
+    // app_no range: [0, 9999]
+    pub fn get_app_no_list(&self) -> BitSet {
+        let mut list = BitSet::new();
+        let _: LoggedResult<()> = try {
+            let mut dir = Directory::open(self.app_data_dir())?;
+            // For each user
+            loop {
+                let entry: DirEntry;
+                match dir.read()? {
+                    None => break,
+                    Some(e) => entry = e,
+                }
+                if let Ok(mut dir) = entry.open_as_dir() {
+                    // For each package
+                    loop {
+                        match dir.read()? {
+                            None => break,
+                            Some(e) => {
+                                let attr = e.get_attr()?;
+                                let app_id = to_app_id(attr.st.st_uid as i32);
+                                if app_id >= AID_APP_START && app_id <= AID_APP_END {
+                                    let app_no = app_id - AID_APP_START;
+                                    list.insert(app_no as usize);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        };
+        list
     }
 
     pub fn boot_stage_handler(&self, client: i32, code: i32) {

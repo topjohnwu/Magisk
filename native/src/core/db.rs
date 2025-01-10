@@ -213,7 +213,7 @@ impl MagiskD {
         )
     }
 
-    fn db_exec(&self, sql: &str, args: &[DbArg]) -> i32 {
+    pub fn db_exec(&self, sql: &str, args: &[DbArg]) -> i32 {
         self.db_exec_impl(sql, args, None, ptr::null_mut())
     }
 
@@ -306,10 +306,6 @@ impl MagiskD {
 
     pub fn set_db_setting_for_cxx(&self, key: DbEntryKey, value: i32) -> bool {
         self.set_db_setting(key, value).log().is_ok()
-    }
-
-    pub fn rm_db_string_for_cxx(&self, key: DbEntryKey) -> bool {
-        self.rm_db_string(key).log().is_ok()
     }
 
     pub fn db_exec_for_cxx(&self, client_fd: RawFd) {
