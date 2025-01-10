@@ -39,7 +39,11 @@ int remote_get_info(int uid, const char *process, uint32_t *flags, vector<int> &
     if (int fd = zygisk_request(ZygiskRequest::GET_INFO); fd >= 0) {
         write_int(fd, uid);
         write_string(fd, process);
-        write_int(fd, sizeof(void*) == 8 ? 1 : 0);
+#ifdef __LP64__
+        write_int(fd, 1);
+#else
+        write_int(fd, 0);
+#endif
         xxread(fd, flags, sizeof(*flags));
         if (should_load_modules(*flags)) {
             fds = recv_fds(fd);
