@@ -44,7 +44,8 @@ void su_info::refresh() {
 
 void su_info::check_db() {
     eval_uid = uid;
-    MagiskD().get_db_settings(cfg);
+    auto &daemon = MagiskD();
+    daemon.get_db_settings(cfg);
 
     // Check multiuser settings
     switch (cfg.multiuser_mode) {
@@ -63,57 +64,14 @@ void su_info::check_db() {
     }
 
     if (eval_uid > 0) {
-        if (!MagiskD().get_root_settings(eval_uid, access))
+        if (!daemon.get_root_settings(eval_uid, access))
             return;
     }
 
     // We need to check our manager
     if (access.policy == SuPolicy::Query || access.log || access.notify) {
-        mgr_uid = MagiskD().get_manager(to_user_id(eval_uid), &mgr_pkg, true);
+        mgr_uid = daemon.get_manager(to_user_id(eval_uid), &mgr_pkg, true);
     }
-}
-
-bool uid_granted_root(int uid) {
-    if (uid == AID_ROOT)
-        return true;
-
-    auto cfg = DbSettings();
-    MagiskD().get_db_settings(cfg);
-
-    // Check user root access settings
-    switch (cfg.root_access) {
-    case RootAccess::Disabled:
-        return false;
-    case RootAccess::AppsOnly:
-        if (uid == AID_SHELL)
-            return false;
-        break;
-    case RootAccess::AdbOnly:
-        if (uid != AID_SHELL)
-            return false;
-        break;
-    case RootAccess::AppsAndAdb:
-        break;
-    }
-
-    // Check multiuser settings
-    switch (cfg.multiuser_mode) {
-    case MultiuserMode::OwnerOnly:
-        if (to_user_id(uid) != 0)
-            return false;
-        break;
-    case MultiuserMode::OwnerManaged:
-        uid = to_app_id(uid);
-        break;
-    case MultiuserMode::User:
-    default:
-        break;
-    }
-
-    bool granted = false;
-    db_exec("SELECT policy FROM policies WHERE uid=? AND (until=0 OR until>strftime('%s', 'now'))",
-            { uid }, [&](auto, const DbValues &v) { granted = v.get_int(0) == +SuPolicy::Allow; });
-    return granted;
 }
 
 static shared_ptr<su_info> get_su_info(unsigned uid) {

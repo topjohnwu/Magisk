@@ -182,6 +182,7 @@ pub mod ffi {
         fn boot_stage_handler(&self, client: i32, code: i32);
         fn preserve_stub_apk(&self);
         fn prune_su_access(&self);
+        fn uid_granted_root(&self, mut uid: i32) -> bool;
         #[cxx_name = "get_manager"]
         unsafe fn get_manager_for_cxx(&self, user: i32, ptr: *mut CxxString, install: bool) -> i32;
 
