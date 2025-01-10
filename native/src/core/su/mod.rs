@@ -1,7 +1,9 @@
-use crate::daemon::{to_app_id, MagiskD, AID_APP_END, AID_APP_START};
+use crate::daemon::{
+    to_app_id, to_user_id, MagiskD, AID_APP_END, AID_APP_START, AID_ROOT, AID_SHELL,
+};
 use crate::db::DbArg::Integer;
 use crate::db::{SqlTable, SqliteResult, SqliteReturn};
-use crate::ffi::{DbValues, RootSettings, SuPolicy};
+use crate::ffi::{DbValues, MultiuserMode, RootAccess, RootSettings, SuPolicy};
 use base::ResultExt;
 
 impl Default for SuPolicy {
@@ -44,7 +46,7 @@ impl SqlTable for UidList {
 }
 
 impl MagiskD {
-    fn get_root_settings(&self, uid: i32, settings: &mut RootSettings) -> SqliteResult {
+    fn get_root_settings(&self, uid: i32, settings: &mut RootSettings) -> SqliteResult<()> {
         self.db_exec_with_rows(
             "SELECT policy, logging, notification FROM policies \
              WHERE uid=? AND (until=0 OR until>strftime('%s', 'now'))",
@@ -86,6 +88,55 @@ impl MagiskD {
         for uid in rm_uids {
             self.db_exec("DELETE FROM policies WHERE uid=?", &[Integer(uid as i64)]);
         }
+    }
+
+    pub fn uid_granted_root(&self, mut uid: i32) -> bool {
+        if uid == AID_ROOT {
+            return true;
+        }
+
+        let cfg = match self.get_db_settings().log() {
+            Ok(cfg) => cfg,
+            Err(_) => return false,
+        };
+
+        // Check user root access settings
+        match cfg.root_access {
+            RootAccess::Disabled => return false,
+            RootAccess::AppsOnly => {
+                if uid == AID_SHELL {
+                    return false;
+                }
+            }
+            RootAccess::AdbOnly => {
+                if uid != AID_SHELL {
+                    return false;
+                }
+            }
+            _ => {}
+        }
+
+        // Check multiuser settings
+        match cfg.multiuser_mode {
+            MultiuserMode::OwnerOnly => {
+                if to_user_id(uid) != 0 {
+                    return false;
+                }
+            }
+            MultiuserMode::OwnerManaged => uid = to_app_id(uid),
+            _ => {}
+        }
+
+        let mut granted = false;
+        let mut output_fn =
+            |_: &[String], values: &DbValues| granted = values.get_int(0) == SuPolicy::Allow.repr;
+        self.db_exec_with_rows(
+            "SELECT policy FROM policies WHERE uid=? AND (until=0 OR until>strftime('%s', 'now'))",
+            &[Integer(uid as i64)],
+            &mut output_fn,
+        );
+
+        granted
     }
 }
 

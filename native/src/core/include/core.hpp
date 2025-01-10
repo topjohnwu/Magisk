@@ -53,7 +53,6 @@ void init_thread_pool();
 void exec_task(std::function<void()> &&task);
 
 // Daemon handlers
-void boot_stage_handler(int client, int code);
 void denylist_handler(int client, const sock_cred *cred);
 void su_daemon_handler(int client, const sock_cred *cred);
 void zygisk_handler(int client, const sock_cred *cred);

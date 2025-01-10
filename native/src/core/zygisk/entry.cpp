@@ -122,23 +122,23 @@ static void connect_companion(int client, bool is_64_bit) {
     send_fd(zygiskd_socket, client);
 }
 
-extern bool uid_granted_root(int uid);
 static void get_process_info(int client, const sock_cred *cred) {
     int uid = read_int(client);
     string process = read_string(client);
+    auto &daemon = MagiskD();
 
     uint32_t flags = 0;
 
     if (is_deny_target(uid, process)) {
         flags |= PROCESS_ON_DENYLIST;
     }
-    if (MagiskD().get_manager(to_user_id(uid), nullptr, false) == uid) {
+    if (daemon.get_manager(to_user_id(uid), nullptr, false) == uid) {
         flags |= PROCESS_IS_MAGISK_APP;
     }
     if (denylist_enforced) {
         flags |= DENYLIST_ENFORCING;
     }
-    if (uid_granted_root(uid)) {
+    if (daemon.uid_granted_root(uid)) {
         flags |= PROCESS_GRANTED_ROOT;
     }
 
