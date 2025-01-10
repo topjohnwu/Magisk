@@ -25,14 +25,14 @@ fn sqlite_err_str(code: i32) -> &'static Utf8CStr {
 #[error("sqlite3: {}", sqlite_err_str(self.0))]
 pub struct SqliteError(i32);
 
-pub type SqliteResult = Result<(), SqliteError>;
+pub type SqliteResult<T> = Result<T, SqliteError>;
 
 pub trait SqliteReturn {
-    fn sql_result(self) -> SqliteResult;
+    fn sql_result(self) -> SqliteResult<()>;
 }
 
 impl SqliteReturn for i32 {
-    fn sql_result(self) -> SqliteResult {
+    fn sql_result(self) -> SqliteResult<()> {
         if self != 0 {
             Err(SqliteError(self))
         } else {
@@ -213,11 +213,11 @@ impl MagiskD {
         )
     }
 
-    fn db_exec(&self, sql: &str, args: &[DbArg]) -> i32 {
+    pub fn db_exec(&self, sql: &str, args: &[DbArg]) -> i32 {
         self.db_exec_impl(sql, args, None, ptr::null_mut())
     }
 
-    pub fn set_db_setting(&self, key: DbEntryKey, value: i32) -> SqliteResult {
+    pub fn set_db_setting(&self, key: DbEntryKey, value: i32) -> SqliteResult<()> {
         self.db_exec(
             "INSERT OR REPLACE INTO settings (key,value) VALUES(?,?)",
             &[Text(key.to_str()), Integer(value as i64)],
@@ -232,7 +232,7 @@ impl MagiskD {
             DbEntryKey::SuMultiuserMode => MultiuserMode::default().repr,
             DbEntryKey::SuMntNs => MntNsMode::default().repr,
             DbEntryKey::DenylistConfig => 0,
-            DbEntryKey::ZygiskConfig => self.is_emulator() as i32,
+            DbEntryKey::ZygiskConfig => self.is_emulator as i32,
             DbEntryKey::BootloopCount => 0,
             _ => -1,
         };
@@ -250,10 +250,14 @@ impl MagiskD {
         val
     }
 
-    pub fn get_db_settings(&self, cfg: &mut DbSettings) -> SqliteResult {
-        cfg.zygisk = self.is_emulator();
-        self.db_exec_with_rows("SELECT * FROM settings", &[], cfg)
-            .sql_result()
+    pub fn get_db_settings(&self) -> SqliteResult<DbSettings> {
+        let mut cfg = DbSettings {
+            zygisk: self.is_emulator,
+            ..Default::default()
+        };
+        self.db_exec_with_rows("SELECT * FROM settings", &[], &mut cfg)
+            .sql_result()?;
+        Ok(cfg)
     }
 
     pub fn get_db_string(&self, key: DbEntryKey) -> String {
@@ -272,7 +276,7 @@ impl MagiskD {
         val
     }
 
-    pub fn rm_db_string(&self, key: DbEntryKey) -> SqliteResult {
+    pub fn rm_db_string(&self, key: DbEntryKey) -> SqliteResult<()> {
         self.db_exec("DELETE FROM strings WHERE key=?", &[Text(key.to_str())])
             .sql_result()
     }
@@ -301,15 +305,15 @@ impl MagiskD {
 
 impl MagiskD {
     pub fn get_db_settings_for_cxx(&self, cfg: &mut DbSettings) -> bool {
-        self.get_db_settings(cfg).log().is_ok()
+        cfg.zygisk = self.is_emulator;
+        self.db_exec_with_rows("SELECT * FROM settings", &[], cfg)
+            .sql_result()
+            .log()
+            .is_ok()
     }
 
     pub fn set_db_setting_for_cxx(&self, key: DbEntryKey, value: i32) -> bool {
         self.set_db_setting(key, value).log().is_ok()
-    }
-
-    pub fn rm_db_string_for_cxx(&self, key: DbEntryKey) -> bool {
-        self.rm_db_string(key).log().is_ok()
     }
 
     pub fn db_exec_for_cxx(&self, client_fd: RawFd) {

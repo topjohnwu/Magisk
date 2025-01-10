@@ -44,7 +44,8 @@ void su_info::refresh() {
 
 void su_info::check_db() {
     eval_uid = uid;
-    MagiskD().get_db_settings(cfg);
+    auto &daemon = MagiskD();
+    daemon.get_db_settings(cfg);
 
     // Check multiuser settings
     switch (cfg.multiuser_mode) {
@@ -63,84 +64,13 @@ void su_info::check_db() {
     }
 
     if (eval_uid > 0) {
-        if (!MagiskD().get_root_settings(eval_uid, access))
+        if (!daemon.get_root_settings(eval_uid, access))
             return;
     }
 
     // We need to check our manager
     if (access.policy == SuPolicy::Query || access.log || access.notify) {
-        mgr_uid = get_manager(to_user_id(eval_uid), &mgr_pkg, true);
-    }
-}
-
-bool uid_granted_root(int uid) {
-    if (uid == AID_ROOT)
-        return true;
-
-    auto cfg = DbSettings();
-    MagiskD().get_db_settings(cfg);
-
-    // Check user root access settings
-    switch (cfg.root_access) {
-    case RootAccess::Disabled:
-        return false;
-    case RootAccess::AppsOnly:
-        if (uid == AID_SHELL)
-            return false;
-        break;
-    case RootAccess::AdbOnly:
-        if (uid != AID_SHELL)
-            return false;
-        break;
-    case RootAccess::AppsAndAdb:
-        break;
-    }
-
-    // Check multiuser settings
-    switch (cfg.multiuser_mode) {
-    case MultiuserMode::OwnerOnly:
-        if (to_user_id(uid) != 0)
-            return false;
-        break;
-    case MultiuserMode::OwnerManaged:
-        uid = to_app_id(uid);
-        break;
-    case MultiuserMode::User:
-    default:
-        break;
-    }
-
-    bool granted = false;
-    db_exec("SELECT policy FROM policies WHERE uid=? AND (until=0 OR until>strftime('%s', 'now'))",
-            { uid }, [&](auto, const DbValues &v) { granted = v.get_int(0) == +SuPolicy::Allow; });
-    return granted;
-}
-
-struct policy_uid_list : public vector<int> {
-    void operator()(StringSlice, const DbValues &values) {
-        push_back(values.get_int(0));
-    }
-};
-
-void prune_su_access() {
-    cached.reset();
-    policy_uid_list uids;
-    if (!db_exec("SELECT uid FROM policies", {}, uids))
-        return;
-    vector<bool> app_no_list = get_app_no_list();
-    vector<int> rm_uids;
-    for (int uid : uids) {
-        int app_id = to_app_id(uid);
-        if (app_id >= AID_APP_START && app_id <= AID_APP_END) {
-            int app_no = app_id - AID_APP_START;
-            if (app_no >= app_no_list.size() || !app_no_list[app_no]) {
-                // The app_id is no longer installed
-                rm_uids.push_back(uid);
-            }
-        }
-    }
-    for (int uid : rm_uids) {
-        db_exec("DELETE FROM policies WHERE uid=?", { uid });
+        mgr_uid = daemon.get_manager(to_user_id(eval_uid), &mgr_pkg, true);
     }
 }
 

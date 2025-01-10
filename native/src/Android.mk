@@ -20,7 +20,6 @@ LOCAL_SRC_FILES := \
     core/daemon.cpp \
     core/bootstages.cpp \
     core/socket.cpp \
-    core/package.cpp \
     core/scripting.cpp \
     core/selinux.cpp \
     core/sqlite.cpp \

@@ -39,6 +39,11 @@ int remote_get_info(int uid, const char *process, uint32_t *flags, vector<int> &
     if (int fd = zygisk_request(ZygiskRequest::GET_INFO); fd >= 0) {
         write_int(fd, uid);
         write_string(fd, process);
+#ifdef __LP64__
+        write_int(fd, 1);
+#else
+        write_int(fd, 0);
+#endif
         xxread(fd, flags, sizeof(*flags));
         if (should_load_modules(*flags)) {
             fds = recv_fds(fd);
@@ -66,13 +71,6 @@ static vector<int> get_module_fds(bool is_64_bit) {
             [](const module_info &info) { return info.z32 < 0 ? STDOUT_FILENO : info.z32; });
     }
     return fds;
-}
-
-static bool get_exe(int pid, char *buf, size_t sz) {
-    char exe[128];
-    if (ssprintf(exe, sizeof(exe), "/proc/%d/exe", pid) < 0)
-        return false;
-    return xreadlink(exe, buf, sz) > 0;
 }
 
 static pthread_mutex_t zygiskd_lock = PTHREAD_MUTEX_INITIALIZER;
@@ -122,36 +120,31 @@ static void connect_companion(int client, bool is_64_bit) {
     send_fd(zygiskd_socket, client);
 }
 
-extern bool uid_granted_root(int uid);
 static void get_process_info(int client, const sock_cred *cred) {
     int uid = read_int(client);
     string process = read_string(client);
+    int arch = read_int(client);
+    auto &daemon = MagiskD();
 
     uint32_t flags = 0;
 
     if (is_deny_target(uid, process)) {
         flags |= PROCESS_ON_DENYLIST;
     }
-    if (get_manager(to_user_id(uid)) == uid) {
+    if (daemon.get_manager(to_user_id(uid), nullptr, false) == uid) {
         flags |= PROCESS_IS_MAGISK_APP;
     }
     if (denylist_enforced) {
         flags |= DENYLIST_ENFORCING;
     }
-    if (uid_granted_root(uid)) {
+    if (daemon.uid_granted_root(uid)) {
         flags |= PROCESS_GRANTED_ROOT;
     }
 
     xwrite(client, &flags, sizeof(flags));
 
     if (should_load_modules(flags)) {
-        char buf[256];
-        if (!get_exe(cred->pid, buf, sizeof(buf))) {
-            LOGW("zygisk: remote process %d probably died, abort\n", cred->pid);
-            send_fd(client, -1);
-            return;
-        }
-        vector<int> fds = get_module_fds(str_ends(buf, "64"));
+        vector<int> fds = get_module_fds(arch);
         send_fds(client, fds.data(), fds.size());
     }
 
@@ -191,18 +184,15 @@ static void get_moddir(int client) {
 
 void zygisk_handler(int client, const sock_cred *cred) {
     int code = read_int(client);
-    char buf[256];
     switch (code) {
     case ZygiskRequest::GET_INFO:
         get_process_info(client, cred);
         break;
-    case ZygiskRequest::CONNECT_COMPANION:
-        if (get_exe(cred->pid, buf, sizeof(buf))) {
-            connect_companion(client, str_ends(buf, "64"));
-        } else {
-            LOGW("zygisk: remote process %d probably died, abort\n", cred->pid);
-        }
+    case ZygiskRequest::CONNECT_COMPANION: {
+        int arch = read_int(client);
+        connect_companion(client, arch);
         break;
+    }
     case ZygiskRequest::GET_MODDIR:
         get_moddir(client);
         break;

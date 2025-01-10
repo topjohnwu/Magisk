@@ -1,19 +1,20 @@
+use crate::consts::{MAGISK_FULL_VER, MAIN_CONFIG};
+use crate::db::Sqlite3;
+use crate::ffi::{get_magisk_tmp, RequestCode};
+use crate::get_prop;
+use crate::logging::{magisk_logging, start_log_daemon};
+use crate::package::ManagerInfo;
 use base::libc::{O_CLOEXEC, O_RDONLY};
 use base::{
-    cstr, libc, open_fd, BufReadExt, Directory, FsPathBuf, ReadExt, ResultExt, Utf8CStr,
-    Utf8CStrBuf, Utf8CStrBufArr, Utf8CStrBufRef, WalkResult,
+    cstr, info, libc, open_fd, BufReadExt, Directory, FsPath, FsPathBuf, LoggedResult, ReadExt,
+    Utf8CStr, Utf8CStrBufArr,
 };
+use bit_set::BitSet;
 use bytemuck::bytes_of;
 use std::fs::File;
 use std::io;
 use std::io::{BufReader, Read, Write};
 use std::sync::{Mutex, OnceLock};
-
-use crate::consts::MAIN_CONFIG;
-use crate::db::Sqlite3;
-use crate::ffi::{get_magisk_tmp, RequestCode};
-use crate::get_prop;
-use crate::logging::magisk_logging;
 
 // Global magiskd singleton
 pub static MAGISKD: OnceLock<MagiskD> = OnceLock::new();
@@ -40,22 +41,80 @@ impl BootStateFlags {
     }
 }
 
+pub const AID_ROOT: i32 = 0;
+pub const AID_SHELL: i32 = 2000;
+pub const AID_APP_START: i32 = 10000;
+pub const AID_APP_END: i32 = 19999;
+pub const AID_USER_OFFSET: i32 = 100000;
+
+pub const fn to_app_id(uid: i32) -> i32 {
+    uid % AID_USER_OFFSET
+}
+
+pub const fn to_user_id(uid: i32) -> i32 {
+    uid / AID_USER_OFFSET
+}
+
 #[derive(Default)]
 pub struct MagiskD {
-    pub logd: Mutex<Option<File>>,
     pub sql_connection: Mutex<Option<Sqlite3>>,
+    pub manager_info: Mutex<ManagerInfo>,
     boot_stage_lock: Mutex<BootStateFlags>,
-    is_emulator: bool,
+    sdk_int: i32,
+    pub is_emulator: bool,
     is_recovery: bool,
 }
 
 impl MagiskD {
-    pub fn is_emulator(&self) -> bool {
-        self.is_emulator
-    }
-
     pub fn is_recovery(&self) -> bool {
         self.is_recovery
+    }
+
+    pub fn sdk_int(&self) -> i32 {
+        self.sdk_int
+    }
+
+    pub fn app_data_dir(&self) -> &'static Utf8CStr {
+        if self.sdk_int >= 24 {
+            cstr!("/data/user_de")
+        } else {
+            cstr!("/data/user")
+        }
+    }
+
+    // app_id = app_no + AID_APP_START
+    // app_no range: [0, 9999]
+    pub fn get_app_no_list(&self) -> BitSet {
+        let mut list = BitSet::new();
+        let _: LoggedResult<()> = try {
+            let mut app_data_dir = Directory::open(self.app_data_dir())?;
+            // For each user
+            loop {
+                let entry = match app_data_dir.read()? {
+                    None => break,
+                    Some(e) => e,
+                };
+                let mut user_dir = match entry.open_as_dir() {
+                    Err(_) => continue,
+                    Ok(dir) => dir,
+                };
+                // For each package
+                loop {
+                    match user_dir.read()? {
+                        None => break,
+                        Some(e) => {
+                            let attr = e.get_attr()?;
+                            let app_id = to_app_id(attr.st.st_uid as i32);
+                            if (AID_APP_START..=AID_APP_END).contains(&app_id) {
+                                let app_no = app_id - AID_APP_START;
+                                list.insert(app_no as usize);
+                            }
+                        }
+                    }
+                }
+            }
+        };
+        list
     }
 
     pub fn boot_stage_handler(&self, client: i32, code: i32) {
@@ -96,6 +155,10 @@ impl MagiskD {
 }
 
 pub fn daemon_entry() {
+    start_log_daemon();
+    magisk_logging();
+    info!("Magisk {} daemon started", MAGISK_FULL_VER);
+
     let is_emulator = get_prop(cstr!("ro.kernel.qemu"), false) == "1"
         || get_prop(cstr!("ro.boot.qemu"), false) == "1"
         || get_prop(cstr!("ro.product.device"), false).contains("vsoc");
@@ -117,14 +180,32 @@ pub fn daemon_entry() {
         });
     }
 
+    let mut sdk_int = -1;
+    if let Ok(file) = FsPath::from(cstr!("/system/build.prop")).open(O_RDONLY | O_CLOEXEC) {
+        let mut file = BufReader::new(file);
+        file.foreach_props(|key, val| {
+            if key == "ro.build.version.sdk" {
+                sdk_int = val.parse::<i32>().unwrap_or(-1);
+                return false;
+            }
+            true
+        });
+    }
+    if sdk_int < 0 {
+        // In case some devices do not store this info in build.prop, fallback to getprop
+        sdk_int = get_prop(cstr!("ro.build.version.sdk"), false)
+            .parse::<i32>()
+            .unwrap_or(-1);
+    }
+    info!("* Device API level: {}", sdk_int);
+
     let magiskd = MagiskD {
+        sdk_int,
         is_emulator,
         is_recovery,
         ..Default::default()
     };
-    magiskd.start_log_daemon();
     MAGISKD.set(magiskd).ok();
-    magisk_logging();
 }
 
 fn check_data() -> bool {
@@ -160,34 +241,6 @@ fn check_data() -> bool {
 
 pub fn get_magiskd() -> &'static MagiskD {
     unsafe { MAGISKD.get().unwrap_unchecked() }
-}
-
-pub fn find_apk_path(pkg: &Utf8CStr, data: &mut [u8]) -> usize {
-    use WalkResult::*;
-    fn inner(pkg: &Utf8CStr, buf: &mut dyn Utf8CStrBuf) -> io::Result<usize> {
-        Directory::open(cstr!("/data/app"))?.pre_order_walk(|e| {
-            if !e.is_dir() {
-                return Ok(Skip);
-            }
-            let d_name = e.d_name().to_bytes();
-            if d_name.starts_with(pkg.as_bytes()) && d_name[pkg.len()] == b'-' {
-                // Found the APK path, we can abort now
-                e.path(buf)?;
-                return Ok(Abort);
-            }
-            if d_name.starts_with(b"~~") {
-                return Ok(Continue);
-            }
-            Ok(Skip)
-        })?;
-        if !buf.is_empty() {
-            buf.push_str("/base.apk");
-        }
-        Ok(buf.len())
-    }
-    inner(pkg, &mut Utf8CStrBufRef::from(data))
-        .log()
-        .unwrap_or(0)
 }
 
 pub trait IpcRead {

@@ -25,6 +25,7 @@ der = "0.8.0-rc.1"
 bytemuck = "1.16"
 fdt = "0.1"
 const_format = "0.2"
+bit-set = "0.8"
 
 [workspace.dependencies.argh]
 git = "https://github.com/google/argh.git"

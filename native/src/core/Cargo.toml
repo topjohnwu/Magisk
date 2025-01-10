@@ -7,6 +7,10 @@ edition = "2021"
 crate-type = ["staticlib"]
 path = "lib.rs"
 
+[features]
+default = ["check-signature"]
+check-signature = []
+
 [build-dependencies]
 cxx-gen = { workspace = true }
 pb-rs = { workspace = true }
@@ -19,3 +23,4 @@ num-derive = { workspace = true }
 quick-protobuf = { workspace = true }
 bytemuck = { workspace = true, features = ["derive"] }
 thiserror = { workspace = true }
+bit-set = { workspace = true }

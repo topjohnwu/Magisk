@@ -78,6 +78,11 @@ bool ZygiskModule::valid() const {
 
 int ZygiskModule::connectCompanion() const {
     if (int fd = zygisk_request(ZygiskRequest::CONNECT_COMPANION); fd >= 0) {
+#ifdef __LP64__
+        write_int(fd, 1);
+#else
+        write_int(fd, 0);
+#endif
         write_int(fd, id);
         return fd;
     }

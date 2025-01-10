@@ -144,7 +144,7 @@ static void handle_request_async(int client, int code, const sock_cred &cred) {
         break;
     case +RequestCode::ZYGOTE_RESTART:
         LOGI("** zygote restarted\n");
-        prune_su_access();
+        MagiskD().prune_su_access();
         scan_deny_apps();
         reset_zygisk(false);
         close(client);
@@ -183,7 +183,7 @@ static void handle_request_sync(int client, int code) {
         write_int(client, MAGISK_VER_CODE);
         break;
     case +RequestCode::START_DAEMON:
-        MagiskD().setup_logfile();
+        setup_logfile();
         break;
     case +RequestCode::STOP_DAEMON: {
         // Unmount all overlays
@@ -328,8 +328,7 @@ static void daemon_entry() {
     setcon(MAGISK_PROC_CON);
 
     rust::daemon_entry();
-
-    LOGI(NAME_WITH_VER(Magisk) " daemon started\n");
+    SDK_INT = MagiskD().sdk_int();
 
     // Escape from cgroup
     int pid = getpid();
@@ -343,23 +342,6 @@ static void daemon_entry() {
     // Get self stat
     xstat("/proc/self/exe", &self_st);
 
-    // Get API level
-    parse_prop_file("/system/build.prop", [](auto key, auto val) -> bool {
-        if (key == "ro.build.version.sdk") {
-            SDK_INT = parse_int(val);
-            return false;
-        }
-        return true;
-    });
-    if (SDK_INT < 0) {
-        // In case some devices do not store this info in build.prop, fallback to getprop
-        auto sdk = get_prop("ro.build.version.sdk");
-        if (!sdk.empty()) {
-            SDK_INT = parse_int(sdk);
-        }
-    }
-    LOGI("* Device API level: %d\n", SDK_INT);
-    
     // Samsung workaround  #7887
     if (access("/system_ext/app/mediatek-res/mediatek-res.apk", F_OK) == 0) {
         set_prop("ro.vendor.mtk_model", "0");
