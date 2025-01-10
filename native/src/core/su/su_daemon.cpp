@@ -116,34 +116,6 @@ bool uid_granted_root(int uid) {
     return granted;
 }
 
-struct policy_uid_list : public vector<int> {
-    void operator()(StringSlice, const DbValues &values) {
-        push_back(values.get_int(0));
-    }
-};
-
-void prune_su_access() {
-    cached.reset();
-    policy_uid_list uids;
-    if (!db_exec("SELECT uid FROM policies", {}, uids))
-        return;
-    vector<bool> app_no_list = get_app_no_list();
-    vector<int> rm_uids;
-    for (int uid : uids) {
-        int app_id = to_app_id(uid);
-        if (app_id >= AID_APP_START && app_id <= AID_APP_END) {
-            int app_no = app_id - AID_APP_START;
-            if (app_no >= app_no_list.size() || !app_no_list[app_no]) {
-                // The app_id is no longer installed
-                rm_uids.push_back(uid);
-            }
-        }
-    }
-    for (int uid : rm_uids) {
-        db_exec("DELETE FROM policies WHERE uid=?", { uid });
-    }
-}
-
 static shared_ptr<su_info> get_su_info(unsigned uid) {
     if (uid == AID_ROOT) {
         auto info = make_shared<su_info>(uid);
