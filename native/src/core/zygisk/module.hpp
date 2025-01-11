@@ -224,7 +224,7 @@ enum : uint32_t {
     SKIP_CLOSE_LOG_PIPE = (1u << 5),
 };
 
-#define MAX_FD_SIZE 1024
+#define MAX_FD_SIZE 32768
 
 #define DCL_PRE_POST(name) \
 void name##_pre();         \
