@@ -6,8 +6,8 @@ use base::libc::{
     timespec, tm, O_CLOEXEC, O_RDWR, O_WRONLY, PIPE_BUF, SIGPIPE, SIG_BLOCK, SIG_SETMASK,
 };
 use base::{
-    const_format::concatcp, libc, raw_cstr, FsPathBuf, LogLevel, Logger, ReadExt, SharedFd,
-    Utf8CStr, Utf8CStrBuf, Utf8CStrBufArr, Utf8CStrWrite, LOGGER,
+    const_format::concatcp, libc, raw_cstr, FsPathBuf, LogLevel, Logger, ReadExt, Utf8CStr,
+    Utf8CStrBuf, Utf8CStrBufArr, Utf8CStrWrite, WriteExt, LOGGER,
 };
 use bytemuck::{bytes_of, write_zeroes, Pod, Zeroable};
 use num_derive::{FromPrimitive, ToPrimitive};
@@ -18,10 +18,10 @@ use std::fmt::Write as FmtWrite;
 use std::fs::File;
 use std::io::{IoSlice, Read, Write};
 use std::mem::ManuallyDrop;
-use std::os::fd::{FromRawFd, OwnedFd, RawFd};
+use std::os::fd::{FromRawFd, RawFd};
 use std::ptr::null_mut;
 use std::sync::atomic::{AtomicI32, Ordering};
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
 use std::{fs, io};
 
@@ -114,7 +114,7 @@ struct LogMeta {
 
 const MAX_MSG_LEN: usize = PIPE_BUF - size_of::<LogMeta>();
 
-fn write_log_to_pipe(logd: &mut File, prio: i32, msg: &Utf8CStr) -> io::Result<usize> {
+fn write_log_to_pipe(mut logd: &File, prio: i32, msg: &Utf8CStr) -> io::Result<usize> {
     // Truncate message if needed
     let len = min(MAX_MSG_LEN, msg.len());
     let msg = &msg.as_bytes()[..len];
@@ -131,28 +131,27 @@ fn write_log_to_pipe(logd: &mut File, prio: i32, msg: &Utf8CStr) -> io::Result<u
     let result = logd.write_vectored(&[io1, io2]);
     if let Err(ref e) = result {
         let mut buf = Utf8CStrBufArr::default();
-        buf.write_fmt(format_args_nl!("Cannot write_log_to_pipe: {}", e))
+        buf.write_fmt(format_args!("Cannot write_log_to_pipe: {}", e))
             .ok();
         android_log_write(LogLevel::Error, &buf);
     }
     result
 }
 
-static MAGISK_LOGD_FD: Mutex<SharedFd> = Mutex::new(SharedFd::new());
+static MAGISK_LOGD_FD: Mutex<Option<Arc<File>>> = Mutex::new(None);
 
-fn with_logd_fd<F: FnOnce(&mut File) -> io::Result<()>>(f: F) {
+fn with_logd_fd<R, F: FnOnce(&File) -> io::Result<R>>(f: F) {
     let fd = MAGISK_LOGD_FD.lock().unwrap().clone();
-    // SAFETY: writing less than PIPE_BUF bytes is guaranteed to be atomic on Linux
-    if let Some(mut logd) = unsafe { fd.as_file() } {
-        if f(&mut logd).is_err() {
+    if let Some(logd) = fd {
+        if f(&logd).is_err() {
             // If any error occurs, shut down the logd pipe
-            *MAGISK_LOGD_FD.lock().unwrap() = SharedFd::default();
+            *MAGISK_LOGD_FD.lock().unwrap() = None;
         }
     }
 }
 
 fn magisk_log_to_pipe(prio: i32, msg: &Utf8CStr) {
-    with_logd_fd(|logd| write_log_to_pipe(logd, prio, msg).map(|_| ()));
+    with_logd_fd(|logd| write_log_to_pipe(logd, prio, msg));
 }
 
 // SAFETY: zygisk client code runs single threaded, so no need to prevent data race
@@ -217,8 +216,8 @@ fn zygisk_log_to_pipe(prio: i32, msg: &Utf8CStr) {
         pthread_sigmask(SIG_BLOCK, &mask, &mut orig_mask);
     }
 
-    let mut logd = ManuallyDrop::new(unsafe { File::from_raw_fd(fd) });
-    let result = write_log_to_pipe(&mut logd, prio, msg);
+    let logd = ManuallyDrop::new(unsafe { File::from_raw_fd(fd) });
+    let result = write_log_to_pipe(&logd, prio, msg);
 
     // Consume SIGPIPE if exists, then restore mask
     unsafe {
@@ -347,19 +346,19 @@ extern "C" fn logfile_writer(arg: *mut c_void) -> *mut c_void {
 
     writer_loop(arg as RawFd).ok();
     // If any error occurs, shut down the logd pipe
-    *MAGISK_LOGD_FD.lock().unwrap() = SharedFd::default();
+    *MAGISK_LOGD_FD.lock().unwrap() = None;
     null_mut()
 }
 
 pub fn setup_logfile() {
-    with_logd_fd(|logd| {
+    with_logd_fd(|mut logd| {
         let meta = LogMeta {
             prio: -1,
             len: 0,
             pid: 0,
             tid: 0,
         };
-        logd.write_all(bytes_of(&meta))
+        (&mut logd).write_pod(&meta)
     });
 }
 
@@ -374,7 +373,7 @@ pub fn start_log_daemon() {
         libc::chown(path.as_ptr(), 0, 0);
         let read = libc::open(path.as_ptr(), O_RDWR | O_CLOEXEC);
         let write = libc::open(path.as_ptr(), O_WRONLY | O_CLOEXEC);
-        *MAGISK_LOGD_FD.lock().unwrap() = SharedFd::from(OwnedFd::from_raw_fd(write));
+        *MAGISK_LOGD_FD.lock().unwrap() = Some(Arc::new(File::from_raw_fd(write)));
         new_daemon_thread(logfile_writer, read as *mut c_void);
     }
 }
