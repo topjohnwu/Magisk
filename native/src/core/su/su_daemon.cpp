@@ -359,6 +359,13 @@ void su_daemon_handler(int client, const sock_cred *cred) {
             setenv("USER", pw->pw_name, 1);
             setenv("LOGNAME", pw->pw_name, 1);
             setenv("SHELL", ctx.req.shell.data(), 1);
+            // Add MAGISKTMP to PATH
+            auto env_path = getenv("PATH")?: "";
+            auto env_split = split(env_path, ":");
+            auto tmp_path = get_magisk_tmp();
+            if (std::find(env_split.begin(), env_split.end(), tmp_path) == env_split.end()) {
+                setenv("PATH", (std::string(tmp_path) + ":" + env_path).data(), 1);
+            }
         }
     }
 
