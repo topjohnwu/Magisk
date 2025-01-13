@@ -7,10 +7,9 @@ use crate::package::ManagerInfo;
 use base::libc::{O_CLOEXEC, O_RDONLY};
 use base::{
     cstr, info, libc, open_fd, BufReadExt, Directory, FsPath, FsPathBuf, LoggedResult, ReadExt,
-    Utf8CStr, Utf8CStrBufArr,
+    Utf8CStr, Utf8CStrBufArr, WriteExt,
 };
 use bit_set::BitSet;
-use bytemuck::bytes_of;
 use std::fs::File;
 use std::io;
 use std::io::{BufReader, Read, Write};
@@ -270,7 +269,7 @@ pub trait IpcWrite {
 
 impl<T: Write> IpcWrite for T {
     fn ipc_write_int(&mut self, val: i32) -> io::Result<()> {
-        self.write_all(bytes_of(&val))
+        self.write_pod(&val)
     }
 
     fn ipc_write_string(&mut self, val: &str) -> io::Result<()> {
