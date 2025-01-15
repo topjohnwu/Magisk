@@ -146,12 +146,11 @@ unsafe extern "C" fn bind_arguments(v: *mut c_void, idx: i32, stmt: Pin<&mut DbS
     let args = &mut *(v as *mut DbArgs<'_>);
     if args.curr < args.args.len() {
         let arg = &args.args[args.curr];
-        let result = match *arg {
+        args.curr += 1;
+        match *arg {
             Text(v) => stmt.bind_text(idx, v),
             Integer(v) => stmt.bind_int64(idx, v),
-        };
-        args.curr += 1;
-        result
+        }
     } else {
         0
     }
