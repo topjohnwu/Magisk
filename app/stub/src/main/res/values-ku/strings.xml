@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="upgrade_msg">ماجیسکەکەت بەرزبکەوە بۆ وەشانی تەواوەتی، دەتەوێت دایبگریت و ڕێکیبخەیت؟</string>
+    <string name="no_internet_msg">تکایە پەیوەست ببە بە ئینتەرنێتەوە، پێویستە ماجیسکەکەت ڕێک بخەیت.</string>
+    <string name="dling">داگرتن</string>
+    <string name="relaunch_app">تکایە دووبارە ئەپەکە بکەوە</string>
+</resources>
