@@ -597,7 +597,9 @@ abstract class MagiskInstallImpl protected constructor(
         if (result)
             return true
 
-        Shell.cmd("rm -rf $installDir").submit()
+        // Not every operation initializes installDir
+        if (::installDir.isInitialized)
+            Shell.cmd("rm -rf $installDir").submit()
         return false
     }
 
