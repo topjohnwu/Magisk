@@ -96,12 +96,18 @@ fn parse_term<'a>(tokens: &mut Tokens<'a>) -> ParseResult<'a, Vec<&'a str>> {
 //     sterm ::= LB names(n) RB { n };
 fn parse_sterm<'a>(tokens: &mut Tokens<'a>) -> ParseResult<'a, Vec<&'a str>> {
     match tokens.next() {
+        Some(Token::IO) => Ok(vec!["ioctl"]),
         Some(Token::ID(name)) => Ok(vec![name]),
         Some(Token::ST) => Ok(vec![]),
         Some(Token::LB) => {
             let mut names = Some(Vec::new());
             loop {
                 match tokens.next() {
+                    Some(Token::IO) => {
+                        if let Some(ref mut names) = names {
+                            names.push("ioctl")
+                        }
+                    }
                     Some(Token::ID(name)) => {
                         if let Some(ref mut names) = names {
                             names.push(name)
