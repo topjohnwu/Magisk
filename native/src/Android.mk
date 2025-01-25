@@ -168,6 +168,7 @@ LOCAL_SRC_FILES := \
     sepolicy/policy-rs.cpp
 include $(BUILD_STATIC_LIBRARY)
 
-include src/Android-rs.mk
-include src/base/Android.mk
-include src/external/Android.mk
+CWD := $(LOCAL_PATH)
+include $(CWD)/Android-rs.mk
+include $(CWD)/base/Android.mk
+include $(CWD)/external/Android.mk
