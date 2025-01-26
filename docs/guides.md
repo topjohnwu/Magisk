@@ -51,7 +51,8 @@ A Magisk module is a folder placed in `/data/adb/modules` with the structure bel
 │   │
 │   │      *** Optional Files ***
 │   │
-│   ├── post-fs-data.sh     <--- This script will be executed in post-fs-data
+│   ├── post-fs-data.sh     <--- This script will be executed in post-fs-data and before magic mount is done
+│   ├── post-mount.sh       <--- This script will be executed in post-fs-data and after magic mount is done
 │   ├── service.sh          <--- This script will be executed in late_start service
 |   ├── uninstall.sh        <--- This script will be executed when Magisk removes your module
 |   ├── action.sh           <--- This script will be executed when user click the action button in Magisk app
@@ -111,7 +112,7 @@ Update JSON format:
 
 #### Shell scripts (`*.sh`)
 
-Please read the [Boot Scripts](#boot-scripts) section to understand the difference between `post-fs-data.sh` and `service.sh`. For most module developers, `service.sh` should be good enough if you just need to run a boot script. If you need to wait for boot completed, you can use `resetprop -w sys.boot_completed 0`.
+Please read the [Boot Scripts](#boot-scripts) section to understand the difference between `post-fs-data.sh`, `post-mount.sh` and `service.sh`. For most module developers, `service.sh` should be good enough if you just need to run a boot script. If you need to wait for boot completed, you can use `resetprop -w sys.boot_completed 0`.
 
 In all scripts of your module, please use `MODDIR=${0%/*}` to get your module's base directory path; do **NOT** hardcode your module path in scripts.
 If Zygisk is enabled, the environment variable `ZYGISK_ENABLED` will be set to `1`.
@@ -242,7 +243,7 @@ The list above will result in the following dummy devices being created: `$MODPA
 
 ## Boot Scripts
 
-In Magisk, you can run boot scripts in 2 different modes: **post-fs-data** and **late_start service** mode.
+In Magisk, you can run boot scripts in 3 different modes: **post-fs-data**, **post-mount** and **late_start service** mode.
 
 - post-fs-data mode
   - This stage is BLOCKING. The boot process is paused before execution is done, or 40 seconds have passed.
@@ -250,6 +251,9 @@ In Magisk, you can run boot scripts in 2 different modes: **post-fs-data** and *
   - This stage happens before Zygote is started, which pretty much means everything in Android
   - **WARNING:** using `setprop` will deadlock the boot process! Please use `resetprop -n <prop_name> <prop_value>` instead.
   - **Only run scripts in this mode if necessary.**
+- post-mount mode
+  - Same as post-fs-data mode, only difference is that scripts run after every module is mounted.
+  - **This is the recommended stage to run app_process.**
 - late_start service mode
   - This stage is NON-BLOCKING. Your script runs in parallel with the rest of the booting process.
   - **This is the recommended stage to run most scripts.**
@@ -257,14 +261,14 @@ In Magisk, you can run boot scripts in 2 different modes: **post-fs-data** and *
 In Magisk, there are also 2 kinds of scripts: **general scripts** and **module scripts**.
 
 - General Scripts
-  - Placed in `/data/adb/post-fs-data.d` or `/data/adb/service.d`
+  - Placed in `/data/adb/post-fs-data.d`, `/data/adb/post-mount.d` or `/data/adb/service.d`
   - Only executed if the script is set as executable (`chmod +x script.sh`)
-  - Scripts in `post-fs-data.d` runs in post-fs-data mode, and scripts in `service.d` runs in late_start service mode.
+  - Scripts in `post-fs-data.d` runs in post-fs-data mode, scripts in `/data/adb/post-mount.d` runs in post-mount mode and scripts in `service.d` runs in late_start service mode.
   - Modules should **NOT** add general scripts during installation
 - Module Scripts
   - Placed in the module's own folder
   - Only executed if the module is enabled
-  - `post-fs-data.sh` runs in post-fs-data mode, and `service.sh` runs in late_start service mode.
+  - `post-fs-data.sh` and `post-mount.sh` runs in post-fs-data mode, and `service.sh` runs in late_start service mode.
 
 All boot scripts will run in Magisk's BusyBox `ash` shell with "Standalone Mode" enabled.
 

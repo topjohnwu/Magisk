@@ -51,6 +51,9 @@ SECURE_DIR=/data/adb
 # Folder storing general post-fs-data scripts
 $SECURE_DIR/post-fs-data.d
 
+# Folder storing general post-mount scripts
+$SECURE_DIR/post-mount.d
+
 # Folder storing general late_start service scripts
 $SECURE_DIR/service.d
 
@@ -88,6 +91,10 @@ DATABIN=$SECURE_DIR/magisk
 ### post-fs-data
 
 This triggers on `post-fs-data` when `/data` is decrypted and mounted. The daemon `magiskd` will be launched, post-fs-data scripts are executed, and module files are magic mounted.
+
+### post-mount
+
+This triggers on `post-fs-data` but instantly after magic mount completes. In this mode, post-mount scripts are executed.
 
 ### late_start
 

@@ -125,6 +125,7 @@ mkdir -p $MAGISKBIN 2>/dev/null
 unzip -oj magisk.apk 'assets/*.sh' -d $MAGISKBIN
 mkdir /data/adb/modules 2>/dev/null
 mkdir /data/adb/post-fs-data.d 2>/dev/null
+mkdir /data/adb/post-mount.d 2>/dev/null
 mkdir /data/adb/service.d 2>/dev/null
 
 for file in magisk magisk32 magiskpolicy stub.apk; do

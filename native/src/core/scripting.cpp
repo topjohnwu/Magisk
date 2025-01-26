@@ -63,7 +63,7 @@ if (pfs) { \
     if (timer_pid < 0) \
         continue; \
     if (int pid = waitpid(-1, nullptr, 0); pid == timer_pid) { \
-        LOGW("* post-fs-data scripts blocking phase timeout\n"); \
+        LOGW("* post-fs-data or post-mount scripts blocking phase timeout\n"); \
         timer_pid = -1; \
     } \
 }
@@ -82,6 +82,7 @@ void exec_common_scripts(const char *stage) {
     auto dir = xopen_dir(path);
     if (!dir) return;
 
+    // No need to check post-mount becasue it is not a separate stage
     bool pfs = stage == "post-fs-data"sv;
     int timer_pid = -1;
     if (pfs) {
@@ -122,7 +123,7 @@ void exec_module_scripts(const char *stage, const vector<string_view> &modules) 
     if (modules.empty())
         return;
 
-    bool pfs = stage == "post-fs-data"sv;
+    bool pfs = stage == "post-fs-data"sv || stage == "post-mount"sv;
     if (pfs) {
         timespec now{};
         clock_gettime(CLOCK_MONOTONIC, &now);

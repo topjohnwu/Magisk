@@ -41,6 +41,7 @@ static bool magisk_env() {
     xmkdir(DATABIN, 0755);
     xmkdir(MODULEROOT, 0755);
     xmkdir(SECURE_DIR "/post-fs-data.d", 0755);
+    xmkdir(SECURE_DIR "/post-mount.d", 0755);
     xmkdir(SECURE_DIR "/service.d", 0755);
     restorecon();
 
@@ -180,6 +181,10 @@ bool MagiskD::post_fs_data() const noexcept {
     setup_mounts();
     handle_modules();
     load_modules();
+
+    LOGI("** post-mount mode running\n");
+    exec_common_scripts("post-mount");
+    exec_module_scripts("post-mount");
     return false;
 }
 

@@ -150,7 +150,7 @@ ui_print "- Removing Magisk files"
 rm -rf \
 /cache/*magisk* /cache/unblock /data/*magisk* /data/cache/*magisk* /data/property/*magisk* \
 /data/Magisk.apk /data/busybox /data/custom_ramdisk_patch.sh /data/adb/*magisk* \
-/data/adb/post-fs-data.d /data/adb/service.d /data/adb/modules* \
+/data/adb/post-fs-data.d /data/adb/post-mount.d /data/adb/service.d /data/adb/modules* \
 /data/unencrypted/magisk /metadata/magisk /metadata/watchdog/magisk /persist/magisk /mnt/vendor/persist/magisk
 
 ADDOND=/system/addon.d/99-magisk.sh
