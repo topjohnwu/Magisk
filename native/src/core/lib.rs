@@ -135,6 +135,12 @@ pub mod ffi {
         notify: bool,
     }
 
+    struct ModuleInfo {
+        name: String,
+        z32: i32,
+        z64: i32,
+    }
+
     unsafe extern "C++" {
         include!("include/sqlite.hpp");
 
@@ -185,6 +191,8 @@ pub mod ffi {
         fn uid_granted_root(&self, mut uid: i32) -> bool;
         #[cxx_name = "get_manager"]
         unsafe fn get_manager_for_cxx(&self, user: i32, ptr: *mut CxxString, install: bool) -> i32;
+        fn set_module_list(&self, module_list: Vec<ModuleInfo>);
+        fn module_list(&self) -> &Vec<ModuleInfo>;
 
         #[cxx_name = "get_db_settings"]
         fn get_db_settings_for_cxx(&self, cfg: &mut DbSettings) -> bool;
@@ -209,6 +217,8 @@ pub mod ffi {
         fn post_fs_data(self: &MagiskD) -> bool;
         fn late_start(self: &MagiskD);
         fn boot_complete(self: &MagiskD);
+        #[allow(dead_code)]
+        fn handle_modules(self: &MagiskD);
     }
 }
 

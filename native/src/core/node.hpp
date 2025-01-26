@@ -105,7 +105,7 @@ public:
      **************/
 
     // Traverse through module directories to generate a tree of module files
-    void collect_module_files(const char *module, int dfd);
+    void collect_module_files(std::string_view module, int dfd);
 
     // Traverse through the real filesystem and prepare the tree for magic mount.
     // Return true to indicate that this node needs to be upgraded to tmpfs_node.
@@ -279,16 +279,16 @@ public:
 
 class module_node : public node_entry {
 public:
-    module_node(const char *module, dirent *entry)
+    module_node(std::string_view module, dirent *entry)
     : node_entry(entry->d_name, entry->d_type, this), module(module) {}
 
-    module_node(node_entry *node, const char *module) : node_entry(this), module(module) {
+    module_node(node_entry *node, std::string_view module) : node_entry(this), module(module) {
         node_entry::consume(node);
     }
 
     void mount() override;
 private:
-    const char *module;
+    std::string_view module;
 };
 
 // Don't create tmpfs_node before prepare

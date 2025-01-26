@@ -179,7 +179,6 @@ bool MagiskD::post_fs_data() const noexcept {
     initialize_denylist();
     setup_mounts();
     handle_modules();
-    load_modules();
     return false;
 }
 
@@ -189,7 +188,7 @@ void MagiskD::late_start() const noexcept {
     LOGI("** late_start service mode running\n");
 
     exec_common_scripts("service");
-    exec_module_scripts("service");
+    exec_module_scripts("service", module_list());
 }
 
 void MagiskD::boot_complete() const noexcept {

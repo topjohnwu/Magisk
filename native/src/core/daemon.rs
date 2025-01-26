@@ -1,6 +1,6 @@
 use crate::consts::{MAGISK_FULL_VER, MAIN_CONFIG};
 use crate::db::Sqlite3;
-use crate::ffi::{get_magisk_tmp, RequestCode};
+use crate::ffi::{get_magisk_tmp, ModuleInfo, RequestCode};
 use crate::get_prop;
 use crate::logging::{magisk_logging, start_log_daemon};
 use crate::package::ManagerInfo;
@@ -59,6 +59,7 @@ pub struct MagiskD {
     pub sql_connection: Mutex<Option<Sqlite3>>,
     pub manager_info: Mutex<ManagerInfo>,
     boot_stage_lock: Mutex<BootStateFlags>,
+    module_list: OnceLock<Vec<ModuleInfo>>,
     sdk_int: i32,
     pub is_emulator: bool,
     is_recovery: bool,
@@ -71,6 +72,14 @@ impl MagiskD {
 
     pub fn sdk_int(&self) -> i32 {
         self.sdk_int
+    }
+
+    pub fn set_module_list(&self, module_list: Vec<ModuleInfo>) {
+        self.module_list.set(module_list).ok();
+    }
+
+    pub fn module_list(&self) -> &Vec<ModuleInfo> {
+        self.module_list.get().unwrap()
     }
 
     pub fn app_data_dir(&self) -> &'static Utf8CStr {
