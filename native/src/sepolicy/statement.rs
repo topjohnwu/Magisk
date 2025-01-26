@@ -2,9 +2,9 @@ use std::fmt::{Display, Formatter, Write};
 use std::io::stderr;
 use std::{iter::Peekable, pin::Pin, vec::IntoIter};
 
-use base::{error, warn, FmtAdaptor};
 use crate::ffi::Xperm;
 use crate::sepolicy;
+use base::{error, warn, FmtAdaptor};
 
 pub enum Token<'a> {
     AL,
@@ -23,7 +23,6 @@ pub enum Token<'a> {
     TC,
     TM,
     GF,
-    IO,
     LB,
     RB,
     CM,
@@ -96,18 +95,12 @@ fn parse_term<'a>(tokens: &mut Tokens<'a>) -> ParseResult<'a, Vec<&'a str>> {
 //     sterm ::= LB names(n) RB { n };
 fn parse_sterm<'a>(tokens: &mut Tokens<'a>) -> ParseResult<'a, Vec<&'a str>> {
     match tokens.next() {
-        Some(Token::IO) => Ok(vec!["ioctl"]),
         Some(Token::ID(name)) => Ok(vec![name]),
         Some(Token::ST) => Ok(vec![]),
         Some(Token::LB) => {
             let mut names = Some(Vec::new());
             loop {
                 match tokens.next() {
-                    Some(Token::IO) => {
-                        if let Some(ref mut names) = names {
-                            names.push("ioctl")
-                        }
-                    }
                     Some(Token::ID(name)) => {
                         if let Some(ref mut names) = names {
                             names.push(name)
@@ -207,13 +200,25 @@ fn parse_xperms<'a>(tokens: &mut Tokens<'a>) -> ParseResult<'a, Vec<Xperm>> {
     Ok(xperms)
 }
 
+fn match_string<'a>(tokens: &mut Tokens<'a>, pattern: &str) -> ParseResult<'a, ()> {
+    match tokens.next() {
+        Some(Token::ID(s)) => {
+            if s == pattern {
+                return Ok(());
+            }
+        }
+        _ => {}
+    }
+    Err(ParseError::General)
+}
+
 //     statement ::= AL sterm(s) sterm(t) sterm(c) sterm(p) { sepolicy.allow(s, t, c, p); };
 //     statement ::= DN sterm(s) sterm(t) sterm(c) sterm(p) { sepolicy.deny(s, t, c, p); };
 //     statement ::= AA sterm(s) sterm(t) sterm(c) sterm(p) { sepolicy.auditallow(s, t, c, p); };
 //     statement ::= DA sterm(s) sterm(t) sterm(c) sterm(p) { sepolicy.dontaudit(s, t, c, p); };
-//     statement ::= AX sterm(s) sterm(t) sterm(c) IO xperms(p) { sepolicy.allowxperm(s, t, c, p); };
-//     statement ::= AY sterm(s) sterm(t) sterm(c) IO xperms(p) { sepolicy.auditallowxperm(s, t, c, p); };
-//     statement ::= DX sterm(s) sterm(t) sterm(c) IO xperms(p) { sepolicy.dontauditxperm(s, t, c, p); };
+//     statement ::= AX sterm(s) sterm(t) sterm(c) ID(i) xperms(p) { sepolicy.allowxperm(s, t, c, p); };
+//     statement ::= AY sterm(s) sterm(t) sterm(c) ID(i) xperms(p) { sepolicy.auditallowxperm(s, t, c, p); };
+//     statement ::= DX sterm(s) sterm(t) sterm(c) ID(i) xperms(p) { sepolicy.dontauditxperm(s, t, c, p); };
 //     statement ::= PM sterm(t) { sepolicy.permissive(t); };
 //     statement ::= EF sterm(t) { sepolicy.enforce(t); };
 //     statement ::= TA term(t) term(a) { sepolicy.typeattribute(t, a); };
@@ -265,11 +270,8 @@ fn exec_statement<'a>(
                 let s = parse_sterm(tokens)?;
                 let t = parse_sterm(tokens)?;
                 let c = parse_sterm(tokens)?;
-                let p = if matches!(tokens.next(), Some(Token::IO)) {
-                    parse_xperms(tokens)?
-                } else {
-                    throw!()
-                };
+                match_string(tokens, "ioctl")?;
+                let p = parse_xperms(tokens)?;
                 check_additional_args(tokens)?;
                 match action {
                     Token::AX => sepolicy.allowxperm(s, t, c, p),
@@ -402,7 +404,6 @@ fn extract_token<'a>(s: &'a str, tokens: &mut Vec<Token<'a>>) {
         "type_change" => tokens.push(Token::TC),
         "type_member" => tokens.push(Token::TM),
         "genfscon" => tokens.push(Token::GF),
-        "ioctl" => tokens.push(Token::IO),
         "*" => tokens.push(Token::ST),
         "" => {}
         _ => {
@@ -479,7 +480,6 @@ impl Display for Token<'_> {
             Token::TC => f.write_str("type_change"),
             Token::TM => f.write_str("type_member"),
             Token::GF => f.write_str("genfscon"),
-            Token::IO => f.write_str("ioctl"),
             Token::LB => f.write_char('{'),
             Token::RB => f.write_char('}'),
             Token::CM => f.write_char(','),
