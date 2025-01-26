@@ -378,7 +378,6 @@ static void daemon_entry() {
 
     default_new(poll_map);
     default_new(poll_fds);
-    default_new(module_list);
 
     // Register handler for main socket
     pollfd main_socket_pfd = { fd, POLLIN, 0 };

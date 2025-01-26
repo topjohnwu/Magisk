@@ -117,9 +117,9 @@ static bool operator>(const timespec &a, const timespec &b) {
     return a.tv_nsec > b.tv_nsec;
 }
 
-void exec_module_scripts(const char *stage, const vector<string_view> &modules) {
+void exec_module_scripts(const char *stage, const rust::Vec<ModuleInfo> &module_list) {
     LOGI("* Running module %s scripts\n", stage);
-    if (modules.empty())
+    if (module_list.empty())
         return;
 
     bool pfs = stage == "post-fs-data"sv;
@@ -134,12 +134,11 @@ void exec_module_scripts(const char *stage, const vector<string_view> &modules) 
     PFS_SETUP()
 
     char path[4096];
-    for (auto &m : modules) {
-        const char *module = m.data();
-        sprintf(path, MODULEROOT "/%s/%s.sh", module, stage);
+    for (auto &m : module_list) {
+        sprintf(path, MODULEROOT "/%.*s/%s.sh", (int) m.name.size(), m.name.data(), stage);
         if (access(path, F_OK) == -1)
             continue;
-        LOGI("%s: exec [%s.sh]\n", module, stage);
+        LOGI("%.*s: exec [%s.sh]\n", (int) m.name.size(), m.name.data(), stage);
         exec_t exec {
             .pre_exec = set_script_env,
             .fork = pfs ? xfork : fork_dont_care
