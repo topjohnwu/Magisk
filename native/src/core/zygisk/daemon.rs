@@ -1,8 +1,9 @@
 use crate::consts::MODULEROOT;
-use crate::daemon::{to_user_id, IpcRead, MagiskD, UnixSocketExt};
+use crate::daemon::{to_user_id, MagiskD};
 use crate::ffi::{
     get_magisk_tmp, restore_zygisk_prop, update_deny_flags, ZygiskRequest, ZygiskStateFlags,
 };
+use crate::socket::{IpcRead, UnixSocketExt};
 use base::libc::{O_CLOEXEC, O_CREAT, O_RDONLY};
 use base::{
     cstr, error, fork_dont_care, libc, open_fd, raw_cstr, warn, Directory, FsPathBuf, LoggedError,
@@ -19,6 +20,38 @@ const UNMOUNT_MASK: u32 =
 
 pub fn zygisk_should_load_module(flags: u32) -> bool {
     flags & UNMOUNT_MASK != UNMOUNT_MASK && flags & ZygiskStateFlags::ProcessIsMagiskApp.repr == 0
+}
+
+fn exec_zygiskd(is_64_bit: bool, remote: UnixStream) {
+    // This fd has to survive exec
+    unsafe {
+        libc::fcntl(remote.as_raw_fd(), libc::F_SETFD, 0);
+    }
+
+    // Start building the exec arguments
+    let mut exe = Utf8CStrBufArr::<64>::new();
+
+    #[cfg(target_pointer_width = "64")]
+    let magisk = if is_64_bit { "magisk" } else { "magisk32" };
+
+    #[cfg(target_pointer_width = "32")]
+    let magisk = "magisk";
+
+    let exe = FsPathBuf::new(&mut exe).join(get_magisk_tmp()).join(magisk);
+
+    let mut fd_str = Utf8CStrBufArr::<16>::new();
+    write!(fd_str, "{}", remote.as_raw_fd()).ok();
+    unsafe {
+        libc::execl(
+            exe.as_ptr(),
+            raw_cstr!(""),
+            raw_cstr!("zygisk"),
+            raw_cstr!("companion"),
+            fd_str.as_ptr(),
+            ptr::null() as *const libc::c_char,
+        );
+        libc::exit(-1);
+    }
 }
 
 impl MagiskD {
@@ -66,38 +99,6 @@ impl MagiskD {
         })
     }
 
-    fn exec_zygiskd(is_64_bit: bool, remote: UnixStream) {
-        // This fd has to survive exec
-        unsafe {
-            libc::fcntl(remote.as_raw_fd(), libc::F_SETFD, 0);
-        }
-
-        // Start building the exec arguments
-        let mut exe = Utf8CStrBufArr::<64>::new();
-
-        #[cfg(target_pointer_width = "64")]
-        let magisk = if is_64_bit { "magisk" } else { "magisk32" };
-
-        #[cfg(target_pointer_width = "32")]
-        let magisk = "magisk";
-
-        let exe = FsPathBuf::new(&mut exe).join(get_magisk_tmp()).join(magisk);
-
-        let mut fd_str = Utf8CStrBufArr::<16>::new();
-        write!(fd_str, "{}", remote.as_raw_fd()).ok();
-        unsafe {
-            libc::execl(
-                exe.as_ptr(),
-                raw_cstr!(""),
-                raw_cstr!("zygisk"),
-                raw_cstr!("companion"),
-                fd_str.as_ptr(),
-                ptr::null() as *const libc::c_char,
-            );
-            libc::exit(-1);
-        }
-    }
-
     fn connect_zygiskd(&self, mut client: UnixStream) {
         let mut zygiskd_sockets = self.zygiskd_sockets.lock().unwrap();
         let result: LoggedResult<()> = try {
@@ -127,7 +128,7 @@ impl MagiskD {
                 // Create a new socket pair and fork zygiskd process
                 let (local, remote) = UnixStream::pair()?;
                 if fork_dont_care() == 0 {
-                    Self::exec_zygiskd(is_64_bit, remote);
+                    exec_zygiskd(is_64_bit, remote);
                 }
                 *socket = Some(local);
                 let local = socket.as_mut().unwrap();

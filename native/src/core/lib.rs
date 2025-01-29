@@ -7,11 +7,12 @@
 #![allow(clippy::missing_safety_doc)]
 
 use base::Utf8CStr;
-use daemon::{daemon_entry, get_magiskd, recv_fd, recv_fds, send_fd, send_fds, MagiskD};
+use daemon::{daemon_entry, get_magiskd, MagiskD};
 use db::get_default_db_settings;
 use logging::{android_logging, setup_logfile, zygisk_close_logd, zygisk_get_logd, zygisk_logging};
 use mount::{clean_mounts, find_preinit_device, revert_unmount};
 use resetprop::{persist_delete_prop, persist_get_prop, persist_get_props, persist_set_prop};
+use socket::{recv_fd, recv_fds, send_fd, send_fds};
 use su::get_default_root_settings;
 use zygisk::zygisk_should_load_module;
 
@@ -23,6 +24,7 @@ mod logging;
 mod mount;
 mod package;
 mod resetprop;
+mod socket;
 mod su;
 mod zygisk;
 

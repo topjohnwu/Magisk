@@ -1,9 +1,10 @@
 #![allow(improper_ctypes, improper_ctypes_definitions)]
-use crate::daemon::{IpcRead, IpcWrite, MagiskD, MAGISKD};
+use crate::daemon::{MagiskD, MAGISKD};
 use crate::ffi::{
     open_and_init_db, sqlite3, sqlite3_errstr, DbEntryKey, DbSettings, DbStatement, DbValues,
     MntNsMode, MultiuserMode, RootAccess,
 };
+use crate::socket::{IpcRead, IpcWrite};
 use base::{LoggedResult, ResultExt, Utf8CStr};
 use std::ffi::c_void;
 use std::fs::File;
