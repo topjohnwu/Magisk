@@ -28,7 +28,6 @@ enum class RespondCode : int {
 
 extern std::string native_bridge;
 
-void reset_zygisk(bool restore);
 int connect_daemon(int req, bool create = false);
 void unlock_blocks();
 
@@ -52,8 +51,6 @@ void remove_modules();
 
 // Scripting
 void exec_script(const char *script);
-void exec_common_scripts(const char *stage);
-void exec_module_scripts(const char *stage, const rust::Vec<ModuleInfo> &module_list);
 void clear_pkg(const char *pkg, int user_id);
 [[noreturn]] void install_module(const char *file);
 

@@ -1,16 +1,18 @@
-use crate::consts::{MAGISK_FULL_VER, MAIN_CONFIG};
+use crate::consts::{MAGISK_FULL_VER, MAIN_CONFIG, SECURE_DIR};
 use crate::db::Sqlite3;
-use crate::ffi::{get_magisk_tmp, initialize_denylist, DbEntryKey, ModuleInfo, RequestCode};
+use crate::ffi::{
+    check_key_combo, disable_modules, exec_common_scripts, exec_module_scripts, get_magisk_tmp,
+    initialize_denylist, setup_magisk_env, DbEntryKey, ModuleInfo, RequestCode,
+};
 use crate::get_prop;
-use crate::logging::{magisk_logging, start_log_daemon};
+use crate::logging::{magisk_logging, setup_logfile, start_log_daemon};
 use crate::mount::setup_mounts;
 use crate::package::ManagerInfo;
 use base::libc::{O_CLOEXEC, O_RDONLY};
 use base::{
-    cstr, info, libc, open_fd, warn, BufReadExt, Directory, FsPath, FsPathBuf, LoggedResult,
-    ReadExt, ResultExt, Utf8CStr, Utf8CStrBufArr, WriteExt,
+    cstr, error, info, libc, open_fd, warn, BufReadExt, FsPath, FsPathBuf, ReadExt, ResultExt,
+    Utf8CStr, Utf8CStrBufArr, WriteExt,
 };
-use bit_set::BitSet;
 use bytemuck::{bytes_of, bytes_of_mut, Pod, Zeroable};
 use std::fs::File;
 use std::io;
@@ -91,10 +93,6 @@ impl MagiskD {
         self.module_list.set(module_list).ok();
     }
 
-    pub fn module_list(&self) -> &Vec<ModuleInfo> {
-        self.module_list.get().unwrap()
-    }
-
     pub fn app_data_dir(&self) -> &'static Utf8CStr {
         if self.sdk_int >= 24 {
             cstr!("/data/user_de")
@@ -103,39 +101,85 @@ impl MagiskD {
         }
     }
 
-    // app_id = app_no + AID_APP_START
-    // app_no range: [0, 9999]
-    pub fn get_app_no_list(&self) -> BitSet {
-        let mut list = BitSet::new();
-        let _: LoggedResult<()> = try {
-            let mut app_data_dir = Directory::open(self.app_data_dir())?;
-            // For each user
-            loop {
-                let entry = match app_data_dir.read()? {
-                    None => break,
-                    Some(e) => e,
-                };
-                let mut user_dir = match entry.open_as_dir() {
-                    Err(_) => continue,
-                    Ok(dir) => dir,
-                };
-                // For each package
-                loop {
-                    match user_dir.read()? {
-                        None => break,
-                        Some(e) => {
-                            let attr = e.get_attr()?;
-                            let app_id = to_app_id(attr.st.st_uid as i32);
-                            if (AID_APP_START..=AID_APP_END).contains(&app_id) {
-                                let app_no = app_id - AID_APP_START;
-                                list.insert(app_no as usize);
-                            }
-                        }
-                    }
-                }
+    fn post_fs_data(&self) -> bool {
+        setup_logfile();
+        info!("** post-fs-data mode running");
+
+        self.preserve_stub_apk();
+
+        // Check secure dir
+        let secure_dir = FsPath::from(cstr!(SECURE_DIR));
+        if !secure_dir.exists() {
+            if self.sdk_int < 24 {
+                secure_dir.mkdir(0o700).log().ok();
+            } else {
+                error!("* {} is not present, abort", SECURE_DIR);
+                return true;
             }
-        };
-        list
+        }
+
+        self.prune_su_access();
+
+        if !setup_magisk_env() {
+            error!("* Magisk environment incomplete, abort");
+            return true;
+        }
+
+        // Check safe mode
+        let boot_cnt = self.get_db_setting(DbEntryKey::BootloopCount);
+        self.set_db_setting(DbEntryKey::BootloopCount, boot_cnt + 1)
+            .log()
+            .ok();
+        let safe_mode = boot_cnt >= 2
+            || get_prop(cstr!("persist.sys.safemode"), true) == "1"
+            || get_prop(cstr!("ro.sys.safemode"), false) == "1"
+            || check_key_combo();
+
+        if safe_mode {
+            info!("* Safe mode triggered");
+            // Disable all modules and zygisk so next boot will be clean
+            disable_modules();
+            self.set_db_setting(DbEntryKey::ZygiskConfig, 0).log().ok();
+            return true;
+        }
+
+        exec_common_scripts(cstr!("post-fs-data"));
+        self.zygisk_enabled.store(
+            self.get_db_setting(DbEntryKey::ZygiskConfig) != 0,
+            Ordering::Release,
+        );
+        initialize_denylist();
+        setup_mounts();
+        self.handle_modules();
+
+        false
+    }
+
+    fn late_start(&self) {
+        setup_logfile();
+        info!("** late_start service mode running");
+
+        exec_common_scripts(cstr!("service"));
+        if let Some(module_list) = self.module_list.get() {
+            exec_module_scripts(cstr!("service"), module_list);
+        }
+    }
+
+    fn boot_complete(&self) {
+        setup_logfile();
+        info!("** boot-complete triggered");
+
+        // Reset the bootloop counter once we have boot-complete
+        self.set_db_setting(DbEntryKey::BootloopCount, 0).log().ok();
+
+        // At this point it's safe to create the folder
+        let secure_dir = FsPath::from(cstr!(SECURE_DIR));
+        if !secure_dir.exists() {
+            secure_dir.mkdir(0o700).log().ok();
+        }
+
+        self.ensure_manager();
+        self.zygisk_reset(true)
     }
 
     pub fn boot_stage_handler(&self, client: i32, code: i32) {
@@ -148,14 +192,6 @@ impl MagiskD {
                 if check_data() && !state.contains(BootState::PostFsDataDone) {
                     if self.post_fs_data() {
                         state.set(BootState::SafeMode);
-                    } else {
-                        self.zygisk_enabled.store(
-                            self.get_db_setting(DbEntryKey::ZygiskConfig) != 0,
-                            Ordering::Release,
-                        );
-                        initialize_denylist();
-                        setup_mounts();
-                        self.handle_modules();
                     }
                     state.set(BootState::PostFsDataDone);
                 }

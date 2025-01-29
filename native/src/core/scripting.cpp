@@ -75,10 +75,10 @@ if (pfs) { \
     exit(0); \
 }
 
-void exec_common_scripts(const char *stage) {
-    LOGI("* Running %s.d scripts\n", stage);
+void exec_common_scripts(rust::Utf8CStr stage) {
+    LOGI("* Running %s.d scripts\n", stage.c_str());
     char path[4096];
-    char *name = path + sprintf(path, SECURE_DIR "/%s.d", stage);
+    char *name = path + sprintf(path, SECURE_DIR "/%s.d", stage.c_str());
     auto dir = xopen_dir(path);
     if (!dir) return;
 
@@ -97,7 +97,7 @@ void exec_common_scripts(const char *stage) {
         if (entry->d_type == DT_REG) {
             if (faccessat(dfd, entry->d_name, X_OK, 0) != 0)
                 continue;
-            LOGI("%s.d: exec [%s]\n", stage, entry->d_name);
+            LOGI("%s.d: exec [%s]\n", stage.c_str(), entry->d_name);
             strcpy(name, entry->d_name);
             exec_t exec {
                 .pre_exec = set_script_env,
@@ -117,12 +117,12 @@ static bool operator>(const timespec &a, const timespec &b) {
     return a.tv_nsec > b.tv_nsec;
 }
 
-void exec_module_scripts(const char *stage, const rust::Vec<ModuleInfo> &module_list) {
-    LOGI("* Running module %s scripts\n", stage);
+void exec_module_scripts(rust::Utf8CStr stage, const rust::Vec<ModuleInfo> &module_list) {
+    LOGI("* Running module %s scripts\n", stage.c_str());
     if (module_list.empty())
         return;
 
-    bool pfs = stage == "post-fs-data"sv;
+    bool pfs = (string_view) stage == "post-fs-data";
     if (pfs) {
         timespec now{};
         clock_gettime(CLOCK_MONOTONIC, &now);
@@ -135,10 +135,10 @@ void exec_module_scripts(const char *stage, const rust::Vec<ModuleInfo> &module_
 
     char path[4096];
     for (auto &m : module_list) {
-        sprintf(path, MODULEROOT "/%.*s/%s.sh", (int) m.name.size(), m.name.data(), stage);
+        sprintf(path, MODULEROOT "/%.*s/%s.sh", (int) m.name.size(), m.name.data(), stage.c_str());
         if (access(path, F_OK) == -1)
             continue;
-        LOGI("%.*s: exec [%s.sh]\n", (int) m.name.size(), m.name.data(), stage);
+        LOGI("%.*s: exec [%s.sh]\n", (int) m.name.size(), m.name.data(), stage.c_str());
         exec_t exec {
             .pre_exec = set_script_env,
             .fork = pfs ? xfork : fork_dont_care

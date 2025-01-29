@@ -10,7 +10,7 @@ use base::Utf8CStr;
 use daemon::{daemon_entry, get_magiskd, recv_fd, recv_fds, send_fd, send_fds, MagiskD};
 use db::get_default_db_settings;
 use logging::{android_logging, setup_logfile, zygisk_close_logd, zygisk_get_logd, zygisk_logging};
-use mount::{clean_mounts, find_preinit_device, revert_unmount, setup_mounts};
+use mount::{clean_mounts, find_preinit_device, revert_unmount};
 use resetprop::{persist_delete_prop, persist_get_prop, persist_get_props, persist_set_prop};
 use su::get_default_root_settings;
 use zygisk::zygisk_should_load_module;
@@ -72,12 +72,17 @@ pub mod ffi {
         #[cxx_name = "Utf8CStr"]
         type Utf8CStrRef<'a> = base::ffi::Utf8CStrRef<'a>;
 
-        include!("include/daemon.hpp");
+        include!("include/ffi.hpp");
 
         #[cxx_name = "get_magisk_tmp_rs"]
         fn get_magisk_tmp() -> Utf8CStrRef<'static>;
         #[cxx_name = "resolve_preinit_dir_rs"]
         fn resolve_preinit_dir(base_dir: Utf8CStrRef) -> String;
+        fn setup_magisk_env() -> bool;
+        fn check_key_combo() -> bool;
+        fn disable_modules();
+        fn exec_common_scripts(stage: Utf8CStrRef);
+        fn exec_module_scripts(state: Utf8CStrRef, modules: &Vec<ModuleInfo>);
         fn install_apk(apk: Utf8CStrRef);
         fn uninstall_pkg(apk: Utf8CStrRef);
         fn update_deny_flags(uid: i32, process: &str, flags: &mut u32);
@@ -214,12 +219,10 @@ pub mod ffi {
         fn boot_stage_handler(&self, client: i32, code: i32);
         fn zygisk_handler(&self, client: i32);
         fn zygisk_reset(&self, restore: bool);
-        fn preserve_stub_apk(&self);
         fn prune_su_access(&self);
         #[cxx_name = "get_manager"]
         unsafe fn get_manager_for_cxx(&self, user: i32, ptr: *mut CxxString, install: bool) -> i32;
         fn set_module_list(&self, module_list: Vec<ModuleInfo>);
-        fn module_list(&self) -> &Vec<ModuleInfo>;
 
         #[cxx_name = "get_db_settings"]
         fn get_db_settings_for_cxx(&self, cfg: &mut DbSettings) -> bool;
@@ -241,10 +244,7 @@ pub mod ffi {
     unsafe extern "C++" {
         #[allow(dead_code)]
         fn reboot(self: &MagiskD);
-        fn post_fs_data(self: &MagiskD) -> bool;
         fn handle_modules(self: &MagiskD);
-        fn late_start(self: &MagiskD);
-        fn boot_complete(self: &MagiskD);
     }
 }
 

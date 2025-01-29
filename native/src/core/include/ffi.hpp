@@ -2,7 +2,14 @@
 
 #include <base.hpp>
 
+struct ModuleInfo;
+
 const char *get_magisk_tmp();
+bool setup_magisk_env();
+bool check_key_combo();
+void disable_modules();
+void exec_common_scripts(rust::Utf8CStr stage);
+void exec_module_scripts(rust::Utf8CStr stage, const rust::Vec<ModuleInfo> &module_list);
 void install_apk(rust::Utf8CStr apk);
 void uninstall_pkg(rust::Utf8CStr pkg);
 void update_deny_flags(int uid, rust::Str process, uint32_t &flags);
