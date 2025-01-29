@@ -429,3 +429,12 @@ bool is_deny_target(int uid, string_view process) {
     }
     return false;
 }
+
+void update_deny_flags(int uid, rust::Str process, uint32_t &flags) {
+    if (is_deny_target(uid, { process.begin(), process.end() })) {
+        flags |= +ZygiskStateFlags::ProcessOnDenyList;
+    }
+    if (denylist_enforced) {
+        flags |= +ZygiskStateFlags::DenyListEnforced;
+    }
+}

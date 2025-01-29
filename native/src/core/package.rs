@@ -473,6 +473,12 @@ impl MagiskD {
         apk.remove().log().ok();
     }
 
+    pub fn get_manager_uid(&self, user: i32) -> i32 {
+        let mut info = self.manager_info.lock().unwrap();
+        let (uid, _) = info.get_manager(self, user, false);
+        uid
+    }
+
     pub unsafe fn get_manager_for_cxx(&self, user: i32, ptr: *mut CxxString, install: bool) -> i32 {
         let mut info = self.manager_info.lock().unwrap();
         let (uid, pkg) = info.get_manager(self, user, install);

@@ -15,8 +15,6 @@ using namespace std;
 
 string native_bridge = "0";
 
-using modules_t = const rust::Vec<ModuleInfo>&;
-
 static bool is_compatible_with(uint32_t) {
     zygisk_logging();
     hook_entry();
@@ -30,56 +28,13 @@ extern "C" [[maybe_unused]] NativeBridgeCallbacks NativeBridgeItf {
     .isCompatibleWith = &is_compatible_with,
 };
 
-// The following code runs in zygote/app process
-
-static inline bool should_load_modules(uint32_t flags) {
-    return (flags & UNMOUNT_MASK) != UNMOUNT_MASK &&
-           (flags & PROCESS_IS_MAGISK_APP) != PROCESS_IS_MAGISK_APP;
-}
-
-int remote_get_info(int uid, const char *process, uint32_t *flags, vector<int> &fds) {
-    if (int fd = zygisk_request(ZygiskRequest::GET_INFO); fd >= 0) {
-        write_int(fd, uid);
-        write_string(fd, process);
-#ifdef __LP64__
-        write_int(fd, 1);
-#else
-        write_int(fd, 0);
-#endif
-        xxread(fd, flags, sizeof(*flags));
-        if (should_load_modules(*flags)) {
-            fds = recv_fds(fd);
-        }
-        return fd;
-    }
-    return -1;
-}
-
 // The following code runs in magiskd
-
-static vector<int> get_module_fds(bool is_64_bit, modules_t module_list) {
-    vector<int> fds;
-    // All fds passed to send_fds have to be valid file descriptors.
-    // To workaround this issue, send over STDOUT_FILENO as an indicator of an
-    // invalid fd as it will always be /dev/null in magiskd
-#if defined(__LP64__)
-    if (is_64_bit) {
-        std::transform(module_list.begin(), module_list.end(), std::back_inserter(fds),
-            [](const ModuleInfo &info) { return info.z64 < 0 ? STDOUT_FILENO : info.z64; });
-    } else
-#endif
-    {
-        std::transform(module_list.begin(), module_list.end(), std::back_inserter(fds),
-            [](const ModuleInfo &info) { return info.z32 < 0 ? STDOUT_FILENO : info.z32; });
-    }
-    return fds;
-}
 
 static pthread_mutex_t zygiskd_lock = PTHREAD_MUTEX_INITIALIZER;
 static int zygiskd_sockets[] = { -1, -1 };
 #define zygiskd_socket zygiskd_sockets[is_64_bit]
 
-static void connect_companion(int client, modules_t module_list) {
+void MagiskD::connect_zygiskd(int client) const noexcept {
     mutex_guard g(zygiskd_lock);
 
     bool is_64_bit = read_int(client);
@@ -112,7 +67,7 @@ static void connect_companion(int client, modules_t module_list) {
             exit(-1);
         }
         close(fds[1]);
-        vector<int> module_fds = get_module_fds(is_64_bit, module_list);
+        rust::Vec<int> module_fds = get_module_fds(is_64_bit);
         send_fds(zygiskd_socket, module_fds.data(), module_fds.size());
         // Wait for ack
         if (read_int(zygiskd_socket) != 0) {
@@ -121,89 +76,6 @@ static void connect_companion(int client, modules_t module_list) {
         }
     }
     send_fd(zygiskd_socket, client);
-}
-
-static void get_process_info(int client, const sock_cred *cred, modules_t module_list) {
-    int uid = read_int(client);
-    string process = read_string(client);
-    int arch = read_int(client);
-    auto &daemon = MagiskD();
-
-    uint32_t flags = 0;
-
-    if (is_deny_target(uid, process)) {
-        flags |= PROCESS_ON_DENYLIST;
-    }
-    if (daemon.get_manager(to_user_id(uid), nullptr, false) == uid) {
-        flags |= PROCESS_IS_MAGISK_APP;
-    }
-    if (denylist_enforced) {
-        flags |= DENYLIST_ENFORCING;
-    }
-    if (daemon.uid_granted_root(uid)) {
-        flags |= PROCESS_GRANTED_ROOT;
-    }
-
-    xwrite(client, &flags, sizeof(flags));
-
-    if (should_load_modules(flags)) {
-        vector<int> fds = get_module_fds(arch, module_list);
-        send_fds(client, fds.data(), fds.size());
-    }
-
-    if (uid != 1000 || process != "system_server")
-        return;
-
-    // Collect module status from system_server
-    int slots = read_int(client);
-    dynamic_bitset bits;
-    for (int i = 0; i < slots; ++i) {
-        dynamic_bitset::slot_type l = 0;
-        xxread(client, &l, sizeof(l));
-        bits.emplace_back(l);
-    }
-    for (int id = 0; id < module_list.size(); ++id) {
-        if (!as_const(bits)[id]) {
-            // Either not a zygisk module, or incompatible
-            char buf[4096];
-            ssprintf(buf, sizeof(buf), MODULEROOT "/%s/zygisk",
-                module_list[id].name.data());
-            if (int dirfd = open(buf, O_RDONLY | O_CLOEXEC); dirfd >= 0) {
-                close(xopenat(dirfd, "unloaded", O_CREAT | O_RDONLY, 0644));
-                close(dirfd);
-            }
-        }
-    }
-}
-
-static void get_moddir(int client, modules_t module_list) {
-    int id = read_int(client);
-    char buf[4096];
-    auto &m = module_list[id];
-    ssprintf(buf, sizeof(buf), MODULEROOT "/%.*s", (int) m.name.size(), m.name.data());
-    int dfd = xopen(buf, O_RDONLY | O_CLOEXEC);
-    send_fd(client, dfd);
-    close(dfd);
-}
-
-void zygisk_handler(int client, const sock_cred *cred) {
-    auto &module_list = MagiskD().module_list();
-    int code = read_int(client);
-    switch (code) {
-    case ZygiskRequest::GET_INFO:
-        get_process_info(client, cred, module_list);
-        break;
-    case ZygiskRequest::CONNECT_COMPANION:
-        connect_companion(client, module_list);
-        break;
-    case ZygiskRequest::GET_MODDIR:
-        get_moddir(client, module_list);
-        break;
-    default:
-        // Unknown code
-        break;
-    }
-    close(client);
 }
 
 void reset_zygisk(bool restore) {
