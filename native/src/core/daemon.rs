@@ -6,13 +6,16 @@ use crate::logging::{magisk_logging, start_log_daemon};
 use crate::package::ManagerInfo;
 use base::libc::{O_CLOEXEC, O_RDONLY};
 use base::{
-    cstr, info, libc, open_fd, BufReadExt, Directory, FsPath, FsPathBuf, LoggedResult, ReadExt,
-    Utf8CStr, Utf8CStrBufArr, WriteExt,
+    cstr, info, libc, open_fd, warn, BufReadExt, Directory, FsPath, FsPathBuf, LoggedResult,
+    ReadExt, Utf8CStr, Utf8CStrBufArr, WriteExt,
 };
 use bit_set::BitSet;
+use bytemuck::{bytes_of, bytes_of_mut, Pod, Zeroable};
 use std::fs::File;
 use std::io;
-use std::io::{BufReader, Read, Write};
+use std::io::{BufReader, ErrorKind, IoSlice, IoSliceMut, Read, Write};
+use std::os::fd::{FromRawFd, OwnedFd, RawFd};
+use std::os::unix::net::{AncillaryData, SocketAncillary, UnixStream};
 use std::sync::{Mutex, OnceLock};
 
 // Global magiskd singleton
@@ -59,7 +62,7 @@ pub struct MagiskD {
     pub sql_connection: Mutex<Option<Sqlite3>>,
     pub manager_info: Mutex<ManagerInfo>,
     boot_stage_lock: Mutex<BootStateFlags>,
-    module_list: OnceLock<Vec<ModuleInfo>>,
+    pub module_list: OnceLock<Vec<ModuleInfo>>,
     sdk_int: i32,
     pub is_emulator: bool,
     is_recovery: bool,
@@ -254,6 +257,7 @@ pub fn get_magiskd() -> &'static MagiskD {
 pub trait IpcRead {
     fn ipc_read_int(&mut self) -> io::Result<i32>;
     fn ipc_read_string(&mut self) -> io::Result<String>;
+    fn ipc_read_vec<E: Pod>(&mut self) -> io::Result<Vec<E>>;
 }
 
 impl<T: Read> IpcRead for T {
@@ -268,6 +272,17 @@ impl<T: Read> IpcRead for T {
         let mut val = "".to_string();
         self.take(len as u64).read_to_string(&mut val)?;
         Ok(val)
+    }
+
+    fn ipc_read_vec<E: Pod>(&mut self) -> io::Result<Vec<E>> {
+        let len = self.ipc_read_int()? as usize;
+        let mut vec = Vec::new();
+        let mut val: E = Zeroable::zeroed();
+        for _ in 0..len {
+            self.read_pod(&mut val)?;
+            vec.push(val.clone());
+        }
+        Ok(vec)
     }
 }
 
@@ -284,5 +299,90 @@ impl<T: Write> IpcWrite for T {
     fn ipc_write_string(&mut self, val: &str) -> io::Result<()> {
         self.ipc_write_int(val.len() as i32)?;
         self.write_all(val.as_bytes())
+    }
+}
+
+pub trait UnixSocketExt {
+    fn send_fds(&mut self, fd: &[RawFd]) -> io::Result<()>;
+    fn recv_fd(&mut self) -> io::Result<Option<OwnedFd>>;
+    fn recv_fds(&mut self) -> io::Result<Vec<OwnedFd>>;
+}
+
+impl UnixSocketExt for UnixStream {
+    fn send_fds(&mut self, fds: &[RawFd]) -> io::Result<()> {
+        match fds.len() {
+            0 => self.ipc_write_int(-1)?,
+            len => {
+                // 4k buffer is reasonable enough
+                let mut buf = [0u8; 4096];
+                let mut ancillary = SocketAncillary::new(&mut buf);
+                if !ancillary.add_fds(fds) {
+                    return Err(ErrorKind::OutOfMemory.into());
+                }
+                let fd_count = len as i32;
+                let iov = IoSlice::new(bytes_of(&fd_count));
+                self.send_vectored_with_ancillary(&[iov], &mut ancillary)?;
+            }
+        };
+        Ok(())
+    }
+
+    fn recv_fd(&mut self) -> io::Result<Option<OwnedFd>> {
+        let mut fd_count = 0;
+        self.peek(bytes_of_mut(&mut fd_count))?;
+        if fd_count < 1 {
+            return Ok(None);
+        }
+
+        // 4k buffer is reasonable enough
+        let mut buf = [0u8; 4096];
+        let mut ancillary = SocketAncillary::new(&mut buf);
+        let iov = IoSliceMut::new(bytes_of_mut(&mut fd_count));
+        self.recv_vectored_with_ancillary(&mut [iov], &mut ancillary)?;
+        for msg in ancillary.messages() {
+            if let Ok(msg) = msg {
+                if let AncillaryData::ScmRights(mut scm_rights) = msg {
+                    // We only want the first one
+                    let fd = if let Some(fd) = scm_rights.next() {
+                        unsafe { OwnedFd::from_raw_fd(fd) }
+                    } else {
+                        return Ok(None);
+                    };
+                    // Close all others
+                    for fd in scm_rights {
+                        unsafe { libc::close(fd) };
+                    }
+                    return Ok(Some(fd));
+                }
+            }
+        }
+        Ok(None)
+    }
+
+    fn recv_fds(&mut self) -> io::Result<Vec<OwnedFd>> {
+        let mut fd_count = 0;
+        // 4k buffer is reasonable enough
+        let mut buf = [0u8; 4096];
+        let mut ancillary = SocketAncillary::new(&mut buf);
+        let iov = IoSliceMut::new(bytes_of_mut(&mut fd_count));
+        self.recv_vectored_with_ancillary(&mut [iov], &mut ancillary)?;
+        let mut fds: Vec<OwnedFd> = Vec::new();
+        for msg in ancillary.messages() {
+            if let Ok(msg) = msg {
+                if let AncillaryData::ScmRights(scm_rights) = msg {
+                    fds = scm_rights
+                        .map(|fd| unsafe { OwnedFd::from_raw_fd(fd) })
+                        .collect();
+                }
+            }
+        }
+        if fd_count as usize != fds.len() {
+            warn!(
+                "Received unexpected number of fds: expected={} actual={}",
+                fd_count,
+                fds.len()
+            );
+        }
+        Ok(fds)
     }
 }

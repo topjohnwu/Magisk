@@ -2,6 +2,8 @@
 #![feature(try_blocks)]
 #![feature(let_chains)]
 #![feature(fn_traits)]
+#![feature(unix_socket_ancillary_data)]
+#![feature(unix_socket_peek)]
 #![allow(clippy::missing_safety_doc)]
 
 use base::Utf8CStr;
@@ -11,6 +13,7 @@ use logging::{android_logging, setup_logfile, zygisk_close_logd, zygisk_get_logd
 use mount::{clean_mounts, find_preinit_device, revert_unmount, setup_mounts};
 use resetprop::{persist_delete_prop, persist_get_prop, persist_get_props, persist_set_prop};
 use su::get_default_root_settings;
+use zygisk::zygisk_should_load_module;
 
 #[path = "../include/consts.rs"]
 mod consts;
@@ -21,6 +24,7 @@ mod mount;
 mod package;
 mod resetprop;
 mod su;
+mod zygisk;
 
 #[cxx::bridge]
 pub mod ffi {
@@ -76,7 +80,7 @@ pub mod ffi {
         fn resolve_preinit_dir(base_dir: Utf8CStrRef) -> String;
         fn install_apk(apk: Utf8CStrRef);
         fn uninstall_pkg(apk: Utf8CStrRef);
-
+        fn update_deny_flags(uid: i32, process: &str, flags: &mut u32);
         fn switch_mnt_ns(pid: i32) -> i32;
     }
 
@@ -141,6 +145,21 @@ pub mod ffi {
         z64: i32,
     }
 
+    #[repr(i32)]
+    enum ZygiskRequest {
+        GetInfo,
+        ConnectCompanion,
+        GetModDir,
+    }
+
+    #[repr(u32)]
+    enum ZygiskStateFlags {
+        ProcessGrantedRoot = 0x00000001,
+        ProcessOnDenyList = 0x00000002,
+        DenyListEnforced = 0x40000000,
+        ProcessIsMagiskApp = 0x80000000,
+    }
+
     unsafe extern "C++" {
         include!("include/sqlite.hpp");
 
@@ -171,6 +190,7 @@ pub mod ffi {
         fn clean_mounts();
         fn find_preinit_device() -> String;
         fn revert_unmount(pid: i32);
+        fn zygisk_should_load_module(flags: u32) -> bool;
         unsafe fn persist_get_prop(name: Utf8CStrRef, prop_cb: Pin<&mut PropCb>);
         unsafe fn persist_get_props(prop_cb: Pin<&mut PropCb>);
         unsafe fn persist_delete_prop(name: Utf8CStrRef) -> bool;
@@ -186,13 +206,14 @@ pub mod ffi {
         fn is_recovery(&self) -> bool;
         fn sdk_int(&self) -> i32;
         fn boot_stage_handler(&self, client: i32, code: i32);
+        fn zygisk_handler(&self, client: i32);
         fn preserve_stub_apk(&self);
         fn prune_su_access(&self);
-        fn uid_granted_root(&self, mut uid: i32) -> bool;
         #[cxx_name = "get_manager"]
         unsafe fn get_manager_for_cxx(&self, user: i32, ptr: *mut CxxString, install: bool) -> i32;
         fn set_module_list(&self, module_list: Vec<ModuleInfo>);
         fn module_list(&self) -> &Vec<ModuleInfo>;
+        fn get_module_fds(&self, is_64_bit: bool) -> Vec<i32>;
 
         #[cxx_name = "get_db_settings"]
         fn get_db_settings_for_cxx(&self, cfg: &mut DbSettings) -> bool;
@@ -219,6 +240,7 @@ pub mod ffi {
         fn boot_complete(self: &MagiskD);
         #[allow(dead_code)]
         fn handle_modules(self: &MagiskD);
+        fn connect_zygiskd(self: &MagiskD, client: i32);
     }
 }
 

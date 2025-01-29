@@ -122,15 +122,13 @@ struct module_abi_v1 {
     void (*postServerSpecialize)(void *, const void *);
 };
 
+// Assert the flag values to be the same as the public API
+static_assert(+ZygiskStateFlags::ProcessGrantedRoot == zygisk::StateFlag::PROCESS_GRANTED_ROOT);
+static_assert(+ZygiskStateFlags::ProcessOnDenyList == zygisk::StateFlag::PROCESS_ON_DENYLIST);
+
 enum : uint32_t {
-    PROCESS_GRANTED_ROOT = zygisk::StateFlag::PROCESS_GRANTED_ROOT,
-    PROCESS_ON_DENYLIST = zygisk::StateFlag::PROCESS_ON_DENYLIST,
-
-    DENYLIST_ENFORCING = (1u << 30),
-    PROCESS_IS_MAGISK_APP = (1u << 31),
-
-    UNMOUNT_MASK = (PROCESS_ON_DENYLIST | DENYLIST_ENFORCING),
-    PRIVATE_MASK = (DENYLIST_ENFORCING | PROCESS_IS_MAGISK_APP)
+    UNMOUNT_MASK = (+ZygiskStateFlags::ProcessOnDenyList | +ZygiskStateFlags::DenyListEnforced),
+    PRIVATE_MASK = (+ZygiskStateFlags::DenyListEnforced | +ZygiskStateFlags::ProcessIsMagiskApp)
 };
 
 struct api_abi_base {
@@ -188,7 +186,6 @@ struct ZygiskModule {
     static uint32_t getFlags();
     void tryUnload() const;
     void clearApi() { memset(&api, 0, sizeof(api)); }
-    int getId() const { return id; }
 
     ZygiskModule(int id, void *handle, void *entry);
 
@@ -264,7 +261,7 @@ struct ZygiskContext {
     ZygiskContext(JNIEnv *env, void *args);
     ~ZygiskContext();
 
-    void run_modules_pre(const std::vector<int> &fds);
+    void run_modules_pre(std::vector<int> &fds);
     void run_modules_post();
     DCL_PRE_POST(fork)
     DCL_PRE_POST(app_specialize)
@@ -273,6 +270,7 @@ struct ZygiskContext {
     DCL_PRE_POST(nativeSpecializeAppProcess)
     DCL_PRE_POST(nativeForkSystemServer)
 
+    int get_module_info(int uid, std::vector<int> &fds);
     void sanitize_fds();
     bool exempt_fd(int fd);
     bool can_exempt_fd() const;

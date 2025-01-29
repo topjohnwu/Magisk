@@ -6,15 +6,6 @@
 #include <vector>
 #include <core.hpp>
 
-namespace ZygiskRequest {
-enum : int {
-    GET_INFO,
-    CONNECT_COMPANION,
-    GET_MODDIR,
-    END
-};
-}
-
 #if defined(__LP64__)
 #define ZLOGD(...) LOGD("zygisk64: " __VA_ARGS__)
 #define ZLOGE(...) LOGE("zygisk64: " __VA_ARGS__)
@@ -33,8 +24,6 @@ enum : int {
 
 void hook_entry();
 void hookJniNativeMethods(JNIEnv *env, const char *clz, JNINativeMethod *methods, int numMethods);
-
-int remote_get_info(int uid, const char *process, uint32_t *flags, std::vector<int> &fds);
 
 inline int zygisk_request(int req) {
     int fd = connect_daemon(+RequestCode::ZYGISK);

@@ -163,7 +163,7 @@ static void handle_request_async(int client, int code, const sock_cred &cred) {
         break;
     }
     case +RequestCode::ZYGISK:
-        zygisk_handler(client, &cred);
+        MagiskD().zygisk_handler(client);
         break;
     default:
         __builtin_unreachable();

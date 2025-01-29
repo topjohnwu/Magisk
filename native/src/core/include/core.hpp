@@ -46,7 +46,6 @@ void exec_task(std::function<void()> &&task);
 // Daemon handlers
 void denylist_handler(int client, const sock_cred *cred);
 void su_daemon_handler(int client, const sock_cred *cred);
-void zygisk_handler(int client, const sock_cred *cred);
 
 // Module stuffs
 void disable_modules();

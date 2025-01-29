@@ -268,7 +268,7 @@ impl DirEntry<'_> {
     }
 
     unsafe fn open_fd(&self, flags: i32) -> io::Result<RawFd> {
-        self.dir.open_fd(self.d_name(), flags, 0)
+        self.dir.open_raw_fd(self.d_name(), flags, 0)
     }
 
     pub fn open_as_dir(&self) -> io::Result<Directory> {
@@ -353,8 +353,15 @@ impl Directory {
         unsafe { libc::rewinddir(self.dirp) }
     }
 
-    unsafe fn open_fd(&self, name: &CStr, flags: i32, mode: i32) -> io::Result<RawFd> {
+    unsafe fn open_raw_fd(&self, name: &CStr, flags: i32, mode: i32) -> io::Result<RawFd> {
         libc::openat(self.as_raw_fd(), name.as_ptr(), flags | O_CLOEXEC, mode).check_os_err()
+    }
+
+    pub fn open_fd(&self, name: &Utf8CStr, flags: i32, mode: i32) -> io::Result<OwnedFd> {
+        unsafe {
+            self.open_raw_fd(name.as_cstr(), flags, mode)
+                .map(|fd| OwnedFd::from_raw_fd(fd))
+        }
     }
 
     pub fn contains_path(&self, path: &CStr) -> bool {
@@ -417,7 +424,7 @@ impl Directory {
             } else if e.is_file() {
                 let mut src = e.open_as_file(O_RDONLY)?;
                 let mut dest = unsafe {
-                    File::from_raw_fd(dir.open_fd(
+                    File::from_raw_fd(dir.open_raw_fd(
                         e.d_name(),
                         O_WRONLY | O_CREAT | O_TRUNC,
                         0o777,
