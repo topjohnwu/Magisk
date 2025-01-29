@@ -269,7 +269,7 @@ static void inject_zygisk_libs(root_node *system) {
     }
 }
 
-static void load_modules(const rust::Vec<ModuleInfo> &module_list) {
+static void load_modules(bool zygisk_enabled, const rust::Vec<ModuleInfo> &module_list) {
     node_entry::module_mnt =  get_magisk_tmp() + "/"s MODULEMNT "/";
 
     auto root = make_unique<root_node>("");
@@ -392,7 +392,7 @@ static void foreach_module(Func fn) {
     }
 }
 
-static rust::Vec<ModuleInfo> collect_modules(bool open_zygisk) {
+static rust::Vec<ModuleInfo> collect_modules(bool zygisk_enabled, bool open_zygisk) {
     rust::Vec<ModuleInfo> modules;
     foreach_module([&](int dfd, dirent *entry, int modfd) {
         if (faccessat(modfd, "remove", F_OK, 0) == 0) {
@@ -475,11 +475,12 @@ static rust::Vec<ModuleInfo> collect_modules(bool open_zygisk) {
 }
 
 void MagiskD::handle_modules() const noexcept {
+    bool zygisk = zygisk_enabled();
     prepare_modules();
-    exec_module_scripts("post-fs-data", collect_modules(false));
+    exec_module_scripts("post-fs-data", collect_modules(zygisk, false));
     // Recollect modules (module scripts could remove itself)
-    auto list = collect_modules(true);
-    load_modules(list);
+    auto list = collect_modules(zygisk, true);
+    load_modules(zygisk, list);
     set_module_list(std::move(list));
 }
 

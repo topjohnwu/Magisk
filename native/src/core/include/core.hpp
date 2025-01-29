@@ -26,7 +26,6 @@ enum class RespondCode : int {
     END
 };
 
-extern bool zygisk_enabled;
 extern std::string native_bridge;
 
 void reset_zygisk(bool restore);

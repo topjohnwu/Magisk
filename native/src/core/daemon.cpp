@@ -142,13 +142,15 @@ static void handle_request_async(int client, int code, const sock_cred &cred) {
     case +RequestCode::SUPERUSER:
         su_daemon_handler(client, &cred);
         break;
-    case +RequestCode::ZYGOTE_RESTART:
+    case +RequestCode::ZYGOTE_RESTART: {
         LOGI("** zygote restarted\n");
-        MagiskD().prune_su_access();
+        auto &daemon = MagiskD();
+        daemon.prune_su_access();
         scan_deny_apps();
-        reset_zygisk(false);
+        daemon.zygisk_reset(false);
         close(client);
         break;
+    }
     case +RequestCode::SQLITE_CMD:
         MagiskD().db_exec(client);
         break;

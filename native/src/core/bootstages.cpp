@@ -13,8 +13,6 @@
 
 using namespace std;
 
-bool zygisk_enabled = false;
-
 /*********
  * Setup *
  *********/
@@ -175,10 +173,6 @@ bool MagiskD::post_fs_data() const noexcept {
     }
 
     exec_common_scripts("post-fs-data");
-    zygisk_enabled = get_db_setting(DbEntryKey::ZygiskConfig);
-    initialize_denylist();
-    setup_mounts();
-    handle_modules();
     return false;
 }
 
@@ -206,5 +200,5 @@ void MagiskD::boot_complete() const noexcept {
     // Ensure manager exists
     get_manager(0, nullptr, true);
 
-    reset_zygisk(true);
+    zygisk_reset(true);
 }

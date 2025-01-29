@@ -1,8 +1,9 @@
 use crate::consts::{MAGISK_FULL_VER, MAIN_CONFIG};
 use crate::db::Sqlite3;
-use crate::ffi::{get_magisk_tmp, ModuleInfo, RequestCode};
+use crate::ffi::{get_magisk_tmp, initialize_denylist, DbEntryKey, ModuleInfo, RequestCode};
 use crate::get_prop;
 use crate::logging::{magisk_logging, start_log_daemon};
+use crate::mount::setup_mounts;
 use crate::package::ManagerInfo;
 use base::libc::{O_CLOEXEC, O_RDONLY};
 use base::{
@@ -17,6 +18,7 @@ use std::io::{BufReader, ErrorKind, IoSlice, IoSliceMut, Read, Write};
 use std::mem::ManuallyDrop;
 use std::os::fd::{FromRawFd, IntoRawFd, OwnedFd, RawFd};
 use std::os::unix::net::{AncillaryData, SocketAncillary, UnixStream};
+use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 use std::sync::{Mutex, OnceLock};
 
 // Global magiskd singleton
@@ -64,6 +66,9 @@ pub struct MagiskD {
     pub manager_info: Mutex<ManagerInfo>,
     boot_stage_lock: Mutex<BootStateFlags>,
     pub module_list: OnceLock<Vec<ModuleInfo>>,
+    pub zygiskd_sockets: Mutex<(Option<UnixStream>, Option<UnixStream>)>,
+    pub zygisk_enabled: AtomicBool,
+    pub zygote_start_count: AtomicU32,
     sdk_int: i32,
     pub is_emulator: bool,
     is_recovery: bool,
@@ -72,6 +77,10 @@ pub struct MagiskD {
 impl MagiskD {
     pub fn is_recovery(&self) -> bool {
         self.is_recovery
+    }
+
+    pub fn zygisk_enabled(&self) -> bool {
+        self.zygisk_enabled.load(Ordering::Acquire)
     }
 
     pub fn sdk_int(&self) -> i32 {
@@ -139,6 +148,14 @@ impl MagiskD {
                 if check_data() && !state.contains(BootState::PostFsDataDone) {
                     if self.post_fs_data() {
                         state.set(BootState::SafeMode);
+                    } else {
+                        self.zygisk_enabled.store(
+                            self.get_db_setting(DbEntryKey::ZygiskConfig) != 0,
+                            Ordering::Release,
+                        );
+                        initialize_denylist();
+                        setup_mounts();
+                        self.handle_modules();
                     }
                     state.set(BootState::PostFsDataDone);
                 }
@@ -215,6 +232,7 @@ pub fn daemon_entry() {
         sdk_int,
         is_emulator,
         is_recovery,
+        zygote_start_count: AtomicU32::new(1),
         ..Default::default()
     };
     MAGISKD.set(magiskd).ok();
