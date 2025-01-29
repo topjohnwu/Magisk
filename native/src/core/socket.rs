@@ -32,7 +32,7 @@ impl<T: Read> IpcRead for T {
         let mut val: E = Zeroable::zeroed();
         for _ in 0..len {
             self.read_pod(&mut val)?;
-            vec.push(val.clone());
+            vec.push(val);
         }
         Ok(vec)
     }
@@ -91,21 +91,19 @@ impl UnixSocketExt for UnixStream {
         let mut ancillary = SocketAncillary::new(&mut buf);
         let iov = IoSliceMut::new(bytes_of_mut(&mut fd_count));
         self.recv_vectored_with_ancillary(&mut [iov], &mut ancillary)?;
-        for msg in ancillary.messages() {
-            if let Ok(msg) = msg {
-                if let AncillaryData::ScmRights(mut scm_rights) = msg {
-                    // We only want the first one
-                    let fd = if let Some(fd) = scm_rights.next() {
-                        unsafe { OwnedFd::from_raw_fd(fd) }
-                    } else {
-                        return Ok(None);
-                    };
-                    // Close all others
-                    for fd in scm_rights {
-                        unsafe { libc::close(fd) };
-                    }
-                    return Ok(Some(fd));
+        for msg in ancillary.messages().flatten() {
+            if let AncillaryData::ScmRights(mut scm_rights) = msg {
+                // We only want the first one
+                let fd = if let Some(fd) = scm_rights.next() {
+                    unsafe { OwnedFd::from_raw_fd(fd) }
+                } else {
+                    return Ok(None);
+                };
+                // Close all others
+                for fd in scm_rights {
+                    unsafe { libc::close(fd) };
                 }
+                return Ok(Some(fd));
             }
         }
         Ok(None)
@@ -119,13 +117,11 @@ impl UnixSocketExt for UnixStream {
         let iov = IoSliceMut::new(bytes_of_mut(&mut fd_count));
         self.recv_vectored_with_ancillary(&mut [iov], &mut ancillary)?;
         let mut fds: Vec<OwnedFd> = Vec::new();
-        for msg in ancillary.messages() {
-            if let Ok(msg) = msg {
-                if let AncillaryData::ScmRights(scm_rights) = msg {
-                    fds = scm_rights
-                        .map(|fd| unsafe { OwnedFd::from_raw_fd(fd) })
-                        .collect();
-                }
+        for msg in ancillary.messages().flatten() {
+            if let AncillaryData::ScmRights(scm_rights) = msg {
+                fds = scm_rights
+                    .map(|fd| unsafe { OwnedFd::from_raw_fd(fd) })
+                    .collect();
             }
         }
         if fd_count as usize != fds.len() {

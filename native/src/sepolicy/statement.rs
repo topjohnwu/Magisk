@@ -201,13 +201,10 @@ fn parse_xperms<'a>(tokens: &mut Tokens<'a>) -> ParseResult<'a, Vec<Xperm>> {
 }
 
 fn match_string<'a>(tokens: &mut Tokens<'a>, pattern: &str) -> ParseResult<'a, ()> {
-    match tokens.next() {
-        Some(Token::ID(s)) => {
-            if s == pattern {
-                return Ok(());
-            }
+    if let Some(Token::ID(s)) = tokens.next() {
+        if s == pattern {
+            return Ok(());
         }
-        _ => {}
     }
     Err(ParseError::General)
 }

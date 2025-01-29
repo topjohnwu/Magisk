@@ -70,5 +70,5 @@ pub mod ffi {
 
 #[inline(always)]
 pub(crate) fn check_env(env: &str) -> bool {
-    env::var(env).map_or(false, |var| var == "true")
+    env::var(env).is_ok_and(|var| var == "true")
 }
