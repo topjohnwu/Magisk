@@ -208,7 +208,7 @@ bool ZygiskContext::plt_hook_commit() {
 
 // -----------------------------------------------------------------
 
-int ZygiskContext::get_module_info(int uid, std::vector<int> &fds) {
+int ZygiskContext::get_module_info(int uid, rust::Vec<int> &fds) {
     if (int fd = zygisk_request(+ZygiskRequest::GetInfo); fd >= 0) {
         write_int(fd, uid);
         write_string(fd, process);
@@ -331,7 +331,7 @@ void ZygiskContext::fork_post() {
     sigmask(SIG_UNBLOCK, SIGCHLD);
 }
 
-void ZygiskContext::run_modules_pre(vector<int> &fds) {
+void ZygiskContext::run_modules_pre(rust::Vec<int> &fds) {
     for (int i = 0; i < fds.size(); ++i) {
         owned_fd fd = fds[i];
         struct stat s{};
@@ -386,7 +386,7 @@ void ZygiskContext::run_modules_post() {
 void ZygiskContext::app_specialize_pre() {
     flags |= APP_SPECIALIZE;
 
-    vector<int> module_fds;
+    rust::Vec<int> module_fds;
     owned_fd fd = get_module_info(args.app->uid, module_fds);
     if ((info_flags & UNMOUNT_MASK) == UNMOUNT_MASK) {
         ZLOGI("[%s] is on the denylist\n", process);
@@ -407,7 +407,7 @@ void ZygiskContext::app_specialize_post() {
 }
 
 void ZygiskContext::server_specialize_pre() {
-    vector<int> module_fds;
+    rust::Vec<int> module_fds;
     if (owned_fd fd = get_module_info(1000, module_fds); fd >= 0) {
         if (module_fds.empty()) {
             write_int(fd, 0);

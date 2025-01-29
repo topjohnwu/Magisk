@@ -29,7 +29,7 @@ static void zygiskd(int socket) {
     using comp_entry = void(*)(int);
     vector<comp_entry> modules;
     {
-        vector<int> module_fds = recv_fds(socket);
+        auto module_fds = recv_fds(socket);
         for (int fd : module_fds) {
             comp_entry entry = nullptr;
             struct stat s{};
