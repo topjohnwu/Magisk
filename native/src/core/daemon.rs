@@ -7,14 +7,15 @@ use crate::package::ManagerInfo;
 use base::libc::{O_CLOEXEC, O_RDONLY};
 use base::{
     cstr, info, libc, open_fd, warn, BufReadExt, Directory, FsPath, FsPathBuf, LoggedResult,
-    ReadExt, Utf8CStr, Utf8CStrBufArr, WriteExt,
+    ReadExt, ResultExt, Utf8CStr, Utf8CStrBufArr, WriteExt,
 };
 use bit_set::BitSet;
 use bytemuck::{bytes_of, bytes_of_mut, Pod, Zeroable};
 use std::fs::File;
 use std::io;
 use std::io::{BufReader, ErrorKind, IoSlice, IoSliceMut, Read, Write};
-use std::os::fd::{FromRawFd, OwnedFd, RawFd};
+use std::mem::ManuallyDrop;
+use std::os::fd::{FromRawFd, IntoRawFd, OwnedFd, RawFd};
 use std::os::unix::net::{AncillaryData, SocketAncillary, UnixStream};
 use std::sync::{Mutex, OnceLock};
 
@@ -385,4 +386,30 @@ impl UnixSocketExt for UnixStream {
         }
         Ok(fds)
     }
+}
+
+pub fn send_fd(socket: RawFd, fd: RawFd) -> bool {
+    let mut socket = ManuallyDrop::new(unsafe { UnixStream::from_raw_fd(socket) });
+    socket.send_fds(&[fd]).log().is_ok()
+}
+
+pub fn send_fds(socket: RawFd, fds: &[RawFd]) -> bool {
+    let mut socket = ManuallyDrop::new(unsafe { UnixStream::from_raw_fd(socket) });
+    socket.send_fds(fds).log().is_ok()
+}
+
+pub fn recv_fd(socket: RawFd) -> RawFd {
+    let mut socket = ManuallyDrop::new(unsafe { UnixStream::from_raw_fd(socket) });
+    socket
+        .recv_fd()
+        .log()
+        .unwrap_or(None)
+        .map_or(-1, IntoRawFd::into_raw_fd)
+}
+
+pub fn recv_fds(socket: RawFd) -> Vec<RawFd> {
+    let mut socket = ManuallyDrop::new(unsafe { UnixStream::from_raw_fd(socket) });
+    let fds = socket.recv_fds().log().unwrap_or(Vec::new());
+    // SAFETY: OwnedFd and RawFd has the same layout
+    unsafe { std::mem::transmute(fds) }
 }

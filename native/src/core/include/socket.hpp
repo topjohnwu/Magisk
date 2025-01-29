@@ -11,10 +11,6 @@ struct sock_cred : public ucred {
 };
 
 bool get_client_cred(int fd, sock_cred *cred);
-std::vector<int> recv_fds(int sockfd);
-int recv_fd(int sockfd);
-int send_fds(int sockfd, const int *fds, int cnt);
-int send_fd(int sockfd, int fd);
 int read_int(int fd);
 int read_int_be(int fd);
 void write_int(int fd, int val);

@@ -261,7 +261,7 @@ struct ZygiskContext {
     ZygiskContext(JNIEnv *env, void *args);
     ~ZygiskContext();
 
-    void run_modules_pre(std::vector<int> &fds);
+    void run_modules_pre(rust::Vec<int> &fds);
     void run_modules_post();
     DCL_PRE_POST(fork)
     DCL_PRE_POST(app_specialize)
@@ -270,7 +270,7 @@ struct ZygiskContext {
     DCL_PRE_POST(nativeSpecializeAppProcess)
     DCL_PRE_POST(nativeForkSystemServer)
 
-    int get_module_info(int uid, std::vector<int> &fds);
+    int get_module_info(int uid, rust::Vec<int> &fds);
     void sanitize_fds();
     bool exempt_fd(int fd);
     bool can_exempt_fd() const;

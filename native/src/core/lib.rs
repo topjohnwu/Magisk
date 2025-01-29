@@ -7,7 +7,7 @@
 #![allow(clippy::missing_safety_doc)]
 
 use base::Utf8CStr;
-use daemon::{daemon_entry, get_magiskd, MagiskD};
+use daemon::{daemon_entry, get_magiskd, recv_fd, recv_fds, send_fd, send_fds, MagiskD};
 use db::get_default_db_settings;
 use logging::{android_logging, setup_logfile, zygisk_close_logd, zygisk_get_logd, zygisk_logging};
 use mount::{clean_mounts, find_preinit_device, revert_unmount, setup_mounts};
@@ -195,6 +195,10 @@ pub mod ffi {
         unsafe fn persist_get_props(prop_cb: Pin<&mut PropCb>);
         unsafe fn persist_delete_prop(name: Utf8CStrRef) -> bool;
         unsafe fn persist_set_prop(name: Utf8CStrRef, value: Utf8CStrRef) -> bool;
+        fn send_fd(socket: i32, fd: i32) -> bool;
+        fn send_fds(socket: i32, fds: &[i32]) -> bool;
+        fn recv_fd(socket: i32) -> i32;
+        fn recv_fds(socket: i32) -> Vec<i32>;
 
         #[namespace = "rust"]
         fn daemon_entry();

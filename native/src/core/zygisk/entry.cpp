@@ -68,7 +68,7 @@ void MagiskD::connect_zygiskd(int client) const noexcept {
         }
         close(fds[1]);
         rust::Vec<int> module_fds = get_module_fds(is_64_bit);
-        send_fds(zygiskd_socket, module_fds.data(), module_fds.size());
+        send_fds(zygiskd_socket, rust::Slice<const int>(module_fds));
         // Wait for ack
         if (read_int(zygiskd_socket) != 0) {
             LOGE("zygiskd startup error\n");
