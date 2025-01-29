@@ -81,6 +81,8 @@ pub mod ffi {
         fn install_apk(apk: Utf8CStrRef);
         fn uninstall_pkg(apk: Utf8CStrRef);
         fn update_deny_flags(uid: i32, process: &str, flags: &mut u32);
+        fn initialize_denylist();
+        fn restore_zygisk_prop();
         fn switch_mnt_ns(pid: i32) -> i32;
     }
 
@@ -186,7 +188,6 @@ pub mod ffi {
         fn zygisk_close_logd();
         fn zygisk_get_logd() -> i32;
         fn setup_logfile();
-        fn setup_mounts();
         fn clean_mounts();
         fn find_preinit_device() -> String;
         fn revert_unmount(pid: i32);
@@ -209,15 +210,16 @@ pub mod ffi {
         type MagiskD;
         fn is_recovery(&self) -> bool;
         fn sdk_int(&self) -> i32;
+        fn zygisk_enabled(&self) -> bool;
         fn boot_stage_handler(&self, client: i32, code: i32);
         fn zygisk_handler(&self, client: i32);
+        fn zygisk_reset(&self, restore: bool);
         fn preserve_stub_apk(&self);
         fn prune_su_access(&self);
         #[cxx_name = "get_manager"]
         unsafe fn get_manager_for_cxx(&self, user: i32, ptr: *mut CxxString, install: bool) -> i32;
         fn set_module_list(&self, module_list: Vec<ModuleInfo>);
         fn module_list(&self) -> &Vec<ModuleInfo>;
-        fn get_module_fds(&self, is_64_bit: bool) -> Vec<i32>;
 
         #[cxx_name = "get_db_settings"]
         fn get_db_settings_for_cxx(&self, cfg: &mut DbSettings) -> bool;
@@ -240,11 +242,9 @@ pub mod ffi {
         #[allow(dead_code)]
         fn reboot(self: &MagiskD);
         fn post_fs_data(self: &MagiskD) -> bool;
+        fn handle_modules(self: &MagiskD);
         fn late_start(self: &MagiskD);
         fn boot_complete(self: &MagiskD);
-        #[allow(dead_code)]
-        fn handle_modules(self: &MagiskD);
-        fn connect_zygiskd(self: &MagiskD, client: i32);
     }
 }
 

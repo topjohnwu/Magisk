@@ -8,6 +8,7 @@ use num_traits::FromPrimitive;
 
 pub use cstr::*;
 use cxx_extern::*;
+pub use ffi::fork_dont_care;
 pub use files::*;
 pub use logging::*;
 pub use misc::*;
@@ -42,6 +43,7 @@ pub mod ffi {
         type Utf8CStrRef<'a> = &'a crate::cstr::Utf8CStr;
 
         fn mut_u8_patch(buf: &mut [u8], from: &[u8], to: &[u8]) -> Vec<usize>;
+        fn fork_dont_care() -> i32;
     }
 
     extern "Rust" {

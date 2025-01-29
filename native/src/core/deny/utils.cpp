@@ -370,7 +370,7 @@ int enable_deny() {
 
         denylist_enforced = true;
 
-        if (!zygisk_enabled) {
+        if (!MagiskD().zygisk_enabled()) {
             if (new_daemon_thread(&logcat)) {
                 denylist_enforced = false;
                 return DenyResponse::ERROR;
