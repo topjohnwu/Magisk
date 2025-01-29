@@ -17,7 +17,7 @@ using namespace std;
  * Setup *
  *********/
 
-static bool magisk_env() {
+bool setup_magisk_env() {
     char buf[4096];
 
     LOGI("* Initializing Magisk environment\n");
@@ -85,7 +85,7 @@ void unlock_blocks() {
 
 #define test_bit(bit, array) (array[bit / 8] & (1 << (bit % 8)))
 
-static bool check_key_combo() {
+bool check_key_combo() {
     uint8_t bitmask[(KEY_MAX + 1) / 8];
     vector<int> events;
     constexpr char name[] = "/dev/.ev";
@@ -128,77 +128,4 @@ static bool check_key_combo() {
     }
     LOGD("KEY_VOLUMEDOWN detected: enter safe mode\n");
     return true;
-}
-
-/***********************
- * Boot Stage Handlers *
- ***********************/
-
-bool MagiskD::post_fs_data() const noexcept {
-    setup_logfile();
-
-    LOGI("** post-fs-data mode running\n");
-
-    preserve_stub_apk();
-
-    if (access(SECURE_DIR, F_OK) != 0) {
-        if (SDK_INT < 24) {
-            xmkdir(SECURE_DIR, 0700);
-        } else {
-            LOGE(SECURE_DIR " is not present, abort\n");
-            return true;
-        }
-    }
-
-    prune_su_access();
-
-    if (!magisk_env()) {
-        LOGE("* Magisk environment incomplete, abort\n");
-        return true;
-    }
-
-    // Check safe mode
-    int bootloop_cnt = get_db_setting(DbEntryKey::BootloopCount);
-    // Increment the boot counter
-    set_db_setting(DbEntryKey::BootloopCount, bootloop_cnt + 1);
-    bool safe_mode = bootloop_cnt >= 2 || get_prop("persist.sys.safemode", true) == "1" ||
-           get_prop("ro.sys.safemode") == "1" || check_key_combo();
-
-    if (safe_mode) {
-        LOGI("* Safe mode triggered\n");
-        // Disable all modules and zygisk so next boot will be clean
-        disable_modules();
-        set_db_setting(DbEntryKey::ZygiskConfig, false);
-        return true;
-    }
-
-    exec_common_scripts("post-fs-data");
-    return false;
-}
-
-void MagiskD::late_start() const noexcept {
-    setup_logfile();
-
-    LOGI("** late_start service mode running\n");
-
-    exec_common_scripts("service");
-    exec_module_scripts("service", module_list());
-}
-
-void MagiskD::boot_complete() const noexcept {
-    setup_logfile();
-
-    LOGI("** boot-complete triggered\n");
-
-    // Reset the bootloop counter once we have boot-complete
-    set_db_setting(DbEntryKey::BootloopCount, 0);
-
-    // At this point it's safe to create the folder
-    if (access(SECURE_DIR, F_OK) != 0)
-        xmkdir(SECURE_DIR, 0700);
-
-    // Ensure manager exists
-    get_manager(0, nullptr, true);
-
-    zygisk_reset(true);
 }

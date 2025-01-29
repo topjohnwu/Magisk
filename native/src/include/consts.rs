@@ -13,7 +13,7 @@ pub const APP_PACKAGE_NAME: &str = "com.topjohnwu.magisk";
 pub const LOGFILE: &str = "/cache/magisk.log";
 
 // data paths
-const SECURE_DIR: &str = "/data/adb";
+pub const SECURE_DIR: &str = "/data/adb";
 pub const MODULEROOT: &str = concatcp!(SECURE_DIR, "/modules");
 
 // tmpfs paths
