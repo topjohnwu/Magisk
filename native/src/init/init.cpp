@@ -60,7 +60,7 @@ void restore_ramdisk_init() {
     }
 }
 
-MagiskInit::MagiskInit(char **argv) : argv(argv), config{} {
+void MagiskInit::init() noexcept {
     // Get kernel data using procfs and sysfs
     if (access("/proc/cmdline", F_OK) != 0) {
         xmkdir("/proc", 0755);
@@ -86,7 +86,7 @@ static void recovery() {
     rm_rf("/.backup");
 }
 
-void MagiskInit::legacy_system_as_root() {
+void MagiskInit::legacy_system_as_root() noexcept {
     LOGI("Legacy SAR Init\n");
     prepare_data();
     bool is_two_stage = mount_system_root();
@@ -96,7 +96,7 @@ void MagiskInit::legacy_system_as_root() {
         patch_ro_root();
 }
 
-void MagiskInit::rootfs() {
+void MagiskInit::rootfs() noexcept {
     LOGI("RootFS Init\n");
     prepare_data();
     LOGD("Restoring /init\n");
@@ -104,7 +104,7 @@ void MagiskInit::rootfs() {
     patch_rw_root();
 }
 
-void MagiskInit::start() {
+void MagiskInit::start() noexcept {
     if (argv[1] != nullptr && argv[1] == "selinux_setup"sv)
         second_stage();
     else if (config.skip_initramfs)
@@ -132,6 +132,5 @@ int main(int argc, char *argv[]) {
     if (getpid() != 1)
         return 1;
 
-    MagiskInit init(argv);
-    init.start();
+    rust::start_magisk_init(argv);
 }

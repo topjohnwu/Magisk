@@ -7,7 +7,7 @@
 
 using namespace std;
 
-void MagiskInit::patch_sepolicy(const char *in, const char *out) {
+void MagiskInit::patch_sepolicy(const char *in, const char *out) const noexcept {
     LOGD("Patching monolithic policy\n");
     auto sepol = SePolicy::from_file(in);
 
@@ -34,7 +34,7 @@ void MagiskInit::patch_sepolicy(const char *in, const char *out) {
 #define MOCK_LOAD      SELINUXMOCK "/load"
 #define MOCK_ENFORCE   SELINUXMOCK "/enforce"
 
-bool MagiskInit::hijack_sepolicy() {
+bool MagiskInit::hijack_sepolicy() noexcept {
     xmkdir(SELINUXMOCK, 0);
 
     if (access("/system/bin/init", F_OK) == 0) {
@@ -76,10 +76,12 @@ bool MagiskInit::hijack_sepolicy() {
 
         LOGD("Hijack [%s]\n", buf);
 
+        decltype(mount_list) new_mount_list;
         // Preserve sysfs and procfs for hijacking
-        mount_list.erase(std::remove_if(
-                mount_list.begin(), mount_list.end(),
-                [](const string &s) { return s == "/proc" || s == "/sys"; }), mount_list.end());
+        for (const auto &s: mount_list)
+            if (s != "/proc" && s != "/sys")
+                new_mount_list.emplace_back(s);
+        new_mount_list.swap(mount_list);
 
         mkfifo(MOCK_COMPAT, 0444);
         xmount(MOCK_COMPAT, buf, nullptr, MS_BIND, nullptr);

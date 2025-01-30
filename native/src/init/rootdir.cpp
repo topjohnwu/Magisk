@@ -257,17 +257,17 @@ static void extract_files(bool sbin) {
     }
 }
 
-void MagiskInit::parse_config_file() {
+void MagiskInit::parse_config_file() noexcept {
     parse_prop_file("/data/.backup/.magisk", [&](auto key, auto value) -> bool {
         if (key == "PREINITDEVICE") {
-            preinit_dev = value;
+            preinit_dev = std::string(value);
             return false;
         }
         return true;
     });
 }
 
-void MagiskInit::patch_ro_root() {
+void MagiskInit::patch_ro_root() noexcept {
     mount_list.emplace_back("/data");
     parse_config_file();
 
@@ -356,7 +356,7 @@ void MagiskInit::patch_ro_root() {
 #define PRE_TMPSRC "/magisk"
 #define PRE_TMPDIR PRE_TMPSRC "/tmp"
 
-void MagiskInit::patch_rw_root() {
+void MagiskInit::patch_rw_root() noexcept {
     mount_list.emplace_back("/data");
     parse_config_file();
 
