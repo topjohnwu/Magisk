@@ -158,18 +158,6 @@ void BootConfig::set(const kv_pairs &kv) noexcept {
     }
 }
 
-void BootConfig::print() const noexcept {
-    LOGD("skip_initramfs=[%d]\n", skip_initramfs);
-    LOGD("force_normal_boot=[%d]\n", force_normal_boot);
-    LOGD("rootwait=[%d]\n", rootwait);
-    LOGD("slot=[%s]\n", slot.data());
-    LOGD("dt_dir=[%s]\n", dt_dir.data());
-    LOGD("fstab_suffix=[%s]\n", fstab_suffix.data());
-    LOGD("hardware=[%s]\n", hardware.data());
-    LOGD("hardware.platform=[%s]\n", hardware_plat.data());
-    LOGD("emulator=[%d]\n", emulator);
-}
-
 #define read_dt(name, key)                                          \
 ssprintf(file_name, sizeof(file_name), "%s/" name, dt_dir.data());  \
 if (access(file_name, R_OK) == 0) {                                 \

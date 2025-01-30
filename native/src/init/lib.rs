@@ -18,9 +18,11 @@ use std::ptr::null as nullptr;
 mod logging;
 mod mount;
 mod rootdir;
+mod getinfo;
 
 #[cxx::bridge]
 pub mod ffi {
+    #[derive(Debug)]
     struct KeyValue {
         key: String,
         value: String,
@@ -57,6 +59,7 @@ pub mod ffi {
     }
 
     extern "Rust" {
+        fn print(self: &BootConfig);
         fn prepare_data(self: &MagiskInit);
         fn exec_init(self: &MagiskInit);
     }
@@ -68,7 +71,6 @@ pub mod ffi {
         #[cxx_name = "Utf8CStr"]
         type Utf8CStrRef<'a> = base::ffi::Utf8CStrRef<'a>;
         fn init(self: &mut BootConfig);
-        fn print(self: &BootConfig);
         type kv_pairs;
         fn set(self: &mut BootConfig, config: &kv_pairs);
 
