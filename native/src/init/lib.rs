@@ -55,9 +55,10 @@ pub mod ffi {
         fn reset_overlay_contexts();
         unsafe fn start_magisk_init(argv: *mut *mut c_char);
     }
-    
+
     extern "Rust" {
         fn prepare_data(self: &MagiskInit);
+        fn exec_init(self: &MagiskInit);
     }
 
     unsafe extern "C++" {
@@ -90,7 +91,6 @@ pub mod ffi {
         // SELinux
         unsafe fn patch_sepolicy(self: &MagiskInit, in_: *const c_char, out: *const c_char);
         fn hijack_sepolicy(self: &mut MagiskInit) -> bool;
-        fn exec_init(self: &MagiskInit);
         fn legacy_system_as_root(self: &mut MagiskInit);
         fn rootfs(self: &mut MagiskInit);
         fn start(self: &mut MagiskInit);

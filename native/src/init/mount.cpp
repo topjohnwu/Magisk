@@ -210,17 +210,6 @@ mount_root:
     return is_two_stage;
 }
 
-void MagiskInit::exec_init() const noexcept {
-    // Unmount in reverse order
-    for (auto i = mount_list.size(); i > 0; --i) {
-        auto &p = mount_list[i - 1];
-        if (xumount2(p.data(), MNT_DETACH) == 0)
-            LOGD("Unmount [%s]\n", p.data());
-    }
-    execve("/init", argv, environ);
-    exit(1);
-}
-
 void MagiskInit::setup_tmp(const char *path) const noexcept {
     LOGD("Setup Magisk tmp at %s\n", path);
     chdir("/data");

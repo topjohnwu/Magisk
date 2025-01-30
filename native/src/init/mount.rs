@@ -1,3 +1,4 @@
+use cxx::CxxString;
 use std::{
     collections::BTreeSet,
     ops::Bound::{Excluded, Unbounded},
@@ -5,14 +6,17 @@ use std::{
     ptr::null as nullptr,
 };
 
-use cxx::CxxString;
-
 use crate::ffi::MagiskInit;
 use base::{
-    cstr, debug,
-    libc::{chdir, chroot, mount, MS_MOVE},
-    parse_mount_info, raw_cstr, Directory, FsPath, LibcReturn, LoggedResult, StringExt, Utf8CStr,
+    cstr, debug, libc,
+    libc::{chdir, chroot, execve, exit, mount, umount2, MNT_DETACH, MS_MOVE},
+    parse_mount_info, raw_cstr, Directory, FsPath, LibcReturn, LoggedResult, ResultExt, StringExt,
+    Utf8CStr,
 };
+
+extern "C" {
+    static environ: *const *mut libc::c_char;
+}
 
 pub fn switch_root(path: &Utf8CStr) {
     let res: LoggedResult<()> = try {
@@ -93,5 +97,24 @@ impl MagiskInit {
             Ok(())
         }
         inner().ok();
+    }
+
+    pub(crate) fn exec_init(&self) {
+        unsafe {
+            for p in self.mount_list.iter().rev() {
+                if umount2(p.as_ptr().cast(), MNT_DETACH)
+                    .as_os_err()
+                    .log()
+                    .is_ok()
+                {
+                    debug!("Unmount [{}]", p);
+                }
+            }
+            execve(raw_cstr!("/init"), self.argv.cast(), environ.cast())
+                .as_os_err()
+                .log()
+                .ok();
+            exit(1);
+        }
     }
 }
