@@ -7,10 +7,11 @@ use std::{
 
 use cxx::CxxString;
 
+use crate::ffi::MagiskInit;
 use base::{
     cstr, debug,
     libc::{chdir, chroot, mount, MS_MOVE},
-    parse_mount_info, raw_cstr, Directory, LibcReturn, LoggedResult, StringExt, Utf8CStr,
+    parse_mount_info, raw_cstr, Directory, FsPath, LibcReturn, LoggedResult, StringExt, Utf8CStr,
 };
 
 pub fn switch_root(path: &Utf8CStr) {
@@ -67,4 +68,30 @@ pub fn is_device_mounted(dev: u64, target: Pin<&mut CxxString>) -> bool {
         }
     }
     false
+}
+
+impl MagiskInit {
+    pub(crate) fn prepare_data(&self) {
+        debug!("Setup data tmp");
+        fn inner() -> LoggedResult<()> {
+            FsPath::from(cstr!("/data")).mkdir(0o755)?;
+            unsafe {
+                mount(
+                    raw_cstr!("magisk"),
+                    raw_cstr!("/data"),
+                    raw_cstr!("tmpfs"),
+                    0,
+                    raw_cstr!("mode=755").cast(),
+                )
+            }
+            .as_os_err()?;
+
+            FsPath::from(cstr!("/init")).copy_to(FsPath::from(cstr!("/data/magiskinit")))?;
+            FsPath::from(cstr!("/.backup")).copy_to(FsPath::from(cstr!("/data/.backup")))?;
+            FsPath::from(cstr!("/overlay.d")).copy_to(FsPath::from(cstr!("/data/overlay.d")))?;
+
+            Ok(())
+        }
+        inner().ok();
+    }
 }

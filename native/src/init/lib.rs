@@ -55,6 +55,10 @@ pub mod ffi {
         fn reset_overlay_contexts();
         unsafe fn start_magisk_init(argv: *mut *mut c_char);
     }
+    
+    extern "Rust" {
+        fn prepare_data(self: &MagiskInit);
+    }
 
     unsafe extern "C++" {
         include!("../base/include/base.hpp");
@@ -70,7 +74,6 @@ pub mod ffi {
         unsafe fn setup_tmp(self: &MagiskInit, path: *const c_char);
         fn collect_devices(self: &MagiskInit);
         fn mount_preinit_dir(self: &MagiskInit);
-        fn prepare_data(self: &MagiskInit);
         unsafe fn find_block(self: &MagiskInit, partname: *const c_char) -> u64;
         fn mount_system_root(self: &mut MagiskInit) -> bool;
 

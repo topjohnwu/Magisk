@@ -221,16 +221,6 @@ void MagiskInit::exec_init() const noexcept {
     exit(1);
 }
 
-void MagiskInit::prepare_data() const noexcept {
-    LOGD("Setup data tmp\n");
-    xmkdir("/data", 0755);
-    xmount("magisk", "/data", "tmpfs", 0, "mode=755");
-
-    cp_afc("/init", REDIR_PATH);
-    cp_afc("/.backup", "/data/.backup");
-    cp_afc("/overlay.d", "/data/overlay.d");
-}
-
 void MagiskInit::setup_tmp(const char *path) const noexcept {
     LOGD("Setup Magisk tmp at %s\n", path);
     chdir("/data");
