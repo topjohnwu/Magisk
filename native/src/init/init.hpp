@@ -3,26 +3,6 @@
 
 #include "init-rs.hpp"
 
-using kv_pairs = std::vector<std::pair<std::string, std::string>>;
-
-struct BootConfig {
-    bool skip_initramfs;
-    bool force_normal_boot;
-    bool rootwait;
-    bool emulator;
-    char slot[3];
-    char dt_dir[64];
-    char fstab_suffix[32];
-    char hardware[32];
-    char hardware_plat[32];
-    kv_pairs partition_map;
-
-    void init();
-private:
-    void set(const kv_pairs &);
-    void print();
-};
-
 #define DEFAULT_DT_DIR "/proc/device-tree/firmware/android"
 #define INIT_PATH  "/system/bin/init"
 #define REDIR_PATH "/data/magiskinit"

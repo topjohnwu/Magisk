@@ -14,6 +14,23 @@ mod rootdir;
 
 #[cxx::bridge]
 pub mod ffi {
+    struct KeyValue {
+        key: String,
+        value: String,
+    }
+    struct BootConfig {
+        skip_initramfs: bool,
+        force_normal_boot: bool,
+        rootwait: bool,
+        emulator: bool,
+        slot: [c_char; 3],
+        dt_dir: [c_char; 64],
+        fstab_suffix: [c_char; 32],
+        hardware: [c_char; 32],
+        hardware_plat: [c_char; 32],
+        partition_map: Vec<KeyValue>,
+    }
+
     #[namespace = "rust"]
     extern "Rust" {
         fn setup_klog();
@@ -30,5 +47,9 @@ pub mod ffi {
         #[namespace = "rust"]
         #[cxx_name = "Utf8CStr"]
         type Utf8CStrRef<'a> = base::ffi::Utf8CStrRef<'a>;
+        fn init(self: &mut BootConfig);
+        fn print(self: &BootConfig);
+        type kv_pairs;
+        fn set(self: &mut BootConfig, config: &kv_pairs);
     }
 }

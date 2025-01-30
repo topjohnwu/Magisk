@@ -118,7 +118,7 @@ static bool check_key_combo() {
     return false;
 }
 
-void BootConfig::set(const kv_pairs &kv) {
+void BootConfig::set(const kv_pairs &kv) noexcept {
     for (const auto &[key, value] : kv) {
         if (key == "androidboot.slot_suffix") {
             // Many Amlogic devices are A-only but have slot_suffix...
@@ -126,10 +126,10 @@ void BootConfig::set(const kv_pairs &kv) {
                 LOGW("Skip invalid androidboot.slot_suffix=[normal]\n");
                 continue;
             }
-            strscpy(slot, value.data(), sizeof(slot));
+            strscpy(slot.data(), value.data(), slot.size());
         } else if (key == "androidboot.slot") {
             slot[0] = '_';
-            strscpy(slot + 1, value.data(), sizeof(slot) - 1);
+            strscpy(slot.data() + 1, value.data(), slot.size() - 1);
         } else if (key == "skip_initramfs") {
             skip_initramfs = true;
         } else if (key == "androidboot.force_normal_boot") {
@@ -137,13 +137,13 @@ void BootConfig::set(const kv_pairs &kv) {
         } else if (key == "rootwait") {
             rootwait = true;
         } else if (key == "androidboot.android_dt_dir") {
-            strscpy(dt_dir, value.data(), sizeof(dt_dir));
+            strscpy(dt_dir.data(), value.data(), dt_dir.size());
         } else if (key == "androidboot.hardware") {
-            strscpy(hardware, value.data(), sizeof(hardware));
+            strscpy(hardware.data(), value.data(), hardware.size());
         } else if (key == "androidboot.hardware.platform") {
-            strscpy(hardware_plat, value.data(), sizeof(hardware_plat));
+            strscpy(hardware_plat.data(), value.data(), hardware_plat.size());
         } else if (key == "androidboot.fstab_suffix") {
-            strscpy(fstab_suffix, value.data(), sizeof(fstab_suffix));
+            strscpy(fstab_suffix.data(), value.data(), fstab_suffix.size());
         } else if (key == "qemu") {
             emulator = true;
         } else if (key == "androidboot.partition_map") {
@@ -151,34 +151,36 @@ void BootConfig::set(const kv_pairs &kv) {
             // For example, "androidboot.partition_map=vdb,metadata;vdc,userdata" maps
             // "vdb" to "metadata", and "vdc" to "userdata".
             // https://android.googlesource.com/platform/system/core/+/refs/heads/android13-release/init/devices.cpp#191
-            partition_map = parse_partition_map(value);
+            for (const auto &[k, v]: parse_partition_map(value)) {
+                partition_map.emplace_back(k, v);
+            }
         }
     }
 }
 
-void BootConfig::print() {
+void BootConfig::print() const noexcept {
     LOGD("skip_initramfs=[%d]\n", skip_initramfs);
     LOGD("force_normal_boot=[%d]\n", force_normal_boot);
     LOGD("rootwait=[%d]\n", rootwait);
-    LOGD("slot=[%s]\n", slot);
-    LOGD("dt_dir=[%s]\n", dt_dir);
-    LOGD("fstab_suffix=[%s]\n", fstab_suffix);
-    LOGD("hardware=[%s]\n", hardware);
-    LOGD("hardware.platform=[%s]\n", hardware_plat);
+    LOGD("slot=[%s]\n", slot.data());
+    LOGD("dt_dir=[%s]\n", dt_dir.data());
+    LOGD("fstab_suffix=[%s]\n", fstab_suffix.data());
+    LOGD("hardware=[%s]\n", hardware.data());
+    LOGD("hardware.platform=[%s]\n", hardware_plat.data());
     LOGD("emulator=[%d]\n", emulator);
 }
 
 #define read_dt(name, key)                                          \
-ssprintf(file_name, sizeof(file_name), "%s/" name, dt_dir);         \
+ssprintf(file_name, sizeof(file_name), "%s/" name, dt_dir.data());  \
 if (access(file_name, R_OK) == 0) {                                 \
     string data = full_read(file_name);                             \
     if (!data.empty()) {                                            \
         data.pop_back();                                            \
-        strscpy(key, data.data(), sizeof(key));                     \
+        strscpy(key.data(), data.data(), key.size());               \
     }                                                               \
 }
 
-void BootConfig::init() {
+void BootConfig::init() noexcept {
     set(parse_cmdline(full_read("/proc/cmdline")));
     set(parse_bootconfig(full_read("/proc/bootconfig")));
 
@@ -191,7 +193,7 @@ void BootConfig::init() {
     });
 
     if (dt_dir[0] == '\0')
-        strscpy(dt_dir, DEFAULT_DT_DIR, sizeof(dt_dir));
+        strscpy(dt_dir.data(), DEFAULT_DT_DIR, dt_dir.size());
 
     char file_name[128];
     read_dt("fstab_suffix", fstab_suffix)
