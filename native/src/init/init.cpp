@@ -60,26 +60,6 @@ void restore_ramdisk_init() {
     }
 }
 
-void MagiskInit::init() noexcept {
-    // Get kernel data using procfs and sysfs
-    if (access("/proc/cmdline", F_OK) != 0) {
-        xmkdir("/proc", 0755);
-        xmount("proc", "/proc", "proc", 0, nullptr);
-        mount_list.emplace_back("/proc");
-    }
-    if (access("/sys/block", F_OK) != 0) {
-        xmkdir("/sys", 0755);
-        xmount("sysfs", "/sys", "sysfs", 0, nullptr);
-        mount_list.emplace_back("/sys");
-    }
-
-    // Log to kernel
-    rust::setup_klog();
-
-    // Load kernel configs
-    config.init();
-}
-
 static void recovery() {
     LOGI("Ramdisk is recovery, abort\n");
     restore_ramdisk_init();

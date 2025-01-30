@@ -2,12 +2,18 @@
 #![feature(once_cell_try)]
 #![feature(try_blocks)]
 
+use base::{
+    cstr,
+    libc::{mount},
+    raw_cstr, FsPath, LibcReturn, LoggedResult,
+};
 use logging::setup_klog;
 use mount::{is_device_mounted, switch_root};
 use rootdir::{collect_overlay_contexts, inject_magisk_rc, reset_overlay_contexts};
 // Has to be pub so all symbols in that crate is included
-pub use magiskpolicy;
 use crate::ffi::{BootConfig, MagiskInit};
+pub use magiskpolicy;
+use std::ptr::null as nullptr;
 
 mod logging;
 mod mount;
@@ -85,28 +91,64 @@ pub mod ffi {
         fn legacy_system_as_root(self: &mut MagiskInit);
         fn rootfs(self: &mut MagiskInit);
         fn start(self: &mut MagiskInit);
-        fn init(self: &mut MagiskInit);
     }
 }
 
 pub(crate) fn start_magisk_init(argv: *mut *mut std::ffi::c_char) {
-    let mut init = MagiskInit {
-        preinit_dev: String::new(),
-        mount_list: Vec::new(),
-        argv,
-        config: BootConfig {
-            skip_initramfs: false,
-            force_normal_boot: false,
-            rootwait: false,
-            emulator: false,
-            slot: [0; 3],
-            dt_dir: [0; 64],
-            fstab_suffix: [0; 32],
-            hardware: [0; 32],
-            hardware_plat: [0; 32],
-            partition_map: Vec::new(),
-        },
-    };
-    init.init();
-    init.start();
+    fn inner(argv: *mut *mut std::ffi::c_char) -> LoggedResult<()> {
+        let mut init = MagiskInit {
+            preinit_dev: String::new(),
+            mount_list: Vec::new(),
+            argv,
+            config: BootConfig {
+                skip_initramfs: false,
+                force_normal_boot: false,
+                rootwait: false,
+                emulator: false,
+                slot: [0; 3],
+                dt_dir: [0; 64],
+                fstab_suffix: [0; 32],
+                hardware: [0; 32],
+                hardware_plat: [0; 32],
+                partition_map: Vec::new(),
+            },
+        };
+        if !FsPath::from(cstr!("/proc/cmdline")).exists() {
+            FsPath::from(cstr!("/proc")).mkdir(0o755)?;
+            unsafe {
+                mount(
+                    raw_cstr!("proc"),
+                    raw_cstr!("/proc"),
+                    raw_cstr!("proc"),
+                    0,
+                    nullptr(),
+                )
+            }
+            .as_os_err()?;
+            init.mount_list.push("/proc".to_string());
+        }
+        if !FsPath::from(cstr!("/sys/block")).exists() {
+            FsPath::from(cstr!("/sys")).mkdir(0o755)?;
+            unsafe {
+                mount(
+                    raw_cstr!("sysfs"),
+                    raw_cstr!("/sys"),
+                    raw_cstr!("sysfs"),
+                    0,
+                    nullptr(),
+                )
+            }
+            .as_os_err()?;
+            init.mount_list.push("/sys".to_string());
+        }
+
+        setup_klog();
+
+        init.config.init();
+
+        init.start();
+        Ok(())
+    }
+
+    inner(argv).ok();
 }
