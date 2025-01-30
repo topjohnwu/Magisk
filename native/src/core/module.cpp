@@ -408,7 +408,7 @@ static rust::Vec<ModuleInfo> collect_modules(bool zygisk_enabled, bool open_zygi
         if (faccessat(modfd, "disable", F_OK, 0) == 0)
             return;
 
-        ModuleInfo info{};
+        ModuleInfo info{{}, -1, -1};
         if (zygisk_enabled) {
             // Riru and its modules are not compatible with zygisk
             if (entry->d_name == "riru-core"sv || faccessat(modfd, "riru", F_OK, 0) == 0) {
