@@ -8,7 +8,7 @@
 
 using namespace std;
 
-void MagiskInit::first_stage() {
+void MagiskInit::first_stage() const noexcept {
     LOGI("First Stage Init\n");
     prepare_data();
 
@@ -45,7 +45,7 @@ void MagiskInit::first_stage() {
     }
 }
 
-void MagiskInit::redirect_second_stage() {
+void MagiskInit::redirect_second_stage() const noexcept {
     // Patch init binary
     int src = xopen("/init", O_RDONLY);
     int dest = xopen("/data/init", O_CREAT | O_WRONLY, 0);
@@ -62,7 +62,7 @@ void MagiskInit::redirect_second_stage() {
     xmount("/data/init", "/init", nullptr, MS_BIND, nullptr);
 }
 
-void MagiskInit::second_stage() {
+void MagiskInit::second_stage() noexcept {
     LOGI("Second Stage Init\n");
     umount2("/init", MNT_DETACH);
     umount2(INIT_PATH, MNT_DETACH); // just in case
