@@ -60,10 +60,10 @@ void MagiskInit::collect_devices() {
                 strscpy(dev.dmname, name.data(), sizeof(dev.dmname));
             }
             if (auto it = std::ranges::find_if(config.partition_map, [&](const auto &i) {
-                return i.first == dev.devname;
+                return i.key == dev.devname;
             }); dev.partname[0] == '\0' && it != config.partition_map.end()) {
                 // use androidboot.partition_map as partname fallback.
-                strscpy(dev.partname, it->second.data(), sizeof(dev.partname));
+                strscpy(dev.partname, it->value.data(), sizeof(dev.partname));
             }
             sprintf(path, "/sys/dev/block/%s", entry->d_name);
             xrealpath(path, dev.devpath, sizeof(dev.devpath));
@@ -163,7 +163,7 @@ bool MagiskInit::mount_system_root() {
 
         // Try normal partname
         char sys_part[32];
-        sprintf(sys_part, "system%s", config.slot);
+        sprintf(sys_part, "system%s", config.slot.data());
         dev = find_block(sys_part);
         if (dev > 0)
             goto mount_root;

@@ -8,3 +8,4 @@
 
 using rust::xpipe2;
 using rust::fd_path;
+using kv_pairs = std::vector<std::pair<std::string, std::string>>;
