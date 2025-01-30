@@ -63,7 +63,6 @@ LOCAL_STATIC_LIBRARIES := \
     libinit-rs
 
 LOCAL_SRC_FILES := \
-    init/init.cpp \
     init/mount.cpp \
     init/rootdir.cpp \
     init/getinfo.cpp \

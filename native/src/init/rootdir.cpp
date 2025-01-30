@@ -6,6 +6,7 @@
 #include <consts.hpp>
 #include <base.hpp>
 #include <flags.h>
+#include <xz.h>
 
 #include "init.hpp"
 
@@ -16,6 +17,31 @@ static string magic_mount_list;
 
 #define NEW_INITRC_DIR  "/system/etc/init/hw"
 #define INIT_RC         "init.rc"
+
+static bool unxz(out_stream &strm, rust::Slice<const uint8_t> bytes) {
+    uint8_t out[8192];
+    xz_crc32_init();
+    size_t size = bytes.size();
+    struct xz_dec *dec = xz_dec_init(XZ_DYNALLOC, 1 << 26);
+    run_finally finally([&] { xz_dec_end(dec); });
+    struct xz_buf b = {
+        .in = bytes.data(),
+        .in_pos = 0,
+        .in_size = size,
+        .out = out,
+        .out_pos = 0,
+        .out_size = sizeof(out)
+    };
+    enum xz_ret ret;
+    do {
+        ret = xz_dec_run(dec, &b);
+        if (ret != XZ_OK && ret != XZ_STREAM_END)
+            return false;
+        strm.write(out, b.out_pos);
+        b.out_pos = 0;
+    } while (b.in_pos != size);
+    return true;
+}
 
 static void magic_mount(const string &sdir, const string &ddir = "") {
     auto dir = xopen_dir(sdir.data());
@@ -426,3 +452,28 @@ int magisk_proxy_main(int argc, char *argv[]) {
     execve("/sbin/magisk", argv, environ);
     return 1;
 }
+
+static void unxz_init(const char *init_xz, const char *init) {
+    LOGD("unxz %s -> %s\n", init_xz, init);
+    int fd = xopen(init, O_WRONLY | O_CREAT, 0777);
+    fd_stream ch(fd);
+    unxz(ch, mmap_data{init_xz});
+    close(fd);
+    clone_attr(init_xz, init);
+    unlink(init_xz);
+}
+
+const char *MagiskInit::backup_init() const noexcept {
+    if (access("/.backup/init.xz", F_OK) == 0)
+        unxz_init("/.backup/init.xz", "/.backup/init");
+    return "/.backup/init";
+}
+
+#ifdef USE_CRT0
+__BEGIN_DECLS
+int tiny_vfprintf(FILE *stream, const char *format, va_list arg);
+int vfprintf(FILE *stream, const char *format, va_list arg) {
+    return tiny_vfprintf(stream, format, arg);
+}
+__END_DECLS
+#endif

@@ -192,7 +192,7 @@ void BootConfig::init() noexcept {
     print();
 }
 
-bool check_two_stage() {
+bool MagiskInit::check_two_stage() const noexcept {
     if (access("/first_stage_ramdisk", F_OK) == 0)
         return true;
     if (access("/second_stage_resources", F_OK) == 0)
@@ -205,20 +205,4 @@ bool check_two_stage() {
     // If we still have no indication, parse the original init and see what's up
     mmap_data init(backup_init());
     return init.contains("selinux_setup");
-}
-
-static void unxz_init(const char *init_xz, const char *init) {
-    LOGD("unxz %s -> %s\n", init_xz, init);
-    int fd = xopen(init, O_WRONLY | O_CREAT, 0777);
-    fd_stream ch(fd);
-    unxz(ch, mmap_data{init_xz});
-    close(fd);
-    clone_attr(init_xz, init);
-    unlink(init_xz);
-}
-
-const char *backup_init() {
-    if (access("/.backup/init.xz", F_OK) == 0)
-        unxz_init("/.backup/init.xz", "/.backup/init");
-    return "/.backup/init";
 }
