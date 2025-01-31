@@ -84,9 +84,6 @@ pub mod ffi {
         fn patch_rw_root(self: &mut MagiskInit);
         fn patch_ro_root(self: &mut MagiskInit);
 
-        // Two stage init
-        fn redirect_second_stage(self: &MagiskInit);
-
         // SELinux
         unsafe fn patch_sepolicy(self: &MagiskInit, in_: *const c_char, out: *const c_char);
         fn hijack_sepolicy(self: &mut MagiskInit) -> bool;
