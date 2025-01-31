@@ -79,9 +79,9 @@ bool ZygiskModule::valid() const {
 int ZygiskModule::connectCompanion() const {
     if (int fd = zygisk_request(+ZygiskRequest::ConnectCompanion); fd >= 0) {
 #ifdef __LP64__
-        write_int(fd, 1);
+        write_any<bool>(fd, true);
 #else
-        write_int(fd, 0);
+        write_any<bool>(fd, false);
 #endif
         write_int(fd, id);
         return fd;
@@ -213,9 +213,9 @@ int ZygiskContext::get_module_info(int uid, rust::Vec<int> &fds) {
         write_int(fd, uid);
         write_string(fd, process);
 #ifdef __LP64__
-        write_int(fd, 1);
+        write_any<bool>(fd, true);
 #else
-        write_int(fd, 0);
+        write_any<bool>(fd, false);
 #endif
         xxread(fd, &info_flags, sizeof(info_flags));
         if (zygisk_should_load_module(info_flags)) {

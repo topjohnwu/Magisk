@@ -282,7 +282,7 @@ impl MagiskD {
     fn db_exec_for_client(&self, fd: OwnedFd) -> LoggedResult<()> {
         let mut file = File::from(fd);
         let mut reader = BufReader::new(&mut file);
-        let sql = reader.ipc_read_string()?;
+        let sql: String = reader.read_decodable()?;
         let mut writer = BufWriter::new(&mut file);
         let mut output_fn = |columns: &[String], values: &DbValues| {
             let mut out = "".to_string();
@@ -294,10 +294,10 @@ impl MagiskD {
                 out.push('=');
                 out.push_str(values.get_text(i as i32));
             }
-            writer.ipc_write_string(&out).log().ok();
+            writer.write_encodable(&out).log().ok();
         };
         self.db_exec_with_rows(&sql, &[], &mut output_fn);
-        writer.ipc_write_string("").log()
+        writer.write_encodable("").log()
     }
 }
 

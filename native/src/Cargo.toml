@@ -1,6 +1,6 @@
 [workspace]
 exclude = ["external"]
-members = ["base", "boot", "core", "init", "sepolicy"]
+members = ["base", "boot", "core", "core/derive", "init", "sepolicy"]
 resolver = "2"
 
 [workspace.dependencies]
@@ -26,6 +26,9 @@ bytemuck = "1.16"
 fdt = "0.1"
 const_format = "0.2"
 bit-set = "0.8"
+syn = "2"
+quote = "1"
+proc-macro2 = "1"
 
 [workspace.dependencies.argh]
 git = "https://github.com/google/argh.git"

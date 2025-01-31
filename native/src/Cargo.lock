@@ -301,6 +301,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "derive"
+version = "0.0.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "digest"
 version = "0.11.0-pre.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -461,6 +470,7 @@ dependencies = [
  "bytemuck",
  "cxx",
  "cxx-gen",
+ "derive",
  "num-derive",
  "num-traits",
  "pb-rs",

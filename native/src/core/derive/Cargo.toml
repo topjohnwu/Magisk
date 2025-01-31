@@ -1,0 +1,13 @@
+[package]
+name = "derive"
+version = "0.0.0"
+edition = "2021"
+
+[lib]
+path = "lib.rs"
+proc-macro = true
+
+[dependencies]
+syn = { workspace = true }
+quote = { workspace = true }
+proc-macro2 = { workspace = true }

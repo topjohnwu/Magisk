@@ -1,56 +1,140 @@
 use base::{libc, warn, ReadExt, ResultExt, WriteExt};
-use bytemuck::{bytes_of, bytes_of_mut, Pod, Zeroable};
+use bytemuck::{bytes_of, bytes_of_mut, Zeroable};
 use std::io;
 use std::io::{ErrorKind, IoSlice, IoSliceMut, Read, Write};
 use std::mem::ManuallyDrop;
 use std::os::fd::{FromRawFd, IntoRawFd, OwnedFd, RawFd};
 use std::os::unix::net::{AncillaryData, SocketAncillary, UnixStream};
 
+pub trait Encodable {
+    fn encoded_len(&self) -> usize;
+    fn encode(&self, w: &mut impl Write) -> io::Result<()>;
+}
+
+pub trait Decodable: Sized + Encodable {
+    fn decode(r: &mut impl Read) -> io::Result<Self>;
+}
+
+macro_rules! impl_pod_encodable {
+    ($($t:ty)*) => ($(
+        impl Encodable for $t {
+            #[inline(always)]
+            fn encoded_len(&self) -> usize {
+                size_of::<Self>()
+            }
+
+            #[inline(always)]
+            fn encode(&self, w: &mut impl Write) -> io::Result<()> {
+                w.write_pod(self)
+            }
+        }
+        impl Decodable for $t {
+            #[inline(always)]
+            fn decode(r: &mut impl Read) -> io::Result<Self> {
+                let mut val = Self::zeroed();
+                r.read_pod(&mut val)?;
+                Ok(val)
+            }
+        }
+    )*)
+}
+
+impl_pod_encodable! { u8 i32 usize }
+
+impl Encodable for bool {
+    #[inline(always)]
+    fn encoded_len(&self) -> usize {
+        size_of::<u8>()
+    }
+
+    #[inline(always)]
+    fn encode(&self, w: &mut impl Write) -> io::Result<()> {
+        match *self {
+            true => 1u8.encode(w),
+            false => 0u8.encode(w),
+        }
+    }
+}
+
+impl Decodable for bool {
+    #[inline(always)]
+    fn decode(r: &mut impl Read) -> io::Result<Self> {
+        Ok(u8::decode(r)? != 0)
+    }
+}
+
+impl<T: Decodable> Encodable for Vec<T> {
+    fn encoded_len(&self) -> usize {
+        size_of::<usize>() + size_of::<T>() * self.len()
+    }
+
+    fn encode(&self, w: &mut impl Write) -> io::Result<()> {
+        self.len().encode(w)?;
+        self.iter().try_for_each(|e| e.encode(w))
+    }
+}
+
+impl<T: Decodable> Decodable for Vec<T> {
+    fn decode(r: &mut impl Read) -> io::Result<Self> {
+        let len = usize::decode(r)?;
+        let mut val = Vec::with_capacity(len);
+        for _ in 0..len {
+            val.push(T::decode(r)?);
+        }
+        Ok(val)
+    }
+}
+
+impl Encodable for str {
+    fn encoded_len(&self) -> usize {
+        size_of::<usize>() + self.as_bytes().len()
+    }
+
+    fn encode(&self, w: &mut impl Write) -> io::Result<()> {
+        self.as_bytes().len().encode(w)?;
+        w.write_all(self.as_bytes())
+    }
+}
+
+impl Encodable for String {
+    fn encoded_len(&self) -> usize {
+        self.as_str().encoded_len()
+    }
+
+    fn encode(&self, w: &mut impl Write) -> io::Result<()> {
+        self.as_str().encode(w)
+    }
+}
+
+impl Decodable for String {
+    fn decode(r: &mut impl Read) -> io::Result<String> {
+        let len = usize::decode(r)?;
+        let mut val = String::with_capacity(len);
+        let mut r = r.take(len as u64);
+        r.read_to_string(&mut val)?;
+        Ok(val)
+    }
+}
+
 pub trait IpcRead {
-    fn ipc_read_int(&mut self) -> io::Result<i32>;
-    fn ipc_read_string(&mut self) -> io::Result<String>;
-    fn ipc_read_vec<E: Pod>(&mut self) -> io::Result<Vec<E>>;
+    fn read_decodable<E: Decodable>(&mut self) -> io::Result<E>;
 }
 
 impl<T: Read> IpcRead for T {
-    fn ipc_read_int(&mut self) -> io::Result<i32> {
-        let mut val: i32 = 0;
-        self.read_pod(&mut val)?;
-        Ok(val)
-    }
-
-    fn ipc_read_string(&mut self) -> io::Result<String> {
-        let len = self.ipc_read_int()?;
-        let mut val = "".to_string();
-        self.take(len as u64).read_to_string(&mut val)?;
-        Ok(val)
-    }
-
-    fn ipc_read_vec<E: Pod>(&mut self) -> io::Result<Vec<E>> {
-        let len = self.ipc_read_int()? as usize;
-        let mut vec = Vec::new();
-        let mut val: E = Zeroable::zeroed();
-        for _ in 0..len {
-            self.read_pod(&mut val)?;
-            vec.push(val);
-        }
-        Ok(vec)
+    #[inline(always)]
+    fn read_decodable<E: Decodable>(&mut self) -> io::Result<E> {
+        E::decode(self)
     }
 }
 
 pub trait IpcWrite {
-    fn ipc_write_int(&mut self, val: i32) -> io::Result<()>;
-    fn ipc_write_string(&mut self, val: &str) -> io::Result<()>;
+    fn write_encodable<E: Encodable + ?Sized>(&mut self, val: &E) -> io::Result<()>;
 }
 
 impl<T: Write> IpcWrite for T {
-    fn ipc_write_int(&mut self, val: i32) -> io::Result<()> {
-        self.write_pod(&val)
-    }
-
-    fn ipc_write_string(&mut self, val: &str) -> io::Result<()> {
-        self.ipc_write_int(val.len() as i32)?;
-        self.write_all(val.as_bytes())
+    #[inline(always)]
+    fn write_encodable<E: Encodable + ?Sized>(&mut self, val: &E) -> io::Result<()> {
+        val.encode(self)
     }
 }
 
@@ -63,7 +147,7 @@ pub trait UnixSocketExt {
 impl UnixSocketExt for UnixStream {
     fn send_fds(&mut self, fds: &[RawFd]) -> io::Result<()> {
         match fds.len() {
-            0 => self.ipc_write_int(-1)?,
+            0 => self.write_encodable(&-1)?,
             len => {
                 // 4k buffer is reasonable enough
                 let mut buf = [0u8; 4096];
