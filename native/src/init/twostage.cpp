@@ -61,25 +61,3 @@ void MagiskInit::redirect_second_stage() const noexcept {
     }
     xmount("/data/init", "/init", nullptr, MS_BIND, nullptr);
 }
-
-void MagiskInit::second_stage() noexcept {
-    LOGI("Second Stage Init\n");
-    umount2("/init", MNT_DETACH);
-    umount2(INIT_PATH, MNT_DETACH); // just in case
-    unlink("/data/init");
-
-    // Make sure init dmesg logs won't get messed up
-    argv[0] = (char *) INIT_PATH;
-
-    // Some weird devices like meizu, uses 2SI but still have legacy rootfs
-    struct statfs sfs{};
-    statfs("/", &sfs);
-    if (sfs.f_type == RAMFS_MAGIC || sfs.f_type == TMPFS_MAGIC) {
-        // We are still on rootfs, so make sure we will execute the init of the 2nd stage
-        unlink("/init");
-        xsymlink(INIT_PATH, "/init");
-        patch_rw_root();
-    } else {
-        patch_ro_root();
-    }
-}
