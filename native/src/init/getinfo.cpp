@@ -191,18 +191,3 @@ void BootConfig::init() noexcept {
     LOGD("Device config:\n");
     print();
 }
-
-bool MagiskInit::check_two_stage() const noexcept {
-    if (access("/first_stage_ramdisk", F_OK) == 0)
-        return true;
-    if (access("/second_stage_resources", F_OK) == 0)
-        return true;
-    if (access("/system/bin/init", F_OK) == 0)
-        return true;
-    // Use the apex folder to determine whether 2SI (Android 10+)
-    if (access("/apex", F_OK) == 0)
-        return true;
-    // If we still have no indication, parse the original init and see what's up
-    mmap_data init(backup_init());
-    return init.contains("selinux_setup");
-}
