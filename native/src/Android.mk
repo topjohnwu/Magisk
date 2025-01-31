@@ -73,6 +73,7 @@ LOCAL_LDFLAGS := -static
 
 ifdef B_CRT0
 LOCAL_STATIC_LIBRARIES += crt0
+LOCAL_LDFLAGS += -Wl,--defsym=vfprintf=tiny_vfprintf
 endif
 
 include $(BUILD_EXECUTABLE)

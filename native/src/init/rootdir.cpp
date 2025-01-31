@@ -468,12 +468,3 @@ const char *MagiskInit::backup_init() const noexcept {
         unxz_init("/.backup/init.xz", "/.backup/init");
     return "/.backup/init";
 }
-
-#ifdef USE_CRT0
-__BEGIN_DECLS
-int tiny_vfprintf(FILE *stream, const char *format, va_list arg);
-int vfprintf(FILE *stream, const char *format, va_list arg) {
-    return tiny_vfprintf(stream, format, arg);
-}
-__END_DECLS
-#endif
