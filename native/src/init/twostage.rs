@@ -1,14 +1,15 @@
 use crate::ffi::MagiskInit;
-use base::libc::{mount, MS_BIND};
+use base::libc::{mount, MS_BIND, O_WRONLY};
 use base::{
-    cstr, debug, info,
+    clone_attr, cstr, debug, error, info,
     libc::{
         fstatat, stat, statfs, umount2, AT_SYMLINK_NOFOLLOW, MNT_DETACH, O_CLOEXEC, O_CREAT,
         O_RDONLY, TMPFS_MAGIC,
     },
-    raw_cstr, FsPath, MappedFile, MutBytesExt, ResultExt,
+    raw_cstr, FsPath, LibcReturn, MappedFile, MutBytesExt, ResultExt,
 };
 use std::ffi::c_long;
+use std::io::Write;
 use std::ptr::null;
 
 impl MagiskInit {
@@ -17,7 +18,7 @@ impl MagiskInit {
         self.prepare_data();
 
         if unsafe {
-            let mut st: stat = unsafe { std::mem::zeroed() };
+            let mut st: stat = std::mem::zeroed();
             fstatat(
                 -1,
                 raw_cstr!("/sdcard"),
@@ -104,8 +105,37 @@ impl MagiskInit {
                     debug!("Patch @ {:#010X} [{}] -> [{}]", off, from, to);
                 }
             } else {
-                debug!("Failed to open /init for hexpatch");
+                error!("Failed to open /init for hexpatch");
             }
+        }
+    }
+
+    pub(crate) fn redirect_second_stage(&self) {
+        let src = FsPath::from(cstr!("/init"));
+        let dest = FsPath::from(cstr!("/data/init"));
+        // Patch init binary
+        if let Ok(mut map) = MappedFile::open(src) {
+            let from = "/system/bin/init";
+            let to = "/data/magiskinit";
+
+            // Redirect original init to magiskinit
+            let v = map.patch(from.as_bytes(), to.as_bytes());
+            for off in &v {
+                debug!("Patch @ {:#010X} [{}] -> [{}]", off, from, to);
+            }
+            if let Ok(mut dest) = dest.create(O_CREAT | O_WRONLY, 0) {
+                dest.write_all(map.as_ref()).log().ok();
+            } else {
+                error!("Failed to create {}", dest);
+            }
+        } else {
+            error!("Failed to open {} for hexpatch", src);
+        }
+        clone_attr(src, dest).log().ok();
+        unsafe {
+            mount(dest.as_ptr(), src.as_ptr(), null(), MS_BIND, null())
+                .as_os_err()
+                .ok();
         }
     }
 
