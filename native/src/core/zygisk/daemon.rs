@@ -59,7 +59,7 @@ impl MagiskD {
         let mut client = unsafe { UnixStream::from_raw_fd(client) };
         let _: LoggedResult<()> = try {
             let code = ZygiskRequest {
-                repr: client.ipc_read_int()?,
+                repr: client.read_decodable()?,
             };
             match code {
                 ZygiskRequest::GetInfo => self.get_process_info(client)?,
@@ -102,7 +102,7 @@ impl MagiskD {
     fn connect_zygiskd(&self, mut client: UnixStream) {
         let mut zygiskd_sockets = self.zygiskd_sockets.lock().unwrap();
         let result: LoggedResult<()> = try {
-            let is_64_bit = client.ipc_read_int()? != 0;
+            let is_64_bit: bool = client.read_decodable()?;
             let socket = if is_64_bit {
                 &mut zygiskd_sockets.1
             } else {
@@ -135,7 +135,7 @@ impl MagiskD {
                 if let Some(module_fds) = self.get_module_fds(is_64_bit) {
                     local.send_fds(&module_fds)?;
                 }
-                if local.ipc_read_int()? != 0 {
+                if local.read_decodable::<i32>()? != 0 {
                     Err(LoggedError::default())?;
                 }
                 local
@@ -148,9 +148,9 @@ impl MagiskD {
     }
 
     fn get_process_info(&self, mut client: UnixStream) -> LoggedResult<()> {
-        let uid = client.ipc_read_int()?;
-        let process = client.ipc_read_string()?;
-        let is_64_bit = client.ipc_read_int()? != 0;
+        let uid: i32 = client.read_decodable()?;
+        let process: String = client.read_decodable()?;
+        let is_64_bit: bool = client.read_decodable()?;
         let mut flags: u32 = 0;
         update_deny_flags(uid, &process, &mut flags);
         if self.get_manager_uid(to_user_id(uid)) == uid {
@@ -180,7 +180,7 @@ impl MagiskD {
         }
 
         // Read all failed modules
-        let failed_ids: Vec<i32> = client.ipc_read_vec()?;
+        let failed_ids: Vec<i32> = client.read_decodable()?;
         if let Some(module_list) = self.module_list.get() {
             for id in failed_ids {
                 let mut buf = Utf8CStrBufArr::default();
@@ -197,7 +197,7 @@ impl MagiskD {
     }
 
     fn get_mod_dir(&self, mut client: UnixStream) -> LoggedResult<()> {
-        let id = client.ipc_read_int()?;
+        let id: i32 = client.read_decodable()?;
         let module = &self.module_list.get().unwrap()[id as usize];
         let mut buf = Utf8CStrBufArr::default();
         let dir = FsPathBuf::new(&mut buf).join(MODULEROOT).join(&module.name);

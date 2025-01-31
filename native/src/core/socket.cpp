@@ -19,20 +19,8 @@ bool get_client_cred(int fd, sock_cred *cred) {
     return true;
 }
 
-int read_int(int fd) {
-    int val;
-    if (xxread(fd, &val, sizeof(val)) != sizeof(val))
-        return -1;
-    return val;
-}
-
 int read_int_be(int fd) {
     return ntohl(read_int(fd));
-}
-
-void write_int(int fd, int val) {
-    if (fd < 0) return;
-    xwrite(fd, &val, sizeof(val));
 }
 
 void write_int_be(int fd, int val) {
@@ -40,10 +28,8 @@ void write_int_be(int fd, int val) {
 }
 
 bool read_string(int fd, std::string &str) {
-    int len = read_int(fd);
     str.clear();
-    if (len < 0)
-        return false;
+    auto len = read_any<size_t>(fd);
     str.resize(len);
     return xxread(fd, str.data(), len) == len;
 }
@@ -56,6 +42,6 @@ string read_string(int fd) {
 
 void write_string(int fd, string_view str) {
     if (fd < 0) return;
-    write_int(fd, str.size());
+    write_any(fd, str.size());
     xwrite(fd, str.data(), str.size());
 }
