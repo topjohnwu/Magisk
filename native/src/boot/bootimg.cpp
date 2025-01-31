@@ -431,9 +431,20 @@ bool boot_img::parse_image(const uint8_t *p, format_t type) {
         }
         if (k_fmt == ZIMAGE) {
             z_hdr = reinterpret_cast<const zimage_hdr *>(kernel);
-            if (const void *gzip = memmem(kernel, hdr->kernel_size(), GZIP1_MAGIC "\x08\x00", 4)) {
+
+            const uint8_t* found_pos = 0;
+            
+            for (const uint8_t* search_pos = kernel + 0x28; search_pos < kernel + hdr->kernel_size(); search_pos++) {
+                //                                  ^^^^^^ +0x28 to search after zimage header and magic
+                if (check_fmt_lg(search_pos, hdr->kernel_size() - (search_pos - kernel)) != UNKNOWN) {
+                    found_pos = search_pos;
+                    search_pos = kernel + hdr->kernel_size();
+                }
+            }
+
+            if (found_pos != 0) {
                 fprintf(stderr, "ZIMAGE_KERNEL\n");
-                z_info.hdr_sz = (const uint8_t *) gzip - kernel;
+                z_info.hdr_sz = (const uint8_t *) found_pos - kernel;
 
                 // Find end of piggy
                 uint32_t zImage_size = z_hdr->end - z_hdr->start;
@@ -457,7 +468,7 @@ bool boot_img::parse_image(const uint8_t *p, format_t type) {
                     k_fmt = check_fmt_lg(kernel, hdr->kernel_size());
                 }
             } else {
-                fprintf(stderr, "! Could not find zImage gzip piggy, keeping raw kernel\n");
+                fprintf(stderr, "! Could not find zImage piggy, keeping raw kernel\n");
             }
         }
         fprintf(stderr, "%-*s [%s]\n", PADDING, "KERNEL_FMT", fmt2name[k_fmt]);
