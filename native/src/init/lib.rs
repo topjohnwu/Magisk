@@ -88,6 +88,5 @@ pub mod ffi {
         unsafe fn patch_sepolicy(self: &MagiskInit, in_: *const c_char, out: *const c_char);
         fn hijack_sepolicy(self: &mut MagiskInit) -> bool;
         fn backup_init(self: &MagiskInit) -> *const c_char;
-        fn check_two_stage(self: &MagiskInit) -> bool;
     }
 }
