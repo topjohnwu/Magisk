@@ -14,6 +14,7 @@ mod rootdir;
 mod getinfo;
 mod init;
 mod twostage;
+mod selinux;
 
 #[cxx::bridge]
 pub mod ffi {
@@ -54,6 +55,8 @@ pub mod ffi {
 
     extern "Rust" {
         fn print(self: &BootConfig);
+
+        fn patch_sepolicy(self: &MagiskInit, in_: Utf8CStrRef, out: Utf8CStrRef);
     }
 
     unsafe extern "C++" {
@@ -82,7 +85,6 @@ pub mod ffi {
         fn patch_ro_root(self: &mut MagiskInit);
 
         // SELinux
-        unsafe fn patch_sepolicy(self: &MagiskInit, in_: *const c_char, out: *const c_char);
         fn hijack_sepolicy(self: &mut MagiskInit) -> bool;
         fn backup_init(self: &MagiskInit) -> *const c_char;
     }
