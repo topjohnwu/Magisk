@@ -1,6 +1,5 @@
-use crate::{ffi::Xperm, sepolicy, SepolicyMagisk};
+use crate::{ffi::Xperm, sepolicy};
 use base::{set_log_level_state, LogLevel};
-use std::pin::Pin;
 
 macro_rules! rules {
     (@args all) => {
@@ -38,7 +37,7 @@ macro_rules! rules {
     };
     (@stmt $self:ident) => {};
     (@stmt $self:ident $action:ident($($args:tt),*); $($res:tt)*) => {
-        $self.as_mut().$action($(rules!(@args $args)),*);
+        $self.$action($(rules!(@args $args)),*);
         rules!{@stmt $self $($res)* }
     };
     (use $self:ident; $($res:tt)*) => {{
@@ -46,8 +45,8 @@ macro_rules! rules {
     }};
 }
 
-impl SepolicyMagisk for sepolicy {
-    fn magisk_rules(mut self: Pin<&mut Self>) {
+impl sepolicy {
+    pub fn magisk_rules(&mut self) {
         // Temp suppress warnings
         set_log_level_state(LogLevel::Warn, false);
         rules! {
@@ -138,7 +137,7 @@ impl SepolicyMagisk for sepolicy {
         }
 
         #[cfg(any())]
-        self.as_mut().strip_dontaudit();
+        self.strip_dontaudit();
 
         set_log_level_state(LogLevel::Warn, true);
     }

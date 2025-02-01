@@ -1,7 +1,7 @@
 #include <base.hpp>
 #include <vector>
 
-#include "policy.hpp"
+#include "include/sepolicy.hpp"
 
 using namespace std;
 
@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
     cmdline_logging();
     const char *out_file = nullptr;
     vector<string_view> rule_files;
-    sepolicy *sepol = nullptr;
+    std::unique_ptr<sepolicy> sepol;
     bool magisk = false;
     bool live = false;
     bool print = false;
@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
                 rule_files.emplace_back(argv[i + 1]);
                 ++i;
             } else if (option == "help"sv) {
-                rust::print_statement_help();
+                sepolicy::print_statement_help();
                 exit(0);
             } else {
                 usage(argv[0]);
@@ -126,6 +126,5 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    delete sepol;
     return 0;
 }

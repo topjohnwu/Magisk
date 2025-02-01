@@ -1,8 +1,10 @@
 #include <base.hpp>
 
-#include "policy.hpp"
+#include "include/sepolicy.hpp"
 
 using Str = rust::Str;
+using StrVec = rust::Vec<rust::Str>;
+using Xperms = rust::Vec<Xperm>;
 
 #if 0
 template<typename Arg>
@@ -26,26 +28,6 @@ static void print_rule(const char *action, Args ...args) {
 #else
 #define print_rule(...) ((void) 0)
 #endif
-
-bool sepolicy::exists(const char *type) {
-    return hashtab_search(impl->db->p_types.table, type) != nullptr;
-}
-
-void sepolicy::load_rule_file(const char *file) {
-    rust::load_rule_file(*this, file);
-}
-
-void sepolicy::parse_statement(const char *data) {
-    rust::parse_statement(*this, data);
-}
-
-void sepolicy::magisk_rules() {
-    rust::magisk_rules(*this);
-}
-
-void sepolicy::load_rules(const std::string &rules) {
-    rust::load_rules(*this, byte_view(rules, false));
-}
 
 template<typename F, typename ...T>
 requires(std::invocable<F, T...>)
@@ -80,70 +62,70 @@ static inline void expand(const Xperms &vec, T &&...args) {
     }
 }
 
-void sepolicy::allow(StrVec src, StrVec tgt, StrVec cls, StrVec perm) {
+void sepolicy::allow(StrVec src, StrVec tgt, StrVec cls, StrVec perm) noexcept {
     expand(src, tgt, cls, perm, [this](auto ...args) {
         print_rule("allow", args...);
         impl->add_rule(args..., AVTAB_ALLOWED, false);
     });
 }
 
-void sepolicy::deny(StrVec src, StrVec tgt, StrVec cls, StrVec perm) {
+void sepolicy::deny(StrVec src, StrVec tgt, StrVec cls, StrVec perm) noexcept {
     expand(src, tgt, cls, perm, [this](auto ...args) {
         print_rule("deny", args...);
         impl->add_rule(args..., AVTAB_ALLOWED, true);
     });
 }
 
-void sepolicy::auditallow(StrVec src, StrVec tgt, StrVec cls, StrVec perm) {
+void sepolicy::auditallow(StrVec src, StrVec tgt, StrVec cls, StrVec perm) noexcept {
     expand(src, tgt, cls, perm, [this](auto ...args) {
         print_rule("auditallow", args...);
         impl->add_rule(args..., AVTAB_AUDITALLOW, false);
     });
 }
 
-void sepolicy::dontaudit(StrVec src, StrVec tgt, StrVec cls, StrVec perm) {
+void sepolicy::dontaudit(StrVec src, StrVec tgt, StrVec cls, StrVec perm) noexcept {
     expand(src, tgt, cls, perm, [this](auto ...args) {
         print_rule("dontaudit", args...);
         impl->add_rule(args..., AVTAB_AUDITDENY, true);
     });
 }
 
-void sepolicy::permissive(StrVec types) {
+void sepolicy::permissive(StrVec types) noexcept {
     expand(types, [this](auto ...args) {
         print_rule("permissive", args...);
         impl->set_type_state(args..., true);
     });
 }
 
-void sepolicy::enforce(StrVec types) {
+void sepolicy::enforce(StrVec types) noexcept {
     expand(types, [this](auto ...args) {
         print_rule("enforce", args...);
         impl->set_type_state(args..., false);
     });
 }
 
-void sepolicy::typeattribute(StrVec types, StrVec attrs) {
+void sepolicy::typeattribute(StrVec types, StrVec attrs) noexcept {
     expand(types, attrs, [this](auto ...args) {
         print_rule("typeattribute", args...);
         impl->add_typeattribute(args...);
     });
 }
 
-void sepolicy::type(Str type, StrVec attrs) {
+void sepolicy::type(Str type, StrVec attrs) noexcept {
     expand(type, attrs, [this](auto name, auto attr) {
         print_rule("type", name, attr);
         impl->add_type(name, TYPE_TYPE) && impl->add_typeattribute(name, attr);
     });
 }
 
-void sepolicy::attribute(Str name) {
+void sepolicy::attribute(Str name) noexcept {
     expand(name, [this](auto ...args) {
         print_rule("attribute", args...);
         impl->add_type(args..., TYPE_ATTRIB);
     });
 }
 
-void sepolicy::type_transition(Str src, Str tgt, Str cls, Str def, Str obj) {
+void sepolicy::type_transition(Str src, Str tgt, Str cls, Str def, Str obj) noexcept {
     expand(src, tgt, cls, def, obj, [this](auto s, auto t, auto c, auto d, auto o) {
         if (o) {
             print_rule("type_transition", s, t, c, d, o);
@@ -155,42 +137,42 @@ void sepolicy::type_transition(Str src, Str tgt, Str cls, Str def, Str obj) {
     });
 }
 
-void sepolicy::type_change(Str src, Str tgt, Str cls, Str def) {
+void sepolicy::type_change(Str src, Str tgt, Str cls, Str def) noexcept {
     expand(src, tgt, cls, def, [this](auto ...args) {
         print_rule("type_change", args...);
         impl->add_type_rule(args..., AVTAB_CHANGE);
     });
 }
 
-void sepolicy::type_member(Str src, Str tgt, Str cls, Str def) {
+void sepolicy::type_member(Str src, Str tgt, Str cls, Str def) noexcept {
     expand(src, tgt, cls, def, [this](auto ...args) {
         print_rule("type_member", args...);
         impl->add_type_rule(args..., AVTAB_MEMBER);
     });
 }
 
-void sepolicy::genfscon(Str fs_name, Str path, Str ctx) {
+void sepolicy::genfscon(Str fs_name, Str path, Str ctx) noexcept {
     expand(fs_name, path, ctx, [this](auto ...args) {
         print_rule("genfscon", args...);
         impl->add_genfscon(args...);
     });
 }
 
-void sepolicy::allowxperm(StrVec src, StrVec tgt, StrVec cls, Xperms xperm) {
+void sepolicy::allowxperm(StrVec src, StrVec tgt, StrVec cls, Xperms xperm) noexcept {
     expand(src, tgt, cls, xperm, [this](auto ...args) {
         print_rule("allowxperm", args...);
         impl->add_xperm_rule(args..., AVTAB_XPERMS_ALLOWED);
     });
 }
 
-void sepolicy::auditallowxperm(StrVec src, StrVec tgt, StrVec cls, Xperms xperm) {
+void sepolicy::auditallowxperm(StrVec src, StrVec tgt, StrVec cls, Xperms xperm) noexcept {
     expand(src, tgt, cls, xperm, [this](auto ...args) {
         print_rule("auditallowxperm", args...);
         impl->add_xperm_rule(args..., AVTAB_XPERMS_AUDITALLOW);
     });
 }
 
-void sepolicy::dontauditxperm(StrVec src, StrVec tgt, StrVec cls, Xperms xperm) {
+void sepolicy::dontauditxperm(StrVec src, StrVec tgt, StrVec cls, Xperms xperm) noexcept {
     expand(src, tgt, cls, xperm, [this](auto ...args) {
         print_rule("dontauditxperm", args...);
         impl->add_xperm_rule(args..., AVTAB_XPERMS_DONTAUDIT);

@@ -1,6 +1,6 @@
 use std::fmt::{Display, Formatter, Write};
 use std::io::stderr;
-use std::{iter::Peekable, pin::Pin, vec::IntoIter};
+use std::{iter::Peekable, vec::IntoIter};
 
 use crate::ffi::Xperm;
 use crate::sepolicy;
@@ -228,7 +228,7 @@ fn match_string<'a>(tokens: &mut Tokens<'a>, pattern: &str) -> ParseResult<'a, (
 //     statement ::= TM ID(s) ID(t) ID(c) ID(d) { sepolicy.type_member(s, t, c, d);};
 //     statement ::= GF ID(s) ID(t) ID(c) { sepolicy.genfscon(s, t, c); };
 fn exec_statement<'a>(
-    sepolicy: Pin<&mut sepolicy>,
+    sepolicy: &mut sepolicy,
     tokens: &mut Tokens<'a>,
 ) -> ParseResult<'a, ()> {
     let action = match tokens.next() {
@@ -444,16 +444,18 @@ fn tokenize_statement(statement: &str) -> Vec<Token> {
     tokens
 }
 
-pub fn parse_statement(sepolicy: Pin<&mut sepolicy>, statement: &str) {
-    let statement = statement.trim();
-    if statement.is_empty() || statement.starts_with('#') {
-        return;
-    }
-    let mut tokens = tokenize_statement(statement).into_iter().peekable();
-    let result = exec_statement(sepolicy, &mut tokens);
-    if let Err(e) = result {
-        warn!("Syntax error in: \"{}\"", statement);
-        error!("Hint: {}", e);
+impl sepolicy {
+    pub fn parse_statement(self: &mut sepolicy, statement: &str) {
+        let statement = statement.trim();
+        if statement.is_empty() || statement.starts_with('#') {
+            return;
+        }
+        let mut tokens = tokenize_statement(statement).into_iter().peekable();
+        let result = exec_statement(self, &mut tokens);
+        if let Err(e) = result {
+            warn!("Syntax error in: \"{}\"", statement);
+            error!("Hint: {}", e);
+        }
     }
 }
 
@@ -598,7 +600,9 @@ allowxperm source target class ioctl *
     )
 }
 
-pub fn print_statement_help() {
-    format_statement_help(&mut FmtAdaptor(&mut stderr())).ok();
-    eprintln!();
+impl sepolicy {
+    pub fn print_statement_help() {
+        format_statement_help(&mut FmtAdaptor(&mut stderr())).ok();
+        eprintln!();
+    }
 }
