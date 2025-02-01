@@ -52,7 +52,7 @@ macro_rules! bad_apk {
  * within the APK v2 signature block.
  */
 fn read_certificate(apk: &mut File, version: i32) -> Vec<u8> {
-    fn inner(apk: &mut File, version: i32) -> io::Result<Vec<u8>> {
+    let res: io::Result<Vec<u8>> = try {
         let mut u32_val = 0u32;
         let mut u64_val = 0u64;
 
@@ -71,7 +71,7 @@ fn read_certificate(apk: &mut File, version: i32) -> Vec<u8> {
                 }
             }
             if i == 0xffff {
-                return Err(bad_apk!("invalid APK format"));
+                Err(bad_apk!("invalid APK format"))?;
             }
         }
 
@@ -98,7 +98,7 @@ fn read_certificate(apk: &mut File, version: i32) -> Vec<u8> {
                 }
             });
             if version > apk_ver {
-                return Err(bad_apk!("APK version too low"));
+                Err(bad_apk!("APK version too low"))?;
             }
         }
 
@@ -108,7 +108,7 @@ fn read_certificate(apk: &mut File, version: i32) -> Vec<u8> {
         let mut magic = [0u8; 16];
         apk.read_exact(&mut magic)?;
         if magic != APK_SIGNING_BLOCK_MAGIC {
-            return Err(bad_apk!("invalid signing block magic"));
+            Err(bad_apk!("invalid signing block magic"))?;
         }
         let mut signing_blk_sz = 0u64;
         apk.seek(SeekFrom::Current(
@@ -116,14 +116,14 @@ fn read_certificate(apk: &mut File, version: i32) -> Vec<u8> {
         ))?;
         apk.read_pod(&mut signing_blk_sz)?;
         if signing_blk_sz != u64_val {
-            return Err(bad_apk!("invalid signing block size"));
+            Err(bad_apk!("invalid signing block size"))?;
         }
 
         // Finally, we are now at the beginning of the id-value pair sequence
         loop {
             apk.read_pod(&mut u64_val)?; // id-value pair length
             if u64_val == signing_blk_sz {
-                break;
+                Err(bad_apk!("cannot find certificate"))?;
             }
 
             let mut id = 0u32;
@@ -140,7 +140,7 @@ fn read_certificate(apk: &mut File, version: i32) -> Vec<u8> {
 
                 let mut cert = vec![0; u32_val as usize];
                 apk.read_exact(cert.as_mut())?;
-                return Ok(cert);
+                break cert;
             } else {
                 // Skip this id-value pair
                 apk.seek(SeekFrom::Current(
@@ -148,10 +148,8 @@ fn read_certificate(apk: &mut File, version: i32) -> Vec<u8> {
                 ))?;
             }
         }
-
-        Err(bad_apk!("cannot find certificate"))
-    }
-    inner(apk, version).log().unwrap_or(vec![])
+    };
+    res.log().unwrap_or(vec![])
 }
 
 fn find_apk_path(pkg: &str, buf: &mut dyn Utf8CStrBuf) -> io::Result<()> {

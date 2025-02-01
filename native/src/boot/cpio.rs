@@ -755,9 +755,9 @@ impl Display for CpioEntry {
 }
 
 pub fn cpio_commands(argc: i32, argv: *const *const c_char) -> bool {
-    fn inner(argc: i32, argv: *const *const c_char) -> LoggedResult<()> {
+    let res: LoggedResult<()> = try {
         if argc < 1 {
-            return Err(log_err!("No arguments"));
+            Err(log_err!("No arguments"))?;
         }
 
         let cmds = map_args(argc, argv)?;
@@ -807,7 +807,7 @@ pub fn cpio_commands(argc: i32, argv: *const *const c_char) -> bool {
                 CpioAction::Add(Add { mode, path, file }) => cpio.add(*mode, path, file)?,
                 CpioAction::Extract(Extract { paths }) => {
                     if !paths.is_empty() && paths.len() != 2 {
-                        return Err(log_err!("invalid arguments"));
+                        Err(log_err!("invalid arguments"))?;
                     }
                     let mut it = paths.iter_mut();
                     cpio.extract(it.next(), it.next())?;
@@ -819,10 +819,8 @@ pub fn cpio_commands(argc: i32, argv: *const *const c_char) -> bool {
             };
         }
         cpio.dump(file)?;
-        Ok(())
-    }
-    inner(argc, argv)
-        .log_with_msg(|w| w.write_str("Failed to process cpio"))
+    };
+    res.log_with_msg(|w| w.write_str("Failed to process cpio"))
         .is_ok()
 }
 

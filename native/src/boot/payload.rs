@@ -1,17 +1,19 @@
-use std::fs::File;
-use std::io::{BufReader, Read, Seek, SeekFrom, Write};
-use std::os::fd::{AsRawFd, FromRawFd};
+use std::{
+    fs::File,
+    io::{BufReader, Read, Seek, SeekFrom, Write},
+    os::fd::{AsRawFd, FromRawFd},
+};
 
 use byteorder::{BigEndian, ReadBytesExt};
 use quick_protobuf::{BytesReader, MessageRead};
 
-use base::libc::c_char;
-use base::{error, LoggedError, LoggedResult, ReadSeekExt, StrErr, Utf8CStr};
-use base::{ResultExt, WriteExt};
-
-use crate::ffi;
-use crate::proto::update_metadata::mod_InstallOperation::Type;
-use crate::proto::update_metadata::DeltaArchiveManifest;
+use crate::{
+    ffi,
+    proto::update_metadata::{mod_InstallOperation::Type, DeltaArchiveManifest},
+};
+use base::{
+    error, ffi::Utf8CStrRef, LoggedError, LoggedResult, ReadSeekExt, ResultExt, Utf8CStr, WriteExt,
+};
 
 macro_rules! bad_payload {
     ($msg:literal) => {{
@@ -178,28 +180,23 @@ fn do_extract_boot_from_payload(
 }
 
 pub fn extract_boot_from_payload(
-    in_path: *const c_char,
-    partition: *const c_char,
-    out_path: *const c_char,
+    in_path: Utf8CStrRef,
+    partition: Utf8CStrRef,
+    out_path: Utf8CStrRef,
 ) -> bool {
-    fn inner(
-        in_path: *const c_char,
-        partition: *const c_char,
-        out_path: *const c_char,
-    ) -> LoggedResult<()> {
-        let in_path = unsafe { Utf8CStr::from_ptr(in_path) }?;
-        let partition = match unsafe { Utf8CStr::from_ptr(partition) } {
-            Ok(s) => Some(s),
-            Err(StrErr::NullPointerError) => None,
-            Err(e) => Err(e)?,
+    let res: LoggedResult<()> = try {
+        let partition = if partition.is_empty() {
+            None
+        } else {
+            Some(partition)
         };
-        let out_path = match unsafe { Utf8CStr::from_ptr(out_path) } {
-            Ok(s) => Some(s),
-            Err(StrErr::NullPointerError) => None,
-            Err(e) => Err(e)?,
+        let out_path = if out_path.is_empty() {
+            None
+        } else {
+            Some(out_path)
         };
-        do_extract_boot_from_payload(in_path, partition, out_path)
-            .log_with_msg(|w| w.write_str("Failed to extract from payload"))
-    }
-    inner(in_path, partition, out_path).is_ok()
+        do_extract_boot_from_payload(in_path, partition, out_path)?
+    };
+    res.log_with_msg(|w| w.write_str("Failed to extract from payload"))
+        .is_ok()
 }

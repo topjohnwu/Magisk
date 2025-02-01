@@ -254,7 +254,7 @@ impl BootSignature {
 }
 
 pub fn verify_boot_image(img: &BootImage, cert: *const c_char) -> bool {
-    fn inner(img: &BootImage, cert: *const c_char) -> LoggedResult<()> {
+    let res: LoggedResult<()> = try {
         let tail = img.tail();
         // Don't use BootSignature::from_der because tail might have trailing zeros
         let mut reader = SliceReader::new(tail)?;
@@ -268,9 +268,8 @@ pub fn verify_boot_image(img: &BootImage, cert: *const c_char) -> bool {
             Err(e) => Err(e)?,
         };
         sig.verify(img.payload())?;
-        Ok(())
-    }
-    inner(img, cert).is_ok()
+    };
+    res.is_ok()
 }
 
 enum Bytes {
@@ -296,12 +295,7 @@ pub fn sign_boot_image(
     cert: *const c_char,
     key: *const c_char,
 ) -> Vec<u8> {
-    fn inner(
-        payload: &[u8],
-        name: *const c_char,
-        cert: *const c_char,
-        key: *const c_char,
-    ) -> LoggedResult<Vec<u8>> {
+    let res: LoggedResult<Vec<u8>> = try {
         // Process arguments
         let name = unsafe { Utf8CStr::from_ptr(name) }?;
         let cert = match unsafe { Utf8CStr::from_ptr(cert) } {
@@ -337,7 +331,7 @@ pub fn sign_boot_image(
             authenticated_attributes: attr,
             signature: OctetString::new(sig)?,
         };
-        sig.to_der().log()
-    }
-    inner(payload, name, cert, key).unwrap_or_default()
+        sig.to_der()?
+    };
+    res.unwrap_or_default()
 }

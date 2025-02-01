@@ -101,7 +101,7 @@ fn hex2byte(hex: &[u8]) -> Vec<u8> {
 }
 
 pub fn hexpatch(file: &[u8], from: &[u8], to: &[u8]) -> bool {
-    fn inner(file: &[u8], from: &[u8], to: &[u8]) -> LoggedResult<bool> {
+    let res: LoggedResult<bool> = try {
         let file = Utf8CStr::from_bytes(file)?;
         let from = Utf8CStr::from_bytes(from)?;
         let to = Utf8CStr::from_bytes(to)?;
@@ -114,8 +114,7 @@ pub fn hexpatch(file: &[u8], from: &[u8], to: &[u8]) -> bool {
         for off in &v {
             eprintln!("Patch @ {:#010X} [{}] -> [{}]", off, from, to);
         }
-
-        Ok(!v.is_empty())
-    }
-    inner(file, from, to).unwrap_or(false)
+        !v.is_empty()
+    };
+    res.unwrap_or(false)
 }
