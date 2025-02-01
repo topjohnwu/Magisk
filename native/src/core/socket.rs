@@ -137,7 +137,11 @@ impl UnixSocketExt for UnixStream {
 
 pub fn send_fd(socket: RawFd, fd: RawFd) -> bool {
     let mut socket = ManuallyDrop::new(unsafe { UnixStream::from_raw_fd(socket) });
-    socket.send_fds(&[fd]).log().is_ok()
+    if fd < 0 {
+        socket.send_fds(&[]).log().is_ok()
+    } else {
+        socket.send_fds(&[fd]).log().is_ok()
+    }
 }
 
 pub fn send_fds(socket: RawFd, fds: &[RawFd]) -> bool {
