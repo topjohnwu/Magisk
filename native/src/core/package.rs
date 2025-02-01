@@ -480,6 +480,12 @@ impl MagiskD {
         uid
     }
 
+    pub fn get_manager(&self, user: i32, install: bool) -> (i32, String) {
+        let mut info = self.manager_info.lock().unwrap();
+        let (uid, pkg) = info.get_manager(self, user, install);
+        (uid, pkg.to_string())
+    }
+
     pub fn ensure_manager(&self) {
         let mut info = self.manager_info.lock().unwrap();
         let _ = info.get_manager(self, 0, true);

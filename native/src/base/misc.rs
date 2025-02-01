@@ -1,12 +1,13 @@
-use std::fmt::Arguments;
-use std::io::Write;
-use std::process::exit;
-use std::{fmt, io, slice, str};
-
+use crate::{ffi, StrErr, Utf8CStr};
 use argh::EarlyExit;
 use libc::c_char;
-
-use crate::{ffi, StrErr, Utf8CStr};
+use std::fmt::Arguments;
+use std::io::Write;
+use std::mem::ManuallyDrop;
+use std::process::exit;
+use std::sync::atomic::{AtomicPtr, Ordering};
+use std::sync::Arc;
+use std::{fmt, io, slice, str};
 
 pub fn errno() -> &'static mut i32 {
     unsafe { &mut *libc::__errno() }
@@ -159,5 +160,54 @@ impl<T: Write> fmt::Write for FmtAdaptor<'_, T> {
     }
     fn write_fmt(&mut self, args: Arguments<'_>) -> fmt::Result {
         self.0.write_fmt(args).map_err(|_| fmt::Error)
+    }
+}
+
+pub struct AtomicArc<T> {
+    ptr: AtomicPtr<T>,
+}
+
+impl<T> AtomicArc<T> {
+    pub fn new(arc: Arc<T>) -> AtomicArc<T> {
+        let raw = Arc::into_raw(arc);
+        Self {
+            ptr: AtomicPtr::new(raw as *mut _),
+        }
+    }
+
+    pub fn load(&self) -> Arc<T> {
+        let raw = self.ptr.load(Ordering::Acquire);
+        // SAFETY: the raw pointer is always created from Arc::into_raw
+        let arc = ManuallyDrop::new(unsafe { Arc::from_raw(raw) });
+        ManuallyDrop::into_inner(arc.clone())
+    }
+
+    fn swap_ptr(&self, raw: *const T) -> Arc<T> {
+        let prev = self.ptr.swap(raw as *mut _, Ordering::AcqRel);
+        // SAFETY: the raw pointer is always created from Arc::into_raw
+        unsafe { Arc::from_raw(prev) }
+    }
+
+    pub fn swap(&self, arc: Arc<T>) -> Arc<T> {
+        let raw = Arc::into_raw(arc);
+        self.swap_ptr(raw)
+    }
+
+    pub fn store(&self, arc: Arc<T>) {
+        // Drop the previous value
+        let _ = self.swap(arc);
+    }
+}
+
+impl<T> Drop for AtomicArc<T> {
+    fn drop(&mut self) {
+        // Drop the internal value
+        let _ = self.swap_ptr(std::ptr::null());
+    }
+}
+
+impl<T: Default> Default for AtomicArc<T> {
+    fn default() -> Self {
+        Self::new(Default::default())
     }
 }

@@ -52,7 +52,6 @@ void exec_task(std::function<void()> &&task);
 
 // Daemon handlers
 void denylist_handler(int client, const sock_cred *cred);
-void su_daemon_handler(int client, const sock_cred *cred);
 
 // Module stuffs
 void disable_modules();
@@ -75,6 +74,12 @@ void scan_deny_apps();
 bool is_deny_target(int uid, std::string_view process);
 void revert_unmount(int pid = -1) noexcept;
 void update_deny_flags(int uid, rust::Str process, uint32_t &flags);
+
+// MagiskSU
+void exec_root_shell(int client, int pid, SuRequest &req, MntNsMode mode);
+void app_log(const SuAppRequest &info, SuPolicy policy, bool notify);
+void app_notify(const SuAppRequest &info, SuPolicy policy);
+int app_request(const SuAppRequest &info);
 
 // Rust bindings
 static inline rust::Utf8CStr get_magisk_tmp_rs() { return get_magisk_tmp(); }

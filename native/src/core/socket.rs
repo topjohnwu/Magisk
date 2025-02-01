@@ -39,7 +39,7 @@ macro_rules! impl_pod_encodable {
     )*)
 }
 
-impl_pod_encodable! { u8 i32 usize }
+impl_pod_encodable! { u8 u32 i32 usize }
 
 impl Encodable for bool {
     #[inline(always)]

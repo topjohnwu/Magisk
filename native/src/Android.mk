@@ -29,7 +29,6 @@ LOCAL_SRC_FILES := \
     core/su/su.cpp \
     core/su/connect.cpp \
     core/su/pts.cpp \
-    core/su/su_daemon.cpp \
     core/zygisk/entry.cpp \
     core/zygisk/module.cpp \
     core/zygisk/hook.cpp \

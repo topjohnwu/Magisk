@@ -137,16 +137,16 @@ void MagiskD::reboot() const noexcept {
 }
 
 static void handle_request_async(int client, int code, const sock_cred &cred) {
+    auto &daemon = MagiskD::Get();
     switch (code) {
     case +RequestCode::DENYLIST:
         denylist_handler(client, &cred);
         break;
     case +RequestCode::SUPERUSER:
-        su_daemon_handler(client, &cred);
+        daemon.su_daemon_handler(client, cred);
         break;
     case +RequestCode::ZYGOTE_RESTART: {
         LOGI("** zygote restarted\n");
-        auto &daemon = MagiskD::Get();
         daemon.prune_su_access();
         scan_deny_apps();
         daemon.zygisk_reset(false);
@@ -154,7 +154,7 @@ static void handle_request_async(int client, int code, const sock_cred &cred) {
         break;
     }
     case +RequestCode::SQLITE_CMD:
-        MagiskD::Get().db_exec(client);
+        daemon.db_exec(client);
         break;
     case +RequestCode::REMOVE_MODULES: {
         int do_reboot = read_int(client);
@@ -162,12 +162,12 @@ static void handle_request_async(int client, int code, const sock_cred &cred) {
         write_int(client, 0);
         close(client);
         if (do_reboot) {
-            MagiskD::Get().reboot();
+            daemon.reboot();
         }
         break;
     }
     case +RequestCode::ZYGISK:
-        MagiskD::Get().zygisk_handler(client);
+        daemon.zygisk_handler(client);
         break;
     default:
         __builtin_unreachable();
