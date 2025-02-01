@@ -9,6 +9,7 @@ Before you start:
 - This tutorial assumes you understand how to use `adb` and `fastboot`
 - If you plan to also install custom kernels, install it after Magisk
 - Your device's bootloader has to be unlocked
+- Make sure to use "/" instead of "\"
 
 ---
 
