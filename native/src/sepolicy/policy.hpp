@@ -6,11 +6,10 @@
 #include <string_view>
 
 #include <sepol/policydb/policydb.h>
-#include <sepolicy.hpp>
 
-#include "policy-rs.hpp"
+struct Xperm;
 
-struct sepol_impl : public sepolicy {
+class sepol_impl {
     avtab_ptr_t find_avtab_node(avtab_key_t *key, avtab_extended_perms_t *xperms);
     avtab_ptr_t insert_avtab_node(avtab_key_t *key);
     avtab_ptr_t get_avtab_node(avtab_key_t *key, avtab_extended_perms_t *xperms);
@@ -31,12 +30,13 @@ struct sepol_impl : public sepolicy {
     bool add_typeattribute(const char *type, const char *attr);
 
     sepol_impl(policydb *db) : db(db) {}
-    ~sepol_impl();
 
     policydb *db;
 
-private:
     std::map<std::string_view, std::array<const char *, 32>> class_perm_names;
-};
 
-#define impl reinterpret_cast<sepol_impl *>(this)
+    friend struct sepolicy;
+
+public:
+    ~sepol_impl();
+};
