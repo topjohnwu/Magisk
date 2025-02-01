@@ -106,11 +106,7 @@ pub fn clean_mounts() {
     let module_mnt = FsPathBuf::new(&mut buf).join(magisk_tmp).join(MODULEMNT);
     let _: LoggedResult<()> = try {
         unsafe {
-            libc::umount2(
-                module_mnt.as_ptr(),
-                libc::MNT_DETACH,
-            )
-            .as_os_err()?;
+            libc::umount2(module_mnt.as_ptr(), libc::MNT_DETACH).as_os_err()?;
         }
     };
 
@@ -125,11 +121,7 @@ pub fn clean_mounts() {
                 ptr::null(),
             )
             .as_os_err()?;
-            libc::umount2(
-                worker_dir.as_ptr(),
-                libc::MNT_DETACH,
-            )
-            .as_os_err()?;
+            libc::umount2(worker_dir.as_ptr(), libc::MNT_DETACH).as_os_err()?;
         }
     };
 }

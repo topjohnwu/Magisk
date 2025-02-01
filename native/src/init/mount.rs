@@ -14,7 +14,7 @@ use base::{
 };
 
 pub fn switch_root(path: &Utf8CStr) {
-    fn inner(path: &Utf8CStr) -> LoggedResult<()> {
+    let res: LoggedResult<()> = try {
         debug!("Switch root to {}", path);
         let mut mounts = BTreeSet::new();
         let mut rootfs = Directory::open(cstr!("/"))?;
@@ -55,9 +55,8 @@ pub fn switch_root(path: &Utf8CStr) {
 
         debug!("Cleaning rootfs");
         rootfs.remove_all()?;
-        Ok(())
-    }
-    inner(path).ok();
+    };
+    res.ok();
 }
 
 pub fn is_device_mounted(dev: u64, target: Pin<&mut CxxString>) -> bool {

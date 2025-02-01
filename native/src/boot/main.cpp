@@ -217,8 +217,8 @@ int main(int argc, char *argv[]) {
     } else if (argc > 2 && action == "extract") {
         return rust::extract_boot_from_payload(
                 argv[2],
-                argc > 3 ? argv[3] : nullptr,
-                argc > 4 ? argv[4] : nullptr
+                argc > 3 ? argv[3] : "",
+                argc > 4 ? argv[4] : ""
                 ) ? 0 : 1;
     } else {
         usage(argv[0]);

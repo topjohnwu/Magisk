@@ -273,9 +273,9 @@ fn dtb_patch(file: &Utf8CStr) -> LoggedResult<bool> {
 }
 
 pub fn dtb_commands(argc: i32, argv: *const *const c_char) -> bool {
-    fn inner(argc: i32, argv: *const *const c_char) -> LoggedResult<()> {
+    let res: LoggedResult<()> = try {
         if argc < 1 {
-            return Err(log_err!("No arguments"));
+            Err(log_err!("No arguments"))?;
         }
         let cmds = map_args(argc, argv)?;
 
@@ -299,9 +299,7 @@ pub fn dtb_commands(argc: i32, argv: *const *const c_char) -> bool {
                 }
             }
         }
-        Ok(())
-    }
-    inner(argc, argv)
-        .log_with_msg(|w| w.write_str("Failed to process dtb"))
+    };
+    res.log_with_msg(|w| w.write_str("Failed to process dtb"))
         .is_ok()
 }
