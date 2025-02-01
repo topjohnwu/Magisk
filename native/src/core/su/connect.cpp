@@ -4,8 +4,7 @@
 #include <base.hpp>
 #include <selinux.hpp>
 #include <consts.hpp>
-
-#include "su.hpp"
+#include <core.hpp>
 
 using namespace std;
 
@@ -128,14 +127,15 @@ static bool check_no_error(int fd) {
 }
 
 static void exec_cmd(const char *action, vector<Extra> &data,
-                     const shared_ptr<su_info> &info, bool provider = true) {
+                     const SuAppRequest &info, bool provider = true) {
     char target[128];
     char user[4];
-    ssprintf(user, sizeof(user), "%d", to_user_id(info->eval_uid));
+    ssprintf(user, sizeof(user), "%d", to_user_id(info.eval_uid));
 
     // First try content provider call method
     if (provider) {
-        ssprintf(target, sizeof(target), "content://%s.provider", info->mgr_pkg.data());
+        ssprintf(target, sizeof(target), "content://%.*s.provider",
+                 (int) info.mgr_pkg.size(), info.mgr_pkg.data());
         vector<const char *> args{ CALL_PROVIDER };
         for (auto &e : data) {
             e.add_bind(args);
@@ -153,7 +153,7 @@ static void exec_cmd(const char *action, vector<Extra> &data,
     }
 
     // Then try start activity with package name
-    strscpy(target, info->mgr_pkg.data(), sizeof(target));
+    ssprintf(target, sizeof(target), "%.*s", (int) info.mgr_pkg.size(), info.mgr_pkg.data());
     vector<const char *> args{ START_ACTIVITY };
     for (auto &e : data) {
         e.add_intent(args);
@@ -168,53 +168,58 @@ static void exec_cmd(const char *action, vector<Extra> &data,
     exec_command(exec);
 }
 
-void app_log(const su_context &ctx) {
+void app_log(const SuAppRequest &info, SuPolicy policy, bool notify) {
     if (fork_dont_care() == 0) {
+        string context = (string) info.request.context;
+        string command = info.request.command.empty()
+            ? (string) info.request.shell
+            : (string) info.request.command;
+
         vector<Extra> extras;
         extras.reserve(9);
-        extras.emplace_back("from.uid", ctx.info->uid);
-        extras.emplace_back("to.uid", static_cast<int>(ctx.req.uid));
-        extras.emplace_back("pid", ctx.pid);
-        extras.emplace_back("policy", +ctx.info->access.policy);
-        extras.emplace_back("target", ctx.req.target);
-        extras.emplace_back("context", ctx.req.context.data());
-        extras.emplace_back("gids", &ctx.req.gids);
-        extras.emplace_back("command", get_cmd(ctx.req));
-        extras.emplace_back("notify", (bool) ctx.info->access.notify);
+        extras.emplace_back("from.uid", info.uid);
+        extras.emplace_back("to.uid", info.request.target_uid);
+        extras.emplace_back("pid", info.pid);
+        extras.emplace_back("policy", +policy);
+        extras.emplace_back("target", info.request.target_pid);
+        extras.emplace_back("context", context.data());
+        extras.emplace_back("gids", &info.request.gids);
+        extras.emplace_back("command", command.data());
+        extras.emplace_back("notify", notify);
 
-        exec_cmd("log", extras, ctx.info);
+        exec_cmd("log", extras, info);
         exit(0);
     }
 }
 
-void app_notify(const su_context &ctx) {
+void app_notify(const SuAppRequest &info, SuPolicy policy) {
     if (fork_dont_care() == 0) {
         vector<Extra> extras;
         extras.reserve(3);
-        extras.emplace_back("from.uid", ctx.info->uid);
-        extras.emplace_back("pid", ctx.pid);
-        extras.emplace_back("policy", +ctx.info->access.policy);
+        extras.emplace_back("from.uid", info.uid);
+        extras.emplace_back("pid", info.pid);
+        extras.emplace_back("policy", +policy);
 
-        exec_cmd("notify", extras, ctx.info);
+        exec_cmd("notify", extras, info);
         exit(0);
     }
 }
 
-int app_request(const su_context &ctx) {
+int app_request(const SuAppRequest &info) {
     // Create FIFO
     char fifo[64];
-    ssprintf(fifo, sizeof(fifo), "%s/" INTLROOT "/su_request_%d", get_magisk_tmp(), ctx.pid);
+    ssprintf(fifo, sizeof(fifo), "%s/" INTLROOT "/su_request_%d", get_magisk_tmp(), info.pid);
     mkfifo(fifo, 0600);
-    chown(fifo, ctx.info->mgr_uid, ctx.info->mgr_uid);
+    chown(fifo, info.mgr_uid, info.mgr_uid);
     setfilecon(fifo, MAGISK_FILE_CON);
 
     // Send request
     vector<Extra> extras;
     extras.reserve(3);
     extras.emplace_back("fifo", fifo);
-    extras.emplace_back("uid", ctx.info->eval_uid);
-    extras.emplace_back("pid", ctx.pid);
-    exec_cmd("request", extras, ctx.info, false);
+    extras.emplace_back("uid", info.eval_uid);
+    extras.emplace_back("pid", info.pid);
+    exec_cmd("request", extras, info, false);
 
     // Wait for data input for at most 70 seconds
     // Open with O_RDWR to prevent FIFO open block

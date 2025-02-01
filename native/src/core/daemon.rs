@@ -8,10 +8,11 @@ use crate::get_prop;
 use crate::logging::{magisk_logging, setup_logfile, start_log_daemon};
 use crate::mount::setup_mounts;
 use crate::package::ManagerInfo;
+use crate::su::SuInfo;
 use base::libc::{O_CLOEXEC, O_RDONLY};
 use base::{
-    cstr, error, info, libc, open_fd, BufReadExt, FsPath, FsPathBuf, ResultExt, Utf8CStr,
-    Utf8CStrBufArr,
+    cstr, error, info, libc, open_fd, AtomicArc, BufReadExt, FsPath, FsPathBuf, ResultExt,
+    Utf8CStr, Utf8CStrBufArr,
 };
 use std::fs::File;
 use std::io::BufReader;
@@ -67,6 +68,7 @@ pub struct MagiskD {
     pub zygiskd_sockets: Mutex<(Option<UnixStream>, Option<UnixStream>)>,
     pub zygisk_enabled: AtomicBool,
     pub zygote_start_count: AtomicU32,
+    pub cached_su_info: AtomicArc<SuInfo>,
     sdk_int: i32,
     pub is_emulator: bool,
     is_recovery: bool,
