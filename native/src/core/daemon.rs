@@ -73,6 +73,10 @@ pub struct MagiskD {
 }
 
 impl MagiskD {
+    pub fn get() -> &'static MagiskD {
+        unsafe { MAGISKD.get().unwrap_unchecked() }
+    }
+
     pub fn is_recovery(&self) -> bool {
         self.is_recovery
     }
@@ -299,8 +303,4 @@ fn check_data() -> bool {
         };
     }
     false
-}
-
-pub fn get_magiskd() -> &'static MagiskD {
-    unsafe { MAGISKD.get().unwrap_unchecked() }
 }

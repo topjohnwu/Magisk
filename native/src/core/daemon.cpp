@@ -146,7 +146,7 @@ static void handle_request_async(int client, int code, const sock_cred &cred) {
         break;
     case +RequestCode::ZYGOTE_RESTART: {
         LOGI("** zygote restarted\n");
-        auto &daemon = MagiskD();
+        auto &daemon = MagiskD::Get();
         daemon.prune_su_access();
         scan_deny_apps();
         daemon.zygisk_reset(false);
@@ -154,7 +154,7 @@ static void handle_request_async(int client, int code, const sock_cred &cred) {
         break;
     }
     case +RequestCode::SQLITE_CMD:
-        MagiskD().db_exec(client);
+        MagiskD::Get().db_exec(client);
         break;
     case +RequestCode::REMOVE_MODULES: {
         int do_reboot = read_int(client);
@@ -162,12 +162,12 @@ static void handle_request_async(int client, int code, const sock_cred &cred) {
         write_int(client, 0);
         close(client);
         if (do_reboot) {
-            MagiskD().reboot();
+            MagiskD::Get().reboot();
         }
         break;
     }
     case +RequestCode::ZYGISK:
-        MagiskD().zygisk_handler(client);
+        MagiskD::Get().zygisk_handler(client);
         break;
     default:
         __builtin_unreachable();
@@ -289,7 +289,7 @@ static void handle_request(pollfd *pfd) {
         exec_task([=, fd = client.release()] { handle_request_async(fd, code, cred); });
     } else {
         exec_task([=, fd = client.release()] {
-            MagiskD().boot_stage_handler(fd, code);
+            MagiskD::Get().boot_stage_handler(fd, code);
         });
     }
 }
@@ -332,7 +332,7 @@ static void daemon_entry() {
     setcon(MAGISK_PROC_CON);
 
     rust::daemon_entry();
-    SDK_INT = MagiskD().sdk_int();
+    SDK_INT = MagiskD::Get().sdk_int();
 
     // Escape from cgroup
     int pid = getpid();

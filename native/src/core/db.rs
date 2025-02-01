@@ -73,10 +73,6 @@ impl Default for MntNsMode {
     }
 }
 
-pub fn get_default_db_settings() -> DbSettings {
-    DbSettings::default()
-}
-
 impl DbEntryKey {
     fn to_str(self) -> &'static str {
         match self {

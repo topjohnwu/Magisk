@@ -7,6 +7,8 @@
 #include <atomic>
 #include <functional>
 
+#include <base.hpp>
+
 #include "socket.hpp"
 #include "../core-rs.hpp"
 
@@ -26,10 +28,17 @@ enum class RespondCode : int {
     END
 };
 
+struct ModuleInfo;
+
 extern std::string native_bridge;
 
+// Daemon
 int connect_daemon(int req, bool create = false);
+const char *get_magisk_tmp();
 void unlock_blocks();
+bool setup_magisk_env();
+bool check_key_combo();
+void restore_zygisk_prop();
 
 // Poll control
 using poll_callback = void(*)(pollfd*);
@@ -50,6 +59,10 @@ void disable_modules();
 void remove_modules();
 
 // Scripting
+void install_apk(rust::Utf8CStr apk);
+void uninstall_pkg(rust::Utf8CStr pkg);
+void exec_common_scripts(rust::Utf8CStr stage);
+void exec_module_scripts(rust::Utf8CStr stage, const rust::Vec<ModuleInfo> &module_list);
 void exec_script(const char *script);
 void clear_pkg(const char *pkg, int user_id);
 [[noreturn]] void install_module(const char *file);
@@ -61,3 +74,10 @@ void initialize_denylist();
 void scan_deny_apps();
 bool is_deny_target(int uid, std::string_view process);
 void revert_unmount(int pid = -1) noexcept;
+void update_deny_flags(int uid, rust::Str process, uint32_t &flags);
+
+// Rust bindings
+static inline rust::Utf8CStr get_magisk_tmp_rs() { return get_magisk_tmp(); }
+static inline rust::String resolve_preinit_dir_rs(rust::Utf8CStr base_dir) {
+    return resolve_preinit_dir(base_dir.c_str());
+}

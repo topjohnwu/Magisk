@@ -26,7 +26,7 @@ static void set_script_env() {
     char new_path[4096];
     ssprintf(new_path, sizeof(new_path), "%s:%s", getenv("PATH"), get_magisk_tmp());
     setenv("PATH", new_path, 1);
-    if (MagiskD().zygisk_enabled())
+    if (MagiskD::Get().zygisk_enabled())
         setenv("ZYGISK_ENABLED", "1", 1);
 };
 

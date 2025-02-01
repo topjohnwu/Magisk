@@ -18,7 +18,7 @@ static pthread_mutex_t cache_lock = PTHREAD_MUTEX_INITIALIZER;
 static shared_ptr<su_info> cached;
 
 su_info::su_info(int uid) :
-uid(uid), eval_uid(-1), cfg(DbSettings()), access(RootSettings()),
+uid(uid), eval_uid(-1), cfg(DbSettings::New()), access(RootSettings::New()),
 mgr_uid(-1), timestamp(0), _lock(PTHREAD_MUTEX_INITIALIZER) {}
 
 su_info::~su_info() {
@@ -44,7 +44,7 @@ void su_info::refresh() {
 
 void su_info::check_db() {
     eval_uid = uid;
-    auto &daemon = MagiskD();
+    auto &daemon = MagiskD::Get();
     daemon.get_db_settings(cfg);
 
     // Check multiuser settings

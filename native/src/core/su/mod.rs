@@ -139,7 +139,3 @@ impl MagiskD {
         granted
     }
 }
-
-pub fn get_default_root_settings() -> RootSettings {
-    RootSettings::default()
-}

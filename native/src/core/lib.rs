@@ -7,13 +7,11 @@
 #![allow(clippy::missing_safety_doc)]
 
 use base::Utf8CStr;
-use daemon::{daemon_entry, get_magiskd, MagiskD};
-use db::get_default_db_settings;
+use daemon::{daemon_entry, MagiskD};
 use logging::{android_logging, setup_logfile, zygisk_close_logd, zygisk_get_logd, zygisk_logging};
 use mount::{clean_mounts, find_preinit_device, revert_unmount};
 use resetprop::{persist_delete_prop, persist_get_prop, persist_get_props, persist_set_prop};
 use socket::{recv_fd, recv_fds, send_fd, send_fds};
-use su::get_default_root_settings;
 use zygisk::zygisk_should_load_module;
 
 #[path = "../include/consts.rs"]
@@ -74,7 +72,7 @@ pub mod ffi {
         #[cxx_name = "Utf8CStr"]
         type Utf8CStrRef<'a> = base::ffi::Utf8CStrRef<'a>;
 
-        include!("include/ffi.hpp");
+        include!("include/core.hpp");
 
         #[cxx_name = "get_magisk_tmp_rs"]
         fn get_magisk_tmp() -> Utf8CStrRef<'static>;
@@ -236,12 +234,17 @@ pub mod ffi {
         #[cxx_name = "get_root_settings"]
         fn get_root_settings_for_cxx(&self, uid: i32, settings: &mut RootSettings) -> bool;
 
-        #[cxx_name = "DbSettings"]
-        fn get_default_db_settings() -> DbSettings;
-        #[cxx_name = "RootSettings"]
-        fn get_default_root_settings() -> RootSettings;
-        #[cxx_name = "MagiskD"]
-        fn get_magiskd() -> &'static MagiskD;
+        #[Self = DbSettings]
+        #[cxx_name = "New"]
+        fn default() -> DbSettings;
+
+        #[Self = RootSettings]
+        #[cxx_name = "New"]
+        fn default() -> RootSettings;
+
+        #[Self = MagiskD]
+        #[cxx_name = "Get"]
+        fn get() -> &'static MagiskD;
     }
     unsafe extern "C++" {
         #[allow(dead_code)]
