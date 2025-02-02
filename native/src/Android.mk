@@ -18,7 +18,6 @@ LOCAL_SRC_FILES := \
     core/applets.cpp \
     core/magisk.cpp \
     core/daemon.cpp \
-    core/socket.cpp \
     core/scripting.cpp \
     core/selinux.cpp \
     core/sqlite.cpp \

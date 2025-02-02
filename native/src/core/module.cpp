@@ -466,22 +466,20 @@ static rust::Vec<ModuleInfo> collect_modules(bool zygisk_enabled, bool open_zygi
         };
         std::for_each(modules.begin(),modules.end(), [&](ModuleInfo &info) {
             info.z32 = convert_to_memfd(info.z32);
-#if defined(__LP64__)
             info.z64 = convert_to_memfd(info.z64);
-#endif
         });
     }
     return modules;
 }
 
-void MagiskD::handle_modules() const noexcept {
+rust::Vec<ModuleInfo> MagiskD::handle_modules() const noexcept {
     bool zygisk = zygisk_enabled();
     prepare_modules();
     exec_module_scripts("post-fs-data", collect_modules(zygisk, false));
     // Recollect modules (module scripts could remove itself)
     auto list = collect_modules(zygisk, true);
     load_modules(zygisk, list);
-    set_module_list(std::move(list));
+    return list;
 }
 
 static int check_rules_dir(char *buf, size_t sz) {

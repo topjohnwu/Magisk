@@ -2,8 +2,8 @@ use crate::daemon::{
     to_app_id, to_user_id, MagiskD, AID_APP_END, AID_APP_START, AID_ROOT, AID_SHELL,
 };
 use crate::db::DbArg::Integer;
-use crate::db::{SqlTable, SqliteResult, SqliteReturn};
-use crate::ffi::{DbValues, MultiuserMode, RootAccess, RootSettings, SuPolicy};
+use crate::db::{MultiuserMode, RootAccess, SqlTable, SqliteResult, SqliteReturn};
+use crate::ffi::{DbValues, SuPolicy};
 use base::ResultExt;
 
 impl Default for SuPolicy {
@@ -12,14 +12,11 @@ impl Default for SuPolicy {
     }
 }
 
-impl Default for RootSettings {
-    fn default() -> Self {
-        RootSettings {
-            policy: Default::default(),
-            log: true,
-            notify: true,
-        }
-    }
+#[derive(Default)]
+pub struct RootSettings {
+    pub policy: SuPolicy,
+    pub log: bool,
+    pub notify: bool,
 }
 
 impl SqlTable for RootSettings {
@@ -54,10 +51,6 @@ impl MagiskD {
             settings,
         )
         .sql_result()
-    }
-
-    pub fn get_root_settings_for_cxx(&self, uid: i32, settings: &mut RootSettings) -> bool {
-        self.get_root_settings(uid, settings).log().is_ok()
     }
 
     pub fn prune_su_access(&self) {

@@ -91,10 +91,6 @@ impl MagiskD {
         self.sdk_int
     }
 
-    pub fn set_module_list(&self, module_list: Vec<ModuleInfo>) {
-        self.module_list.set(module_list).ok();
-    }
-
     pub fn app_data_dir(&self) -> &'static Utf8CStr {
         if self.sdk_int >= 24 {
             cstr!("/data/user_de")
@@ -152,7 +148,8 @@ impl MagiskD {
         );
         initialize_denylist();
         setup_mounts();
-        self.handle_modules();
+        let modules = self.handle_modules();
+        self.module_list.set(modules).ok();
 
         false
     }

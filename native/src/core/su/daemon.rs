@@ -1,9 +1,10 @@
 use crate::daemon::{to_app_id, to_user_id, MagiskD, AID_ROOT, AID_SHELL};
+use crate::db::{DbSettings, MultiuserMode, RootAccess};
 use crate::ffi::{
-    app_log, app_notify, app_request, exec_root_shell, DbSettings, MultiuserMode, RootAccess,
-    RootSettings, SuAppRequest, SuPolicy, SuRequest,
+    app_log, app_notify, app_request, exec_root_shell, SuAppRequest, SuPolicy, SuRequest,
 };
 use crate::socket::IpcRead;
+use crate::su::db::RootSettings;
 use crate::UCred;
 use base::{debug, error, exit_on_error, libc, warn, LoggedResult, ResultExt, WriteExt};
 use std::fs::File;
@@ -133,7 +134,7 @@ impl MagiskD {
         let info = self.get_su_info(cred.uid as i32);
         let app_req = SuAppRequest {
             uid: cred.uid as i32,
-            pid: cred.pid as i32,
+            pid: cred.pid,
             eval_uid: info.eval_uid,
             mgr_pkg: &info.mgr_pkg,
             mgr_uid: info.mgr_uid,

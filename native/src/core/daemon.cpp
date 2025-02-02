@@ -136,6 +136,38 @@ void MagiskD::reboot() const noexcept {
         exec_command_sync("/system/bin/reboot");
 }
 
+bool get_client_cred(int fd, sock_cred *cred) {
+    socklen_t len = sizeof(ucred);
+    if (getsockopt(fd, SOL_SOCKET, SO_PEERCRED, cred, &len) != 0)
+        return false;
+    char buf[4096];
+    len = sizeof(buf);
+    if (getsockopt(fd, SOL_SOCKET, SO_PEERSEC, buf, &len) != 0)
+        len = 0;
+    buf[len] = '\0';
+    cred->context = buf;
+    return true;
+}
+
+bool read_string(int fd, std::string &str) {
+    str.clear();
+    auto len = read_any<size_t>(fd);
+    str.resize(len);
+    return xxread(fd, str.data(), len) == len;
+}
+
+string read_string(int fd) {
+    string str;
+    read_string(fd, str);
+    return str;
+}
+
+void write_string(int fd, string_view str) {
+    if (fd < 0) return;
+    write_any(fd, str.size());
+    xwrite(fd, str.data(), str.size());
+}
+
 static void handle_request_async(int client, int code, const sock_cred &cred) {
     auto &daemon = MagiskD::Get();
     switch (code) {

@@ -1,11 +1,12 @@
 #![allow(improper_ctypes, improper_ctypes_definitions)]
 use crate::daemon::{MagiskD, MAGISKD};
 use crate::ffi::{
-    open_and_init_db, sqlite3, sqlite3_errstr, DbEntryKey, DbSettings, DbStatement, DbValues,
-    MntNsMode, MultiuserMode, RootAccess,
+    open_and_init_db, sqlite3, sqlite3_errstr, DbEntryKey, DbStatement, DbValues, MntNsMode,
 };
 use crate::socket::{IpcRead, IpcWrite};
 use base::{LoggedResult, ResultExt, Utf8CStr};
+use num_derive::FromPrimitive;
+use num_traits::FromPrimitive;
 use std::ffi::c_void;
 use std::fs::File;
 use std::io::{BufReader, BufWriter};
@@ -55,16 +56,33 @@ where
     }
 }
 
-impl Default for RootAccess {
-    fn default() -> Self {
-        RootAccess::AppsAndAdb
-    }
+#[derive(Default)]
+pub struct DbSettings {
+    pub root_access: RootAccess,
+    pub multiuser_mode: MultiuserMode,
+    pub mnt_ns: MntNsMode,
+    pub boot_count: i32,
+    pub denylist: bool,
+    pub zygisk: bool,
 }
 
-impl Default for MultiuserMode {
-    fn default() -> Self {
-        MultiuserMode::OwnerOnly
-    }
+#[repr(i32)]
+#[derive(Default, FromPrimitive)]
+pub enum RootAccess {
+    Disabled,
+    AppsOnly,
+    AdbOnly,
+    #[default]
+    AppsAndAdb,
+}
+
+#[repr(i32)]
+#[derive(Default, FromPrimitive)]
+pub enum MultiuserMode {
+    #[default]
+    OwnerOnly,
+    OwnerManaged,
+    User,
 }
 
 impl Default for MntNsMode {
@@ -100,8 +118,10 @@ impl SqlTable for DbSettings {
             }
         }
         match key {
-            "root_access" => self.root_access = RootAccess { repr: value },
-            "multiuser_mode" => self.multiuser_mode = MultiuserMode { repr: value },
+            "root_access" => self.root_access = RootAccess::from_i32(value).unwrap_or_default(),
+            "multiuser_mode" => {
+                self.multiuser_mode = MultiuserMode::from_i32(value).unwrap_or_default()
+            }
             "mnt_ns" => self.mnt_ns = MntNsMode { repr: value },
             "denylist" => self.denylist = value != 0,
             "zygisk" => self.zygisk = value != 0,
@@ -226,8 +246,8 @@ impl MagiskD {
     pub fn get_db_setting(&self, key: DbEntryKey) -> i32 {
         // Get default values
         let mut val = match key {
-            DbEntryKey::RootAccess => RootAccess::default().repr,
-            DbEntryKey::SuMultiuserMode => MultiuserMode::default().repr,
+            DbEntryKey::RootAccess => RootAccess::default() as i32,
+            DbEntryKey::SuMultiuserMode => MultiuserMode::default() as i32,
             DbEntryKey::SuMntNs => MntNsMode::default().repr,
             DbEntryKey::DenylistConfig => 0,
             DbEntryKey::ZygiskConfig => self.is_emulator as i32,
@@ -302,14 +322,6 @@ impl MagiskD {
 }
 
 impl MagiskD {
-    pub fn get_db_settings_for_cxx(&self, cfg: &mut DbSettings) -> bool {
-        cfg.zygisk = self.is_emulator;
-        self.db_exec_with_rows("SELECT * FROM settings", &[], cfg)
-            .sql_result()
-            .log()
-            .is_ok()
-    }
-
     pub fn set_db_setting_for_cxx(&self, key: DbEntryKey, value: i32) -> bool {
         self.set_db_setting(key, value).log().is_ok()
     }
