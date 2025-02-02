@@ -87,11 +87,11 @@ impl<T: Decodable> Decodable for Vec<T> {
 
 impl Encodable for str {
     fn encoded_len(&self) -> usize {
-        size_of::<usize>() + self.as_bytes().len()
+        size_of::<usize>() + self.len()
     }
 
     fn encode(&self, w: &mut impl Write) -> io::Result<()> {
-        self.as_bytes().len().encode(w)?;
+        self.len().encode(w)?;
         w.write_all(self.as_bytes())
     }
 }

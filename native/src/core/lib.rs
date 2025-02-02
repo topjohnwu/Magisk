@@ -34,6 +34,7 @@ mod socket;
 mod su;
 mod zygisk;
 
+#[allow(clippy::needless_lifetimes)]
 #[cxx::bridge]
 pub mod ffi {
     #[repr(i32)]
@@ -72,35 +73,10 @@ pub mod ffi {
     }
 
     #[repr(i32)]
-    enum RootAccess {
-        Disabled,
-        AppsOnly,
-        AdbOnly,
-        AppsAndAdb,
-    }
-
-    #[repr(i32)]
-    enum MultiuserMode {
-        OwnerOnly,
-        OwnerManaged,
-        User,
-    }
-
-    #[repr(i32)]
     enum MntNsMode {
         Global,
         Requester,
         Isolate,
-    }
-
-    #[derive(Default)]
-    struct DbSettings {
-        root_access: RootAccess,
-        multiuser_mode: MultiuserMode,
-        mnt_ns: MntNsMode,
-        boot_count: i32,
-        denylist: bool,
-        zygisk: bool,
     }
 
     #[repr(i32)]
@@ -108,12 +84,6 @@ pub mod ffi {
         Query,
         Deny,
         Allow,
-    }
-
-    struct RootSettings {
-        policy: SuPolicy,
-        log: bool,
-        notify: bool,
     }
 
     struct ModuleInfo {
@@ -242,14 +212,6 @@ pub mod ffi {
 
     // Default constructors
     extern "Rust" {
-        #[Self = DbSettings]
-        #[cxx_name = "New"]
-        fn default() -> DbSettings;
-
-        #[Self = RootSettings]
-        #[cxx_name = "New"]
-        fn default() -> RootSettings;
-
         #[Self = SuRequest]
         #[cxx_name = "New"]
         fn default() -> SuRequest;
@@ -268,17 +230,12 @@ pub mod ffi {
         fn su_daemon_handler(&self, client: i32, cred: &UCred);
         #[cxx_name = "get_manager"]
         unsafe fn get_manager_for_cxx(&self, user: i32, ptr: *mut CxxString, install: bool) -> i32;
-        fn set_module_list(&self, module_list: Vec<ModuleInfo>);
 
-        #[cxx_name = "get_db_settings"]
-        fn get_db_settings_for_cxx(&self, cfg: &mut DbSettings) -> bool;
         fn get_db_setting(&self, key: DbEntryKey) -> i32;
         #[cxx_name = "set_db_setting"]
         fn set_db_setting_for_cxx(&self, key: DbEntryKey, value: i32) -> bool;
         #[cxx_name = "db_exec"]
         fn db_exec_for_cxx(&self, client_fd: i32);
-        #[cxx_name = "get_root_settings"]
-        fn get_root_settings_for_cxx(&self, uid: i32, settings: &mut RootSettings) -> bool;
 
         #[Self = MagiskD]
         #[cxx_name = "Get"]
@@ -287,7 +244,7 @@ pub mod ffi {
     unsafe extern "C++" {
         #[allow(dead_code)]
         fn reboot(self: &MagiskD);
-        fn handle_modules(self: &MagiskD);
+        fn handle_modules(self: &MagiskD) -> Vec<ModuleInfo>;
     }
 }
 

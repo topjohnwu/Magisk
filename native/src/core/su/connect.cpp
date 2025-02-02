@@ -20,11 +20,6 @@ using namespace std;
 // 0x18800020 = FLAG_ACTIVITY_NEW_TASK|FLAG_ACTIVITY_MULTIPLE_TASK|
 //              FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS|FLAG_INCLUDE_STOPPED_PACKAGES
 
-#define get_cmd(to) \
-((to).command.empty() ? \
-((to).shell.empty() ? DEFAULT_SHELL : (to).shell.data()) : \
-(to).command.data())
-
 class Extra {
     const char *key;
     enum {
