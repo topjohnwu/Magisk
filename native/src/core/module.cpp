@@ -233,10 +233,21 @@ private:
 };
 
 static void inject_magisk_bins(root_node *system) {
-    auto bin = system->get_child<inter_node>("bin");
+    dir_node* bin = system->get_child<inter_node>("bin");
     if (!bin) {
-        bin = new inter_node("bin");
-        system->insert(bin);
+        struct stat st{};
+        bin = system;
+        for (auto &item: split(getenv("PATH"), ":")) {
+            item.erase(0, item.starts_with("/system/") ? 8 : 1);
+            auto system_path = "/system/" + item;
+            if (stat(system_path.data(), &st) == 0 && st.st_mode & S_IXOTH) {
+                for (const auto &dir: split(item, "/")) {
+                    auto node = bin->get_child<inter_node>(dir);
+                    bin = node ? node : bin->emplace<inter_node>(dir, dir.data());
+                }
+                break;
+            }
+        }
     }
 
     // Insert binaries
