@@ -65,19 +65,19 @@ impl Decodable for bool {
 
 impl<T: Decodable> Encodable for Vec<T> {
     fn encoded_len(&self) -> usize {
-        size_of::<usize>() + size_of::<T>() * self.len()
+        size_of::<i32>() + size_of::<T>() * self.len()
     }
 
     fn encode(&self, w: &mut impl Write) -> io::Result<()> {
-        self.len().encode(w)?;
+        (self.len() as i32).encode(w)?;
         self.iter().try_for_each(|e| e.encode(w))
     }
 }
 
 impl<T: Decodable> Decodable for Vec<T> {
     fn decode(r: &mut impl Read) -> io::Result<Self> {
-        let len = usize::decode(r)?;
-        let mut val = Vec::with_capacity(len);
+        let len = i32::decode(r)?;
+        let mut val = Vec::with_capacity(len as usize);
         for _ in 0..len {
             val.push(T::decode(r)?);
         }
@@ -87,11 +87,11 @@ impl<T: Decodable> Decodable for Vec<T> {
 
 impl Encodable for str {
     fn encoded_len(&self) -> usize {
-        size_of::<usize>() + self.len()
+        size_of::<i32>() + self.len()
     }
 
     fn encode(&self, w: &mut impl Write) -> io::Result<()> {
-        self.len().encode(w)?;
+        (self.len() as i32).encode(w)?;
         w.write_all(self.as_bytes())
     }
 }
@@ -108,10 +108,9 @@ impl Encodable for String {
 
 impl Decodable for String {
     fn decode(r: &mut impl Read) -> io::Result<String> {
-        let len = usize::decode(r)?;
-        let mut val = String::with_capacity(len);
-        let mut r = r.take(len as u64);
-        r.read_to_string(&mut val)?;
+        let len = i32::decode(r)?;
+        let mut val = String::with_capacity(len as usize);
+        r.take(len as u64).read_to_string(&mut val)?;
         Ok(val)
     }
 }

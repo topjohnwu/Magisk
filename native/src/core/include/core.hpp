@@ -59,25 +59,25 @@ void write_any(int fd, T val) {
     xwrite(fd, &val, sizeof(val));
 }
 
-template<typename T> requires(std::is_trivially_copyable_v<T>)
-void write_vector(int fd, const std::vector<T> &vec) {
-    write_any(fd, vec.size());
-    xwrite(fd, vec.data(), vec.size() * sizeof(T));
-}
-
-template<typename T> requires(std::is_trivially_copyable_v<T>)
-bool read_vector(int fd, std::vector<T> &vec) {
-    auto size = read_any<size_t>(fd);
-    vec.resize(size);
-    return xread(fd, vec.data(), size * sizeof(T)) == size * sizeof(T);
-}
-
 bool get_client_cred(int fd, sock_cred *cred);
 static inline int read_int(int fd) { return read_any<int>(fd); }
 static inline void write_int(int fd, int val) { write_any(fd, val); }
 std::string read_string(int fd);
 bool read_string(int fd, std::string &str);
 void write_string(int fd, std::string_view str);
+
+template<typename T> requires(std::is_trivially_copyable_v<T>)
+void write_vector(int fd, const std::vector<T> &vec) {
+    write_int(fd, vec.size());
+    xwrite(fd, vec.data(), vec.size() * sizeof(T));
+}
+
+template<typename T> requires(std::is_trivially_copyable_v<T>)
+bool read_vector(int fd, std::vector<T> &vec) {
+    int size = read_int(fd);
+    vec.resize(size);
+    return xread(fd, vec.data(), size * sizeof(T)) == size * sizeof(T);
+}
 
 // Poll control
 using poll_callback = void(*)(pollfd*);
