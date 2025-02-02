@@ -213,8 +213,7 @@ pub mod ffi {
     // Default constructors
     extern "Rust" {
         #[Self = SuRequest]
-        #[cxx_name = "New"]
-        fn default() -> SuRequest;
+        fn default() -> Self;
     }
 
     // FFI for MagiskD

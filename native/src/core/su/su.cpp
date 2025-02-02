@@ -108,7 +108,7 @@ int su_client_main(int argc, char *argv[]) {
             { nullptr, 0, nullptr, 0 },
     };
 
-    auto req = SuRequest::New();
+    SuRequest req;
 
     for (int i = 0; i < argc; i++) {
         // Replace -cn and -z with -Z for backwards compatibility
