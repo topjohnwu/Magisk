@@ -122,7 +122,7 @@ void exec_module_scripts(rust::Utf8CStr stage, const rust::Vec<ModuleInfo> &modu
     if (module_list.empty())
         return;
 
-    bool pfs = (string_view) stage == "post-fs-data";
+    bool pfs = stage == "post-fs-data"sv;
     if (pfs) {
         timespec now{};
         clock_gettime(CLOCK_MONOTONIC, &now);

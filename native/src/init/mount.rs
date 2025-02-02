@@ -4,18 +4,19 @@ use std::{
     pin::Pin,
     ptr::null as nullptr,
 };
-
+use std::ops::Deref;
 use cxx::CxxString;
 
 use base::{
     cstr, debug,
     libc::{chdir, chroot, mount, MS_MOVE},
-    parse_mount_info, raw_cstr, Directory, LibcReturn, LoggedResult, StringExt, Utf8CStr,
+    parse_mount_info, raw_cstr, Directory, LibcReturn, LoggedResult, StringExt,
 };
+use crate::ffi::Utf8CStrRef;
 
-pub fn switch_root(path: &Utf8CStr) {
+pub fn switch_root(path: Utf8CStrRef) {
     let res: LoggedResult<()> = try {
-        debug!("Switch root to {}", path);
+        debug!("Switch root to {}", path.deref());
         let mut mounts = BTreeSet::new();
         let mut rootfs = Directory::open(cstr!("/"))?;
         for info in parse_mount_info("self") {

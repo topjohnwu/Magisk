@@ -195,7 +195,7 @@ pub fn extract_boot_from_payload(
         } else {
             Some(out_path)
         };
-        do_extract_boot_from_payload(in_path, partition, out_path)?
+        do_extract_boot_from_payload(&in_path, partition.as_deref(),out_path.as_deref())?
     };
     res.log_with_msg(|w| w.write_str("Failed to extract from payload"))
         .is_ok()

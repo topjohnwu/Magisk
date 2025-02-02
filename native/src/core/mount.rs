@@ -1,16 +1,13 @@
+use num_traits::AsPrimitive;
+use std::ops::Deref;
 use std::{
     cmp::Ordering::{Greater, Less},
     path::{Path, PathBuf},
     ptr,
 };
 
-use num_traits::AsPrimitive;
-
 use base::libc::{c_uint, dev_t};
-use base::{
-    cstr, debug, info, libc, parse_mount_info, raw_cstr, warn, FsPath, FsPathBuf, LibcReturn,
-    LoggedResult, MountInfo, ResultExt, Utf8CStr, Utf8CStrBufArr,
-};
+use base::{cstr, debug, info, libc, parse_mount_info, raw_cstr, warn, FsPath, FsPathBuf, LibcReturn, LoggedResult, MountInfo, ResultExt, Utf8CStr, Utf8CStrBufArr};
 
 use crate::consts::{MODULEMNT, MODULEROOT, PREINITDEV, PREINITMIRR, WORKERDIR};
 use crate::ffi::{get_magisk_tmp, resolve_preinit_dir, switch_mnt_ns};
@@ -25,7 +22,7 @@ pub fn setup_mounts() {
     // Mount preinit directory
     let mut dev_buf = Utf8CStrBufArr::<64>::new();
     let dev_path = FsPathBuf::new(&mut dev_buf)
-        .join(magisk_tmp)
+        .join(magisk_tmp.deref())
         .join(PREINITDEV);
     let mut linked = false;
     if let Ok(attr) = dev_path.get_attr() {
@@ -36,7 +33,7 @@ pub fn setup_mounts() {
             // What we do instead is to scan through the current mountinfo and find a pre-existing
             // mount point mounting our desired partition, and then bind mount the target folder.
             let preinit_dev = attr.st.st_rdev;
-            let mnt_path = FsPathBuf::new(&mut buf).join(magisk_tmp).join(PREINITMIRR);
+            let mnt_path = FsPathBuf::new(&mut buf).join(magisk_tmp.deref()).join(PREINITMIRR);
             for info in parse_mount_info("self") {
                 if info.root == "/" && info.device == preinit_dev {
                     if !info.fs_option.split(',').any(|s| s == "rw") {
@@ -45,7 +42,7 @@ pub fn setup_mounts() {
                     }
                     let mut target = info.target;
                     let target = Utf8CStr::from_string(&mut target);
-                    let mut preinit_dir = resolve_preinit_dir(target);
+                    let mut preinit_dir = resolve_preinit_dir(target.into());
                     let preinit_dir = Utf8CStr::from_string(&mut preinit_dir);
                     let r: LoggedResult<()> = try {
                         FsPath::from(preinit_dir).mkdir(0o700)?;
@@ -74,7 +71,7 @@ pub fn setup_mounts() {
     }
 
     // Bind remount module root to clear nosuid
-    let module_mnt = FsPathBuf::new(&mut buf).join(magisk_tmp).join(MODULEMNT);
+    let module_mnt = FsPathBuf::new(&mut buf).join(magisk_tmp.deref()).join(MODULEMNT);
     let _: LoggedResult<()> = try {
         module_mnt.mkdir(0o755)?;
         unsafe {
@@ -103,14 +100,14 @@ pub fn clean_mounts() {
 
     let mut buf = Utf8CStrBufArr::default();
 
-    let module_mnt = FsPathBuf::new(&mut buf).join(magisk_tmp).join(MODULEMNT);
+    let module_mnt = FsPathBuf::new(&mut buf).join(magisk_tmp.deref()).join(MODULEMNT);
     let _: LoggedResult<()> = try {
         unsafe {
             libc::umount2(module_mnt.as_ptr(), libc::MNT_DETACH).as_os_err()?;
         }
     };
 
-    let worker_dir = FsPathBuf::new(&mut buf).join(magisk_tmp).join(WORKERDIR);
+    let worker_dir = FsPathBuf::new(&mut buf).join(magisk_tmp.deref()).join(WORKERDIR);
     let _: LoggedResult<()> = try {
         unsafe {
             libc::mount(
@@ -213,7 +210,7 @@ pub fn find_preinit_device() -> String {
     );
     let info = &preinit_info.1;
     let mut target = info.target.clone();
-    let mut preinit_dir = resolve_preinit_dir(Utf8CStr::from_string(&mut target));
+    let mut preinit_dir = resolve_preinit_dir(Utf8CStr::from_string(&mut target).into());
     if unsafe { libc::getuid() } == 0
         && let Ok(tmp) = std::env::var("MAGISKTMP")
         && !tmp.is_empty()

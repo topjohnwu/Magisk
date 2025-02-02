@@ -13,6 +13,7 @@ use std::collections::BTreeMap;
 use std::fs::File;
 use std::io;
 use std::io::{Cursor, Read, Seek, SeekFrom};
+use std::ops::Deref;
 use std::os::fd::AsRawFd;
 use std::os::unix::fs::MetadataExt;
 use std::path::{Path, PathBuf};
@@ -287,7 +288,7 @@ impl ManagerInfo {
 
         if cert.is_empty() || (pkg == self.repackaged_pkg && cert != self.repackaged_cert) {
             error!("pkg: repackaged APK signature invalid: {}", apk);
-            uninstall_pkg(apk);
+            uninstall_pkg(apk.deref().into());
             return Status::CertMismatch;
         }
 
@@ -314,7 +315,7 @@ impl ManagerInfo {
             error!("pkg: APK signature mismatch: {}", apk);
             #[cfg(all(feature = "check-signature", not(debug_assertions)))]
             {
-                uninstall_pkg(cstr!(APP_PACKAGE_NAME));
+                uninstall_pkg(cstr!(APP_PACKAGE_NAME).into());
                 return Status::CertMismatch;
             }
         }
@@ -340,7 +341,7 @@ impl ManagerInfo {
                 stub_fd.seek(SeekFrom::Start(0))?;
             };
             if result.is_ok() {
-                install_apk(tmp_apk);
+                install_apk(tmp_apk.into());
             }
         }
     }
@@ -459,7 +460,7 @@ impl MagiskD {
 
         let mut arr = Utf8CStrBufArr::default();
         let apk = FsPathBuf::new(&mut arr)
-            .join(get_magisk_tmp())
+            .join(get_magisk_tmp().deref())
             .join("stub.apk");
 
         if let Ok(mut fd) = apk.open(O_RDONLY | O_CLOEXEC) {

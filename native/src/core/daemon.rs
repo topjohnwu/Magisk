@@ -16,6 +16,7 @@ use base::{
 };
 use std::fs::File;
 use std::io::BufReader;
+use std::ops::Deref;
 use std::os::unix::net::UnixStream;
 use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 use std::sync::{Mutex, OnceLock};
@@ -141,7 +142,7 @@ impl MagiskD {
             return true;
         }
 
-        exec_common_scripts(cstr!("post-fs-data"));
+        exec_common_scripts(cstr!("post-fs-data").into());
         self.zygisk_enabled.store(
             self.get_db_setting(DbEntryKey::ZygiskConfig) != 0,
             Ordering::Release,
@@ -158,9 +159,9 @@ impl MagiskD {
         setup_logfile();
         info!("** late_start service mode running");
 
-        exec_common_scripts(cstr!("service"));
+        exec_common_scripts(cstr!("service").into());
         if let Some(module_list) = self.module_list.get() {
-            exec_module_scripts(cstr!("service"), module_list);
+            exec_module_scripts(cstr!("service").into(), module_list);
         }
     }
 
@@ -230,7 +231,7 @@ pub fn daemon_entry() {
     // Load config status
     let mut buf = Utf8CStrBufArr::<64>::new();
     let path = FsPathBuf::new(&mut buf)
-        .join(get_magisk_tmp())
+        .join(get_magisk_tmp().deref())
         .join(MAIN_CONFIG);
     let mut is_recovery = false;
     if let Ok(file) = path.open(O_RDONLY | O_CLOEXEC) {

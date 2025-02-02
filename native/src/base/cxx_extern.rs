@@ -12,6 +12,7 @@ use crate::{
     clone_attr, cstr, fclone_attr, fd_path, map_fd, map_file, slice_from_ptr, CxxResultExt,
     Directory, FsPath, Utf8CStr, Utf8CStrBufRef,
 };
+use crate::ffi::Utf8CStrRef;
 
 pub(crate) fn fd_path_for_cxx(fd: RawFd, buf: &mut [u8]) -> isize {
     let mut buf = Utf8CStrBufRef::from(buf);
@@ -57,13 +58,13 @@ unsafe extern "C" fn frm_rf(fd: OwnedFd) -> bool {
     inner(fd).is_ok()
 }
 
-pub(crate) fn map_file_for_cxx(path: &Utf8CStr, rw: bool) -> &'static mut [u8] {
-    map_file(path, rw).log_cxx().unwrap_or(&mut [])
+pub(crate) fn map_file_for_cxx(path: Utf8CStrRef, rw: bool) -> &'static mut [u8] {
+    map_file(&path, rw).log_cxx().unwrap_or(&mut [])
 }
 
-pub(crate) fn map_file_at_for_cxx(fd: RawFd, path: &Utf8CStr, rw: bool) -> &'static mut [u8] {
+pub(crate) fn map_file_at_for_cxx(fd: RawFd, path: Utf8CStrRef, rw: bool) -> &'static mut [u8] {
     unsafe {
-        map_file_at(BorrowedFd::borrow_raw(fd), path, rw)
+        map_file_at(BorrowedFd::borrow_raw(fd), &path, rw)
             .log_cxx()
             .unwrap_or(&mut [])
     }

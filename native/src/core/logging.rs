@@ -24,6 +24,7 @@ use std::sync::atomic::{AtomicI32, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
 use std::{fs, io};
+use std::ops::Deref;
 
 #[allow(dead_code, non_camel_case_types)]
 #[derive(FromPrimitive, ToPrimitive)]
@@ -182,7 +183,7 @@ pub fn zygisk_get_logd() -> i32 {
         android_logging();
         let mut buf = Utf8CStrBufArr::default();
         let path = FsPathBuf::new(&mut buf)
-            .join(get_magisk_tmp())
+            .join(get_magisk_tmp().deref())
             .join(LOG_PIPE);
         // Open as RW as sometimes it may block
         fd = unsafe { libc::open(path.as_ptr(), O_RDWR | O_CLOEXEC) };
@@ -365,7 +366,7 @@ pub fn setup_logfile() {
 pub fn start_log_daemon() {
     let mut buf = Utf8CStrBufArr::default();
     let path = FsPathBuf::new(&mut buf)
-        .join(get_magisk_tmp())
+        .join(get_magisk_tmp().deref())
         .join(LOG_PIPE);
 
     unsafe {

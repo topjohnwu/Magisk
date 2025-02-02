@@ -10,6 +10,7 @@ use base::{
     LoggedResult, Utf8CStrBufArr, WriteExt,
 };
 use std::fmt::Write;
+use std::ops::Deref;
 use std::os::fd::{AsRawFd, FromRawFd, RawFd};
 use std::os::unix::net::UnixStream;
 use std::ptr;
@@ -38,7 +39,7 @@ fn exec_zygiskd(is_64_bit: bool, remote: UnixStream) {
     #[cfg(target_pointer_width = "32")]
     let magisk = "magisk";
 
-    let exe = FsPathBuf::new(&mut exe).join(get_magisk_tmp()).join(magisk);
+    let exe = FsPathBuf::new(&mut exe).join(get_magisk_tmp().deref()).join(magisk);
 
     let mut fd_str = Utf8CStrBufArr::<16>::new();
     write!(fd_str, "{}", remote.as_raw_fd()).ok();

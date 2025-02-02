@@ -1,10 +1,8 @@
-use base::{
-    debug, libc, Directory, LibcReturn, LoggedResult, ResultExt, Utf8CStr, Utf8CStrBuf,
-    Utf8CStrBufArr, WalkResult,
-};
+use base::{debug, libc, Directory, LibcReturn, LoggedResult, ResultExt, Utf8CStrBuf, Utf8CStrBufArr, Utf8CStrRef, WalkResult};
 use std::fs::File;
 use std::io::Write;
 use std::mem;
+use std::ops::Deref;
 use std::os::fd::{FromRawFd, RawFd};
 use std::sync::OnceLock;
 
@@ -39,13 +37,13 @@ fn set_context(path: &str, con: &str) -> std::io::Result<()> {
     }
 }
 
-pub fn collect_overlay_contexts(src: &Utf8CStr) {
+pub fn collect_overlay_contexts(src: Utf8CStrRef) {
     OVERLAY_ATTRS
         .get_or_try_init(|| -> LoggedResult<_> {
             let mut contexts = vec![];
             let mut con = Utf8CStrBufArr::default();
             let mut path = Utf8CStrBufArr::default();
-            let mut src = Directory::open(src)?;
+            let mut src = Directory::open(&src)?;
             src.path(&mut path)?;
             let src_len = path.len();
             src.post_order_walk(|f| {
@@ -79,7 +77,7 @@ pub fn reset_overlay_contexts() {
     });
 }
 
-pub fn inject_magisk_rc(fd: RawFd, tmp_dir: &Utf8CStr) {
+pub fn inject_magisk_rc(fd: RawFd, tmp_dir: Utf8CStrRef) {
     debug!("Injecting magisk rc");
 
     let mut file = unsafe { File::from_raw_fd(fd) };
@@ -102,7 +100,7 @@ on property:sys.boot_completed=1
 on property:init.svc.zygote=stopped
     exec {0} 0 0 -- {1}/magisk --zygote-restart
 "#,
-        "u:r:magisk:s0", tmp_dir
+        "u:r:magisk:s0", tmp_dir.deref()
     )
     .ok();
 

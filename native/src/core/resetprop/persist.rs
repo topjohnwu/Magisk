@@ -10,10 +10,7 @@ use std::{
 use quick_protobuf::{BytesReader, MessageRead, MessageWrite, Writer};
 
 use base::libc::{O_CLOEXEC, O_RDONLY};
-use base::{
-    clone_attr, cstr, debug, libc::mkstemp, Directory, FsPath, FsPathBuf, LibcReturn, LoggedResult,
-    MappedFile, SilentResultExt, Utf8CStr, Utf8CStrBufArr, WalkResult,
-};
+use base::{clone_attr, cstr, debug, libc::mkstemp, Directory, FsPath, FsPathBuf, LibcReturn, LoggedResult, MappedFile, SilentResultExt, Utf8CStr, Utf8CStrBufArr, Utf8CStrRef, WalkResult};
 
 use crate::ffi::{prop_cb_exec, PropCb};
 use crate::resetprop::proto::persistent_properties::{
@@ -141,11 +138,11 @@ fn proto_write_props(props: &PersistentProperties) -> LoggedResult<()> {
     Ok(())
 }
 
-pub fn persist_get_prop(name: &Utf8CStr, mut prop_cb: Pin<&mut PropCb>) {
+pub fn persist_get_prop(name: Utf8CStrRef, mut prop_cb: Pin<&mut PropCb>) {
     let res: LoggedResult<()> = try {
         if check_proto() {
             let mut props = proto_read_props()?;
-            let prop = props.find(name)?;
+            let prop = props.find(&name)?;
             if let PersistentPropertyRecord {
                 name: Some(ref mut n),
                 value: Some(ref mut v),
@@ -154,9 +151,9 @@ pub fn persist_get_prop(name: &Utf8CStr, mut prop_cb: Pin<&mut PropCb>) {
                 prop_cb.exec(Utf8CStr::from_string(n), Utf8CStr::from_string(v));
             }
         } else {
-            let mut value = file_get_prop(name)?;
-            prop_cb.exec(name, Utf8CStr::from_string(&mut value));
-            debug!("resetprop: found prop [{}] = [{}]", name, value);
+            let mut value = file_get_prop(&name)?;
+            prop_cb.exec(&name, Utf8CStr::from_string(&mut value));
+            debug!("resetprop: found prop [{}] = [{}]", name.deref(), value);
         }
     };
     res.ok();
@@ -193,25 +190,25 @@ pub fn persist_get_props(mut prop_cb: Pin<&mut PropCb>) {
     res.ok();
 }
 
-pub fn persist_delete_prop(name: &Utf8CStr) -> bool {
+pub fn persist_delete_prop(name: Utf8CStrRef) -> bool {
     let res: LoggedResult<()> = try {
         if check_proto() {
             let mut props = proto_read_props()?;
-            let idx = props.find_index(name).silent()?;
+            let idx = props.find_index(&name).silent()?;
             props.remove(idx);
             proto_write_props(&props)?;
         } else {
-            file_set_prop(name, None)?;
+            file_set_prop(&name, None)?;
         }
     };
     res.is_ok()
 }
 
-pub fn persist_set_prop(name: &Utf8CStr, value: &Utf8CStr) -> bool {
+pub fn persist_set_prop(name: Utf8CStrRef, value: Utf8CStrRef) -> bool {
     let res: LoggedResult<()> = try {
         if check_proto() {
             let mut props = proto_read_props()?;
-            match props.find_index(name) {
+            match props.find_index(&name) {
                 Ok(idx) => props[idx].value = Some(value.to_string()),
                 Err(idx) => props.insert(
                     idx,
@@ -223,7 +220,7 @@ pub fn persist_set_prop(name: &Utf8CStr, value: &Utf8CStr) -> bool {
             }
             proto_write_props(&props)?;
         } else {
-            file_set_prop(name, Some(value))?;
+            file_set_prop(&name, Some(&value))?;
         }
     };
     res.is_ok()

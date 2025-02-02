@@ -5,12 +5,13 @@ use io::Cursor;
 use std::fmt::Write;
 use std::io;
 use std::io::{BufRead, BufReader};
+use std::ops::Deref;
 use std::pin::Pin;
 
 pub use base;
 use base::libc::{O_CLOEXEC, O_RDONLY};
-use base::{BufReadExt, FsPath, LoggedResult, Utf8CStr};
-use statement::{parse_statement, print_statement_help};
+use base::{BufReadExt, FsPath, LoggedResult, Utf8CStrRef};
+use statement::{parse_statement_for_cxx, parse_statement, print_statement_help};
 
 use crate::ffi::sepolicy;
 
@@ -88,7 +89,8 @@ mod ffi {
     extern "Rust" {
         fn load_rules(sepol: Pin<&mut sepolicy>, rules: &[u8]);
         fn load_rule_file(sepol: Pin<&mut sepolicy>, filename: Utf8CStrRef);
-        fn parse_statement(sepol: Pin<&mut sepolicy>, statement: Utf8CStrRef);
+        #[cxx_name="parse_statement"]
+        fn parse_statement_for_cxx(sepol: Pin<&mut sepolicy>, statement: Utf8CStrRef);
         fn magisk_rules(sepol: Pin<&mut sepolicy>);
         fn xperm_to_string(perm: &Xperm) -> String;
         fn print_statement_help();
@@ -97,7 +99,7 @@ mod ffi {
 
 trait SepolicyExt {
     fn load_rules(self: Pin<&mut Self>, rules: &[u8]);
-    fn load_rule_file(self: Pin<&mut Self>, filename: &Utf8CStr);
+    fn load_rule_file(self: Pin<&mut Self>, filename: Utf8CStrRef);
     fn load_rules_from_reader<T: BufRead>(self: Pin<&mut Self>, reader: &mut T);
 }
 
@@ -107,9 +109,9 @@ impl SepolicyExt for sepolicy {
         self.load_rules_from_reader(&mut cursor);
     }
 
-    fn load_rule_file(self: Pin<&mut sepolicy>, filename: &Utf8CStr) {
+    fn load_rule_file(self: Pin<&mut sepolicy>, filename: Utf8CStrRef) {
         let result: LoggedResult<()> = try {
-            let file = FsPath::from(filename).open(O_RDONLY | O_CLOEXEC)?;
+            let file = FsPath::from(filename.deref()).open(O_RDONLY | O_CLOEXEC)?;
             let mut reader = BufReader::new(file);
             self.load_rules_from_reader(&mut reader);
         };
@@ -124,7 +126,7 @@ impl SepolicyExt for sepolicy {
     }
 }
 
-fn load_rule_file(sepol: Pin<&mut sepolicy>, filename: &Utf8CStr) {
+fn load_rule_file(sepol: Pin<&mut sepolicy>, filename: Utf8CStrRef) {
     sepol.load_rule_file(filename);
 }
 

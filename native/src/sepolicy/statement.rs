@@ -2,7 +2,7 @@ use std::fmt::{Display, Formatter, Write};
 use std::io::stderr;
 use std::{iter::Peekable, pin::Pin, vec::IntoIter};
 
-use crate::ffi::Xperm;
+use crate::ffi::{Utf8CStrRef, Xperm};
 use crate::sepolicy;
 use base::{error, warn, FmtAdaptor};
 
@@ -442,6 +442,9 @@ fn tokenize_statement(statement: &str) -> Vec<Token> {
         extract_token(s, &mut tokens);
     }
     tokens
+}
+pub fn parse_statement_for_cxx(sepolicy: Pin<&mut sepolicy>, statement: Utf8CStrRef) {
+    parse_statement(sepolicy, statement.as_str());
 }
 
 pub fn parse_statement(sepolicy: Pin<&mut sepolicy>, statement: &str) {

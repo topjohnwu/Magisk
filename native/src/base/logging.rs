@@ -6,7 +6,7 @@ use std::process::exit;
 use num_derive::{FromPrimitive, ToPrimitive};
 use num_traits::FromPrimitive;
 
-use crate::ffi::LogLevelCxx;
+use crate::ffi::{LogLevelCxx, Utf8CStrRef};
 use crate::{Utf8CStr, Utf8CStrBufArr};
 
 // Ugly hack to avoid using enum
@@ -88,9 +88,9 @@ fn log_with_writer<F: FnOnce(LogWriter)>(level: LogLevel, f: F) {
     }
 }
 
-pub fn log_from_cxx(level: LogLevelCxx, msg: &Utf8CStr) {
+pub fn log_from_cxx(level: LogLevelCxx, msg: Utf8CStrRef) {
     if let Some(level) = LogLevel::from_i32(level.repr) {
-        log_with_writer(level, |write| write(level, msg));
+        log_with_writer(level, |write| write(level, &msg));
     }
 }
 
