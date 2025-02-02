@@ -22,6 +22,7 @@ pub fn zygisk_should_load_module(flags: u32) -> bool {
     flags & UNMOUNT_MASK != UNMOUNT_MASK && flags & ZygiskStateFlags::ProcessIsMagiskApp.repr == 0
 }
 
+#[allow(unused_variables)]
 fn exec_zygiskd(is_64_bit: bool, remote: UnixStream) {
     // This fd has to survive exec
     unsafe {

@@ -151,7 +151,7 @@ bool get_client_cred(int fd, sock_cred *cred) {
 
 bool read_string(int fd, std::string &str) {
     str.clear();
-    auto len = read_any<size_t>(fd);
+    int len = read_int(fd);
     str.resize(len);
     return xxread(fd, str.data(), len) == len;
 }
@@ -164,7 +164,7 @@ string read_string(int fd) {
 
 void write_string(int fd, string_view str) {
     if (fd < 0) return;
-    write_any(fd, str.size());
+    write_int(fd, str.size());
     xwrite(fd, str.data(), str.size());
 }
 
