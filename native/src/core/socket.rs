@@ -146,7 +146,7 @@ pub trait UnixSocketExt {
 impl UnixSocketExt for UnixStream {
     fn send_fds(&mut self, fds: &[RawFd]) -> io::Result<()> {
         match fds.len() {
-            0 => self.write_encodable(&-1)?,
+            0 => self.write_pod(&0)?,
             len => {
                 // 4k buffer is reasonable enough
                 let mut buf = [0u8; 4096];
@@ -166,7 +166,15 @@ impl UnixSocketExt for UnixStream {
         let mut fd_count = 0;
         self.peek(bytes_of_mut(&mut fd_count))?;
         if fd_count < 1 {
+            // Actually consume the data
+            self.read_pod(&mut fd_count)?;
             return Ok(None);
+        }
+        if fd_count > 1 {
+            warn!(
+                "Received unexpected number of fds: expected=1 actual={}",
+                fd_count
+            );
         }
 
         // 4k buffer is reasonable enough
