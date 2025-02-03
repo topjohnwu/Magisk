@@ -297,57 +297,78 @@ pub enum StrErr {
 
 // UTF-8 validated + null terminated string slice
 #[repr(transparent)]
-pub struct Utf8CStr([u8]);
+pub struct Utf8CStr(str);
 
 impl Utf8CStr {
-    pub fn from_cstr(cstr: &CStr) -> Result<&Utf8CStr, StrErr> {
+    pub fn from_cstr(cstr: &CStr) -> Result<&Self, StrErr> {
         // Validate the buffer during construction
         str::from_utf8(cstr.to_bytes())?;
-        Ok(unsafe { Self::from_bytes_unchecked(cstr.to_bytes_with_nul()) })
+        Ok(unsafe { Self::from_cstr_unchecked(cstr) })
     }
 
-    pub fn from_bytes(buf: &[u8]) -> Result<&Utf8CStr, StrErr> {
+    pub unsafe fn from_cstr_unchecked(cstr: &CStr) -> &Self {
+        Self::from_bytes_unchecked(cstr.to_bytes_with_nul())
+    }
+
+    pub fn from_bytes(buf: &[u8]) -> Result<&Self, StrErr> {
         Self::from_cstr(CStr::from_bytes_with_nul(buf)?)
     }
 
-    pub fn from_bytes_mut(buf: &mut [u8]) -> Result<&mut Utf8CStr, StrErr> {
+    #[allow(clippy::should_implement_trait)]
+    pub fn from_str(str: &str) -> Result<&Self, StrErr> {
+        Self::from_bytes(str.as_bytes())
+    }
+
+    pub unsafe fn from_str_unchecked(str: &str) -> &Self {
+        Self::from_bytes_unchecked(str.as_bytes())
+    }
+
+    pub fn from_str_mut(str: &mut str) -> Result<&mut Self, StrErr> {
+        Self::from_bytes_mut(unsafe { str.as_bytes_mut() })
+    }
+
+    pub unsafe fn from_str_with_nul_unchecked_mut(str: &mut str) -> &mut Self {
+        Self::from_bytes_unchecked_mut(str.as_bytes_mut())
+    }
+
+    pub fn from_bytes_mut(buf: &mut [u8]) -> Result<&mut Self, StrErr> {
         CStr::from_bytes_with_nul(buf)?;
         str::from_utf8(buf)?;
         // Both condition checked
-        unsafe { Ok(mem::transmute::<&mut [u8], &mut Utf8CStr>(buf)) }
+        unsafe { Ok(Self::from_bytes_unchecked_mut(buf)) }
     }
 
-    pub fn from_string(s: &mut String) -> &mut Utf8CStr {
+    pub fn from_string(s: &mut String) -> &mut Self {
         let buf = s.nul_terminate();
         // SAFETY: the null byte is explicitly added to the buffer
-        unsafe { mem::transmute(buf) }
+        unsafe { Self::from_bytes_unchecked_mut(buf) }
     }
 
     #[inline(always)]
-    pub unsafe fn from_bytes_unchecked(buf: &[u8]) -> &Utf8CStr {
+    pub unsafe fn from_bytes_unchecked(buf: &[u8]) -> &Self {
         mem::transmute(buf)
     }
 
     #[inline(always)]
-    pub unsafe fn from_bytes_unchecked_mut(buf: &mut [u8]) -> &mut Utf8CStr {
+    pub unsafe fn from_bytes_unchecked_mut(buf: &mut [u8]) -> &mut Self {
         mem::transmute(buf)
     }
 
-    pub unsafe fn from_ptr<'a>(ptr: *const c_char) -> Result<&'a Utf8CStr, StrErr> {
+    pub unsafe fn from_ptr<'a>(ptr: *const c_char) -> Result<&'a Self, StrErr> {
         if ptr.is_null() {
             return Err(StrErr::NullPointerError);
         }
         Self::from_cstr(unsafe { CStr::from_ptr(ptr) })
     }
 
-    pub unsafe fn from_ptr_unchecked<'a>(ptr: *const c_char) -> &'a Utf8CStr {
+    pub unsafe fn from_ptr_unchecked<'a>(ptr: *const c_char) -> &'a Self {
         let cstr = CStr::from_ptr(ptr);
         Self::from_bytes_unchecked(cstr.to_bytes_with_nul())
     }
 
     #[inline(always)]
     pub fn as_bytes_with_nul(&self) -> &[u8] {
-        &self.0
+        self.0.as_bytes()
     }
 
     #[inline(always)]
@@ -363,21 +384,21 @@ impl Utf8CStr {
     #[inline(always)]
     pub fn as_cstr(&self) -> &CStr {
         // SAFETY: Already validated as null terminated during construction
-        unsafe { CStr::from_bytes_with_nul_unchecked(&self.0) }
+        unsafe { CStr::from_bytes_with_nul_unchecked(self.0.as_bytes()) }
     }
 
     #[inline(always)]
     pub fn as_str(&self) -> &str {
         // SAFETY: Already UTF-8 validated during construction
         // SAFETY: The length of the slice is at least 1 due to null termination check
-        unsafe { str::from_utf8_unchecked(self.0.get_unchecked(..self.0.len() - 1)) }
+        unsafe { self.0.get_unchecked(..self.0.len() - 1) }
     }
 
     #[inline(always)]
     pub fn as_str_mut(&mut self) -> &mut str {
         // SAFETY: Already UTF-8 validated during construction
         // SAFETY: The length of the slice is at least 1 due to null termination check
-        unsafe { str::from_utf8_unchecked_mut(self.0.get_unchecked_mut(..self.0.len() - 1)) }
+        unsafe { self.0.get_unchecked_mut(..self.0.len() - 1) }
     }
 }
 
