@@ -9,7 +9,7 @@ use crate::logging::{magisk_logging, setup_logfile, start_log_daemon};
 use crate::mount::setup_mounts;
 use crate::package::ManagerInfo;
 use crate::su::SuInfo;
-use base::libc::{O_CLOEXEC, O_RDONLY};
+use base::libc::{O_CLOEXEC, O_RDONLY, STDOUT_FILENO};
 use base::{
     cstr, error, info, libc, open_fd, AtomicArc, BufReadExt, FsPath, FsPathBuf, ResultExt,
     Utf8CStr, Utf8CStrBufArr,
@@ -148,7 +148,18 @@ impl MagiskD {
         );
         initialize_denylist();
         setup_mounts();
-        let modules = self.handle_modules();
+        let mut modules = self.handle_modules();
+        for m in modules.iter_mut() {
+            // All fds passed to send_fds have to be valid file descriptors.
+            // To workaround this issue, send over STDOUT_FILENO as an indicator of an
+            // invalid fd as it will always be /dev/null in magiskd
+            if m.z64 < 0 {
+                m.z64 = STDOUT_FILENO;
+            }
+            if m.z32 < 0 {
+                m.z32 = STDOUT_FILENO;
+            }
+        }
         self.module_list.set(modules).ok();
 
         false
