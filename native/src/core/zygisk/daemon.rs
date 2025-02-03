@@ -4,10 +4,10 @@ use crate::ffi::{
     get_magisk_tmp, restore_zygisk_prop, update_deny_flags, ZygiskRequest, ZygiskStateFlags,
 };
 use crate::socket::{IpcRead, UnixSocketExt};
-use base::libc::{O_CLOEXEC, O_CREAT, O_RDONLY};
+use base::libc::{O_CLOEXEC, O_CREAT, O_RDONLY, STDOUT_FILENO};
 use base::{
     cstr, error, fork_dont_care, libc, open_fd, raw_cstr, warn, Directory, FsPathBuf, LoggedError,
-    LoggedResult, Utf8CStrBufArr, WriteExt,
+    LoggedResult, ResultExt, Utf8CStrBufArr, WriteExt,
 };
 use std::fmt::Write;
 use std::os::fd::{AsRawFd, FromRawFd, RawFd};
@@ -170,6 +170,10 @@ impl MagiskD {
                 let module_fds: Vec<RawFd> = module_list
                     .iter()
                     .map(|m| if is_64_bit { m.z64 } else { m.z32 })
+                    // All fds passed over sockets have to be valid file descriptors.
+                    // To work around this issue, send over STDOUT_FILENO as an indicator of an
+                    // invalid fd as it will always be /dev/null in magiskd.
+                    .map(|fd| if fd < 0 { STDOUT_FILENO } else { fd })
                     .collect();
                 client.send_fds(&module_fds)?;
             }
@@ -190,7 +194,11 @@ impl MagiskD {
                     .join(&module_list[id as usize].name)
                     .join("zygisk");
                 // Create the unloaded marker file
-                Directory::open(&path)?.open_fd(cstr!("unloaded"), O_CREAT | O_RDONLY, 0o644)?;
+                if let Ok(dir) = Directory::open(&path) {
+                    dir.open_fd(cstr!("unloaded"), O_CREAT | O_RDONLY, 0o644)
+                        .log()
+                        .ok();
+                }
             }
         }
 
