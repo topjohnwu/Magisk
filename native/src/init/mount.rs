@@ -1,17 +1,16 @@
-use cxx::CxxString;
-use std::{
-    collections::BTreeSet,
-    ops::Bound::{Excluded, Unbounded},
-    pin::Pin,
-    ptr::null as nullptr,
-};
-
 use crate::ffi::MagiskInit;
 use base::{
     cstr, debug, libc,
     libc::{chdir, chroot, execve, exit, mount, umount2, MNT_DETACH, MS_MOVE},
     parse_mount_info, raw_cstr, Directory, FsPath, LibcReturn, LoggedResult, ResultExt, StringExt,
     Utf8CStr,
+};
+use cxx::CxxString;
+use std::{
+    collections::BTreeSet,
+    ops::Bound::{Excluded, Unbounded},
+    pin::Pin,
+    ptr::null as nullptr,
 };
 
 extern "C" {
