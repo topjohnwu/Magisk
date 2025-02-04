@@ -55,6 +55,7 @@ impl<T> SilentResultExt<T> for Option<T> {
 pub trait ResultExt<T> {
     fn log(self) -> LoggedResult<T>;
     fn log_with_msg<F: FnOnce(Formatter) -> fmt::Result>(self, f: F) -> LoggedResult<T>;
+    fn log_ok(self);
 }
 
 // Internal C++ bridging logging routines
@@ -93,6 +94,17 @@ impl<T, R: Loggable<T>> ResultExt<T> for R {
     #[cfg(debug_assertions)]
     fn log(self) -> LoggedResult<T> {
         self.do_log(LogLevel::Error, Some(Location::caller()))
+    }
+
+    #[track_caller]
+    #[cfg(debug_assertions)]
+    fn log_ok(self) {
+        self.log().ok();
+    }
+    
+    #[cfg(not(debug_assertions))]
+    fn log_ok(self) {
+        self.log().ok();
     }
 
     #[cfg(not(debug_assertions))]
