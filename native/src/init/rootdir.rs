@@ -2,11 +2,13 @@ use base::{
     debug, libc, Directory, LibcReturn, LoggedResult, ResultExt, Utf8CStr, Utf8CStrBuf,
     Utf8CStrBufArr, WalkResult,
 };
-use std::fs::File;
-use std::io::Write;
-use std::mem;
-use std::os::fd::{FromRawFd, RawFd};
-use std::sync::OnceLock;
+use std::{
+    fs::File,
+    io::Write,
+    mem,
+    os::fd::{FromRawFd, RawFd},
+    sync::OnceLock,
+};
 
 pub static OVERLAY_ATTRS: OnceLock<Vec<(String, String)>> = OnceLock::new();
 

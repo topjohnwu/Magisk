@@ -1,12 +1,16 @@
-use crate::ffi::{magisk_proxy_main, BootConfig, MagiskInit};
-use crate::logging::setup_klog;
+use crate::{
+    ffi::{magisk_proxy_main, BootConfig, MagiskInit},
+    logging::setup_klog,
+};
 use base::{
     cstr, debug, info,
     libc::{basename, getpid, mount, umask},
     raw_cstr, FsPath, LibcReturn, LoggedResult, ResultExt, Utf8CStr,
 };
-use std::ffi::{c_char, CStr};
-use std::ptr::null as nullptr;
+use std::{
+    ffi::{c_char, CStr},
+    ptr::null,
+};
 
 impl MagiskInit {
     fn new(argv: *mut *mut c_char) -> Self {
@@ -83,7 +87,7 @@ impl MagiskInit {
                     raw_cstr!("/proc"),
                     raw_cstr!("proc"),
                     0,
-                    nullptr(),
+                    null(),
                 )
             }
             .as_os_err()?;
@@ -97,7 +101,7 @@ impl MagiskInit {
                     raw_cstr!("/sys"),
                     raw_cstr!("sysfs"),
                     0,
-                    nullptr(),
+                    null(),
                 )
             }
             .as_os_err()?;

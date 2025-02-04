@@ -1,12 +1,17 @@
-use base::libc::{
-    makedev, mknod, syscall, SYS_dup3, O_CLOEXEC, O_RDWR, O_WRONLY, STDERR_FILENO, STDIN_FILENO,
-    STDOUT_FILENO, S_IFCHR,
+use base::{
+    cstr,
+    libc::{
+        makedev, mknod, syscall, SYS_dup3, O_CLOEXEC, O_RDWR, O_WRONLY, STDERR_FILENO,
+        STDIN_FILENO, STDOUT_FILENO, S_IFCHR,
+    },
+    open_fd, raw_cstr, FsPath, LogLevel, Logger, Utf8CStr, LOGGER,
 };
-use base::{cstr, open_fd, raw_cstr, FsPath, LogLevel, Logger, Utf8CStr, LOGGER};
-use std::fs::File;
-use std::io::{IoSlice, Write};
-use std::mem;
-use std::os::fd::{FromRawFd, IntoRawFd, RawFd};
+use std::{
+    fs::File,
+    io::{IoSlice, Write},
+    mem,
+    os::fd::{FromRawFd, IntoRawFd, RawFd},
+};
 
 // SAFETY: magiskinit is single threaded
 static mut KMSG: RawFd = -1;

@@ -1,16 +1,13 @@
 use crate::ffi::MagiskInit;
-use base::libc::{mount, MS_BIND, O_WRONLY};
 use base::{
     clone_attr, cstr, debug, error, info,
     libc::{
-        fstatat, stat, statfs, umount2, AT_SYMLINK_NOFOLLOW, MNT_DETACH, O_CLOEXEC, O_CREAT,
-        O_RDONLY, TMPFS_MAGIC,
+        fstatat, mount, stat, statfs, umount2, AT_SYMLINK_NOFOLLOW, MNT_DETACH, MS_BIND, O_CLOEXEC,
+        O_CREAT, O_RDONLY, O_WRONLY, TMPFS_MAGIC,
     },
     raw_cstr, FsPath, LibcReturn, MappedFile, MutBytesExt, ResultExt,
 };
-use std::ffi::c_long;
-use std::io::Write;
-use std::ptr::null;
+use std::{ffi::c_long, io::Write, ptr::null};
 
 impl MagiskInit {
     pub(crate) fn first_stage(&self) {
@@ -19,16 +16,11 @@ impl MagiskInit {
 
         if unsafe {
             let mut st: stat = std::mem::zeroed();
-            fstatat(
-                -1,
-                raw_cstr!("/sdcard"),
-                std::ptr::from_mut(&mut st),
-                AT_SYMLINK_NOFOLLOW,
-            ) != 0
+            fstatat(-1, raw_cstr!("/sdcard"), &mut st, AT_SYMLINK_NOFOLLOW) != 0
                 && fstatat(
                     -1,
                     raw_cstr!("/first_stage_ramdisk/sdcard"),
-                    std::ptr::from_mut(&mut st),
+                    &mut st,
                     AT_SYMLINK_NOFOLLOW,
                 ) != 0
         } {
@@ -151,7 +143,7 @@ impl MagiskInit {
 
             // Some weird devices like meizu, uses 2SI but still have legacy rootfs
             let mut sfs: statfs = std::mem::zeroed();
-            statfs(raw_cstr!("/"), std::ptr::from_mut(&mut sfs));
+            statfs(raw_cstr!("/"), &mut sfs);
             if sfs.f_type == 0x858458f6 || sfs.f_type as c_long == TMPFS_MAGIC {
                 // We are still on rootfs, so make sure we will execute the init of the 2nd stage
                 let init_path = FsPath::from(cstr!("/init"));
