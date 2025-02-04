@@ -465,11 +465,11 @@ impl MagiskD {
         if let Ok(mut fd) = apk.open(O_RDONLY | O_CLOEXEC) {
             info.trusted_cert = read_certificate(&mut fd, MAGISK_VER_CODE);
             // Seek the fd back to start
-            fd.seek(SeekFrom::Start(0)).log().ok();
+            fd.seek(SeekFrom::Start(0)).log_ok();
             info.stub_apk_fd = Some(fd);
         }
 
-        apk.remove().log().ok();
+        apk.remove().log_ok();
     }
 
     pub fn get_manager_uid(&self, user: i32) -> i32 {

@@ -66,7 +66,7 @@ impl MagiskInit {
         let orig_init = FsPath::from(unsafe { Utf8CStr::from_ptr_unchecked(self.backup_init()) });
 
         if orig_init.exists() {
-            orig_init.rename_to(FsPath::from(cstr!("/init"))).log().ok();
+            orig_init.rename_to(FsPath::from(cstr!("/init"))).log_ok();
         } else {
             // If the backup init is missing, this means that the boot ramdisk
             // was created from scratch, and the real init is in a separate CPIO,
@@ -151,7 +151,7 @@ pub unsafe extern "C" fn main(
     }
 
     if getpid() == 1 {
-        MagiskInit::new(argv).start().log().ok();
+        MagiskInit::new(argv).start().log_ok();
     }
 
     1

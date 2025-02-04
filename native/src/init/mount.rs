@@ -76,26 +76,20 @@ pub fn is_device_mounted(dev: u64, target: Pin<&mut CxxString>) -> bool {
 impl MagiskInit {
     pub(crate) fn prepare_data(&self) {
         debug!("Setup data tmp");
-        fn inner() -> LoggedResult<()> {
-            FsPath::from(cstr!("/data")).mkdir(0o755)?;
-            unsafe {
-                mount(
-                    raw_cstr!("magisk"),
-                    raw_cstr!("/data"),
-                    raw_cstr!("tmpfs"),
-                    0,
-                    raw_cstr!("mode=755").cast(),
-                )
-            }
-            .as_os_err()?;
+        FsPath::from(cstr!("/data")).mkdir(0o755).log_ok();
+        unsafe {
+            mount(
+                raw_cstr!("magisk"),
+                raw_cstr!("/data"),
+                raw_cstr!("tmpfs"),
+                0,
+                raw_cstr!("mode=755").cast(),
+            )
+        }.as_os_err().log_ok();
 
-            FsPath::from(cstr!("/init")).copy_to(FsPath::from(cstr!("/data/magiskinit")))?;
-            FsPath::from(cstr!("/.backup")).copy_to(FsPath::from(cstr!("/data/.backup")))?;
-            FsPath::from(cstr!("/overlay.d")).copy_to(FsPath::from(cstr!("/data/overlay.d")))?;
-
-            Ok(())
-        }
-        inner().ok();
+        FsPath::from(cstr!("/init")).copy_to(FsPath::from(cstr!("/data/magiskinit"))).log_ok();
+        FsPath::from(cstr!("/.backup")).copy_to(FsPath::from(cstr!("/data/.backup"))).log_ok();
+        FsPath::from(cstr!("/overlay.d")).copy_to(FsPath::from(cstr!("/data/overlay.d"))).log_ok();
     }
 
     pub(crate) fn exec_init(&self) {

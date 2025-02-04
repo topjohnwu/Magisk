@@ -116,14 +116,14 @@ impl MagiskInit {
                 debug!("Patch @ {:#010X} [{}] -> [{}]", off, from, to);
             }
             if let Ok(mut dest) = dest.create(O_CREAT | O_WRONLY, 0) {
-                dest.write_all(map.as_ref()).log().ok();
+                dest.write_all(map.as_ref()).log_ok();
             } else {
                 error!("Failed to create {}", dest);
             }
         } else {
             error!("Failed to open {} for hexpatch", src);
         }
-        clone_attr(src, dest).log().ok();
+        clone_attr(src, dest).log_ok();
         unsafe {
             mount(dest.as_ptr(), src.as_ptr(), null(), MS_BIND, null())
                 .as_os_err()

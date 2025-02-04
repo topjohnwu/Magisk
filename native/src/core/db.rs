@@ -314,7 +314,7 @@ impl MagiskD {
                 out.push('=');
                 out.push_str(values.get_text(i as i32));
             }
-            writer.write_encodable(&out).log().ok();
+            writer.write_encodable(&out).log_ok();
         };
         self.db_exec_with_rows(&sql, &[], &mut output_fn);
         writer.write_encodable("").log()
