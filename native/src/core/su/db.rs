@@ -27,7 +27,7 @@ impl SqlTable for RootSettings {
                 self.policy.repr = val;
             } else if column == "logging" {
                 self.log = val != 0;
-            } else if column == "notify" {
+            } else if column == "notification" {
                 self.notify = val != 0;
             }
         }
