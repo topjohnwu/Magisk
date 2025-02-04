@@ -23,12 +23,11 @@ impl SqlTable for RootSettings {
     fn on_row(&mut self, columns: &[String], values: &DbValues) {
         for (i, column) in columns.iter().enumerate() {
             let val = values.get_int(i as i32);
-            if column == "policy" {
-                self.policy.repr = val;
-            } else if column == "logging" {
-                self.log = val != 0;
-            } else if column == "notify" {
-                self.notify = val != 0;
+            match column.as_str() {
+                "policy" => self.policy.repr = val,
+                "logging" => self.log = val != 0,
+                "notification" => self.notify = val != 0,
+                _ => {}
             }
         }
     }
