@@ -29,11 +29,7 @@ bit-set = "0.8"
 syn = "2"
 quote = "1"
 proc-macro2 = "1"
-
-[workspace.dependencies.argh]
-git = "https://github.com/google/argh.git"
-rev = "1c632b046d084e7bde86b82dfc969b30b4647c8c"
-default-features = false
+argh = { version = "0.1.13", default-features = false }
 
 [workspace.dependencies.pb-rs]
 git = "https://github.com/tafia/quick-protobuf.git"
