@@ -96,6 +96,10 @@ impl MagiskD {
             module_list
                 .iter()
                 .map(|m| if is_64_bit { m.z64 } else { m.z32 })
+                // All fds passed over sockets have to be valid file descriptors.
+                // To work around this issue, send over STDOUT_FILENO as an indicator of an
+                // invalid fd as it will always be /dev/null in magiskd.
+                .map(|fd| if fd < 0 { STDOUT_FILENO } else { fd })
                 .collect()
         })
     }
