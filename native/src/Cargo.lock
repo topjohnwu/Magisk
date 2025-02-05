@@ -519,6 +519,7 @@ dependencies = [
 name = "magiskpolicy"
 version = "0.0.0"
 dependencies = [
+ "argh",
  "base",
  "cxx",
  "cxx-gen",
