@@ -653,14 +653,14 @@ bool sepol_impl::add_typeattribute(const char *type, const char *attr) {
     return true;
 }
 
-void sepolicy::strip_dontaudit() noexcept {
+void SePolicy::strip_dontaudit() noexcept {
     avtab_for_each(&impl->db->te_avtab, [=, this](avtab_ptr_t node) {
         if (node->key.specified == AVTAB_AUDITDENY || node->key.specified == AVTAB_XPERMS_DONTAUDIT)
             avtab_remove_node(&impl->db->te_avtab, node);
     });
 }
 
-void sepolicy::print_rules() const noexcept {
+void SePolicy::print_rules() const noexcept {
     hashtab_for_each(impl->db->p_types.table, [&](hashtab_ptr_t node) {
         type_datum_t *type = auto_cast(node->datum);
         if (type->flavor == TYPE_ATTRIB) {

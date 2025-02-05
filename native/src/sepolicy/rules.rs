@@ -1,4 +1,4 @@
-use crate::{ffi::Xperm, sepolicy};
+use crate::{ffi::Xperm, SePolicy};
 use base::{set_log_level_state, LogLevel};
 
 macro_rules! rules {
@@ -45,7 +45,7 @@ macro_rules! rules {
     }};
 }
 
-impl sepolicy {
+impl SePolicy {
     pub fn magisk_rules(&mut self) {
         // Temp suppress warnings
         set_log_level_state(LogLevel::Warn, false);

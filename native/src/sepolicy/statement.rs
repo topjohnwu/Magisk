@@ -3,7 +3,7 @@ use std::io::stderr;
 use std::{iter::Peekable, vec::IntoIter};
 
 use crate::ffi::Xperm;
-use crate::sepolicy;
+use crate::SePolicy;
 use base::{error, warn, FmtAdaptor};
 
 pub enum Token<'a> {
@@ -227,10 +227,7 @@ fn match_string<'a>(tokens: &mut Tokens<'a>, pattern: &str) -> ParseResult<'a, (
 //     statement ::= TC ID(s) ID(t) ID(c) ID(d) { sepolicy.type_change(s, t, c, d); };
 //     statement ::= TM ID(s) ID(t) ID(c) ID(d) { sepolicy.type_member(s, t, c, d);};
 //     statement ::= GF ID(s) ID(t) ID(c) { sepolicy.genfscon(s, t, c); };
-fn exec_statement<'a>(
-    sepolicy: &mut sepolicy,
-    tokens: &mut Tokens<'a>,
-) -> ParseResult<'a, ()> {
+fn exec_statement<'a>(sepolicy: &mut SePolicy, tokens: &mut Tokens<'a>) -> ParseResult<'a, ()> {
     let action = match tokens.next() {
         Some(token) => token,
         _ => Err(ParseError::ShowHelp)?,
@@ -444,8 +441,8 @@ fn tokenize_statement(statement: &str) -> Vec<Token> {
     tokens
 }
 
-impl sepolicy {
-    pub fn parse_statement(self: &mut sepolicy, statement: &str) {
+impl SePolicy {
+    pub fn parse_statement(self: &mut SePolicy, statement: &str) {
         let statement = statement.trim();
         if statement.is_empty() || statement.starts_with('#') {
             return;
@@ -600,7 +597,7 @@ allowxperm source target class ioctl *
     )
 }
 
-impl sepolicy {
+impl SePolicy {
     pub fn print_statement_help() {
         format_statement_help(&mut FmtAdaptor(&mut stderr())).ok();
         eprintln!();

@@ -1,14 +1,14 @@
 #![feature(format_args_nl)]
 #![feature(try_blocks)]
 
-use std::fmt::Write;
-use std::io::{BufRead, BufReader, Cursor};
-use cxx::CxxString;
 pub use base;
 use base::libc::{O_CLOEXEC, O_RDONLY};
 use base::{BufReadExt, FsPath, LoggedResult, Utf8CStr};
+use cxx::CxxString;
+use std::fmt::Write;
+use std::io::{BufRead, BufReader, Cursor};
 
-use crate::ffi::sepolicy;
+use crate::ffi::SePolicy;
 
 mod rules;
 mod statement;
@@ -21,7 +21,7 @@ pub mod ffi {
         reset: bool,
     }
 
-    pub struct sepolicy {
+    struct SePolicy {
         #[cxx_name = "impl"]
         _impl: UniquePtr<sepol_impl>,
     }
@@ -36,88 +36,70 @@ pub mod ffi {
 
         type sepol_impl;
 
-        fn allow(self: &mut sepolicy, s: Vec<&str>, t: Vec<&str>, c: Vec<&str>, p: Vec<&str>);
-        fn deny(self: &mut sepolicy, s: Vec<&str>, t: Vec<&str>, c: Vec<&str>, p: Vec<&str>);
-        fn auditallow(
-            self: &mut sepolicy,
-            s: Vec<&str>,
-            t: Vec<&str>,
-            c: Vec<&str>,
-            p: Vec<&str>,
-        );
-        fn dontaudit(
-            self: &mut sepolicy,
-            s: Vec<&str>,
-            t: Vec<&str>,
-            c: Vec<&str>,
-            p: Vec<&str>,
-        );
-        fn allowxperm(
-            self: &mut sepolicy,
-            s: Vec<&str>,
-            t: Vec<&str>,
-            c: Vec<&str>,
-            p: Vec<Xperm>,
-        );
+        fn allow(self: &mut SePolicy, s: Vec<&str>, t: Vec<&str>, c: Vec<&str>, p: Vec<&str>);
+        fn deny(self: &mut SePolicy, s: Vec<&str>, t: Vec<&str>, c: Vec<&str>, p: Vec<&str>);
+        fn auditallow(self: &mut SePolicy, s: Vec<&str>, t: Vec<&str>, c: Vec<&str>, p: Vec<&str>);
+        fn dontaudit(self: &mut SePolicy, s: Vec<&str>, t: Vec<&str>, c: Vec<&str>, p: Vec<&str>);
+        fn allowxperm(self: &mut SePolicy, s: Vec<&str>, t: Vec<&str>, c: Vec<&str>, p: Vec<Xperm>);
         fn auditallowxperm(
-            self: &mut sepolicy,
+            self: &mut SePolicy,
             s: Vec<&str>,
             t: Vec<&str>,
             c: Vec<&str>,
             p: Vec<Xperm>,
         );
         fn dontauditxperm(
-            self: &mut sepolicy,
+            self: &mut SePolicy,
             s: Vec<&str>,
             t: Vec<&str>,
             c: Vec<&str>,
             p: Vec<Xperm>,
         );
-        fn permissive(self: &mut sepolicy, t: Vec<&str>);
-        fn enforce(self: &mut sepolicy, t: Vec<&str>);
-        fn typeattribute(self: &mut sepolicy, t: Vec<&str>, a: Vec<&str>);
+        fn permissive(self: &mut SePolicy, t: Vec<&str>);
+        fn enforce(self: &mut SePolicy, t: Vec<&str>);
+        fn typeattribute(self: &mut SePolicy, t: Vec<&str>, a: Vec<&str>);
         #[cxx_name = "type"]
-        fn type_(self: &mut sepolicy, t: &str, a: Vec<&str>);
-        fn attribute(self: &mut sepolicy, t: &str);
-        fn type_transition(self: &mut sepolicy, s: &str, t: &str, c: &str, d: &str, o: &str);
-        fn type_change(self: &mut sepolicy, s: &str, t: &str, c: &str, d: &str);
-        fn type_member(self: &mut sepolicy, s: &str, t: &str, c: &str, d: &str);
-        fn genfscon(self: &mut sepolicy, s: &str, t: &str, c: &str);
+        fn type_(self: &mut SePolicy, t: &str, a: Vec<&str>);
+        fn attribute(self: &mut SePolicy, t: &str);
+        fn type_transition(self: &mut SePolicy, s: &str, t: &str, c: &str, d: &str, o: &str);
+        fn type_change(self: &mut SePolicy, s: &str, t: &str, c: &str, d: &str);
+        fn type_member(self: &mut SePolicy, s: &str, t: &str, c: &str, d: &str);
+        fn genfscon(self: &mut SePolicy, s: &str, t: &str, c: &str);
         #[allow(dead_code)]
-        fn strip_dontaudit(self: &mut sepolicy);
+        fn strip_dontaudit(self: &mut SePolicy);
 
-        fn print_rules(self: &sepolicy);
-        fn to_file(self: &sepolicy, file: Utf8CStrRef) -> bool;
+        fn print_rules(self: &SePolicy);
+        fn to_file(self: &SePolicy, file: Utf8CStrRef) -> bool;
 
-        #[Self = sepolicy]
-        fn from_file(file: Utf8CStrRef) -> UniquePtr<sepolicy>;
-        #[Self = sepolicy]
-        fn from_split() -> UniquePtr<sepolicy>;
-        #[Self = sepolicy]
-        fn compile_split() -> UniquePtr<sepolicy>;
-        #[Self = sepolicy]
-        unsafe fn from_data(data: *mut c_char, len: usize) -> UniquePtr<sepolicy>;
+        #[Self = SePolicy]
+        fn from_file(file: Utf8CStrRef) -> SePolicy;
+        #[Self = SePolicy]
+        fn from_split() -> SePolicy;
+        #[Self = SePolicy]
+        fn compile_split() -> SePolicy;
+        #[Self = SePolicy]
+        unsafe fn from_data(data: *mut c_char, len: usize) -> SePolicy;
     }
 
     extern "Rust" {
-        fn parse_statement(self: &mut sepolicy, statement: Utf8CStrRef);
-        fn magisk_rules(self: &mut sepolicy);
-        fn load_rule_file(self: &mut sepolicy, filename: Utf8CStrRef);
-        fn load_rules(self: &mut sepolicy, rules: &CxxString);
-        #[Self = sepolicy]
+        fn parse_statement(self: &mut SePolicy, statement: Utf8CStrRef);
+        fn magisk_rules(self: &mut SePolicy);
+        fn load_rule_file(self: &mut SePolicy, filename: Utf8CStrRef);
+        fn load_rules(self: &mut SePolicy, rules: &CxxString);
+        #[Self = SePolicy]
         fn xperm_to_string(perm: &Xperm) -> String;
-        #[Self = sepolicy]
+        #[Self = SePolicy]
         fn print_statement_help();
     }
 }
 
-impl sepolicy {
-    fn load_rules(self: &mut sepolicy, rules: &CxxString) {
+impl SePolicy {
+    fn load_rules(self: &mut SePolicy, rules: &CxxString) {
         let mut cursor = Cursor::new(rules.as_bytes());
         self.load_rules_from_reader(&mut cursor);
     }
 
-    pub fn load_rule_file(self: &mut sepolicy, filename: &Utf8CStr) {
+    pub fn load_rule_file(self: &mut SePolicy, filename: &Utf8CStr) {
         let result: LoggedResult<()> = try {
             let file = FsPath::from(filename).open(O_RDONLY | O_CLOEXEC)?;
             let mut reader = BufReader::new(file);
@@ -126,7 +108,7 @@ impl sepolicy {
         result.ok();
     }
 
-    fn load_rules_from_reader<T: BufRead>(self: &mut sepolicy, reader: &mut T) {
+    fn load_rules_from_reader<T: BufRead>(self: &mut SePolicy, reader: &mut T) {
         reader.foreach_lines(|line| {
             self.parse_statement(line);
             true

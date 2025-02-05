@@ -9,19 +9,19 @@ using namespace std;
 
 void MagiskInit::patch_sepolicy(const char *in, const char *out) {
     LOGD("Patching monolithic policy\n");
-    auto sepol = unique_ptr<sepolicy>(sepolicy::from_file(in));
+    auto sepol = SePolicy::from_file(in);
 
-    sepol->magisk_rules();
+    sepol.magisk_rules();
 
     // Custom rules
     auto rule = "/data/" PREINITMIRR "/sepolicy.rule";
     if (xaccess(rule, R_OK) == 0) {
         LOGD("Loading custom sepolicy patch: [%s]\n", rule);
-        sepol->load_rule_file(rule);
+        sepol.load_rule_file(rule);
     }
 
     LOGD("Dumping sepolicy to: [%s]\n", out);
-    sepol->to_file(out);
+    sepol.to_file(out);
 
     // Remove OnePlus stupid debug sepolicy and use our own
     if (access("/sepolicy_debug", F_OK) == 0) {
@@ -124,12 +124,12 @@ bool MagiskInit::hijack_sepolicy() {
     xumount2(SELINUX_ENFORCE, MNT_DETACH);
 
     // Load and patch policy
-    auto sepol = unique_ptr<sepolicy>(sepolicy::from_file(MOCK_LOAD));
-    sepol->magisk_rules();
-    sepol->load_rules(rules);
+    auto sepol = SePolicy::from_file(MOCK_LOAD);
+    sepol.magisk_rules();
+    sepol.load_rules(rules);
 
     // Load patched policy into kernel
-    sepol->to_file(SELINUX_LOAD);
+    sepol.to_file(SELINUX_LOAD);
 
     // restore mounted files' context after sepolicy loaded
     rust::reset_overlay_contexts();

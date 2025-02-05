@@ -79,7 +79,7 @@ static void load_cil(struct cil_db *db, const char *file) {
     LOGD("cil_add [%s]\n", file);
 }
 
-std::unique_ptr<sepolicy> sepolicy::from_data(char *data, size_t len) noexcept {
+SePolicy SePolicy::from_data(char *data, size_t len) noexcept {
     LOGD("Load policy from data\n");
 
     policy_file_t pf;
@@ -92,12 +92,13 @@ std::unique_ptr<sepolicy> sepolicy::from_data(char *data, size_t len) noexcept {
     if (policydb_init(db) || policydb_read(db, &pf, 0)) {
         LOGE("Fail to load policy from data\n");
         free(db);
-        return nullptr;
+        return {};
     }
-    return std::make_unique<sepolicy>(sepolicy{.impl{new sepol_impl(db)}});
+
+    return {std::make_unique<sepol_impl>(db)};
 }
 
-std::unique_ptr<sepolicy> sepolicy::from_file(::rust::Utf8CStr file) noexcept {
+SePolicy SePolicy::from_file(::rust::Utf8CStr file) noexcept {
     LOGD("Load policy from: %.*s\n", static_cast<int>(file.size()), file.data());
 
     policy_file_t pf;
@@ -110,13 +111,13 @@ std::unique_ptr<sepolicy> sepolicy::from_file(::rust::Utf8CStr file) noexcept {
     if (policydb_init(db) || policydb_read(db, &pf, 0)) {
         LOGE("Fail to load policy from %.*s\n", static_cast<int>(file.size()), file.data());
         free(db);
-        return nullptr;
+        return {};
     }
 
-    return std::make_unique<sepolicy>(sepolicy{.impl{new sepol_impl(db)}});
+    return {std::make_unique<sepol_impl>(db)};
 }
 
-std::unique_ptr<sepolicy> sepolicy::compile_split() noexcept {
+SePolicy SePolicy::compile_split() noexcept {
     char path[128], plat_ver[10];
     cil_db_t *db = nullptr;
     sepol_policydb_t *pdb = nullptr;
@@ -207,21 +208,21 @@ std::unique_ptr<sepolicy> sepolicy::compile_split() noexcept {
         load_cil(db, cil_file);
 
     if (cil_compile(db))
-        return nullptr;
+        return {};
     if (cil_build_policydb(db, &pdb))
-        return nullptr;
-    return std::make_unique<sepolicy>(sepolicy{.impl{new sepol_impl(&pdb->p)}});
+        return {};
+    return {std::make_unique<sepol_impl>(&pdb->p)};
 }
 
-std::unique_ptr<sepolicy> sepolicy::from_split() noexcept {
+SePolicy SePolicy::from_split() noexcept {
     const char *odm_pre = ODM_POLICY_DIR "precompiled_sepolicy";
     const char *vend_pre = VEND_POLICY_DIR "precompiled_sepolicy";
     if (access(odm_pre, R_OK) == 0 && check_precompiled(odm_pre))
-        return sepolicy::from_file(odm_pre);
+        return SePolicy::from_file(odm_pre);
     else if (access(vend_pre, R_OK) == 0 && check_precompiled(vend_pre))
-        return sepolicy::from_file(vend_pre);
+        return SePolicy::from_file(vend_pre);
     else
-        return sepolicy::compile_split();
+        return SePolicy::compile_split();
 }
 
 sepol_impl::~sepol_impl() {
@@ -229,7 +230,7 @@ sepol_impl::~sepol_impl() {
     free(db);
 }
 
-bool sepolicy::to_file(::rust::Utf8CStr file) const noexcept {
+bool SePolicy::to_file(::rust::Utf8CStr file) const noexcept {
     // No partial writes are allowed to /sys/fs/selinux/load, thus the reason why we
     // first dump everything into memory, then directly call write system call
     heap_data data;

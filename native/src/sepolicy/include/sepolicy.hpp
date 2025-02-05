@@ -6,6 +6,7 @@
 #include <base.hpp>
 
 #include "../policy-rs.hpp"
+
 // sepolicy paths
 #define PLAT_POLICY_DIR     "/system/etc/selinux/"
 #define VEND_POLICY_DIR     "/vendor/etc/selinux/"

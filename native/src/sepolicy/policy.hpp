@@ -29,14 +29,13 @@ class sepol_impl {
     void add_typeattribute(type_datum_t *type, type_datum_t *attr);
     bool add_typeattribute(const char *type, const char *attr);
 
-    sepol_impl(policydb *db) : db(db) {}
-
     policydb *db;
 
     std::map<std::string_view, std::array<const char *, 32>> class_perm_names;
 
-    friend struct sepolicy;
+    friend struct SePolicy;
 
 public:
+    sepol_impl(policydb *db) : db(db) {}
     ~sepol_impl();
 };

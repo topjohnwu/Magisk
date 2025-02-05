@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
     cmdline_logging();
     const char *out_file = nullptr;
     vector<string_view> rule_files;
-    std::unique_ptr<sepolicy> sepol;
+    SePolicy sepol;
     bool magisk = false;
     bool live = false;
     bool print = false;
@@ -56,21 +56,21 @@ int main(int argc, char *argv[]) {
             else if (option == "load"sv) {
                 if (argv[i + 1] == nullptr)
                     usage(argv[0]);
-                sepol = sepolicy::from_file(argv[i + 1]);
-                if (!sepol) {
+                sepol = SePolicy::from_file(argv[i + 1]);
+                if (!sepol.impl) {
                     fprintf(stderr, "Cannot load policy from %s\n", argv[i + 1]);
                     return 1;
                 }
                 ++i;
             } else if (option == "load-split"sv) {
-                sepol = sepolicy::from_split();
-                if (!sepol) {
+                sepol = SePolicy::from_split();
+                if (!sepol.impl) {
                     fprintf(stderr, "Cannot load split cil\n");
                     return 1;
                 }
             } else if (option == "compile-split"sv) {
-                sepol = sepolicy::compile_split();
-                if (!sepol) {
+                sepol = SePolicy::compile_split();
+                if (!sepol.impl) {
                     fprintf(stderr, "Cannot compile split cil\n");
                     return 1;
                 }
@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
                 rule_files.emplace_back(argv[i + 1]);
                 ++i;
             } else if (option == "help"sv) {
-                sepolicy::print_statement_help();
+                SePolicy::print_statement_help();
                 exit(0);
             } else {
                 usage(argv[0]);
@@ -96,32 +96,32 @@ int main(int argc, char *argv[]) {
     }
 
     // Use current policy if nothing is loaded
-    if (sepol == nullptr && !(sepol = sepolicy::from_file(SELINUX_POLICY))) {
+    if (!sepol.impl && !(sepol = SePolicy::from_file(SELINUX_POLICY)).impl) {
         fprintf(stderr, "Cannot load policy from " SELINUX_POLICY "\n");
         return 1;
     }
 
     if (print) {
-        sepol->print_rules();
+        sepol.print_rules();
         return 0;
     }
 
     if (magisk)
-        sepol->magisk_rules();
+        sepol.magisk_rules();
 
     if (!rule_files.empty())
         for (const auto &rule_file : rule_files)
-            sepol->load_rule_file(rule_file.data());
+            sepol.load_rule_file(rule_file.data());
 
     for (; i < argc; ++i)
-        sepol->parse_statement(argv[i]);
+        sepol.parse_statement(argv[i]);
 
-    if (live && !sepol->to_file(SELINUX_LOAD)) {
+    if (live && !sepol.to_file(SELINUX_LOAD)) {
         fprintf(stderr, "Cannot apply policy\n");
         return 1;
     }
 
-    if (out_file && !sepol->to_file(out_file)) {
+    if (out_file && !sepol.to_file(out_file)) {
         fprintf(stderr, "Cannot dump policy to %s\n", out_file);
         return 1;
     }
