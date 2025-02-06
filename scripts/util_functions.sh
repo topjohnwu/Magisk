@@ -704,6 +704,7 @@ install_module() {
 
   for TARGET in $REMOVE; do
     ui_print "- Remove target: $TARGET"
+    mkdir -p "${MODPATH}${TARGET%/*}" 2>/dev/null
     mknod $MODPATH$TARGET c 0 0
   done
 
