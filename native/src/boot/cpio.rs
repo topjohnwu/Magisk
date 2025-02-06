@@ -15,13 +15,13 @@ use num_traits::cast::AsPrimitive;
 use size::{Base, Size, Style};
 
 use base::libc::{
-    dev_t, gid_t, major, makedev, minor, mknod, mode_t, uid_t, O_CLOEXEC, O_CREAT,
-    O_RDONLY, O_TRUNC, O_WRONLY, S_IFBLK, S_IFCHR, S_IFDIR, S_IFLNK, S_IFMT, S_IFREG, S_IRGRP,
-    S_IROTH, S_IRUSR, S_IWGRP, S_IWOTH, S_IWUSR, S_IXGRP, S_IXOTH, S_IXUSR,
+    dev_t, gid_t, major, makedev, minor, mknod, mode_t, uid_t, O_CLOEXEC, O_CREAT, O_RDONLY,
+    O_TRUNC, O_WRONLY, S_IFBLK, S_IFCHR, S_IFDIR, S_IFLNK, S_IFMT, S_IFREG, S_IRGRP, S_IROTH,
+    S_IRUSR, S_IWGRP, S_IWOTH, S_IWUSR, S_IXGRP, S_IXOTH, S_IXUSR,
 };
 use base::{
-    log_err, BytesExt, EarlyExitExt, FsPath, LoggedResult, MappedFile, ResultExt,
-    Utf8CStr, Utf8CStrBufArr, Utf8CStrWrite, WriteExt,
+    log_err, BytesExt, EarlyExitExt, FsPath, LoggedResult, MappedFile, ResultExt, Utf8CStr,
+    Utf8CStrBufArr, Utf8CStrWrite, WriteExt,
 };
 
 use crate::check_env;
@@ -150,7 +150,7 @@ struct List {
     recursive: bool,
 }
 
-fn print_cpio_usage() {
+pub(crate) fn print_cpio_usage() {
     eprintln!(
         r#"Usage: magiskboot cpio <incpio> [commands...]
 

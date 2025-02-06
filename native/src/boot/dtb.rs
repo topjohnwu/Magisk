@@ -6,9 +6,7 @@ use fdt::{
     Fdt,
 };
 
-use base::{
-    EarlyExitExt, LoggedResult, MappedFile, ResultExt, Utf8CStr,
-};
+use base::{EarlyExitExt, LoggedResult, MappedFile, ResultExt, Utf8CStr};
 
 use crate::{check_env, patch::patch_verity};
 
@@ -43,7 +41,7 @@ struct Patch {}
 #[argh(subcommand, name = "test")]
 struct Test {}
 
-fn print_dtb_usage() {
+pub(crate) fn print_dtb_usage() {
     eprintln!(
         r#"Usage: magiskboot dtb <file> <action> [args...]
 Do dtb related actions to <file>.
