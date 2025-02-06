@@ -12,7 +12,7 @@ use crate::{
     proto::update_metadata::{mod_InstallOperation::Type, DeltaArchiveManifest},
 };
 use base::{
-    error, ffi::Utf8CStrRef, LoggedError, LoggedResult, ReadSeekExt, ResultExt, Utf8CStr, WriteExt,
+    error, LoggedError, LoggedResult, ReadSeekExt, ResultExt, WriteExt,
 };
 
 macro_rules! bad_payload {
@@ -28,10 +28,10 @@ macro_rules! bad_payload {
 
 const PAYLOAD_MAGIC: &str = "CrAU";
 
-fn do_extract_boot_from_payload(
-    in_path: &Utf8CStr,
-    partition_name: Option<&Utf8CStr>,
-    out_path: Option<&Utf8CStr>,
+pub fn extract_boot_from_payload(
+    in_path: &str,
+    partition_name: Option<&str>,
+    out_path: Option<&str>,
 ) -> LoggedResult<()> {
     let mut reader = BufReader::new(if in_path == "-" {
         unsafe { File::from_raw_fd(0) }
@@ -179,24 +179,3 @@ fn do_extract_boot_from_payload(
     Ok(())
 }
 
-pub fn extract_boot_from_payload(
-    in_path: Utf8CStrRef,
-    partition: Utf8CStrRef,
-    out_path: Utf8CStrRef,
-) -> bool {
-    let res: LoggedResult<()> = try {
-        let partition = if partition.is_empty() {
-            None
-        } else {
-            Some(partition)
-        };
-        let out_path = if out_path.is_empty() {
-            None
-        } else {
-            Some(out_path)
-        };
-        do_extract_boot_from_payload(in_path, partition, out_path)?
-    };
-    res.log_with_msg(|w| w.write_str("Failed to extract from payload"))
-        .is_ok()
-}

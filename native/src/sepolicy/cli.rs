@@ -6,7 +6,6 @@ use base::{
 use std::{ffi::c_char, io::Cursor};
 
 #[derive(FromArgs)]
-/// Reach new heights.
 struct Cli {
     #[argh(switch)]
     live: bool,

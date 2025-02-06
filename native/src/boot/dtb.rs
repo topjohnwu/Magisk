@@ -7,7 +7,7 @@ use fdt::{
 };
 
 use base::{
-    libc::c_char, log_err, map_args, EarlyExitExt, LoggedResult, MappedFile, ResultExt, Utf8CStr,
+    EarlyExitExt, LoggedResult, MappedFile, ResultExt, Utf8CStr,
 };
 
 use crate::{check_env, patch::patch_verity};
@@ -272,13 +272,8 @@ fn dtb_patch(file: &Utf8CStr) -> LoggedResult<bool> {
     Ok(patched)
 }
 
-pub fn dtb_commands(argc: i32, argv: *const *const c_char) -> bool {
+pub fn dtb_commands(cmds: &Vec<&str>) -> bool {
     let res: LoggedResult<()> = try {
-        if argc < 1 {
-            Err(log_err!("No arguments"))?;
-        }
-        let cmds = map_args(argc, argv)?;
-
         let mut cli =
             DtbCli::from_args(&["magiskboot", "dtb"], &cmds).on_early_exit(print_dtb_usage);
 

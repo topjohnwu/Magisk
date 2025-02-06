@@ -537,8 +537,8 @@ bool boot_img::parse_image(const uint8_t *p, format_t type) {
     return true;
 }
 
-bool boot_img::verify(const char *cert) const {
-    return rust::verify_boot_image(*this, cert);
+bool boot_img::verify() const {
+    return flags[AVB1_SIGNED_FLAG];
 }
 
 int split_image_dtb(const char *filename, bool skip_decomp) {
@@ -985,17 +985,6 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
     }
 
     close(fd);
-}
-
-int verify(const char *image, const char *cert) {
-    const boot_img boot(image);
-    if (cert == nullptr) {
-        // Boot image parsing already checks if the image is signed
-        return boot.flags[AVB1_SIGNED_FLAG] ? 0 : 1;
-    } else {
-        // Provide a custom certificate and re-verify
-        return boot.verify(cert) ? 0 : 1;
-    }
 }
 
 int sign(const char *image, const char *name, const char *cert, const char *key) {
