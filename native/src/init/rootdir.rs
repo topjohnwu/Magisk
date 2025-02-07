@@ -21,7 +21,11 @@ fn get_context<const N: usize>(path: &str, con: &mut Utf8CStrBufArr<N>) -> std::
             con.capacity(),
         )
         .check_os_err()?;
-        con.set_len((sz - 1) as usize);
+        if sz > 0 && *con.as_ptr().add((sz - 1) as usize) == 0 {
+            con.set_len((sz - 1) as usize);
+        } else {
+            con.set_len(sz as usize);
+        }
     }
     Ok(())
 }
