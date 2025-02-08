@@ -1,41 +1,58 @@
-use base::{
-    debug, libc, Directory, LibcReturn, LoggedResult, ResultExt, Utf8CStr, Utf8CStrBuf,
-    Utf8CStrBufArr, WalkResult,
-};
+use base::{debug, errno, error, libc, Directory, FsPath, LibcReturn, LoggedResult, ResultExt, Utf8CStr, Utf8CStrBufArr, Utf8CString, WalkResult};
 use std::fs::File;
 use std::io::Write;
 use std::mem;
 use std::os::fd::{FromRawFd, RawFd};
 use std::sync::OnceLock;
+use base::libc::EROFS;
 
-pub static OVERLAY_ATTRS: OnceLock<Vec<(String, String)>> = OnceLock::new();
+pub static OVERLAY_ATTRS: OnceLock<Vec<(Utf8CString, Utf8CString)>> = OnceLock::new();
 
 const XATTR_NAME_SELINUX: &[u8] = b"security.selinux\0";
 
-fn get_context<const N: usize>(path: &str, con: &mut Utf8CStrBufArr<N>) -> std::io::Result<()> {
+fn get_context(path: &Utf8CStr, con: &mut Utf8CString) -> std::io::Result<()> {
+    con.clear();
+    
+    let sz = unsafe {
+        libc::lgetxattr(
+            path.as_ptr().cast(),
+            XATTR_NAME_SELINUX.as_ptr().cast(),
+            con.as_mut_ptr().cast(),
+            0,
+        )
+    }.check_os_err()? as usize;
+    
+    if sz > con.capacity() {
+        con.reserve(sz);
+    }
+    
     unsafe {
-        let sz = libc::lgetxattr(
+        libc::lgetxattr(
             path.as_ptr().cast(),
             XATTR_NAME_SELINUX.as_ptr().cast(),
             con.as_mut_ptr().cast(),
             con.capacity(),
         )
         .check_os_err()?;
-        con.set_len((sz - 1) as usize);
+        con.set_len(sz - 1);
     }
     Ok(())
 }
 
-fn set_context(path: &str, con: &str) -> std::io::Result<()> {
+fn set_context(path: &Utf8CStr, con: &Utf8CStr) -> std::io::Result<()> {
     unsafe {
-        libc::lsetxattr(
+        if libc::lsetxattr(
             path.as_ptr().cast(),
             XATTR_NAME_SELINUX.as_ptr().cast(),
             con.as_ptr().cast(),
-            con.len() + 1,
+            con.len(),
             0,
-        )
-        .as_os_err()
+        ) < 0 && *errno() != EROFS {
+            Err(std::io::Error::last_os_error())
+        } else {
+            *errno() = 0;
+            Ok(())
+        }
     }
 }
 
@@ -43,21 +60,22 @@ pub fn collect_overlay_contexts(src: &Utf8CStr) {
     OVERLAY_ATTRS
         .get_or_try_init(|| -> LoggedResult<_> {
             let mut contexts = vec![];
-            let mut con = Utf8CStrBufArr::default();
             let mut path = Utf8CStrBufArr::default();
             let mut src = Directory::open(src)?;
             src.path(&mut path)?;
             let src_len = path.len();
-            src.post_order_walk(|f| {
+            src.pre_order_walk(|f| {
                 f.path(&mut path)?;
 
-                let path = &path[src_len..];
+                // SAFETY: path is a sub-path of src
+                let path = unsafe { path.skip_unchecked(src_len) };
+                let mut con = Utf8CString::new();
                 if get_context(path, &mut con)
                     .log_with_msg(|w| w.write_fmt(format_args!("collect context {}", path)))
                     .is_ok()
                 {
                     debug!("collect context: {:?} -> {:?}", path, con);
-                    contexts.push((path.to_string(), con.to_string()));
+                    contexts.push((Utf8CString::from(path.to_string()), con));
                 }
 
                 Ok(WalkResult::Continue)

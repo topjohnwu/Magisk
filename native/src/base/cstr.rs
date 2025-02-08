@@ -132,13 +132,55 @@ impl StringExt for PathBuf {
     }
 }
 
-#[derive(Default)]
 pub struct Utf8CString(String);
+
+impl Default for Utf8CString {
+    fn default() -> Self {
+        let mut s = Utf8CString(String::with_capacity(4096));
+        s.0.nul_terminate();
+        s
+    }
+}
 
 impl Utf8CString {
     #[inline(always)]
     pub fn new() -> Self {
-        Self::default()
+        let mut s = Utf8CString(String::new());
+        s.0.nul_terminate();
+        s
+    }
+
+    #[inline(always)]
+    pub fn clear(&mut self) {
+        self.0.clear();
+        self.0.nul_terminate();
+    }
+
+    #[inline(always)]
+    pub fn reserve(&mut self, additional: usize) {
+        self.0.reserve(additional + 1);
+    }
+
+    #[inline(always)]
+    pub fn capacity(&self) -> usize {
+        // SAFETY: the internal string has capacity at least 1
+        self.0.capacity() - 1
+    }
+
+    #[inline(always)]
+    pub unsafe fn set_len(&mut self, len: usize) {
+        self.0.as_mut_vec().set_len(len);
+        self.0.nul_terminate();
+    }
+    
+    #[inline(always)]
+    pub fn shrink_to_fit(&mut self) {
+        unsafe {
+            let vec = self.0.as_mut_vec();
+            vec.set_len(vec.len() + 1);
+            vec.shrink_to_fit();
+            vec.set_len(vec.len() - 1);
+        }
     }
 }
 
@@ -151,7 +193,8 @@ impl AsUtf8CStr for Utf8CString {
 
     #[inline(always)]
     fn as_utf8_cstr_mut(&mut self) -> &mut Utf8CStr {
-        Utf8CStr::from_string(&mut self.0)
+        // SAFETY: the internal string is always null terminated
+        unsafe { mem::transmute(slice::from_raw_parts_mut(self.0.as_mut_ptr(), self.0.len() + 1)) }
     }
 }
 
@@ -179,9 +222,10 @@ impl Utf8CStrWrite for Utf8CString {
 }
 
 impl From<String> for Utf8CString {
-    fn from(mut value: String) -> Self {
-        value.nul_terminate();
-        Utf8CString(value)
+    fn from(value: String) -> Self {
+        let mut s = Utf8CString(value);
+        s.0.nul_terminate();
+        s
     }
 }
 
@@ -378,6 +422,32 @@ impl Utf8CStr {
         // SAFETY: Already UTF-8 validated during construction
         // SAFETY: The length of the slice is at least 1 due to null termination check
         unsafe { str::from_utf8_unchecked_mut(self.0.get_unchecked_mut(..self.0.len() - 1)) }
+    }
+
+    pub fn skip(&self, n: usize) -> Option<&Utf8CStr> {
+        if n >= self.0.len() {
+            None
+        } else {
+            // SAFETY: The length of the slice is at least 1 due to null termination check
+            Some(unsafe { self.skip_unchecked(n) })
+        }
+    }
+
+    pub fn skip_mut(&mut self, n: usize) -> Option<&mut Utf8CStr> {
+        if n >= self.0.len() {
+            None
+        } else {
+            // SAFETY: The length of the slice is at least 1 due to null termination check
+            Some(unsafe { self.skip_unchecked_mut(n) })
+        }
+    }
+
+    pub unsafe fn skip_unchecked(&self, n: usize) -> &Utf8CStr {
+        Self::from_bytes_unchecked(self.0.get_unchecked(n..))
+    }
+
+    pub unsafe fn skip_unchecked_mut(&mut self, n: usize) -> &mut Utf8CStr {
+        Self::from_bytes_unchecked_mut(self.0.get_unchecked_mut(n..))
     }
 }
 
