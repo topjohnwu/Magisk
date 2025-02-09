@@ -29,14 +29,6 @@ use crate::ffi::{unxz, xz};
 use crate::patch::{patch_encryption, patch_verity};
 
 #[derive(FromArgs)]
-struct CpioCli {
-    #[argh(positional)]
-    file: String,
-    #[argh(positional)]
-    commands: Vec<String>,
-}
-
-#[derive(FromArgs)]
 struct CpioCommand {
     #[argh(subcommand)]
     action: CpioAction,
@@ -754,68 +746,58 @@ impl Display for CpioEntry {
     }
 }
 
-pub fn cpio_commands(cmds: &Vec<&str>) -> bool {
-    let res: LoggedResult<()> = try {
-        let mut cli =
-            CpioCli::from_args(&["magiskboot", "cpio"], &cmds).on_early_exit(print_cpio_usage);
-
-        let file = Utf8CStr::from_string(&mut cli.file);
-        let mut cpio = if FsPath::from(file).exists() {
-            Cpio::load_from_file(file)?
-        } else {
-            Cpio::new()
-        };
-
-        for cmd in cli.commands {
-            if cmd.starts_with('#') {
-                continue;
-            }
-            let mut cli = CpioCommand::from_args(
-                &["magiskboot", "cpio", file],
-                cmd.split(' ')
-                    .filter(|x| !x.is_empty())
-                    .collect::<Vec<_>>()
-                    .as_slice(),
-            )
-            .on_early_exit(print_cpio_usage);
-
-            match &mut cli.action {
-                CpioAction::Test(_) => exit(cpio.test()),
-                CpioAction::Restore(_) => cpio.restore()?,
-                CpioAction::Patch(_) => cpio.patch(),
-                CpioAction::Exists(Exists { path }) => {
-                    if cpio.exists(path) {
-                        exit(0);
-                    } else {
-                        exit(1);
-                    }
-                }
-                CpioAction::Backup(Backup {
-                    origin,
-                    skip_compress,
-                }) => cpio.backup(origin, *skip_compress)?,
-                CpioAction::Remove(Remove { path, recursive }) => cpio.rm(path, *recursive),
-                CpioAction::Move(Move { from, to }) => cpio.mv(from, to)?,
-                CpioAction::MakeDir(MakeDir { mode, dir }) => cpio.mkdir(*mode, dir),
-                CpioAction::Link(Link { src, dst }) => cpio.ln(src, dst),
-                CpioAction::Add(Add { mode, path, file }) => cpio.add(*mode, path, file)?,
-                CpioAction::Extract(Extract { paths }) => {
-                    if !paths.is_empty() && paths.len() != 2 {
-                        Err(log_err!("invalid arguments"))?;
-                    }
-                    let mut it = paths.iter_mut();
-                    cpio.extract(it.next(), it.next())?;
-                }
-                CpioAction::List(List { path, recursive }) => {
-                    cpio.ls(path.as_str(), *recursive);
-                    exit(0);
-                }
-            };
-        }
-        cpio.dump(file)?;
+pub(crate) fn cpio_commands(file: &mut String, cmds: &mut Vec<String>) -> LoggedResult<bool> {
+    let file = Utf8CStr::from_string(file);
+    let mut cpio = if FsPath::from(file).exists() {
+        Cpio::load_from_file(file)?
+    } else {
+        Cpio::new()
     };
-    res.log_with_msg(|w| w.write_str("Failed to process cpio"))
-        .is_ok()
+
+    for cmd in cmds {
+        if cmd.starts_with('#') {
+            continue;
+        }
+        let mut cmd = CpioCommand::from_args(
+            &["magiskboot", "cpio", file],
+            cmd.split(' ')
+                .filter(|x| !x.is_empty())
+                .collect::<Vec<_>>()
+                .as_slice(),
+        )
+        .on_early_exit(print_cpio_usage);
+
+        match &mut cmd.action {
+            CpioAction::Test(_) => exit(cpio.test()),
+            CpioAction::Restore(_) => cpio.restore()?,
+            CpioAction::Patch(_) => cpio.patch(),
+            CpioAction::Exists(Exists { path }) => {
+                return Ok(cpio.exists(path));
+            }
+            CpioAction::Backup(Backup {
+                origin,
+                skip_compress,
+            }) => cpio.backup(origin, *skip_compress)?,
+            CpioAction::Remove(Remove { path, recursive }) => cpio.rm(path, *recursive),
+            CpioAction::Move(Move { from, to }) => cpio.mv(from, to)?,
+            CpioAction::MakeDir(MakeDir { mode, dir }) => cpio.mkdir(*mode, dir),
+            CpioAction::Link(Link { src, dst }) => cpio.ln(src, dst),
+            CpioAction::Add(Add { mode, path, file }) => cpio.add(*mode, path, file)?,
+            CpioAction::Extract(Extract { paths }) => {
+                if !paths.is_empty() && paths.len() != 2 {
+                    Err(log_err!("invalid arguments"))?;
+                }
+                let mut it = paths.iter_mut();
+                cpio.extract(it.next(), it.next())?;
+            }
+            CpioAction::List(List { path, recursive }) => {
+                cpio.ls(path.as_str(), *recursive);
+                return Ok(true);
+            }
+        };
+    }
+    cpio.dump(file)?;
+    Ok(true)
 }
 
 fn x8u(x: &[u8; 8]) -> LoggedResult<u32> {

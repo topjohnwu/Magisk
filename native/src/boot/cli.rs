@@ -1,5 +1,5 @@
 use crate::cpio::{cpio_commands, print_cpio_usage};
-use crate::dtb::{dtb_commands, print_dtb_usage};
+use crate::dtb::{dtb_commands, print_dtb_usage, DtbAction};
 use crate::ffi::{
     cleanup, compress, decompress_raw, formats, repack, sign, split_image_dtb, unpack, BootImage,
 };
@@ -101,6 +101,8 @@ struct HexPatch {
 #[argh(subcommand, name = "cpio")]
 struct Cpio {
     #[argh(positional)]
+    file: String,
+    #[argh(positional)]
     cmds: Vec<String>,
 }
 
@@ -108,7 +110,9 @@ struct Cpio {
 #[argh(subcommand, name = "dtb")]
 struct Dtb {
     #[argh(positional)]
-    cmds: Vec<String>,
+    file: String,
+    #[argh(subcommand)]
+    action: DtbAction,
 }
 
 #[derive(FromArgs)]
@@ -365,15 +369,27 @@ pub unsafe extern "C" fn main(
                     Err(log_err!("Failed to patch"))?;
                 }
             }
-            Action::Cpio(Cpio { ref cmds }) => {
-                return if cpio_commands(&cmds.iter().map(|x| x.as_str()).collect::<Vec<_>>()) {
+            Action::Cpio(Cpio {
+                ref mut file,
+                ref mut cmds,
+            }) => {
+                return if cpio_commands(file, cmds)
+                    .log_with_msg(|w| w.write_str("Failed to process cpio"))
+                    .is_ok()
+                {
                     0
                 } else {
                     1
                 }
             }
-            Action::Dtb(Dtb { ref cmds }) => {
-                return if dtb_commands(&cmds.iter().map(|x| x.as_str()).collect::<Vec<_>>()) {
+            Action::Dtb(Dtb {
+                ref mut file,
+                ref action,
+            }) => {
+                return if dtb_commands(file, action)
+                    .log_with_msg(|w| w.write_str("Failed to process dtb"))
+                    .unwrap_or(false)
+                {
                     0
                 } else {
                     1
