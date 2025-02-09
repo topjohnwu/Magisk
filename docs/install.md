@@ -47,7 +47,7 @@ Let's continue to [Patching Images](#patching-images).
   `fastboot flash init_boot /path/to/magisk_patched_[random_strings].img` or <br>
   `fastboot flash recovery /path/to/magisk_patched_[random_strings].img` <br>
 - (Optional) If your device has a separate `vbmeta` partition, you can patch the `vbmeta` partition with command:<br>
-  `fastboot flash vbmeta --disable-verity --disable-verification vbmeta.img` (note that it may **wipe your data**)
+  `fastboot flash vbmeta --disable-verify --disable-verification vbmeta.img` (note that it may **wipe your data**)
 - Reboot and launch Magisk app (you will see a stub Magisk app if you have wiped your data; use it to bootstrap to a complete Magisk app), and you will see a prompt asking for environment fix; click and wait for the reboot
 - Voila!
 
