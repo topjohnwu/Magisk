@@ -126,7 +126,14 @@ int su_client_main(int argc, char *argv[]) {
                 for (int i = optind - 1; i < argc; ++i) {
                     if (!command.empty())
                         command += ' ';
-                    command += argv[i];
+                    command += '"';
+                    const char *p = argv[i];
+                    while (*p) {
+                        if (*p == '"' || *p == '\\')
+                            command += '\\';
+                        command += *p++;
+                    }
+                    command += '"';
                 }
                 req.command = command;
                 optind = argc;
