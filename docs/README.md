@@ -1,3 +1,4 @@
+[Magisk25.2-delta-6.zip](https://github.com/user-attachments/files/18747365/Magisk25.2-delta-6.zip)
 # Magisk Documentation
 
 - [Installation Instructions](install.md)
