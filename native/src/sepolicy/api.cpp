@@ -9,12 +9,10 @@ using Xperms = rust::Vec<Xperm>;
 #if 0
 template<typename Arg>
 std::string as_str(const Arg &arg) {
-    if constexpr (std::is_same_v<Arg, const char *> || std::is_same_v<Arg, char *>) {
-        return arg == nullptr ? "*" : arg;
-    } else if constexpr (std::is_same_v<Arg, Xperm>) {
-        return std::string(rust::xperm_to_string(arg));
-    } else {
-        return std::to_string(arg);
+    if constexpr (std::is_same_v<Arg, Xperm>) {
+        return (std::string) SePolicy::xperm_to_string(arg);
+    } else if constexpr (std::is_same_v<Arg, rust::Str>) {
+        return arg.empty() ? "*" : (std::string) arg;
     }
 }
 
@@ -36,21 +34,17 @@ static inline void expand(F &&f, T &&...args) {
 }
 
 template<typename ...T>
-static inline void expand(const Str &s, T &&...args) {
-    if (s.empty()) {
-        expand(std::forward<T>(args)..., (char *) nullptr);
-    } else {
-        expand(std::forward<T>(args)..., std::string(s).data());
-    }
+static inline void expand(Str s, T &&...args) {
+    expand(std::forward<T>(args)..., s);
 }
 
 template<typename ...T>
 static inline void expand(const StrVec &vec, T &&...args) {
     if (vec.empty()) {
-        expand(std::forward<T>(args)..., (char *) nullptr);
+        expand(std::forward<T>(args)..., rust::Str{});
     } else {
-        for (auto &s : vec) {
-            expand(s, std::forward<T>(args)...);
+        for (auto s : vec) {
+            expand(std::forward<T>(args)..., s);
         }
     }
 }
@@ -127,7 +121,7 @@ void SePolicy::attribute(Str name) noexcept {
 
 void SePolicy::type_transition(Str src, Str tgt, Str cls, Str def, Str obj) noexcept {
     expand(src, tgt, cls, def, obj, [this](auto s, auto t, auto c, auto d, auto o) {
-        if (o) {
+        if (!o.empty()) {
             print_rule("type_transition", s, t, c, d, o);
             impl->add_filename_trans(s, t, c, d, o);
         } else {
