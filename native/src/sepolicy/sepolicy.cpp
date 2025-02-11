@@ -25,8 +25,7 @@ int context_to_string(
 __END_DECLS
 
 template <typename T>
-struct auto_cast_wrapper
-{
+struct auto_cast_wrapper {
     auto_cast_wrapper(T *ptr) : ptr(ptr) {}
     template <typename U>
     operator U*() const { return static_cast<U*>(ptr); }
@@ -39,8 +38,31 @@ static auto_cast_wrapper<T> auto_cast(T *p) {
     return auto_cast_wrapper<T>(p);
 }
 
-static auto hashtab_find(hashtab_t h, const_hashtab_key_t key) {
-    return auto_cast(hashtab_search(h, key));
+template <size_t T>
+static size_t copy_str(std::array<char, T> &dest, rust::Str src) {
+    if (T == 0) return 0;
+    size_t len = std::min(T - 1, src.size());
+    memcpy(dest.data(), src.data(), len);
+    dest[len] = '\0';
+    return len;
+}
+
+static char *dup_str(rust::Str src) {
+    size_t len = src.size();
+    char *s = static_cast<char *>(malloc(len + 1));
+    memcpy(s, src.data(), len);
+    s[len] = '\0';
+    return s;
+}
+
+static bool str_eq(string_view a, rust::Str b) {
+    return a.size() == b.size() && memcmp(a.data(), b.data(), a.size()) == 0;
+}
+
+static auto hashtab_find(hashtab_t h, Str key) {
+    array<char, 256> buf{};
+    copy_str(buf, key);
+    return auto_cast(hashtab_search(h, buf.data()));
 }
 
 template <class Node, class Func>
@@ -219,38 +241,38 @@ void sepol_impl::add_rule(type_datum_t *src, type_datum_t *tgt, class_datum_t *c
     }
 }
 
-bool sepol_impl::add_rule(const char *s, const char *t, const char *c, const char *p, int effect, bool invert) {
+bool sepol_impl::add_rule(Str s, Str t, Str c, Str p, int effect, bool invert) {
     type_datum_t *src = nullptr, *tgt = nullptr;
     class_datum_t *cls = nullptr;
     perm_datum_t *perm = nullptr;
 
-    if (s) {
+    if (!s.empty()) {
         src = hashtab_find(db->p_types.table, s);
         if (src == nullptr) {
-            LOGW("source type %s does not exist\n", s);
+            LOGW("source type %.*s does not exist\n", (int) s.size(), s.data());
             return false;
         }
     }
 
-    if (t) {
+    if (!t.empty()) {
         tgt = hashtab_find(db->p_types.table, t);
         if (tgt == nullptr) {
-            LOGW("target type %s does not exist\n", t);
+            LOGW("target type %.*s does not exist\n", (int) t.size(), t.data());
             return false;
         }
     }
 
-    if (c) {
+    if (!c.empty()) {
         cls = hashtab_find(db->p_classes.table, c);
         if (cls == nullptr) {
-            LOGW("class %s does not exist\n", c);
+            LOGW("class %.*s does not exist\n", (int) c.size(), c.data());
             return false;
         }
     }
 
-    if (p) {
-        if (c == nullptr) {
-            LOGW("No class is specified, cannot add perm [%s] \n", p);
+    if (!p.empty()) {
+        if (c.empty()) {
+            LOGW("No class is specified, cannot add perm [%.*s] \n", (int) p.size(), p.data());
             return false;
         }
 
@@ -259,7 +281,8 @@ bool sepol_impl::add_rule(const char *s, const char *t, const char *c, const cha
             perm = hashtab_find(cls->comdatum->permissions.table, p);
         }
         if (perm == nullptr) {
-            LOGW("perm %s does not exist in class %s\n", p, c);
+            LOGW("perm %.*s does not exist in class %.*s\n",
+                 (int) p.size(), p.data(), (int) c.size(), c.data());
             return false;
         }
     }
@@ -384,30 +407,30 @@ void sepol_impl::add_xperm_rule(type_datum_t *src, type_datum_t *tgt, class_datu
     }
 }
 
-bool sepol_impl::add_xperm_rule(const char *s, const char *t, const char *c, const Xperm &p, int effect) {
+bool sepol_impl::add_xperm_rule(Str s, Str t, Str c, const Xperm &p, int effect) {
     type_datum_t *src = nullptr, *tgt = nullptr;
     class_datum_t *cls = nullptr;
 
-    if (s) {
+    if (!s.empty()) {
         src = hashtab_find(db->p_types.table, s);
         if (src == nullptr) {
-            LOGW("source type %s does not exist\n", s);
+            LOGW("source type %.*s does not exist\n", (int) s.size(), s.data());
             return false;
         }
     }
 
-    if (t) {
+    if (!t.empty()) {
         tgt = hashtab_find(db->p_types.table, t);
         if (tgt == nullptr) {
-            LOGW("target type %s does not exist\n", t);
+            LOGW("target type %.*s does not exist\n", (int) t.size(), t.data());
             return false;
         }
     }
 
-    if (c) {
+    if (!c.empty()) {
         cls = hashtab_find(db->p_classes.table, c);
         if (cls == nullptr) {
-            LOGW("class %s does not exist\n", c);
+            LOGW("class %.*s does not exist\n", (int) c.size(), c.data());
             return false;
         }
     }
@@ -416,28 +439,28 @@ bool sepol_impl::add_xperm_rule(const char *s, const char *t, const char *c, con
     return true;
 }
 
-bool sepol_impl::add_type_rule(const char *s, const char *t, const char *c, const char *d, int effect) {
+bool sepol_impl::add_type_rule(Str s, Str t, Str c, Str d, int effect) {
     type_datum_t *src, *tgt, *def;
     class_datum_t *cls;
 
     src = hashtab_find(db->p_types.table, s);
     if (src == nullptr) {
-        LOGW("source type %s does not exist\n", s);
+        LOGW("source type %.*s does not exist\n", (int) s.size(), s.data());
         return false;
     }
     tgt = hashtab_find(db->p_types.table, t);
     if (tgt == nullptr) {
-        LOGW("target type %s does not exist\n", t);
+        LOGW("target type %.*s does not exist\n", (int) t.size(), t.data());
         return false;
     }
     cls = hashtab_find(db->p_classes.table, c);
     if (cls == nullptr) {
-        LOGW("class %s does not exist\n", c);
+        LOGW("class %.*s does not exist\n", (int) c.size(), c.data());
         return false;
     }
     def = hashtab_find(db->p_types.table, d);
     if (def == nullptr) {
-        LOGW("default type %s does not exist\n", d);
+        LOGW("default type %.*s does not exist\n", (int) d.size(), d.data());
         return false;
     }
 
@@ -453,35 +476,37 @@ bool sepol_impl::add_type_rule(const char *s, const char *t, const char *c, cons
     return true;
 }
 
-bool sepol_impl::add_filename_trans(const char *s, const char *t, const char *c, const char *d, const char *o) {
+bool sepol_impl::add_filename_trans(Str s, Str t, Str c, Str d, Str o) {
     type_datum_t *src, *tgt, *def;
     class_datum_t *cls;
 
     src = hashtab_find(db->p_types.table, s);
     if (src == nullptr) {
-        LOGW("source type %s does not exist\n", s);
+        LOGW("source type %.*s does not exist\n", (int) s.size(), s.data());
         return false;
     }
     tgt = hashtab_find(db->p_types.table, t);
     if (tgt == nullptr) {
-        LOGW("target type %s does not exist\n", t);
+        LOGW("target type %.*s does not exist\n", (int) t.size(), t.data());
         return false;
     }
     cls = hashtab_find(db->p_classes.table, c);
     if (cls == nullptr) {
-        LOGW("class %s does not exist\n", c);
+        LOGW("class %.*s does not exist\n", (int) c.size(), c.data());
         return false;
     }
     def = hashtab_find(db->p_types.table, d);
     if (def == nullptr) {
-        LOGW("default type %s does not exist\n", d);
+        LOGW("default type %.*s does not exist\n", (int) d.size(), d.data());
         return false;
     }
 
+    array<char, 256> key_name{};
+    copy_str(key_name, o);
     filename_trans_key_t key;
     key.ttype = tgt->s.value;
     key.tclass = cls->s.value;
-    key.name = (char *) o;
+    key.name = key_name.data();
 
     filename_trans_datum_t *trans = hashtab_find(db->filename_trans, (hashtab_key_t) &key);
     filename_trans_datum_t *last = nullptr;
@@ -514,32 +539,32 @@ bool sepol_impl::add_filename_trans(const char *s, const char *t, const char *c,
     return ebitmap_set_bit(&trans->stypes, src->s.value - 1, 1) == 0;
 }
 
-bool sepol_impl::add_genfscon(const char *fs_name, const char *path, const char *context) {
+bool sepol_impl::add_genfscon(Str fs_name, Str path, Str context) {
     // First try to create context
     context_struct_t *ctx;
-    if (context_from_string(nullptr, db, &ctx, context, strlen(context))) {
-        LOGW("Failed to create context from string [%s]\n", context);
+    if (context_from_string(nullptr, db, &ctx, context.data(), context.size())) {
+        LOGW("Failed to create context from string [%.*s]\n", (int) context.size(), context.data());
         return false;
     }
 
     // Find genfs node
     genfs_t *fs = list_find(db->genfs, [&](genfs_t *n) {
-        return strcmp(n->fstype, fs_name) == 0;
+        return str_eq(n->fstype, fs_name);
     });
     if (fs == nullptr) {
         fs = auto_cast(calloc(sizeof(*fs), 1));
-        fs->fstype = strdup(fs_name);
+        fs->fstype = dup_str(fs_name);
         fs->next = db->genfs;
         db->genfs = fs;
     }
 
     // Find context node
     ocontext_t *o_ctx = list_find(fs->head, [&](ocontext_t *n) {
-        return strcmp(n->u.name, path) == 0;
+        return str_eq(n->u.name, path);
     });
     if (o_ctx == nullptr) {
         o_ctx = auto_cast(calloc(sizeof(*o_ctx), 1));
-        o_ctx->u.name = strdup(path);
+        o_ctx->u.name = dup_str(path);
         o_ctx->next = fs->head;
         fs->head = o_ctx;
     }
@@ -550,21 +575,24 @@ bool sepol_impl::add_genfscon(const char *fs_name, const char *path, const char 
     return true;
 }
 
-bool sepol_impl::add_type(const char *type_name, uint32_t flavor) {
+bool sepol_impl::add_type(Str type_name, uint32_t flavor) {
     type_datum_t *type = hashtab_find(db->p_types.table, type_name);
     if (type) {
-        LOGW("Type %s already exists\n", type_name);
+        LOGW("Type %.*s already exists\n", (int) type_name.size(), type_name.data());
         return true;
     }
 
-    type = auto_cast(malloc(sizeof(type_datum_t)));
+    type = auto_cast(malloc(sizeof(*type)));
     type_datum_init(type);
     type->primary = 1;
     type->flavor = flavor;
 
     uint32_t value = 0;
-    if (symtab_insert(db, SYM_TYPES, strdup(type_name), type, SCOPE_DECL, 1, &value))
+    auto ty_name = dup_str(type_name);
+    if (symtab_insert(db, SYM_TYPES, ty_name, type, SCOPE_DECL, 1, &value)) {
+        free(ty_name);
         return false;
+    }
     type->s.value = value;
     ebitmap_set_bit(&db->global->branch_list->declared.p_types_scope, value - 1, 1);
 
@@ -591,9 +619,9 @@ bool sepol_impl::add_type(const char *type_name, uint32_t flavor) {
     return true;
 }
 
-bool sepol_impl::set_type_state(const char *type_name, bool permissive) {
+bool sepol_impl::set_type_state(Str type_name, bool permissive) {
     type_datum_t *type;
-    if (type_name == nullptr) {
+    if (type_name.empty()) {
         hashtab_for_each(db->p_types.table, [&](hashtab_ptr_t node) {
             type = auto_cast(node->datum);
             if (ebitmap_set_bit(&db->permissive_map, type->s.value, permissive))
@@ -602,7 +630,7 @@ bool sepol_impl::set_type_state(const char *type_name, bool permissive) {
     } else {
         type = hashtab_find(db->p_types.table, type_name);
         if (type == nullptr) {
-            LOGW("type %s does not exist\n", type_name);
+            LOGW("type %.*s does not exist\n", (int) type_name.size(), type_name.data());
             return false;
         }
         if (ebitmap_set_bit(&db->permissive_map, type->s.value, permissive)) {
@@ -630,22 +658,22 @@ void sepol_impl::add_typeattribute(type_datum_t *type, type_datum_t *attr) {
     });
 }
 
-bool sepol_impl::add_typeattribute(const char *type, const char *attr) {
+bool sepol_impl::add_typeattribute(Str type, Str attr) {
     type_datum_t *type_d = hashtab_find(db->p_types.table, type);
     if (type_d == nullptr) {
-        LOGW("type %s does not exist\n", type);
+        LOGW("type %.*s does not exist\n", (int) type.size(), type.data());
         return false;
     } else if (type_d->flavor == TYPE_ATTRIB) {
-        LOGW("type %s is an attribute\n", attr);
+        LOGW("type %.*s is an attribute\n", (int) attr.size(), attr.data());
         return false;
     }
 
     type_datum *attr_d = hashtab_find(db->p_types.table, attr);
     if (attr_d == nullptr) {
-        LOGW("attribute %s does not exist\n", type);
+        LOGW("attribute %.*s does not exist\n", (int) type.size(), type.data());
         return false;
     } else if (attr_d->flavor != TYPE_ATTRIB) {
-        LOGW("type %s is not an attribute \n", attr);
+        LOGW("type %.*s is not an attribute \n", (int) attr.size(), attr.data());
         return false;
     }
 
@@ -654,32 +682,32 @@ bool sepol_impl::add_typeattribute(const char *type, const char *attr) {
 }
 
 void SePolicy::strip_dontaudit() noexcept {
-    avtab_for_each(&impl->db->te_avtab, [=, this](avtab_ptr_t node) {
+    avtab_for_each(&impl->db->te_avtab, [this](avtab_ptr_t node) {
         if (node->key.specified == AVTAB_AUDITDENY || node->key.specified == AVTAB_XPERMS_DONTAUDIT)
             avtab_remove_node(&impl->db->te_avtab, node);
     });
 }
 
 void SePolicy::print_rules() const noexcept {
-    hashtab_for_each(impl->db->p_types.table, [&](hashtab_ptr_t node) {
+    hashtab_for_each(impl->db->p_types.table, [this](hashtab_ptr_t node) {
         type_datum_t *type = auto_cast(node->datum);
         if (type->flavor == TYPE_ATTRIB) {
             impl->print_type(stdout, type);
         }
     });
-    hashtab_for_each(impl->db->p_types.table, [&](hashtab_ptr_t node) {
+    hashtab_for_each(impl->db->p_types.table, [this](hashtab_ptr_t node) {
         type_datum_t *type = auto_cast(node->datum);
         if (type->flavor == TYPE_TYPE) {
             impl->print_type(stdout, type);
         }
     });
-    avtab_for_each(&impl->db->te_avtab, [&](avtab_ptr_t node) {
+    avtab_for_each(&impl->db->te_avtab, [this](avtab_ptr_t node) {
         impl->print_avtab(stdout, node);
     });
-    hashtab_for_each(impl->db->filename_trans, [&](hashtab_ptr_t node) {
+    hashtab_for_each(impl->db->filename_trans, [this](hashtab_ptr_t node) {
         impl->print_filename_trans(stdout, node);
     });
-    list_for_each(impl->db->genfs, [&](genfs_t *genfs) {
+    list_for_each(impl->db->genfs, [this](genfs_t *genfs) {
         list_for_each(genfs->head, [&](ocontext *context) {
             char *ctx = nullptr;
             size_t len = 0;
