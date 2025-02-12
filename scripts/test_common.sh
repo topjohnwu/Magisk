@@ -53,9 +53,7 @@ run_setup() {
   local app='com.topjohnwu.magisk.test/com.topjohnwu.magisk.test.AppTestRunner'
 
   # Run setup through the test app
-  am_instrument '.Environment#setupMagisk' $app
-  # Install LSPosed
-  am_instrument '.Environment#setupLsposed' $app
+  am_instrument '.Environment#setupEnvironment' $app
 }
 
 run_tests() {

@@ -42,33 +42,30 @@ class Environment : BaseTest {
     }
 
     @Test
-    fun setupMagisk() {
+    fun setupEnvironment() {
         runBlocking {
             assertTrue(
                 "Magisk setup failed",
                 MagiskInstaller.Emulator(TimberLog, TimberLog).exec()
             )
         }
-    }
 
-    @Test
-    fun setupLsposed() {
-        assumeTrue(lsposed())
-
-        val notify = object : DownloadNotifier {
-            override val context = appContext
-            override fun notifyUpdate(id: Int, editor: (Notification.Builder) -> Unit) {}
-        }
-        val processor = DownloadProcessor(notify)
-        val zip = appContext.cachedFile("lsposed.zip")
-        runBlocking {
-            testContext.assets.open("lsposed.zip").use {
-                processor.handleModule(it, zip.toUri())
+        if (lsposed()) {
+            val notify = object : DownloadNotifier {
+                override val context = appContext
+                override fun notifyUpdate(id: Int, editor: (Notification.Builder) -> Unit) {}
             }
-            assertTrue(
-                "LSPosed installation failed",
-                FlashZip(zip.toUri(), TimberLog, TimberLog).exec()
-            )
+            val processor = DownloadProcessor(notify)
+            val zip = appContext.cachedFile("lsposed.zip")
+            runBlocking {
+                testContext.assets.open("lsposed.zip").use {
+                    processor.handleModule(it, zip.toUri())
+                }
+                assertTrue(
+                    "LSPosed installation failed",
+                    FlashZip(zip.toUri(), TimberLog, TimberLog).exec()
+                )
+            }
         }
     }
 
