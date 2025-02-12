@@ -20,7 +20,7 @@ android {
     }
 }
 
-setupAppCommon()
+setupTestApk()
 
 dependencies {
     implementation(libs.test.runner)

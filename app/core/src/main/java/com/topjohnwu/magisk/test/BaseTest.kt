@@ -12,7 +12,8 @@ import org.junit.Assert.assertTrue
 interface BaseTest {
     val instrumentation: Instrumentation
         get() = InstrumentationRegistry.getInstrumentation()
-    val context: Context get() = instrumentation.targetContext
+    val appContext: Context get() = instrumentation.targetContext
+    val testContext: Context get() = instrumentation.context
     val uiAutomation: UiAutomation get() = instrumentation.uiAutomation
     val device: UiDevice get() = UiDevice.getInstance(instrumentation)
 

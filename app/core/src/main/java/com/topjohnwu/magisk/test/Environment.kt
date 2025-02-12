@@ -6,7 +6,6 @@ import androidx.annotation.Keep
 import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.topjohnwu.magisk.core.BuildConfig.APP_PACKAGE_NAME
-import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.download.DownloadNotifier
 import com.topjohnwu.magisk.core.download.DownloadProcessor
 import com.topjohnwu.magisk.core.ktx.cachedFile
@@ -34,9 +33,6 @@ class Environment : BaseTest {
         fun lsposed(): Boolean {
             return Build.VERSION.SDK_INT >= 27 && Build.VERSION.SDK_INT <= 34
         }
-
-        private const val LSPOSED_URL =
-            "https://github.com/LSPosed/LSPosed/releases/download/v1.9.2/LSPosed-v1.9.2-7024-zygisk-release.zip"
     }
 
     object TimberLog : CallbackList<String>(Runnable::run) {
@@ -60,13 +56,13 @@ class Environment : BaseTest {
         assumeTrue(lsposed())
 
         val notify = object : DownloadNotifier {
-            override val context = this@Environment.context
+            override val context = appContext
             override fun notifyUpdate(id: Int, editor: (Notification.Builder) -> Unit) {}
         }
         val processor = DownloadProcessor(notify)
-        val zip = context.cachedFile("lsposed.zip")
+        val zip = appContext.cachedFile("lsposed.zip")
         runBlocking {
-            ServiceLocator.networkService.fetchFile(LSPOSED_URL).byteStream().use {
+            testContext.assets.open("lsposed.zip").use {
                 processor.handleModule(it, zip.toUri())
             }
             assertTrue(
@@ -82,7 +78,7 @@ class Environment : BaseTest {
             assertTrue(
                 "App hiding failed",
                 AppMigration.patchAndHide(
-                    context = context,
+                    context = appContext,
                     label = "Settings",
                     pkg = "repackaged.$APP_PACKAGE_NAME"
                 )
@@ -95,7 +91,7 @@ class Environment : BaseTest {
         runBlocking {
             assertTrue(
                 "App restoration failed",
-                AppMigration.restoreApp(context)
+                AppMigration.restoreApp(appContext)
             )
         }
     }
