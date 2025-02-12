@@ -472,6 +472,11 @@ const val LSPOSED_DOWNLOAD_URL =
 const val LSPOSED_CHECKSUM =
     "0ebc6bcb465d1c4b44b7220ab5f0252e6b4eb7fe43da74650476d2798bb29622"
 
+const val SHAMIKO_DOWNLOAD_URL =
+    "https://github.com/LSPosed/LSPosed.github.io/releases/download/shamiko-383/Shamiko-v1.2.1-383-release.zip"
+const val SHAMIKO_CHECKSUM =
+    "93754a038c2d8f0e985bad45c7303b96f70a93d8335060e50146f028d3a9b13f"
+
 fun Project.setupTestApk() {
     setupAppCommon()
 
@@ -480,6 +485,9 @@ fun Project.setupTestApk() {
         val dlTask by tasks.register("download${variantCapped}Lsposed", Sync::class) {
             from(downloadFile(LSPOSED_DOWNLOAD_URL, LSPOSED_CHECKSUM)) {
                 rename { "lsposed.zip" }
+            }
+            from(downloadFile(SHAMIKO_DOWNLOAD_URL, SHAMIKO_CHECKSUM)) {
+                rename { "shamiko.zip" }
             }
             into("src/${this@all.name}/assets")
         }
