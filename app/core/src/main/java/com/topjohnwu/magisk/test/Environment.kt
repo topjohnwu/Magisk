@@ -6,13 +6,18 @@ import androidx.annotation.Keep
 import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.topjohnwu.magisk.core.BuildConfig.APP_PACKAGE_NAME
+import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.download.DownloadNotifier
 import com.topjohnwu.magisk.core.download.DownloadProcessor
 import com.topjohnwu.magisk.core.ktx.cachedFile
+import com.topjohnwu.magisk.core.model.module.LocalModule
 import com.topjohnwu.magisk.core.tasks.AppMigration
 import com.topjohnwu.magisk.core.tasks.FlashZip
 import com.topjohnwu.magisk.core.tasks.MagiskInstaller
+import com.topjohnwu.magisk.core.utils.RootUtils
 import com.topjohnwu.superuser.CallbackList
+import com.topjohnwu.superuser.Shell
+import com.topjohnwu.superuser.nio.ExtendedFile
 import kotlinx.coroutines.runBlocking
 import org.apache.commons.compress.archivers.zip.ZipFile
 import org.junit.Assert.assertArrayEquals
@@ -37,7 +42,7 @@ class Environment : BaseTest {
             return Build.VERSION.SDK_INT >= 27 && Build.VERSION.SDK_INT <= 34
         }
 
-        private fun shamiko(): Boolean {
+        fun shamiko(): Boolean {
             return Build.VERSION.SDK_INT >= 27
         }
 
@@ -70,6 +75,55 @@ class Environment : BaseTest {
             ).use { it.readBytes() }
             assertArrayEquals(MODULE_ERROR, "#MAGISK\n".toByteArray(), script)
         }
+    }
+
+    private fun setupModule01(root: ExtendedFile) {
+        val error = "test_01 setup failed"
+        val path = root.getChildFile("test_01")
+
+        // Create /system/etc/newfile
+        val etc = path.getChildFile("system").getChildFile("etc")
+        assertTrue(error, etc.mkdirs())
+        assertTrue(error, etc.getChildFile("newfile").createNewFile())
+
+        // Delete /system/bin/screenrecord
+        val bin = path.getChildFile("system").getChildFile("bin")
+        assertTrue(error, bin.mkdirs())
+        assertTrue(error, Shell.cmd("mknod $bin/screenrecord c 0 0").exec().isSuccess)
+
+        // Create an empty zygisk folder
+        val module = LocalModule(path)
+        assertTrue(error, module.zygiskFolder.mkdir())
+
+        assertTrue(error, Shell.cmd("set_default_perm $path").exec().isSuccess)
+    }
+
+    private fun setupModule02(root: ExtendedFile) {
+        val error = "test_02 setup failed"
+        val path = root.getChildFile("test_02")
+
+        // Create invalid zygisk libraries
+        val module = LocalModule(path)
+        assertTrue(error, module.zygiskFolder.mkdirs())
+        assertTrue(error, module.zygiskFolder.getChildFile("armeabi-v7a.so").createNewFile())
+        assertTrue(error, module.zygiskFolder.getChildFile("arm64-v8a.so").createNewFile())
+        assertTrue(error, module.zygiskFolder.getChildFile("x86.so").createNewFile())
+        assertTrue(error, module.zygiskFolder.getChildFile("x86_64.so").createNewFile())
+
+        assertTrue(error, Shell.cmd("set_default_perm $path").exec().isSuccess)
+    }
+
+    private fun setupModule03(root: ExtendedFile) {
+        val error = "test_03 setup failed"
+        val path = root.getChildFile("test_03")
+
+        // Create a new module but mark is as "remove"
+        val module = LocalModule(path)
+        assertTrue(error, path.mkdirs())
+        assertTrue(error, path.getChildFile("service.sh").createNewFile())
+        module.remove = true
+
+        assertTrue(error, Shell.cmd("set_default_perm $path").exec().isSuccess)
     }
 
     @Test
@@ -114,6 +168,11 @@ class Environment : BaseTest {
                 )
             }
         }
+
+        val root = RootUtils.fs.getFile(Const.MODULE_PATH)
+        setupModule01(root)
+        setupModule02(root)
+        setupModule03(root)
     }
 
     @Test

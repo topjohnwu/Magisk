@@ -621,6 +621,15 @@ is_legacy_script() {
   return $?
 }
 
+# $1 = MODPATH
+set_default_perm() {
+  set_perm_recursive $1 0 0 0755 0644
+  set_perm_recursive $1/system/bin 0 2000 0755 0755
+  set_perm_recursive $1/system/xbin 0 2000 0755 0755
+  set_perm_recursive $1/system/system_ext/bin 0 2000 0755 0755
+  set_perm_recursive $1/system/vendor/bin 0 2000 0755 0755 u:object_r:vendor_file:s0
+}
+
 # Require OUTFD, ZIPFILE to be set
 install_module() {
   rm -rf $TMPDIR
@@ -683,13 +692,7 @@ install_module() {
     if ! grep -q '^SKIPUNZIP=1$' $MODPATH/customize.sh 2>/dev/null; then
       ui_print "- Extracting module files"
       unzip -o "$ZIPFILE" -x 'META-INF/*' -d $MODPATH >&2
-
-      # Default permissions
-      set_perm_recursive $MODPATH 0 0 0755 0644
-      set_perm_recursive $MODPATH/system/bin 0 2000 0755 0755
-      set_perm_recursive $MODPATH/system/xbin 0 2000 0755 0755
-      set_perm_recursive $MODPATH/system/system_ext/bin 0 2000 0755 0755
-      set_perm_recursive $MODPATH/system/vendor/bin 0 2000 0755 0755 u:object_r:vendor_file:s0
+      set_default_perm $MODPATH
     fi
 
     # Load customization script
