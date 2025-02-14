@@ -510,7 +510,7 @@ public class SignApk {
         privateKey[0] = key;
 
         // Generate, in memory, an APK signed using standard JAR Signature Scheme.
-        ByteArrayOutputStream v1SignedApkBuf = new ByteArrayOutputStream();
+        ByteArrayStream v1SignedApkBuf = new ByteArrayStream();
         JarOutputStream outputJar = new JarOutputStream(v1SignedApkBuf);
         // Use maximum compression for compressed entries because the APK lives forever on
         // the system partition.
@@ -519,8 +519,7 @@ public class SignApk {
         copyFiles(manifest, inputJar, outputJar, timestamp, alignment);
         signFile(manifest, publicKey, privateKey, timestamp, outputJar);
         outputJar.close();
-        ByteBuffer v1SignedApk = ByteBuffer.wrap(v1SignedApkBuf.toByteArray());
-        v1SignedApkBuf.reset();
+        ByteBuffer v1SignedApk = v1SignedApkBuf.toByteBuffer();
 
         ByteBuffer[] outputChunks;
         List<ApkSignerV2.SignerConfig> signerConfigs = createV2SignerConfigs(privateKey, publicKey,
