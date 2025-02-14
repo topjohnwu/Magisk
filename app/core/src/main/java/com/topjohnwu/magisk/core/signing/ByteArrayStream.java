@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 
 public class ByteArrayStream extends ByteArrayOutputStream {
 
@@ -26,5 +27,9 @@ public class ByteArrayStream extends ByteArrayOutputStream {
 
     public ByteArrayInputStream getInputStream() {
         return new ByteArrayInputStream(buf, 0, count);
+    }
+
+    public ByteBuffer toByteBuffer() {
+        return ByteBuffer.wrap(buf, 0, count);
     }
 }
