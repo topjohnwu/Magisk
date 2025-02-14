@@ -13,7 +13,7 @@ use cxx::{type_id, ExternType};
 use daemon::{daemon_entry, MagiskD};
 use derive::Decodable;
 use logging::{android_logging, setup_logfile, zygisk_close_logd, zygisk_get_logd, zygisk_logging};
-use mount::{clean_mounts, find_preinit_device, revert_unmount};
+use mount::{find_preinit_device, revert_unmount};
 use resetprop::{persist_delete_prop, persist_get_prop, persist_get_props, persist_set_prop};
 use socket::{recv_fd, recv_fds, send_fd, send_fds};
 use std::fs::File;
@@ -192,7 +192,6 @@ pub mod ffi {
         fn zygisk_close_logd();
         fn zygisk_get_logd() -> i32;
         fn setup_logfile();
-        fn clean_mounts();
         fn find_preinit_device() -> String;
         fn revert_unmount(pid: i32);
         fn zygisk_should_load_module(flags: u32) -> bool;

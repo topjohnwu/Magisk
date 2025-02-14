@@ -341,9 +341,6 @@ static void load_modules(bool zygisk_enabled, const rust::Vec<ModuleInfo> &modul
         root->prepare();
         root->mount();
     }
-
-    // cleanup mounts
-    clean_mounts();
 }
 
 /************************
