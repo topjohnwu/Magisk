@@ -18,8 +18,15 @@
 #
 #####################################################################
 
+mount_tmpfs() {
+  # If a file name 'magisk' is in current directory, mount will fail
+  mv magisk magisk.tmp
+  mount -t tmpfs -o 'mode=0755' magisk $1
+  mv magisk.tmp magisk
+}
+
 mount_sbin() {
-  mount -t tmpfs -o 'mode=0755' magisk /sbin
+  mount_tmpfs /sbin
   chcon u:object_r:rootfs:s0 /sbin
 }
 
@@ -114,10 +121,7 @@ elif [ -e /sbin ]; then
 else
   # Android Q+ without sbin
   MAGISKTMP=/debug_ramdisk
-  # If a file name 'magisk' is in current directory, mount will fail
-  mv magisk magisk.tmp
-  mount -t tmpfs -o 'mode=0755' magisk /debug_ramdisk
-  mv magisk.tmp magisk
+  mount_tmpfs /debug_ramdisk
 fi
 
 # Magisk stuff
@@ -142,7 +146,7 @@ ln -s ./magiskpolicy $MAGISKTMP/supolicy
 
 mkdir -p $MAGISKTMP/.magisk/device
 mkdir -p $MAGISKTMP/.magisk/worker
-mount -t tmpfs -o 'mode=0755' magisk $MAGISKTMP/.magisk/worker
+mount_tmpfs $MAGISKTMP/.magisk/worker
 mount --make-private $MAGISKTMP/.magisk/worker
 touch $MAGISKTMP/.magisk/config
 
