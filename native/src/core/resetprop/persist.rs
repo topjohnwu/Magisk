@@ -12,7 +12,7 @@ use quick_protobuf::{BytesReader, MessageRead, MessageWrite, Writer};
 use base::libc::{O_CLOEXEC, O_RDONLY};
 use base::{
     clone_attr, cstr, debug, libc::mkstemp, Directory, FsPath, FsPathBuf, LibcReturn, LoggedResult,
-    MappedFile, SilentResultExt, Utf8CStr, Utf8CStrBufArr, WalkResult,
+    MappedFile, SilentResultExt, Utf8CStr, WalkResult,
 };
 
 use crate::ffi::{prop_cb_exec, PropCb};
@@ -77,10 +77,7 @@ fn check_proto() -> bool {
 }
 
 fn file_get_prop(name: &Utf8CStr) -> LoggedResult<String> {
-    let mut buf = Utf8CStrBufArr::default();
-    let path = FsPathBuf::new(&mut buf)
-        .join(PERSIST_PROP_DIR!())
-        .join(name);
+    let path = FsPathBuf::default().join(PERSIST_PROP_DIR!()).join(name);
     let mut file = path.open(O_RDONLY | O_CLOEXEC).silent()?;
     debug!("resetprop: read prop from [{}]", path);
     let mut s = String::new();
@@ -89,13 +86,9 @@ fn file_get_prop(name: &Utf8CStr) -> LoggedResult<String> {
 }
 
 fn file_set_prop(name: &Utf8CStr, value: Option<&Utf8CStr>) -> LoggedResult<()> {
-    let mut buf = Utf8CStrBufArr::default();
-    let path = FsPathBuf::new(&mut buf)
-        .join(PERSIST_PROP_DIR!())
-        .join(name);
+    let path = FsPathBuf::default().join(PERSIST_PROP_DIR!()).join(name);
     if let Some(value) = value {
-        let mut buf = Utf8CStrBufArr::default();
-        let mut tmp = FsPathBuf::new(&mut buf)
+        let mut tmp = FsPathBuf::default()
             .join(PERSIST_PROP_DIR!())
             .join("prop.XXXXXX");
         {
@@ -126,8 +119,7 @@ fn proto_read_props() -> LoggedResult<PersistentProperties> {
 }
 
 fn proto_write_props(props: &PersistentProperties) -> LoggedResult<()> {
-    let mut buf = Utf8CStrBufArr::default();
-    let mut tmp = FsPathBuf::new(&mut buf).join(concat!(PERSIST_PROP!(), ".XXXXXX"));
+    let mut tmp = FsPathBuf::default().join(concat!(PERSIST_PROP!(), ".XXXXXX"));
     {
         let f = unsafe {
             let fd = mkstemp(tmp.as_mut_ptr()).check_os_err()?;

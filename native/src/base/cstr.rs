@@ -449,15 +449,57 @@ impl DerefMut for FsPath {
     }
 }
 
-pub struct FsPathBuf<'a>(&'a mut dyn Utf8CStrBuf);
+enum Utf8CStrBufOwned<const N: usize> {
+    Dynamic(Utf8CString),
+    Fixed(Utf8CStrBufArr<N>),
+}
 
-impl<'a> FsPathBuf<'a> {
-    pub fn new(value: &'a mut dyn Utf8CStrBuf) -> Self {
-        value.clear();
-        FsPathBuf(value)
+impl<const N: usize> Deref for Utf8CStrBufOwned<N> {
+    type Target = dyn Utf8CStrBuf;
+
+    fn deref(&self) -> &Self::Target {
+        match self {
+            Utf8CStrBufOwned::Dynamic(s) => s,
+            Utf8CStrBufOwned::Fixed(arr) => arr,
+        }
+    }
+}
+
+impl<const N: usize> DerefMut for Utf8CStrBufOwned<N> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        match self {
+            Utf8CStrBufOwned::Dynamic(s) => s,
+            Utf8CStrBufOwned::Fixed(arr) => arr,
+        }
+    }
+}
+
+pub struct FsPathBuf<const N: usize>(Utf8CStrBufOwned<N>);
+
+impl FsPathBuf<0> {
+    pub fn new_dynamic(capacity: usize) -> Self {
+        FsPathBuf(Utf8CStrBufOwned::Dynamic(Utf8CString::with_capacity(
+            capacity,
+        )))
+    }
+}
+
+impl Default for FsPathBuf<4096> {
+    fn default() -> Self {
+        FsPathBuf(Utf8CStrBufOwned::Fixed(Utf8CStrBufArr::default()))
+    }
+}
+
+impl<const N: usize> FsPathBuf<N> {
+    pub fn new() -> Self {
+        FsPathBuf(Utf8CStrBufOwned::Fixed(Utf8CStrBufArr::<N>::new()))
     }
 
-    pub fn join<T: AsRef<str>>(self, path: T) -> Self {
+    pub fn clear(&mut self) {
+        self.0.clear();
+    }
+
+    pub fn join<T: AsRef<str>>(mut self, path: T) -> Self {
         fn inner(buf: &mut dyn Utf8CStrBuf, path: &str) {
             if path.starts_with('/') {
                 buf.clear();
@@ -466,30 +508,30 @@ impl<'a> FsPathBuf<'a> {
             }
             buf.push_str(path);
         }
-        inner(self.0, path.as_ref());
+        inner(self.0.deref_mut(), path.as_ref());
         self
     }
 
-    pub fn join_fmt<T: Display>(self, name: T) -> Self {
+    pub fn join_fmt<T: Display>(mut self, name: T) -> Self {
         fn inner(buf: &mut dyn Utf8CStrBuf, path: Arguments) {
             buf.write_fmt(path).ok();
         }
-        inner(self.0, format_args!("/{}", name));
+        inner(self.0.deref_mut(), format_args!("/{}", name));
         self
     }
 }
 
-impl Deref for FsPathBuf<'_> {
+impl<const N: usize> Deref for FsPathBuf<N> {
     type Target = FsPath;
 
     fn deref(&self) -> &FsPath {
-        FsPath::from(&self.0)
+        FsPath::from(self.0.deref())
     }
 }
 
-impl DerefMut for FsPathBuf<'_> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        FsPath::from_mut(&mut self.0)
+impl<const N: usize> DerefMut for FsPathBuf<N> {
+    fn deref_mut(&mut self) -> &mut FsPath {
+        FsPath::from_mut(self.0.deref_mut())
     }
 }
 
@@ -575,7 +617,7 @@ macro_rules! impl_str {
 impl_str!(
     (Utf8CStr,)
     (FsPath,)
-    (FsPathBuf<'_>,)
+    (FsPathBuf<N>, const N: usize)
     (Utf8CStrBufRef<'_>,)
     (Utf8CStrBufArr<N>, const N: usize)
     (Utf8CString,)

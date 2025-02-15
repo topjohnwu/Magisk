@@ -38,8 +38,7 @@ macro_rules! open_fd {
 }
 
 pub fn fd_path(fd: RawFd, buf: &mut dyn Utf8CStrBuf) -> io::Result<()> {
-    let mut arr = Utf8CStrBufArr::<40>::new();
-    let path = FsPathBuf::new(&mut arr).join("/proc/self/fd").join_fmt(fd);
+    let path = FsPathBuf::default().join("/proc/self/fd").join_fmt(fd);
     path.read_link(buf)
 }
 
