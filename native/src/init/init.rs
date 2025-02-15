@@ -1,3 +1,4 @@
+use crate::ffi::backup_init;
 use crate::{
     ffi::{magisk_proxy_main, BootConfig, MagiskInit},
     logging::setup_klog,
@@ -5,7 +6,7 @@ use crate::{
 use base::{
     cstr, debug, info,
     libc::{basename, getpid, mount, umask},
-    raw_cstr, FsPath, LibcReturn, LoggedResult, ResultExt, Utf8CStr,
+    raw_cstr, FsPath, LibcReturn, LoggedResult, ResultExt,
 };
 use std::{
     ffi::{c_char, CStr},
@@ -63,7 +64,7 @@ impl MagiskInit {
     pub(crate) fn restore_ramdisk_init(&self) {
         FsPath::from(cstr!("/init")).remove().ok();
 
-        let orig_init = FsPath::from(unsafe { Utf8CStr::from_ptr_unchecked(self.backup_init()) });
+        let orig_init = FsPath::from(backup_init());
 
         if orig_init.exists() {
             orig_init.rename_to(FsPath::from(cstr!("/init"))).log_ok();

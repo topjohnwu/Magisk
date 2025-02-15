@@ -78,7 +78,7 @@ pub mod ffi {
         #[Self = SePolicy]
         fn compile_split() -> SePolicy;
         #[Self = SePolicy]
-        unsafe fn from_data(data: *mut c_char, len: usize) -> SePolicy;
+        fn from_data(data: &[u8]) -> SePolicy;
     }
 
     extern "Rust" {

@@ -1,7 +1,10 @@
+use crate::ffi::MagiskInit;
+use base::libc::O_RDONLY;
 use base::{
-    debug, libc, Directory, LibcReturn, LoggedResult, ResultExt, Utf8CStr, Utf8CStrBuf,
-    Utf8CStrBufArr, WalkResult,
+    cstr, debug, libc, BufReadExt, Directory, FsPath, LibcReturn, LoggedResult, ResultExt,
+    Utf8CStr, Utf8CStrBuf, Utf8CStrBufArr, WalkResult,
 };
+use std::io::BufReader;
 use std::{
     fs::File,
     io::Write,
@@ -109,4 +112,19 @@ on property:init.svc.zygote=stopped
     .ok();
 
     mem::forget(file)
+}
+
+impl MagiskInit {
+    pub(crate) fn parse_config_file(&mut self) {
+        if let Ok(fd) = FsPath::from(cstr!("/data/.backup/.magisk")).open(O_RDONLY) {
+            let mut reader = BufReader::new(fd);
+            reader.foreach_props(|key, val| {
+                if key == "PREINITDEVICE" {
+                    self.preinit_dev = val.to_string();
+                    return false;
+                }
+                true
+            })
+        }
+    }
 }

@@ -1,11 +1,11 @@
 use crate::ffi::MagiskInit;
-use base::{cstr, debug, ffi::Utf8CStrRef, FsPath};
+use base::{cstr, debug, FsPath, Utf8CStr};
 use magiskpolicy::ffi::SePolicy;
 
 impl MagiskInit {
-    pub(crate) fn patch_sepolicy(self: &MagiskInit, in_: Utf8CStrRef, out: Utf8CStrRef) {
+    pub(crate) fn patch_sepolicy(self: &MagiskInit, src: &Utf8CStr, out: &Utf8CStr) {
         debug!("Patching monolithic policy");
-        let mut sepol = SePolicy::from_file(in_);
+        let mut sepol = SePolicy::from_file(src);
 
         sepol.magisk_rules();
 

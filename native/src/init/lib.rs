@@ -1,20 +1,21 @@
 #![feature(format_args_nl)]
 #![feature(once_cell_try)]
 #![feature(try_blocks)]
+#![allow(clippy::missing_safety_doc)]
 
 use logging::setup_klog;
-use mount::{is_device_mounted, switch_root};
-use rootdir::{collect_overlay_contexts, inject_magisk_rc, reset_overlay_contexts};
 // Has to be pub so all symbols in that crate is included
 pub use magiskpolicy;
+use mount::{is_device_mounted, switch_root};
+use rootdir::{collect_overlay_contexts, inject_magisk_rc, reset_overlay_contexts};
 
+mod getinfo;
+mod init;
 mod logging;
 mod mount;
 mod rootdir;
-mod getinfo;
-mod init;
-mod twostage;
 mod selinux;
+mod twostage;
 
 #[cxx::bridge]
 pub mod ffi {
@@ -23,6 +24,7 @@ pub mod ffi {
         key: String,
         value: String,
     }
+
     struct BootConfig {
         skip_initramfs: bool,
         force_normal_boot: bool,
@@ -43,6 +45,17 @@ pub mod ffi {
         config: BootConfig,
     }
 
+    unsafe extern "C++" {
+        include!("init.hpp");
+
+        #[namespace = "rust"]
+        #[cxx_name = "Utf8CStr"]
+        type Utf8CStrRef<'a> = base::ffi::Utf8CStrRef<'a>;
+
+        unsafe fn magisk_proxy_main(argc: i32, argv: *mut *mut c_char) -> i32;
+        fn backup_init() -> Utf8CStrRef<'static>;
+    }
+
     #[namespace = "rust"]
     extern "Rust" {
         fn setup_klog();
@@ -53,39 +66,32 @@ pub mod ffi {
         fn reset_overlay_contexts();
     }
 
+    // BootConfig
     extern "Rust" {
         fn print(self: &BootConfig);
-
-        fn patch_sepolicy(self: &MagiskInit, in_: Utf8CStrRef, out: Utf8CStrRef);
     }
-
     unsafe extern "C++" {
-        include!("../base/include/base.hpp");
-        include!("init.hpp");
-
-        #[namespace = "rust"]
-        #[cxx_name = "Utf8CStr"]
-        type Utf8CStrRef<'a> = base::ffi::Utf8CStrRef<'a>;
-
-        unsafe fn magisk_proxy_main(argc: i32, argv: *mut *mut c_char) -> i32;
-
         fn init(self: &mut BootConfig);
         type kv_pairs;
         fn set(self: &mut BootConfig, config: &kv_pairs);
+    }
 
+    // MagiskInit
+    extern "Rust" {
+        fn patch_sepolicy(self: &MagiskInit, src: Utf8CStrRef, out: Utf8CStrRef);
+        fn parse_config_file(self: &mut MagiskInit);
+    }
+    unsafe extern "C++" {
+        // Used in Rust
+        fn mount_system_root(self: &mut MagiskInit) -> bool;
+        fn patch_rw_root(self: &mut MagiskInit);
+        fn patch_ro_root(self: &mut MagiskInit);
+
+        // Used in C++
         unsafe fn setup_tmp(self: &MagiskInit, path: *const c_char);
         fn collect_devices(self: &MagiskInit);
         fn mount_preinit_dir(self: &MagiskInit);
         unsafe fn find_block(self: &MagiskInit, partname: *const c_char) -> u64;
-        fn mount_system_root(self: &mut MagiskInit) -> bool;
-
-        // Setup and patch root directory
-        fn parse_config_file(self: &mut MagiskInit);
-        fn patch_rw_root(self: &mut MagiskInit);
-        fn patch_ro_root(self: &mut MagiskInit);
-
-        // SELinux
         fn hijack_sepolicy(self: &mut MagiskInit) -> bool;
-        fn backup_init(self: &MagiskInit) -> *const c_char;
     }
 }
