@@ -239,8 +239,7 @@ impl TrackedFile {
 
 impl ManagerInfo {
     fn check_dyn(&mut self, daemon: &MagiskD, user: i32, pkg: &str) -> Status {
-        let mut arr = Utf8CStrBufArr::default();
-        let apk = FsPathBuf::new(&mut arr)
+        let apk = FsPathBuf::default()
             .join(daemon.app_data_dir())
             .join_fmt(user)
             .join(pkg)
@@ -444,8 +443,7 @@ impl ManagerInfo {
 
 impl MagiskD {
     fn get_package_uid(&self, user: i32, pkg: &str) -> i32 {
-        let mut arr = Utf8CStrBufArr::default();
-        let path = FsPathBuf::new(&mut arr)
+        let path = FsPathBuf::default()
             .join(self.app_data_dir())
             .join_fmt(user)
             .join(pkg);
@@ -457,10 +455,7 @@ impl MagiskD {
     pub fn preserve_stub_apk(&self) {
         let mut info = self.manager_info.lock().unwrap();
 
-        let mut arr = Utf8CStrBufArr::default();
-        let apk = FsPathBuf::new(&mut arr)
-            .join(get_magisk_tmp())
-            .join("stub.apk");
+        let apk = FsPathBuf::default().join(get_magisk_tmp()).join("stub.apk");
 
         if let Ok(mut fd) = apk.open(O_RDONLY | O_CLOEXEC) {
             info.trusted_cert = read_certificate(&mut fd, MAGISK_VER_CODE);
