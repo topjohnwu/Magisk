@@ -678,5 +678,9 @@ struct boot_img {
     // Rust FFI
     rust::Slice<const uint8_t> get_payload() const { return payload; }
     rust::Slice<const uint8_t> get_tail() const { return tail; }
-    bool verify(const char *cert = nullptr) const;
+    bool verify() const;
+
+    static std::unique_ptr<boot_img> load(::rust::Utf8CStr const file) {
+        return std::make_unique<boot_img>(file.data());
+    }
 };

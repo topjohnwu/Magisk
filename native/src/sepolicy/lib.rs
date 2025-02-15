@@ -12,6 +12,8 @@ use crate::ffi::SePolicy;
 
 mod rules;
 mod statement;
+#[cfg(feature = "main")]
+mod cli;
 
 #[cxx::bridge]
 pub mod ffi {
@@ -88,8 +90,6 @@ pub mod ffi {
         fn load_rules(self: &mut SePolicy, rules: &CxxString);
         #[Self = SePolicy]
         fn xperm_to_string(perm: &Xperm) -> String;
-        #[Self = SePolicy]
-        fn print_statement_help();
     }
 }
 
