@@ -283,16 +283,6 @@ static void extract_files(bool sbin) {
     }
 }
 
-void MagiskInit::parse_config_file() noexcept {
-    parse_prop_file("/data/.backup/.magisk", [&](auto key, auto value) -> bool {
-        if (key == "PREINITDEVICE") {
-            preinit_dev = std::string(value);
-            return false;
-        }
-        return true;
-    });
-}
-
 void MagiskInit::patch_ro_root() noexcept {
     mount_list.emplace_back("/data");
     parse_config_file();
@@ -427,7 +417,7 @@ void MagiskInit::patch_rw_root() noexcept {
     cp_afc(REDIR_PATH, "/sbin/magisk");
 }
 
-int magisk_proxy_main(int argc, char *argv[]) {
+int magisk_proxy_main(int, char *argv[]) {
     rust::setup_klog();
     LOGD("%s\n", __FUNCTION__);
 
@@ -463,7 +453,7 @@ static void unxz_init(const char *init_xz, const char *init) {
     unlink(init_xz);
 }
 
-const char *MagiskInit::backup_init() const noexcept {
+rust::Utf8CStr backup_init() {
     if (access("/.backup/init.xz", F_OK) == 0)
         unxz_init("/.backup/init.xz", "/.backup/init");
     return "/.backup/init";

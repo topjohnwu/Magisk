@@ -79,13 +79,13 @@ static void load_cil(struct cil_db *db, const char *file) {
     LOGD("cil_add [%s]\n", file);
 }
 
-SePolicy SePolicy::from_data(char *data, size_t len) noexcept {
+SePolicy SePolicy::from_data(rust::Slice<const uint8_t> data) noexcept {
     LOGD("Load policy from data\n");
 
     policy_file_t pf;
     policy_file_init(&pf);
-    pf.data = data;
-    pf.len = len;
+    pf.data = (char *) data.data();
+    pf.len = data.size();
     pf.type = PF_USE_MEMORY;
 
     auto db = static_cast<policydb_t *>(malloc(sizeof(policydb_t)));
