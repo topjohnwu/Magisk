@@ -7,7 +7,7 @@ use base::libc::{
 };
 use base::{
     const_format::concatcp, libc, raw_cstr, FsPathBuf, LogLevel, Logger, ReadExt, Utf8CStr,
-    Utf8CStrBuf, Utf8CStrBufArr, Utf8CStrWrite, WriteExt, LOGGER,
+    Utf8CStrBuf, Utf8CStrBufArr, WriteExt, LOGGER,
 };
 use bytemuck::{bytes_of, write_zeroes, Pod, Zeroable};
 use num_derive::{FromPrimitive, ToPrimitive};
@@ -319,12 +319,7 @@ extern "C" fn logfile_writer(arg: *mut c_void) -> *mut c_void {
                 if localtime_r(&secs, &mut tm).is_null() {
                     continue;
                 }
-                let len = strftime(
-                    aux.mut_buf().as_mut_ptr().cast(),
-                    aux.capacity(),
-                    raw_cstr!("%m-%d %T"),
-                    &tm,
-                );
+                let len = strftime(aux.as_mut_ptr(), aux.capacity(), raw_cstr!("%m-%d %T"), &tm);
                 aux.set_len(len);
                 aux.write_fmt(format_args!(
                     ".{:03} {:5} {:5} {} : ",

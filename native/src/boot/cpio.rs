@@ -21,7 +21,7 @@ use base::libc::{
 };
 use base::{
     log_err, map_args, BytesExt, EarlyExitExt, FsPath, LoggedResult, MappedFile, ResultExt,
-    Utf8CStr, Utf8CStrBufArr, Utf8CStrWrite, WriteExt,
+    Utf8CStr, Utf8CStrBuf, Utf8CStrBufArr, WriteExt,
 };
 
 use crate::check_env;
