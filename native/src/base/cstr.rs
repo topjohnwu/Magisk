@@ -33,47 +33,25 @@ use crate::slice_from_ptr_mut;
 // All types dereferences to &Utf8CStr.
 // Utf8CString, Utf8CStrBufRef, and Utf8CStrBufArr<N> implements Utf8CStrBuf.
 
-fn utf8_cstr_buf_append(buf: &mut dyn Utf8CStrBufWithSlice, s: &[u8]) -> usize {
-    let mut used = buf.len();
-    if used >= buf.capacity() - 1 {
-        // Truncate
-        return 0;
-    }
-    let dest = unsafe { &mut buf.mut_buf()[used..] };
-    let len = min(s.len(), dest.len() - 1);
-    if len > 0 {
-        dest[..len].copy_from_slice(&s[..len]);
-    }
-    dest[len] = b'\0';
-    used += len;
-    unsafe { buf.set_len(used) };
-    len
-}
-
-fn utf8_cstr_append_lossy(buf: &mut dyn Utf8CStrBuf, s: &[u8]) -> usize {
-    let mut len = 0_usize;
-    for chunk in s.utf8_chunks() {
-        len += buf.push_str(chunk.valid());
-        if !chunk.invalid().is_empty() {
-            len += buf.push_str(char::REPLACEMENT_CHARACTER.encode_utf8(&mut [0; 4]));
-        }
-    }
-    len
-}
-
 // Trait definitions
 
 pub trait Utf8CStrBuf:
     Write + AsRef<Utf8CStr> + AsMut<Utf8CStr> + Deref<Target = Utf8CStr> + DerefMut
 {
+    // The length of the string without the terminating null character.
+    // assert_true(len <= capacity - 1)
     fn len(&self) -> usize;
-    // Modifying the underlying buffer or length is unsafe because it can either:
-    // 1. Break null termination
-    // 2. Break UTF-8 validation
-    // 3. Introduce inner null byte in the string
+    // Set the length of the string
+    //
+    // It is your responsibility to:
+    // 1. Null terminate the string by setting the next byte after len to null
+    // 2. Ensure len <= capacity - 1
+    // 3. All bytes from 0 to len is valid UTF-8 and does not contain null
     unsafe fn set_len(&mut self, len: usize);
     fn push_str(&mut self, s: &str) -> usize;
     fn push_lossy(&mut self, s: &[u8]) -> usize;
+    // The capacity of the internal buffer. The maximum string length this buffer can contain
+    // is capacity - 1, because the last byte is reserved for the terminating null character.
     fn capacity(&self) -> usize;
     fn clear(&mut self);
 
@@ -114,6 +92,34 @@ impl<T: Utf8CStrBufWithSlice> AsUtf8CStr for T {
 
 // Implementation for Utf8CString
 
+fn utf8_cstr_buf_append(buf: &mut dyn Utf8CStrBufWithSlice, s: &[u8]) -> usize {
+    let mut used = buf.len();
+    if used >= buf.capacity() - 1 {
+        // Truncate
+        return 0;
+    }
+    let dest = unsafe { &mut buf.mut_buf()[used..] };
+    let len = min(s.len(), dest.len() - 1);
+    if len > 0 {
+        dest[..len].copy_from_slice(&s[..len]);
+    }
+    dest[len] = b'\0';
+    used += len;
+    unsafe { buf.set_len(used) };
+    len
+}
+
+fn utf8_cstr_append_lossy(buf: &mut dyn Utf8CStrBuf, s: &[u8]) -> usize {
+    let mut len = 0_usize;
+    for chunk in s.utf8_chunks() {
+        len += buf.push_str(chunk.valid());
+        if !chunk.invalid().is_empty() {
+            len += buf.push_str(char::REPLACEMENT_CHARACTER.encode_utf8(&mut [0; 4]));
+        }
+    }
+    len
+}
+
 pub trait StringExt {
     fn nul_terminate(&mut self) -> &mut [u8];
 }
@@ -150,13 +156,13 @@ pub struct Utf8CString(String);
 
 impl Default for Utf8CString {
     fn default() -> Self {
-        Utf8CString(String::with_capacity(256))
+        Utf8CString::with_capacity(256)
     }
 }
 
 impl Utf8CString {
     pub fn with_capacity(capacity: usize) -> Utf8CString {
-        Utf8CString(String::with_capacity(capacity))
+        Utf8CString::from(String::with_capacity(capacity))
     }
 
     pub fn ensure_capacity(&mut self, capacity: usize) {
