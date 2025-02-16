@@ -49,7 +49,8 @@ class AdditionalTest : BaseTest {
 
     @Test
     fun testModuleCount() {
-        var expected = 2
+        var expected = 0
+        if (Environment.testModules()) expected +=2
         if (Environment.lsposed()) expected++
         if (Environment.shamiko()) expected++
         assertEquals("Module count incorrect", expected, modules.size)
@@ -78,6 +79,8 @@ class AdditionalTest : BaseTest {
 
     @Test
     fun testModule01() {
+        assumeTrue(Environment.testModules())
+
         val module = modules.find { it.id == "test_01" }
         assertNotNull("test_01 is not installed", module)
         assertTrue(
@@ -94,6 +97,8 @@ class AdditionalTest : BaseTest {
 
     @Test
     fun testModule02() {
+        assumeTrue(Environment.testModules())
+
         val module = modules.find { it.id == "test_02" }
         assertNotNull("test_02 is not installed", module)
         module!!
@@ -102,6 +107,8 @@ class AdditionalTest : BaseTest {
 
     @Test
     fun testModule03() {
+        assumeTrue(Environment.testModules())
+
         assertNull("test_03 should be removed", modules.find { it.id == "test_03" })
     }
 }

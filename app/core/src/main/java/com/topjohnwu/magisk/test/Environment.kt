@@ -38,8 +38,14 @@ class Environment : BaseTest {
         @JvmStatic
         fun before() = BaseTest.prerequisite()
 
+        // The kernel running on emulators < API 26 does not play well with
+        // magic mount. Skip module tests on those legacy platforms.
+        fun testModules(): Boolean {
+            return Build.VERSION.SDK_INT >= 26
+        }
+
         fun lsposed(): Boolean {
-            return Build.VERSION.SDK_INT >= 27 && Build.VERSION.SDK_INT <= 34
+            return Build.VERSION.SDK_INT in 27..34
         }
 
         fun shamiko(): Boolean {
@@ -169,10 +175,12 @@ class Environment : BaseTest {
             }
         }
 
-        val root = RootUtils.fs.getFile(Const.MODULE_PATH)
-        setupModule01(root)
-        setupModule02(root)
-        setupModule03(root)
+        if (testModules()) {
+            val root = RootUtils.fs.getFile(Const.MODULE_PATH)
+            setupModule01(root)
+            setupModule02(root)
+            setupModule03(root)
+        }
     }
 
     @Test
