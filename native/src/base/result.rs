@@ -96,17 +96,6 @@ impl<T, R: Loggable<T>> ResultExt<T> for R {
         self.do_log(LogLevel::Error, Some(Location::caller()))
     }
 
-    #[track_caller]
-    #[cfg(debug_assertions)]
-    fn log_ok(self) {
-        self.log().ok();
-    }
-    
-    #[cfg(not(debug_assertions))]
-    fn log_ok(self) {
-        self.log().ok();
-    }
-
     #[cfg(not(debug_assertions))]
     fn log_with_msg<F: FnOnce(Formatter) -> fmt::Result>(self, f: F) -> LoggedResult<T> {
         self.do_log_msg(LogLevel::Error, None, f)
@@ -116,6 +105,17 @@ impl<T, R: Loggable<T>> ResultExt<T> for R {
     #[cfg(debug_assertions)]
     fn log_with_msg<F: FnOnce(Formatter) -> fmt::Result>(self, f: F) -> LoggedResult<T> {
         self.do_log_msg(LogLevel::Error, Some(Location::caller()), f)
+    }
+
+    #[cfg(not(debug_assertions))]
+    fn log_ok(self) {
+        self.log().ok();
+    }
+
+    #[track_caller]
+    #[cfg(debug_assertions)]
+    fn log_ok(self) {
+        self.do_log(LogLevel::Error, Some(Location::caller())).ok();
     }
 }
 
