@@ -165,15 +165,17 @@ int DbStatement::bind_text(int index, rust::Str val) {
     return sqlite3_bind_text(reinterpret_cast<sqlite3_stmt*>(this), index, val.data(), val.size(), nullptr);
 }
 
-#define sql_chk_log(fn, ...) if (int rc = fn(__VA_ARGS__); rc != SQLITE_OK) { \
-    LOGE("sqlite3(line:%d): %s\n", __LINE__, sqlite3_errstr(rc));             \
-    return false;                                                             \
+#define sql_chk_log_ret(ret, fn, ...) if (int rc = fn(__VA_ARGS__); rc != SQLITE_OK) { \
+    LOGE("sqlite3(line:%d): %s\n", __LINE__, sqlite3_errstr(rc));                      \
+    return ret;                                                                        \
 }
 
-static bool open_and_init_db_impl(sqlite3 **dbOut) {
+#define sql_chk_log(fn, ...) sql_chk_log_ret(nullptr, fn, __VA_ARGS__)
+
+sqlite3 *open_and_init_db() {
     if (!load_sqlite()) {
         LOGE("sqlite3: Cannot load libsqlite.so\n");
-        return false;
+        return nullptr;
     }
 
     unique_ptr<sqlite3, decltype(sqlite3_close)> db(nullptr, sqlite3_close);
@@ -192,9 +194,10 @@ static bool open_and_init_db_impl(sqlite3 **dbOut) {
     };
     sql_chk_log(sql_exec_impl, db.get(), "PRAGMA user_version", nullptr, nullptr, ver_cb, &ver);
     if (ver > DB_VERSION) {
-        // Don't support downgrading database
+        // Don't support downgrading database, delete and retry
         LOGE("sqlite3: Downgrading database is not supported\n");
-        return false;
+        unlink(MAGISKDB);
+        return open_and_init_db();
     }
 
     auto create_policy = [&] {
@@ -298,13 +301,7 @@ static bool open_and_init_db_impl(sqlite3 **dbOut) {
         sql_chk_log(sql_exec_impl, db.get(), "PRAGMA user_version=" DB_VERSION_STR);
     }
 
-    *dbOut = db.release();
-    return true;
-}
-
-sqlite3 *open_and_init_db() {
-    sqlite3 *db = nullptr;
-    return open_and_init_db_impl(&db) ? db : nullptr;
+    return db.release();
 }
 
 // Exported from Rust
@@ -332,7 +329,7 @@ bool db_exec(const char *sql, DbArgs args, db_exec_callback exec_fn) {
             fn->operator()(columns, values);
         };
     }
-    sql_chk_log(sql_exec_rs, sql, bind_cb, &bind_fn, exec_cb, &exec_fn);
+    sql_chk_log_ret(false, sql_exec_rs, sql, bind_cb, &bind_fn, exec_cb, &exec_fn);
     return true;
 }
 
