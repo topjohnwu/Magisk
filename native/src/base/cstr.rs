@@ -22,6 +22,8 @@ use crate::slice_from_ptr_mut;
 // Utf8CStrBufRef: reference to a fixed sized buffer
 // Utf8CStrBufArr<N>: fixed sized buffer allocated on the stack
 //
+// For easier usage, please use the helper functions in cstr_buf.
+//
 // In most cases, these are the types being used
 //
 // &Utf8CStr: whenever a printable null terminated string is needed
@@ -32,6 +34,37 @@ use crate::slice_from_ptr_mut;
 //
 // All types dereferences to &Utf8CStr.
 // Utf8CString, Utf8CStrBufRef, and Utf8CStrBufArr<N> implements Utf8CStrBuf.
+
+// Public helper functions
+
+pub mod cstr_buf {
+    use super::{Utf8CStrBufArr, Utf8CStrBufRef, Utf8CString};
+
+    #[inline(always)]
+    pub fn with_capacity(capacity: usize) -> Utf8CString {
+        Utf8CString::with_capacity(capacity)
+    }
+
+    #[inline(always)]
+    pub fn default() -> Utf8CStrBufArr<4096> {
+        Utf8CStrBufArr::default()
+    }
+
+    #[inline(always)]
+    pub fn new<const N: usize>() -> Utf8CStrBufArr<N> {
+        Utf8CStrBufArr::new()
+    }
+
+    #[inline(always)]
+    pub fn wrap(buf: &mut [u8]) -> Utf8CStrBufRef {
+        Utf8CStrBufRef::from(buf)
+    }
+
+    #[inline(always)]
+    pub unsafe fn wrap_ptr<'a>(buf: *mut u8, len: usize) -> Utf8CStrBufRef<'a> {
+        Utf8CStrBufRef::from_ptr(buf, len)
+    }
+}
 
 // Trait definitions
 
@@ -492,13 +525,13 @@ impl FsPathBuf<0> {
 
 impl Default for FsPathBuf<4096> {
     fn default() -> Self {
-        FsPathBuf(Utf8CStrBufOwned::Fixed(Utf8CStrBufArr::default()))
+        FsPathBuf(Utf8CStrBufOwned::Fixed(cstr_buf::default()))
     }
 }
 
 impl<const N: usize> FsPathBuf<N> {
     pub fn new() -> Self {
-        FsPathBuf(Utf8CStrBufOwned::Fixed(Utf8CStrBufArr::<N>::new()))
+        FsPathBuf(Utf8CStrBufOwned::Fixed(cstr_buf::new::<N>()))
     }
 
     pub fn clear(&mut self) {

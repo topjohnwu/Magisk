@@ -4,8 +4,8 @@ use crate::ffi::{get_magisk_tmp, install_apk, uninstall_pkg, DbEntryKey};
 use base::libc::{O_CLOEXEC, O_CREAT, O_RDONLY, O_TRUNC, O_WRONLY};
 use base::WalkResult::{Abort, Continue, Skip};
 use base::{
-    cstr, error, fd_get_attr, open_fd, warn, BufReadExt, Directory, FsPath, FsPathBuf,
-    LoggedResult, ReadExt, ResultExt, Utf8CStrBuf, Utf8CStrBufArr,
+    cstr, cstr_buf, error, fd_get_attr, open_fd, warn, BufReadExt, Directory, FsPath, FsPathBuf,
+    LoggedResult, ReadExt, ResultExt, Utf8CStrBuf,
 };
 use bit_set::BitSet;
 use cxx::CxxString;
@@ -273,7 +273,7 @@ impl ManagerInfo {
     }
 
     fn check_stub(&mut self, user: i32, pkg: &str) -> Status {
-        let mut arr = Utf8CStrBufArr::default();
+        let mut arr = cstr_buf::default();
         if find_apk_path(pkg, &mut arr).is_err() {
             return Status::NotInstalled;
         }
@@ -298,7 +298,7 @@ impl ManagerInfo {
     }
 
     fn check_orig(&mut self, user: i32) -> Status {
-        let mut arr = Utf8CStrBufArr::default();
+        let mut arr = cstr_buf::default();
         if find_apk_path(APP_PACKAGE_NAME, &mut arr).is_err() {
             return Status::NotInstalled;
         }

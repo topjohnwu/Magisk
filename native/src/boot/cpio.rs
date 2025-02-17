@@ -20,8 +20,8 @@ use base::libc::{
     S_IROTH, S_IRUSR, S_IWGRP, S_IWOTH, S_IWUSR, S_IXGRP, S_IXOTH, S_IXUSR,
 };
 use base::{
-    log_err, map_args, BytesExt, EarlyExitExt, FsPath, LoggedResult, MappedFile, ResultExt,
-    Utf8CStr, Utf8CStrBuf, Utf8CStrBufArr, WriteExt,
+    cstr_buf, log_err, map_args, BytesExt, EarlyExitExt, FsPath, LoggedResult, MappedFile,
+    ResultExt, Utf8CStr, Utf8CStrBuf, WriteExt,
 };
 
 use crate::check_env;
@@ -344,7 +344,7 @@ impl Cpio {
         let out = Utf8CStr::from_string(out);
         let out = FsPath::from(out);
 
-        let mut buf = Utf8CStrBufArr::default();
+        let mut buf = cstr_buf::default();
 
         // Make sure its parent directories exist
         if out.parent(&mut buf) {

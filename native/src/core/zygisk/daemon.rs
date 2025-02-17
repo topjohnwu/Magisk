@@ -6,8 +6,8 @@ use crate::ffi::{
 use crate::socket::{IpcRead, UnixSocketExt};
 use base::libc::{O_CLOEXEC, O_CREAT, O_RDONLY, STDOUT_FILENO};
 use base::{
-    cstr, error, fork_dont_care, libc, open_fd, raw_cstr, warn, Directory, FsPathBuf, LoggedError,
-    LoggedResult, ResultExt, Utf8CStrBufArr, WriteExt,
+    cstr, cstr_buf, error, fork_dont_care, libc, open_fd, raw_cstr, warn, Directory, FsPathBuf,
+    LoggedError, LoggedResult, ResultExt, WriteExt,
 };
 use std::fmt::Write;
 use std::os::fd::{AsRawFd, FromRawFd, RawFd};
@@ -39,7 +39,7 @@ fn exec_zygiskd(is_64_bit: bool, remote: UnixStream) {
 
     let exe = FsPathBuf::<64>::new().join(get_magisk_tmp()).join(magisk);
 
-    let mut fd_str = Utf8CStrBufArr::<16>::new();
+    let mut fd_str = cstr_buf::new::<16>();
     write!(fd_str, "{}", remote.as_raw_fd()).ok();
     unsafe {
         libc::execl(

@@ -1,6 +1,7 @@
 use crate::cxx_extern::readlinkat_for_cxx;
 use crate::{
-    cstr, errno, error, FsPath, FsPathBuf, LibcReturn, Utf8CStr, Utf8CStrBuf, Utf8CStrBufArr,
+    cstr, cstr_buf, errno, error, FsPath, FsPathBuf, LibcReturn, Utf8CStr, Utf8CStrBuf,
+    Utf8CStrBufArr,
 };
 use bytemuck::{bytes_of, bytes_of_mut, Pod};
 use libc::{
@@ -284,13 +285,13 @@ impl DirEntry<'_> {
     }
 
     pub fn get_attr(&self) -> io::Result<FileAttr> {
-        let mut path = Utf8CStrBufArr::default();
+        let mut path = cstr_buf::default();
         self.path(&mut path)?;
         FsPath::from(&path).get_attr()
     }
 
     pub fn set_attr(&self, attr: &FileAttr) -> io::Result<()> {
-        let mut path = Utf8CStrBufArr::default();
+        let mut path = cstr_buf::default();
         self.path(&mut path)?;
         FsPath::from(&path).set_attr(attr)
     }
@@ -431,7 +432,7 @@ impl Directory {
                 std::io::copy(&mut src, &mut dest)?;
                 fd_set_attr(dest.as_raw_fd(), &attr)?;
             } else if e.is_symlink() {
-                let mut path = Utf8CStrBufArr::default();
+                let mut path = cstr_buf::default();
                 e.read_link(&mut path)?;
                 unsafe {
                     libc::symlinkat(path.as_ptr(), dir.as_raw_fd(), e.d_name.as_ptr())
@@ -645,7 +646,7 @@ impl FsPath {
         if self.is_empty() {
             return Ok(());
         }
-        let mut arr = Utf8CStrBufArr::default();
+        let mut arr = cstr_buf::default();
         arr.push_str(self);
         let mut off = 1;
         unsafe {
@@ -748,7 +749,7 @@ impl FsPath {
                 let mut dest = path.create(O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0o777)?;
                 std::io::copy(&mut src, &mut dest)?;
             } else if attr.is_symlink() {
-                let mut buf = Utf8CStrBufArr::default();
+                let mut buf = cstr_buf::default();
                 self.read_link(&mut buf)?;
                 unsafe {
                     libc::symlink(buf.as_ptr(), path.as_ptr()).as_os_err()?;

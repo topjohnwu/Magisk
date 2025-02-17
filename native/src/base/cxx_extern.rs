@@ -9,12 +9,12 @@ use libc::{c_char, mode_t};
 use crate::files::map_file_at;
 pub(crate) use crate::xwrap::*;
 use crate::{
-    clone_attr, cstr, fclone_attr, fd_path, map_fd, map_file, slice_from_ptr, CxxResultExt,
-    Directory, FsPath, Utf8CStr, Utf8CStrBufRef,
+    clone_attr, cstr, cstr_buf, fclone_attr, fd_path, map_fd, map_file, slice_from_ptr,
+    CxxResultExt, Directory, FsPath, Utf8CStr,
 };
 
 pub(crate) fn fd_path_for_cxx(fd: RawFd, buf: &mut [u8]) -> isize {
-    let mut buf = Utf8CStrBufRef::from(buf);
+    let mut buf = cstr_buf::wrap(buf);
     fd_path(fd, &mut buf)
         .log_cxx_with_msg(|w| w.write_str("fd_path failed"))
         .map_or(-1_isize, |_| buf.len() as isize)
@@ -24,7 +24,7 @@ pub(crate) fn fd_path_for_cxx(fd: RawFd, buf: &mut [u8]) -> isize {
 unsafe extern "C" fn canonical_path(path: *const c_char, buf: *mut u8, bufsz: usize) -> isize {
     match Utf8CStr::from_ptr(path) {
         Ok(p) => {
-            let mut buf = Utf8CStrBufRef::from_ptr(buf, bufsz);
+            let mut buf = cstr_buf::wrap_ptr(buf, bufsz);
             FsPath::from(p)
                 .realpath(&mut buf)
                 .map_or(-1, |_| buf.len() as isize)

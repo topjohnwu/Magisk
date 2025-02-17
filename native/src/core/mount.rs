@@ -8,8 +8,8 @@ use num_traits::AsPrimitive;
 
 use base::libc::{c_uint, dev_t};
 use base::{
-    cstr, debug, info, libc, parse_mount_info, raw_cstr, warn, FsPath, FsPathBuf, LibcReturn,
-    LoggedResult, MountInfo, ResultExt, Utf8CStr, Utf8CStrBufArr,
+    cstr, cstr_buf, debug, info, libc, parse_mount_info, raw_cstr, warn, FsPath, FsPathBuf,
+    LibcReturn, LoggedResult, MountInfo, ResultExt, Utf8CStr,
 };
 
 use crate::consts::{MODULEMNT, MODULEROOT, PREINITDEV, PREINITMIRR, WORKERDIR};
@@ -45,7 +45,7 @@ pub fn setup_mounts() {
                     let preinit_dir = Utf8CStr::from_string(&mut preinit_dir);
                     let r: LoggedResult<()> = try {
                         FsPath::from(preinit_dir).mkdir(0o700)?;
-                        let mut buf = Utf8CStrBufArr::default();
+                        let mut buf = cstr_buf::default();
                         if mnt_path.parent(&mut buf) {
                             FsPath::from(&buf).mkdirs(0o755)?;
                         }
@@ -217,7 +217,7 @@ pub fn find_preinit_device() -> String {
         let preinit_dir = FsPath::from(Utf8CStr::from_string(&mut preinit_dir));
         let _: LoggedResult<()> = try {
             preinit_dir.mkdirs(0o700)?;
-            let mut buf = Utf8CStrBufArr::default();
+            let mut buf = cstr_buf::default();
             if mirror_dir.parent(&mut buf) {
                 FsPath::from(&buf).mkdirs(0o755)?;
             }

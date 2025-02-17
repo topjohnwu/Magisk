@@ -6,8 +6,8 @@ use base::libc::{
     timespec, tm, O_CLOEXEC, O_RDWR, O_WRONLY, PIPE_BUF, SIGPIPE, SIG_BLOCK, SIG_SETMASK,
 };
 use base::{
-    const_format::concatcp, libc, raw_cstr, FsPathBuf, LogLevel, Logger, ReadExt, Utf8CStr,
-    Utf8CStrBuf, Utf8CStrBufArr, WriteExt, LOGGER,
+    const_format::concatcp, cstr_buf, libc, raw_cstr, FsPathBuf, LogLevel, Logger, ReadExt,
+    Utf8CStr, Utf8CStrBuf, WriteExt, LOGGER,
 };
 use bytemuck::{bytes_of, write_zeroes, Pod, Zeroable};
 use num_derive::{FromPrimitive, ToPrimitive};
@@ -130,7 +130,7 @@ fn write_log_to_pipe(mut logd: &File, prio: i32, msg: &Utf8CStr) -> io::Result<u
     let io2 = IoSlice::new(msg);
     let result = logd.write_vectored(&[io1, io2]);
     if let Err(ref e) = result {
-        let mut buf = Utf8CStrBufArr::default();
+        let mut buf = cstr_buf::default();
         buf.write_fmt(format_args!("Cannot write_log_to_pipe: {}", e))
             .ok();
         android_log_write(LogLevel::Error, &buf);
@@ -266,7 +266,7 @@ extern "C" fn logfile_writer(arg: *mut c_void) -> *mut c_void {
 
         let mut meta = LogMeta::zeroed();
         let mut msg_buf = [0u8; MAX_MSG_LEN];
-        let mut aux = Utf8CStrBufArr::<64>::new();
+        let mut aux = cstr_buf::new::<64>();
 
         loop {
             // Read request
