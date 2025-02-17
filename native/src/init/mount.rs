@@ -2,7 +2,7 @@ use crate::ffi::MagiskInit;
 use base::{
     cstr, debug, libc,
     libc::{chdir, chroot, execve, exit, mount, umount2, MNT_DETACH, MS_MOVE},
-    parse_mount_info, raw_cstr, Directory, FsPath, LibcReturn, LoggedResult, ResultExt, StringExt,
+    parse_mount_info, path, raw_cstr, Directory, LibcReturn, LoggedResult, ResultExt, StringExt,
     Utf8CStr,
 };
 use cxx::CxxString;
@@ -76,7 +76,7 @@ pub fn is_device_mounted(dev: u64, target: Pin<&mut CxxString>) -> bool {
 impl MagiskInit {
     pub(crate) fn prepare_data(&self) {
         debug!("Setup data tmp");
-        FsPath::from(cstr!("/data")).mkdir(0o755).log_ok();
+        path!("/data").mkdir(0o755).log_ok();
         unsafe {
             mount(
                 raw_cstr!("magisk"),
@@ -85,11 +85,15 @@ impl MagiskInit {
                 0,
                 raw_cstr!("mode=755").cast(),
             )
-        }.as_os_err().log_ok();
+        }
+        .as_os_err()
+        .log_ok();
 
-        FsPath::from(cstr!("/init")).copy_to(FsPath::from(cstr!("/data/magiskinit"))).log_ok();
-        FsPath::from(cstr!("/.backup")).copy_to(FsPath::from(cstr!("/data/.backup"))).log_ok();
-        FsPath::from(cstr!("/overlay.d")).copy_to(FsPath::from(cstr!("/data/overlay.d"))).log_ok();
+        path!("/init").copy_to(path!("/data/magiskinit")).log_ok();
+        path!("/.backup").copy_to(path!("/data/.backup")).log_ok();
+        path!("/overlay.d")
+            .copy_to(path!("/data/overlay.d"))
+            .log_ok();
     }
 
     pub(crate) fn exec_init(&self) {

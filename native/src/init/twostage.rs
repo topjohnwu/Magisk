@@ -5,7 +5,7 @@ use base::{
         fstatat, mount, stat, statfs, umount2, AT_SYMLINK_NOFOLLOW, MNT_DETACH, MS_BIND, O_CLOEXEC,
         O_CREAT, O_RDONLY, O_WRONLY, TMPFS_MAGIC,
     },
-    raw_cstr, FsPath, LibcReturn, MappedFile, MutBytesExt, ResultExt,
+    path, raw_cstr, LibcReturn, MappedFile, MutBytesExt, ResultExt,
 };
 use std::{ffi::c_long, io::Write, ptr::null};
 
@@ -25,38 +25,26 @@ impl MagiskInit {
                 ) != 0
         } {
             if self.config.force_normal_boot {
-                FsPath::from(cstr!("/first_stage_ramdisk/storage/self"))
+                path!("/first_stage_ramdisk/storage/self")
                     .mkdirs(0o755)
-                    .log()
-                    .ok();
-                FsPath::from(cstr!("/system/system/bin/init"))
-                    .symlink_to(FsPath::from(cstr!(
-                        "/first_stage_ramdisk/storage/self/primary"
-                    )))
-                    .log()
-                    .ok();
+                    .log_ok();
+                path!("/system/system/bin/init")
+                    .symlink_to(path!("/first_stage_ramdisk/storage/self/primary"))
+                    .log_ok();
                 debug!(
                     "Symlink /first_stage_ramdisk/storage/self/primary -> /system/system/bin/init"
                 );
-                FsPath::from(cstr!("/first_stage_ramdisk/sdcard"))
+                path!("/first_stage_ramdisk/sdcard")
                     .create(O_RDONLY | O_CREAT | O_CLOEXEC, 0)
-                    .log()
-                    .ok();
+                    .log_ok();
             } else {
-                FsPath::from(cstr!("/storage/self"))
-                    .mkdirs(0o755)
-                    .log()
-                    .ok();
-                FsPath::from(cstr!("/system/system/bin/init"))
-                    .symlink_to(FsPath::from(cstr!("/storage/self/primary")))
-                    .log()
-                    .ok();
+                path!("/storage/self").mkdirs(0o755).log_ok();
+                path!("/system/system/bin/init")
+                    .symlink_to(path!("/storage/self/primary"))
+                    .log_ok();
                 debug!("Symlink /storage/self/primary -> /system/system/bin/init");
             }
-            FsPath::from(cstr!("/init"))
-                .rename_to(FsPath::from(cstr!("/sdcard")))
-                .log()
-                .ok();
+            path!("/init").rename_to(path!("/sdcard")).log_ok();
             // Try to keep magiskinit in rootfs for samsung RKP
             if unsafe {
                 mount(
@@ -103,8 +91,8 @@ impl MagiskInit {
     }
 
     pub(crate) fn redirect_second_stage(&self) {
-        let src = FsPath::from(cstr!("/init"));
-        let dest = FsPath::from(cstr!("/data/init"));
+        let src = path!("/init");
+        let dest = path!("/data/init");
         // Patch init binary
         if let Ok(mut map) = MappedFile::open(src) {
             let from = "/system/bin/init";
@@ -136,7 +124,7 @@ impl MagiskInit {
         unsafe {
             umount2(raw_cstr!("/init"), MNT_DETACH);
             umount2(raw_cstr!("/system/bin/init"), MNT_DETACH); // just in case
-            FsPath::from(cstr!("/data/init")).remove().ok();
+            path!("/data/init").remove().ok();
 
             // Make sure init dmesg logs won't get messed up
             *self.argv = raw_cstr!("/system/bin/init") as *mut _;
@@ -146,12 +134,9 @@ impl MagiskInit {
             statfs(raw_cstr!("/"), &mut sfs);
             if sfs.f_type == 0x858458f6 || sfs.f_type as c_long == TMPFS_MAGIC {
                 // We are still on rootfs, so make sure we will execute the init of the 2nd stage
-                let init_path = FsPath::from(cstr!("/init"));
+                let init_path = path!("/init");
                 init_path.remove().ok();
-                FsPath::from(cstr!("/system/bin/init"))
-                    .symlink_to(init_path)
-                    .log()
-                    .ok();
+                path!("/system/bin/init").symlink_to(init_path).log_ok();
                 self.patch_rw_root();
             } else {
                 self.patch_ro_root();

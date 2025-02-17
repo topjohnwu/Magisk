@@ -4,9 +4,9 @@ use crate::{
     logging::setup_klog,
 };
 use base::{
-    cstr, debug, info,
+    debug, info,
     libc::{basename, getpid, mount, umask},
-    raw_cstr, FsPath, LibcReturn, LoggedResult, ResultExt,
+    path, raw_cstr, FsPath, LibcReturn, LoggedResult, ResultExt,
 };
 use std::{
     ffi::{c_char, CStr},
@@ -48,40 +48,36 @@ impl MagiskInit {
         info!("RootFS Init");
         self.prepare_data();
         debug!("Restoring /init\n");
-        FsPath::from(cstr!("/.backup/init"))
-            .rename_to(FsPath::from(cstr!("/init")))
-            .log()
-            .ok();
+        path!("/.backup/init").rename_to(path!("/init")).log_ok();
         self.patch_rw_root();
     }
 
     pub(crate) fn recovery(&self) {
         info!("Ramdisk is recovery, abort");
         self.restore_ramdisk_init();
-        FsPath::from(cstr!("/.backup")).remove_all().ok();
+        path!("/.backup").remove_all().ok();
     }
 
     pub(crate) fn restore_ramdisk_init(&self) {
-        FsPath::from(cstr!("/init")).remove().ok();
+        path!("/init").remove().ok();
 
         let orig_init = FsPath::from(backup_init());
 
         if orig_init.exists() {
-            orig_init.rename_to(FsPath::from(cstr!("/init"))).log_ok();
+            orig_init.rename_to(path!("/init")).log_ok();
         } else {
             // If the backup init is missing, this means that the boot ramdisk
             // was created from scratch, and the real init is in a separate CPIO,
             // which is guaranteed to be placed at /system/bin/init.
-            FsPath::from(cstr!("/system/bin/init"))
-                .symlink_to(FsPath::from(cstr!("/init")))
-                .log()
-                .ok();
+            path!("/system/bin/init")
+                .symlink_to(path!("/init"))
+                .log_ok();
         }
     }
 
     fn start(&mut self) -> LoggedResult<()> {
-        if !FsPath::from(cstr!("/proc/cmdline")).exists() {
-            FsPath::from(cstr!("/proc")).mkdir(0o755)?;
+        if !path!("/proc/cmdline").exists() {
+            path!("/proc").mkdir(0o755)?;
             unsafe {
                 mount(
                     raw_cstr!("proc"),
@@ -94,8 +90,8 @@ impl MagiskInit {
             .as_os_err()?;
             self.mount_list.push("/proc".to_string());
         }
-        if !FsPath::from(cstr!("/sys/block")).exists() {
-            FsPath::from(cstr!("/sys")).mkdir(0o755)?;
+        if !path!("/sys/block").exists() {
+            path!("/sys").mkdir(0o755)?;
             unsafe {
                 mount(
                     raw_cstr!("sysfs"),
@@ -120,9 +116,7 @@ impl MagiskInit {
             self.legacy_system_as_root();
         } else if self.config.force_normal_boot {
             self.first_stage();
-        } else if FsPath::from(cstr!("/sbin/recovery")).exists()
-            || FsPath::from(cstr!("/system/bin/recovery")).exists()
-        {
+        } else if path!("/sbin/recovery").exists() || path!("/system/bin/recovery").exists() {
             self.recovery();
         } else if self.check_two_stage() {
             self.first_stage();

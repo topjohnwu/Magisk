@@ -4,7 +4,7 @@ use base::{
         makedev, mknod, syscall, SYS_dup3, O_CLOEXEC, O_RDWR, O_WRONLY, STDERR_FILENO,
         STDIN_FILENO, STDOUT_FILENO, S_IFCHR,
     },
-    open_fd, raw_cstr, FsPath, LogLevel, Logger, Utf8CStr, LOGGER,
+    open_fd, path, raw_cstr, LogLevel, Logger, Utf8CStr, LOGGER,
 };
 use std::{
     fs::File,
@@ -23,7 +23,7 @@ pub fn setup_klog() {
         if fd.is_err() {
             mknod(raw_cstr!("/null"), S_IFCHR | 0o666, makedev(1, 3));
             fd = open_fd!(cstr!("/null"), O_RDWR | O_CLOEXEC);
-            FsPath::from(cstr!("/null")).remove().ok();
+            path!("/null").remove().ok();
         }
         if let Ok(ref fd) = fd {
             syscall(SYS_dup3, fd, STDIN_FILENO, O_CLOEXEC);
@@ -36,7 +36,7 @@ pub fn setup_klog() {
         if fd.is_err() {
             mknod(raw_cstr!("/kmsg"), S_IFCHR | 0o666, makedev(1, 11));
             fd = open_fd!(cstr!("/kmsg"), O_WRONLY | O_CLOEXEC);
-            FsPath::from(cstr!("/kmsg")).remove().ok();
+            path!("/kmsg").remove().ok();
         }
         KMSG = fd.map(|fd| fd.into_raw_fd()).unwrap_or(-1);
     }

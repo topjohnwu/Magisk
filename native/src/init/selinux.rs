@@ -1,5 +1,5 @@
 use crate::ffi::MagiskInit;
-use base::{cstr, debug, FsPath, Utf8CStr};
+use base::{debug, path, Utf8CStr};
 use magiskpolicy::ffi::SePolicy;
 
 impl MagiskInit {
@@ -10,7 +10,7 @@ impl MagiskInit {
         sepol.magisk_rules();
 
         // Custom rules
-        let rule = FsPath::from(cstr!("/data/.magisk/preinit/sepolicy.rule"));
+        let rule = path!("/data/.magisk/preinit/sepolicy.rule");
         if rule.exists() {
             debug!("Loading custom sepolicy patch: [{}]", rule);
             sepol.load_rule_file(rule);
@@ -20,10 +20,10 @@ impl MagiskInit {
         sepol.to_file(out);
 
         // Remove OnePlus stupid debug sepolicy and use our own
-        let sepol_debug = FsPath::from(cstr!("/sepolicy_debug"));
+        let sepol_debug = path!("/sepolicy_debug");
         if sepol_debug.exists() {
             sepol_debug.remove().ok();
-            FsPath::from(cstr!("/sepolicy")).link_to(sepol_debug).ok();
+            path!("/sepolicy").link_to(sepol_debug).ok();
         }
     }
 }

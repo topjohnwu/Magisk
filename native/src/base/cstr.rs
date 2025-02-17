@@ -704,26 +704,27 @@ impl_str_buf_with_slice!(
     (Utf8CStrBufArr<N>, const N: usize)
 );
 
-// The cstr! macro is copied from https://github.com/bytecodealliance/rustix/blob/main/src/cstr.rs
-
 #[macro_export]
 macro_rules! cstr {
-    ($($str:tt)*) => {{
-        assert!(
-            !($($str)*).bytes().any(|b| b == b'\0'),
-            "cstr argument contains embedded NUL bytes",
-        );
+    ($str:expr) => {{
+        const NULL_STR: &str = $crate::const_format::concatcp!($str, "\0");
         #[allow(unused_unsafe)]
         unsafe {
-            $crate::Utf8CStr::from_bytes_unchecked($crate::const_format::concatcp!($($str)*, "\0")
-                .as_bytes())
+            $crate::Utf8CStr::from_bytes_unchecked(NULL_STR.as_bytes())
         }
     }};
 }
 
 #[macro_export]
 macro_rules! raw_cstr {
-    ($($str:tt)*) => {{
-        $crate::cstr!($($str)*).as_ptr()
+    ($str:expr) => {{
+        $crate::cstr!($str).as_ptr()
+    }};
+}
+
+#[macro_export]
+macro_rules! path {
+    ($str:expr) => {{
+        $crate::FsPath::from($crate::cstr!($str))
     }};
 }

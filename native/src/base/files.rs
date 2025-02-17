@@ -616,6 +616,7 @@ impl FsPath {
         self.remove()
     }
 
+    #[allow(clippy::unnecessary_cast)]
     pub fn read_link(&self, buf: &mut dyn Utf8CStrBuf) -> io::Result<()> {
         buf.clear();
         unsafe {
