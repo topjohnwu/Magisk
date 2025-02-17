@@ -520,6 +520,16 @@ def build_all():
 ############
 
 
+def clippy_cli():
+    args.force_out = True
+    os.chdir(Path("native", "src"))
+    cmds = ["clippy", "--no-deps", "--target", ""]
+    for triple in build_abis.values():
+        cmds[3] = triple
+        run_cargo(cmds)
+    os.chdir(Path("..", ".."))
+
+
 def cargo_cli():
     args.force_out = True
     if len(args.commands) >= 1 and args.commands[0] == "--":
@@ -769,6 +779,8 @@ def parse_args():
     )
     cargo_parser.add_argument("commands", nargs=argparse.REMAINDER)
 
+    clippy_parser = subparsers.add_parser("clippy", help="run clippy on Rust sources")
+
     rustup_parser = subparsers.add_parser("rustup", help="setup rustup wrapper")
     rustup_parser.add_argument(
         "wrapper_dir", help="path to setup rustup wrapper binaries"
@@ -778,6 +790,7 @@ def parse_args():
     all_parser.set_defaults(func=build_all)
     native_parser.set_defaults(func=build_native)
     cargo_parser.set_defaults(func=cargo_cli)
+    clippy_parser.set_defaults(func=clippy_cli)
     rustup_parser.set_defaults(func=setup_rustup)
     app_parser.set_defaults(func=build_app)
     stub_parser.set_defaults(func=build_stub)
