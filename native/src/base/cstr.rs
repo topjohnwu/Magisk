@@ -352,13 +352,6 @@ impl Utf8CStr {
         Self::from_cstr(CStr::from_bytes_with_nul(buf)?)
     }
 
-    pub fn from_bytes_mut(buf: &mut [u8]) -> Result<&mut Utf8CStr, StrErr> {
-        CStr::from_bytes_with_nul(buf)?;
-        str::from_utf8(buf)?;
-        // Both condition checked
-        unsafe { Ok(mem::transmute::<&mut [u8], &mut Utf8CStr>(buf)) }
-    }
-
     pub fn from_string(s: &mut String) -> &mut Utf8CStr {
         let buf = s.nul_terminate();
         // SAFETY: the null byte is explicitly added to the buffer
@@ -371,7 +364,7 @@ impl Utf8CStr {
     }
 
     #[inline(always)]
-    pub unsafe fn from_bytes_unchecked_mut(buf: &mut [u8]) -> &mut Utf8CStr {
+    unsafe fn from_bytes_unchecked_mut(buf: &mut [u8]) -> &mut Utf8CStr {
         mem::transmute(buf)
     }
 
