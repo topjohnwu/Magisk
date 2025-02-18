@@ -68,6 +68,7 @@ test_emu() {
   print_title "* Testing $avd_pkg ($variant)"
 
   if [ -n "$AVD_TEST_LOG" ]; then
+    rm -f logcat.log
     "$emu" @test $emu_args > kernel.log 2>&1 &
   else
     "$emu" @test $emu_args > /dev/null 2>&1 &
