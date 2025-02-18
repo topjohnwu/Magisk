@@ -154,3 +154,4 @@ Installing using custom recoveries is only possible if your device has boot ramd
 - Launch the Magisk app; it will show a dialog asking for reinstallation. Do the reinstallation **directly within the app** and reboot (if you are using MTK devices that lock the boot partition after boot, please [patch the boot image](#patching-images) and flash it by custom recovery or fastboot).
 
 > Warning: the `sepolicy.rule` file of modules may be stored in the `cache` partition. DO NOT WIPE THE `CACHE` PARTITION.
+![1000232118](https://github.com/user-attachments/assets/ec41ced6-28f8-4546-9d41-6063a406a080)
