@@ -162,7 +162,7 @@ pub fn persist_get_props(mut prop_cb: Pin<&mut PropCb>) {
             let mut dir = Directory::open(cstr!(PERSIST_PROP_DIR))?;
             dir.pre_order_walk(|e| {
                 if e.is_file() {
-                    if let Ok(name) = Utf8CStr::from_cstr(e.d_name()) {
+                    if let Ok(name) = Utf8CStr::from_cstr(e.name()) {
                         if let Ok(mut value) = file_get_prop(name) {
                             prop_cb.exec(name, Utf8CStr::from_string(&mut value));
                         }

@@ -7,8 +7,10 @@ use logging::setup_klog;
 // Has to be pub so all symbols in that crate is included
 pub use magiskpolicy;
 use mount::{is_device_mounted, switch_root};
-use rootdir::{collect_overlay_contexts, inject_magisk_rc, reset_overlay_contexts};
+use rootdir::{inject_magisk_rc, OverlayAttr};
 
+#[path = "../include/consts.rs"]
+mod consts;
 mod getinfo;
 mod init;
 mod logging;
@@ -43,6 +45,7 @@ pub mod ffi {
         mount_list: Vec<String>,
         argv: *mut *mut c_char,
         config: BootConfig,
+        overlay_con: Vec<OverlayAttr>,
     }
 
     unsafe extern "C++" {
@@ -62,8 +65,6 @@ pub mod ffi {
         fn inject_magisk_rc(fd: i32, tmp_dir: Utf8CStrRef);
         fn switch_root(path: Utf8CStrRef);
         fn is_device_mounted(dev: u64, target: Pin<&mut CxxString>) -> bool;
-        fn collect_overlay_contexts(src: Utf8CStrRef);
-        fn reset_overlay_contexts();
     }
 
     // BootConfig
@@ -78,8 +79,11 @@ pub mod ffi {
 
     // MagiskInit
     extern "Rust" {
+        type OverlayAttr;
         fn patch_sepolicy(self: &MagiskInit, src: Utf8CStrRef, out: Utf8CStrRef);
         fn parse_config_file(self: &mut MagiskInit);
+        fn mount_overlay(self: &mut MagiskInit, dest: Utf8CStrRef);
+        fn restore_overlay_contexts(self: &MagiskInit);
     }
     unsafe extern "C++" {
         // Used in Rust
@@ -93,5 +97,6 @@ pub mod ffi {
         fn mount_preinit_dir(self: &MagiskInit);
         unsafe fn find_block(self: &MagiskInit, partname: *const c_char) -> u64;
         fn hijack_sepolicy(self: &mut MagiskInit) -> bool;
+        unsafe fn patch_fissiond(self: &mut MagiskInit, tmp_path: *const c_char);
     }
 }

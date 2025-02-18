@@ -1,8 +1,5 @@
 use crate::cxx_extern::readlinkat_for_cxx;
-use crate::{
-    cstr, cstr_buf, errno, error, FsPath, FsPathBuf, LibcReturn, Utf8CStr, Utf8CStrBuf,
-    Utf8CStrBufArr,
-};
+use crate::{cstr, cstr_buf, errno, error, FsPath, FsPathBuf, LibcReturn, Utf8CStr, Utf8CStrBuf};
 use bytemuck::{bytes_of, bytes_of_mut, Pod};
 use libc::{
     c_uint, dirent, makedev, mode_t, EEXIST, ENOENT, F_OK, O_CLOEXEC, O_CREAT, O_PATH, O_RDONLY,
@@ -142,7 +139,7 @@ impl<T: Write> WriteExt for T {
 pub struct FileAttr {
     pub st: libc::stat,
     #[cfg(feature = "selinux")]
-    pub con: Utf8CStrBufArr<128>,
+    pub con: crate::Utf8CStrBufArr<128>,
 }
 
 impl FileAttr {
@@ -150,7 +147,7 @@ impl FileAttr {
         FileAttr {
             st: unsafe { mem::zeroed() },
             #[cfg(feature = "selinux")]
-            con: Utf8CStrBufArr::new(),
+            con: crate::Utf8CStrBufArr::new(),
         }
     }
 
@@ -189,7 +186,6 @@ impl FileAttr {
     }
 }
 
-#[cfg(feature = "selinux")]
 const XATTR_NAME_SELINUX: &[u8] = b"security.selinux\0";
 
 pub struct DirEntry<'a> {
@@ -199,7 +195,7 @@ pub struct DirEntry<'a> {
 }
 
 impl DirEntry<'_> {
-    pub fn d_name(&self) -> &CStr {
+    pub fn name(&self) -> &CStr {
         unsafe {
             CStr::from_bytes_with_nul_unchecked(slice::from_raw_parts(
                 self.d_name.as_ptr().cast(),
@@ -211,7 +207,7 @@ impl DirEntry<'_> {
     pub fn path(&self, buf: &mut dyn Utf8CStrBuf) -> io::Result<()> {
         self.dir.path(buf)?;
         buf.push_str("/");
-        buf.push_lossy(self.d_name().to_bytes());
+        buf.push_lossy(self.name().to_bytes());
         Ok(())
     }
 
@@ -267,7 +263,7 @@ impl DirEntry<'_> {
     }
 
     unsafe fn open_fd(&self, flags: i32) -> io::Result<RawFd> {
-        self.dir.open_raw_fd(self.d_name(), flags, 0)
+        self.dir.open_raw_fd(self.name(), flags, 0)
     }
 
     pub fn open_as_dir(&self) -> io::Result<Directory> {
@@ -294,6 +290,18 @@ impl DirEntry<'_> {
         let mut path = cstr_buf::default();
         self.path(&mut path)?;
         FsPath::from(&path).set_attr(attr)
+    }
+
+    pub fn get_secontext(&self, con: &mut dyn Utf8CStrBuf) -> io::Result<()> {
+        let mut path = cstr_buf::default();
+        self.path(&mut path)?;
+        FsPath::from(&path).get_secontext(con)
+    }
+
+    pub fn set_secontext(&self, con: &Utf8CStr) -> io::Result<()> {
+        let mut path = cstr_buf::default();
+        self.path(&mut path)?;
+        FsPath::from(&path).set_secontext(con)
     }
 }
 
@@ -424,7 +432,7 @@ impl Directory {
                 let mut src = e.open_as_file(O_RDONLY)?;
                 let mut dest = unsafe {
                     File::from_raw_fd(dir.open_raw_fd(
-                        e.d_name(),
+                        e.name(),
                         O_WRONLY | O_CREAT | O_TRUNC,
                         0o777,
                     )?)
@@ -447,7 +455,7 @@ impl Directory {
     pub fn move_into(&mut self, dir: &Directory) -> io::Result<()> {
         let dir_fd = self.as_raw_fd();
         while let Some(ref e) = self.read()? {
-            if e.is_dir() && dir.contains_path(e.d_name()) {
+            if e.is_dir() && dir.contains_path(e.name()) {
                 // Destination folder exists, needs recursive move
                 let mut src = e.open_as_dir()?;
                 let new_entry = DirEntry {
@@ -621,7 +629,7 @@ impl FsPath {
     pub fn read_link(&self, buf: &mut dyn Utf8CStrBuf) -> io::Result<()> {
         buf.clear();
         unsafe {
-            let r = libc::readlink(self.as_ptr(), buf.as_mut_ptr().cast(), buf.capacity() - 1)
+            let r = libc::readlink(self.as_ptr(), buf.as_mut_ptr(), buf.capacity() - 1)
                 .check_os_err()? as isize;
             *(buf.as_mut_ptr().offset(r) as *mut u8) = b'\0';
             buf.set_len(r as usize);
@@ -698,16 +706,7 @@ impl FsPath {
             libc::lstat(self.as_ptr(), &mut attr.st).as_os_err()?;
 
             #[cfg(feature = "selinux")]
-            {
-                let sz = libc::lgetxattr(
-                    self.as_ptr(),
-                    XATTR_NAME_SELINUX.as_ptr().cast(),
-                    attr.con.as_mut_ptr().cast(),
-                    attr.con.capacity(),
-                )
-                .check_os_err()?;
-                attr.con.set_len((sz - 1) as usize);
-            }
+            self.get_secontext(&mut attr.con)?;
         }
         Ok(attr)
     }
@@ -721,17 +720,41 @@ impl FsPath {
 
             #[cfg(feature = "selinux")]
             if !attr.con.is_empty() {
-                libc::lsetxattr(
-                    self.as_ptr(),
-                    XATTR_NAME_SELINUX.as_ptr().cast(),
-                    attr.con.as_ptr().cast(),
-                    attr.con.len() + 1,
-                    0,
-                )
-                .as_os_err()?;
+                self.set_secontext(&attr.con)?;
             }
         }
         Ok(())
+    }
+
+    pub fn get_secontext(&self, con: &mut dyn Utf8CStrBuf) -> io::Result<()> {
+        unsafe {
+            let sz = libc::lgetxattr(
+                self.as_ptr(),
+                XATTR_NAME_SELINUX.as_ptr().cast(),
+                con.as_mut_ptr().cast(),
+                con.capacity(),
+            )
+            .check_os_err()?;
+            if sz < 1 {
+                con.clear();
+            } else {
+                con.set_len((sz - 1) as usize);
+            }
+        }
+        Ok(())
+    }
+
+    pub fn set_secontext(&self, con: &Utf8CStr) -> io::Result<()> {
+        unsafe {
+            libc::lsetxattr(
+                self.as_ptr(),
+                XATTR_NAME_SELINUX.as_ptr().cast(),
+                con.as_ptr().cast(),
+                con.len() + 1,
+                0,
+            )
+            .as_os_err()
+        }
     }
 
     pub fn copy_to(&self, path: &FsPath) -> io::Result<()> {
