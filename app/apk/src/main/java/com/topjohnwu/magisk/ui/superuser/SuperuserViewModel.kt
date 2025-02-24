@@ -156,15 +156,16 @@ class SuperuserViewModel(
         }
     }
 
-    fun togglePolicy(item: PolicyRvItem, enable: Boolean) {
+    fun updatePolicy(item: PolicyRvItem, policy: Int) {
         val items = itemsPolicies.filter { it.item.uid == item.item.uid }
         fun updateState() {
             viewModelScope.launch {
-                val res = if (enable) R.string.su_snack_grant else R.string.su_snack_deny
-                item.item.policy = if (enable) SuPolicy.ALLOW else SuPolicy.DENY
+                val res = if (policy >= SuPolicy.ALLOW) R.string.su_snack_grant else R.string.su_snack_deny
+                item.item.policy = policy
                 db.update(item.item)
                 items.forEach {
                     it.notifyPropertyChanged(BR.enabled)
+                    it.notifyPropertyChanged(BR.sliderValue)
                 }
                 SnackbarEvent(res.asText(item.appName)).publish()
             }
