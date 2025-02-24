@@ -1,8 +1,9 @@
+use crate::consts::{ROOTMNT, ROOTOVL};
 use crate::ffi::MagiskInit;
-use base::libc::O_RDONLY;
+use base::libc::{O_CREAT, O_RDONLY, O_WRONLY};
 use base::{
-    cstr_buf, debug, libc, path, BufReadExt, Directory, LibcReturn, LoggedResult, ResultExt,
-    Utf8CStr, Utf8CStrBuf, Utf8CStrBufArr, WalkResult,
+    clone_attr, cstr, cstr_buf, debug, libc, path, BufReadExt, Directory, FsPath, FsPathBuf,
+    LibcReturn, LoggedResult, ResultExt, Utf8CStr, Utf8CString,
 };
 use std::io::BufReader;
 use std::{
@@ -10,79 +11,8 @@ use std::{
     io::Write,
     mem,
     os::fd::{FromRawFd, RawFd},
-    sync::OnceLock,
+    ptr,
 };
-
-pub static OVERLAY_ATTRS: OnceLock<Vec<(String, String)>> = OnceLock::new();
-
-const XATTR_NAME_SELINUX: &[u8] = b"security.selinux\0";
-
-fn get_context<const N: usize>(path: &str, con: &mut Utf8CStrBufArr<N>) -> std::io::Result<()> {
-    unsafe {
-        let sz = libc::lgetxattr(
-            path.as_ptr().cast(),
-            XATTR_NAME_SELINUX.as_ptr().cast(),
-            con.as_mut_ptr().cast(),
-            con.capacity(),
-        )
-        .check_os_err()?;
-        con.set_len((sz - 1) as usize);
-    }
-    Ok(())
-}
-
-fn set_context(path: &str, con: &str) -> std::io::Result<()> {
-    unsafe {
-        libc::lsetxattr(
-            path.as_ptr().cast(),
-            XATTR_NAME_SELINUX.as_ptr().cast(),
-            con.as_ptr().cast(),
-            con.len() + 1,
-            0,
-        )
-        .as_os_err()
-    }
-}
-
-pub fn collect_overlay_contexts(src: &Utf8CStr) {
-    OVERLAY_ATTRS
-        .get_or_try_init(|| -> LoggedResult<_> {
-            let mut contexts = vec![];
-            let mut con = cstr_buf::default();
-            let mut path = cstr_buf::default();
-            let mut src = Directory::open(src)?;
-            src.path(&mut path)?;
-            let src_len = path.len();
-            src.post_order_walk(|f| {
-                f.path(&mut path)?;
-
-                let path = &path[src_len..];
-                if get_context(path, &mut con)
-                    .log_with_msg(|w| w.write_fmt(format_args!("collect context {}", path)))
-                    .is_ok()
-                {
-                    debug!("collect context: {:?} -> {:?}", path, con);
-                    contexts.push((path.to_string(), con.to_string()));
-                }
-
-                Ok(WalkResult::Continue)
-            })?;
-            Ok(contexts)
-        })
-        .ok();
-}
-
-pub fn reset_overlay_contexts() {
-    OVERLAY_ATTRS.get().map(|attrs| {
-        for (path, con) in attrs.iter() {
-            debug!("set context: {} -> {}", path, con);
-            set_context(path, con)
-                .log_with_msg(|w| w.write_fmt(format_args!("reset context {}", path)))
-                .ok();
-        }
-        Some(())
-    });
-}
 
 pub fn inject_magisk_rc(fd: RawFd, tmp_dir: &Utf8CStr) {
     debug!("Injecting magisk rc");
@@ -114,6 +44,8 @@ on property:init.svc.zygote=stopped
     mem::forget(file)
 }
 
+pub struct OverlayAttr(Utf8CString, Utf8CString);
+
 impl MagiskInit {
     pub(crate) fn parse_config_file(&mut self) {
         if let Ok(fd) = path!("/data/.backup/.magisk").open(O_RDONLY) {
@@ -126,5 +58,65 @@ impl MagiskInit {
                 true
             })
         }
+    }
+
+    fn mount_impl(
+        &mut self,
+        src_dir: &Utf8CStr,
+        dest_dir: &Utf8CStr,
+        mount_list: &mut String,
+    ) -> LoggedResult<()> {
+        let mut dir = Directory::open(src_dir)?;
+        let mut con = cstr_buf::default();
+        loop {
+            match &dir.read()? {
+                None => return Ok(()),
+                Some(e) => {
+                    let name = e.name().to_str()?;
+                    let src = FsPathBuf::new_dynamic(256).join(src_dir).join(name);
+                    let dest = FsPathBuf::new_dynamic(256).join(dest_dir).join(name);
+                    if dest.exists() {
+                        if e.is_dir() {
+                            // Recursive
+                            self.mount_impl(&src, &dest, mount_list)?;
+                        } else {
+                            debug!("Mount [{}] -> [{}]", src, dest);
+                            clone_attr(&dest, &src)?;
+                            dest.get_secontext(&mut con)?;
+                            unsafe {
+                                libc::mount(
+                                    src.as_ptr(),
+                                    dest.as_ptr(),
+                                    ptr::null(),
+                                    libc::MS_BIND,
+                                    ptr::null(),
+                                )
+                                .as_os_err()?;
+                            };
+                            self.overlay_con
+                                .push(OverlayAttr(dest.to_owned(), con.to_owned()));
+                            mount_list.push_str(dest.as_str());
+                            mount_list.push('\n');
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    pub(crate) fn mount_overlay(&mut self, dest: &Utf8CStr) {
+        let mut mount_list = String::new();
+        self.mount_impl(cstr!(ROOTOVL), dest, &mut mount_list)
+            .log_ok();
+        if let Ok(mut fd) = path!(ROOTMNT).create(O_CREAT | O_WRONLY, 0) {
+            fd.write(mount_list.as_bytes()).log_ok();
+        }
+    }
+
+    pub(crate) fn restore_overlay_contexts(&self) {
+        self.overlay_con.iter().for_each(|attr| {
+            let OverlayAttr(path, con) = attr;
+            FsPath::from(path).set_secontext(con).log_ok();
+        })
     }
 }

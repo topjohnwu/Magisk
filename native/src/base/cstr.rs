@@ -1,14 +1,14 @@
+use cxx::{type_id, ExternType};
+use libc::c_char;
+use std::borrow::Borrow;
 use std::cmp::min;
 use std::ffi::{CStr, FromBytesWithNulError, OsStr};
-use std::fmt::{Arguments, Debug, Display, Formatter, Write};
+use std::fmt::{Debug, Display, Formatter, Write};
 use std::ops::{Deref, DerefMut};
 use std::os::unix::ffi::OsStrExt;
 use std::path::{Path, PathBuf};
 use std::str::Utf8Error;
 use std::{fmt, mem, slice, str};
-
-use cxx::{type_id, ExternType};
-use libc::c_char;
 use thiserror::Error;
 
 use crate::slice_from_ptr_mut;
@@ -263,6 +263,12 @@ impl From<String> for Utf8CString {
     }
 }
 
+impl Borrow<Utf8CStr> for Utf8CString {
+    fn borrow(&self) -> &Utf8CStr {
+        self.deref()
+    }
+}
+
 // UTF-8 validated + null terminated reference to buffer
 pub struct Utf8CStrBufRef<'a> {
     used: usize,
@@ -359,7 +365,7 @@ impl Utf8CStr {
     }
 
     #[inline(always)]
-    pub unsafe fn from_bytes_unchecked(buf: &[u8]) -> &Utf8CStr {
+    pub const unsafe fn from_bytes_unchecked(buf: &[u8]) -> &Utf8CStr {
         mem::transmute(buf)
     }
 
@@ -429,6 +435,16 @@ impl DerefMut for Utf8CStr {
     #[inline(always)]
     fn deref_mut(&mut self) -> &mut Self::Target {
         self.as_str_mut()
+    }
+}
+
+impl ToOwned for Utf8CStr {
+    type Owned = Utf8CString;
+
+    fn to_owned(&self) -> Utf8CString {
+        let mut s = Utf8CString::with_capacity(self.len() + 1);
+        s.push_str(self.as_str());
+        s
     }
 }
 
@@ -535,7 +551,8 @@ impl<const N: usize> FsPathBuf<N> {
         fn inner(buf: &mut dyn Utf8CStrBuf, path: &str) {
             if path.starts_with('/') {
                 buf.clear();
-            } else {
+            }
+            if !buf.is_empty() && !buf.ends_with('/') {
                 buf.push_str("/");
             }
             buf.push_str(path);
@@ -545,10 +562,7 @@ impl<const N: usize> FsPathBuf<N> {
     }
 
     pub fn join_fmt<T: Display>(mut self, name: T) -> Self {
-        fn inner(buf: &mut dyn Utf8CStrBuf, path: Arguments) {
-            buf.write_fmt(path).ok();
-        }
-        inner(self.0.deref_mut(), format_args!("/{}", name));
+        self.0.write_fmt(format_args!("/{}", name)).ok();
         self
     }
 }

@@ -111,7 +111,7 @@ bool MagiskInit::hijack_sepolicy() noexcept {
     sepol.to_file(SELINUX_LOAD);
 
     // restore mounted files' context after sepolicy loaded
-    rust::reset_overlay_contexts();
+    restore_overlay_contexts();
 
     // Write to the enforce node ONLY after sepolicy is loaded. We need to make sure
     // the actual init process is blocked until sepolicy is loaded, or else

@@ -13,7 +13,6 @@
 using namespace std;
 
 static vector<string> rc_list;
-static string magic_mount_list;
 
 #define NEW_INITRC_DIR  "/system/etc/init/hw"
 #define INIT_RC         "init.rc"
@@ -43,33 +42,10 @@ static bool unxz(out_stream &strm, rust::Slice<const uint8_t> bytes) {
     return true;
 }
 
-static void magic_mount(const string &sdir, const string &ddir = "") {
-    auto dir = xopen_dir(sdir.data());
-    if (!dir) return;
-    for (dirent *entry; (entry = xreaddir(dir.get()));) {
-        string src = sdir + "/" + entry->d_name;
-        string dest = ddir + "/" + entry->d_name;
-        if (access(dest.data(), F_OK) == 0) {
-            if (entry->d_type == DT_DIR) {
-                // Recursive
-                magic_mount(src, dest);
-            } else {
-                LOGD("Mount [%s] -> [%s]\n", src.data(), dest.data());
-                struct stat st;
-                xstat(dest.data(), &st);
-                chmod(src.data(), st.st_mode & 0777);
-                chown(src.data(), st.st_uid, st.st_gid);
-                xmount(src.data(), dest.data(), nullptr, MS_BIND, nullptr);
-                magic_mount_list += dest;
-                magic_mount_list += '\n';
-            }
-        }
-    }
-}
-
-static void patch_rc_scripts(const char *src_path, const char *tmp_path, bool writable) {
+// When return true, run patch_fissiond
+static bool patch_rc_scripts(const char *src_path, const char *tmp_path, bool writable) {
     auto src_dir = xopen_dir(src_path);
-    if (!src_dir) return;
+    if (!src_dir) return false;
     int src_fd = dirfd(src_dir.get());
 
     // If writable, directly modify the file in src_path, or else add to rootfs overlay
@@ -81,17 +57,17 @@ static void patch_rc_scripts(const char *src_path, const char *tmp_path, bool wr
         xmkdirs(buf, 0755);
         return xopen_dir(buf);
     }();
-    if (!dest_dir) return;
+    if (!dest_dir) return false;
     int dest_fd = dirfd(dest_dir.get());
 
     // First patch init.rc
     {
         auto src = xopen_file(xopenat(src_fd, INIT_RC, O_RDONLY | O_CLOEXEC, 0), "re");
-        if (!src) return;
+        if (!src) return false;
         if (writable) unlinkat(src_fd, INIT_RC, 0);
         auto dest = xopen_file(
                 xopenat(dest_fd, INIT_RC, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0), "we");
-        if (!dest) return;
+        if (!dest) return false;
         LOGD("Patching " INIT_RC " in %s\n", src_path);
         file_readline(false, src.get(), [&dest](string_view line) -> bool {
             // Do not start vaultkeeper
@@ -157,41 +133,45 @@ static void patch_rc_scripts(const char *src_path, const char *tmp_path, bool wr
         fclone_attr(fileno(src.get()), fileno(dest.get()));
     }
 
-    if (faccessat(src_fd, "init.fission_host.rc", F_OK, 0) == 0) {
+    return faccessat(src_fd, "init.fission_host.rc", F_OK, 0) == 0;
+}
+
+void MagiskInit::patch_fissiond(const char *tmp_path) noexcept {
+    {
+        LOGD("Patching fissiond\n");
+        mmap_data fissiond("/system/bin/fissiond", false);
+        for (size_t off : fissiond.patch(
+                "ro.build.system.fission_single_os",
+                "ro.build.system.xxxxxxxxxxxxxxxxx"))
         {
-            LOGD("Patching fissiond\n");
-            mmap_data fissiond("/system/bin/fissiond", false);
-            for (size_t off : fissiond.patch("ro.build.system.fission_single_os", "ro.build.system.xxxxxxxxxxxxxxxxx")) {
-                LOGD("Patch @ %08zX [ro.build.system.fission_single_os] -> [ro.build.system.xxxxxxxxxxxxxxxxx]\n", off);
-            }
-            mkdirs(ROOTOVL "/system/bin", 0755);
-            if (auto target_fissiond = xopen_file(ROOTOVL "/system/bin/fissiond", "we")) {
-                fwrite(fissiond.buf(), 1, fissiond.sz(), target_fissiond.get());
-                clone_attr("/system/bin/fissiond", ROOTOVL "/system/bin/fissiond");
-            }
+            LOGD("Patch @ %08zX [ro.build.system.fission_single_os] -> "
+                 "[ro.build.system.xxxxxxxxxxxxxxxxx]\n", off);
         }
-        LOGD("hijack isolated\n");
-        auto hijack = xopen_file("/sys/devices/system/cpu/isolated", "re");
-        mkfifo(INTLROOT "/isolated", 0777);
-        xmount(INTLROOT "/isolated", "/sys/devices/system/cpu/isolated", nullptr, MS_BIND, nullptr);
-        if (!xfork()) {
-            auto dest = xopen_file(INTLROOT "/isolated", "we");
-            LOGD("hijacked isolated\n");
-            xumount2("/sys/devices/system/cpu/isolated", MNT_DETACH);
-            unlink(INTLROOT "/isolated");
-            string content;
-            full_read(fileno(hijack.get()), content);
-            {
-                string target = "/dev/cells/cell2"s + tmp_path;
-                xmkdirs(target.data(), 0);
-                xmount(tmp_path, target.data(), nullptr, MS_BIND | MS_REC,nullptr);
-                magic_mount(ROOTOVL, "/dev/cells/cell2");
-                auto mount = xopen_file(ROOTMNT, "w");
-                fwrite(magic_mount_list.data(), 1, magic_mount_list.length(), mount.get());
-            }
-            fprintf(dest.get(), "%s", content.data());
-            exit(0);
+        mkdirs(ROOTOVL "/system/bin", 0755);
+        if (auto target_fissiond = xopen_file(ROOTOVL "/system/bin/fissiond", "we")) {
+            fwrite(fissiond.buf(), 1, fissiond.sz(), target_fissiond.get());
+            clone_attr("/system/bin/fissiond", ROOTOVL "/system/bin/fissiond");
         }
+    }
+    LOGD("hijack isolated\n");
+    auto hijack = xopen_file("/sys/devices/system/cpu/isolated", "re");
+    mkfifo(INTLROOT "/isolated", 0777);
+    xmount(INTLROOT "/isolated", "/sys/devices/system/cpu/isolated", nullptr, MS_BIND, nullptr);
+    if (!xfork()) {
+        auto dest = xopen_file(INTLROOT "/isolated", "we");
+        LOGD("hijacked isolated\n");
+        xumount2("/sys/devices/system/cpu/isolated", MNT_DETACH);
+        unlink(INTLROOT "/isolated");
+        string content;
+        full_read(fileno(hijack.get()), content);
+        {
+            string target = "/dev/cells/cell2"s + tmp_path;
+            xmkdirs(target.data(), 0);
+            xmount(tmp_path, target.data(), nullptr, MS_BIND | MS_REC, nullptr);
+            mount_overlay("/dev/cells/cell2");
+        }
+        fprintf(dest.get(), "%s", content.data());
+        exit(0);
     }
 }
 
@@ -337,17 +317,17 @@ void MagiskInit::patch_ro_root() noexcept {
     }
 
     // Patch init.rc
+    bool p;
     if (access(NEW_INITRC_DIR "/" INIT_RC, F_OK) == 0) {
         // Android 11's new init.rc
-        patch_rc_scripts(NEW_INITRC_DIR, tmp_dir.data(), false);
+        p = patch_rc_scripts(NEW_INITRC_DIR, tmp_dir.data(), false);
     } else {
-        patch_rc_scripts("/", tmp_dir.data(), false);
+        p = patch_rc_scripts("/", tmp_dir.data(), false);
     }
+    if (p) patch_fissiond(tmp_dir.data());
 
     // Extract overlay archives
     extract_files(false);
-
-    rust::collect_overlay_contexts(ROOTOVL);
 
     // Oculus Go will use a special sepolicy if unlocked
     if (access("/sepolicy.unlocked", F_OK) == 0) {
@@ -361,10 +341,7 @@ void MagiskInit::patch_ro_root() noexcept {
     unlink("init-ld");
 
     // Mount rootdir
-    magic_mount(ROOTOVL);
-    int dest = xopen(ROOTMNT, O_WRONLY | O_CREAT, 0);
-    write(dest, magic_mount_list.data(), magic_mount_list.length());
-    close(dest);
+    mount_overlay("/");
 
     chdir("/");
 }
@@ -388,7 +365,8 @@ void MagiskInit::patch_rw_root() noexcept {
     rm_rf("/.backup");
 
     // Patch init.rc
-    patch_rc_scripts("/", "/sbin", true);
+    if (patch_rc_scripts("/", "/sbin", true))
+        patch_fissiond("/sbin");
 
     bool treble;
     {
