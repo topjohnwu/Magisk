@@ -128,6 +128,7 @@ Having KnoxGuard active will prevent you from installing/running Magisk regardle
   **DO NOT USE MTP** as it is known to corrupt large files.
 - Reboot to download mode. Open Odin on your PC, and flash `magisk_patched.tar` as `AP`, together with `BL`, `CP`, and `CSC` (**NOT** `HOME_CSC` because we want to **wipe data**) from the original firmware.
 - Your device should reboot automatically once Odin finished flashing. **Agree to do a factory reset if asked.**
+- If your device leaves in boot loop, do not panic, execute the manipulation to go into recovery mode and make a factory reset, everything will go to order.
 - If your device does **NOT** have boot ramdisk, reboot to recovery now to enable Magisk (reason stated in [Magisk in Recovery](#magisk-in-recovery)).
 - Install the Magisk app you've already downloaded and launch the app. It should show a dialog asking for additional setup.
 - Let the app do its job and automatically reboot the device. Voila!
