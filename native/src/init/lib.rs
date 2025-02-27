@@ -16,7 +16,6 @@ mod init;
 mod logging;
 mod mount;
 mod rootdir;
-mod selinux;
 mod twostage;
 
 #[cxx::bridge]
@@ -80,7 +79,6 @@ pub mod ffi {
     // MagiskInit
     extern "Rust" {
         type OverlayAttr;
-        fn patch_sepolicy(self: &MagiskInit, src: Utf8CStrRef, out: Utf8CStrRef);
         fn parse_config_file(self: &mut MagiskInit);
         fn mount_overlay(self: &mut MagiskInit, dest: Utf8CStrRef);
         fn restore_overlay_contexts(self: &MagiskInit);
@@ -96,7 +94,7 @@ pub mod ffi {
         fn collect_devices(self: &MagiskInit);
         fn mount_preinit_dir(self: &MagiskInit);
         unsafe fn find_block(self: &MagiskInit, partname: *const c_char) -> u64;
-        fn hijack_sepolicy(self: &mut MagiskInit) -> bool;
+        fn handle_sepolicy(self: &mut MagiskInit);
         unsafe fn patch_fissiond(self: &mut MagiskInit, tmp_path: *const c_char);
     }
 }

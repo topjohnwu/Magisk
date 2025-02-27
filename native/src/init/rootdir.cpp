@@ -329,15 +329,7 @@ void MagiskInit::patch_ro_root() noexcept {
     // Extract overlay archives
     extract_files(false);
 
-    // Oculus Go will use a special sepolicy if unlocked
-    if (access("/sepolicy.unlocked", F_OK) == 0) {
-        patch_sepolicy("/sepolicy.unlocked", ROOTOVL "/sepolicy.unlocked");
-    } else {
-        bool patch = access(SPLIT_PLAT_CIL, F_OK) != 0 && access("/sepolicy", F_OK) == 0;
-        if (patch || !hijack_sepolicy()) {
-            patch_sepolicy("/sepolicy", ROOTOVL "/sepolicy");
-        }
-    }
+    handle_sepolicy();
     unlink("init-ld");
 
     // Mount rootdir
@@ -368,12 +360,6 @@ void MagiskInit::patch_rw_root() noexcept {
     if (patch_rc_scripts("/", "/sbin", true))
         patch_fissiond("/sbin");
 
-    bool treble;
-    {
-        auto init = mmap_data("/init");
-        treble = init.contains(SPLIT_PLAT_CIL);
-    }
-
     xmkdir(PRE_TMPSRC, 0);
     xmount("tmpfs", PRE_TMPSRC, "tmpfs", 0, "mode=755");
     xmkdir(PRE_TMPDIR, 0);
@@ -383,10 +369,7 @@ void MagiskInit::patch_rw_root() noexcept {
     // Extract overlay archives
     extract_files(true);
 
-    bool patch = !treble && access("/sepolicy", F_OK) == 0;
-    if (patch || !hijack_sepolicy()) {
-        patch_sepolicy("/sepolicy", "/sepolicy");
-    }
+    handle_sepolicy();
     unlink("init-ld");
 
     chdir("/");
