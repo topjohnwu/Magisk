@@ -93,8 +93,8 @@ if mount | grep -q rootfs; then
   # Legacy rootfs
   mount -o rw,remount /
   rm -rf /root
-  mkdir /root
-  chmod 750 /root
+  mkdir /root /sbin 2>/dev/null
+  chmod 750 /root /sbin
   ln /sbin/* /root
   mount -o ro,remount /
   mount_sbin
