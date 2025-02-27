@@ -4,7 +4,14 @@
 #
 # Support API level: 23 - 34
 #
-# With an emulator booted and accessible via ADB, usage:
+# Push files to AVD:
+# /data/local/tmp/magisk.apk
+# /data/local/tmp/busybox (extract from apk)
+# /data/local/tmp/avd_magisk.sh (this file)
+# Then execute, you must use non-interactive shell:
+# adb shell sh /data/local/tmp/avd_magisk.sh
+#
+# For developing Magisk, just use:
 # ./build.py emulator
 #
 # This script will stop zygote, simulate the Magisk start up process
