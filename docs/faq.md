@@ -20,3 +20,9 @@ Magisk no longer handles root hiding. There are plenty of Magisk/Zygisk modules 
 When hiding the Magisk app, it will install a "stub" APK that has nothing in it. The only functionality this stub app has is downloading the full Magisk app APK into its internal storage and dynamically loading it. Due to the fact that the APK is literally _empty_, it does not contain the image resource for the app icon.
 
 When you open the hidden Magisk app, it will offer you the option to create a shortcut in the homescreen (which has both the correct app name and icon) for your convenience. You can also manually ask the app to create the icon in app settings.
+
+### Q: How to use Magisk in the emulator?
+
+[avd_magisk.sh](../scripts/avd_magisk.sh) script can run Magisk in the emulator, Magisk will be lost after reboot, so please re-execute the script instead of tapping the reboot button.
+Only official Android Virtual Device (AVD) is supported, other emulators may work, but emulators without SELinux will never be supported.
+For more information, read the script comments.
