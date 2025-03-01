@@ -102,7 +102,10 @@ post_ota() {
   cp -f $1 bootctl
   rm -f $1
   chmod 755 bootctl
-  ./bootctl hal-info || return
+  if ! ./bootctl hal-info; then
+    rm -f bootctl
+    return
+  fi
   SLOT_NUM=0
   [ $(./bootctl get-current-slot) -eq 0 ] && SLOT_NUM=1
   ./bootctl set-active-boot-slot $SLOT_NUM
