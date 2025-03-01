@@ -146,7 +146,7 @@ test_main() {
 
   if [ -z "$AVD_TEST_SKIP_DEBUG" ]; then
     # Patch and test debug build
-    ./build.py avd_patch -s "$ramdisk" magisk_patched.img
+    ./build.py avd_patch "$ramdisk" magisk_patched.img
     kill -INT $emu_pid
     wait $emu_pid
     test_emu debug $api
@@ -154,7 +154,7 @@ test_main() {
 
   if [ -z "$AVD_TEST_SKIP_RELEASE" ]; then
     # Patch and test release build
-    ./build.py -r avd_patch -s "$ramdisk" magisk_patched.img
+    ./build.py -r avd_patch "$ramdisk" magisk_patched.img
     kill -INT $emu_pid
     wait $emu_pid
     test_emu release $api

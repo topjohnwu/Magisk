@@ -2,7 +2,6 @@
 import argparse
 import copy
 import glob
-import lzma
 import multiprocessing
 import os
 import platform
@@ -57,14 +56,6 @@ if is_windows:
 if not sys.version_info >= (3, 8):
     error("Requires Python 3.8+")
 
-try:
-    sdk_path = Path(os.environ["ANDROID_HOME"])
-except KeyError:
-    try:
-        sdk_path = Path(os.environ["ANDROID_SDK_ROOT"])
-    except KeyError:
-        error("Please set Android SDK path to environment variable ANDROID_HOME")
-
 cpu_count = multiprocessing.cpu_count()
 os_name = platform.system().lower()
 
@@ -79,17 +70,6 @@ support_abis = {
 default_targets = {"magisk", "magiskinit", "magiskboot", "magiskpolicy"}
 support_targets = default_targets | {"resetprop"}
 rust_targets = {"magisk", "magiskinit", "magiskboot", "magiskpolicy"}
-
-# Common paths
-ndk_root = sdk_path / "ndk"
-ndk_path = ndk_root / "magisk"
-ndk_build = ndk_path / "ndk-build"
-rust_bin = ndk_path / "toolchains" / "rust" / "bin"
-llvm_bin = ndk_path / "toolchains" / "llvm" / "prebuilt" / f"{os_name}-x86_64" / "bin"
-cargo = rust_bin / "cargo"
-gradlew = Path.cwd() / "gradlew"
-adb_path = sdk_path / "platform-tools" / "adb"
-native_gen_path = Path("native", "out", "generated").resolve()
 
 # Global vars
 config = {}
@@ -160,10 +140,6 @@ def cmd_out(cmds: list):
         .stdout.strip()
         .decode("utf-8")
     )
-
-
-def xz(data):
-    return lzma.compress(data, preset=9, check=lzma.CHECK_NONE)
 
 
 ###############
@@ -256,6 +232,7 @@ def build_cpp_src(targets: set):
 
 
 def run_cargo(cmds):
+    ensure_paths()
     env = os.environ.copy()
     env["PATH"] = f'{rust_bin}{os.pathsep}{env["PATH"]}'
     env["CARGO_BUILD_RUSTC"] = str(rust_bin / f"rustc{EXE_EXT}")
@@ -333,6 +310,7 @@ def dump_flag_header():
     flag_txt += f'#define MAGISK_VER_CODE     {config["versionCode"]}\n'
     flag_txt += f"#define MAGISK_DEBUG        {0 if args.release else 1}\n"
 
+    native_gen_path = Path("native", "out", "generated")
     native_gen_path.mkdir(mode=0o755, parents=True, exist_ok=True)
     write_if_diff(native_gen_path / "flags.h", flag_txt)
 
@@ -342,6 +320,8 @@ def dump_flag_header():
 
 
 def build_native():
+    ensure_paths()
+
     # Verify NDK install
     try:
         with open(Path(ndk_path, "ONDK_VERSION"), "r") as ondk_ver:
@@ -401,13 +381,14 @@ def find_jdk():
     if no_jdk:
         error(
             "Please set Android Studio's path to environment variable ANDROID_STUDIO,\n"
-            + "or install JDK 17 and make sure 'javac' is available in PATH"
+            + "or install JDK 21 and make sure 'javac' is available in PATH"
         )
 
     return env
 
 
 def build_apk(module: str):
+    ensure_paths()
     env = find_jdk()
 
     build_type = "Release" if args.release else "Debug"
@@ -479,6 +460,7 @@ def build_test():
 
 
 def cleanup():
+    ensure_paths()
     support_targets = {"native", "cpp", "rust", "app"}
     if args.targets:
         targets = set(args.targets) & support_targets
@@ -540,6 +522,7 @@ def cargo_cli():
 
 
 def setup_ndk():
+    ensure_paths()
     ndk_ver = config["ondkVersion"]
     url = f"https://github.com/topjohnwu/ondk/releases/download/{ndk_ver}/ondk-{ndk_ver}-{os_name}.tar.xz"
     ndk_archive = url.split("/")[-1]
@@ -556,79 +539,6 @@ def setup_ndk():
 
     rm_rf(ndk_path)
     mv(ondk_path, ndk_path)
-
-
-def push_files(script):
-    abi = cmd_out([adb_path, "shell", "getprop", "ro.product.cpu.abi"])
-    if not abi:
-        error("Cannot detect emulator ABI")
-
-    apk = Path(
-        config["outdir"], ("app-release.apk" if args.release else "app-debug.apk")
-    )
-
-    # Extract busybox from APK
-    busybox = Path(config["outdir"], "busybox")
-    with ZipFile(apk) as zf:
-        with zf.open(f"lib/{abi}/libbusybox.so") as libbb:
-            with open(busybox, "wb") as bb:
-                bb.write(libbb.read())
-
-    try:
-        proc = execv([adb_path, "push", busybox, script, "/data/local/tmp"])
-        if proc.returncode != 0:
-            error("adb push failed!")
-    finally:
-        rm_rf(busybox)
-
-    proc = execv([adb_path, "push", apk, "/data/local/tmp/magisk.apk"])
-    if proc.returncode != 0:
-        error("adb push failed!")
-
-
-def setup_avd():
-    if not args.skip:
-        build_all()
-
-    header("* Setting up emulator")
-
-    push_files(Path("scripts", "avd_magisk.sh"))
-
-    proc = execv([adb_path, "shell", "sh", "/data/local/tmp/avd_magisk.sh"])
-    if proc.returncode != 0:
-        error("avd_magisk.sh failed!")
-
-
-def patch_avd_file():
-    if not args.skip:
-        build_all()
-
-    input = Path(args.image)
-    if args.output:
-        output = Path(args.output)
-    else:
-        output = input.parent / f"{input.name}.magisk"
-
-    src_file = f"/data/local/tmp/{input.name}"
-    out_file = f"{src_file}.magisk"
-
-    header(f"* Patching {input.name}")
-
-    push_files(Path("scripts", "avd_patch.sh"))
-
-    proc = execv([adb_path, "push", input, "/data/local/tmp"])
-    if proc.returncode != 0:
-        error("adb push failed!")
-
-    proc = execv([adb_path, "shell", "sh", "/data/local/tmp/avd_patch.sh", src_file])
-    if proc.returncode != 0:
-        error("avd_patch.sh failed!")
-
-    proc = execv([adb_path, "pull", out_file, output])
-    if proc.returncode != 0:
-        error("adb pull failed!")
-
-    header(f"Output: {output}")
 
 
 def setup_rustup():
@@ -660,8 +570,123 @@ def setup_rustup():
 
 
 ##################
-# Config and args
+# AVD and testing
 ##################
+
+
+def push_files(script):
+    if args.build:
+        build_all()
+    ensure_adb()
+
+    abi = cmd_out([adb_path, "shell", "getprop", "ro.product.cpu.abi"])
+    if not abi:
+        error("Cannot detect emulator ABI")
+
+    if args.apk:
+        apk = Path(args.apk)
+    else:
+        apk = Path(
+            config["outdir"], ("app-release.apk" if args.release else "app-debug.apk")
+        )
+
+    # Extract busybox from APK
+    busybox = Path(config["outdir"], "busybox")
+    with ZipFile(apk) as zf:
+        with zf.open(f"lib/{abi}/libbusybox.so") as libbb:
+            with open(busybox, "wb") as bb:
+                bb.write(libbb.read())
+
+    try:
+        proc = execv([adb_path, "push", busybox, script, "/data/local/tmp"])
+        if proc.returncode != 0:
+            error("adb push failed!")
+    finally:
+        rm_rf(busybox)
+
+    proc = execv([adb_path, "push", apk, "/data/local/tmp/magisk.apk"])
+    if proc.returncode != 0:
+        error("adb push failed!")
+
+
+def setup_avd():
+    header("* Setting up emulator")
+
+    push_files(Path("scripts", "avd_magisk.sh"))
+
+    proc = execv([adb_path, "shell", "sh", "/data/local/tmp/avd_magisk.sh"])
+    if proc.returncode != 0:
+        error("avd_magisk.sh failed!")
+
+
+def patch_avd_file():
+    input = Path(args.image)
+    output = Path(args.output)
+
+    header(f"* Patching {input.name}")
+
+    push_files(Path("scripts", "avd_patch.sh"))
+
+    proc = execv([adb_path, "push", input, "/data/local/tmp"])
+    if proc.returncode != 0:
+        error("adb push failed!")
+
+    src_file = f"/data/local/tmp/{input.name}"
+    out_file = f"{src_file}.magisk"
+
+    proc = execv([adb_path, "shell", "sh", "/data/local/tmp/avd_patch.sh", src_file])
+    if proc.returncode != 0:
+        error("avd_patch.sh failed!")
+
+    proc = execv([adb_path, "pull", out_file, output])
+    if proc.returncode != 0:
+        error("adb pull failed!")
+
+    header(f"Output: {output}")
+
+
+##########################
+# Config, paths, argparse
+##########################
+
+
+def ensure_paths():
+    global sdk_path, ndk_root, ndk_path, ndk_build, rust_bin
+    global llvm_bin, cargo, gradlew, adb_path, native_gen_path
+
+    # Skip if already initialized
+    if "sdk_path" in globals():
+        return
+
+    try:
+        sdk_path = Path(os.environ["ANDROID_HOME"])
+    except KeyError:
+        try:
+            sdk_path = Path(os.environ["ANDROID_SDK_ROOT"])
+        except KeyError:
+            error("Please set Android SDK path to environment variable ANDROID_HOME")
+
+    ndk_root = sdk_path / "ndk"
+    ndk_path = ndk_root / "magisk"
+    ndk_build = ndk_path / "ndk-build"
+    rust_bin = ndk_path / "toolchains" / "rust" / "bin"
+    llvm_bin = (
+        ndk_path / "toolchains" / "llvm" / "prebuilt" / f"{os_name}-x86_64" / "bin"
+    )
+    cargo = rust_bin / "cargo"
+    adb_path = sdk_path / "platform-tools" / "adb"
+    gradlew = Path.cwd() / "gradlew"
+
+
+# We allow using several functionality with only ADB
+def ensure_adb():
+    global adb_path
+    if "adb_path" not in globals():
+        adb_path = shutil.which("adb")
+        if not adb_path:
+            error("Command 'adb' cannot be found in PATH")
+        else:
+            adb_path = Path(adb_path)
 
 
 def parse_props(file):
@@ -761,17 +786,19 @@ def parse_args():
     ndk_parser = subparsers.add_parser("ndk", help="setup Magisk NDK")
 
     emu_parser = subparsers.add_parser("emulator", help="setup AVD for development")
+    emu_parser.add_argument("apk", help="a Magisk APK to use", nargs="?")
     emu_parser.add_argument(
-        "-s", "--skip", action="store_true", help="skip building binaries and the app"
+        "-b", "--build", action="store_true", help="build before patching"
     )
 
     avd_patch_parser = subparsers.add_parser(
         "avd_patch", help="patch AVD ramdisk.img or init_boot.img"
     )
     avd_patch_parser.add_argument("image", help="path to ramdisk.img or init_boot.img")
-    avd_patch_parser.add_argument("output", help="optional output file name", nargs="?")
+    avd_patch_parser.add_argument("output", help="output file name")
+    avd_patch_parser.add_argument("--apk", help="a Magisk APK to use")
     avd_patch_parser.add_argument(
-        "-s", "--skip", action="store_true", help="skip building binaries and the app"
+        "-b", "--build", action="store_true", help="build before patching"
     )
 
     cargo_parser = subparsers.add_parser(
@@ -807,7 +834,13 @@ def parse_args():
     return parser.parse_args()
 
 
-args = parse_args()
-load_config()
-vars(args)["force_out"] = False
-args.func()
+def main():
+    global args
+    args = parse_args()
+    load_config()
+    vars(args)["force_out"] = False
+    args.func()
+
+
+if __name__ == "__main__":
+    main()
