@@ -2,14 +2,7 @@
 #   AVD Magisk Setup
 #####################################################################
 #
-# Support API level: 23 - 34
-#
-# Push files to AVD:
-# /data/local/tmp/magisk.apk
-# /data/local/tmp/busybox (extract from apk)
-# /data/local/tmp/avd_magisk.sh (this file)
-# Then execute, you must use non-interactive shell:
-# adb shell sh /data/local/tmp/avd_magisk.sh
+# Support API level: 23 - 35
 #
 # For developing Magisk, just use:
 # ./build.py emulator
