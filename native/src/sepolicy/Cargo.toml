@@ -10,6 +10,11 @@ path = "lib.rs"
 [build-dependencies]
 cxx-gen = { workspace = true }
 
+[features]
+default = ["main"]
+main = []
+
 [dependencies]
 base = { path = "../base" }
 cxx = { workspace = true }
+argh = { workspace = true }
