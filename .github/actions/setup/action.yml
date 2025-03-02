@@ -64,7 +64,7 @@ runs:
 
     - name: Cache Gradle dependencies
       uses: actions/cache@v4
-      if: inputs.is-asset-build == 'true' && ${{ github.event_name != 'pull_request' }}
+      if: ${{ inputs.is-asset-build == 'true' && github.event_name != 'pull_request' }}
       with:
         path: |
           .gradle/caches
@@ -75,7 +75,7 @@ runs:
 
     - name: Restore Gradle dependencies
       uses: actions/cache/restore@v4
-      if: inputs.is-asset-build == 'false' || ${{ github.event_name == 'pull_request' }}
+      if: ${{ inputs.is-asset-build == 'false' || github.event_name == 'pull_request' }}
       with:
         path: |
           .gradle/caches
@@ -87,7 +87,7 @@ runs:
 
     - name: Cache Gradle build cache
       uses: actions/cache@v4
-      if: inputs.is-asset-build == 'true' && ${{ github.event_name != 'pull_request' }}
+      if: ${{ inputs.is-asset-build == 'true' && github.event_name != 'pull_request' }}
       with:
         path: .gradle/caches/build-cache-*
         key: gradle-build-cache-${{ github.sha }}
@@ -95,7 +95,7 @@ runs:
 
     - name: Restore Gradle build cache
       uses: actions/cache/restore@v4
-      if: inputs.is-asset-build == 'false' || ${{ github.event_name == 'pull_request' }}
+      if: ${{ inputs.is-asset-build == 'false' || github.event_name == 'pull_request' }}
       with:
         path: .gradle/caches/build-cache-*
         key: gradle-build-cache-${{ github.sha }}
