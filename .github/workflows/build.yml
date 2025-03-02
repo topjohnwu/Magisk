@@ -1,6 +1,16 @@
 name: Magisk Build
 
 on:
+  push:
+    branches: [master]
+    paths:
+      - "app/**"
+      - "native/**"
+      - "buildSrc/**"
+      - "build.py"
+      - "gradle.properties"
+      - "gradle/libs.versions.toml"
+      - ".github/workflows/build.yml"
   pull_request:
     branches: [master]
   workflow_dispatch:
@@ -71,6 +81,7 @@ jobs:
     name: Test API ${{ matrix.version }} (x86_64)
     runs-on: ubuntu-24.04
     needs: build
+    if: ${{ github.event_name != 'push' }}
     strategy:
       fail-fast: false
       matrix:
@@ -117,6 +128,7 @@ jobs:
     name: Test API ${{ matrix.version }} (x86)
     runs-on: ubuntu-24.04
     needs: build
+    if: ${{ github.event_name != 'push' }}
     strategy:
       fail-fast: false
       matrix:
