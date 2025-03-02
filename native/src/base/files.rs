@@ -733,10 +733,12 @@ impl FsPath {
                 XATTR_NAME_SELINUX.as_ptr().cast(),
                 con.as_mut_ptr().cast(),
                 con.capacity(),
-            )
-            .check_os_err()?;
+            );
             if sz < 1 {
                 con.clear();
+                if *errno() != libc::ENODATA {
+                    return Err(io::Error::last_os_error());
+                }
             } else {
                 con.set_len((sz - 1) as usize);
             }
@@ -840,9 +842,14 @@ pub fn fd_get_attr(fd: RawFd) -> io::Result<FileAttr> {
                 XATTR_NAME_SELINUX.as_ptr().cast(),
                 attr.con.as_mut_ptr().cast(),
                 attr.con.capacity(),
-            )
-            .check_os_err()?;
-            attr.con.set_len((sz - 1) as usize);
+            );
+            if sz < 1 {
+                if *errno() != libc::ENODATA {
+                    return Err(io::Error::last_os_error());
+                }
+            } else {
+                attr.con.set_len((sz - 1) as usize);
+            }
         }
     }
     Ok(attr)
