@@ -81,6 +81,7 @@ impl MagiskInit {
 
                 // Redirect original init to magiskinit
                 let v = map.patch(from.as_bytes(), to.as_bytes());
+                #[allow(unused_variables)]
                 for off in &v {
                     debug!("Patch @ {:#010X} [{}] -> [{}]", off, from, to);
                 }
@@ -100,6 +101,7 @@ impl MagiskInit {
 
             // Redirect original init to magiskinit
             let v = map.patch(from.as_bytes(), to.as_bytes());
+            #[allow(unused_variables)]
             for off in &v {
                 debug!("Patch @ {:#010X} [{}] -> [{}]", off, from, to);
             }

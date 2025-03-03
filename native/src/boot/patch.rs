@@ -95,7 +95,7 @@ fn hex2byte(hex: &[u8]) -> Vec<u8> {
         let low = bytes[1].to_ascii_uppercase() - b'0';
         let h = if high > 9 { high - 7 } else { high };
         let l = if low > 9 { low - 7 } else { low };
-        v.push(h << 4 | l);
+        v.push((h << 4) | l);
     }
     v
 }

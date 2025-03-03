@@ -8,7 +8,7 @@ use crate::su::db::RootSettings;
 use crate::UCred;
 use base::{debug, error, exit_on_error, libc, warn, LoggedResult, ResultExt, WriteExt};
 use std::fs::File;
-use std::os::fd::{AsRawFd, FromRawFd, IntoRawFd};
+use std::os::fd::{FromRawFd, IntoRawFd};
 use std::os::unix::net::UnixStream;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
@@ -113,14 +113,13 @@ impl AccessInfo {
 
 impl MagiskD {
     pub fn su_daemon_handler(&self, client: i32, cred: &UCred) {
-        let mut client = unsafe { UnixStream::from_raw_fd(client) };
         let cred = cred.0;
         debug!(
             "su: request from uid=[{}], pid=[{}], client=[{}]",
-            cred.uid,
-            cred.pid,
-            client.as_raw_fd()
+            cred.uid, cred.pid, client
         );
+
+        let mut client = unsafe { UnixStream::from_raw_fd(client) };
 
         let mut req = match client.read_decodable::<SuRequest>().log() {
             Ok(req) => req,
