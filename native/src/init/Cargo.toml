@@ -12,5 +12,5 @@ cxx-gen = { workspace = true }
 
 [dependencies]
 base = { path = "../base" }
-magiskpolicy = { path = "../sepolicy" }
+magiskpolicy = { path = "../sepolicy", default-features = false }
 cxx = { workspace = true }

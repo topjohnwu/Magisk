@@ -1,25 +1,16 @@
-use std::{cell::UnsafeCell, process::exit};
+use std::cell::UnsafeCell;
 
 use argh::FromArgs;
 use fdt::{node::{FdtNode, NodeProperty}, Fdt, FdtError};
 
-use base::{
-    libc::c_char, log_err, map_args, EarlyExitExt, LoggedResult, MappedFile, ResultExt, Utf8CStr,
-};
+use base::{LoggedResult, MappedFile, Utf8CStr};
 
 use crate::{check_env, patch::patch_verity};
 
 #[derive(FromArgs)]
-struct DtbCli {
-    #[argh(positional)]
-    file: String,
-    #[argh(subcommand)]
-    action: DtbAction,
-}
-
-#[derive(FromArgs)]
 #[argh(subcommand)]
-enum DtbAction {
+#[allow(private_interfaces)]
+pub(crate) enum DtbAction {
     Print(Print),
     Patch(Patch),
     Test(Test),
@@ -40,7 +31,7 @@ struct Patch {}
 #[argh(subcommand, name = "test")]
 struct Test {}
 
-fn print_dtb_usage() {
+pub(crate) fn print_dtb_usage() {
     eprintln!(
         r#"Usage: magiskboot dtb <file> <action> [args...]
 Do dtb related actions to <file>.
@@ -271,34 +262,18 @@ fn dtb_patch(file: &Utf8CStr) -> LoggedResult<bool> {
     Ok(patched)
 }
 
-pub fn dtb_commands(argc: i32, argv: *const *const c_char) -> bool {
-    let res: LoggedResult<()> = try {
-        if argc < 1 {
-            Err(log_err!("No arguments"))?;
+pub(crate) fn dtb_commands(file: &mut String, action: &DtbAction) -> LoggedResult<bool> {
+    let file = Utf8CStr::from_string(file);
+    match action {
+        DtbAction::Print(Print { fstab }) => {
+            dtb_print(file, *fstab)?;
+            Ok(true)
         }
-        let cmds = map_args(argc, argv)?;
-
-        let mut cli =
-            DtbCli::from_args(&["magiskboot", "dtb"], &cmds).on_early_exit(print_dtb_usage);
-
-        let file = Utf8CStr::from_string(&mut cli.file);
-
-        match cli.action {
-            DtbAction::Print(Print { fstab }) => {
-                dtb_print(file, fstab)?;
-            }
-            DtbAction::Test(_) => {
-                if !dtb_test(file)? {
-                    exit(1);
-                }
-            }
-            DtbAction::Patch(_) => {
-                if !dtb_patch(file)? {
-                    exit(1);
-                }
-            }
+        DtbAction::Test(_) => {
+            Ok(dtb_test(file)?)
         }
-    };
-    res.log_with_msg(|w| w.write_str("Failed to process dtb"))
-        .is_ok()
+        DtbAction::Patch(_) => {
+            Ok(dtb_patch(file)?)
+        }
+    }
 }
