@@ -509,6 +509,7 @@ def clippy_cli():
     for triple in build_abis.values():
         cmds[3] = triple
         run_cargo(cmds)
+        run_cargo(cmds + ["--release"])
     os.chdir(Path("..", ".."))
 
 
