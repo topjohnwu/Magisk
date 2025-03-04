@@ -84,7 +84,7 @@ fn log_with_writer<F: FnOnce(LogWriter)>(level: LogLevel, f: F) {
     }
     f(logger.write);
     if matches!(level, LogLevel::ErrorCxx) && (logger.flags & LogFlag::ExitOnError) != 0 {
-        exit(1);
+        exit(-1);
     }
 }
 
