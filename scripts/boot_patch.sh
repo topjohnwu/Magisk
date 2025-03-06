@@ -104,14 +104,24 @@ case $? in
     ;;
 esac
 
+#########
+# Checking ramdisk cpio file
+#########
+
+if [ -e ./vendor_ramdisk/init_boot.cpio ]; then # for some xiaomi devices
+  RAMDISK_FILE="./vendor_ramdisk/init_boot.cpio"
+else
+  RAMDISK_FILE="ramdisk.cpio" #for other devices
+fi
+
 ###################
 # Ramdisk Restores
 ###################
 
 # Test patch status and do restore
 ui_print "- Checking ramdisk status"
-if [ -e ramdisk.cpio ]; then
-  ./magiskboot cpio ramdisk.cpio test
+if [ -e $RAMDISK_FILE ]; then
+  ./magiskboot cpio $RAMDISK_FILE test
   STATUS=$?
   SKIP_BACKUP=""
 else
@@ -125,15 +135,15 @@ case $STATUS in
     ui_print "- Stock boot image detected"
     SHA1=$(./magiskboot sha1 "$BOOTIMAGE" 2>/dev/null)
     cat $BOOTIMAGE > stock_boot.img
-    cp -af ramdisk.cpio ramdisk.cpio.orig 2>/dev/null
+    cp -af $RAMDISK_FILE $RAMDISK_FILE.orig 2>/dev/null
     ;;
   1 )
     # Magisk patched
     ui_print "- Magisk patched boot image detected"
-    ./magiskboot cpio ramdisk.cpio \
+    ./magiskboot cpio $RAMDISK_FILE \
     "extract .backup/.magisk config.orig" \
     "restore"
-    cp -af ramdisk.cpio ramdisk.cpio.orig
+    cp -af $RAMDISK_FILE $RAMDISK_FILE.orig
     rm -f stock_boot.img
     ;;
   2 )
@@ -176,7 +186,7 @@ if [ -n "$PREINITDEVICE" ]; then
 fi
 [ -n "$SHA1" ] && echo "SHA1=$SHA1" >> config
 
-./magiskboot cpio ramdisk.cpio \
+./magiskboot cpio $RAMDISK_FILE \
 "add 0750 init magiskinit" \
 "mkdir 0750 overlay.d" \
 "mkdir 0750 overlay.d/sbin" \
@@ -184,12 +194,12 @@ fi
 "add 0644 overlay.d/sbin/stub.xz stub.xz" \
 "add 0644 overlay.d/sbin/init-ld.xz init-ld.xz" \
 "patch" \
-"$SKIP_BACKUP backup ramdisk.cpio.orig" \
+"$SKIP_BACKUP backup $RAMDISK_FILE.orig" \
 "mkdir 000 .backup" \
 "add 000 .backup/.magisk config" \
 || abort "! Unable to patch ramdisk"
 
-rm -f ramdisk.cpio.orig config *.xz
+rm -f $RAMDISK_FILE.orig config *.xz
 
 #################
 # Binary Patches
