@@ -99,7 +99,7 @@ build_canary() {
   # Commit version code changes
   git add -u .
   git status
-  git commit -m "Release new canary build"
+  git commit -m "Release new canary build" -m "[skip ci]"
   git tag $tag
 
   # Update version name
@@ -150,7 +150,7 @@ build_release() {
   # Commit version code changes
   git add -u .
   git status
-  git commit -m "Release Magisk v$ver"
+  git commit -m "Release Magisk v$ver" -m "[skip ci]"
   git tag $tag
 
   # Build
@@ -205,7 +205,10 @@ pub() {
 
     # Publish release
     tail -n +3 docs/releases/$code.md > release.md
-    gh release create --verify-tag $tag -t "$title" -F release.md "$out/app-release.apk#Magisk-v${ver}.apk"
+    local release_apk="Magisk-v${ver}.apk"
+    cp $out/app-release.apk $release_apk
+    gh release create --verify-tag $tag -t "$title" -F release.md $release_apk
+    rm -f $release_apk
   fi
 
   rm -f release.md
