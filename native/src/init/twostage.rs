@@ -2,7 +2,7 @@ use crate::ffi::MagiskInit;
 use base::{
     clone_attr, cstr, debug, error, info,
     libc::{
-        fstatat, mount, stat, statfs, umount2, AT_SYMLINK_NOFOLLOW, MNT_DETACH, MS_BIND, O_CLOEXEC,
+        mount, statfs, umount2, MNT_DETACH, MS_BIND, O_CLOEXEC,
         O_CREAT, O_RDONLY, O_WRONLY, TMPFS_MAGIC,
     },
     path, raw_cstr, LibcReturn, MappedFile, MutBytesExt, ResultExt,
@@ -14,16 +14,7 @@ impl MagiskInit {
         info!("First Stage Init");
         self.prepare_data();
 
-        if unsafe {
-            let mut st: stat = std::mem::zeroed();
-            fstatat(-1, raw_cstr!("/sdcard"), &mut st, AT_SYMLINK_NOFOLLOW) != 0
-                && fstatat(
-                    -1,
-                    raw_cstr!("/first_stage_ramdisk/sdcard"),
-                    &mut st,
-                    AT_SYMLINK_NOFOLLOW,
-                ) != 0
-        } {
+        if !path!("/sdcard").exists() && !path!("/first_stage_ramdisk/sdcard").exists() {
             if self.config.force_normal_boot {
                 path!("/first_stage_ramdisk/storage/self")
                     .mkdirs(0o755)
