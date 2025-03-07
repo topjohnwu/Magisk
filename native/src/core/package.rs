@@ -485,14 +485,16 @@ impl MagiskD {
     }
 
     pub unsafe fn get_manager_for_cxx(&self, user: i32, ptr: *mut CxxString, install: bool) -> i32 {
-        let mut info = self.manager_info.lock().unwrap();
-        let (uid, pkg) = info.get_manager(self, user, install);
-        if let Some(str) = ptr.as_mut() {
-            let mut str = Pin::new_unchecked(str);
-            str.as_mut().clear();
-            str.push_str(pkg);
+        unsafe {
+            let mut info = self.manager_info.lock().unwrap();
+            let (uid, pkg) = info.get_manager(self, user, install);
+            if let Some(str) = ptr.as_mut() {
+                let mut str = Pin::new_unchecked(str);
+                str.as_mut().clear();
+                str.push_str(pkg);
+            }
+            uid
         }
-        uid
     }
 
     // app_id = app_no + AID_APP_START

@@ -132,23 +132,25 @@ impl MagiskInit {
     }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn main(
     argc: i32,
     argv: *mut *mut c_char,
     _envp: *const *const c_char,
 ) -> i32 {
-    umask(0);
+    unsafe {
+        umask(0);
 
-    let name = basename(*argv);
+        let name = basename(*argv);
 
-    if CStr::from_ptr(name) == c"magisk" {
-        return magisk_proxy_main(argc, argv);
+        if CStr::from_ptr(name) == c"magisk" {
+            return magisk_proxy_main(argc, argv);
+        }
+
+        if getpid() == 1 {
+            MagiskInit::new(argv).start().log_ok();
+        }
+
+        1
     }
-
-    if getpid() == 1 {
-        MagiskInit::new(argv).start().log_ok();
-    }
-
-    1
 }

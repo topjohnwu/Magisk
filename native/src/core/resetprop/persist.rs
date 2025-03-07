@@ -130,8 +130,8 @@ pub fn persist_get_prop(name: &Utf8CStr, mut prop_cb: Pin<&mut PropCb>) {
             let mut props = proto_read_props()?;
             let prop = props.find(name)?;
             if let PersistentPropertyRecord {
-                name: Some(ref mut n),
-                value: Some(ref mut v),
+                name: Some(n),
+                value: Some(v),
             } = prop
             {
                 prop_cb.exec(Utf8CStr::from_string(n), Utf8CStr::from_string(v));
@@ -151,8 +151,8 @@ pub fn persist_get_props(mut prop_cb: Pin<&mut PropCb>) {
             let mut props = proto_read_props()?;
             props.iter_mut().for_each(|prop| {
                 if let PersistentPropertyRecord {
-                    name: Some(ref mut n),
-                    value: Some(ref mut v),
+                    name: Some(n),
+                    value: Some(v),
                 } = prop
                 {
                     prop_cb.exec(Utf8CStr::from_string(n), Utf8CStr::from_string(v));

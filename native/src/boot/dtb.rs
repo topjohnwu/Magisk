@@ -1,7 +1,10 @@
 use std::{cell::UnsafeCell, process::exit};
 
 use argh::FromArgs;
-use fdt::{node::{FdtNode, NodeProperty}, Fdt, FdtError};
+use fdt::{
+    node::{FdtNode, NodeProperty},
+    Fdt, FdtError,
+};
 
 use base::{
     libc::c_char, log_err, map_args, EarlyExitExt, LoggedResult, MappedFile, ResultExt, Utf8CStr,
@@ -172,7 +175,7 @@ fn for_each_fdt<F: FnMut(usize, Fdt) -> LoggedResult<()>>(
             Err(FdtError::BufferTooSmall) => {
                 eprintln!("dtb.{:04} is truncated", dtb_num);
                 break;
-            },
+            }
             Ok(fdt) => fdt,
             e => e?,
         };

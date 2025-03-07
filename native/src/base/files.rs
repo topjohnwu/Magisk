@@ -263,7 +263,7 @@ impl DirEntry<'_> {
     }
 
     unsafe fn open_fd(&self, flags: i32) -> io::Result<RawFd> {
-        self.dir.open_raw_fd(self.name(), flags, 0)
+        unsafe { self.dir.open_raw_fd(self.name(), flags, 0) }
     }
 
     pub fn open_as_dir(&self) -> io::Result<Directory> {
@@ -361,7 +361,9 @@ impl Directory {
     }
 
     unsafe fn open_raw_fd(&self, name: &CStr, flags: i32, mode: i32) -> io::Result<RawFd> {
-        libc::openat(self.as_raw_fd(), name.as_ptr(), flags | O_CLOEXEC, mode).check_os_err()
+        unsafe {
+            libc::openat(self.as_raw_fd(), name.as_ptr(), flags | O_CLOEXEC, mode).check_os_err()
+        }
     }
 
     pub fn open_fd(&self, name: &Utf8CStr, flags: i32, mode: i32) -> io::Result<OwnedFd> {
@@ -929,7 +931,7 @@ impl Drop for MappedFile {
     }
 }
 
-extern "C" {
+unsafe extern "C" {
     // Don't use the declaration from the libc crate as request should be u32 not i32
     fn ioctl(fd: RawFd, request: u32, ...) -> i32;
 }
