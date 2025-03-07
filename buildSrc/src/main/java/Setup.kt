@@ -74,7 +74,7 @@ fun Project.setupCommon() {
         compileSdkVersion(35)
         buildToolsVersion = "35.0.1"
         ndkPath = "$sdkDirectory/ndk/magisk"
-        ndkVersion = "28.0.12674087"
+        ndkVersion = "28.0.13004108"
 
         defaultConfig {
             minSdk = 23
