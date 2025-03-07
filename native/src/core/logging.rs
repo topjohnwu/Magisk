@@ -42,7 +42,7 @@ enum ALogPriority {
 
 type ThreadEntry = extern "C" fn(*mut c_void) -> *mut c_void;
 
-extern "C" {
+unsafe extern "C" {
     fn __android_log_write(prio: i32, tag: *const c_char, msg: *const c_char);
     fn strftime(buf: *mut c_char, len: usize, fmt: *const c_char, tm: *const tm) -> usize;
     fn new_daemon_thread(entry: ThreadEntry, arg: *mut c_void);

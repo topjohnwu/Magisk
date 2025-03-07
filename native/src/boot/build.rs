@@ -1,9 +1,9 @@
 use pb_rs::{types::FileDescriptor, ConfigBuilder};
 
-use crate::gen::gen_cxx_binding;
+use crate::codegen::gen_cxx_binding;
 
-#[path = "../include/gen.rs"]
-mod gen;
+#[path = "../include/codegen.rs"]
+mod codegen;
 
 fn main() {
     println!("cargo:rerun-if-changed=proto/update_metadata.proto");

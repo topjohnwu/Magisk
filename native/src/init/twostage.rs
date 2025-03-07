@@ -75,7 +75,31 @@ impl MagiskInit {
             self.restore_ramdisk_init();
 
             // fallback to hexpatch if /sdcard exists
-            if let Ok(mut map) = MappedFile::open_rw(cstr!("/init")) {
+            match MappedFile::open_rw(cstr!("/init")) {
+                Ok(mut map) => {
+                    let from = "/system/bin/init";
+                    let to = "/data/magiskinit";
+
+                    // Redirect original init to magiskinit
+                    let v = map.patch(from.as_bytes(), to.as_bytes());
+                    #[allow(unused_variables)]
+                    for off in &v {
+                        debug!("Patch @ {:#010X} [{}] -> [{}]", off, from, to);
+                    }
+                }
+                _ => {
+                    error!("Failed to open /init for hexpatch");
+                }
+            }
+        }
+    }
+
+    pub(crate) fn redirect_second_stage(&self) {
+        let src = path!("/init");
+        let dest = path!("/data/init");
+        // Patch init binary
+        match MappedFile::open(src) {
+            Ok(mut map) => {
                 let from = "/system/bin/init";
                 let to = "/data/magiskinit";
 
@@ -85,33 +109,18 @@ impl MagiskInit {
                 for off in &v {
                     debug!("Patch @ {:#010X} [{}] -> [{}]", off, from, to);
                 }
-            } else {
-                error!("Failed to open /init for hexpatch");
+                match dest.create(O_CREAT | O_WRONLY, 0) {
+                    Ok(mut dest) => {
+                        dest.write_all(map.as_ref()).log_ok();
+                    }
+                    _ => {
+                        error!("Failed to create {}", dest);
+                    }
+                }
             }
-        }
-    }
-
-    pub(crate) fn redirect_second_stage(&self) {
-        let src = path!("/init");
-        let dest = path!("/data/init");
-        // Patch init binary
-        if let Ok(mut map) = MappedFile::open(src) {
-            let from = "/system/bin/init";
-            let to = "/data/magiskinit";
-
-            // Redirect original init to magiskinit
-            let v = map.patch(from.as_bytes(), to.as_bytes());
-            #[allow(unused_variables)]
-            for off in &v {
-                debug!("Patch @ {:#010X} [{}] -> [{}]", off, from, to);
+            _ => {
+                error!("Failed to open {} for hexpatch", src);
             }
-            if let Ok(mut dest) = dest.create(O_CREAT | O_WRONLY, 0) {
-                dest.write_all(map.as_ref()).log_ok();
-            } else {
-                error!("Failed to create {}", dest);
-            }
-        } else {
-            error!("Failed to open {} for hexpatch", src);
         }
         clone_attr(src, dest).log_ok();
         unsafe {

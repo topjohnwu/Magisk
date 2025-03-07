@@ -13,7 +13,7 @@ use std::{
     ptr::null as nullptr,
 };
 
-extern "C" {
+unsafe extern "C" {
     static environ: *const *mut libc::c_char;
 }
 

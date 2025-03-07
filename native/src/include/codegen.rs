@@ -39,7 +39,7 @@ fn write_if_diff<P: AsRef<Path>>(path: P, bytes: &[u8]) -> io::Result<()> {
 pub fn gen_cxx_binding(name: &str) {
     println!("cargo:rerun-if-changed=lib.rs");
     let opt = Opt::default();
-    let gen = cxx_gen::generate_header_and_cc_with_path("lib.rs", &opt);
-    write_if_diff(format!("{}.cpp", name), gen.implementation.as_slice()).ok_or_exit();
-    write_if_diff(format!("{}.hpp", name), gen.header.as_slice()).ok_or_exit();
+    let code = cxx_gen::generate_header_and_cc_with_path("lib.rs", &opt);
+    write_if_diff(format!("{}.cpp", name), code.implementation.as_slice()).ok_or_exit();
+    write_if_diff(format!("{}.hpp", name), code.header.as_slice()).ok_or_exit();
 }

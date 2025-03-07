@@ -257,8 +257,10 @@ unsafe impl ExternType for UCred {
 
 impl SuRequest {
     unsafe fn write_to_fd(&self, fd: i32) {
-        let mut w = ManuallyDrop::new(File::from_raw_fd(fd));
-        self.encode(w.deref_mut()).ok();
+        unsafe {
+            let mut w = ManuallyDrop::new(File::from_raw_fd(fd));
+            self.encode(w.deref_mut()).ok();
+        }
     }
 }
 

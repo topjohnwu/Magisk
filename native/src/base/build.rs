@@ -1,7 +1,7 @@
-use crate::gen::gen_cxx_binding;
+use crate::codegen::gen_cxx_binding;
 
-#[path = "../include/gen.rs"]
-mod gen;
+#[path = "../include/codegen.rs"]
+mod codegen;
 
 fn main() {
     gen_cxx_binding("base-rs");
