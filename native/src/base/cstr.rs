@@ -501,6 +501,25 @@ impl DerefMut for FsPath {
     }
 }
 
+#[repr(transparent)]
+pub struct FsPathFollow(Utf8CStr);
+
+impl Deref for FsPathFollow {
+    type Target = Utf8CStr;
+
+    #[inline(always)]
+    fn deref(&self) -> &Utf8CStr {
+        &self.0
+    }
+}
+
+impl DerefMut for FsPathFollow {
+    #[inline(always)]
+    fn deref_mut(&mut self) -> &mut Utf8CStr {
+        &mut self.0
+    }
+}
+
 enum Utf8CStrBufOwned<const N: usize> {
     Dynamic(Utf8CString),
     Fixed(Utf8CStrBufArr<N>),
@@ -667,6 +686,7 @@ macro_rules! impl_str {
 impl_str!(
     (Utf8CStr,)
     (FsPath,)
+    (FsPathFollow,)
     (FsPathBuf<N>, const N: usize)
     (Utf8CStrBufRef<'_>,)
     (Utf8CStrBufArr<N>, const N: usize)

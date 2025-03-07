@@ -8,6 +8,7 @@ use num_traits::FromPrimitive;
 
 pub use cstr::*;
 use cxx_extern::*;
+pub use dir::*;
 pub use ffi::fork_dont_care;
 pub use files::*;
 pub use logging::*;
@@ -16,6 +17,7 @@ pub use result::*;
 
 mod cstr;
 mod cxx_extern;
+mod dir;
 mod files;
 mod logging;
 mod misc;
