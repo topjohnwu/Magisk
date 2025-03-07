@@ -1,7 +1,7 @@
 [package]
 name = "magisk"
-version = "0.0.0"
-edition = "2021"
+version.workspace = true
+edition.workspace = true
 
 [lib]
 crate-type = ["staticlib"]
