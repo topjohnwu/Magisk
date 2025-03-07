@@ -33,15 +33,11 @@ bit-set = "0.8"
 syn = "2"
 quote = "1"
 proc-macro2 = "1"
+argh = { version = "0.1.13", default-features = false }
 
 # Pin version to prevent cargo update break builds
 block-buffer = "=0.11.0-rc.3"
 sec1 = "=0.8.0-rc.3"
-
-[workspace.dependencies.argh]
-git = "https://github.com/google/argh.git"
-rev = "1c632b046d084e7bde86b82dfc969b30b4647c8c"
-default-features = false
 
 [workspace.dependencies.pb-rs]
 git = "https://github.com/tafia/quick-protobuf.git"
