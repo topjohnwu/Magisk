@@ -153,7 +153,7 @@ class zopfli_encoder : public chunk_out_stream {
 public:
     explicit zopfli_encoder(out_strm_ptr &&base) :
         chunk_out_stream(std::move(base), ZOPFLI_MASTER_BLOCK_SIZE),
-        zo{}, out(nullptr), outsize(0), crc(crc32_z(0L, Z_NULL, 0)), in_total(0), bp(0) {
+        zo{}, out(nullptr), outsize(0), crc(crc32(0L, Z_NULL, 0)), in_total(0), bp(0) {
         ZopfliInitOptions(&zo);
 
         // This config is already better than gzip -9
@@ -198,7 +198,7 @@ protected:
         auto in = static_cast<const unsigned char *>(buf);
 
         in_total += len;
-        crc = crc32_z(crc, in, len);
+        crc = crc32(crc, in, len);
 
         ZopfliDeflatePart(&zo, 2, final, in, 0, len, &bp, &out, &outsize);
 
