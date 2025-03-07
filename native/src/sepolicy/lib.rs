@@ -10,6 +10,8 @@ use std::io::{BufRead, BufReader, Cursor};
 
 use crate::ffi::SePolicy;
 
+#[cfg(feature = "main")]
+mod cli;
 mod rules;
 mod statement;
 
@@ -88,8 +90,6 @@ pub mod ffi {
         fn load_rules(self: &mut SePolicy, rules: &CxxString);
         #[Self = SePolicy]
         fn xperm_to_string(perm: &Xperm) -> String;
-        #[Self = SePolicy]
-        fn print_statement_help();
     }
 }
 

@@ -119,8 +119,6 @@ LOCAL_STATIC_LIBRARIES := \
     libpolicy \
     libpolicy-rs
 
-LOCAL_SRC_FILES := sepolicy/main.cpp
-
 include $(BUILD_EXECUTABLE)
 
 endif
