@@ -1,7 +1,7 @@
 [package]
 name = "magiskboot"
-version = "0.0.0"
-edition = "2021"
+version.workspace = true
+edition.workspace = true
 
 [lib]
 crate-type = ["staticlib"]
@@ -25,6 +25,8 @@ p256 = { workspace = true }
 p384 = { workspace = true }
 p521 = { workspace = true }
 rsa = { workspace = true, features = ["sha2"] }
+block-buffer = { workspace = true }
+sec1 = { workspace = true }
 x509-cert = { workspace = true }
 der = { workspace = true, features = ["derive", "pem"] }
 fdt = { workspace = true }

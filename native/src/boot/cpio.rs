@@ -746,8 +746,7 @@ impl Display for CpioEntry {
             Size::from_bytes(self.data.len())
                 .format()
                 .with_style(Style::Abbreviated)
-                .with_base(Base::Base10)
-                .to_string(),
+                .with_base(Base::Base10),
             self.rdevmajor,
             self.rdevminor,
         )

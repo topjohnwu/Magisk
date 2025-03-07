@@ -3,6 +3,10 @@ exclude = ["external"]
 members = ["base", "boot", "core", "core/derive", "init", "sepolicy"]
 resolver = "2"
 
+[workspace.package]
+version = "0.0.0"
+edition = "2021"
+
 [workspace.dependencies]
 cxx = { path = "external/cxx-rs" }
 cxx-gen = { path = "external/cxx-rs/gen/lib" }
@@ -12,14 +16,14 @@ num-traits = "0.2"
 num-derive = "0.4"
 thiserror = "2.0"
 byteorder = "1"
-size = "0.4"
+size = "0.5"
 sha1 = "0.11.0-pre.4"
-sha2 = "=0.11.0-pre.4"
+sha2 = "0.11.0-pre.4"
 digest = "0.11.0-pre.9"
 p256 = "0.14.0-pre.2"
 p384 = "0.14.0-pre.2"
 p521 = "0.14.0-pre.2"
-rsa = "0.10.0-pre.3"
+rsa = "0.10.0-pre.4"
 x509-cert = "0.3.0-pre.0"
 der = "0.8.0-rc.1"
 bytemuck = "1.16"
@@ -29,6 +33,10 @@ bit-set = "0.8"
 syn = "2"
 quote = "1"
 proc-macro2 = "1"
+
+# Pin version to prevent cargo update break builds
+block-buffer = "=0.11.0-rc.3"
+sec1 = "=0.8.0-rc.3"
 
 [workspace.dependencies.argh]
 git = "https://github.com/google/argh.git"
