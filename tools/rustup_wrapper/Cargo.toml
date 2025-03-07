@@ -3,7 +3,10 @@ name = "rustup_wrapper"
 version = "0.0.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 home = "0.5"
+
+[profile.release]
+strip = true
+lto = true
+codegen-units = 1
