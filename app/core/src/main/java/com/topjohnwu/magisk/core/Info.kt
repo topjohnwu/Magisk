@@ -47,7 +47,6 @@ object Info {
         private set
     private var crypto = ""
 
-    var hasGMS = true
     val isEmulator =
         Build.DEVICE.contains("vsoc")
             || getProperty("ro.kernel.qemu", "0") == "1"
