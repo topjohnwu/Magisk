@@ -33,3 +33,4 @@ fdt = { workspace = true }
 bytemuck = { workspace = true, features = ["derive", "min_const_generics"] }
 num-traits = { workspace = true }
 libz-rs-sys = { workspace = true }
+libbz2-rs-sys = { workspace = true }

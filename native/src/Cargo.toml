@@ -35,6 +35,7 @@ quote = "1"
 proc-macro2 = "1"
 argh = { version = "0.1.13", default-features = false }
 libz-rs-sys = { version = "0.4.2", default-features = false, features=["c-allocator"] }
+libbz2-rs-sys = { version = "0.1.3", default-features = false, features = ["c-allocator"] }
 
 # Pin version to prevent cargo update break builds
 block-buffer = "=0.11.0-rc.3"
