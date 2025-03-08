@@ -155,6 +155,8 @@ else
     RAMDISK_EXISTS=0
 fi
 
+ui_print "- toto 1"
+
 if [ -f config.orig ]; then
   # Read existing configs
   chmod 0644 config.orig
@@ -165,6 +167,8 @@ if [ -f config.orig ]; then
   fi
   rm config.orig
 fi
+
+ui_print "- toto 2"
 
 ##################
 # Ramdisk Patches
@@ -207,6 +211,8 @@ if [ $RAMDISK_EXISTS -eq 1 ]; then
   
 fi
 
+ui_print "- toto 3"
+
 #################
 # Binary Patches
 #################
@@ -222,6 +228,8 @@ for dt in dtb kernel_dtb extra; do
     fi
   fi
 done
+
+ui_print "- toto 4"
 
 if [ -f kernel ]; then
   PATCHEDKERNEL=false
@@ -254,12 +262,16 @@ if [ -f kernel ]; then
   # If the kernel doesn't need to be patched at all,
   # keep raw kernel to avoid bootloops on some weird devices
   $PATCHEDKERNEL || rm -f kernel
+
+  ui_print "- toto 5"
   
 elif [ $RAMDISK_EXISTS -eq 1 ] then
   ui_print "- Warning"
   ui_print "- Selected boot image does not contain anything to patch"
 fi
 
+ui_print "- toto 6
+"
 #################
 # Repack & Flash
 #################
@@ -267,6 +279,8 @@ fi
 if [ $RAMDISK_EXISTS -eq 1 ]; then
   ui_print "- Repacking boot image"
   ./magiskboot repack "$BOOTIMAGE" || abort "! Unable to repack boot image"
+
+  ui_print "- toto 7"
   
   # Sign chromeos boot
   $CHROMEOS && sign_chromeos
