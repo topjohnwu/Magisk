@@ -256,21 +256,18 @@ if [ -f kernel ]; then
   $PATCHEDKERNEL || rm -f kernel
   
 elif [ $RAMDISK_EXISTS -eq 1 ]; then
-  ui_print "- Warning"
-  ui_print "- Selected boot image does not contain anything to patch"
+  abort "! Selected boot image does not contain anything to patch"
 fi
 
 #################
 # Repack & Flash
 #################
 
-if [ $RAMDISK_EXISTS -eq 1 ]; then
-  ui_print "- Repacking boot image"
-  ./magiskboot repack "$BOOTIMAGE" || abort "! Unable to repack boot image"
+ui_print "- Repacking boot image"
+./magiskboot repack "$BOOTIMAGE" || abort "! Unable to repack boot image"
   
-  # Sign chromeos boot
-  $CHROMEOS && sign_chromeos
-fi
+# Sign chromeos boot
+$CHROMEOS && sign_chromeos
 
 # Restore the original boot partition path
 [ -e "$BOOTNAND" ] && BOOTIMAGE="$BOOTNAND"
