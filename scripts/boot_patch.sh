@@ -225,7 +225,7 @@ done
 
 if [ -f kernel ]; then
   PATCHEDKERNEL=false
-   ui_print "! Patching kernel"
+   ui_print "- Patching kernel"
   # Remove Samsung RKP
   ./magiskboot hexpatch kernel \
   49010054011440B93FA00F71E9000054010840B93FA00F7189000054001840B91FA00F7188010054 \
