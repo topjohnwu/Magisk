@@ -4,6 +4,7 @@
 #![feature(try_blocks)]
 
 pub use libz_rs_sys::*;
+pub use libbz2_rs_sys::*;
 pub use base;
 use cpio::cpio_commands;
 use dtb::dtb_commands;

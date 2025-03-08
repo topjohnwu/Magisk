@@ -447,6 +447,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "libbz2-rs-sys"
+version = "0.1.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0864a00c8d019e36216b69c2c4ce50b83b7bd966add3cf5ba554ec44f8bebcf5"
+dependencies = [
+ "libc",
+]
+
+[[package]]
 name = "libc"
 version = "0.2.170"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -498,6 +507,7 @@ dependencies = [
  "der",
  "digest",
  "fdt",
+ "libbz2-rs-sys",
  "libz-rs-sys",
  "num-traits",
  "p256",

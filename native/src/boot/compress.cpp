@@ -2,7 +2,7 @@
 #include <functional>
 
 #include <zlib.h>
-#include <bzlib.h>
+#include "bzlib.h"
 #include <lzma.h>
 #include <lz4.h>
 #include <lz4frame.h>

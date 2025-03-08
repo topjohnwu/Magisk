@@ -88,7 +88,6 @@ LOCAL_STATIC_LIBRARIES := \
     libbase \
     liblzma \
     liblz4 \
-    libbz2 \
     libzopfli \
     libboot-rs
 

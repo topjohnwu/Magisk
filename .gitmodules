@@ -4,9 +4,6 @@
 [submodule "lz4"]
 	path = native/src/external/lz4
 	url = https://github.com/lz4/lz4.git
-[submodule "bzip2"]
-	path = native/src/external/bzip2
-	url = https://github.com/nemequ/bzip2.git
 [submodule "xz"]
 	path = native/src/external/xz
 	url = https://github.com/xz-mirror/xz.git
