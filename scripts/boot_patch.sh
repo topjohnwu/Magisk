@@ -255,7 +255,7 @@ if [ -f kernel ]; then
   # keep raw kernel to avoid bootloops on some weird devices
   $PATCHEDKERNEL || rm -f kernel
   
-elif [ $RAMDISK_EXISTS -eq 1 ]; then
+elif [ $RAMDISK_EXISTS -eq 0 ]; then
   abort "! Selected boot image does not contain anything to patch"
 fi
 
