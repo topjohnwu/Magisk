@@ -7,12 +7,12 @@ public class ProviderInstaller {
 
     private static final String GMS_PACKAGE_NAME = "com.google.android.gms";
 
-    public static boolean install(Context context) {
+    public static void install(Context context) {
         try {
             // Check if gms is a system app
             ApplicationInfo appInfo = context.getPackageManager().getApplicationInfo(GMS_PACKAGE_NAME, 0);
             if ((appInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0) {
-                return false;
+                return;
             }
 
             // Try installing new SSL provider from Google Play Service
@@ -22,9 +22,7 @@ public class ProviderInstaller {
                     .loadClass("com.google.android.gms.common.security.ProviderInstallerImpl")
                     .getMethod("insertProvider", Context.class)
                     .invoke(null, gms);
-        } catch (Exception e) {
-            return false;
+        } catch (Exception ignored) {
         }
-        return true;
     }
 }
