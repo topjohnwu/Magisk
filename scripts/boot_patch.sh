@@ -118,11 +118,12 @@ else
   #checking if non compliant implementation
    if find . -name "*.cpio" | grep -vF "./ramdisk.cpio" >null; then NONCOMPLIANT=1; fi #searching for any cpio file other than ./ramdisk.cpio
    if [ $NONCOMPLIANT -eq 1 ]; then 
-     ui_print "This boot image contains the following non standard cpio:"
+     ui_print "- This boot image contains non standard cpio:"
      find . -name "*.cpio" | grep -vF "./ramdisk.cpio" | xargs ui_print
-     abort "! The selected boot image does not comply with standard boot images structure. This configuration is not supported"
+     abort "! This boot image is unsupported"
    fi  
-  ui_print "No ramdisk file found in the root directory of the boot image. Skipping ramdisk patching"
+  ui_print "- No ramdisk file in the root directory"
+  ui_print "- Skipping ramdisk patching"
   RAMDISK_EXISTS=0
 fi
 case $STATUS in
@@ -250,7 +251,8 @@ if [ -f kernel ]; then
   $PATCHEDKERNEL || rm -f kernel
   
 elif [ $RAMDISK_EXISTS -eq 1 ] then
-  ui_print "Error - The selected boot image does not contain anything to patch"
+ ui_print "- Warning"
+  ui_print "- Selected boot image does not contain anything to patch"
 fi
 
 #################
