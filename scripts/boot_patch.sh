@@ -225,7 +225,7 @@ done
 
 if [ -f kernel ]; then
   PATCHEDKERNEL=false
-   ui_print "Kernel file found - Patching"
+   ui_print "! Patching kernel"
   # Remove Samsung RKP
   ./magiskboot hexpatch kernel \
   49010054011440B93FA00F71E9000054010840B93FA00F7189000054001840B91FA00F7188010054 \
@@ -254,16 +254,12 @@ if [ -f kernel ]; then
   # If the kernel doesn't need to be patched at all,
   # keep raw kernel to avoid bootloops on some weird devices
   $PATCHEDKERNEL || rm -f kernel
-
-  ui_print "- toto 5"
   
 elif [ $RAMDISK_EXISTS -eq 1 ]; then
   ui_print "- Warning"
   ui_print "- Selected boot image does not contain anything to patch"
 fi
 
-ui_print "- toto 6
-"
 #################
 # Repack & Flash
 #################
@@ -271,8 +267,6 @@ ui_print "- toto 6
 if [ $RAMDISK_EXISTS -eq 1 ]; then
   ui_print "- Repacking boot image"
   ./magiskboot repack "$BOOTIMAGE" || abort "! Unable to repack boot image"
-
-  ui_print "- toto 7"
   
   # Sign chromeos boot
   $CHROMEOS && sign_chromeos
