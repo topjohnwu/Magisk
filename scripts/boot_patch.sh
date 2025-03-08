@@ -110,10 +110,34 @@ esac
 
 # Test patch status and do restore
 ui_print "- Checking ramdisk status"
+
 if [ -e ramdisk.cpio ]; then
   ./magiskboot cpio ramdisk.cpio test
   STATUS=$?
   RAMDISK_EXISTS=1
+  case $STATUS in
+    0 )
+      # Stock boot
+      ui_print "- Stock boot image detected"
+      SHA1=$(./magiskboot sha1 "$BOOTIMAGE" 2>/dev/null)
+      cat $BOOTIMAGE > stock_boot.img
+      cp -af ramdisk.cpio ramdisk.cpio.orig 2>/dev/null
+      ;;
+    1 )
+      # Magisk patched
+      ui_print "- Magisk patched boot image detected"
+      ./magiskboot cpio ramdisk.cpio \
+      "extract .backup/.magisk config.orig" \
+      "restore"
+      cp -af ramdisk.cpio ramdisk.cpio.orig
+      rm -f stock_boot.img
+      ;;
+    2 )
+      # Unsupported
+      ui_print "! Boot image patched by unsupported programs"
+      abort "! Please restore back to stock boot image"
+      ;;
+    esac
 else 
   #checking if non compliant implementation
    if find . -name "*.cpio" | grep -vF "./ramdisk.cpio" >null; then NONCOMPLIANT=1; fi #searching for any cpio file other than ./ramdisk.cpio
@@ -125,34 +149,11 @@ else
      done <tmp.log
      rm tmp.log
      abort "! This boot image is unsupported"
-   fi  
-  ui_print "- No ramdisk file in the root directory"
-  ui_print "- Skipping ramdisk patching"
-  RAMDISK_EXISTS=0
+    fi  
+    ui_print "- No ramdisk file in the root directory"
+    ui_print "- Skipping ramdisk patching"
+    RAMDISK_EXISTS=0
 fi
-case $STATUS in
-  0 )
-    # Stock boot
-    ui_print "- Stock boot image detected"
-    SHA1=$(./magiskboot sha1 "$BOOTIMAGE" 2>/dev/null)
-    cat $BOOTIMAGE > stock_boot.img
-    cp -af ramdisk.cpio ramdisk.cpio.orig 2>/dev/null
-    ;;
-  1 )
-    # Magisk patched
-    ui_print "- Magisk patched boot image detected"
-    ./magiskboot cpio ramdisk.cpio \
-    "extract .backup/.magisk config.orig" \
-    "restore"
-    cp -af ramdisk.cpio ramdisk.cpio.orig
-    rm -f stock_boot.img
-    ;;
-  2 )
-    # Unsupported
-    ui_print "! Boot image patched by unsupported programs"
-    abort "! Please restore back to stock boot image"
-    ;;
-esac
 
 if [ -f config.orig ]; then
   # Read existing configs
@@ -255,7 +256,7 @@ if [ -f kernel ]; then
   $PATCHEDKERNEL || rm -f kernel
   
 elif [ $RAMDISK_EXISTS -eq 1 ] then
- ui_print "- Warning"
+  ui_print "- Warning"
   ui_print "- Selected boot image does not contain anything to patch"
 fi
 
