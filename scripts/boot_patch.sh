@@ -152,9 +152,11 @@ else
     fi  
     ui_print "- No ramdisk file in the root directory"
     ui_print "- Skipping ramdisk patching"
+    ui_print "- coucou"
     RAMDISK_EXISTS=0
+    ui_print "- dugnou"
 fi
-
+ui_print "- monq"
 ui_print "- toto 1"
 
 if [ -f config.orig ]; then
