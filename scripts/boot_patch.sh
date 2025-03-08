@@ -119,7 +119,11 @@ else
    if find . -name "*.cpio" | grep -vF "./ramdisk.cpio" >null; then NONCOMPLIANT=1; fi #searching for any cpio file other than ./ramdisk.cpio
    if [ $NONCOMPLIANT -eq 1 ]; then 
      ui_print "- This boot image contains non standard cpio:"
-     find . -name "*.cpio" | grep -vF "./ramdisk.cpio" | xargs ui_print
+     find . -name "*.cpio" | grep -vF "./ramdisk.cpio" > tmp.log
+     while read p; do
+       ui_print "- $p"
+     done <tmp.log
+     rm tmp.log
      abort "! This boot image is unsupported"
    fi  
   ui_print "- No ramdisk file in the root directory"
