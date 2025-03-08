@@ -113,11 +113,17 @@ ui_print "- Checking ramdisk status"
 if [ -e ramdisk.cpio ]; then
   ./magiskboot cpio ramdisk.cpio test
   STATUS=$?
-  SKIP_BACKUP=""
-else
-  # Stock A only legacy SAR, or some Android 13 GKIs
-  STATUS=0
-  SKIP_BACKUP="#"
+  RAMDISK_EXISTS=1
+else 
+  #checking if non compliant implementation
+   if find . -name "*.cpio" | grep -vF "./ramdisk.cpio" >null; then NONCOMPLIANT=1; fi #searching for any cpio file other than ./ramdisk.cpio
+   if [ $NONCOMPLIANT -eq 1 ]; then 
+     ui_print "This boot image contains the following non standard cpio:"
+     find . -name "*.cpio" | grep -vF "./ramdisk.cpio" | xargs ui_print
+     abort "! The selected boot image does not comply with standard boot images structure. This configuration is not supported"
+   fi  
+  ui_print "No ramdisk file found in the root directory of the boot image. Skipping ramdisk patching"
+  RAMDISK_EXISTS=0
 fi
 case $STATUS in
   0 )
@@ -158,38 +164,42 @@ fi
 # Ramdisk Patches
 ##################
 
-ui_print "- Patching ramdisk"
+if [ $RAMDISK_EXISTS -eq 1 ]; then
 
-$BOOTMODE && [ -z "$PREINITDEVICE" ] && PREINITDEVICE=$(./magisk --preinit-device)
-
-# Compress to save precious ramdisk space
-./magiskboot compress=xz magisk magisk.xz
-./magiskboot compress=xz stub.apk stub.xz
-./magiskboot compress=xz init-ld init-ld.xz
-
-echo "KEEPVERITY=$KEEPVERITY" > config
-echo "KEEPFORCEENCRYPT=$KEEPFORCEENCRYPT" >> config
-echo "RECOVERYMODE=$RECOVERYMODE" >> config
-if [ -n "$PREINITDEVICE" ]; then
-  ui_print "- Pre-init storage partition: $PREINITDEVICE"
-  echo "PREINITDEVICE=$PREINITDEVICE" >> config
+  ui_print "- Patching ramdisk"
+  
+  $BOOTMODE && [ -z "$PREINITDEVICE" ] && PREINITDEVICE=$(./magisk --preinit-device)
+  
+  # Compress to save precious ramdisk space
+  ./magiskboot compress=xz magisk magisk.xz
+  ./magiskboot compress=xz stub.apk stub.xz
+  ./magiskboot compress=xz init-ld init-ld.xz
+  
+  echo "KEEPVERITY=$KEEPVERITY" > config
+  echo "KEEPFORCEENCRYPT=$KEEPFORCEENCRYPT" >> config
+  echo "RECOVERYMODE=$RECOVERYMODE" >> config
+  if [ -n "$PREINITDEVICE" ]; then
+    ui_print "- Pre-init storage partition: $PREINITDEVICE"
+    echo "PREINITDEVICE=$PREINITDEVICE" >> config
+  fi
+  [ -n "$SHA1" ] && echo "SHA1=$SHA1" >> config
+  
+  ./magiskboot cpio ramdisk.cpio \
+  "add 0750 init magiskinit" \
+  "mkdir 0750 overlay.d" \
+  "mkdir 0750 overlay.d/sbin" \
+  "add 0644 overlay.d/sbin/magisk.xz magisk.xz" \
+  "add 0644 overlay.d/sbin/stub.xz stub.xz" \
+  "add 0644 overlay.d/sbin/init-ld.xz init-ld.xz" \
+  "patch" \
+  "backup ramdisk.cpio.orig" \
+  "mkdir 000 .backup" \
+  "add 000 .backup/.magisk config" \
+  || abort "! Unable to patch ramdisk"
+  
+  rm -f ramdisk.cpio.orig config *.xz
+  
 fi
-[ -n "$SHA1" ] && echo "SHA1=$SHA1" >> config
-
-./magiskboot cpio ramdisk.cpio \
-"add 0750 init magiskinit" \
-"mkdir 0750 overlay.d" \
-"mkdir 0750 overlay.d/sbin" \
-"add 0644 overlay.d/sbin/magisk.xz magisk.xz" \
-"add 0644 overlay.d/sbin/stub.xz stub.xz" \
-"add 0644 overlay.d/sbin/init-ld.xz init-ld.xz" \
-"patch" \
-"$SKIP_BACKUP backup ramdisk.cpio.orig" \
-"mkdir 000 .backup" \
-"add 000 .backup/.magisk config" \
-|| abort "! Unable to patch ramdisk"
-
-rm -f ramdisk.cpio.orig config *.xz
 
 #################
 # Binary Patches
@@ -209,6 +219,7 @@ done
 
 if [ -f kernel ]; then
   PATCHEDKERNEL=false
+   ui_print "Kernel file found - Patching"
   # Remove Samsung RKP
   ./magiskboot hexpatch kernel \
   49010054011440B93FA00F71E9000054010840B93FA00F7189000054001840B91FA00F7188010054 \
@@ -237,17 +248,22 @@ if [ -f kernel ]; then
   # If the kernel doesn't need to be patched at all,
   # keep raw kernel to avoid bootloops on some weird devices
   $PATCHEDKERNEL || rm -f kernel
+  
+elif [ $RAMDISK_EXISTS -eq 1 ] then
+  ui_print "Error - The selected boot image does not contain anything to patch"
 fi
 
 #################
 # Repack & Flash
 #################
 
-ui_print "- Repacking boot image"
-./magiskboot repack "$BOOTIMAGE" || abort "! Unable to repack boot image"
-
-# Sign chromeos boot
-$CHROMEOS && sign_chromeos
+if [ $RAMDISK_EXISTS -eq 1 ]; then
+  ui_print "- Repacking boot image"
+  ./magiskboot repack "$BOOTIMAGE" || abort "! Unable to repack boot image"
+  
+  # Sign chromeos boot
+  $CHROMEOS && sign_chromeos
+fi
 
 # Restore the original boot partition path
 [ -e "$BOOTNAND" ] && BOOTIMAGE="$BOOTNAND"
