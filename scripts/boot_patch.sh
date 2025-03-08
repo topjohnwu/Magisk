@@ -152,12 +152,8 @@ else
     fi  
     ui_print "- No ramdisk file in the root directory"
     ui_print "- Skipping ramdisk patching"
-    ui_print "- coucou"
     RAMDISK_EXISTS=0
-    ui_print "- dugnou"
 fi
-ui_print "- monq"
-ui_print "- toto 1"
 
 if [ -f config.orig ]; then
   # Read existing configs
@@ -169,8 +165,6 @@ if [ -f config.orig ]; then
   fi
   rm config.orig
 fi
-
-ui_print "- toto 2"
 
 ##################
 # Ramdisk Patches
@@ -213,8 +207,6 @@ if [ $RAMDISK_EXISTS -eq 1 ]; then
   
 fi
 
-ui_print "- toto 3"
-
 #################
 # Binary Patches
 #################
@@ -230,8 +222,6 @@ for dt in dtb kernel_dtb extra; do
     fi
   fi
 done
-
-ui_print "- toto 4"
 
 if [ -f kernel ]; then
   PATCHEDKERNEL=false
@@ -267,7 +257,7 @@ if [ -f kernel ]; then
 
   ui_print "- toto 5"
   
-elif [ $RAMDISK_EXISTS -eq 1 ] then
+elif [ $RAMDISK_EXISTS -eq 1 ]; then
   ui_print "- Warning"
   ui_print "- Selected boot image does not contain anything to patch"
 fi
