@@ -2,15 +2,14 @@
 
 use std::ffi::CStr;
 use std::os::unix::io::RawFd;
-use std::ptr;
 
 use libc::{
     c_char, c_uint, c_ulong, c_void, dev_t, mode_t, nfds_t, off_t, pollfd, sockaddr, socklen_t,
-    ssize_t, SYS_dup3,
+    ssize_t,
 };
 
 use crate::cxx_extern::readlinkat_for_cxx;
-use crate::{errno, raw_cstr, CxxResultExt, FsPath, Utf8CStr, Utf8CStrBufRef};
+use crate::{CxxResultExt, FsPath, Utf8CStr, Utf8CStrBufRef, errno, raw_cstr};
 
 fn ptr_to_str<'a, T>(ptr: *const T) -> &'a str {
     if ptr.is_null() {
@@ -222,17 +221,6 @@ fn xxread(fd: RawFd, data: &mut [u8]) -> isize {
     }
 }
 
-#[unsafe(no_mangle)]
-extern "C" fn xlseek64(fd: RawFd, offset: i64, whence: i32) -> i64 {
-    unsafe {
-        let r = libc::lseek64(fd, offset, whence);
-        if r < 0 {
-            perror!("lseek64");
-        }
-        r
-    }
-}
-
 pub(crate) fn xpipe2(fds: &mut [i32; 2], flags: i32) -> i32 {
     unsafe {
         let r = libc::pipe2(fds.as_mut_ptr(), flags);
@@ -370,49 +358,11 @@ unsafe extern "C" fn xaccept4(
 }
 
 #[unsafe(no_mangle)]
-unsafe extern "C" fn xsendmsg(fd: RawFd, msg: *const libc::msghdr, flags: i32) -> ssize_t {
-    unsafe {
-        let r = libc::sendmsg(fd, msg, flags);
-        if r < 0 {
-            perror!("sendmsg");
-        }
-        r
-    }
-}
-
-#[unsafe(no_mangle)]
-unsafe extern "C" fn xrecvmsg(fd: RawFd, msg: *mut libc::msghdr, flags: i32) -> ssize_t {
-    unsafe {
-        let r = libc::recvmsg(fd, msg, flags);
-        if r < 0 {
-            perror!("recvmsg");
-        }
-        r
-    }
-}
-
-#[unsafe(no_mangle)]
 unsafe extern "C" fn xaccess(path: *const c_char, mode: i32) -> i32 {
     unsafe {
         let r = libc::access(path, mode);
         if r < 0 {
             perror!("access {}", ptr_to_str(path));
-        }
-        r
-    }
-}
-
-#[unsafe(no_mangle)]
-unsafe extern "C" fn xfaccessat(dirfd: RawFd, path: *const c_char, mode: i32, flags: i32) -> i32 {
-    unsafe {
-        #[allow(unused_mut)]
-        let mut r = libc::faccessat(dirfd, path, mode, flags);
-        if r < 0 {
-            perror!("faccessat {}", ptr_to_str(path));
-        }
-        #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
-        if r > 0 && *errno() == 0 {
-            r = 0
         }
         r
     }
@@ -430,38 +380,11 @@ unsafe extern "C" fn xstat(path: *const c_char, buf: *mut libc::stat) -> i32 {
 }
 
 #[unsafe(no_mangle)]
-unsafe extern "C" fn xlstat(path: *const c_char, buf: *mut libc::stat) -> i32 {
-    unsafe {
-        let r = libc::lstat(path, buf);
-        if r < 0 {
-            perror!("lstat {}", ptr_to_str(path));
-        }
-        r
-    }
-}
-
-#[unsafe(no_mangle)]
 unsafe extern "C" fn xfstat(fd: RawFd, buf: *mut libc::stat) -> i32 {
     unsafe {
         let r = libc::fstat(fd, buf);
         if r < 0 {
             perror!("fstat");
-        }
-        r
-    }
-}
-
-#[unsafe(no_mangle)]
-unsafe extern "C" fn xfstatat(
-    dirfd: RawFd,
-    path: *const c_char,
-    buf: *mut libc::stat,
-    flags: i32,
-) -> i32 {
-    unsafe {
-        let r = libc::fstatat(dirfd, path, buf, flags);
-        if r < 0 {
-            perror!("fstatat {}", ptr_to_str(path));
         }
         r
     }
@@ -490,58 +413,11 @@ extern "C" fn xdup2(oldfd: RawFd, newfd: RawFd) -> RawFd {
 }
 
 #[unsafe(no_mangle)]
-extern "C" fn xdup3(oldfd: RawFd, newfd: RawFd, flags: i32) -> RawFd {
-    unsafe {
-        let fd = libc::syscall(SYS_dup3, oldfd, newfd, flags) as RawFd;
-        if fd < 0 {
-            perror!("dup3");
-        }
-        fd
-    }
-}
-
-#[unsafe(no_mangle)]
 unsafe extern "C" fn xsymlink(target: *const c_char, linkpath: *const c_char) -> i32 {
     unsafe {
         let r = libc::symlink(target, linkpath);
         if r < 0 {
             perror!("symlink {} -> {}", ptr_to_str(target), ptr_to_str(linkpath));
-        }
-        r
-    }
-}
-
-#[unsafe(no_mangle)]
-unsafe extern "C" fn xsymlinkat(
-    target: *const c_char,
-    dirfd: RawFd,
-    linkpath: *const c_char,
-) -> i32 {
-    unsafe {
-        let r = libc::symlinkat(target, dirfd, linkpath);
-        if r < 0 {
-            perror!(
-                "symlinkat {} -> {}",
-                ptr_to_str(target),
-                ptr_to_str(linkpath)
-            );
-        }
-        r
-    }
-}
-
-#[unsafe(no_mangle)]
-unsafe extern "C" fn xlinkat(
-    olddirfd: RawFd,
-    target: *const c_char,
-    newdirfd: RawFd,
-    linkpath: *const c_char,
-    flags: i32,
-) -> i32 {
-    unsafe {
-        let r = libc::linkat(olddirfd, target, newdirfd, linkpath, flags);
-        if r < 0 {
-            perror!("linkat {} -> {}", ptr_to_str(target), ptr_to_str(linkpath));
         }
         r
     }
@@ -559,17 +435,6 @@ unsafe extern "C" fn xmount(
         let r = libc::mount(src, target, fstype, flags, data);
         if r < 0 {
             perror!("mount {} -> {}", ptr_to_str(src), ptr_to_str(target));
-        }
-        r
-    }
-}
-
-#[unsafe(no_mangle)]
-unsafe extern "C" fn xumount(target: *const c_char) -> i32 {
-    unsafe {
-        let r = libc::umount(target);
-        if r < 0 {
-            perror!("umount {}", ptr_to_str(target));
         }
         r
     }
@@ -622,17 +487,6 @@ unsafe extern "C" fn xmkdirs(path: *const c_char, mode: mode_t) -> i32 {
 }
 
 #[unsafe(no_mangle)]
-unsafe extern "C" fn xmkdirat(dirfd: RawFd, path: *const c_char, mode: mode_t) -> i32 {
-    unsafe {
-        let r = libc::mkdirat(dirfd, path, mode);
-        if r < 0 && *errno() != libc::EEXIST {
-            perror!("mkdirat {}", ptr_to_str(path));
-        }
-        r
-    }
-}
-
-#[unsafe(no_mangle)]
 unsafe extern "C" fn xsendfile(
     out_fd: RawFd,
     in_fd: RawFd,
@@ -643,25 +497,6 @@ unsafe extern "C" fn xsendfile(
         let r = libc::sendfile(out_fd, in_fd, offset, count);
         if r < 0 {
             perror!("sendfile");
-        }
-        r
-    }
-}
-
-#[unsafe(no_mangle)]
-unsafe extern "C" fn xmmap(
-    addr: *mut c_void,
-    len: usize,
-    prot: i32,
-    flags: i32,
-    fd: RawFd,
-    offset: off_t,
-) -> *mut c_void {
-    unsafe {
-        let r = libc::mmap(addr, len, prot, flags, fd, offset);
-        if r == libc::MAP_FAILED {
-            perror!("mmap");
-            return ptr::null_mut();
         }
         r
     }
