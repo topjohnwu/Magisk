@@ -139,17 +139,16 @@ if [ -e ramdisk.cpio ]; then
       ;;
     esac
 else 
-  #checking if non compliant implementation
+  #checking if other cpio exist in the boot image
    if find . -name "*.cpio" | grep -vF "./ramdisk.cpio" >null; then NONCOMPLIANT=1; fi #searching for any cpio file other than ./ramdisk.cpio
    if [ $NONCOMPLIANT -eq 1 ]; then 
      ui_print "- Information"
-     ui_print "- This boot image contains non standard cpio:"
+     ui_print "- This boot image contains the following unsupported cpio:"
      find . -name "*.cpio" | grep -vF "./ramdisk.cpio" > tmp.log
      while read p; do
        ui_print "- $p"
      done <tmp.log
      rm tmp.log
-     ui_print "- They are not supported and wont be processed"
     fi  
     ui_print "- No ramdisk file in the root directory"
     ui_print "- Skipping ramdisk patching"
