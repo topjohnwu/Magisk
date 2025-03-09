@@ -150,7 +150,7 @@ else
      done <tmp.log
      rm tmp.log
     fi  
-    ui_print "- No ramdisk file in the root directory"
+    ui_print "- No ramdisk file found in the root directory"
     ui_print "- Skipping ramdisk patching"
     RAMDISK_EXISTS=0
 fi
