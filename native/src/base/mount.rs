@@ -16,6 +16,28 @@ impl Utf8CStr {
         }
     }
 
+    pub fn bind_mount_ro_to<'a>(&'a self, path: &'a Utf8CStr) -> OsResult<'a, ()> {
+        unsafe {
+            libc::mount(
+                self.as_ptr(),
+                path.as_ptr(),
+                ptr::null(),
+                libc::MS_BIND | libc::MS_REC,
+                ptr::null(),
+            )
+            .check_os_err("bind_mount", Some(self), Some(path))?;
+            libc::mount(
+                ptr::null(),
+                path.as_ptr(),
+                ptr::null(),
+                libc::MS_REMOUNT | libc::MS_BIND | libc::MS_RDONLY,
+                ptr::null(),
+            )
+            .check_os_err("remount", Some(self), Some(path))?;
+        }
+        Ok(())
+    }
+
     pub fn remount_mount_point_flags(&self, flags: c_ulong) -> OsResult<()> {
         unsafe {
             libc::mount(

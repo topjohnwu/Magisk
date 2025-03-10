@@ -4,6 +4,7 @@
 #![feature(fn_traits)]
 #![feature(unix_socket_ancillary_data)]
 #![feature(unix_socket_peek)]
+#![feature(btree_set_entry)]
 #![allow(clippy::missing_safety_doc)]
 
 use crate::ffi::SuRequest;
@@ -23,6 +24,7 @@ use std::ops::DerefMut;
 use std::os::fd::FromRawFd;
 use su::{get_pty_num, pump_tty, restore_stdin};
 use zygisk::zygisk_should_load_module;
+use module::deploy_modules;
 
 #[path = "../include/consts.rs"]
 mod consts;
@@ -36,6 +38,7 @@ mod selinux;
 mod socket;
 mod su;
 mod zygisk;
+mod module;
 
 #[allow(clippy::needless_lifetimes)]
 #[cxx::bridge]
@@ -251,6 +254,7 @@ pub mod ffi {
         #[Self = MagiskD]
         #[cxx_name = "Get"]
         fn get() -> &'static MagiskD;
+        fn deploy_modules(module_list: &Vec<ModuleInfo>, zygisk_lib: &CxxString, magisk_path: &CxxString) -> bool;
     }
     unsafe extern "C++" {
         fn handle_modules(self: &MagiskD) -> Vec<ModuleInfo>;

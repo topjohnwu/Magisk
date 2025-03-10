@@ -3,7 +3,7 @@ use crate::{
     FsPathBuilder, LibcReturn, OsError, OsResult, OsResultStatic, Utf8CStr, Utf8CStrBuf, cstr,
     errno, fd_path, fd_set_attr,
 };
-use libc::{EEXIST, O_CLOEXEC, O_CREAT, O_RDONLY, O_TRUNC, O_WRONLY, dirent, mode_t};
+use libc::{EEXIST, O_CLOEXEC, O_CREAT, O_DIRECTORY, O_RDONLY, O_TRUNC, O_WRONLY, dirent, mode_t};
 use std::fs::File;
 use std::marker::PhantomData;
 use std::ops::{Deref, DerefMut};
@@ -206,7 +206,7 @@ impl Directory {
     }
 
     pub fn open_as_dir_at<'a>(&self, name: &'a Utf8CStr) -> OsResult<'a, Directory> {
-        let fd = self.openat(name, O_RDONLY, 0)?;
+        let fd = self.openat(name, O_RDONLY | O_DIRECTORY, 0)?;
         Directory::try_from(fd).map_err(|e| e.set_args(Some(name), None))
     }
 
