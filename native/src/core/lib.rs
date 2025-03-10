@@ -21,6 +21,7 @@ use std::mem::ManuallyDrop;
 use std::ops::DerefMut;
 use std::os::fd::FromRawFd;
 use zygisk::zygisk_should_load_module;
+use module::deploy_modules;
 
 #[path = "../include/consts.rs"]
 mod consts;
@@ -33,6 +34,7 @@ mod resetprop;
 mod socket;
 mod su;
 mod zygisk;
+mod module;
 
 #[allow(clippy::needless_lifetimes)]
 #[cxx::bridge]
@@ -239,6 +241,7 @@ pub mod ffi {
         #[Self = MagiskD]
         #[cxx_name = "Get"]
         fn get() -> &'static MagiskD;
+        fn deploy_modules(zygisk_enabled: bool, module_list: &Vec<ModuleInfo>) -> bool;
     }
     unsafe extern "C++" {
         #[allow(dead_code)]

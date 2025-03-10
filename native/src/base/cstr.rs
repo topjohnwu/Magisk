@@ -185,6 +185,7 @@ impl StringExt for PathBuf {
     }
 }
 
+#[derive(Eq, Ord, PartialOrd)]
 pub struct Utf8CString(String);
 
 impl Default for Utf8CString {
@@ -581,6 +582,30 @@ impl<const N: usize> FsPathBuf<N> {
             buf.push_str(path);
         }
         inner(self.0.deref_mut(), path.as_ref());
+        self
+    }
+    
+    pub fn pop(mut self) -> Self {
+        fn inner(buf: &mut dyn Utf8CStrBuf) {
+            if buf.ends_with('/') {
+                unsafe { buf.set_len(buf.len() - 1) };
+            }
+            if let Some(s) = buf.as_str().rfind('/') {
+                unsafe {
+                    buf.as_bytes_mut()[s] = b'\0';
+                    buf.set_len(s)
+                };
+            }
+        }
+        inner(self.0.deref_mut());
+        self
+    }
+    
+    pub fn set_len(mut self, len: usize) -> Self {
+        unsafe {
+            self.0.as_bytes_mut()[len] = b'\0';
+            self.0.set_len(len)
+        };
         self
     }
 
