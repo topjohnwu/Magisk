@@ -3,7 +3,7 @@ use crate::{
     cstr, cstr_buf, errno, fd_path, fd_set_attr, FileAttr, FsPath, LibcReturn, Utf8CStr,
     Utf8CStrBuf,
 };
-use libc::{dirent, O_CLOEXEC, O_CREAT, O_RDONLY, O_TRUNC, O_WRONLY};
+use libc::{dirent, O_CLOEXEC, O_CREAT, O_DIRECTORY, O_RDONLY, O_TRUNC, O_WRONLY};
 use std::ffi::CStr;
 use std::fs::File;
 use std::ops::Deref;
@@ -193,6 +193,13 @@ impl Directory {
             self.open_raw_fd(name.as_cstr(), flags, mode)
                 .map(|fd| OwnedFd::from_raw_fd(fd))
         }
+    }
+
+    pub fn open_dir(&self, name: &CStr) -> io::Result<Directory> {
+        let dirp = unsafe {
+            libc::fdopendir(self.open_raw_fd(name, O_RDONLY|O_DIRECTORY|O_CLOEXEC, 0)?).check_os_err()?
+        };
+        Ok(Directory { dirp })
     }
 
     pub fn contains_path(&self, path: &CStr) -> bool {
