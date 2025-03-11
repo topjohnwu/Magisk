@@ -28,3 +28,16 @@ static inline bool check_env(const char *name) {
     const char *val = getenv(name);
     return val != nullptr && val == "true"sv;
 }
+
+static inline void cleanup() {
+    unlink(HEADER_FILE);
+    unlink(KERNEL_FILE);
+    unlink(RAMDISK_FILE);
+    unlink(SECOND_FILE);
+    unlink(KER_DTB_FILE);
+    unlink(EXTRA_FILE);
+    unlink(RECV_DTBO_FILE);
+    unlink(DTB_FILE);
+    unlink(BOOTCONFIG_FILE);
+    rm_rf(VND_RAMDISK_DIR);
+}

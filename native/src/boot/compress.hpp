@@ -12,3 +12,13 @@ void decompress(char *infile, const char *outfile);
 bool decompress(rust::Slice<const uint8_t> buf, int fd);
 bool xz(rust::Slice<const uint8_t> buf, rust::Vec<uint8_t> &out);
 bool unxz(rust::Slice<const uint8_t> buf, rust::Vec<uint8_t> &out);
+
+inline ::rust::String formats() {
+    std::string s;
+    for (int fmt = GZIP; fmt < LZOP; ++fmt) {
+        s += fmt2name[(format_t) fmt];
+        s += ' ';
+    }
+    s.pop_back();
+    return {s};
+}

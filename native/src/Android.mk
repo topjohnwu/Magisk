@@ -92,7 +92,6 @@ LOCAL_STATIC_LIBRARIES := \
     libboot-rs
 
 LOCAL_SRC_FILES := \
-    boot/main.cpp \
     boot/bootimg.cpp \
     boot/compress.cpp \
     boot/format.cpp \
@@ -102,7 +101,7 @@ LOCAL_LDFLAGS := -static
 
 ifdef B_CRT0
 LOCAL_STATIC_LIBRARIES += crt0
-LOCAL_LDFLAGS += -lm
+LOCAL_LDFLAGS += -lm -Wl,--defsym=vfprintf=musl_vfprintf
 endif
 
 include $(BUILD_EXECUTABLE)
