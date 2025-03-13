@@ -41,6 +41,7 @@ int quit_signals[] = { SIGALRM, SIGABRT, SIGHUP, SIGPIPE, SIGQUIT, SIGTERM, SIGI
     "Usage: su [options] [-] [user [argument...]]\n\n"
     "Options:\n"
     "  -c, --command COMMAND         Pass COMMAND to the invoked shell\n"
+    "  -r                            Pipe STDIN to COMMAND as-is"
     "  -g, --group GROUP             Specify the primary group\n"
     "  -G, --supp-group GROUP        Specify a supplementary group.\n"
     "                                The first specified supplementary group is also used\n"
@@ -119,6 +120,7 @@ int su_client_main(int argc, char *argv[]) {
             strcpy(argv[i], "-M");
     }
 
+    bool is_raw = false;
     while ((c = getopt_long(argc, argv, "c:hlmps:VvuZ:Mt:g:G:", long_opts, nullptr)) != -1) {
         switch (c) {
             case 'c': {
@@ -132,6 +134,9 @@ int su_client_main(int argc, char *argv[]) {
                 optind = argc;
                 break;
             }
+            case 'r':
+                is_raw = true;
+                break;
             case 'h':
                 usage(EXIT_SUCCESS);
             case 'l':
@@ -220,9 +225,9 @@ int su_client_main(int argc, char *argv[]) {
 
     // Determine which one of our streams are attached to a TTY
     int atty = 0;
-    if (isatty(STDIN_FILENO))  atty |= ATTY_IN;
-    if (isatty(STDOUT_FILENO)) atty |= ATTY_OUT;
-    if (isatty(STDERR_FILENO)) atty |= ATTY_ERR;
+    if (isatty(STDIN_FILENO) && !is_raw)  atty |= ATTY_IN;
+    if (isatty(STDOUT_FILENO) && !is_raw) atty |= ATTY_OUT;
+    if (isatty(STDERR_FILENO) && !is_raw) atty |= ATTY_ERR; 
 
     // Send stdin
     send_fd(fd, (atty & ATTY_IN) ? -1 : STDIN_FILENO);
@@ -231,7 +236,7 @@ int su_client_main(int argc, char *argv[]) {
     // Send stderr
     send_fd(fd, (atty & ATTY_ERR) ? -1 : STDERR_FILENO);
 
-    if (atty) {
+    if (atty && !is_raw) {
         // We need a PTY. Get one.
         write_int(fd, 1);
         ptmx = recv_fd(fd);
@@ -239,7 +244,7 @@ int su_client_main(int argc, char *argv[]) {
         write_int(fd, 0);
     }
 
-    if (atty) {
+    if (atty && !is_raw) {
         setup_sighandlers(sighandler);
         watch_sigwinch_async(STDOUT_FILENO, ptmx);
         pump_stdin_async(ptmx);
