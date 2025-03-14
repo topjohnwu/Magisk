@@ -225,9 +225,9 @@ int su_client_main(int argc, char *argv[]) {
 
     // Determine which one of our streams are attached to a TTY
     int atty = 0;
-    if (isatty(STDIN_FILENO) && !is_raw)  atty |= ATTY_IN;
-    if (isatty(STDOUT_FILENO) && !is_raw) atty |= ATTY_OUT;
-    if (isatty(STDERR_FILENO) && !is_raw) atty |= ATTY_ERR; 
+    if (!is_raw && isatty(STDIN_FILENO))  atty |= ATTY_IN;
+    if (!is_raw && isatty(STDOUT_FILENO)) atty |= ATTY_OUT;
+    if (!is_raw && isatty(STDERR_FILENO)) atty |= ATTY_ERR;
 
     // Send stdin
     send_fd(fd, (atty & ATTY_IN) ? -1 : STDIN_FILENO);
