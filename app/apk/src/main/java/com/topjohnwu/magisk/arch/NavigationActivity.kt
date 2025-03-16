@@ -5,6 +5,8 @@ import androidx.databinding.ViewDataBinding
 import androidx.navigation.NavController
 import androidx.navigation.NavDirections
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.navOptions
+import com.topjohnwu.magisk.utils.AccessibilityUtils
 
 abstract class NavigationActivity<Binding : ViewDataBinding> : UIActivity<Binding>() {
 
@@ -32,6 +34,12 @@ abstract class NavigationActivity<Binding : ViewDataBinding> : UIActivity<Bindin
     }
 
     fun NavDirections.navigate() {
-        navigation.navigate(this)
+        if (AccessibilityUtils.isAnimationEnabled(contentResolver)) {
+            navigation.navigate(this)
+        } else {
+            navigation.navigate(this, navOptions {
+                anim { enter = 0; exit = 0; popEnter = 0; popExit = 0 }
+            })
+        }
     }
 }
