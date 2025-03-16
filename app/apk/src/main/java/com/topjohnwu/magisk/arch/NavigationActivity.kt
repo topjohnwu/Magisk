@@ -39,9 +39,7 @@ abstract class NavigationActivity<Binding : ViewDataBinding> : UIActivity<Bindin
             if (AccessibilityUtils.isAnimationEnabled(cr)) {
                 navigation.navigate(directions)
             } else {
-                navigation.navigate(directions, navOptions {
-                    anim { enter = 0; exit = 0; popEnter = 0; popExit = 0 }
-                })
+                navigation.navigate(directions, navOptions {})
             }
         }
     }
