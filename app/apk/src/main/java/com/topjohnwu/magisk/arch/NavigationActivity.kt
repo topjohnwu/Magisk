@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.arch
 
+import android.content.ContentResolver
 import android.view.KeyEvent
 import androidx.databinding.ViewDataBinding
 import androidx.navigation.NavController
@@ -33,13 +34,19 @@ abstract class NavigationActivity<Binding : ViewDataBinding> : UIActivity<Bindin
         }
     }
 
-    fun NavDirections.navigate() {
-        if (AccessibilityUtils.isAnimationEnabled(contentResolver)) {
-            navigation.navigate(this)
-        } else {
-            navigation.navigate(this, navOptions {
-                anim { enter = 0; exit = 0; popEnter = 0; popExit = 0 }
-            })
+    companion object {
+        fun navigate(directions: NavDirections, navigation: NavController, cr: ContentResolver) {
+            if (AccessibilityUtils.isAnimationEnabled(cr)) {
+                navigation.navigate(directions)
+            } else {
+                navigation.navigate(directions, navOptions {
+                    anim { enter = 0; exit = 0; popEnter = 0; popExit = 0 }
+                })
+            }
         }
+    }
+
+    fun NavDirections.navigate() {
+        navigate(this, navigation, contentResolver)
     }
 }
