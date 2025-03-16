@@ -80,7 +80,7 @@ Before proceeding, please acknowledge that:
 
 ### Flashing Tools
 
-- [Samsung Odin3](https://dl2018.sammobile.com/Odin.zip) (Windows only) (requires [Samsung USB Drivers](https://developer.samsung.com/android-usb-driver))
+- [Samsung Odin3](https://xdaforums.com/t/patched-odin-3-13-1.3762572/) (Windows only) (requires [Samsung USB Drivers](https://developer.samsung.com/android-usb-driver))
 - [Samsung Odin4](https://forum.xda-developers.com/t/official-samsung-odin-v4-1-2-1-dc05e3ea-for-linux.4453423/) (Linux only)
 - [Heimdall](https://www.glassechidna.com.au/heimdall/) (or [Grimler's fork](https://git.sr.ht/~grimler/Heimdall))
 
