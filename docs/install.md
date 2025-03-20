@@ -76,7 +76,7 @@ As a summary, after installing Magisk in recovery **(starting from power off)**:
 Before proceeding, please acknowledge that:
 
 - Installing Magisk **WILL** trip your Knox Warranty Bit, this action is not reversible in any way.
-- Installing Magisk for the first time **REQUIRES** a full data wipe (this is **NOT** counting the data wipe when unlocking bootloader). Please make a backup your data.
+- Installing Magisk for the first time **REQUIRES** a full data wipe (this is **NOT** counting the data wipe when unlocking bootloader). Please make a backup of your data.
 
 ### Flashing Tools
 
@@ -86,7 +86,7 @@ Before proceeding, please acknowledge that:
 
 ### Requirements
 
-To verify whether or not Magisk can be installed in your Samsung device, you first must check the OEM Lock and KnoxGuard (RMM) status, to do so boot your device in Download mode with its key combo.
+To verify whether or not Magisk can be installed in your Samsung device, you first must check the OEM Lock and KnoxGuard (RMM) status. To do so, boot your device in Download mode with its key combo.
 
 Possible OEM Lock values are the following:
 - **ON (L)**: fully locked.
