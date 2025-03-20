@@ -17,7 +17,6 @@ import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.ktx.copyAll
-import com.topjohnwu.magisk.core.ktx.copyAndClose
 import com.topjohnwu.magisk.core.ktx.writeTo
 import com.topjohnwu.magisk.core.utils.DummyList
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
@@ -500,7 +499,7 @@ abstract class MagiskInstallImpl protected constructor(
                 bootItem.file = newBoot
                 bootItem.copyTo(outStream as TarArchiveOutputStream)
             } else {
-                newBoot.newInputStream().copyAndClose(outStream)
+                newBoot.newInputStream().use { it.copyAll(outStream) }
             }
             newBoot.delete()
 
@@ -514,6 +513,8 @@ abstract class MagiskInstallImpl protected constructor(
             outFile.delete()
             Timber.e(e)
             return false
+        } finally {
+            outStream.close()
         }
 
         // Fix up binaries
