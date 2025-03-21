@@ -186,8 +186,8 @@ int parse_int(string_view s) {
     return parse_num<int, 10>(s);
 }
 
-uint64_t parse_uint64_hex(string_view s) {
-    return parse_num<uint64_t, 16>(s);
+uint32_t parse_uint32_hex(string_view s) {
+    return parse_num<uint32_t, 16>(s);
 }
 
 uint32_t binary_gcd(uint32_t u, uint32_t v) {
