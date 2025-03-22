@@ -5,6 +5,7 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.widget.HorizontalScrollView
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import com.topjohnwu.magisk.R
@@ -12,6 +13,7 @@ import com.topjohnwu.magisk.arch.BaseFragment
 import com.topjohnwu.magisk.arch.viewModel
 import com.topjohnwu.magisk.databinding.FragmentLogMd2Binding
 import com.topjohnwu.magisk.ui.MainActivity
+import com.topjohnwu.magisk.utils.AccessibilityUtils
 import com.topjohnwu.magisk.utils.MotionRevealHelper
 import rikka.recyclerview.addEdgeSpacing
 import rikka.recyclerview.addItemSpacing
@@ -55,6 +57,11 @@ class LogFragment : BaseFragment<FragmentLogMd2Binding>(), MenuProvider {
             addEdgeSpacing(bottom = R.dimen.l1)
             addItemSpacing(R.dimen.l1, R.dimen.l_50, R.dimen.l1)
             fixEdgeEffect()
+        }
+
+        if (!AccessibilityUtils.isAnimationEnabled(requireContext().contentResolver)) {
+            val scrollView = view.findViewById<HorizontalScrollView>(R.id.log_scroll_magisk)
+            scrollView.setOverScrollMode(View.OVER_SCROLL_NEVER)
         }
     }
 

@@ -17,6 +17,8 @@ import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.download.DownloadEngine
 import com.topjohnwu.magisk.databinding.FragmentHomeMd2Binding
 import com.topjohnwu.magisk.core.R as CoreR
+import androidx.navigation.findNavController
+import com.topjohnwu.magisk.arch.NavigationActivity
 
 class HomeFragment : BaseFragment<FragmentHomeMd2Binding>(), MenuProvider {
 
@@ -68,7 +70,13 @@ class HomeFragment : BaseFragment<FragmentHomeMd2Binding>(), MenuProvider {
     override fun onMenuItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_settings ->
-                HomeFragmentDirections.actionHomeFragmentToSettingsFragment().navigate()
+                activity?.let {
+                    NavigationActivity.navigate(
+                        HomeFragmentDirections.actionHomeFragmentToSettingsFragment(),
+                        it.findNavController(R.id.main_nav_host),
+                        it.contentResolver,
+                    )
+                }
             R.id.action_reboot -> activity?.let { RebootMenu.inflate(it).show() }
             else -> return super.onOptionsItemSelected(item)
         }
