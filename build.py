@@ -505,11 +505,12 @@ def build_all():
 def clippy_cli():
     args.force_out = True
     os.chdir(Path("native", "src"))
-    cmds = ["clippy", "--no-deps", "--target", ""]
+    cmds = ["clippy", "--no-deps"]
     for triple in build_abis.values():
-        cmds[3] = triple
-        run_cargo(cmds)
-        run_cargo(cmds + ["--release"])
+        cmds.append("--target")
+        cmds.append(triple)
+    run_cargo(cmds)
+    run_cargo(cmds + ["--release"])
     os.chdir(Path("..", ".."))
 
 
