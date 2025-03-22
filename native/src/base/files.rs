@@ -3,10 +3,7 @@ use crate::{
     Utf8CStrBuf,
 };
 use bytemuck::{bytes_of, bytes_of_mut, Pod};
-use libc::{
-    c_uint, makedev, mode_t, stat, EEXIST, ENOENT, F_OK, O_CLOEXEC, O_CREAT, O_PATH, O_RDONLY,
-    O_RDWR, O_TRUNC, O_WRONLY,
-};
+use libc::{c_uint, makedev, mode_t, stat, EEXIST, ENOENT, F_OK, MS_BIND, MS_RDONLY, MS_REC, MS_REMOUNT, O_CLOEXEC, O_CREAT, O_PATH, O_RDONLY, O_RDWR, O_TRUNC, O_WRONLY};
 use mem::MaybeUninit;
 use num_traits::AsPrimitive;
 use std::cmp::min;
@@ -185,6 +182,10 @@ impl FileAttr {
     pub fn is_socket(&self) -> bool {
         self.is(libc::S_IFSOCK)
     }
+
+    pub fn is_whiteout(&self) -> bool {
+        self.is_char_device() && self.st.st_rdev == 0
+    }
 }
 
 const XATTR_NAME_SELINUX: &CStr = c"security.selinux";
@@ -199,7 +200,7 @@ impl FsPath {
     }
 
     pub fn create(&self, flags: i32, mode: mode_t) -> io::Result<File> {
-        Ok(File::from(open_fd!(self, flags, mode)?))
+        Ok(File::from(open_fd!(self, flags | O_CREAT, mode)?))
     }
 
     pub fn exists(&self) -> bool {
@@ -428,6 +429,18 @@ impl FsPath {
         } else {
             false
         }
+    }
+
+
+
+    pub fn bind_mount_to(&self, path: &FsPath, ro: bool) -> io::Result<()> {
+        unsafe {
+            libc::mount(path.as_ptr(), self.as_ptr(), ptr::null(), MS_BIND | MS_REC, ptr::null()).as_os_err()?;
+            if ro {
+                libc::mount(ptr::null(), self.as_ptr(), ptr::null(), MS_REMOUNT | MS_BIND | MS_RDONLY, ptr::null()).as_os_err()?;
+            }
+        }
+        Ok(())
     }
 }
 

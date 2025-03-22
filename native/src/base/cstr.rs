@@ -81,6 +81,9 @@ pub trait Utf8CStrBuf:
     // 2. Ensure len <= capacity - 1
     // 3. All bytes from 0 to len is valid UTF-8 and does not contain null
     unsafe fn set_len(&mut self, len: usize);
+    
+    // self[len] = b'\0'; self.set_len(len)
+    fn resize(&mut self, len: usize);
     fn push_str(&mut self, s: &str) -> usize;
     fn push_lossy(&mut self, s: &[u8]) -> usize;
     // The capacity of the internal buffer. The maximum string length this buffer can contain
@@ -185,6 +188,7 @@ impl StringExt for PathBuf {
     }
 }
 
+#[derive(Eq, Ord, PartialOrd)]
 pub struct Utf8CString(String);
 
 impl Default for Utf8CString {
@@ -234,6 +238,16 @@ impl Utf8CStrBuf for Utf8CString {
     unsafe fn set_len(&mut self, len: usize) {
         unsafe {
             self.0.as_mut_vec().set_len(len);
+        }
+    }
+    
+    fn resize(&mut self, len: usize) {
+        if len >= self.0.capacity() {
+            return;
+        }
+        unsafe {
+            *self.0.as_mut_ptr().add(len) = b'\0' as _;
+            self.set_len(len);
         }
     }
 
@@ -583,6 +597,14 @@ impl<const N: usize> FsPathBuf<N> {
         inner(self.0.deref_mut(), path.as_ref());
         self
     }
+    
+    pub fn resize(mut self, len: usize) -> Self {
+        unsafe {
+            self.0.as_bytes_mut()[len] = b'\0';
+            self.0.set_len(len)
+        };
+        self
+    }
 
     pub fn join_fmt<T: Display>(mut self, name: T) -> Self {
         self.0.write_fmt(format_args!("/{}", name)).ok();
@@ -741,6 +763,14 @@ macro_rules! impl_str_buf_with_slice {
             #[inline(always)]
             unsafe fn set_len(&mut self, len: usize) {
                 self.used = len;
+            }
+            fn resize(&mut self, len: usize) {
+                if len < self.capacity() {
+                    unsafe {
+                        self.buf[len] = b'\0';
+                        self.set_len(len);
+                    }
+                }
             }
             #[inline(always)]
             fn push_str(&mut self, s: &str) -> usize {
