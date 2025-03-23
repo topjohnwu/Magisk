@@ -71,8 +71,8 @@ private val Project.androidComponents
 
 fun Project.setupCommon() {
     androidBase {
-        compileSdkVersion(35)
-        buildToolsVersion = "35.0.1"
+        compileSdkVersion(36)
+        buildToolsVersion = "36.0.0"
         ndkPath = "$sdkDirectory/ndk/magisk"
         ndkVersion = "29.0.13113456"
 
@@ -302,7 +302,7 @@ fun Project.setupAppCommon() {
         }
 
         defaultConfig {
-            targetSdk = 35
+            targetSdk = 36
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt")
             )
