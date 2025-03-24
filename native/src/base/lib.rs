@@ -21,6 +21,7 @@ mod dir;
 mod files;
 mod logging;
 mod misc;
+mod mount;
 mod result;
 mod xwrap;
 

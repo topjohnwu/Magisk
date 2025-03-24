@@ -1,15 +1,11 @@
 use crate::ffi::MagiskInit;
+use crate::mount::is_rootfs;
 use base::{
-    LibcReturn, LoggedResult, MappedFile, MutBytesExt, ResultExt, cstr, debug, error, info,
-    libc::{
-        MNT_DETACH, MS_BIND, O_CLOEXEC, O_CREAT, O_RDONLY, O_WRONLY, TMPFS_MAGIC, mount, statfs,
-        umount2,
-    },
+    LoggedResult, MappedFile, MutBytesExt, ResultExt, cstr, debug, error, info,
+    libc::{O_CLOEXEC, O_CREAT, O_RDONLY, O_WRONLY},
     path, raw_cstr,
 };
-use std::{ffi::c_long, io::Write, ptr::null};
-
-const RAMFS_MAGIC: u64 = 0x858458f6;
+use std::io::Write;
 
 fn patch_init_path(init: &mut MappedFile) {
     let from = "/system/bin/init";
@@ -70,28 +66,13 @@ impl MagiskInit {
         path!("/init").rename_to(path!("/sdcard")).log_ok();
 
         // First try to mount magiskinit from rootfs to workaround Samsung RKP
-        if unsafe {
-            mount(
-                raw_cstr!("/sdcard"),
-                raw_cstr!("/sdcard"),
-                null(),
-                MS_BIND,
-                null(),
-            )
-        } == 0
-        {
+        if path!("/sdcard").bind_mount_to(path!("/sdcard")).is_ok() {
             debug!("Bind mount /sdcard -> /sdcard");
         } else {
             // Binding mounting from rootfs is not supported before Linux 3.12
-            unsafe {
-                mount(
-                    raw_cstr!("/data/magiskinit"),
-                    raw_cstr!("/sdcard"),
-                    null(),
-                    MS_BIND,
-                    null(),
-                )
-            };
+            path!("/data/magiskinit")
+                .bind_mount_to(path!("/sdcard"))
+                .log_ok();
             debug!("Bind mount /data/magiskinit -> /sdcard");
         }
     }
@@ -139,36 +120,33 @@ impl MagiskInit {
         let _: LoggedResult<()> = try {
             let attr = src.follow_link().get_attr()?;
             dest.set_attr(&attr)?;
-            unsafe {
-                mount(dest.as_ptr(), src.as_ptr(), null(), MS_BIND, null()).as_os_err()?;
-            }
+            dest.bind_mount_to(src)?;
         };
     }
 
     pub(crate) fn second_stage(&mut self) {
         info!("Second Stage Init");
-        unsafe {
-            umount2(raw_cstr!("/init"), MNT_DETACH);
-            umount2(raw_cstr!("/system/bin/init"), MNT_DETACH); // just in case
-            path!("/data/init").remove().ok();
 
+        path!("/init").unmount().ok();
+        path!("/system/bin/init").unmount().ok(); // just in case
+        path!("/data/init").remove().ok();
+
+        unsafe {
             // Make sure init dmesg logs won't get messed up
             *self.argv = raw_cstr!("/system/bin/init") as *mut _;
+        }
 
-            // Some weird devices like meizu, uses 2SI but still have legacy rootfs
-            let mut sfs: statfs = std::mem::zeroed();
-            statfs(raw_cstr!("/"), &mut sfs);
-            if sfs.f_type as u64 == RAMFS_MAGIC || sfs.f_type as c_long == TMPFS_MAGIC {
-                // We are still on rootfs, so make sure we will execute the init of the 2nd stage
-                let init_path = path!("/init");
-                init_path.remove().ok();
-                init_path
-                    .create_symlink_to(path!("/system/bin/init"))
-                    .log_ok();
-                self.patch_rw_root();
-            } else {
-                self.patch_ro_root();
-            }
+        // Some weird devices like meizu, uses 2SI but still have legacy rootfs
+        if is_rootfs() {
+            // We are still on rootfs, so make sure we will execute the init of the 2nd stage
+            let init_path = path!("/init");
+            init_path.remove().ok();
+            init_path
+                .create_symlink_to(path!("/system/bin/init"))
+                .log_ok();
+            self.patch_rw_root();
+        } else {
+            self.patch_ro_root();
         }
     }
 }

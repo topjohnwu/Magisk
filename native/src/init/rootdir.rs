@@ -2,8 +2,8 @@ use crate::consts::{ROOTMNT, ROOTOVL};
 use crate::ffi::MagiskInit;
 use base::libc::{O_CREAT, O_RDONLY, O_WRONLY};
 use base::{
-    clone_attr, cstr, cstr_buf, debug, libc, path, BufReadExt, Directory, FsPath, FsPathBuf,
-    LibcReturn, LoggedResult, ResultExt, Utf8CStr, Utf8CString,
+    BufReadExt, Directory, FsPath, FsPathBuf, LoggedResult, ResultExt, Utf8CStr, Utf8CString,
+    clone_attr, cstr, cstr_buf, debug, path,
 };
 use std::io::BufReader;
 use std::{
@@ -11,7 +11,6 @@ use std::{
     io::Write,
     mem,
     os::fd::{FromRawFd, RawFd},
-    ptr,
 };
 
 pub fn inject_magisk_rc(fd: RawFd, tmp_dir: &Utf8CStr) {
@@ -83,16 +82,7 @@ impl MagiskInit {
                             debug!("Mount [{}] -> [{}]", src, dest);
                             clone_attr(&dest, &src)?;
                             dest.get_secontext(&mut con)?;
-                            unsafe {
-                                libc::mount(
-                                    src.as_ptr(),
-                                    dest.as_ptr(),
-                                    ptr::null(),
-                                    libc::MS_BIND,
-                                    ptr::null(),
-                                )
-                                .as_os_err()?;
-                            };
+                            src.bind_mount_to(&dest)?;
                             self.overlay_con
                                 .push(OverlayAttr(dest.to_owned(), con.to_owned()));
                             mount_list.push_str(dest.as_str());
