@@ -1,11 +1,11 @@
 use crate::ffi::MagiskInit;
 use base::{
-    clone_attr, cstr, debug, error, info,
+    LibcReturn, LoggedResult, MappedFile, MutBytesExt, ResultExt, cstr, debug, error, info,
     libc::{
-        mount, statfs, umount2, MNT_DETACH, MS_BIND, O_CLOEXEC,
-        O_CREAT, O_RDONLY, O_WRONLY, TMPFS_MAGIC,
+        MNT_DETACH, MS_BIND, O_CLOEXEC, O_CREAT, O_RDONLY, O_WRONLY, TMPFS_MAGIC, mount, statfs,
+        umount2,
     },
-    path, raw_cstr, LibcReturn, MappedFile, MutBytesExt, ResultExt,
+    path, raw_cstr,
 };
 use std::{ffi::c_long, io::Write, ptr::null};
 
@@ -113,12 +113,13 @@ impl MagiskInit {
                 error!("Failed to open {} for hexpatch", src);
             }
         }
-        clone_attr(src, dest).log_ok();
-        unsafe {
-            mount(dest.as_ptr(), src.as_ptr(), null(), MS_BIND, null())
-                .as_os_err()
-                .ok();
-        }
+        let _: LoggedResult<()> = try {
+            let attr = src.follow_link().get_attr()?;
+            dest.set_attr(&attr)?;
+            unsafe {
+                mount(dest.as_ptr(), src.as_ptr(), null(), MS_BIND, null()).as_os_err()?;
+            }
+        };
     }
 
     pub(crate) fn second_stage(&mut self) {
