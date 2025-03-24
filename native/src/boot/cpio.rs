@@ -10,18 +10,18 @@ use std::process::exit;
 use std::str;
 
 use argh::FromArgs;
-use bytemuck::{from_bytes, Pod, Zeroable};
+use bytemuck::{Pod, Zeroable, from_bytes};
 use num_traits::cast::AsPrimitive;
 use size::{Base, Size, Style};
 
 use base::libc::{
-    c_char, dev_t, gid_t, major, makedev, minor, mknod, mode_t, uid_t, O_CLOEXEC, O_CREAT,
-    O_RDONLY, O_TRUNC, O_WRONLY, S_IFBLK, S_IFCHR, S_IFDIR, S_IFLNK, S_IFMT, S_IFREG, S_IRGRP,
-    S_IROTH, S_IRUSR, S_IWGRP, S_IWOTH, S_IWUSR, S_IXGRP, S_IXOTH, S_IXUSR,
+    O_CLOEXEC, O_CREAT, O_RDONLY, O_TRUNC, O_WRONLY, S_IFBLK, S_IFCHR, S_IFDIR, S_IFLNK, S_IFMT,
+    S_IFREG, S_IRGRP, S_IROTH, S_IRUSR, S_IWGRP, S_IWOTH, S_IWUSR, S_IXGRP, S_IXOTH, S_IXUSR,
+    c_char, dev_t, gid_t, major, makedev, minor, mknod, mode_t, uid_t,
 };
 use base::{
-    cstr_buf, log_err, map_args, BytesExt, EarlyExitExt, FsPath, LoggedResult, MappedFile,
-    ResultExt, Utf8CStr, Utf8CStrBuf, WriteExt,
+    BytesExt, EarlyExitExt, FsPath, LoggedResult, MappedFile, ResultExt, Utf8CStr, Utf8CStrBuf,
+    WriteExt, cstr_buf, log_err, map_args,
 };
 
 use crate::check_env;
@@ -362,7 +362,7 @@ impl Cpio {
             S_IFLNK => {
                 buf.clear();
                 buf.push_str(str::from_utf8(entry.data.as_slice())?);
-                FsPath::from(&buf).symlink_to(out)?;
+                out.create_symlink_to(FsPath::from(&buf))?;
             }
             S_IFBLK | S_IFCHR => {
                 let dev = makedev(entry.rdevmajor.try_into()?, entry.rdevminor.try_into()?);
