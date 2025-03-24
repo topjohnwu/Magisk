@@ -1,10 +1,12 @@
 use crate::ffi::backup_init;
+use crate::mount::is_rootfs;
+use crate::twostage::hexpatch_init_for_second_stage;
 use crate::{
     ffi::{BootConfig, MagiskInit, magisk_proxy_main},
     logging::setup_klog,
 };
 use base::{
-    FsPath, LibcReturn, LoggedResult, ResultExt, debug, info,
+    FsPath, LibcReturn, LoggedResult, ResultExt, info,
     libc::{basename, getpid, mount, umask},
     path, raw_cstr,
 };
@@ -35,32 +37,71 @@ impl MagiskInit {
         }
     }
 
-    pub(crate) fn legacy_system_as_root(&mut self) {
-        info!("Legacy SAR Init");
+    fn first_stage(&self) {
+        info!("First Stage Init");
         self.prepare_data();
-        let is_two_stage = self.mount_system_root();
-        if is_two_stage {
-            self.patch_init_for_second_stage();
+
+        if !path!("/sdcard").exists() && !path!("/first_stage_ramdisk/sdcard").exists() {
+            self.hijack_init_with_switch_root();
+            self.restore_ramdisk_init();
+        } else {
+            self.restore_ramdisk_init();
+            // Fallback to hexpatch if /sdcard exists
+            hexpatch_init_for_second_stage(true);
+        }
+    }
+
+    fn second_stage(&mut self) {
+        info!("Second Stage Init");
+
+        path!("/init").unmount().ok();
+        path!("/system/bin/init").unmount().ok(); // just in case
+        path!("/data/init").remove().ok();
+
+        unsafe {
+            // Make sure init dmesg logs won't get messed up
+            *self.argv = raw_cstr!("/system/bin/init") as *mut _;
+        }
+
+        // Some weird devices like meizu, uses 2SI but still have legacy rootfs
+        if is_rootfs() {
+            // We are still on rootfs, so make sure we will execute the init of the 2nd stage
+            let init_path = path!("/init");
+            init_path.remove().ok();
+            init_path
+                .create_symlink_to(path!("/system/bin/init"))
+                .log_ok();
+            self.patch_rw_root();
         } else {
             self.patch_ro_root();
         }
     }
 
-    pub(crate) fn rootfs(&mut self) {
+    fn legacy_system_as_root(&mut self) {
+        info!("Legacy SAR Init");
+        self.prepare_data();
+        let is_two_stage = self.mount_system_root();
+        if is_two_stage {
+            hexpatch_init_for_second_stage(false);
+        } else {
+            self.patch_ro_root();
+        }
+    }
+
+    fn rootfs(&mut self) {
         info!("RootFS Init");
         self.prepare_data();
-        debug!("Restoring /init\n");
-        path!("/.backup/init").rename_to(path!("/init")).log_ok();
+        self.restore_ramdisk_init();
         self.patch_rw_root();
     }
 
-    pub(crate) fn recovery(&self) {
+    fn recovery(&self) {
         info!("Ramdisk is recovery, abort");
         self.restore_ramdisk_init();
         path!("/.backup").remove_all().ok();
     }
 
-    pub(crate) fn restore_ramdisk_init(&self) {
+    fn restore_ramdisk_init(&self) {
         path!("/init").remove().ok();
 
         let orig_init = FsPath::from(backup_init());
