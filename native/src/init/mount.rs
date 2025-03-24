@@ -1,23 +1,23 @@
 use crate::ffi::MagiskInit;
+use base::libc::{TMPFS_MAGIC, statfs};
 use base::{
-    cstr, debug, libc,
-    libc::{chdir, chroot, execve, exit, mount, umount2, MNT_DETACH, MS_MOVE},
-    parse_mount_info, path, raw_cstr, Directory, LibcReturn, LoggedResult, ResultExt, StringExt,
-    Utf8CStr,
+    Directory, FsPath, FsPathBuf, LibcReturn, LoggedResult, ResultExt, Utf8CStr, cstr, debug, libc,
+    libc::{chdir, chroot, execve, exit, mount},
+    parse_mount_info, path, raw_cstr,
 };
 use cxx::CxxString;
+use std::ffi::c_long;
 use std::{
     collections::BTreeSet,
     ops::Bound::{Excluded, Unbounded},
     pin::Pin,
-    ptr::null as nullptr,
 };
 
 unsafe extern "C" {
     static environ: *const *mut libc::c_char;
 }
 
-pub fn switch_root(path: &Utf8CStr) {
+pub(crate) fn switch_root(path: &Utf8CStr) {
     let res: LoggedResult<()> = try {
         debug!("Switch root to {}", path);
         let mut mounts = BTreeSet::new();
@@ -34,26 +34,19 @@ pub fn switch_root(path: &Utf8CStr) {
                     continue;
                 }
             }
-            let mut new_path = format!("{}/{}", path.as_str(), &info.target);
-            std::fs::create_dir(&new_path).ok();
 
-            unsafe {
-                let mut target = info.target.clone();
-                mount(
-                    target.nul_terminate().as_ptr().cast(),
-                    new_path.nul_terminate().as_ptr().cast(),
-                    nullptr(),
-                    MS_MOVE,
-                    nullptr(),
-                )
-                .as_os_err()?;
-            }
-
+            let mut target = info.target.clone();
+            let target = FsPath::from(Utf8CStr::from_string(&mut target));
+            let new_path = FsPathBuf::default()
+                .join(path)
+                .join(info.target.trim_start_matches('/'));
+            new_path.mkdirs(0o755).ok();
+            target.move_mount_to(&new_path)?;
             mounts.insert(info.target);
         }
         unsafe {
             chdir(path.as_ptr()).as_os_err()?;
-            mount(path.as_ptr(), raw_cstr!("/"), nullptr(), MS_MOVE, nullptr()).as_os_err()?;
+            FsPath::from(path).move_mount_to(path!("/"))?;
             chroot(raw_cstr!("."));
         }
 
@@ -63,7 +56,7 @@ pub fn switch_root(path: &Utf8CStr) {
     res.ok();
 }
 
-pub fn is_device_mounted(dev: u64, target: Pin<&mut CxxString>) -> bool {
+pub(crate) fn is_device_mounted(dev: u64, target: Pin<&mut CxxString>) -> bool {
     for mount in parse_mount_info("self") {
         if mount.root == "/" && mount.device == dev {
             target.push_str(&mount.target);
@@ -71,6 +64,16 @@ pub fn is_device_mounted(dev: u64, target: Pin<&mut CxxString>) -> bool {
         }
     }
     false
+}
+
+const RAMFS_MAGIC: u64 = 0x858458f6;
+
+pub(crate) fn is_rootfs() -> bool {
+    unsafe {
+        let mut sfs: statfs = std::mem::zeroed();
+        statfs(raw_cstr!("/"), &mut sfs);
+        sfs.f_type as u64 == RAMFS_MAGIC || sfs.f_type as c_long == TMPFS_MAGIC
+    }
 }
 
 impl MagiskInit {
@@ -96,21 +99,17 @@ impl MagiskInit {
             .log_ok();
     }
 
-    pub(crate) fn exec_init(&self) {
-        unsafe {
-            for p in self.mount_list.iter().rev() {
-                if umount2(p.as_ptr().cast(), MNT_DETACH)
-                    .as_os_err()
-                    .log()
-                    .is_ok()
-                {
-                    debug!("Unmount [{}]", p);
-                }
+    pub(crate) fn exec_init(&mut self) {
+        for path in self.mount_list.iter_mut().rev() {
+            let path = FsPath::from(Utf8CStr::from_string(path));
+            if path.unmount().log().is_ok() {
+                debug!("Unmount [{}]", path);
             }
+        }
+        unsafe {
             execve(raw_cstr!("/init"), self.argv.cast(), environ.cast())
                 .as_os_err()
-                .log()
-                .ok();
+                .log_ok();
             exit(1);
         }
     }

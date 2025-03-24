@@ -1,15 +1,14 @@
 use std::{
     cmp::Ordering::{Greater, Less},
     path::{Path, PathBuf},
-    ptr,
 };
 
 use num_traits::AsPrimitive;
 
 use base::libc::{c_uint, dev_t};
 use base::{
-    cstr, cstr_buf, debug, info, libc, parse_mount_info, raw_cstr, warn, FsPath, FsPathBuf,
-    LibcReturn, LoggedResult, MountInfo, ResultExt, Utf8CStr,
+    FsPath, FsPathBuf, LibcReturn, LoggedResult, MountInfo, ResultExt, Utf8CStr, cstr, cstr_buf,
+    debug, info, libc, parse_mount_info, path, warn,
 };
 
 use crate::consts::{MODULEMNT, MODULEROOT, PREINITDEV, PREINITMIRR, WORKERDIR};
@@ -73,24 +72,8 @@ pub fn setup_mounts() {
     let module_mnt = FsPathBuf::default().join(magisk_tmp).join(MODULEMNT);
     let _: LoggedResult<()> = try {
         module_mnt.mkdir(0o755)?;
-        unsafe {
-            libc::mount(
-                raw_cstr!(MODULEROOT),
-                module_mnt.as_ptr(),
-                ptr::null(),
-                libc::MS_BIND,
-                ptr::null(),
-            )
-            .as_os_err()?;
-            libc::mount(
-                ptr::null(),
-                module_mnt.as_ptr(),
-                ptr::null(),
-                libc::MS_REMOUNT | libc::MS_BIND | libc::MS_RDONLY,
-                ptr::null(),
-            )
-            .as_os_err()?;
-        }
+        path!(MODULEROOT).bind_mount_to(&module_mnt)?;
+        module_mnt.remount_with_flags(libc::MS_RDONLY)?;
     };
 }
 
@@ -98,26 +81,13 @@ pub fn clean_mounts() {
     let magisk_tmp = get_magisk_tmp();
 
     let mut module_mnt = FsPathBuf::default().join(magisk_tmp).join(MODULEMNT);
-    let _: LoggedResult<()> = try {
-        unsafe {
-            libc::umount2(module_mnt.as_ptr(), libc::MNT_DETACH).as_os_err()?;
-        }
-    };
+    module_mnt.unmount().log_ok();
 
     module_mnt.clear();
     let worker_dir = module_mnt.join(magisk_tmp).join(WORKERDIR);
     let _: LoggedResult<()> = try {
-        unsafe {
-            libc::mount(
-                ptr::null(),
-                worker_dir.as_ptr(),
-                ptr::null(),
-                libc::MS_PRIVATE | libc::MS_REC,
-                ptr::null(),
-            )
-            .as_os_err()?;
-            libc::umount2(worker_dir.as_ptr(), libc::MNT_DETACH).as_os_err()?;
-        }
+        worker_dir.set_mount_private(true)?;
+        worker_dir.unmount()?;
     };
 }
 
