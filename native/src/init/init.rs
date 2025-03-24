@@ -1,15 +1,15 @@
 use crate::ffi::backup_init;
 use crate::{
-    ffi::{magisk_proxy_main, BootConfig, MagiskInit},
+    ffi::{BootConfig, MagiskInit, magisk_proxy_main},
     logging::setup_klog,
 };
 use base::{
-    debug, info,
+    FsPath, LibcReturn, LoggedResult, ResultExt, debug, info,
     libc::{basename, getpid, mount, umask},
-    path, raw_cstr, FsPath, LibcReturn, LoggedResult, ResultExt,
+    path, raw_cstr,
 };
 use std::{
-    ffi::{c_char, CStr},
+    ffi::{CStr, c_char},
     ptr::null,
 };
 
@@ -38,8 +38,9 @@ impl MagiskInit {
     pub(crate) fn legacy_system_as_root(&mut self) {
         info!("Legacy SAR Init");
         self.prepare_data();
-        if self.mount_system_root() {
-            self.redirect_second_stage();
+        let is_two_stage = self.mount_system_root();
+        if is_two_stage {
+            self.patch_init_for_second_stage();
         } else {
             self.patch_ro_root();
         }
@@ -70,8 +71,8 @@ impl MagiskInit {
             // If the backup init is missing, this means that the boot ramdisk
             // was created from scratch, and the real init is in a separate CPIO,
             // which is guaranteed to be placed at /system/bin/init.
-            path!("/system/bin/init")
-                .symlink_to(path!("/init"))
+            path!("/init")
+                .create_symlink_to(path!("/system/bin/init"))
                 .log_ok();
         }
     }

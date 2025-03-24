@@ -1,11 +1,11 @@
 use crate::{
-    cstr_buf, errno, error, Directory, FsPath, FsPathBuf, FsPathFollow, LibcReturn, Utf8CStr,
-    Utf8CStrBuf,
+    Directory, FsPath, FsPathBuf, FsPathFollow, LibcReturn, Utf8CStr, Utf8CStrBuf, cstr_buf, errno,
+    error,
 };
-use bytemuck::{bytes_of, bytes_of_mut, Pod};
+use bytemuck::{Pod, bytes_of, bytes_of_mut};
 use libc::{
-    c_uint, makedev, mode_t, stat, EEXIST, ENOENT, F_OK, O_CLOEXEC, O_CREAT, O_PATH, O_RDONLY,
-    O_RDWR, O_TRUNC, O_WRONLY,
+    EEXIST, ENOENT, F_OK, O_CLOEXEC, O_CREAT, O_PATH, O_RDONLY, O_RDWR, O_TRUNC, O_WRONLY, c_uint,
+    makedev, mode_t, stat,
 };
 use mem::MaybeUninit;
 use num_traits::AsPrimitive;
@@ -400,6 +400,20 @@ impl FsPath {
         self.rename_to(path)
     }
 
+    pub fn parent(&self, buf: &mut dyn Utf8CStrBuf) -> bool {
+        buf.clear();
+        if let Some(parent) = Path::new(self.as_str()).parent() {
+            let bytes = parent.as_os_str().as_bytes();
+            // SAFETY: all substring of self is valid UTF-8
+            let parent = unsafe { std::str::from_utf8_unchecked(bytes) };
+            buf.push_str(parent);
+            true
+        } else {
+            false
+        }
+    }
+
+    // ln self path
     pub fn link_to(&self, path: &FsPath) -> io::Result<()> {
         let attr = self.get_attr()?;
         if attr.is_dir() {
@@ -413,21 +427,9 @@ impl FsPath {
         }
     }
 
-    pub fn symlink_to(&self, path: &FsPath) -> io::Result<()> {
-        unsafe { libc::symlink(self.as_ptr(), path.as_ptr()).as_os_err() }
-    }
-
-    pub fn parent(&self, buf: &mut dyn Utf8CStrBuf) -> bool {
-        buf.clear();
-        if let Some(parent) = Path::new(self.as_str()).parent() {
-            let bytes = parent.as_os_str().as_bytes();
-            // SAFETY: all substring of self is valid UTF-8
-            let parent = unsafe { std::str::from_utf8_unchecked(bytes) };
-            buf.push_str(parent);
-            true
-        } else {
-            false
-        }
+    // ln -s target self
+    pub fn create_symlink_to(&self, target: &FsPath) -> io::Result<()> {
+        unsafe { libc::symlink(target.as_ptr(), self.as_ptr()).as_os_err() }
     }
 }
 
