@@ -205,9 +205,9 @@ else
     test_main $api
   done
   # Android 16 Beta
-  test_main Baklava google_apis
+  test_main 36 google_apis
   # Run 16k page tests
-  test_main Baklava google_apis_ps16k
+  test_main 36 google_apis_ps16k
 fi
 
 "$avd" delete avd -n test
