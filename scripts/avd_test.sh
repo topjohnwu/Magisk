@@ -21,20 +21,6 @@ cleanup() {
   exit 1
 }
 
-wait_for_bootanim() {
-  set -e
-  adb wait-for-device
-  while true; do
-    local result="$(adb exec-out getprop init.svc.bootanim)"
-    if [ $? -ne 0 ]; then
-      exit 1
-    elif [ "$result" = "stopped" ]; then
-      break
-    fi
-    sleep 2
-  done
-}
-
 wait_for_boot() {
   set -e
   adb wait-for-device
@@ -50,10 +36,9 @@ wait_for_boot() {
 }
 
 wait_emu() {
-  local wait_fn=$1
   local which_pid
 
-  timeout $boot_timeout bash -c $wait_fn &
+  timeout $boot_timeout bash -c wait_for_boot &
   local wait_pid=$!
 
   # Handle the case when emulator dies earlier than timeout
@@ -75,12 +60,12 @@ test_emu() {
   fi
 
   emu_pid=$!
-  wait_emu wait_for_boot
+  wait_emu
 
   run_setup $variant
 
   adb reboot
-  wait_emu wait_for_boot
+  wait_emu
 
   run_tests
 }
@@ -136,7 +121,7 @@ test_main() {
   print_title "* Launching $avd_pkg"
   "$emu" @test $emu_args >/dev/null 2>&1 &
   emu_pid=$!
-  wait_emu wait_for_bootanim
+  wait_emu
 
   # Update arguments for Magisk runs
   emu_args="$emu_args -ramdisk magisk_patched.img -feature -SystemAsRoot"
@@ -168,7 +153,6 @@ test_main() {
 
 trap cleanup EXIT
 export -f wait_for_boot
-export -f wait_for_bootanim
 
 case $(uname -m) in
   'arm64'|'aarch64')
