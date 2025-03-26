@@ -25,6 +25,7 @@
 
     <application
         android:allowBackup="false"
+        android:enableOnBackInvokedCallback="false"
         android:label="Magisk"
         android:requestLegacyExternalStorage="true"
         android:supportsRtl="true"
