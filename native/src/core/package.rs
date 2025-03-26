@@ -1,11 +1,11 @@
 use crate::consts::{APP_PACKAGE_NAME, MAGISK_VER_CODE};
-use crate::daemon::{to_app_id, MagiskD, AID_APP_END, AID_APP_START, AID_USER_OFFSET};
-use crate::ffi::{get_magisk_tmp, install_apk, uninstall_pkg, DbEntryKey};
-use base::libc::{O_CLOEXEC, O_CREAT, O_RDONLY, O_TRUNC, O_WRONLY};
+use crate::daemon::{AID_APP_END, AID_APP_START, AID_USER_OFFSET, MagiskD, to_app_id};
+use crate::ffi::{DbEntryKey, get_magisk_tmp, install_apk, uninstall_pkg};
 use base::WalkResult::{Abort, Continue, Skip};
+use base::libc::{O_CLOEXEC, O_CREAT, O_RDONLY, O_TRUNC, O_WRONLY};
 use base::{
-    cstr, cstr_buf, error, fd_get_attr, open_fd, warn, BufReadExt, Directory, FsPath, FsPathBuf,
-    LoggedResult, ReadExt, ResultExt, Utf8CStrBuf,
+    BufReadExt, Directory, FsPath, FsPathBuf, LoggedResult, ReadExt, ResultExt, Utf8CStrBuf, cstr,
+    cstr_buf, error, fd_get_attr, open_fd, warn,
 };
 use bit_set::BitSet;
 use cxx::CxxString;
@@ -357,7 +357,7 @@ impl ManagerInfo {
         {
             // no APK
             if file.path == Path::new("/data/system/packages.xml") {
-                if install {
+                if install && !daemon.is_emulator {
                     self.install_stub();
                 }
                 return (-1, "");
@@ -402,7 +402,7 @@ impl ManagerInfo {
                         )
                     } else {
                         (-1, "")
-                    }
+                    };
                 }
                 Status::NotInstalled => {
                     daemon.rm_db_string(DbEntryKey::SuManager).ok();
@@ -434,7 +434,7 @@ impl ManagerInfo {
         self.tracked_files
             .insert(user, TrackedFile::new("/data/system/packages.xml"));
 
-        if install {
+        if install && !daemon.is_emulator {
             self.install_stub();
         }
         (-1, "")
