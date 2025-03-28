@@ -177,8 +177,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - branch: "aosp-main"
-            device: "aosp_cf_x86_64_phone"
+          - branch: "aosp-android-latest-release"
+            device: "aosp_cf_x86_64_only_phone"
 
     steps:
       - name: Check out
