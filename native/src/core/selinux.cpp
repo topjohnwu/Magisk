@@ -119,6 +119,7 @@ void restorecon() {
     lsetfilecon(MODULEROOT, SYSTEM_CON);
     restore_syscon_from_null(xopen(MODULEROOT, O_RDONLY | O_CLOEXEC));
     restore_syscon(xopen(DATABIN, O_RDONLY | O_CLOEXEC));
+    chmod(MAGISKDB, 0000);
 }
 
 void restore_tmpcon() {
