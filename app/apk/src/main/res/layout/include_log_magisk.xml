@@ -16,6 +16,7 @@
         android:layout_height="match_parent">
 
         <HorizontalScrollView
+            android:id="@+id/log_scroll_magisk"
             gone="@{viewModel.loading}"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
