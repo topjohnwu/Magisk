@@ -150,25 +150,14 @@ def cmd_out(cmds: list):
 def clean_elf():
     if is_windows:
         elf_cleaner = Path("tools", "elf-cleaner.exe")
+        cmds = [elf_cleaner, "--api-level", "23"]
+        run = execv
     else:
-        elf_cleaner = Path("native", "out", "elf-cleaner")
-        if not elf_cleaner.exists():
-            execv(
-                [
-                    "gcc",
-                    '-DPACKAGE_NAME="termux-elf-cleaner"',
-                    '-DPACKAGE_VERSION="2.1.1"',
-                    '-DCOPYRIGHT="Copyright (C) 2022 Termux."',
-                    "tools/termux-elf-cleaner/elf-cleaner.cpp",
-                    "tools/termux-elf-cleaner/arghandling.c",
-                    "-o",
-                    elf_cleaner,
-                ]
-            )
-    cmds = [elf_cleaner, "--api-level", "23"]
+        cmds = ["run", "--release", "--manifest-path", "tools/elf-cleaner/Cargo.toml", "--bin", "elf-cleaner"]
+        run = run_cargo
     cmds.extend(glob.glob("native/out/*/magisk"))
     cmds.extend(glob.glob("native/out/*/magiskpolicy"))
-    execv(cmds)
+    run(cmds)
 
 
 def run_ndk_build(cmds: list):

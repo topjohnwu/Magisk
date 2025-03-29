@@ -1,0 +1,14 @@
+[package]
+name = "elf-cleaner"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+lief = { git = "https://github.com/lief-project/LIEF", branch = "main" }
+
+[profile.release]
+opt-level = "z"
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = false
