@@ -19,7 +19,7 @@ run_cvd_bin() {
 }
 
 setup_env() {
-  curl -LO https://github.com/topjohnwu/magisk-files/releases/download/files/cuttlefish-base_0.9.30_amd64.deb
+  curl -LO https://github.com/topjohnwu/magisk-files/releases/download/files/cuttlefish-base_1.2.0_amd64.deb
   sudo dpkg -i ./cuttlefish-base_*_*64.deb || sudo apt-get install -f
   rm cuttlefish-base_*_*64.deb
   echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -37,12 +37,12 @@ download_cf() {
   local device=$2
 
   if [ -z $branch ]; then
-    branch='aosp-main'
+    branch='aosp-android-latest-release'
   fi
   if [ -z $device ]; then
-    device='aosp_cf_x86_64_phone'
+    device='aosp_cf_x86_64_only_phone'
   fi
-  local target="${device}-trunk_staging-userdebug"
+  local target="${device}-userdebug"
 
   local build_id=$(curl -sL https://ci.android.com/builds/branches/${branch}/status.json | \
     jq -r ".targets[] | select(.name == \"$target\") | .last_known_good_build")
