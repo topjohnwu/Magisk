@@ -40,12 +40,9 @@
 
 ### Developing Rust
 
-The Magisk NDK package [ONDK](https://github.com/topjohnwu/ondk) (the one installed with `./build.py ndk`) bundles a complete Rust toolchain, so _building_ the Magisk project itself does not require any further configuration. However, if you'd like to work on the Rust codebase with proper support, you'd need some setup as most development tools are built around `rustup`.
+First, install [rustup](https://www.rust-lang.org/tools/install), the official Rust toolchain manager. The Magisk NDK package [ONDK](https://github.com/topjohnwu/ondk) (the one installed with `./build.py ndk`) bundles a complete Rust toolchain, so _building_ the Magisk project itself does not require any further configuration.
 
-Let's first setup `rustup` to use our custom ONDK Rust toolchain by default:
-
-- Install [rustup](https://rustup.rs/), the official Rust toolchain manager
-- Link the ONDK Rust toolchain and set it as default:
+However, if you'd like to work on the Rust codebase, it'll be easier if you link ONDK's Rust toolchain in `rustup` and set it as default so several development tools and IDEs will work properly:
 
 ```bash
 # Link the ONDK toolchain with the name "magisk"
@@ -54,7 +51,7 @@ rustup toolchain link magisk "$ANDROID_HOME/ndk/magisk/toolchains/rust"
 rustup default magisk
 ```
 
-If you plan to use VSCode, you can then install the [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer) plugin and everything should be good to go. If you plan to use Jetbrain IDEs (e.g. [Rustrover](https://www.jetbrains.com/rust/), or its Rust Plugin), due to its poor support with custom toolchains, we need some additional setup:
+If you plan to use VSCode, you can then install the [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer) plugin and everything should be good to go. If you plan to use Jetbrain IDEs (e.g. [Rustrover](https://www.jetbrains.com/rust/), or its Rust Plugin), we need some additional setup:
 
 - Install the official nightly toolchain and add some components. We won't actually use the nightly toolchain for anything other than tricking the IDE to cooperate; the magic happens in the wrapper we setup in the next step.
 

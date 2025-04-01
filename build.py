@@ -234,10 +234,9 @@ def build_cpp_src(targets: set):
 def run_cargo(cmds):
     ensure_paths()
     env = os.environ.copy()
-    env["PATH"] = f'{rust_bin}{os.pathsep}{env["PATH"]}'
-    env["CARGO_BUILD_RUSTC"] = str(rust_bin / f"rustc{EXE_EXT}")
+    env["RUSTUP_TOOLCHAIN"] = str(rust_sysroot)
     env["CARGO_BUILD_RUSTFLAGS"] = f"-Z threads={min(8, cpu_count)}"
-    return execv([cargo, *cmds], env)
+    return execv(["cargo", *cmds], env)
 
 
 def build_rust_src(targets: set):
@@ -505,12 +504,10 @@ def build_all():
 def clippy_cli():
     args.force_out = True
     os.chdir(Path("native", "src"))
-    cmds = ["clippy", "--no-deps"]
+    cmds = ["clippy", "--no-deps", "--target"]
     for triple in build_abis.values():
-        cmds.append("--target")
-        cmds.append(triple)
-    run_cargo(cmds)
-    run_cargo(cmds + ["--release"])
+        run_cargo(cmds + [triple])
+        run_cargo(cmds + [triple, "--release"])
     os.chdir(Path("..", ".."))
 
 
@@ -653,8 +650,8 @@ def patch_avd_file():
 
 
 def ensure_paths():
-    global sdk_path, ndk_root, ndk_path, ndk_build, rust_bin
-    global llvm_bin, cargo, gradlew, adb_path, native_gen_path
+    global sdk_path, ndk_root, ndk_path, ndk_build, rust_sysroot
+    global llvm_bin, gradlew, adb_path, native_gen_path
 
     # Skip if already initialized
     if "sdk_path" in globals():
@@ -671,11 +668,10 @@ def ensure_paths():
     ndk_root = sdk_path / "ndk"
     ndk_path = ndk_root / "magisk"
     ndk_build = ndk_path / "ndk-build"
-    rust_bin = ndk_path / "toolchains" / "rust" / "bin"
+    rust_sysroot = ndk_path / "toolchains" / "rust"
     llvm_bin = (
         ndk_path / "toolchains" / "llvm" / "prebuilt" / f"{os_name}-x86_64" / "bin"
     )
-    cargo = rust_bin / "cargo"
     adb_path = sdk_path / "platform-tools" / "adb"
     gradlew = Path.cwd() / "gradlew"
 
