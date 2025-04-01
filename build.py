@@ -148,27 +148,16 @@ def cmd_out(cmds: list):
 
 
 def clean_elf():
-    if is_windows:
-        elf_cleaner = Path("tools", "elf-cleaner.exe")
-    else:
-        elf_cleaner = Path("native", "out", "elf-cleaner")
-        if not elf_cleaner.exists():
-            execv(
-                [
-                    "gcc",
-                    '-DPACKAGE_NAME="termux-elf-cleaner"',
-                    '-DPACKAGE_VERSION="2.1.1"',
-                    '-DCOPYRIGHT="Copyright (C) 2022 Termux."',
-                    "tools/termux-elf-cleaner/elf-cleaner.cpp",
-                    "tools/termux-elf-cleaner/arghandling.c",
-                    "-o",
-                    elf_cleaner,
-                ]
-            )
-    cmds = [elf_cleaner, "--api-level", "23"]
+    cargo_toml = Path("tools", "elf-cleaner", "Cargo.toml")
+    cmds = ["run", "--release", "--manifest-path", cargo_toml]
+    if args.verbose == 0:
+        cmds.append("-q")
+    elif args.verbose > 1:
+        cmds.append("--verbose")
+    cmds.append("--")
     cmds.extend(glob.glob("native/out/*/magisk"))
     cmds.extend(glob.glob("native/out/*/magiskpolicy"))
-    execv(cmds)
+    run_cargo(cmds)
 
 
 def run_ndk_build(cmds: list):
@@ -484,6 +473,7 @@ def cleanup():
 
     if "native" in targets:
         rm_rf(Path("native", "out"))
+        rm_rf(Path("tools", "elf-cleaner", "target"))
 
     if "app" in targets:
         header("* Cleaning app")
@@ -553,8 +543,8 @@ def setup_rustup():
         tgt = wrapper_dir / src.name
         tgt.symlink_to(f"rustup{EXE_EXT}")
 
-    # Build rustup_wrapper
-    wrapper_src = Path("tools", "rustup_wrapper")
+    # Build rustup-wrapper
+    wrapper_src = Path("tools", "rustup-wrapper")
     cargo_toml = wrapper_src / "Cargo.toml"
     cmds = ["build", "--release", f"--manifest-path={cargo_toml}"]
     if args.verbose > 1:
@@ -564,7 +554,7 @@ def setup_rustup():
     # Replace rustup with wrapper
     wrapper = wrapper_dir / (f"rustup{EXE_EXT}")
     wrapper.unlink(missing_ok=True)
-    cp(wrapper_src / "target" / "release" / (f"rustup_wrapper{EXE_EXT}"), wrapper)
+    cp(wrapper_src / "target" / "release" / (f"rustup-wrapper{EXE_EXT}"), wrapper)
     wrapper.chmod(0o755)
 
 

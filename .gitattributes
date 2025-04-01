@@ -12,7 +12,8 @@
 
 # Denote all files that are truly binary and should not be modified.
 tools/** binary
-tools/rustup_wrapper/** -binary
+tools/rustup-wrapper/** -binary
+tools/elf-cleaner/** -binary
 *.jar binary
 *.exe binary
 *.apk binary
