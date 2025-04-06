@@ -3,11 +3,12 @@
 #![feature(try_blocks)]
 #![allow(clippy::missing_safety_doc)]
 
+use base::FsPath;
 use logging::setup_klog;
 // Has to be pub so all symbols in that crate is included
 pub use magiskpolicy;
 use mount::{is_device_mounted, switch_root};
-use rootdir::{inject_magisk_rc, OverlayAttr};
+use rootdir::{OverlayAttr, inject_magisk_rc};
 
 #[path = "../include/consts.rs"]
 mod consts;
@@ -16,6 +17,7 @@ mod init;
 mod logging;
 mod mount;
 mod rootdir;
+mod selinux;
 mod twostage;
 
 #[cxx::bridge]
@@ -56,6 +58,12 @@ pub mod ffi {
 
         unsafe fn magisk_proxy_main(argc: i32, argv: *mut *mut c_char) -> i32;
         fn backup_init() -> Utf8CStrRef<'static>;
+
+        // Constants
+        fn split_plat_cil() -> Utf8CStrRef<'static>;
+        fn preload_lib() -> Utf8CStrRef<'static>;
+        fn preload_policy() -> Utf8CStrRef<'static>;
+        fn preload_ack() -> Utf8CStrRef<'static>;
     }
 
     #[namespace = "rust"]
@@ -81,6 +89,7 @@ pub mod ffi {
         type OverlayAttr;
         fn parse_config_file(self: &mut MagiskInit);
         fn mount_overlay(self: &mut MagiskInit, dest: Utf8CStrRef);
+        fn handle_sepolicy(self: &mut MagiskInit);
         fn restore_overlay_contexts(self: &MagiskInit);
     }
     unsafe extern "C++" {
@@ -94,7 +103,21 @@ pub mod ffi {
         fn collect_devices(self: &MagiskInit);
         fn mount_preinit_dir(self: &MagiskInit);
         unsafe fn find_block(self: &MagiskInit, partname: *const c_char) -> u64;
-        fn handle_sepolicy(self: &mut MagiskInit);
         unsafe fn patch_fissiond(self: &mut MagiskInit, tmp_path: *const c_char);
     }
+}
+
+#[inline(always)]
+fn preload_lib() -> &'static FsPath {
+    FsPath::from(ffi::preload_lib())
+}
+
+#[inline(always)]
+fn preload_policy() -> &'static FsPath {
+    FsPath::from(ffi::preload_policy())
+}
+
+#[inline(always)]
+fn preload_ack() -> &'static FsPath {
+    FsPath::from(ffi::preload_ack())
 }

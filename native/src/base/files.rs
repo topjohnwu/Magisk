@@ -199,7 +199,7 @@ impl FsPath {
     }
 
     pub fn create(&self, flags: i32, mode: mode_t) -> io::Result<File> {
-        Ok(File::from(open_fd!(self, flags, mode)?))
+        Ok(File::from(open_fd!(self, O_CREAT | flags, mode)?))
     }
 
     pub fn exists(&self) -> bool {
@@ -430,6 +430,10 @@ impl FsPath {
     // ln -s target self
     pub fn create_symlink_to(&self, target: &FsPath) -> io::Result<()> {
         unsafe { libc::symlink(target.as_ptr(), self.as_ptr()).as_os_err() }
+    }
+
+    pub fn mkfifo(&self, mode: mode_t) -> io::Result<()> {
+        unsafe { libc::mkfifo(self.as_ptr(), mode).as_os_err() }
     }
 }
 
