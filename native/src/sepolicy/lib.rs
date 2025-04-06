@@ -87,14 +87,20 @@ pub mod ffi {
         fn parse_statement(self: &mut SePolicy, statement: Utf8CStrRef);
         fn magisk_rules(self: &mut SePolicy);
         fn load_rule_file(self: &mut SePolicy, filename: Utf8CStrRef);
-        fn load_rules(self: &mut SePolicy, rules: &CxxString);
+        #[cxx_name = "load_rules"]
+        fn load_rules_for_cxx(self: &mut SePolicy, rules: &CxxString);
         #[Self = SePolicy]
         fn xperm_to_string(perm: &Xperm) -> String;
     }
 }
 
 impl SePolicy {
-    fn load_rules(self: &mut SePolicy, rules: &CxxString) {
+    fn load_rules_for_cxx(self: &mut SePolicy, rules: &CxxString) {
+        let mut cursor = Cursor::new(rules.as_bytes());
+        self.load_rules_from_reader(&mut cursor);
+    }
+
+    pub fn load_rules(self: &mut SePolicy, rules: &str) {
         let mut cursor = Cursor::new(rules.as_bytes());
         self.load_rules_from_reader(&mut cursor);
     }

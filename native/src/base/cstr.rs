@@ -1,4 +1,4 @@
-use cxx::{type_id, ExternType};
+use cxx::{ExternType, type_id};
 use libc::c_char;
 use std::borrow::Borrow;
 use std::cmp::min;
@@ -480,6 +480,11 @@ impl FsPath {
     }
 
     #[inline(always)]
+    pub const fn from_utfcstr(value: &Utf8CStr) -> &FsPath {
+        unsafe { mem::transmute(value) }
+    }
+
+    #[inline(always)]
     pub fn from_mut<T: AsMut<Utf8CStr> + ?Sized>(value: &mut T) -> &mut FsPath {
         unsafe { mem::transmute(value.as_mut()) }
     }
@@ -781,14 +786,10 @@ macro_rules! cstr {
 
 #[macro_export]
 macro_rules! raw_cstr {
-    ($str:expr) => {{
-        $crate::cstr!($str).as_ptr()
-    }};
+    ($str:expr) => {{ $crate::cstr!($str).as_ptr() }};
 }
 
 #[macro_export]
 macro_rules! path {
-    ($str:expr) => {{
-        $crate::FsPath::from($crate::cstr!($str))
-    }};
+    ($str:expr) => {{ $crate::FsPath::from_utfcstr($crate::cstr!($str)) }};
 }

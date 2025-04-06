@@ -27,3 +27,4 @@ pub const DEVICEDIR: &str = concatcp!(INTERNAL_DIR, "/device");
 pub const PREINITDEV: &str = concatcp!(DEVICEDIR, "/preinit");
 pub const ROOTOVL: &str = concatcp!(INTERNAL_DIR, "/rootdir");
 pub const ROOTMNT: &str = concatcp!(ROOTOVL, "/.mount_list");
+pub const SELINUXMOCK: &str = concatcp!(INTERNAL_DIR, "/selinux");
