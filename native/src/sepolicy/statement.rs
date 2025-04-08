@@ -1,10 +1,11 @@
 use std::fmt::{Display, Formatter, Write};
-use std::io::stderr;
+use std::io::{BufRead, BufReader, Cursor, stderr};
 use std::{iter::Peekable, vec::IntoIter};
 
-use crate::ffi::Xperm;
 use crate::SePolicy;
-use base::{error, warn, FmtAdaptor};
+use crate::ffi::Xperm;
+use base::libc::{O_CLOEXEC, O_RDONLY};
+use base::{BufReadExt, FmtAdaptor, FsPath, LoggedResult, Utf8CStr, error, warn};
 
 pub enum Token<'a> {
     AL,
@@ -442,7 +443,28 @@ fn tokenize_statement(statement: &str) -> Vec<Token> {
 }
 
 impl SePolicy {
-    pub fn parse_statement(self: &mut SePolicy, statement: &str) {
+    pub fn load_rules(self: &mut SePolicy, rules: &str) {
+        let mut cursor = Cursor::new(rules.as_bytes());
+        self.load_rules_from_reader(&mut cursor);
+    }
+
+    pub fn load_rule_file(self: &mut SePolicy, filename: &Utf8CStr) {
+        let result: LoggedResult<()> = try {
+            let file = FsPath::from(filename).open(O_RDONLY | O_CLOEXEC)?;
+            let mut reader = BufReader::new(file);
+            self.load_rules_from_reader(&mut reader);
+        };
+        result.ok();
+    }
+
+    fn load_rules_from_reader<T: BufRead>(self: &mut SePolicy, reader: &mut T) {
+        reader.foreach_lines(|line| {
+            self.parse_statement(line);
+            true
+        });
+    }
+
+    fn parse_statement(self: &mut SePolicy, statement: &str) {
         let statement = statement.trim();
         if statement.is_empty() || statement.starts_with('#') {
             return;

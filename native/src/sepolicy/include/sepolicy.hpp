@@ -17,8 +17,4 @@
 
 // selinuxfs paths
 #define SELINUX_MNT         "/sys/fs/selinux"
-#define SELINUX_ENFORCE     SELINUX_MNT "/enforce"
-#define SELINUX_POLICY      SELINUX_MNT "/policy"
-#define SELINUX_LOAD        SELINUX_MNT "/load"
 #define SELINUX_VERSION     SELINUX_MNT "/policyvers"
-#define SELINUX_REQPROT     SELINUX_MNT "/checkreqprot"
