@@ -1,9 +1,9 @@
 use crate::cxx_extern::readlinkat_for_cxx;
 use crate::{
-    cstr, cstr_buf, errno, fd_path, fd_set_attr, FileAttr, FsPath, LibcReturn, Utf8CStr,
-    Utf8CStrBuf,
+    FileAttr, FsPath, LibcReturn, Utf8CStr, Utf8CStrBuf, cstr, cstr_buf, errno, fd_path,
+    fd_set_attr,
 };
-use libc::{dirent, O_CLOEXEC, O_CREAT, O_RDONLY, O_TRUNC, O_WRONLY};
+use libc::{O_CLOEXEC, O_CREAT, O_RDONLY, O_TRUNC, O_WRONLY, dirent};
 use std::ffi::CStr;
 use std::fs::File;
 use std::ops::Deref;

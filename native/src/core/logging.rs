@@ -1,15 +1,15 @@
-use crate::consts::{LOGFILE, LOG_PIPE};
+use crate::consts::{LOG_PIPE, LOGFILE};
 use crate::ffi::get_magisk_tmp;
 use crate::logging::LogFile::{Actual, Buffer};
 use base::libc::{
-    getpid, gettid, localtime_r, pthread_sigmask, sigaddset, sigset_t, sigtimedwait, time_t,
-    timespec, tm, O_CLOEXEC, O_RDWR, O_WRONLY, PIPE_BUF, SIGPIPE, SIG_BLOCK, SIG_SETMASK,
+    O_CLOEXEC, O_RDWR, O_WRONLY, PIPE_BUF, SIG_BLOCK, SIG_SETMASK, SIGPIPE, getpid, gettid,
+    localtime_r, pthread_sigmask, sigaddset, sigset_t, sigtimedwait, time_t, timespec, tm,
 };
 use base::{
-    const_format::concatcp, cstr_buf, libc, raw_cstr, FsPathBuf, LogLevel, Logger, ReadExt,
-    Utf8CStr, Utf8CStrBuf, WriteExt, LOGGER,
+    FsPathBuf, LOGGER, LogLevel, Logger, ReadExt, Utf8CStr, Utf8CStrBuf, WriteExt,
+    const_format::concatcp, cstr_buf, libc, raw_cstr,
 };
-use bytemuck::{bytes_of, write_zeroes, Pod, Zeroable};
+use bytemuck::{Pod, Zeroable, bytes_of, write_zeroes};
 use num_derive::{FromPrimitive, ToPrimitive};
 use num_traits::FromPrimitive;
 use std::cmp::min;

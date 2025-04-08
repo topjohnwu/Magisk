@@ -1,5 +1,5 @@
-use base::{libc, warn, ReadExt, ResultExt, WriteExt};
-use bytemuck::{bytes_of, bytes_of_mut, Zeroable};
+use base::{ReadExt, ResultExt, WriteExt, libc, warn};
+use bytemuck::{Zeroable, bytes_of, bytes_of_mut};
 use std::io;
 use std::io::{ErrorKind, IoSlice, IoSliceMut, Read, Write};
 use std::mem::ManuallyDrop;

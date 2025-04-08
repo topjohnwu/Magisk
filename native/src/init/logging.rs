@@ -1,10 +1,10 @@
 use base::{
-    cstr,
+    LOGGER, LogLevel, Logger, Utf8CStr, cstr,
     libc::{
-        makedev, mknod, syscall, SYS_dup3, O_CLOEXEC, O_RDWR, O_WRONLY, STDERR_FILENO,
-        STDIN_FILENO, STDOUT_FILENO, S_IFCHR,
+        O_CLOEXEC, O_RDWR, O_WRONLY, S_IFCHR, STDERR_FILENO, STDIN_FILENO, STDOUT_FILENO, SYS_dup3,
+        makedev, mknod, syscall,
     },
-    open_fd, path, raw_cstr, LogLevel, Logger, Utf8CStr, LOGGER,
+    open_fd, path, raw_cstr,
 };
 use std::{
     fs::File,

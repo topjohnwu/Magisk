@@ -1,9 +1,10 @@
 #![allow(improper_ctypes, improper_ctypes_definitions)]
-use crate::daemon::{MagiskD, MAGISKD};
+use crate::daemon::{MAGISKD, MagiskD};
 use crate::ffi::{
-    open_and_init_db, sqlite3, sqlite3_errstr, DbEntryKey, DbStatement, DbValues, MntNsMode,
+    DbEntryKey, DbStatement, DbValues, MntNsMode, open_and_init_db, sqlite3, sqlite3_errstr,
 };
 use crate::socket::{IpcRead, IpcWrite};
+use DbArg::{Integer, Text};
 use base::{LoggedResult, ResultExt, Utf8CStr};
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
@@ -15,7 +16,6 @@ use std::pin::Pin;
 use std::ptr;
 use std::ptr::NonNull;
 use thiserror::Error;
-use DbArg::{Integer, Text};
 
 fn sqlite_err_str(code: i32) -> &'static Utf8CStr {
     // SAFETY: sqlite3 always returns UTF-8 strings

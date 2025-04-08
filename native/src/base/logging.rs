@@ -1,13 +1,13 @@
 use std::fmt;
 use std::fmt::Arguments;
-use std::io::{stderr, stdout, Write};
+use std::io::{Write, stderr, stdout};
 use std::process::exit;
 
 use num_derive::{FromPrimitive, ToPrimitive};
 use num_traits::FromPrimitive;
 
 use crate::ffi::LogLevelCxx;
-use crate::{cstr_buf, Utf8CStr};
+use crate::{Utf8CStr, cstr_buf};
 
 // Ugly hack to avoid using enum
 #[allow(non_snake_case, non_upper_case_globals)]

@@ -2,12 +2,12 @@ use std::{cell::UnsafeCell, process::exit};
 
 use argh::FromArgs;
 use fdt::{
-    node::{FdtNode, NodeProperty},
     Fdt, FdtError,
+    node::{FdtNode, NodeProperty},
 };
 
 use base::{
-    libc::c_char, log_err, map_args, EarlyExitExt, LoggedResult, MappedFile, ResultExt, Utf8CStr,
+    EarlyExitExt, LoggedResult, MappedFile, ResultExt, Utf8CStr, libc::c_char, log_err, map_args,
 };
 
 use crate::{check_env, patch::patch_verity};

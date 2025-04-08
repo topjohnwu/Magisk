@@ -15,18 +15,18 @@ use rsa::pkcs1v15::{
     Signature as RsaSignature, SigningKey as RsaSigningKey, VerifyingKey as RsaVerifyingKey,
 };
 use rsa::pkcs8::SubjectPublicKeyInfoRef;
-use rsa::signature::hazmat::{PrehashSigner, PrehashVerifier};
 use rsa::signature::SignatureEncoding;
+use rsa::signature::hazmat::{PrehashSigner, PrehashVerifier};
 use rsa::{RsaPrivateKey, RsaPublicKey};
 use sha1::Sha1;
 use sha2::{Sha256, Sha384, Sha512};
-use x509_cert::der::asn1::{OctetString, PrintableString};
-use x509_cert::der::Any;
-use x509_cert::spki::AlgorithmIdentifier;
 use x509_cert::Certificate;
+use x509_cert::der::Any;
+use x509_cert::der::asn1::{OctetString, PrintableString};
+use x509_cert::spki::AlgorithmIdentifier;
 
 use base::libc::c_char;
-use base::{log_err, LoggedResult, MappedFile, ResultExt, StrErr, Utf8CStr};
+use base::{LoggedResult, MappedFile, ResultExt, StrErr, Utf8CStr, log_err};
 
 use crate::ffi::BootImage;
 

@@ -3,7 +3,7 @@ use std::fmt::Display;
 use std::panic::Location;
 
 use crate::logging::Formatter;
-use crate::{log_with_args, log_with_formatter, LogLevel};
+use crate::{LogLevel, log_with_args, log_with_formatter};
 
 // Error handling throughout the Rust codebase in Magisk:
 //

@@ -9,10 +9,10 @@ use quick_protobuf::{BytesReader, MessageRead};
 
 use crate::{
     ffi,
-    proto::update_metadata::{mod_InstallOperation::Type, DeltaArchiveManifest},
+    proto::update_metadata::{DeltaArchiveManifest, mod_InstallOperation::Type},
 };
 use base::{
-    error, ffi::Utf8CStrRef, LoggedError, LoggedResult, ReadSeekExt, ResultExt, Utf8CStr, WriteExt,
+    LoggedError, LoggedResult, ReadSeekExt, ResultExt, Utf8CStr, WriteExt, error, ffi::Utf8CStrRef,
 };
 
 macro_rules! bad_payload {

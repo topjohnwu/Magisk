@@ -1,13 +1,13 @@
 use crate::consts::MODULEROOT;
-use crate::daemon::{to_user_id, MagiskD};
+use crate::daemon::{MagiskD, to_user_id};
 use crate::ffi::{
-    get_magisk_tmp, restore_zygisk_prop, update_deny_flags, ZygiskRequest, ZygiskStateFlags,
+    ZygiskRequest, ZygiskStateFlags, get_magisk_tmp, restore_zygisk_prop, update_deny_flags,
 };
 use crate::socket::{IpcRead, UnixSocketExt};
 use base::libc::{O_CLOEXEC, O_CREAT, O_RDONLY, STDOUT_FILENO};
 use base::{
-    cstr, cstr_buf, error, fork_dont_care, libc, open_fd, raw_cstr, warn, Directory, FsPathBuf,
-    LoggedError, LoggedResult, ResultExt, WriteExt,
+    Directory, FsPathBuf, LoggedError, LoggedResult, ResultExt, WriteExt, cstr, cstr_buf, error,
+    fork_dont_care, libc, open_fd, raw_cstr, warn,
 };
 use std::fmt::Write;
 use std::os::fd::{AsRawFd, FromRawFd, RawFd};

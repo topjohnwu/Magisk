@@ -1,12 +1,12 @@
-use crate::{ffi, StrErr, Utf8CStr};
+use crate::{StrErr, Utf8CStr, ffi};
 use argh::EarlyExit;
 use libc::c_char;
 use std::fmt::Arguments;
 use std::io::Write;
 use std::mem::ManuallyDrop;
 use std::process::exit;
-use std::sync::atomic::{AtomicPtr, Ordering};
 use std::sync::Arc;
+use std::sync::atomic::{AtomicPtr, Ordering};
 use std::{fmt, io, slice, str};
 
 pub fn errno() -> &'static mut i32 {

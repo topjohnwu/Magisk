@@ -1,12 +1,12 @@
-use crate::daemon::{to_app_id, to_user_id, MagiskD, AID_ROOT, AID_SHELL};
+use crate::UCred;
+use crate::daemon::{AID_ROOT, AID_SHELL, MagiskD, to_app_id, to_user_id};
 use crate::db::{DbSettings, MultiuserMode, RootAccess};
 use crate::ffi::{
-    app_log, app_notify, app_request, exec_root_shell, SuAppRequest, SuPolicy, SuRequest,
+    SuAppRequest, SuPolicy, SuRequest, app_log, app_notify, app_request, exec_root_shell,
 };
 use crate::socket::IpcRead;
 use crate::su::db::RootSettings;
-use crate::UCred;
-use base::{debug, error, exit_on_error, libc, warn, LoggedResult, ResultExt, WriteExt};
+use base::{LoggedResult, ResultExt, WriteExt, debug, error, exit_on_error, libc, warn};
 use std::fs::File;
 use std::os::fd::{FromRawFd, IntoRawFd};
 use std::os::unix::net::UnixStream;

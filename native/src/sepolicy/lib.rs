@@ -2,10 +2,7 @@
 #![feature(try_blocks)]
 
 pub use base;
-use base::libc::{O_CLOEXEC, O_RDONLY};
-use base::{BufReadExt, FsPath, LoggedResult, Utf8CStr};
 use std::fmt::Write;
-use std::io::{BufRead, BufReader, Cursor};
 
 use crate::ffi::SePolicy;
 

@@ -1,5 +1,5 @@
-use crate::{ffi::Xperm, SePolicy};
-use base::{set_log_level_state, LogLevel};
+use crate::{SePolicy, ffi::Xperm};
+use base::{LogLevel, set_log_level_state};
 
 macro_rules! rules {
     (@args all) => {

@@ -9,15 +9,15 @@ use std::{
 
 use quick_protobuf::{BytesReader, MessageRead, MessageWrite, Writer};
 
-use crate::ffi::{prop_cb_exec, PropCb};
+use crate::ffi::{PropCb, prop_cb_exec};
 use crate::resetprop::proto::persistent_properties::{
-    mod_PersistentProperties::PersistentPropertyRecord, PersistentProperties,
+    PersistentProperties, mod_PersistentProperties::PersistentPropertyRecord,
 };
 use base::const_format::concatcp;
 use base::libc::{O_CLOEXEC, O_RDONLY};
 use base::{
-    clone_attr, cstr, debug, libc::mkstemp, path, Directory, FsPathBuf, LibcReturn, LoggedResult,
-    MappedFile, SilentResultExt, Utf8CStr, WalkResult,
+    Directory, FsPathBuf, LibcReturn, LoggedResult, MappedFile, SilentResultExt, Utf8CStr,
+    WalkResult, clone_attr, cstr, debug, libc::mkstemp, path,
 };
 
 const PERSIST_PROP_DIR: &str = "/data/property";

@@ -9,8 +9,8 @@ use libc::{c_char, mode_t};
 use crate::files::map_file_at;
 pub(crate) use crate::xwrap::*;
 use crate::{
-    clone_attr, cstr, cstr_buf, fclone_attr, fd_path, map_fd, map_file, slice_from_ptr,
-    CxxResultExt, Directory, FsPath, Utf8CStr,
+    CxxResultExt, Directory, FsPath, Utf8CStr, clone_attr, cstr, cstr_buf, fclone_attr, fd_path,
+    map_fd, map_file, slice_from_ptr,
 };
 
 pub(crate) fn fd_path_for_cxx(fd: RawFd, buf: &mut [u8]) -> isize {

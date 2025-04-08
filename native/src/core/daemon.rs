@@ -1,8 +1,8 @@
 use crate::consts::{MAGISK_FULL_VER, MAIN_CONFIG, SECURE_DIR};
 use crate::db::Sqlite3;
 use crate::ffi::{
-    check_key_combo, disable_modules, exec_common_scripts, exec_module_scripts, get_magisk_tmp,
-    initialize_denylist, setup_magisk_env, DbEntryKey, ModuleInfo, RequestCode,
+    DbEntryKey, ModuleInfo, RequestCode, check_key_combo, disable_modules, exec_common_scripts,
+    exec_module_scripts, get_magisk_tmp, initialize_denylist, setup_magisk_env,
 };
 use crate::get_prop;
 use crate::logging::{magisk_logging, setup_logfile, start_log_daemon};
@@ -11,7 +11,7 @@ use crate::package::ManagerInfo;
 use crate::su::SuInfo;
 use base::libc::{O_CLOEXEC, O_RDONLY};
 use base::{
-    cstr, error, info, libc, open_fd, path, AtomicArc, BufReadExt, FsPathBuf, ResultExt, Utf8CStr,
+    AtomicArc, BufReadExt, FsPathBuf, ResultExt, Utf8CStr, cstr, error, info, libc, open_fd, path,
 };
 use std::fs::File;
 use std::io::BufReader;

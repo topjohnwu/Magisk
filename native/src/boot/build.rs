@@ -1,4 +1,4 @@
-use pb_rs::{types::FileDescriptor, ConfigBuilder};
+use pb_rs::{ConfigBuilder, types::FileDescriptor};
 
 use crate::codegen::gen_cxx_binding;
 

@@ -1,10 +1,10 @@
-use crate::ffi::{backup_init, BootConfig, MagiskInit};
-use base::{path, BytesExt, MappedFile};
+use crate::ffi::{BootConfig, MagiskInit, backup_init};
+use base::{BytesExt, MappedFile, path};
 
 impl BootConfig {
     #[allow(unused_imports, unused_unsafe)]
     pub(crate) fn print(&self) {
-        use base::{debug, Utf8CStr};
+        use base::{Utf8CStr, debug};
         debug!("skip_initramfs=[{}]", self.skip_initramfs);
         debug!("force_normal_boot=[{}]", self.force_normal_boot);
         debug!("rootwait=[{}]", self.rootwait);
