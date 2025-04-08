@@ -3,7 +3,7 @@ use argh::FromArgs;
 use base::{
     EarlyExitExt, LoggedResult, Utf8CStr, cmdline_logging, cstr, libc::umask, log_err, map_args,
 };
-use std::{ffi::c_char, io::Cursor};
+use std::ffi::c_char;
 
 #[derive(FromArgs)]
 struct Cli {
@@ -116,7 +116,7 @@ pub unsafe extern "C" fn main(
         }
 
         for statement in &cli.polices {
-            sepol.load_rules_from_reader(&mut Cursor::new(statement));
+            sepol.load_rules(statement);
         }
 
         if cli.live && !sepol.to_file(cstr!("/sys/fs/selinux/load")) {
