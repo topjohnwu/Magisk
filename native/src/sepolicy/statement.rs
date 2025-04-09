@@ -1,11 +1,11 @@
 use std::fmt::{Display, Formatter, Write};
-use std::io::{BufRead, BufReader, Cursor, stderr};
+use std::io::{BufRead, BufReader, Cursor};
 use std::{iter::Peekable, vec::IntoIter};
 
 use crate::SePolicy;
 use crate::ffi::Xperm;
 use base::libc::{O_CLOEXEC, O_RDONLY};
-use base::{BufReadExt, FmtAdaptor, FsPath, LoggedResult, Utf8CStr, error, warn};
+use base::{BufReadExt, FsPath, LoggedResult, Utf8CStr, error, warn};
 
 pub enum Token<'a> {
     AL,
@@ -65,10 +65,10 @@ fn parse_id<'a>(tokens: &mut Tokens<'a>) -> ParseResult<'a, &'a str> {
     }
 }
 
-//     names ::= ID(n) { vec![n] };
-//     names ::= names(mut v) ID(n) { v.push(n); v };
-//     term ::= ID(n) { vec![n] }
-//     term ::= LB names(n) RB { n };
+// names ::= ID(n) { vec![n] };
+// names ::= names(mut v) ID(n) { v.push(n); v };
+// term ::= ID(n) { vec![n] }
+// term ::= LB names(n) RB { n };
 fn parse_term<'a>(tokens: &mut Tokens<'a>) -> ParseResult<'a, Vec<&'a str>> {
     match tokens.next() {
         Some(Token::ID(name)) => Ok(vec![name]),
@@ -87,13 +87,13 @@ fn parse_term<'a>(tokens: &mut Tokens<'a>) -> ParseResult<'a, Vec<&'a str>> {
     }
 }
 
-//     names ::= ST { vec![] }
-//     names ::= ID(n) { vec![n] };
-//     names ::= names(mut v) ID(n) { v.push(n); v };
-//     names ::= names(n) ST { vec![] };
-//     sterm ::= ST { vec![] }
-//     sterm ::= ID(n) { vec![n] }
-//     sterm ::= LB names(n) RB { n };
+// names ::= ST { vec![] }
+// names ::= ID(n) { vec![n] };
+// names ::= names(mut v) ID(n) { v.push(n); v };
+// names ::= names(n) ST { vec![] };
+// sterm ::= ST { vec![] }
+// sterm ::= ID(n) { vec![n] }
+// sterm ::= LB names(n) RB { n };
 fn parse_sterm<'a>(tokens: &mut Tokens<'a>) -> ParseResult<'a, Vec<&'a str>> {
     match tokens.next() {
         Some(Token::ID(name)) => Ok(vec![name]),
@@ -118,8 +118,8 @@ fn parse_sterm<'a>(tokens: &mut Tokens<'a>) -> ParseResult<'a, Vec<&'a str>> {
     }
 }
 
-//     xperm ::= HX(low) { Xperm{low, high: low, reset: false} };
-//     xperm ::= HX(low) HP HX(high) { Xperm{low, high, reset: false} };
+// xperm ::= HX(low) { Xperm{low, high: low, reset: false} };
+// xperm ::= HX(low) HP HX(high) { Xperm{low, high, reset: false} };
 fn parse_xperm<'a>(tokens: &mut Tokens<'a>) -> ParseResult<'a, Xperm> {
     let low = match tokens.next() {
         Some(Token::HX(low)) => low,
@@ -142,13 +142,13 @@ fn parse_xperm<'a>(tokens: &mut Tokens<'a>) -> ParseResult<'a, Xperm> {
     })
 }
 
-//     xperms ::= HX(low) { if low > 0 { vec![Xperm{low, high: low, reset: false}] } else { vec![Xperm{low: 0x0000, high: 0xFFFF, reset: true}] }};
-//     xperms ::= LB xperm_list(l) RB { l };
-//     xperms ::= TL LB xperm_list(mut l) RB { l.iter_mut().for_each(|x| { x.reset = true; }); l };
-//     xperms ::= ST { vec![Xperm{low: 0x0000, high: 0xFFFF, reset: false}] };
+// xperms ::= HX(low) { if low > 0 { vec![Xperm{low, high: low, reset: false}] } else { vec![Xperm{low: 0x0000, high: 0xFFFF, reset: true}] }};
+// xperms ::= LB xperm_list(l) RB { l };
+// xperms ::= TL LB xperm_list(mut l) RB { l.iter_mut().for_each(|x| { x.reset = true; }); l };
+// xperms ::= ST { vec![Xperm{low: 0x0000, high: 0xFFFF, reset: false}] };
 //
-//     xperm_list ::= xperm(p) { vec![p] }
-//     xperm_list ::= xperm_list(mut l) xperm(p) { l.push(p); l }
+// xperm_list ::= xperm(p) { vec![p] }
+// xperm_list ::= xperm_list(mut l) xperm(p) { l.push(p); l }
 fn parse_xperms<'a>(tokens: &mut Tokens<'a>) -> ParseResult<'a, Vec<Xperm>> {
     let mut xperms = Vec::new();
     let reset = match tokens.peek() {
@@ -208,177 +208,6 @@ fn match_string<'a>(tokens: &mut Tokens<'a>, pattern: &str) -> ParseResult<'a, (
         }
     }
     Err(ParseError::General)
-}
-
-//     statement ::= AL sterm(s) sterm(t) sterm(c) sterm(p) { sepolicy.allow(s, t, c, p); };
-//     statement ::= DN sterm(s) sterm(t) sterm(c) sterm(p) { sepolicy.deny(s, t, c, p); };
-//     statement ::= AA sterm(s) sterm(t) sterm(c) sterm(p) { sepolicy.auditallow(s, t, c, p); };
-//     statement ::= DA sterm(s) sterm(t) sterm(c) sterm(p) { sepolicy.dontaudit(s, t, c, p); };
-//     statement ::= AX sterm(s) sterm(t) sterm(c) ID(i) xperms(p) { sepolicy.allowxperm(s, t, c, p); };
-//     statement ::= AY sterm(s) sterm(t) sterm(c) ID(i) xperms(p) { sepolicy.auditallowxperm(s, t, c, p); };
-//     statement ::= DX sterm(s) sterm(t) sterm(c) ID(i) xperms(p) { sepolicy.dontauditxperm(s, t, c, p); };
-//     statement ::= PM sterm(t) { sepolicy.permissive(t); };
-//     statement ::= EF sterm(t) { sepolicy.enforce(t); };
-//     statement ::= TA term(t) term(a) { sepolicy.typeattribute(t, a); };
-//     statement ::= TY ID(t) { sepolicy.type_(t, vec![]);};
-//     statement ::= TY ID(t) term(a) { sepolicy.type_(t, a);};
-//     statement ::= AT ID(t) { sepolicy.attribute(t); };
-//     statement ::= TT ID(s) ID(t) ID(c) ID(d) { sepolicy.type_transition(s, t, c, d, vec![]); };
-//     statement ::= TT ID(s) ID(t) ID(c) ID(d) ID(o) { sepolicy.type_transition(s, t, c, d, vec![o]); };
-//     statement ::= TC ID(s) ID(t) ID(c) ID(d) { sepolicy.type_change(s, t, c, d); };
-//     statement ::= TM ID(s) ID(t) ID(c) ID(d) { sepolicy.type_member(s, t, c, d);};
-//     statement ::= GF ID(s) ID(t) ID(c) { sepolicy.genfscon(s, t, c); };
-fn exec_statement<'a>(sepolicy: &mut SePolicy, tokens: &mut Tokens<'a>) -> ParseResult<'a, ()> {
-    let action = match tokens.next() {
-        Some(token) => token,
-        _ => Err(ParseError::ShowHelp)?,
-    };
-    let check_additional_args = |tokens: &mut Tokens<'a>| {
-        if tokens.peek().is_none() {
-            Ok(())
-        } else {
-            Err(ParseError::General)
-        }
-    };
-    match action {
-        Token::AL | Token::DN | Token::AA | Token::DA => {
-            let result: ParseResult<()> = try {
-                let s = parse_sterm(tokens)?;
-                let t = parse_sterm(tokens)?;
-                let c = parse_sterm(tokens)?;
-                let p = parse_sterm(tokens)?;
-                check_additional_args(tokens)?;
-                match action {
-                    Token::AL => sepolicy.allow(s, t, c, p),
-                    Token::DN => sepolicy.deny(s, t, c, p),
-                    Token::AA => sepolicy.auditallow(s, t, c, p),
-                    Token::DA => sepolicy.dontaudit(s, t, c, p),
-                    _ => unreachable!(),
-                }
-            };
-            if result.is_err() {
-                Err(ParseError::AvtabAv(action))?
-            }
-        }
-        Token::AX | Token::AY | Token::DX => {
-            let result: ParseResult<()> = try {
-                let s = parse_sterm(tokens)?;
-                let t = parse_sterm(tokens)?;
-                let c = parse_sterm(tokens)?;
-                match_string(tokens, "ioctl")?;
-                let p = parse_xperms(tokens)?;
-                check_additional_args(tokens)?;
-                match action {
-                    Token::AX => sepolicy.allowxperm(s, t, c, p),
-                    Token::AY => sepolicy.auditallowxperm(s, t, c, p),
-                    Token::DX => sepolicy.dontauditxperm(s, t, c, p),
-                    _ => unreachable!(),
-                }
-            };
-            if result.is_err() {
-                Err(ParseError::AvtabXperms(action))?
-            }
-        }
-        Token::PM | Token::EF => {
-            let result: ParseResult<()> = try {
-                let t = parse_sterm(tokens)?;
-                check_additional_args(tokens)?;
-                match action {
-                    Token::PM => sepolicy.permissive(t),
-                    Token::EF => sepolicy.enforce(t),
-                    _ => unreachable!(),
-                }
-            };
-            if result.is_err() {
-                Err(ParseError::TypeState(action))?
-            }
-        }
-        Token::TA => {
-            let result: ParseResult<()> = try {
-                let t = parse_term(tokens)?;
-                let a = parse_term(tokens)?;
-                check_additional_args(tokens)?;
-                sepolicy.typeattribute(t, a)
-            };
-            if result.is_err() {
-                Err(ParseError::TypeAttr)?
-            }
-        }
-        Token::TY => {
-            let result: ParseResult<()> = try {
-                let t = parse_id(tokens)?;
-                let a = if tokens.peek().is_none() {
-                    vec![]
-                } else {
-                    parse_term(tokens)?
-                };
-                check_additional_args(tokens)?;
-                sepolicy.type_(t, a)
-            };
-            if result.is_err() {
-                Err(ParseError::NewType)?
-            }
-        }
-        Token::AT => {
-            let result: ParseResult<()> = try {
-                let t = parse_id(tokens)?;
-                check_additional_args(tokens)?;
-                sepolicy.attribute(t)
-            };
-            if result.is_err() {
-                Err(ParseError::NewAttr)?
-            }
-        }
-        Token::TC | Token::TM => {
-            let result: ParseResult<()> = try {
-                let s = parse_id(tokens)?;
-                let t = parse_id(tokens)?;
-                let c = parse_id(tokens)?;
-                let d = parse_id(tokens)?;
-                check_additional_args(tokens)?;
-                match action {
-                    Token::TC => sepolicy.type_change(s, t, c, d),
-                    Token::TM => sepolicy.type_member(s, t, c, d),
-                    _ => unreachable!(),
-                }
-            };
-            if result.is_err() {
-                Err(ParseError::AvtabType(action))?
-            }
-        }
-        Token::TT => {
-            let result: ParseResult<()> = try {
-                let s = parse_id(tokens)?;
-                let t = parse_id(tokens)?;
-                let c = parse_id(tokens)?;
-                let d = parse_id(tokens)?;
-                let o = if tokens.peek().is_none() {
-                    ""
-                } else {
-                    parse_id(tokens)?
-                };
-                check_additional_args(tokens)?;
-                sepolicy.type_transition(s, t, c, d, o);
-            };
-            if result.is_err() {
-                Err(ParseError::TypeTrans)?
-            }
-        }
-        Token::GF => {
-            let result: ParseResult<()> = try {
-                let s = parse_id(tokens)?;
-                let t = parse_id(tokens)?;
-                let c = parse_id(tokens)?;
-                check_additional_args(tokens)?;
-                sepolicy.genfscon(s, t, c)
-            };
-            if result.is_err() {
-                Err(ParseError::GenfsCon)?
-            }
-        }
-        _ => Err(ParseError::UnknownAction(action))?,
-    }
-    Ok(())
 }
 
 fn extract_token<'a>(s: &'a str, tokens: &mut Vec<Token<'a>>) {
@@ -443,12 +272,12 @@ fn tokenize_statement(statement: &str) -> Vec<Token> {
 }
 
 impl SePolicy {
-    pub fn load_rules(self: &mut SePolicy, rules: &str) {
+    pub fn load_rules(&mut self, rules: &str) {
         let mut cursor = Cursor::new(rules.as_bytes());
         self.load_rules_from_reader(&mut cursor);
     }
 
-    pub fn load_rule_file(self: &mut SePolicy, filename: &Utf8CStr) {
+    pub fn load_rule_file(&mut self, filename: &Utf8CStr) {
         let result: LoggedResult<()> = try {
             let file = FsPath::from(filename).open(O_RDONLY | O_CLOEXEC)?;
             let mut reader = BufReader::new(file);
@@ -457,24 +286,195 @@ impl SePolicy {
         result.ok();
     }
 
-    fn load_rules_from_reader<T: BufRead>(self: &mut SePolicy, reader: &mut T) {
+    fn load_rules_from_reader<T: BufRead>(&mut self, reader: &mut T) {
         reader.foreach_lines(|line| {
             self.parse_statement(line);
             true
         });
     }
 
-    fn parse_statement(self: &mut SePolicy, statement: &str) {
+    fn parse_statement(&mut self, statement: &str) {
         let statement = statement.trim();
         if statement.is_empty() || statement.starts_with('#') {
             return;
         }
         let mut tokens = tokenize_statement(statement).into_iter().peekable();
-        let result = exec_statement(self, &mut tokens);
+        let result = self.exec_statement(&mut tokens);
         if let Err(e) = result {
             warn!("Syntax error in: \"{}\"", statement);
             error!("Hint: {}", e);
         }
+    }
+
+    // statement ::= AL sterm(s) sterm(t) sterm(c) sterm(p) { sepolicy.allow(s, t, c, p); };
+    // statement ::= DN sterm(s) sterm(t) sterm(c) sterm(p) { sepolicy.deny(s, t, c, p); };
+    // statement ::= AA sterm(s) sterm(t) sterm(c) sterm(p) { sepolicy.auditallow(s, t, c, p); };
+    // statement ::= DA sterm(s) sterm(t) sterm(c) sterm(p) { sepolicy.dontaudit(s, t, c, p); };
+    // statement ::= AX sterm(s) sterm(t) sterm(c) ID(i) xperms(p) { sepolicy.allowxperm(s, t, c, p); };
+    // statement ::= AY sterm(s) sterm(t) sterm(c) ID(i) xperms(p) { sepolicy.auditallowxperm(s, t, c, p); };
+    // statement ::= DX sterm(s) sterm(t) sterm(c) ID(i) xperms(p) { sepolicy.dontauditxperm(s, t, c, p); };
+    // statement ::= PM sterm(t) { sepolicy.permissive(t); };
+    // statement ::= EF sterm(t) { sepolicy.enforce(t); };
+    // statement ::= TA term(t) term(a) { sepolicy.typeattribute(t, a); };
+    // statement ::= TY ID(t) { sepolicy.type_(t, vec![]);};
+    // statement ::= TY ID(t) term(a) { sepolicy.type_(t, a);};
+    // statement ::= AT ID(t) { sepolicy.attribute(t); };
+    // statement ::= TT ID(s) ID(t) ID(c) ID(d) { sepolicy.type_transition(s, t, c, d, vec![]); };
+    // statement ::= TT ID(s) ID(t) ID(c) ID(d) ID(o) { sepolicy.type_transition(s, t, c, d, vec![o]); };
+    // statement ::= TC ID(s) ID(t) ID(c) ID(d) { sepolicy.type_change(s, t, c, d); };
+    // statement ::= TM ID(s) ID(t) ID(c) ID(d) { sepolicy.type_member(s, t, c, d);};
+    // statement ::= GF ID(s) ID(t) ID(c) { sepolicy.genfscon(s, t, c); };
+    fn exec_statement<'a>(&mut self, tokens: &mut Tokens<'a>) -> ParseResult<'a, ()> {
+        let action = match tokens.next() {
+            Some(token) => token,
+            _ => Err(ParseError::ShowHelp)?,
+        };
+        let check_additional_args = |tokens: &mut Tokens<'a>| {
+            if tokens.peek().is_none() {
+                Ok(())
+            } else {
+                Err(ParseError::General)
+            }
+        };
+        match action {
+            Token::AL | Token::DN | Token::AA | Token::DA => {
+                let result: ParseResult<()> = try {
+                    let s = parse_sterm(tokens)?;
+                    let t = parse_sterm(tokens)?;
+                    let c = parse_sterm(tokens)?;
+                    let p = parse_sterm(tokens)?;
+                    check_additional_args(tokens)?;
+                    match action {
+                        Token::AL => self.allow(s, t, c, p),
+                        Token::DN => self.deny(s, t, c, p),
+                        Token::AA => self.auditallow(s, t, c, p),
+                        Token::DA => self.dontaudit(s, t, c, p),
+                        _ => unreachable!(),
+                    }
+                };
+                if result.is_err() {
+                    Err(ParseError::AvtabAv(action))?
+                }
+            }
+            Token::AX | Token::AY | Token::DX => {
+                let result: ParseResult<()> = try {
+                    let s = parse_sterm(tokens)?;
+                    let t = parse_sterm(tokens)?;
+                    let c = parse_sterm(tokens)?;
+                    match_string(tokens, "ioctl")?;
+                    let p = parse_xperms(tokens)?;
+                    check_additional_args(tokens)?;
+                    match action {
+                        Token::AX => self.allowxperm(s, t, c, p),
+                        Token::AY => self.auditallowxperm(s, t, c, p),
+                        Token::DX => self.dontauditxperm(s, t, c, p),
+                        _ => unreachable!(),
+                    }
+                };
+                if result.is_err() {
+                    Err(ParseError::AvtabXperms(action))?
+                }
+            }
+            Token::PM | Token::EF => {
+                let result: ParseResult<()> = try {
+                    let t = parse_sterm(tokens)?;
+                    check_additional_args(tokens)?;
+                    match action {
+                        Token::PM => self.permissive(t),
+                        Token::EF => self.enforce(t),
+                        _ => unreachable!(),
+                    }
+                };
+                if result.is_err() {
+                    Err(ParseError::TypeState(action))?
+                }
+            }
+            Token::TA => {
+                let result: ParseResult<()> = try {
+                    let t = parse_term(tokens)?;
+                    let a = parse_term(tokens)?;
+                    check_additional_args(tokens)?;
+                    self.typeattribute(t, a)
+                };
+                if result.is_err() {
+                    Err(ParseError::TypeAttr)?
+                }
+            }
+            Token::TY => {
+                let result: ParseResult<()> = try {
+                    let t = parse_id(tokens)?;
+                    let a = if tokens.peek().is_none() {
+                        vec![]
+                    } else {
+                        parse_term(tokens)?
+                    };
+                    check_additional_args(tokens)?;
+                    self.type_(t, a)
+                };
+                if result.is_err() {
+                    Err(ParseError::NewType)?
+                }
+            }
+            Token::AT => {
+                let result: ParseResult<()> = try {
+                    let t = parse_id(tokens)?;
+                    check_additional_args(tokens)?;
+                    self.attribute(t)
+                };
+                if result.is_err() {
+                    Err(ParseError::NewAttr)?
+                }
+            }
+            Token::TC | Token::TM => {
+                let result: ParseResult<()> = try {
+                    let s = parse_id(tokens)?;
+                    let t = parse_id(tokens)?;
+                    let c = parse_id(tokens)?;
+                    let d = parse_id(tokens)?;
+                    check_additional_args(tokens)?;
+                    match action {
+                        Token::TC => self.type_change(s, t, c, d),
+                        Token::TM => self.type_member(s, t, c, d),
+                        _ => unreachable!(),
+                    }
+                };
+                if result.is_err() {
+                    Err(ParseError::AvtabType(action))?
+                }
+            }
+            Token::TT => {
+                let result: ParseResult<()> = try {
+                    let s = parse_id(tokens)?;
+                    let t = parse_id(tokens)?;
+                    let c = parse_id(tokens)?;
+                    let d = parse_id(tokens)?;
+                    let o = if tokens.peek().is_none() {
+                        ""
+                    } else {
+                        parse_id(tokens)?
+                    };
+                    check_additional_args(tokens)?;
+                    self.type_transition(s, t, c, d, o);
+                };
+                if result.is_err() {
+                    Err(ParseError::TypeTrans)?
+                }
+            }
+            Token::GF => {
+                let result: ParseResult<()> = try {
+                    let s = parse_id(tokens)?;
+                    let t = parse_id(tokens)?;
+                    let c = parse_id(tokens)?;
+                    check_additional_args(tokens)?;
+                    self.genfscon(s, t, c)
+                };
+                if result.is_err() {
+                    Err(ParseError::GenfsCon)?
+                }
+            }
+            _ => Err(ParseError::UnknownAction(action))?,
+        }
+        Ok(())
     }
 }
 
@@ -542,11 +542,11 @@ impl Display for ParseError<'_> {
     }
 }
 
-fn format_statement_help(f: &mut dyn Write) -> std::fmt::Result {
+pub(crate) fn format_statement_help(f: &mut dyn Write) -> std::fmt::Result {
     write!(
         f,
         r#"** Policy statements:
-        
+
 One policy statement should be treated as a single parameter;
 this means each policy statement should be enclosed in quotes.
 Multiple policy statements can be provided in a single command.
@@ -617,11 +617,4 @@ allowxperm source target class ioctl *
         ParseError::AvtabType(Token::TM),
         ParseError::GenfsCon
     )
-}
-
-impl SePolicy {
-    pub fn print_statement_help() {
-        format_statement_help(&mut FmtAdaptor(&mut stderr())).ok();
-        eprintln!();
-    }
 }

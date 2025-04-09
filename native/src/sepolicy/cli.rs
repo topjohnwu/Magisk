@@ -1,9 +1,12 @@
 use crate::ffi::SePolicy;
+use crate::statement::format_statement_help;
 use argh::FromArgs;
 use base::{
-    EarlyExitExt, LoggedResult, Utf8CStr, cmdline_logging, cstr, libc::umask, log_err, map_args,
+    EarlyExitExt, FmtAdaptor, LoggedResult, Utf8CStr, cmdline_logging, cstr, libc::umask, log_err,
+    map_args,
 };
 use std::ffi::c_char;
+use std::io::stderr;
 
 #[derive(FromArgs)]
 struct Cli {
@@ -61,7 +64,8 @@ it will load from current live policies (/sys/fs/selinux/policy)
         cmd
     );
 
-    SePolicy::print_statement_help();
+    format_statement_help(&mut FmtAdaptor(&mut stderr())).ok();
+    eprintln!();
 }
 
 #[unsafe(no_mangle)]
