@@ -20,8 +20,6 @@
 #include <flags.h>
 #include <core.hpp>
 
-#include "pts.hpp"
-
 using namespace std;
 
 #define DEFAULT_SHELL "/system/bin/sh"
@@ -241,9 +239,7 @@ int su_client_main(int argc, char *argv[]) {
 
     if (atty) {
         setup_sighandlers(sighandler);
-        watch_sigwinch_async(STDOUT_FILENO, ptmx);
-        pump_stdin_async(ptmx);
-        pump_stdout_blocking(ptmx);
+        pump_stdin_stdout(ptmx, ptmx);
     }
 
     // Get the exit code
