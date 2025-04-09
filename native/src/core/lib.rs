@@ -16,7 +16,7 @@ use logging::{android_logging, setup_logfile, zygisk_close_logd, zygisk_get_logd
 use mount::{find_preinit_device, revert_unmount};
 use resetprop::{persist_delete_prop, persist_get_prop, persist_get_props, persist_set_prop};
 use socket::{recv_fd, recv_fds, send_fd, send_fds};
-use su::{pump_stdin_stdout, get_pty_num, restore_stdin};
+use su::{pump_tty, get_pty_num, restore_stdin};
 use std::fs::File;
 use std::mem::ManuallyDrop;
 use std::ops::DerefMut;
@@ -209,7 +209,7 @@ pub mod ffi {
         #[namespace = "rust"]
         fn daemon_entry();
 
-        fn pump_stdin_stdout(infd: i32, outfd: i32);
+        fn pump_tty(infd: i32, outfd: i32);
         fn get_pty_num(fd: i32) -> i32;
         fn restore_stdin() -> bool;
     }

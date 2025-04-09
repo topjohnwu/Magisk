@@ -239,7 +239,9 @@ int su_client_main(int argc, char *argv[]) {
 
     if (atty) {
         setup_sighandlers(sighandler);
-        pump_stdin_stdout(ptmx, ptmx);
+        // if stdin is not a tty, if we pump to ptmx, our process may intercept the input to ptmx and
+        // output to stdout, which cause the target process lost input.
+        pump_tty(ptmx, (atty & ATTY_IN) ? ptmx : -1);
     }
 
     // Get the exit code
