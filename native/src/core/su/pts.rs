@@ -28,9 +28,13 @@ fn set_stdin_raw() -> bool {
             return false;
         }
 
+        let old_c_oflag = termios.c_oflag;
         OLD_STDIN = Some(termios);
 
         cfmakeraw(&mut termios);
+
+        // don't modify output flags, since we are not setting stdout raw
+        termios.c_oflag = old_c_oflag;
 
         if tcsetattr(STDIN_FILENO, TCSAFLUSH, &termios) < 0
             && tcsetattr(STDIN_FILENO, TCSADRAIN, &termios) < 0
@@ -65,7 +69,7 @@ fn resize_pty(outfd: i32) {
     }
 }
 
-pub fn pump_stdin_stdout(infd: i32, outfd: i32) {
+pub fn pump_tty(infd: i32, outfd: i32) {
     set_stdin_raw();
 
     let sfd = unsafe {
@@ -82,7 +86,7 @@ pub fn pump_stdin_stdout(infd: i32, outfd: i32) {
 
     let mut pfds = [
         pollfd {
-            fd: STDIN_FILENO,
+            fd: if outfd > 0 { STDIN_FILENO } else { -1 },
             events: POLLIN,
             revents: 0,
         },
