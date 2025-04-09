@@ -27,7 +27,6 @@ LOCAL_SRC_FILES := \
     core/resetprop/resetprop.cpp \
     core/su/su.cpp \
     core/su/connect.cpp \
-    core/su/pts.cpp \
     core/zygisk/entry.cpp \
     core/zygisk/module.cpp \
     core/zygisk/hook.cpp \
