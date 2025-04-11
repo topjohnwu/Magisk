@@ -413,8 +413,8 @@ impl Cpio {
             file.open(O_RDONLY | O_CLOEXEC)?.read_to_end(&mut content)?;
             mode | S_IFREG
         } else {
-            rdevmajor = unsafe { major(attr.st.st_rdev.as_()) }.as_();
-            rdevminor = unsafe { minor(attr.st.st_rdev.as_()) }.as_();
+            rdevmajor = major(attr.st.st_rdev.as_()).as_();
+            rdevminor = minor(attr.st.st_rdev.as_()).as_();
             if attr.is_block_device() {
                 mode | S_IFBLK
             } else if attr.is_char_device() {

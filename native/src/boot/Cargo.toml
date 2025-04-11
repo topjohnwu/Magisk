@@ -13,7 +13,7 @@ pb-rs = { workspace = true }
 
 [dependencies]
 base = { path = "../base" }
-cxx = { path = "../external/cxx-rs" }
+cxx = { workspace = true }
 byteorder = { workspace = true }
 size = { workspace = true }
 quick-protobuf = { workspace = true }
@@ -25,8 +25,6 @@ p256 = { workspace = true }
 p384 = { workspace = true }
 p521 = { workspace = true }
 rsa = { workspace = true, features = ["sha2"] }
-block-buffer = { workspace = true }
-sec1 = { workspace = true }
 x509-cert = { workspace = true }
 der = { workspace = true, features = ["derive", "pem"] }
 fdt = { workspace = true }
@@ -34,3 +32,7 @@ bytemuck = { workspace = true, features = ["derive", "min_const_generics"] }
 num-traits = { workspace = true }
 libz-rs-sys = { workspace = true }
 libbz2-rs-sys = { workspace = true }
+
+# Pin version to prevent cargo update break builds
+block-buffer = { workspace = true }
+sec1 = { workspace = true }
