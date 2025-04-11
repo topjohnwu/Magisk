@@ -1,20 +1,30 @@
 use base::{
-    error,
+    ResultExt, error,
     libc::{
-        POLLIN, SFD_CLOEXEC, SIG_BLOCK, SIGWINCH, STDOUT_FILENO, TCSADRAIN, TCSAFLUSH, TIOCGWINSZ,
-        TIOCSWINSZ, cfmakeraw, close, poll, pollfd, raise, read, sigaddset, sigemptyset, signalfd,
-        sigprocmask, sigset_t, tcsetattr, winsize, write,
+        POLLIN, SFD_CLOEXEC, SIG_BLOCK, SIGWINCH, TCSADRAIN, TCSAFLUSH, TIOCGWINSZ, TIOCSWINSZ,
+        cfmakeraw, close, poll, pollfd, raise, sigaddset, sigemptyset, signalfd, sigprocmask,
+        sigset_t, tcsetattr, winsize,
     },
-    libc::{STDIN_FILENO, ioctl, tcgetattr, termios},
+    libc::{STDIN_FILENO, STDOUT_FILENO, tcgetattr, termios},
     warn,
 };
+use std::fs::File;
+use std::io::{Read, Write};
+use std::mem::ManuallyDrop;
+use std::os::fd::{FromRawFd, RawFd};
 use std::ptr::null_mut;
 
 static mut OLD_STDIN: Option<termios> = None;
+const TIOCGPTN: u32 = 0x80045430;
+
+unsafe extern "C" {
+    // Don't use the declaration from the libc crate as request should be u32 not i32
+    fn ioctl(fd: RawFd, request: u32, ...) -> i32;
+}
 
 pub fn get_pty_num(fd: i32) -> i32 {
     let mut pty_num = -1i32;
-    if unsafe { ioctl(fd, 0x80045430u32 as _, &mut pty_num) } != 0 {
+    if unsafe { ioctl(fd, TIOCGPTN, &mut pty_num) } != 0 {
         warn!("Failed to get pty number");
     }
     pty_num
@@ -64,8 +74,8 @@ pub fn restore_stdin() -> bool {
 
 fn resize_pty(outfd: i32) {
     let mut ws: winsize = unsafe { std::mem::zeroed() };
-    if unsafe { ioctl(STDIN_FILENO, TIOCGWINSZ, &mut ws) } >= 0 {
-        unsafe { ioctl(outfd, TIOCSWINSZ, &ws) };
+    if unsafe { ioctl(STDIN_FILENO, TIOCGWINSZ as u32, &mut ws) } >= 0 {
+        unsafe { ioctl(outfd, TIOCSWINSZ as u32, &ws) };
     }
 }
 
@@ -113,15 +123,19 @@ pub fn pump_tty(infd: i32, outfd: i32) {
 
         for pfd in &pfds {
             if pfd.revents & POLLIN != 0 {
-                let n = unsafe { read(pfd.fd, buf.as_mut_ptr() as _, buf.len()) };
-                if n <= 0 {
+                let mut in_file = ManuallyDrop::new(unsafe { File::from_raw_fd(pfd.fd) });
+
+                let Ok(n) = in_file.read(&mut buf) else {
                     error!("read error");
                     break 'poll;
-                }
+                };
+
                 if pfd.fd == STDIN_FILENO {
-                    unsafe { write(outfd, buf.as_ptr() as _, n as _) };
+                    let mut out = ManuallyDrop::new(unsafe { File::from_raw_fd(outfd) });
+                    out.write_all(&buf[..n]).log_ok();
                 } else if pfd.fd == infd {
-                    unsafe { write(STDOUT_FILENO, buf.as_ptr() as _, n as _) };
+                    let mut out = ManuallyDrop::new(unsafe { File::from_raw_fd(STDOUT_FILENO) });
+                    out.write_all(&buf[..n]).log_ok();
                 } else if pfd.fd == sfd {
                     resize_pty(outfd);
                 }
