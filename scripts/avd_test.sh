@@ -3,7 +3,10 @@
 set -xe
 . scripts/test_common.sh
 
-emu_args_base="-no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -read-only -no-snapshot -cores $core_count"
+emu_port=5682
+export ANDROID_SERIAL="emulator-$emu_port"
+
+emu_args_base="-no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -read-only -no-snapshot -port $emu_port -cores $core_count"
 emu_pid=
 
 atd_min_api=30

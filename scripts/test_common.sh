@@ -12,7 +12,7 @@ emu="$ANDROID_HOME/emulator/emulator"
 sdk="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
 avd="$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager"
 
-boot_timeout=600
+boot_timeout=100
 
 core_count=$(nproc)
 if [ $core_count -gt 8 ]; then
