@@ -6,13 +6,14 @@ use crate::{
 use libc::{EEXIST, O_CLOEXEC, O_CREAT, O_RDONLY, O_TRUNC, O_WRONLY, dirent, mode_t};
 use std::ffi::CStr;
 use std::fs::File;
-use std::ops::Deref;
+use std::marker::PhantomData;
+use std::ops::{Deref, DerefMut};
 use std::os::fd::{AsFd, AsRawFd, BorrowedFd, FromRawFd, IntoRawFd, OwnedFd, RawFd};
 use std::ptr::NonNull;
 use std::{mem, slice};
 
 pub struct DirEntry<'a> {
-    dir: &'a Directory,
+    dir: BorrowedDirectory<'a>,
     entry: NonNull<dirent>,
     d_name_len: usize,
 }
@@ -168,6 +169,30 @@ pub struct Directory {
     inner: NonNull<libc::DIR>,
 }
 
+#[repr(transparent)]
+pub struct BorrowedDirectory<'a> {
+    inner: NonNull<libc::DIR>,
+    phantom: PhantomData<&'a Directory>,
+}
+
+impl Deref for BorrowedDirectory<'_> {
+    type Target = Directory;
+
+    fn deref(&self) -> &Directory {
+        // SAFETY: layout of NonNull<libc::DIR> is the same as Directory
+        // SAFETY: the lifetime of the raw pointer is tracked in the PhantomData
+        unsafe { mem::transmute(&self.inner) }
+    }
+}
+
+impl DerefMut for BorrowedDirectory<'_> {
+    fn deref_mut(&mut self) -> &mut Directory {
+        // SAFETY: layout of NonNull<libc::DIR> is the same as Directory
+        // SAFETY: the lifetime of the raw pointer is tracked in the PhantomData
+        unsafe { mem::transmute(&mut self.inner) }
+    }
+}
+
 pub enum WalkResult {
     Continue,
     Abort,
@@ -175,6 +200,13 @@ pub enum WalkResult {
 }
 
 impl Directory {
+    fn borrow(&self) -> BorrowedDirectory {
+        BorrowedDirectory {
+            inner: self.inner,
+            phantom: PhantomData,
+        }
+    }
+
     pub fn open(path: &Utf8CStr) -> OsResult<Directory> {
         let dirp = unsafe { libc::opendir(path.as_ptr()) };
         let dirp = dirp.as_os_result("opendir", Some(path), None)?;
@@ -199,7 +231,7 @@ impl Directory {
                 self.read()
             } else {
                 let e = DirEntry {
-                    dir: self,
+                    dir: self.borrow(),
                     entry: NonNull::from(entry),
                     d_name_len: d_name.to_bytes_with_nul().len(),
                 };
@@ -304,7 +336,7 @@ impl Directory {
                         .check_os_err("symlinkat", Some(&target), e.utf8_name())?;
                 }
                 let new_entry = DirEntry {
-                    dir,
+                    dir: dir.borrow(),
                     entry: e.entry,
                     d_name_len: e.d_name_len,
                 };
