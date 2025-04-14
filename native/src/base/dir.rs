@@ -178,9 +178,7 @@ impl Directory {
     pub fn open(path: &Utf8CStr) -> OsResult<Directory> {
         let dirp = unsafe { libc::opendir(path.as_ptr()) };
         let dirp = dirp.as_os_result("opendir", Some(path), None)?;
-        Ok(Directory {
-            inner: unsafe { NonNull::new_unchecked(dirp) },
-        })
+        Ok(Directory { inner: dirp })
     }
 
     pub fn read(&mut self) -> OsResult<'static, Option<DirEntry>> {
@@ -424,9 +422,7 @@ impl TryFrom<OwnedFd> for Directory {
     fn try_from(fd: OwnedFd) -> OsResult<'static, Self> {
         let dirp = unsafe { libc::fdopendir(fd.into_raw_fd()) };
         let dirp = dirp.as_os_result("fdopendir", None, None)?;
-        Ok(Directory {
-            inner: unsafe { NonNull::new_unchecked(dirp) },
-        })
+        Ok(Directory { inner: dirp })
     }
 }
 

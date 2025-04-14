@@ -2,6 +2,7 @@ use crate::logging::Formatter;
 use crate::{LogLevel, errno, log_with_args, log_with_formatter};
 use std::fmt::Display;
 use std::panic::Location;
+use std::ptr::NonNull;
 use std::{fmt, io};
 use thiserror::Error;
 
@@ -206,18 +207,21 @@ pub trait LibcReturn
 where
     Self: Copy,
 {
+    type Value;
+
     fn is_error(&self) -> bool;
+    fn map_val(self) -> Self::Value;
 
     fn as_os_result<'a>(
         self,
         name: &'static str,
         arg1: Option<&'a str>,
         arg2: Option<&'a str>,
-    ) -> OsResult<'a, Self> {
+    ) -> OsResult<'a, Self::Value> {
         if self.is_error() {
             Err(OsError::last_os_error(name, arg1, arg2))
         } else {
-            Ok(self)
+            Ok(self.map_val())
         }
     }
 
@@ -227,8 +231,11 @@ where
         arg1: Option<&'a str>,
         arg2: Option<&'a str>,
     ) -> OsResult<'a, ()> {
-        self.as_os_result(name, arg1, arg2)?;
-        Ok(())
+        if self.is_error() {
+            Err(OsError::last_os_error(name, arg1, arg2))
+        } else {
+            Ok(())
+        }
     }
 
     fn check_io_err(self) -> io::Result<()> {
@@ -243,9 +250,16 @@ where
 macro_rules! impl_libc_return {
     ($($t:ty)*) => ($(
         impl LibcReturn for $t {
-            #[inline]
+            type Value = Self;
+
+            #[inline(always)]
             fn is_error(&self) -> bool {
                 *self < 0
+            }
+
+            #[inline(always)]
+            fn map_val(self) -> Self::Value {
+                self
             }
         }
     )*)
@@ -253,17 +267,18 @@ macro_rules! impl_libc_return {
 
 impl_libc_return! { i8 i16 i32 i64 isize }
 
-impl<T> LibcReturn for *const T {
-    #[inline]
+impl<T> LibcReturn for *mut T {
+    type Value = NonNull<T>;
+
+    #[inline(always)]
     fn is_error(&self) -> bool {
         self.is_null()
     }
-}
 
-impl<T> LibcReturn for *mut T {
-    #[inline]
-    fn is_error(&self) -> bool {
-        self.is_null()
+    #[inline(always)]
+    fn map_val(self) -> NonNull<T> {
+        // SAFETY: pointer is null checked by is_error
+        unsafe { NonNull::new_unchecked(self.cast()) }
     }
 }
 

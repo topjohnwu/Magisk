@@ -1,5 +1,10 @@
 // Functions in this file are only for exporting to C++, DO NOT USE IN RUST
 
+use crate::cxx_extern::readlinkat;
+use crate::{
+    CxxResultExt, Directory, FsPath, LibcReturn, Utf8CStr, cstr_buf, slice_from_ptr,
+    slice_from_ptr_mut,
+};
 use libc::{
     c_char, c_uint, c_ulong, c_void, dev_t, mode_t, nfds_t, off_t, pollfd, sockaddr, socklen_t,
 };
@@ -10,12 +15,7 @@ use std::mem::ManuallyDrop;
 use std::os::fd::FromRawFd;
 use std::os::unix::io::RawFd;
 use std::ptr;
-
-use crate::cxx_extern::readlinkat;
-use crate::{
-    CxxResultExt, Directory, FsPath, LibcReturn, Utf8CStr, cstr_buf, slice_from_ptr,
-    slice_from_ptr_mut,
-};
+use std::ptr::NonNull;
 
 fn ptr_to_str<'a>(ptr: *const c_char) -> Option<&'a str> {
     if ptr.is_null() {
@@ -78,7 +78,7 @@ unsafe extern "C" fn xfopen(path: *const c_char, mode: *const c_char) -> *mut li
         libc::fopen(path, mode)
             .as_os_result("fopen", ptr_to_str(path), None)
             .log_cxx()
-            .unwrap_or(ptr::null_mut())
+            .map_or(ptr::null_mut(), NonNull::as_ptr)
     }
 }
 
@@ -88,7 +88,7 @@ unsafe extern "C" fn xfdopen(fd: RawFd, mode: *const c_char) -> *mut libc::FILE 
         libc::fdopen(fd, mode)
             .as_os_result("fdopen", None, None)
             .log_cxx()
-            .unwrap_or(ptr::null_mut())
+            .map_or(ptr::null_mut(), NonNull::as_ptr)
     }
 }
 
@@ -175,7 +175,7 @@ unsafe extern "C" fn xopendir(path: *const c_char) -> *mut libc::DIR {
         libc::opendir(path)
             .as_os_result("opendir", ptr_to_str(path), None)
             .log_cxx()
-            .unwrap_or(ptr::null_mut())
+            .map_or(ptr::null_mut(), NonNull::as_ptr)
     }
 }
 
@@ -185,7 +185,7 @@ extern "C" fn xfdopendir(fd: RawFd) -> *mut libc::DIR {
         libc::fdopendir(fd)
             .as_os_result("fdopendir", None, None)
             .log_cxx()
-            .unwrap_or(ptr::null_mut())
+            .map_or(ptr::null_mut(), NonNull::as_ptr)
     }
 }
 
