@@ -2,7 +2,7 @@
 
 use crate::cxx_extern::readlinkat;
 use crate::{
-    CxxResultExt, Directory, FsPath, LibcReturn, Utf8CStr, cstr_buf, slice_from_ptr,
+    BorrowedDirectory, CxxResultExt, FsPath, LibcReturn, Utf8CStr, cstr_buf, slice_from_ptr,
     slice_from_ptr_mut,
 };
 use libc::{
@@ -190,7 +190,7 @@ extern "C" fn xfdopendir(fd: RawFd) -> *mut libc::DIR {
 }
 
 #[unsafe(no_mangle)]
-unsafe extern "C" fn xreaddir(mut dir: ManuallyDrop<Directory>) -> *mut libc::dirent {
+unsafe extern "C" fn xreaddir(mut dir: BorrowedDirectory) -> *mut libc::dirent {
     dir.read()
         .log_cxx()
         .ok()
