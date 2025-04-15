@@ -152,7 +152,7 @@ fn read_certificate(apk: &mut File, version: i32) -> Vec<u8> {
     res.log().unwrap_or(vec![])
 }
 
-fn find_apk_path(pkg: &str, buf: &mut dyn Utf8CStrBuf) -> io::Result<()> {
+fn find_apk_path(pkg: &str, buf: &mut dyn Utf8CStrBuf) -> LoggedResult<()> {
     Directory::open(cstr!("/data/app"))?.pre_order_walk(|e| {
         if !e.is_dir() {
             return Ok(Skip);

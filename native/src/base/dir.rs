@@ -1,14 +1,14 @@
 use crate::cxx_extern::readlinkat_for_cxx;
 use crate::{
-    FileAttr, FsPath, LibcReturn, Utf8CStr, Utf8CStrBuf, cstr, cstr_buf, errno, fd_path,
-    fd_set_attr,
+    FileAttr, FsPath, LibcReturn, OsError, OsResult, OsResultStatic, Utf8CStr, Utf8CStrBuf, cstr,
+    cstr_buf, errno, fd_path, fd_set_attr,
 };
-use libc::{O_CLOEXEC, O_CREAT, O_RDONLY, O_TRUNC, O_WRONLY, dirent};
+use libc::{EEXIST, O_CLOEXEC, O_CREAT, O_RDONLY, O_TRUNC, O_WRONLY, dirent, mode_t};
 use std::ffi::CStr;
 use std::fs::File;
 use std::ops::Deref;
 use std::os::fd::{AsFd, AsRawFd, BorrowedFd, FromRawFd, IntoRawFd, OwnedFd, RawFd};
-use std::{io, mem, slice};
+use std::{mem, slice};
 
 pub struct DirEntry<'a> {
     dir: &'a Directory,
@@ -26,7 +26,12 @@ impl DirEntry<'_> {
         }
     }
 
-    pub fn path(&self, buf: &mut dyn Utf8CStrBuf) -> io::Result<()> {
+    #[inline(always)]
+    fn utf8_name(&self) -> Option<&str> {
+        self.name().to_str().ok()
+    }
+
+    pub fn path(&self, buf: &mut dyn Utf8CStrBuf) -> OsResult<'static, ()> {
         self.dir.path(buf)?;
         buf.push_str("/");
         buf.push_lossy(self.name().to_bytes());
@@ -61,15 +66,19 @@ impl DirEntry<'_> {
         self.d_type == libc::DT_SOCK
     }
 
-    pub fn unlink(&self) -> io::Result<()> {
+    pub fn unlink(&self) -> OsResult<()> {
         let flag = if self.is_dir() { libc::AT_REMOVEDIR } else { 0 };
         unsafe {
-            libc::unlinkat(self.dir.as_raw_fd(), self.d_name.as_ptr(), flag).check_os_err()?;
+            libc::unlinkat(self.dir.as_raw_fd(), self.d_name.as_ptr(), flag).check_os_err(
+                "unlinkat",
+                self.utf8_name(),
+                None,
+            )?;
         }
         Ok(())
     }
 
-    pub fn read_link(&self, buf: &mut dyn Utf8CStrBuf) -> io::Result<()> {
+    pub fn read_link(&self, buf: &mut dyn Utf8CStrBuf) -> OsResult<()> {
         buf.clear();
         unsafe {
             let r = readlinkat_for_cxx(
@@ -78,52 +87,66 @@ impl DirEntry<'_> {
                 buf.as_mut_ptr().cast(),
                 buf.capacity(),
             )
-            .check_os_err()? as usize;
+            .as_os_result("readlinkat", self.utf8_name(), None)? as usize;
             buf.set_len(r);
         }
         Ok(())
     }
 
-    unsafe fn open_fd(&self, flags: i32) -> io::Result<RawFd> {
-        unsafe { self.dir.open_raw_fd(self.name(), flags, 0) }
-    }
-
-    pub fn open_as_dir(&self) -> io::Result<Directory> {
+    pub fn open_as_dir(&self) -> OsResult<Directory> {
         if !self.is_dir() {
-            return Err(io::Error::from(io::ErrorKind::NotADirectory));
+            return Err(OsError::with_os_error(
+                libc::ENOTDIR,
+                "fdopendir",
+                self.utf8_name(),
+                None,
+            ));
         }
-        unsafe { Directory::try_from(OwnedFd::from_raw_fd(self.open_fd(O_RDONLY)?)) }
+        self.dir.openat_as_dir(self.name())
     }
 
-    pub fn open_as_file(&self, flags: i32) -> io::Result<File> {
+    pub fn open_as_file(&self, flags: i32) -> OsResult<File> {
         if self.is_dir() {
-            return Err(io::Error::from(io::ErrorKind::IsADirectory));
+            return Err(OsError::with_os_error(
+                libc::EISDIR,
+                "open_as_file",
+                self.utf8_name(),
+                None,
+            ));
         }
-        unsafe { Ok(File::from_raw_fd(self.open_fd(flags)?)) }
+        self.dir.openat_as_file(self.name(), flags, 0)
     }
 
-    pub fn get_attr(&self) -> io::Result<FileAttr> {
+    pub fn get_attr(&self) -> OsResult<FileAttr> {
         let mut path = cstr_buf::default();
         self.path(&mut path)?;
-        FsPath::from(&path).get_attr()
+        FsPath::from(&path)
+            .get_attr()
+            .map_err(|e| e.set_args(self.utf8_name(), None))
     }
 
-    pub fn set_attr(&self, attr: &FileAttr) -> io::Result<()> {
+    pub fn set_attr(&self, attr: &FileAttr) -> OsResult<()> {
         let mut path = cstr_buf::default();
         self.path(&mut path)?;
-        FsPath::from(&path).set_attr(attr)
+        FsPath::from(&path)
+            .set_attr(attr)
+            .map_err(|e| e.set_args(self.utf8_name(), None))
     }
 
-    pub fn get_secontext(&self, con: &mut dyn Utf8CStrBuf) -> io::Result<()> {
+    pub fn get_secontext(&self, con: &mut dyn Utf8CStrBuf) -> OsResult<()> {
         let mut path = cstr_buf::default();
         self.path(&mut path)?;
-        FsPath::from(&path).get_secontext(con)
+        FsPath::from(&path)
+            .get_secontext(con)
+            .map_err(|e| e.set_args(self.utf8_name(), None))
     }
 
-    pub fn set_secontext(&self, con: &Utf8CStr) -> io::Result<()> {
+    pub fn set_secontext<'a>(&'a self, con: &'a Utf8CStr) -> OsResult<'a, ()> {
         let mut path = cstr_buf::default();
         self.path(&mut path)?;
-        FsPath::from(&path).set_secontext(con)
+        FsPath::from(&path)
+            .set_secontext(con)
+            .map_err(|e| e.set_args(self.utf8_name(), Some(con)))
     }
 }
 
@@ -146,17 +169,18 @@ pub enum WalkResult {
 }
 
 impl Directory {
-    pub fn open(path: &Utf8CStr) -> io::Result<Directory> {
-        let dirp = unsafe { libc::opendir(path.as_ptr()) }.check_os_err()?;
+    pub fn open(path: &Utf8CStr) -> OsResult<Directory> {
+        let dirp = unsafe { libc::opendir(path.as_ptr()) };
+        let dirp = dirp.as_os_result("opendir", Some(path), None)?;
         Ok(Directory { dirp })
     }
 
-    pub fn read(&mut self) -> io::Result<Option<DirEntry<'_>>> {
+    pub fn read(&mut self) -> OsResult<'static, Option<DirEntry>> {
         *errno() = 0;
         let e = unsafe { libc::readdir(self.dirp) };
         if e.is_null() {
             return if *errno() != 0 {
-                Err(io::Error::last_os_error())
+                Err(OsError::last_os_error("readdir", None, None))
             } else {
                 Ok(None)
             };
@@ -182,17 +206,33 @@ impl Directory {
         unsafe { libc::rewinddir(self.dirp) }
     }
 
-    unsafe fn open_raw_fd(&self, name: &CStr, flags: i32, mode: i32) -> io::Result<RawFd> {
+    fn openat<'a>(&self, name: &'a CStr, flags: i32, mode: u32) -> OsResult<'a, OwnedFd> {
         unsafe {
-            libc::openat(self.as_raw_fd(), name.as_ptr(), flags | O_CLOEXEC, mode).check_os_err()
+            libc::openat(self.as_raw_fd(), name.as_ptr(), flags | O_CLOEXEC, mode)
+                .as_os_result("openat", name.to_str().ok(), None)
+                .map(|fd| OwnedFd::from_raw_fd(fd))
         }
     }
 
-    pub fn open_fd(&self, name: &Utf8CStr, flags: i32, mode: i32) -> io::Result<OwnedFd> {
+    pub fn openat_as_dir<'a>(&self, name: &'a CStr) -> OsResult<'a, Directory> {
+        let fd = self.openat(name, O_RDONLY, 0)?;
+        Directory::try_from(fd).map_err(|e| e.set_args(name.to_str().ok(), None))
+    }
+
+    pub fn openat_as_file<'a>(&self, name: &'a CStr, flags: i32, mode: u32) -> OsResult<'a, File> {
+        let fd = self.openat(name, flags, mode)?;
+        Ok(File::from(fd))
+    }
+
+    pub fn mkdirat<'a>(&self, name: &'a CStr, mode: u32) -> OsResult<'a, ()> {
         unsafe {
-            self.open_raw_fd(name.as_cstr(), flags, mode)
-                .map(|fd| OwnedFd::from_raw_fd(fd))
+            if libc::mkdirat(self.as_raw_fd(), name.as_ptr(), mode as mode_t) < 0
+                && *errno() != EEXIST
+            {
+                return Err(OsError::last_os_error("mkdirat", name.to_str().ok(), None));
+            }
         }
+        Ok(())
     }
 
     pub fn contains_path(&self, path: &CStr) -> bool {
@@ -210,25 +250,25 @@ impl Directory {
         }
     }
 
-    pub fn path(&self, buf: &mut dyn Utf8CStrBuf) -> io::Result<()> {
+    pub fn path(&self, buf: &mut dyn Utf8CStrBuf) -> OsResult<'static, ()> {
         fd_path(self.as_raw_fd(), buf)
     }
 
-    pub fn post_order_walk<F: FnMut(&DirEntry) -> io::Result<WalkResult>>(
+    pub fn post_order_walk<F: FnMut(&DirEntry) -> OsResultStatic<WalkResult>>(
         &mut self,
         mut f: F,
-    ) -> io::Result<WalkResult> {
+    ) -> OsResultStatic<WalkResult> {
         self.post_order_walk_impl(&mut f)
     }
 
-    pub fn pre_order_walk<F: FnMut(&DirEntry) -> io::Result<WalkResult>>(
+    pub fn pre_order_walk<F: FnMut(&DirEntry) -> OsResultStatic<WalkResult>>(
         &mut self,
         mut f: F,
-    ) -> io::Result<WalkResult> {
+    ) -> OsResultStatic<WalkResult> {
         self.pre_order_walk_impl(&mut f)
     }
 
-    pub fn remove_all(&mut self) -> io::Result<()> {
+    pub fn remove_all(&mut self) -> OsResultStatic<()> {
         self.post_order_walk(|e| {
             e.unlink()?;
             Ok(WalkResult::Continue)
@@ -236,60 +276,47 @@ impl Directory {
         Ok(())
     }
 
-    pub fn copy_into(&mut self, dir: &Directory) -> io::Result<()> {
+    pub fn copy_into(&mut self, dir: &Directory) -> OsResultStatic<()> {
         while let Some(ref e) = self.read()? {
             let attr = e.get_attr()?;
-            let new_entry = DirEntry {
-                dir,
-                entry: e.entry,
-                d_name_len: e.d_name_len,
-            };
             if e.is_dir() {
-                unsafe {
-                    libc::mkdirat(dir.as_raw_fd(), e.d_name.as_ptr(), 0o777).as_os_err()?;
-                }
+                dir.mkdirat(e.name(), 0o777)?;
                 let mut src = e.open_as_dir()?;
-                let dest = new_entry.open_as_dir()?;
+                let dest = dir.openat_as_dir(e.name())?;
                 src.copy_into(&dest)?;
                 fd_set_attr(dest.as_raw_fd(), &attr)?;
             } else if e.is_file() {
                 let mut src = e.open_as_file(O_RDONLY)?;
-                let mut dest = unsafe {
-                    File::from_raw_fd(dir.open_raw_fd(
-                        e.name(),
-                        O_WRONLY | O_CREAT | O_TRUNC,
-                        0o777,
-                    )?)
-                };
+                let mut dest = dir.openat_as_file(e.name(), O_WRONLY | O_CREAT | O_TRUNC, 0o777)?;
                 std::io::copy(&mut src, &mut dest)?;
                 fd_set_attr(dest.as_raw_fd(), &attr)?;
             } else if e.is_symlink() {
-                let mut path = cstr_buf::default();
-                e.read_link(&mut path)?;
+                let mut target = cstr_buf::default();
+                e.read_link(&mut target)?;
                 unsafe {
-                    libc::symlinkat(path.as_ptr(), dir.as_raw_fd(), e.d_name.as_ptr())
-                        .as_os_err()?;
+                    libc::symlinkat(target.as_ptr(), dir.as_raw_fd(), e.d_name.as_ptr())
+                        .check_os_err("symlinkat", Some(&target), e.utf8_name())?;
                 }
+                let new_entry = DirEntry {
+                    dir,
+                    entry: e.entry,
+                    d_name_len: e.d_name_len,
+                };
                 new_entry.set_attr(&attr)?;
             }
         }
         Ok(())
     }
 
-    pub fn move_into(&mut self, dir: &Directory) -> io::Result<()> {
+    pub fn move_into(&mut self, dir: &Directory) -> OsResultStatic<()> {
         let dir_fd = self.as_raw_fd();
         while let Some(ref e) = self.read()? {
             if e.is_dir() && dir.contains_path(e.name()) {
                 // Destination folder exists, needs recursive move
                 let mut src = e.open_as_dir()?;
-                let new_entry = DirEntry {
-                    dir,
-                    entry: e.entry,
-                    d_name_len: e.d_name_len,
-                };
-                let dest = new_entry.open_as_dir()?;
+                let dest = dir.openat_as_dir(e.name())?;
                 src.move_into(&dest)?;
-                return e.unlink();
+                return Ok(e.unlink()?);
             }
 
             unsafe {
@@ -299,27 +326,20 @@ impl Directory {
                     dir.as_raw_fd(),
                     e.d_name.as_ptr(),
                 )
-                .as_os_err()?;
+                .check_os_err("renameat", e.utf8_name(), None)?;
             }
         }
         Ok(())
     }
 
-    pub fn link_into(&mut self, dir: &Directory) -> io::Result<()> {
+    pub fn link_into(&mut self, dir: &Directory) -> OsResultStatic<()> {
         let dir_fd = self.as_raw_fd();
         while let Some(ref e) = self.read()? {
             if e.is_dir() {
-                unsafe {
-                    libc::mkdirat(dir.as_raw_fd(), e.d_name.as_ptr(), 0o777).as_os_err()?;
-                }
+                dir.mkdirat(e.name(), 0o777)?;
                 let attr = e.get_attr()?;
-                let new_entry = DirEntry {
-                    dir,
-                    entry: e.entry,
-                    d_name_len: e.d_name_len,
-                };
                 let mut src = e.open_as_dir()?;
-                let dest = new_entry.open_as_dir()?;
+                let dest = dir.openat_as_dir(e.name())?;
                 src.link_into(&dest)?;
                 fd_set_attr(dest.as_raw_fd(), &attr)?;
             } else {
@@ -331,7 +351,7 @@ impl Directory {
                         e.d_name.as_ptr(),
                         0,
                     )
-                    .as_os_err()?;
+                    .check_os_err("linkat", e.utf8_name(), None)?;
                 }
             }
         }
@@ -340,10 +360,10 @@ impl Directory {
 }
 
 impl Directory {
-    fn post_order_walk_impl<F: FnMut(&DirEntry) -> io::Result<WalkResult>>(
+    fn post_order_walk_impl<F: FnMut(&DirEntry) -> OsResultStatic<WalkResult>>(
         &mut self,
         f: &mut F,
-    ) -> io::Result<WalkResult> {
+    ) -> OsResultStatic<WalkResult> {
         use WalkResult::*;
         loop {
             match self.read()? {
@@ -365,10 +385,10 @@ impl Directory {
         }
     }
 
-    fn pre_order_walk_impl<F: FnMut(&DirEntry) -> io::Result<WalkResult>>(
+    fn pre_order_walk_impl<F: FnMut(&DirEntry) -> OsResultStatic<WalkResult>>(
         &mut self,
         f: &mut F,
-    ) -> io::Result<WalkResult> {
+    ) -> OsResultStatic<WalkResult> {
         use WalkResult::*;
         loop {
             match self.read()? {
@@ -391,10 +411,11 @@ impl Directory {
 }
 
 impl TryFrom<OwnedFd> for Directory {
-    type Error = io::Error;
+    type Error = OsError<'static>;
 
-    fn try_from(fd: OwnedFd) -> io::Result<Self> {
-        let dirp = unsafe { libc::fdopendir(fd.into_raw_fd()) }.check_os_err()?;
+    fn try_from(fd: OwnedFd) -> OsResult<'static, Self> {
+        let dirp = unsafe { libc::fdopendir(fd.into_raw_fd()) };
+        let dirp = dirp.as_os_result("fdopendir", None, None)?;
         Ok(Directory { dirp })
     }
 }

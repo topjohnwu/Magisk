@@ -1,9 +1,9 @@
-use crate::{FsPath, LibcReturn, Utf8CStr};
+use crate::{FsPath, LibcReturn, OsResult, Utf8CStr};
 use libc::c_ulong;
 use std::ptr;
 
 impl FsPath {
-    pub fn bind_mount_to(&self, path: &FsPath) -> std::io::Result<()> {
+    pub fn bind_mount_to<'a>(&'a self, path: &'a FsPath) -> OsResult<'a, ()> {
         unsafe {
             libc::mount(
                 self.as_ptr(),
@@ -12,11 +12,11 @@ impl FsPath {
                 libc::MS_BIND,
                 ptr::null(),
             )
-            .as_os_err()
+            .check_os_err("bind_mount", Some(self), Some(path))
         }
     }
 
-    pub fn remount_with_flags(&self, flags: c_ulong) -> std::io::Result<()> {
+    pub fn remount_with_flags(&self, flags: c_ulong) -> OsResult<()> {
         unsafe {
             libc::mount(
                 ptr::null(),
@@ -25,11 +25,11 @@ impl FsPath {
                 libc::MS_BIND | libc::MS_REMOUNT | flags,
                 ptr::null(),
             )
-            .as_os_err()
+            .check_os_err("remount", Some(self), None)
         }
     }
 
-    pub fn remount_with_data(&self, data: &Utf8CStr) -> std::io::Result<()> {
+    pub fn remount_with_data(&self, data: &Utf8CStr) -> OsResult<()> {
         unsafe {
             libc::mount(
                 ptr::null(),
@@ -38,11 +38,11 @@ impl FsPath {
                 libc::MS_REMOUNT,
                 data.as_ptr().cast(),
             )
-            .as_os_err()
+            .check_os_err("remount", Some(self), None)
         }
     }
 
-    pub fn move_mount_to(&self, path: &FsPath) -> std::io::Result<()> {
+    pub fn move_mount_to<'a>(&'a self, path: &'a FsPath) -> OsResult<'a, ()> {
         unsafe {
             libc::mount(
                 self.as_ptr(),
@@ -51,15 +51,17 @@ impl FsPath {
                 libc::MS_MOVE,
                 ptr::null(),
             )
-            .as_os_err()
+            .check_os_err("move_mount", Some(self), Some(path))
         }
     }
 
-    pub fn unmount(&self) -> std::io::Result<()> {
-        unsafe { libc::umount2(self.as_ptr(), libc::MNT_DETACH).as_os_err() }
+    pub fn unmount(&self) -> OsResult<()> {
+        unsafe {
+            libc::umount2(self.as_ptr(), libc::MNT_DETACH).check_os_err("unmount", Some(self), None)
+        }
     }
 
-    pub fn set_mount_private(&self, recursive: bool) -> std::io::Result<()> {
+    pub fn set_mount_private(&self, recursive: bool) -> OsResult<()> {
         let flag = if recursive { libc::MS_REC } else { 0 };
         unsafe {
             libc::mount(
@@ -69,7 +71,7 @@ impl FsPath {
                 libc::MS_PRIVATE | flag,
                 ptr::null(),
             )
-            .as_os_err()
+            .check_os_err("set_mount_private", Some(self), None)
         }
     }
 }

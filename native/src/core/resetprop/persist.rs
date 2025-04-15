@@ -84,13 +84,14 @@ fn file_set_prop(name: &Utf8CStr, value: Option<&Utf8CStr>) -> LoggedResult<()> 
             .join("prop.XXXXXX");
         {
             let mut f = unsafe {
-                let fd = mkstemp(tmp.as_mut_ptr()).check_os_err()?;
-                File::from_raw_fd(fd)
+                mkstemp(tmp.as_mut_ptr())
+                    .as_os_result("mkstemp", None, None)
+                    .map(|fd| File::from_raw_fd(fd))?
             };
             f.write_all(value.as_bytes())?;
         }
         debug!("resetprop: write prop to [{}]", tmp);
-        tmp.rename_to(path)?
+        tmp.rename_to(&path)?
     } else {
         path.remove().silent()?;
         debug!("resetprop: unlink [{}]", path);
@@ -113,14 +114,15 @@ fn proto_write_props(props: &PersistentProperties) -> LoggedResult<()> {
     let mut tmp = FsPathBuf::default().join(concatcp!(PERSIST_PROP, ".XXXXXX"));
     {
         let f = unsafe {
-            let fd = mkstemp(tmp.as_mut_ptr()).check_os_err()?;
-            File::from_raw_fd(fd)
+            mkstemp(tmp.as_mut_ptr())
+                .as_os_result("mkstemp", None, None)
+                .map(|fd| File::from_raw_fd(fd))?
         };
         debug!("resetprop: encode with protobuf [{}]", tmp);
         props.write_message(&mut Writer::new(BufWriter::new(f)))?;
     }
     clone_attr(path!(PERSIST_PROP), &tmp)?;
-    tmp.rename_to(cstr!(PERSIST_PROP))?;
+    tmp.rename_to(path!(PERSIST_PROP))?;
     Ok(())
 }
 

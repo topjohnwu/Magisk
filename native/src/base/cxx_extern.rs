@@ -1,6 +1,5 @@
 // Functions in this file are only for exporting to C++, DO NOT USE IN RUST
 
-use std::io;
 use std::os::fd::{BorrowedFd, OwnedFd, RawFd};
 
 use cfg_if::cfg_if;
@@ -9,8 +8,8 @@ use libc::{c_char, mode_t};
 use crate::files::map_file_at;
 pub(crate) use crate::xwrap::*;
 use crate::{
-    CxxResultExt, Directory, FsPath, Utf8CStr, clone_attr, cstr, cstr_buf, fclone_attr, fd_path,
-    map_fd, map_file, slice_from_ptr,
+    CxxResultExt, Directory, FsPath, OsResultStatic, Utf8CStr, clone_attr, cstr, cstr_buf,
+    fclone_attr, fd_path, map_fd, map_file, slice_from_ptr,
 };
 
 pub(crate) fn fd_path_for_cxx(fd: RawFd, buf: &mut [u8]) -> isize {
@@ -57,7 +56,7 @@ unsafe extern "C" fn rm_rf_for_cxx(path: *const c_char) -> bool {
 
 #[unsafe(no_mangle)]
 unsafe extern "C" fn frm_rf(fd: OwnedFd) -> bool {
-    fn inner(fd: OwnedFd) -> io::Result<()> {
+    fn inner(fd: OwnedFd) -> OsResultStatic<()> {
         Directory::try_from(fd)?.remove_all()
     }
     inner(fd).is_ok()

@@ -1,9 +1,9 @@
-use std::fmt;
+use crate::logging::Formatter;
+use crate::{LogLevel, errno, log_with_args, log_with_formatter};
 use std::fmt::Display;
 use std::panic::Location;
-
-use crate::logging::Formatter;
-use crate::{LogLevel, log_with_args, log_with_formatter};
+use std::{fmt, io};
+use thiserror::Error;
 
 // Error handling throughout the Rust codebase in Magisk:
 //
@@ -205,3 +205,191 @@ impl<T: Display> From<T> for LoggedError {
         LoggedError::default()
     }
 }
+
+// Check libc return value and map to Result
+pub trait LibcReturn
+where
+    Self: Copy,
+{
+    fn is_error(&self) -> bool;
+
+    fn as_os_result<'a>(
+        self,
+        name: &'static str,
+        arg1: Option<&'a str>,
+        arg2: Option<&'a str>,
+    ) -> OsResult<'a, Self> {
+        if self.is_error() {
+            Err(OsError::last_os_error(name, arg1, arg2))
+        } else {
+            Ok(self)
+        }
+    }
+
+    fn check_os_err<'a>(
+        self,
+        name: &'static str,
+        arg1: Option<&'a str>,
+        arg2: Option<&'a str>,
+    ) -> OsResult<'a, ()> {
+        self.as_os_result(name, arg1, arg2)?;
+        Ok(())
+    }
+
+    fn check_io_err(self) -> io::Result<()> {
+        if self.is_error() {
+            Err(io::Error::last_os_error())
+        } else {
+            Ok(())
+        }
+    }
+}
+
+macro_rules! impl_libc_return {
+    ($($t:ty)*) => ($(
+        impl LibcReturn for $t {
+            #[inline]
+            fn is_error(&self) -> bool {
+                *self < 0
+            }
+        }
+    )*)
+}
+
+impl_libc_return! { i8 i16 i32 i64 isize }
+
+impl<T> LibcReturn for *const T {
+    #[inline]
+    fn is_error(&self) -> bool {
+        self.is_null()
+    }
+}
+
+impl<T> LibcReturn for *mut T {
+    #[inline]
+    fn is_error(&self) -> bool {
+        self.is_null()
+    }
+}
+
+#[derive(Debug)]
+enum OwnableStr<'a> {
+    None,
+    Borrowed(&'a str),
+    Owned(Box<str>),
+}
+
+impl OwnableStr<'_> {
+    fn into_owned(self) -> OwnableStr<'static> {
+        match self {
+            OwnableStr::None => OwnableStr::None,
+            OwnableStr::Borrowed(s) => OwnableStr::Owned(Box::from(s)),
+            OwnableStr::Owned(s) => OwnableStr::Owned(s),
+        }
+    }
+
+    fn ok(&self) -> Option<&str> {
+        match self {
+            OwnableStr::None => None,
+            OwnableStr::Borrowed(s) => Some(*s),
+            OwnableStr::Owned(s) => Some(s),
+        }
+    }
+}
+
+impl<'a> From<Option<&'a str>> for OwnableStr<'a> {
+    fn from(value: Option<&'a str>) -> Self {
+        value.map(OwnableStr::Borrowed).unwrap_or(OwnableStr::None)
+    }
+}
+
+#[derive(Debug)]
+pub struct OsError<'a> {
+    code: i32,
+    name: &'static str,
+    arg1: OwnableStr<'a>,
+    arg2: OwnableStr<'a>,
+}
+
+impl OsError<'_> {
+    pub fn with_os_error<'a>(
+        code: i32,
+        name: &'static str,
+        arg1: Option<&'a str>,
+        arg2: Option<&'a str>,
+    ) -> OsError<'a> {
+        OsError {
+            code,
+            name,
+            arg1: OwnableStr::from(arg1),
+            arg2: OwnableStr::from(arg2),
+        }
+    }
+
+    pub fn last_os_error<'a>(
+        name: &'static str,
+        arg1: Option<&'a str>,
+        arg2: Option<&'a str>,
+    ) -> OsError<'a> {
+        Self::with_os_error(*errno(), name, arg1, arg2)
+    }
+
+    pub fn set_args<'a>(self, arg1: Option<&'a str>, arg2: Option<&'a str>) -> OsError<'a> {
+        Self::with_os_error(self.code, self.name, arg1, arg2)
+    }
+
+    pub fn into_owned(self) -> OsError<'static> {
+        OsError {
+            code: *errno(),
+            name: self.name,
+            arg1: self.arg1.into_owned(),
+            arg2: self.arg2.into_owned(),
+        }
+    }
+
+    fn as_io_error(&self) -> io::Error {
+        io::Error::from_raw_os_error(self.code)
+    }
+}
+
+impl Display for OsError<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let error = self.as_io_error();
+        if self.name.is_empty() {
+            write!(f, "{:#}", error)
+        } else {
+            match (self.arg1.ok(), self.arg2.ok()) {
+                (Some(arg1), Some(arg2)) => {
+                    write!(f, "{} '{}' '{}': {:#}", self.name, arg1, arg2, error)
+                }
+                (Some(arg1), None) => {
+                    write!(f, "{} '{}': {:#}", self.name, arg1, error)
+                }
+                _ => {
+                    write!(f, "{}: {:#}", self.name, error)
+                }
+            }
+        }
+    }
+}
+
+impl std::error::Error for OsError<'_> {}
+
+pub type OsResult<'a, T> = Result<T, OsError<'a>>;
+
+#[derive(Debug, Error)]
+pub enum OsErrorStatic {
+    #[error(transparent)]
+    Os(OsError<'static>),
+    #[error(transparent)]
+    Io(#[from] io::Error),
+}
+
+// Convert non-static OsError to static
+impl<'a> From<OsError<'a>> for OsErrorStatic {
+    fn from(value: OsError<'a>) -> Self {
+        OsErrorStatic::Os(value.into_owned())
+    }
+}
+
+pub type OsResultStatic<T> = Result<T, OsErrorStatic>;
