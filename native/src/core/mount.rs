@@ -7,8 +7,8 @@ use num_traits::AsPrimitive;
 
 use base::libc::{c_uint, dev_t};
 use base::{
-    FsPath, FsPathBuf, LibcReturn, LoggedResult, MountInfo, ResultExt, Utf8CStr, cstr, debug, info,
-    libc, parse_mount_info, path, warn,
+    FsPath, FsPathBuf, LibcReturn, LoggedResult, MountInfo, ResultExt, Utf8CStr, cstr, cstr_buf,
+    debug, info, libc, parse_mount_info, path, warn,
 };
 
 use crate::consts::{MODULEMNT, MODULEROOT, PREINITDEV, PREINITMIRR, WORKERDIR};
@@ -21,7 +21,9 @@ pub fn setup_mounts() {
     let magisk_tmp = get_magisk_tmp();
 
     // Mount preinit directory
-    let dev_path = FsPathBuf::<64>::new().join(magisk_tmp).join(PREINITDEV);
+    let dev_path = FsPathBuf::from(cstr_buf::new::<64>())
+        .join(magisk_tmp)
+        .join(PREINITDEV);
     let mut linked = false;
     if let Ok(attr) = dev_path.get_attr() {
         if attr.st.st_mode & libc::S_IFMT as c_uint == libc::S_IFBLK.as_() {

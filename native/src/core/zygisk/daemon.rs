@@ -37,7 +37,9 @@ fn exec_zygiskd(is_64_bit: bool, remote: UnixStream) {
     #[cfg(target_pointer_width = "32")]
     let magisk = "magisk";
 
-    let exe = FsPathBuf::<64>::new().join(get_magisk_tmp()).join(magisk);
+    let exe = FsPathBuf::from(cstr_buf::new::<64>())
+        .join(get_magisk_tmp())
+        .join(magisk);
 
     let mut fd_str = cstr_buf::new::<16>();
     write!(fd_str, "{}", remote.as_raw_fd()).ok();

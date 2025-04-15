@@ -41,7 +41,7 @@ pub mod cstr_buf {
     use super::{Utf8CStrBufArr, Utf8CStrBufRef, Utf8CString};
 
     #[inline(always)]
-    pub fn with_capacity(capacity: usize) -> Utf8CString {
+    pub fn dynamic(capacity: usize) -> Utf8CString {
         Utf8CString::with_capacity(capacity)
     }
 
@@ -63,6 +63,63 @@ pub mod cstr_buf {
     #[inline(always)]
     pub unsafe fn wrap_ptr<'a>(buf: *mut u8, len: usize) -> Utf8CStrBufRef<'a> {
         unsafe { Utf8CStrBufRef::from_ptr(buf, len) }
+    }
+}
+
+// Union type for storing a Utf8CStrBuf value
+
+pub enum Utf8CStrBuffer<'a, const N: usize> {
+    Array(Utf8CStrBufArr<N>),
+    Reference(Utf8CStrBufRef<'a>),
+    Dynamic(Utf8CString),
+    Wrap(&'a mut dyn Utf8CStrBuf),
+}
+
+impl<'a, const N: usize> Deref for Utf8CStrBuffer<'a, N> {
+    type Target = dyn Utf8CStrBuf + 'a;
+
+    fn deref(&self) -> &Self::Target {
+        match self {
+            Utf8CStrBuffer::Array(s) => s,
+            Utf8CStrBuffer::Reference(s) => s,
+            Utf8CStrBuffer::Dynamic(s) => s,
+            Utf8CStrBuffer::Wrap(s) => *s,
+        }
+    }
+}
+
+impl<const N: usize> DerefMut for Utf8CStrBuffer<'_, N> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        match self {
+            Utf8CStrBuffer::Array(s) => s,
+            Utf8CStrBuffer::Reference(s) => s,
+            Utf8CStrBuffer::Dynamic(s) => s,
+            Utf8CStrBuffer::Wrap(s) => *s,
+        }
+    }
+}
+
+impl From<Utf8CString> for Utf8CStrBuffer<'static, 0> {
+    fn from(value: Utf8CString) -> Self {
+        Utf8CStrBuffer::Dynamic(value)
+    }
+}
+
+impl<const N: usize> From<Utf8CStrBufArr<N>> for Utf8CStrBuffer<'static, N> {
+    fn from(value: Utf8CStrBufArr<N>) -> Self {
+        Utf8CStrBuffer::Array(value)
+    }
+}
+
+impl<'a> From<&'a mut dyn Utf8CStrBuf> for Utf8CStrBuffer<'a, 0> {
+    fn from(value: &'a mut dyn Utf8CStrBuf) -> Self {
+        Utf8CStrBuffer::Wrap(value)
+    }
+}
+
+impl Default for Utf8CStrBuffer<'static, 4096> {
+    fn default() -> Self {
+        Utf8CStrBuffer::Array(cstr_buf::default())
     }
 }
 
@@ -125,7 +182,7 @@ impl<T: Utf8CStrBufWithSlice> AsUtf8CStr for T {
 
 // Implementation for Utf8CString
 
-fn utf8_cstr_buf_append(buf: &mut dyn Utf8CStrBufWithSlice, s: &[u8]) -> usize {
+fn utf8_cstr_append(buf: &mut dyn Utf8CStrBufWithSlice, s: &[u8]) -> usize {
     let mut used = buf.len();
     if used >= buf.capacity() - 1 {
         // Truncate
@@ -480,7 +537,7 @@ impl FsPath {
     }
 
     #[inline(always)]
-    pub const fn from_utfcstr(value: &Utf8CStr) -> &FsPath {
+    pub const fn __from_utfcstr(value: &Utf8CStr) -> &FsPath {
         unsafe { mem::transmute(value) }
     }
 
@@ -525,52 +582,33 @@ impl DerefMut for FsPathFollow {
     }
 }
 
-enum Utf8CStrBufOwned<const N: usize> {
-    Dynamic(Utf8CString),
-    Fixed(Utf8CStrBufArr<N>),
-}
+pub struct FsPathBuf<'a, const N: usize>(pub Utf8CStrBuffer<'a, N>);
 
-impl<const N: usize> Deref for Utf8CStrBufOwned<N> {
-    type Target = dyn Utf8CStrBuf;
-
-    fn deref(&self) -> &Self::Target {
-        match self {
-            Utf8CStrBufOwned::Dynamic(s) => s,
-            Utf8CStrBufOwned::Fixed(arr) => arr,
-        }
+impl From<Utf8CString> for FsPathBuf<'static, 0> {
+    fn from(value: Utf8CString) -> Self {
+        FsPathBuf(From::from(value))
     }
 }
 
-impl<const N: usize> DerefMut for Utf8CStrBufOwned<N> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        match self {
-            Utf8CStrBufOwned::Dynamic(s) => s,
-            Utf8CStrBufOwned::Fixed(arr) => arr,
-        }
+impl<const N: usize> From<Utf8CStrBufArr<N>> for FsPathBuf<'static, N> {
+    fn from(value: Utf8CStrBufArr<N>) -> Self {
+        FsPathBuf(From::from(value))
     }
 }
 
-pub struct FsPathBuf<const N: usize>(Utf8CStrBufOwned<N>);
-
-impl FsPathBuf<0> {
-    pub fn new_dynamic(capacity: usize) -> Self {
-        FsPathBuf(Utf8CStrBufOwned::Dynamic(Utf8CString::with_capacity(
-            capacity,
-        )))
+impl<'a> From<&'a mut dyn Utf8CStrBuf> for FsPathBuf<'a, 0> {
+    fn from(value: &'a mut dyn Utf8CStrBuf) -> Self {
+        FsPathBuf(From::from(value))
     }
 }
 
-impl Default for FsPathBuf<4096> {
+impl Default for FsPathBuf<'static, 4096> {
     fn default() -> Self {
-        FsPathBuf(Utf8CStrBufOwned::Fixed(cstr_buf::default()))
+        FsPathBuf(Default::default())
     }
 }
 
-impl<const N: usize> FsPathBuf<N> {
-    pub fn new() -> Self {
-        FsPathBuf(Utf8CStrBufOwned::Fixed(cstr_buf::new::<N>()))
-    }
-
+impl<const N: usize> FsPathBuf<'_, N> {
     pub fn clear(&mut self) {
         self.0.clear();
     }
@@ -595,7 +633,7 @@ impl<const N: usize> FsPathBuf<N> {
     }
 }
 
-impl<const N: usize> Deref for FsPathBuf<N> {
+impl<const N: usize> Deref for FsPathBuf<'_, N> {
     type Target = FsPath;
 
     fn deref(&self) -> &FsPath {
@@ -603,7 +641,7 @@ impl<const N: usize> Deref for FsPathBuf<N> {
     }
 }
 
-impl<const N: usize> DerefMut for FsPathBuf<N> {
+impl<const N: usize> DerefMut for FsPathBuf<'_, N> {
     fn deref_mut(&mut self) -> &mut FsPath {
         FsPath::from_mut(self.0.deref_mut())
     }
@@ -692,7 +730,7 @@ impl_str!(
     (Utf8CStr,)
     (FsPath,)
     (FsPathFollow,)
-    (FsPathBuf<N>, const N: usize)
+    (FsPathBuf<'_, N>, const N: usize)
     (Utf8CStrBufRef<'_>,)
     (Utf8CStrBufArr<N>, const N: usize)
     (Utf8CString,)
@@ -749,7 +787,7 @@ macro_rules! impl_str_buf_with_slice {
             }
             #[inline(always)]
             fn push_str(&mut self, s: &str) -> usize {
-                utf8_cstr_buf_append(self, s.as_bytes())
+                utf8_cstr_append(self, s.as_bytes())
             }
             #[inline(always)]
             fn push_lossy(&mut self, s: &[u8]) -> usize {
@@ -791,5 +829,5 @@ macro_rules! raw_cstr {
 
 #[macro_export]
 macro_rules! path {
-    ($str:expr) => {{ $crate::FsPath::from_utfcstr($crate::cstr!($str)) }};
+    ($str:expr) => {{ $crate::FsPath::__from_utfcstr($crate::cstr!($str)) }};
 }
