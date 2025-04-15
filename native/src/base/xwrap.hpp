@@ -25,7 +25,6 @@ int xsocket(int domain, int type, int protocol);
 int xbind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
 int xlisten(int sockfd, int backlog);
 int xaccept4(int sockfd, struct sockaddr *addr, socklen_t *addrlen, int flags);
-int xaccess(const char *path, int mode);
 int xstat(const char *pathname, struct stat *buf);
 int xfstat(int fd, struct stat *buf);
 int xdup(int fd);
