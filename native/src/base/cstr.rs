@@ -139,7 +139,6 @@ pub trait Utf8CStrBuf:
     // 3. All bytes from 0 to len is valid UTF-8 and does not contain null
     unsafe fn set_len(&mut self, len: usize);
     fn push_str(&mut self, s: &str) -> usize;
-    fn push_lossy(&mut self, s: &[u8]) -> usize;
     // The capacity of the internal buffer. The maximum string length this buffer can contain
     // is capacity - 1, because the last byte is reserved for the terminating null character.
     fn capacity(&self) -> usize;
@@ -196,17 +195,6 @@ fn utf8_cstr_append(buf: &mut dyn Utf8CStrBufWithSlice, s: &[u8]) -> usize {
     dest[len] = b'\0';
     used += len;
     unsafe { buf.set_len(used) };
-    len
-}
-
-fn utf8_cstr_append_lossy(buf: &mut dyn Utf8CStrBuf, s: &[u8]) -> usize {
-    let mut len = 0_usize;
-    for chunk in s.utf8_chunks() {
-        len += buf.push_str(chunk.valid());
-        if !chunk.invalid().is_empty() {
-            len += buf.push_str(char::REPLACEMENT_CHARACTER.encode_utf8(&mut [0; 4]));
-        }
-    }
     len
 }
 
@@ -298,11 +286,6 @@ impl Utf8CStrBuf for Utf8CString {
         self.0.push_str(s);
         self.0.nul_terminate();
         s.len()
-    }
-
-    #[inline(always)]
-    fn push_lossy(&mut self, s: &[u8]) -> usize {
-        utf8_cstr_append_lossy(self, s)
     }
 
     fn capacity(&self) -> usize {
@@ -788,10 +771,6 @@ macro_rules! impl_str_buf_with_slice {
             #[inline(always)]
             fn push_str(&mut self, s: &str) -> usize {
                 utf8_cstr_append(self, s.as_bytes())
-            }
-            #[inline(always)]
-            fn push_lossy(&mut self, s: &[u8]) -> usize {
-                utf8_cstr_append_lossy(self, s)
             }
             #[inline(always)]
             fn capacity(&self) -> usize {
