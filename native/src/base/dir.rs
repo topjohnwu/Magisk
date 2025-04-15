@@ -1,7 +1,7 @@
 use crate::cxx_extern::readlinkat;
 use crate::{
-    FileAttr, FsPath, LibcReturn, OsError, OsResult, OsResultStatic, Utf8CStr, Utf8CStrBuf, cstr,
-    cstr_buf, errno, fd_path, fd_set_attr,
+    FileAttr, FsPath, FsPathBuf, LibcReturn, OsError, OsResult, OsResultStatic, Utf8CStr,
+    Utf8CStrBuf, cstr, cstr_buf, errno, fd_path, fd_set_attr,
 };
 use libc::{EEXIST, O_CLOEXEC, O_CREAT, O_RDONLY, O_TRUNC, O_WRONLY, dirent, mode_t};
 use std::ffi::CStr;
@@ -39,8 +39,12 @@ impl DirEntry<'_> {
 
     pub fn path(&self, buf: &mut dyn Utf8CStrBuf) -> OsResult<'static, ()> {
         self.dir.path(buf)?;
-        buf.push_str("/");
-        buf.push_lossy(self.name().to_bytes());
+        if let Ok(s) = self.name().to_str() {
+            FsPathBuf::from(buf).join(s);
+        } else {
+            buf.push_str("/");
+            buf.push_lossy(self.name().to_bytes());
+        }
         Ok(())
     }
 
