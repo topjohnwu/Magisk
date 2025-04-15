@@ -1,4 +1,4 @@
-use crate::cxx_extern::readlinkat_for_cxx;
+use crate::cxx_extern::readlinkat;
 use crate::{
     FileAttr, FsPath, LibcReturn, OsError, OsResult, OsResultStatic, Utf8CStr, Utf8CStrBuf, cstr,
     cstr_buf, errno, fd_path, fd_set_attr,
@@ -8,15 +8,20 @@ use std::ffi::CStr;
 use std::fs::File;
 use std::ops::Deref;
 use std::os::fd::{AsFd, AsRawFd, BorrowedFd, FromRawFd, IntoRawFd, OwnedFd, RawFd};
+use std::ptr::NonNull;
 use std::{mem, slice};
 
 pub struct DirEntry<'a> {
     dir: &'a Directory,
-    entry: &'a dirent,
+    entry: NonNull<dirent>,
     d_name_len: usize,
 }
 
 impl DirEntry<'_> {
+    pub fn as_ptr(&self) -> *mut dirent {
+        self.entry.as_ptr()
+    }
+
     pub fn name(&self) -> &CStr {
         unsafe {
             CStr::from_bytes_with_nul_unchecked(slice::from_raw_parts(
@@ -81,7 +86,7 @@ impl DirEntry<'_> {
     pub fn read_link(&self, buf: &mut dyn Utf8CStrBuf) -> OsResult<()> {
         buf.clear();
         unsafe {
-            let r = readlinkat_for_cxx(
+            let r = readlinkat(
                 self.dir.as_raw_fd(),
                 self.d_name.as_ptr(),
                 buf.as_mut_ptr().cast(),
@@ -154,12 +159,13 @@ impl Deref for DirEntry<'_> {
     type Target = dirent;
 
     fn deref(&self) -> &dirent {
-        self.entry
+        unsafe { self.entry.as_ref() }
     }
 }
 
+#[repr(transparent)]
 pub struct Directory {
-    dirp: *mut libc::DIR,
+    inner: NonNull<libc::DIR>,
 }
 
 pub enum WalkResult {
@@ -172,12 +178,14 @@ impl Directory {
     pub fn open(path: &Utf8CStr) -> OsResult<Directory> {
         let dirp = unsafe { libc::opendir(path.as_ptr()) };
         let dirp = dirp.as_os_result("opendir", Some(path), None)?;
-        Ok(Directory { dirp })
+        Ok(Directory {
+            inner: unsafe { NonNull::new_unchecked(dirp) },
+        })
     }
 
     pub fn read(&mut self) -> OsResult<'static, Option<DirEntry>> {
         *errno() = 0;
-        let e = unsafe { libc::readdir(self.dirp) };
+        let e = unsafe { libc::readdir(self.inner.as_ptr()) };
         if e.is_null() {
             return if *errno() != 0 {
                 Err(OsError::last_os_error("readdir", None, None))
@@ -194,7 +202,7 @@ impl Directory {
             } else {
                 let e = DirEntry {
                     dir: self,
-                    entry,
+                    entry: NonNull::from(entry),
                     d_name_len: d_name.to_bytes_with_nul().len(),
                 };
                 Ok(Some(e))
@@ -203,7 +211,7 @@ impl Directory {
     }
 
     pub fn rewind(&mut self) {
-        unsafe { libc::rewinddir(self.dirp) }
+        unsafe { libc::rewinddir(self.inner.as_ptr()) };
     }
 
     fn openat<'a>(&self, name: &'a CStr, flags: i32, mode: u32) -> OsResult<'a, OwnedFd> {
@@ -416,13 +424,15 @@ impl TryFrom<OwnedFd> for Directory {
     fn try_from(fd: OwnedFd) -> OsResult<'static, Self> {
         let dirp = unsafe { libc::fdopendir(fd.into_raw_fd()) };
         let dirp = dirp.as_os_result("fdopendir", None, None)?;
-        Ok(Directory { dirp })
+        Ok(Directory {
+            inner: unsafe { NonNull::new_unchecked(dirp) },
+        })
     }
 }
 
 impl AsRawFd for Directory {
     fn as_raw_fd(&self) -> RawFd {
-        unsafe { libc::dirfd(self.dirp) }
+        unsafe { libc::dirfd(self.inner.as_ptr()) }
     }
 }
 
@@ -435,7 +445,7 @@ impl AsFd for Directory {
 impl Drop for Directory {
     fn drop(&mut self) {
         unsafe {
-            libc::closedir(self.dirp);
+            libc::closedir(self.inner.as_ptr());
         }
     }
 }

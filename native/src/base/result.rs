@@ -61,7 +61,6 @@ pub trait ResultExt<T> {
 // Internal C++ bridging logging routines
 pub(crate) trait CxxResultExt<T> {
     fn log_cxx(self) -> LoggedResult<T>;
-    fn log_cxx_with_msg<F: FnOnce(Formatter) -> fmt::Result>(self, f: F) -> LoggedResult<T>;
 }
 
 trait Loggable<T> {
@@ -77,10 +76,6 @@ trait Loggable<T> {
 impl<T, R: Loggable<T>> CxxResultExt<T> for R {
     fn log_cxx(self) -> LoggedResult<T> {
         self.do_log(LogLevel::ErrorCxx, None)
-    }
-
-    fn log_cxx_with_msg<F: FnOnce(Formatter) -> fmt::Result>(self, f: F) -> LoggedResult<T> {
-        self.do_log_msg(LogLevel::ErrorCxx, None, f)
     }
 }
 
