@@ -1,10 +1,9 @@
 use crate::cxx_extern::readlinkat;
 use crate::{
     FileAttr, FsPathBuf, LibcReturn, OsError, OsResult, OsResultStatic, Utf8CStr, Utf8CStrBuf,
-    cstr, cstr_buf, errno, fd_path, fd_set_attr,
+    cstr_buf, errno, fd_path, fd_set_attr,
 };
 use libc::{EEXIST, O_CLOEXEC, O_CREAT, O_RDONLY, O_TRUNC, O_WRONLY, dirent, mode_t};
-use std::ffi::CStr;
 use std::fs::File;
 use std::marker::PhantomData;
 use std::ops::{Deref, DerefMut};
@@ -23,18 +22,13 @@ impl DirEntry<'_> {
         self.entry.as_ptr()
     }
 
-    pub fn name(&self) -> &CStr {
+    pub fn name(&self) -> &Utf8CStr {
         unsafe {
-            CStr::from_bytes_with_nul_unchecked(slice::from_raw_parts(
+            Utf8CStr::from_bytes_unchecked(slice::from_raw_parts(
                 self.d_name.as_ptr().cast(),
                 self.d_name_len,
             ))
         }
-    }
-
-    #[inline(always)]
-    fn utf8_name(&self) -> Option<&str> {
-        self.name().to_str().ok()
     }
 
     pub fn path(&self, buf: &mut dyn Utf8CStrBuf) -> OsResult<'static, ()> {
@@ -74,7 +68,7 @@ impl DirEntry<'_> {
         unsafe {
             libc::unlinkat(self.dir.as_raw_fd(), self.d_name.as_ptr(), flag).check_os_err(
                 "unlinkat",
-                self.utf8_name(),
+                Some(self.name()),
                 None,
             )?;
         }
@@ -90,7 +84,7 @@ impl DirEntry<'_> {
                 buf.as_mut_ptr().cast(),
                 buf.capacity(),
             )
-            .as_os_result("readlinkat", self.utf8_name(), None)? as usize;
+            .as_os_result("readlinkat", Some(self.name()), None)? as usize;
             buf.set_len(r);
         }
         Ok(())
@@ -101,7 +95,7 @@ impl DirEntry<'_> {
             return Err(OsError::with_os_error(
                 libc::ENOTDIR,
                 "fdopendir",
-                self.utf8_name(),
+                Some(self.name()),
                 None,
             ));
         }
@@ -113,7 +107,7 @@ impl DirEntry<'_> {
             return Err(OsError::with_os_error(
                 libc::EISDIR,
                 "open_as_file",
-                self.utf8_name(),
+                Some(self.name()),
                 None,
             ));
         }
@@ -180,22 +174,17 @@ impl Directory {
         }
     }
 
-    fn openat<'a>(&self, name: &'a CStr, flags: i32, mode: u32) -> OsResult<'a, OwnedFd> {
+    fn openat<'a>(&self, name: &'a Utf8CStr, flags: i32, mode: u32) -> OsResult<'a, OwnedFd> {
         unsafe {
             libc::openat(self.as_raw_fd(), name.as_ptr(), flags | O_CLOEXEC, mode)
-                .as_os_result("openat", name.to_str().ok(), None)
+                .as_os_result("openat", Some(name), None)
                 .map(|fd| OwnedFd::from_raw_fd(fd))
         }
     }
 
-    fn path_at(&self, name: &CStr, buf: &mut dyn Utf8CStrBuf) -> OsResult<'static, ()> {
+    fn path_at(&self, name: &Utf8CStr, buf: &mut dyn Utf8CStrBuf) -> OsResult<'static, ()> {
         self.path(buf)?;
-        if let Ok(s) = name.to_str() {
-            FsPathBuf::from(buf).join(s);
-        } else {
-            buf.push_str("/");
-            buf.push_lossy(name.to_bytes());
-        }
+        FsPathBuf::from(buf).join(name);
         Ok(())
     }
 }
@@ -217,17 +206,21 @@ impl Directory {
                 Ok(None)
             };
         }
-        // Skip both "." and ".."
+        // Skip non UTF-8 entries, ".", and ".."
         unsafe {
             let entry = &*e;
-            let d_name = CStr::from_ptr(entry.d_name.as_ptr());
-            if d_name == cstr!(".") || d_name == cstr!("..") {
+
+            let Ok(name) = Utf8CStr::from_ptr(entry.d_name.as_ptr()) else {
+                return self.read();
+            };
+
+            if name == "." || name == ".." {
                 self.read()
             } else {
                 let e = DirEntry {
                     dir: self.borrow(),
                     entry: NonNull::from(entry),
-                    d_name_len: d_name.to_bytes_with_nul().len(),
+                    d_name_len: name.as_bytes_with_nul().len(),
                 };
                 Ok(Some(e))
             }
@@ -238,60 +231,64 @@ impl Directory {
         unsafe { libc::rewinddir(self.inner.as_ptr()) };
     }
 
-    pub fn openat_as_dir<'a>(&self, name: &'a CStr) -> OsResult<'a, Directory> {
+    pub fn openat_as_dir<'a>(&self, name: &'a Utf8CStr) -> OsResult<'a, Directory> {
         let fd = self.openat(name, O_RDONLY, 0)?;
-        Directory::try_from(fd).map_err(|e| e.set_args(name.to_str().ok(), None))
+        Directory::try_from(fd).map_err(|e| e.set_args(Some(name), None))
     }
 
-    pub fn openat_as_file<'a>(&self, name: &'a CStr, flags: i32, mode: u32) -> OsResult<'a, File> {
+    pub fn openat_as_file<'a>(
+        &self,
+        name: &'a Utf8CStr,
+        flags: i32,
+        mode: u32,
+    ) -> OsResult<'a, File> {
         let fd = self.openat(name, flags, mode)?;
         Ok(File::from(fd))
     }
 
-    pub fn get_attr_at<'a>(&self, name: &'a CStr) -> OsResult<'a, FileAttr> {
+    pub fn get_attr_at<'a>(&self, name: &'a Utf8CStr) -> OsResult<'a, FileAttr> {
         let mut path = FsPathBuf::default();
         self.path_at(name, path.0.deref_mut())?;
-        path.get_attr()
-            .map_err(|e| e.set_args(name.to_str().ok(), None))
+        path.get_attr().map_err(|e| e.set_args(Some(name), None))
     }
 
-    pub fn set_attr_at<'a>(&self, name: &'a CStr, attr: &FileAttr) -> OsResult<'a, ()> {
+    pub fn set_attr_at<'a>(&self, name: &'a Utf8CStr, attr: &FileAttr) -> OsResult<'a, ()> {
         let mut path = FsPathBuf::default();
         self.path_at(name, path.0.deref_mut())?;
         path.set_attr(attr)
-            .map_err(|e| e.set_args(name.to_str().ok(), None))
+            .map_err(|e| e.set_args(Some(name), None))
     }
 
     pub fn get_secontext_at<'a>(
         &self,
-        name: &'a CStr,
+        name: &'a Utf8CStr,
         con: &mut dyn Utf8CStrBuf,
     ) -> OsResult<'a, ()> {
         let mut path = FsPathBuf::default();
         self.path_at(name, path.0.deref_mut())?;
         path.get_secontext(con)
-            .map_err(|e| e.set_args(name.to_str().ok(), None))
+            .map_err(|e| e.set_args(Some(name), None))
     }
 
-    pub fn set_secontext_at<'a>(&self, name: &'a CStr, con: &'a Utf8CStr) -> OsResult<'a, ()> {
+    pub fn set_secontext_at<'a>(&self, name: &'a Utf8CStr, con: &'a Utf8CStr) -> OsResult<'a, ()> {
         let mut path = FsPathBuf::default();
         self.path_at(name, path.0.deref_mut())?;
         path.set_secontext(con)
-            .map_err(|e| e.set_args(name.to_str().ok(), Some(con)))
+            .map_err(|e| e.set_args(Some(name), Some(con)))
     }
 
-    pub fn mkdirat<'a>(&self, name: &'a CStr, mode: mode_t) -> OsResult<'a, ()> {
+    pub fn mkdirat<'a>(&self, name: &'a Utf8CStr, mode: mode_t) -> OsResult<'a, ()> {
         unsafe {
             if libc::mkdirat(self.as_raw_fd(), name.as_ptr(), mode as mode_t) < 0
                 && *errno() != EEXIST
             {
-                return Err(OsError::last_os_error("mkdirat", name.to_str().ok(), None));
+                return Err(OsError::last_os_error("mkdirat", Some(name), None));
             }
         }
         Ok(())
     }
 
-    pub fn contains_path(&self, path: &CStr) -> bool {
+    pub fn contains_path(&self, path: &Utf8CStr) -> bool {
         // WARNING: Using faccessat is incorrect, because the raw linux kernel syscall
         // does not support the flag AT_SYMLINK_NOFOLLOW until 5.8 with faccessat2.
         // Use fstatat to check the existence of a file instead.
@@ -351,7 +348,7 @@ impl Directory {
                 e.read_link(&mut target)?;
                 unsafe {
                     libc::symlinkat(target.as_ptr(), dir.as_raw_fd(), e.d_name.as_ptr())
-                        .check_os_err("symlinkat", Some(&target), e.utf8_name())?;
+                        .check_os_err("symlinkat", Some(&target), Some(e.name()))?;
                 }
                 dir.set_attr_at(e.name(), &attr)?;
             }
@@ -377,7 +374,7 @@ impl Directory {
                     dir.as_raw_fd(),
                     e.d_name.as_ptr(),
                 )
-                .check_os_err("renameat", e.utf8_name(), None)?;
+                .check_os_err("renameat", Some(e.name()), None)?;
             }
         }
         Ok(())
@@ -402,7 +399,7 @@ impl Directory {
                         e.d_name.as_ptr(),
                         0,
                     )
-                    .check_os_err("linkat", e.utf8_name(), None)?;
+                    .check_os_err("linkat", Some(e.name()), None)?;
                 }
             }
         }

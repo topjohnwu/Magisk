@@ -191,7 +191,7 @@ impl MagiskD {
                     .join("zygisk");
                 // Create the unloaded marker file
                 if let Ok(dir) = Directory::open(&path) {
-                    dir.openat_as_file(cstr!("unloaded").as_cstr(), O_CREAT | O_RDONLY, 0o644)
+                    dir.openat_as_file(cstr!("unloaded"), O_CREAT | O_RDONLY, 0o644)
                         .log()
                         .ok();
                 }
