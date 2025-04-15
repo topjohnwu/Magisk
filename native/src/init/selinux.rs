@@ -151,7 +151,7 @@ impl MagiskInit {
                             0,
                             ptr::null(),
                         )
-                        .as_os_err()?;
+                        .check_io_err()?;
                     }
                 }
 
@@ -174,7 +174,7 @@ impl MagiskInit {
         }
 
         // Create a new process waiting for init operations
-        let pid = unsafe { libc::fork().check_os_err()? };
+        let pid = unsafe { libc::fork() };
         if pid != 0 {
             return Ok(());
         }
