@@ -1,25 +1,21 @@
 use base::{
-    ResultExt, error,
+    error,
     libc::{
-        POLLIN, SFD_CLOEXEC, SIG_BLOCK, SIGWINCH, TCSADRAIN, TCSAFLUSH, TIOCGWINSZ, TIOCSWINSZ,
-        cfmakeraw, close, poll, pollfd, raise, sigaddset, sigemptyset, signalfd, sigprocmask,
-        sigset_t, tcsetattr, winsize,
+        cfmakeraw, close, pipe, poll, pollfd, raise, read, sigaddset,
+        sigemptyset, signalfd, signalfd_siginfo, sigprocmask, sigset_t, splice, tcsetattr, winsize, POLLIN, SFD_CLOEXEC,
+        SIGWINCH, SIG_BLOCK, TCSADRAIN, TCSAFLUSH, TIOCGWINSZ, TIOCSWINSZ,
     },
-    libc::{STDIN_FILENO, STDOUT_FILENO, tcgetattr, termios},
+    libc::{tcgetattr, termios, STDIN_FILENO, STDOUT_FILENO},
     warn,
 };
-use std::fs::File;
-use std::io::{Read, Write};
-use std::mem::ManuallyDrop;
-use std::os::fd::{FromRawFd, RawFd};
-use std::ptr::null_mut;
+use std::{ffi::c_int, mem::MaybeUninit, ptr::null_mut};
 
 static mut OLD_STDIN: Option<termios> = None;
 const TIOCGPTN: u32 = 0x80045430;
 
 unsafe extern "C" {
     // Don't use the declaration from the libc crate as request should be u32 not i32
-    fn ioctl(fd: RawFd, request: u32, ...) -> i32;
+    fn ioctl(fd: c_int, request: u32, ...) -> i32;
 }
 
 pub fn get_pty_num(fd: i32) -> i32 {
@@ -79,6 +75,24 @@ fn resize_pty(outfd: i32) {
     }
 }
 
+fn pump_via_pipe(infd: i32, outfd: i32, pipe: &[c_int; 2]) -> bool {
+    // usize::MAX will EINVAL in some kernels, use i32::MAX in case
+    let s = unsafe { splice(infd, null_mut(), pipe[1], null_mut(), i32::MAX as _, 0) };
+    if s < 0 {
+        error!("splice error");
+        return false;
+    }
+    if s == 0 {
+        return true;
+    }
+    let s = unsafe { splice(pipe[0], null_mut(), outfd, null_mut(), s as usize, 0) };
+    if s < 0 {
+        error!("splice error");
+        return false;
+    }
+    true
+}
+
 pub fn pump_tty(infd: i32, outfd: i32) {
     set_stdin_raw();
 
@@ -112,7 +126,11 @@ pub fn pump_tty(infd: i32, outfd: i32) {
         },
     ];
 
-    let mut buf = [0u8; 4096];
+    let mut p: [c_int; 2] = [0; 2];
+    if unsafe { pipe(&mut p as *mut c_int) } < 0 {
+        error!("pipe error");
+        return;
+    }
     'poll: loop {
         let ready = unsafe { poll(pfds.as_mut_ptr(), pfds.len() as _, -1) };
 
@@ -123,21 +141,25 @@ pub fn pump_tty(infd: i32, outfd: i32) {
 
         for pfd in &pfds {
             if pfd.revents & POLLIN != 0 {
-                let mut in_file = ManuallyDrop::new(unsafe { File::from_raw_fd(pfd.fd) });
-
-                let Ok(n) = in_file.read(&mut buf) else {
-                    error!("read error");
-                    break 'poll;
-                };
-
-                if pfd.fd == STDIN_FILENO {
-                    let mut out = ManuallyDrop::new(unsafe { File::from_raw_fd(outfd) });
-                    out.write_all(&buf[..n]).log_ok();
+                let res = if pfd.fd == STDIN_FILENO {
+                    pump_via_pipe(pfd.fd, outfd, &p)
                 } else if pfd.fd == infd {
-                    let mut out = ManuallyDrop::new(unsafe { File::from_raw_fd(STDOUT_FILENO) });
-                    out.write_all(&buf[..n]).log_ok();
+                    pump_via_pipe(pfd.fd, STDOUT_FILENO, &p)
                 } else if pfd.fd == sfd {
                     resize_pty(outfd);
+                    let mut buf: [MaybeUninit<u8>; size_of::<signalfd_siginfo>()] =
+                        MaybeUninit::uninit_array();
+                    if unsafe { read(pfd.fd, buf.as_mut_ptr() as *mut _, buf.len()) } < 0 {
+                        error!("read error");
+                        false
+                    } else {
+                        true
+                    }
+                } else {
+                    false
+                };
+                if !res {
+                    break 'poll;
                 }
             } else if pfd.revents != 0 && pfd.fd == infd {
                 unsafe { close(pfd.fd) };
