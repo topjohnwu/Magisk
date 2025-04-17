@@ -71,57 +71,6 @@ static inline void default_new(T *&p) { p = new T(); }
 template<class T>
 static inline void default_new(std::unique_ptr<T> &p) { p.reset(new T()); }
 
-template<typename T, typename Impl>
-class stateless_allocator {
-public:
-    using value_type = T;
-    T *allocate(size_t num) { return static_cast<T*>(Impl::allocate(sizeof(T) * num)); }
-    void deallocate(T *ptr, size_t num) { Impl::deallocate(ptr, sizeof(T) * num); }
-    stateless_allocator()                           = default;
-    stateless_allocator(const stateless_allocator&) = default;
-    stateless_allocator(stateless_allocator&&)      = default;
-    template <typename U>
-    stateless_allocator(const stateless_allocator<U, Impl>&) {}
-    bool operator==(const stateless_allocator&) { return true; }
-    bool operator!=(const stateless_allocator&) { return false; }
-};
-
-class dynamic_bitset_impl {
-public:
-    using slot_type = unsigned long;
-    constexpr static int slot_size = sizeof(slot_type) * 8;
-    using slot_bits = std::bitset<slot_size>;
-
-    size_t slots() const { return slot_list.size(); }
-    slot_type get_slot(size_t slot) const {
-        return slot_list.size() > slot ? slot_list[slot].to_ulong() : 0ul;
-    }
-    void emplace_back(slot_type l) {
-        slot_list.emplace_back(l);
-    }
-protected:
-    slot_bits::reference get(size_t pos) {
-        size_t slot = pos / slot_size;
-        size_t index = pos % slot_size;
-        if (slot_list.size() <= slot) {
-            slot_list.resize(slot + 1);
-        }
-        return slot_list[slot][index];
-    }
-    bool get(size_t pos) const {
-        size_t slot = pos / slot_size;
-        size_t index = pos % slot_size;
-        return slot_list.size() > slot && slot_list[slot][index];
-    }
-private:
-    std::vector<slot_bits> slot_list;
-};
-
-struct dynamic_bitset : public dynamic_bitset_impl {
-    slot_bits::reference operator[] (size_t pos) { return get(pos); }
-    bool operator[] (size_t pos) const { return get(pos); }
-};
-
 struct StringCmp {
     using is_transparent = void;
     bool operator()(std::string_view a, std::string_view b) const { return a < b; }
@@ -198,13 +147,6 @@ struct byte_data : public byte_view {
     rust::Vec<size_t> patch(byte_view from, byte_view to);
 };
 
-template<size_t N>
-struct byte_array : public byte_data {
-    byte_array() : byte_data(arr, N), arr{0} {}
-private:
-    uint8_t arr[N];
-};
-
 class byte_stream;
 
 struct heap_data : public byte_data {
@@ -238,7 +180,6 @@ rust::Vec<size_t> mut_u8_patch(
         rust::Slice<const uint8_t> from,
         rust::Slice<const uint8_t> to);
 
-uint64_t parse_uint64_hex(std::string_view s);
 int parse_int(std::string_view s);
 
 using thread_entry = void *(*)(void *);
@@ -270,11 +211,9 @@ int fork_dont_care();
 int fork_no_orphan();
 void init_argv0(int argc, char **argv);
 void set_nice_name(const char *name);
-uint32_t binary_gcd(uint32_t u, uint32_t v);
 int switch_mnt_ns(int pid);
 std::string &replace_all(std::string &str, std::string_view from, std::string_view to);
 std::vector<std::string> split(std::string_view s, std::string_view delims);
-std::vector<std::string_view> split_view(std::string_view, std::string_view delims);
 
 // Similar to vsnprintf, but the return value is the written number of bytes
 __printflike(3, 0) int vssprintf(char *dest, size_t size, const char *fmt, va_list ap);

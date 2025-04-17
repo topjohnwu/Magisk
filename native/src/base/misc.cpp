@@ -186,27 +186,6 @@ int parse_int(string_view s) {
     return parse_num<int, 10>(s);
 }
 
-uint64_t parse_uint64_hex(string_view s) {
-    return parse_num<uint64_t, 16>(s);
-}
-
-uint32_t binary_gcd(uint32_t u, uint32_t v) {
-    if (u == 0) return v;
-    if (v == 0) return u;
-    auto shift = __builtin_ctz(u | v);
-    u >>= __builtin_ctz(u);
-    do {
-        v >>= __builtin_ctz(v);
-        if (u > v) {
-            auto t = v;
-            v = u;
-            u = t;
-        }
-        v -= u;
-    } while (v != 0);
-    return u << shift;
-}
-
 int switch_mnt_ns(int pid) {
     int ret = -1;
     int fd = syscall(__NR_pidfd_open, pid, 0);
@@ -253,10 +232,6 @@ static auto split_impl(string_view s, string_view delims) {
 
 vector<string> split(string_view s, string_view delims) {
     return split_impl<string>(s, delims);
-}
-
-vector<string_view> split_view(string_view s, string_view delims) {
-    return split_impl<string_view>(s, delims);
 }
 
 #undef vsnprintf
