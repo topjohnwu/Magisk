@@ -6,25 +6,25 @@
     <string name="logs">السجلات</string>
     <string name="settings">الإعدادات</string>
     <string name="install">تثبيت</string>
-    <string name="section_home">الأساسي</string>
-    <string name="section_theme">السِمات</string>
+    <string name="section_home">الصفحة الرئيسية</string>
+    <string name="section_theme">المظهر</string>
 
     <!--Home-->
     <string name="no_connection">لا يوجد إتصال</string>
     <string name="app_changelog">تفاصيل التحديث</string>
     <string name="loading">جارٍ التحميل...</string>
     <string name="update">تحديث</string>
-    <string name="not_available">غير/متوفر</string>
+    <string name="not_available">غير متوفر</string>
     <string name="hide">إخفاء</string>
     <string name="home_package">الحزمة</string>
 
     <string name="home_support_title">تبرع لنا</string>
     <string name="home_item_source">الكود المصدري للتطبيق</string>
-    <string name="home_support_content">مـاجـيسك هي، وستظل دوماً، مجانيةً و مفتوحة المصدر، اظهر اهتمامك لنا لكي نبقيها هكذا بدعم مالي صغير</string>
+    <string name="home_support_content">ماجيسك هو، وسيظل دوماً، مجانياّ و مفتوح المصدر، اظهر اهتمامك لنا لكي نبقيه هكذا بدعم مالي صغير</string>
     <string name="home_installed_version">تم التثبيت</string>
     <string name="home_latest_version">آخر إصدار</string>
     <string name="invalid_update_channel">مصدر التحديث غير صالح</string>
-    <string name="uninstall_magisk_title">إلغاء تثبيت Magisk</string>
+    <string name="uninstall_magisk_title">إلغاء تثبيت ماجيسك</string>
     <string name="uninstall_magisk_msg">ستُعطل/ستُحذف جميع الإضافات. سيُحذف الروت، وربما ستشفر بياناتك إذا لم تكن غير مشفرة حالياً.</string>
 
     <!--Install-->
@@ -34,7 +34,7 @@
     <string name="install_options_title">الخيارات</string>
     <string name="install_method_title">الطريقة</string>
     <string name="install_next">التالي</string>
-    <string name="install_start">هيا، بنا</string>
+    <string name="install_start">هيا بنا</string>
     <string name="manager_download_install">اضغط للتنزيل و التثبيت</string>
     <string name="direct_install">تثبيت مباشر (موصى بها)</string>
     <string name="install_inactive_slot">التثبيت على المنطقة الغير نشطة (بعد OTA)</string>
@@ -87,15 +87,15 @@
 
     <!-- MagiskHide -->
     <string name="show_system_app">إظهار برامج النظام</string>
-    <string name="hide_filter_hint">البحث بالإسم</string>
+    <string name="hide_filter_hint">البحث بالاسم</string>
     <string name="hide_search">ابحث</string>
 
     <!--Module Fragment-->
-    <string name="no_info_provided">(لم توفر معلومات)</string>
+    <string name="no_info_provided">(لا تتوفر معلومات)</string>
     <string name="reboot_recovery">إعادة التشغيل إلى Recovery</string>
     <string name="reboot_bootloader">إعادة التشغيل إلى Bootloader</string>
     <string name="reboot_download">إعادة التشغيل إلى وضـع Odin</string>
-    <string name="reboot_edl">إعادة التشغيل إلى وضـعية EDL</string>
+    <string name="reboot_edl">إعادة التشغيل إلى EDL</string>
     <string name="module_version_author">%1$sبواسطة%2$s</string>
     <string name="module_state_remove">إزالة </string>
     <string name="module_state_restore">إسترجاع</string>
@@ -104,15 +104,15 @@
     <string name="external_rw_permission_denied">امنحني إذن الولوج للذاكرة الداخلية</string>
 
     <!--Settings -->
-    <string name="settings_dark_mode_title">وضـعية الِسمات</string>
-    <string name="settings_dark_mode_message">حدد الوضـع الذي يناسب ذوقك</string>
+    <string name="settings_dark_mode_title">المظهر</string>
+    <string name="settings_dark_mode_message">حدد المظهر الذي يناسب ذوقك</string>
     <string name="settings_dark_mode_light">الوضـع المضيء</string>
     <string name="settings_dark_mode_system">اتبّع النظام</string>
-    <string name="settings_dark_mode_dark">وضـع الظلام</string>
+    <string name="settings_dark_mode_dark">الوضع المظلم</string>
     <string name="settings_download_path_title">مسار التحميل</string>
     <string name="settings_download_path_message">ستحمل الملفات إلى %1$s</string>
     <string name="language">اللغة</string>
-    <string name="system_default">(الأفتراضي)</string>
+    <string name="system_default">(الإفتراضي)</string>
     <string name="settings_check_update_title">تحقق من التحديثات</string>
     <string name="settings_check_update_summary">التحقق من التحديثات في الخلفية بشكل دوري</string>
     <string name="settings_update_channel_title">مصدر التحديثات</string>
@@ -123,8 +123,8 @@
     <string name="settings_hosts_title">موانع الاعلانات</string>
     <string name="settings_hosts_summary">حجب الاعلانات دون تعديل النظام</string>
     <string name="settings_hosts_toast">تم تمكين خاصية حجب الاعلانات</string>
-    <string name="settings_app_name_hint">الإسم الجديد</string>
-    <string name="settings_app_name_helper">التطبيق الجديد سوف يملك هذا الإسم</string>
+    <string name="settings_app_name_hint">الاسم الجديد</string>
+    <string name="settings_app_name_helper">التطبيق الجديد سوف يملك هذا الاسم</string>
     <string name="settings_app_name_error">الصيغة غير مقبولة</string>
     <string name="settings_su_app_adb">التطبيقات و ADB</string>
     <string name="settings_su_app">التطبيقات فقط</string>
@@ -140,51 +140,51 @@
     <string name="auto_response">الفعل التلقائي</string>
     <string name="request_timeout">المهلة قبل الفعل التلقائي</string>
     <string name="superuser_notification">إشعارات طلبات الروت</string>
-    <string name="settings_su_reauth_title">إعادة المصادقة بعد الترقية</string>
-    <string name="settings_su_reauth_summary">أعد مصادقة صلاحيات الروت بعد إجراء ترقيات للتطبيق</string>
+    <string name="settings_su_reauth_title">إعادة المصادقة بعد التحديث</string>
+    <string name="settings_su_reauth_summary">أعد مصادقة صلاحيات الروت بعد تحديث التطبيق</string>
     <string name="settings_customization">تخصيص</string>
 
-    <string name="multiuser_mode">نمط مستخدمين متعددين</string>
+    <string name="multiuser_mode">نمط المستخدم المزدوج</string>
     <string name="settings_owner_only">مالك الجهاز فقط</string>
     <string name="settings_owner_manage">المالك هو من يحدد</string>
-    <string name="settings_user_independent">مستقل </string>
+    <string name="settings_user_independent">مستقل</string>
     <string name="owner_only_summary">للمالك فقط له صلاحيات الروت</string>
     <string name="owner_manage_summary">فقط المالك من يرفض و يمنح صلاحيات الروت</string>
     <string name="user_independent_summary">كل مستخدم له قواعد روت خاصة به</string>
 
     <string name="mount_namespace_mode">نمط Mount Namespace</string>
-    <string name="settings_ns_global">نمط Namespace العام</string>
-    <string name="settings_ns_requester">نمط NameSpace المتوارث</string>
-    <string name="settings_ns_isolate">نمط NameSpace المعزول</string>
+    <string name="settings_ns_global">نمط Namespace عام</string>
+    <string name="settings_ns_requester">نمط NameSpace متوارث</string>
+    <string name="settings_ns_isolate">نمط NameSpace معزول</string>
     <string name="global_summary">جميع الجلسات الروت تستخدم NameSpace العام</string>
     <string name="requester_summary">جميع الجلسات الروت تستخدم NameSpace المتوارث</string>
     <string name="isolate_summary">جميع الجلسات الروت تستخدم NameSpace المعزول</string>
 
     <!--Notifications-->
-    <string name="update_channel">تحديثات Magisk</string>
+    <string name="update_channel">تحديثات ماجيسك</string>
     <string name="progress_channel">إشعارات التقدم</string>
     <string name="download_complete">اكتمل التنزيل</string>
     <string name="download_file_error">فشل تنزيل الملف</string>
-    <string name="magisk_update_title">تحديث مـاجـيسك متوفر!</string>
+    <string name="magisk_update_title">تحديث ماجيسك متوفر!</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">نعم</string>
     <string name="no">لا</string>
     <string name="download">تنزيل</string>
     <string name="reboot">إعادة التشغيل</string>
-    <string name="release_notes">معلومات الأصدار الجديد</string>
-    <string name="flashing">يتم الحرق...</string>
+    <string name="release_notes">معلومات الإصدار الجديد</string>
+    <string name="flashing">يتم التثبيت...</string>
     <string name="done">تم!</string>
     <string name="failure">فشل!</string>
     <string name="open_link_failed_toast">لم يُعثر على تطبيق لفتح الرابط …</string>
     <string name="complete_uninstall">إلغاء التثبيت بالكامل</string>
     <string name="restore_img">استعادة الصور</string>
-    <string name="restore_img_msg">جار الأستعادة…</string>
-    <string name="restore_done">تم الأستعادة</string>
-    <string name="restore_fail">النسخة الاحتياطية الأصلية غير موجودة!</string>
-    <string name="setup_fail">فشل التضبيط</string>
-    <string name="env_fix_title"> الإعداد الأضافي مطلوب</string>
-    <string name="setup_msg">جار تضبيت البيئة</string>
-    <string name="unsupport_magisk_title">إصدار مـاجـيسك غير مدعوم</string>
+    <string name="restore_img_msg">جار الإستعادة…</string>
+    <string name="restore_done">تم الإستعادة</string>
+    <string name="restore_fail">النسخة الإحتياطية الأصلية غير موجودة!</string>
+    <string name="setup_fail">فشل الإعداد</string>
+    <string name="env_fix_title">الإعداد الإضافي مطلوب</string>
+    <string name="setup_msg">جار إعداد البيئة</string>
+    <string name="unsupport_magisk_title">إصدار ماجيسك غير مدعوم</string>
 
 </resources>
