@@ -7,7 +7,7 @@ use logging::setup_klog;
 // Has to be pub so all symbols in that crate is included
 pub use magiskpolicy;
 use mount::{is_device_mounted, switch_root};
-use rootdir::{OverlayAttr, inject_magisk_rc};
+use rootdir::{OverlayAttr, inject_magisk_rc, inject_custom_rc};
 
 #[path = "../include/consts.rs"]
 mod consts;
@@ -43,6 +43,7 @@ pub mod ffi {
     struct MagiskInit {
         preinit_dev: String,
         mount_list: Vec<String>,
+        rc_list: Vec<String>,
         argv: *mut *mut c_char,
         config: BootConfig,
         overlay_con: Vec<OverlayAttr>,
@@ -68,6 +69,7 @@ pub mod ffi {
     #[namespace = "rust"]
     extern "Rust" {
         fn setup_klog();
+        fn inject_custom_rc(mut rc_list: Vec<String>, fd: i32, tmp_dir: Utf8CStrRef);
         fn inject_magisk_rc(fd: i32, tmp_dir: Utf8CStrRef);
         fn switch_root(path: Utf8CStrRef);
         fn is_device_mounted(dev: u64, target: Pin<&mut CxxString>) -> bool;
@@ -90,6 +92,8 @@ pub mod ffi {
         fn mount_overlay(self: &mut MagiskInit, dest: Utf8CStrRef);
         fn handle_sepolicy(self: &mut MagiskInit);
         fn restore_overlay_contexts(self: &MagiskInit);
+        fn load_overlay_rc(self: &mut MagiskInit, overlay: &Utf8CStrRef);
+        fn handle_modules_rc(self: &mut MagiskInit, root_dir: &Utf8CStrRef);
     }
     unsafe extern "C++" {
         // Used in Rust
@@ -102,6 +106,7 @@ pub mod ffi {
         fn collect_devices(self: &MagiskInit);
         fn mount_preinit_dir(self: &MagiskInit);
         unsafe fn find_block(self: &MagiskInit, partname: *const c_char) -> u64;
+        unsafe fn patch_rc_scripts(self: &MagiskInit, src_path: *const c_char, tmp_path: *const c_char, writable: bool) -> bool;
         unsafe fn patch_fissiond(self: &mut MagiskInit, tmp_path: *const c_char);
     }
 }

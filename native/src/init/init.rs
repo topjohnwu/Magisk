@@ -20,6 +20,7 @@ impl MagiskInit {
         Self {
             preinit_dev: String::new(),
             mount_list: Vec::new(),
+            rc_list: Vec::new(),
             overlay_con: Vec::new(),
             argv,
             config: BootConfig {
