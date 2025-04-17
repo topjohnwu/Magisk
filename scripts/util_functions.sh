@@ -586,11 +586,8 @@ copy_preinit_files() {
   done > $PREINITDIR/sepolicy.rule
 
   # Copy all enabled rc
-  find "$PREINITDIR" -mindepth 1 -type d 2>/dev/null | while read -r dir; do
-    rm -rf "${dir:?}"
-  done
-  for d in /data/adb/modules*/*; do
-    local MODDIR=${d%/*}
+  find "$PREINITDIR/" -mindepth 1 -maxdepth 1 -type d -exec rm -rf {} \;
+  find /data/adb/modules* -mindepth 1 -maxdepth 1 -type d 2>/dev/null | while read -r MODDIR; do
     local MODID=$(basename "$MODDIR")
     [ -f "$MODDIR"/disable ] && continue
     [ -f "$MODDIR"/remove ] && continue
