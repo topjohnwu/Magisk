@@ -203,6 +203,18 @@ static void load_overlay_rc(const char *overlay) {
     }
 }
 
+static void handle_module_rc() {
+    if (auto dir = xopen_dir("/data/" PREINITMIRR); dir) {
+        char path[PATH_MAX];
+        for (dirent *entry; (entry = readdir(dir.get()));) {
+            if (entry->d_name == "."sv || entry->d_name == ".."sv || entry->d_type != DT_DIR)
+                continue;
+            sprintf(path, "/data/%s/%s", PREINITMIRR, entry->d_name);
+            load_overlay_rc(path);
+        }
+    }
+}
+
 static void recreate_sbin(const char *mirror, bool use_bind_mount) {
     auto dp = xopen_dir(mirror);
     int src = dirfd(dp.get());
@@ -316,6 +328,8 @@ void MagiskInit::patch_ro_root() noexcept {
         mv_path(ROOTOVL "/sbin", ".");
     }
 
+    handle_module_rc();
+
     // Patch init.rc
     bool p;
     if (access(NEW_INITRC_DIR "/" INIT_RC, F_OK) == 0) {
@@ -355,6 +369,8 @@ void MagiskInit::patch_rw_root() noexcept {
     mv_path("/overlay.d", "/");
     rm_rf("/data/overlay.d");
     rm_rf("/.backup");
+
+    handle_module_rc();
 
     // Patch init.rc
     if (patch_rc_scripts("/", "/sbin", true))
