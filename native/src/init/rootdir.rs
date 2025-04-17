@@ -1,9 +1,11 @@
-use crate::consts::{ROOTMNT, ROOTOVL};
+use crate::consts::{PREINITMIRR, ROOTMNT, ROOTOVL};
 use crate::ffi::MagiskInit;
 use base::nix::fcntl::OFlag;
 use base::{
     BufReadExt, Directory, FsPathBuilder, LoggedResult, ResultExt, Utf8CStr, Utf8CString,
     clone_attr, cstr, debug,
+    const_format::concatcp,
+    libc::{O_CLOEXEC, O_CREAT, O_RDONLY, O_WRONLY},
 };
 use std::fs::File;
 use std::io::{BufReader, Write};
@@ -37,6 +39,17 @@ on property:sys.boot_completed=1
     mem::forget(file)
 }
 
+pub fn inject_custom_rc(mut rc_list: Vec<String>, fd: RawFd, tmp_dir: &Utf8CStr) {
+    let mut file = unsafe { File::from_raw_fd(fd) };
+    rc_list.iter().for_each(|rc| {
+        // Replace template arguments of rc scripts with dynamic paths
+        let rc = rc.replace("${MAGISKTMP}", tmp_dir.as_str());
+        write!(file, "\n{}\n", rc).ok();
+    });
+    mem::forget(file);
+    rc_list.clear();
+}
+
 pub struct OverlayAttr(Utf8CString, Utf8CString);
 
 impl MagiskInit {
@@ -50,6 +63,81 @@ impl MagiskInit {
                 }
                 true
             })
+        }
+    }
+
+    pub(crate) fn load_overlay_rc(&mut self, overlay: &Utf8CStr, module_path: &Utf8CStr) {
+        if let Ok(mut dir) = Directory::open(overlay) {
+            let init_rc = FsPathBuf::from(cstr_buf::dynamic(256))
+                .join(overlay)
+                .join("init.rc");
+            if init_rc.exists() {
+                // Do not allow overwrite init.rc
+                init_rc.remove().log_ok();
+            }
+            loop {
+                match dir.read() {
+                    Ok(None) => break,
+                    Ok(Some(e)) => {
+                        let recursive = FsPathBuf::from(cstr_buf::dynamic(256))
+                            .join(module_path)
+                            .exists();
+                        if (recursive && e.is_dir()) || e.is_file() {
+                            let buf = &mut cstr_buf::dynamic(256);
+                            e.path(buf).log_ok();
+                            if e.is_file() && buf.ends_with(".rc") {
+                                let mut path;
+                                if recursive {
+                                    path = FsPathBuf::from(cstr_buf::dynamic(256))
+                                        .join(buf.replace(module_path.as_str(), ""));
+                                } else {
+                                    path = FsPathBuf::from(cstr_buf::dynamic(256))
+                                        .join("/")
+                                        .join(e.name());
+                                }
+                                if path.exists() {
+                                    debug!("Replace rc script [{}] -> [{}]", path, buf);
+                                } else {
+                                    path = FsPathBuf::from(cstr_buf::dynamic(256)).join(buf);
+                                    debug!("Found rc script [{}]", path);
+                                    let mut rc_content = String::new();
+                                    if let Ok(mut file) = path.open(O_RDONLY | O_CLOEXEC) {
+                                        file.read_to_string(&mut rc_content).log_ok();
+                                        self.rc_list.push(rc_content);
+                                        drop(file);
+                                        path.remove().log_ok();
+                                    }
+                                }
+                            } else if e.is_dir() {
+                                self.load_overlay_rc(buf, module_path);
+                            }
+                        } else {
+                            continue;
+                        }
+                    }
+                    Err(_) => break,
+                }
+            }
+        }
+    }
+
+    pub(crate) fn handle_modules_rc(&mut self, root_dir: &Utf8CStr) {
+        if let Ok(mut dir) = Directory::open(path!(concatcp!("/data/", PREINITMIRR))) {
+            loop {
+                match dir.read() {
+                    Ok(None) => break,
+                    Ok(Some(e)) if e.is_dir() => {
+                        let buf = &mut cstr_buf::dynamic(256);
+                        e.path(buf).log_ok();
+                        let path = FsPathBuf::from(cstr_buf::dynamic(256)).join(&mut *buf);
+                        self.load_overlay_rc(&path, buf);
+                        let desc_path = FsPathBuf::from(cstr_buf::dynamic(256)).join(root_dir);
+                        path.copy_to(&desc_path).log_ok();
+                    }
+                    Ok(_) => continue,
+                    Err(_) => break,
+                }
+            }
         }
     }
 
