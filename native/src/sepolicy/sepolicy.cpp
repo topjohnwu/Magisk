@@ -664,13 +664,13 @@ bool sepol_impl::add_typeattribute(Str type, Str attr) {
         LOGW("type %.*s does not exist\n", (int) type.size(), type.data());
         return false;
     } else if (type_d->flavor == TYPE_ATTRIB) {
-        LOGW("type %.*s is an attribute\n", (int) attr.size(), attr.data());
+        LOGW("type %.*s is an attribute\n", (int) type.size(), type.data());
         return false;
     }
 
     type_datum *attr_d = hashtab_find(db->p_types.table, attr);
     if (attr_d == nullptr) {
-        LOGW("attribute %.*s does not exist\n", (int) type.size(), type.data());
+        LOGW("attribute %.*s does not exist\n", (int) attr.size(), attr.data());
         return false;
     } else if (attr_d->flavor != TYPE_ATTRIB) {
         LOGW("type %.*s is not an attribute \n", (int) attr.size(), attr.data());
