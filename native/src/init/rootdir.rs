@@ -109,7 +109,7 @@ impl MagiskInit {
         }
     }
 
-    pub(crate) fn handle_modules_rc(&mut self) {
+    pub(crate) fn handle_modules_rc(&mut self, root_dir: &Utf8CStr) {
         if let Ok(mut dir) = Directory::open(path!(concatcp!("/data/", PREINITMIRR))) {
             loop {
                 match dir.read() {
@@ -117,8 +117,14 @@ impl MagiskInit {
                         let name = e.name();
                         let path = FsPathBuf::from(cstr_buf::dynamic(256))
                             .join(path!(concatcp!("/data/", PREINITMIRR)))
+                            .join("/")
                             .join(name);
                         self.load_overlay_rc(&path);
+                        let desc_path = FsPathBuf::from(cstr_buf::dynamic(256))
+                            .join(root_dir)
+                            .join("/")
+                            .join(name);
+                        path.copy_to(&desc_path).ok();
                     }
                     Ok(_) => continue,
                     Err(_) => break,

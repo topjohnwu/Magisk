@@ -281,7 +281,7 @@ void MagiskInit::patch_ro_root() noexcept {
         mv_path(ROOTOVL "/sbin", ".");
     }
 
-    handle_modules_rc();
+    handle_modules_rc(ROOTOVL);
 
     // Patch init.rc
     bool p;
@@ -323,7 +323,7 @@ void MagiskInit::patch_rw_root() noexcept {
     rm_rf("/data/overlay.d");
     rm_rf("/.backup");
 
-    handle_modules_rc();
+    handle_modules_rc("/");
 
     // Patch init.rc
     if (patch_rc_scripts("/", "/sbin", true))
