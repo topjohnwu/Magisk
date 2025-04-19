@@ -120,10 +120,12 @@ impl MagiskInit {
                             .join("/")
                             .join(name);
                         self.load_overlay_rc(&path);
-                        let desc_path = FsPathBuf::from(cstr_buf::dynamic(256))
-                            .join(root_dir)
-                            .join("/")
-                            .join(name);
+                        let mut desc_path = FsPathBuf::from(cstr_buf::dynamic(256)).join(root_dir);
+                        desc_path = if root_dir.eq("/") {
+                            desc_path.join(name)
+                        } else {
+                            desc_path.join("/").join(name)
+                        };
                         path.copy_to(&desc_path).ok();
                     }
                     Ok(_) => continue,
