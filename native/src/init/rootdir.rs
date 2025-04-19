@@ -80,11 +80,10 @@ impl MagiskInit {
             }
             loop {
                 match dir.read() {
+                    Ok(None) => break,
                     Ok(Some(e)) if (e.is_file() && e.name().ends_with(".rc")) => {
                         let name = e.name();
-                        let mut path = FsPathBuf::from(cstr_buf::dynamic(256))
-                            .join("/")
-                            .join(e.name());
+                        let mut path = FsPathBuf::from(cstr_buf::dynamic(256)).join("/").join(name);
                         if path.exists() {
                             debug!("Replace rc script [{}]", name);
                         } else {
@@ -92,7 +91,7 @@ impl MagiskInit {
                             path = FsPathBuf::from(cstr_buf::dynamic(256))
                                 .join(overlay)
                                 .join("/")
-                                .join(e.name());
+                                .join(name);
                             let mut rc_content = String::new();
                             if let Ok(mut file) = path.open(O_RDONLY | O_CLOEXEC) {
                                 file.read_to_string(&mut rc_content).ok();
@@ -113,6 +112,7 @@ impl MagiskInit {
         if let Ok(mut dir) = Directory::open(path!(concatcp!("/data/", PREINITMIRR))) {
             loop {
                 match dir.read() {
+                    Ok(None) => break,
                     Ok(Some(e)) if e.is_dir() => {
                         let name = e.name();
                         let path = FsPathBuf::from(cstr_buf::dynamic(256))
