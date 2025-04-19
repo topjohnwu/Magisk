@@ -1,9 +1,9 @@
-use crate::consts::{ROOTMNT, ROOTOVL};
+use crate::consts::{PREINITMIRR, ROOTMNT, ROOTOVL};
 use crate::ffi::MagiskInit;
 use base::libc::{O_CREAT, O_RDONLY, O_WRONLY};
 use base::{
     BufReadExt, Directory, FsPath, FsPathBuf, LoggedResult, ResultExt, Utf8CStr, Utf8CString,
-    clone_attr, cstr, cstr_buf, debug, path,
+    clone_attr, const_format::concatcp, cstr, cstr_buf, debug, path,
 };
 use std::io::BufReader;
 use std::{
@@ -56,6 +56,20 @@ impl MagiskInit {
                 }
                 true
             })
+        }
+    }
+
+    pub(crate) fn handle_modules_rc(&mut self) {
+        if let Ok(mut dir) = Directory::open(path!(concatcp!("/data/", PREINITMIRR))) {
+            loop {
+                match dir.read() {
+                    Ok(Some(e)) if e.is_dir() => {
+                        // format!("/data/{}/{}/", PREINITMIRR, e.name()); // TODO:migrate load overlay rc to rust
+                    }
+                    Ok(_) => continue,
+                    Err(_) => break,
+                }
+            }
         }
     }
 
