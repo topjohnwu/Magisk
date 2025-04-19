@@ -12,8 +12,6 @@
 
 using namespace std;
 
-static vector<string> rc_list;
-
 #define NEW_INITRC_DIR  "/system/etc/init/hw"
 #define INIT_RC         "init.rc"
 
@@ -43,7 +41,7 @@ static bool unxz(out_stream &strm, rust::Slice<const uint8_t> bytes) {
 }
 
 // When return true, run patch_fissiond
-static bool patch_rc_scripts(const char *src_path, const char *tmp_path, bool writable) {
+bool MagiskInit::patch_rc_scripts(const char *src_path, const char *tmp_path, bool writable) const noexcept {
     auto src_dir = xopen_dir(src_path);
     if (!src_dir) return false;
     int src_fd = dirfd(src_dir.get());
@@ -95,12 +93,7 @@ static bool patch_rc_scripts(const char *src_path, const char *tmp_path, bool wr
         fprintf(dest.get(), "\n");
 
         // Inject custom rc scripts
-        for (auto &script : rc_list) {
-            // Replace template arguments of rc scripts with dynamic paths
-            replace_all(script, "${MAGISKTMP}", tmp_path);
-            fprintf(dest.get(), "\n%s\n", script.data());
-        }
-        rc_list.clear();
+        rust::inject_custom_rc(rc_list, fileno(dest.get()), tmp_path);
 
         // Inject Magisk rc scripts
         rust::inject_magisk_rc(fileno(dest.get()), tmp_path);
@@ -172,46 +165,6 @@ void MagiskInit::patch_fissiond(const char *tmp_path) noexcept {
         }
         fprintf(dest.get(), "%s", content.data());
         exit(0);
-    }
-}
-
-static void load_overlay_rc(const char *overlay) {
-    auto dir = open_dir(overlay);
-    if (!dir) return;
-
-    int dfd = dirfd(dir.get());
-    // Do not allow overwrite init.rc
-    unlinkat(dfd, INIT_RC, 0);
-
-    // '/' + name + '\0'
-    char buf[NAME_MAX + 2];
-    buf[0] = '/';
-    for (dirent *entry; (entry = xreaddir(dir.get()));) {
-        if (!str_ends(entry->d_name, ".rc")) {
-            continue;
-        }
-        strscpy(buf + 1, entry->d_name, sizeof(buf) - 1);
-        if (access(buf, F_OK) == 0) {
-            LOGD("Replace rc script [%s]\n", entry->d_name);
-        } else {
-            LOGD("Found rc script [%s]\n", entry->d_name);
-            int rc = xopenat(dfd, entry->d_name, O_RDONLY | O_CLOEXEC);
-            rc_list.push_back(full_read(rc));
-            close(rc);
-            unlinkat(dfd, entry->d_name, 0);
-        }
-    }
-}
-
-static void handle_module_rc() {
-    if (auto dir = xopen_dir("/data/" PREINITMIRR); dir) {
-        char path[PATH_MAX];
-        for (dirent *entry; (entry = readdir(dir.get()));) {
-            if (entry->d_name == "."sv || entry->d_name == ".."sv || entry->d_type != DT_DIR)
-                continue;
-            sprintf(path, "/data/%s/%s", PREINITMIRR, entry->d_name);
-            load_overlay_rc(path);
-        }
     }
 }
 
@@ -328,7 +281,7 @@ void MagiskInit::patch_ro_root() noexcept {
         mv_path(ROOTOVL "/sbin", ".");
     }
 
-    handle_module_rc();
+    handle_modules_rc();
 
     // Patch init.rc
     bool p;
@@ -370,7 +323,7 @@ void MagiskInit::patch_rw_root() noexcept {
     rm_rf("/data/overlay.d");
     rm_rf("/.backup");
 
-    handle_module_rc();
+    handle_modules_rc();
 
     // Patch init.rc
     if (patch_rc_scripts("/", "/sbin", true))

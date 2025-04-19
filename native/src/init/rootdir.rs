@@ -1,6 +1,6 @@
 use crate::consts::{PREINITMIRR, ROOTMNT, ROOTOVL};
 use crate::ffi::MagiskInit;
-use base::libc::{O_CREAT, O_RDONLY, O_WRONLY};
+use base::libc::{O_CLOEXEC, O_CREAT, O_RDONLY, O_WRONLY};
 use base::{
     BufReadExt, Directory, FsPath, FsPathBuf, LoggedResult, ResultExt, Utf8CStr, Utf8CString,
     clone_attr, const_format::concatcp, cstr, cstr_buf, debug, path,
@@ -8,6 +8,7 @@ use base::{
 use std::io::BufReader;
 use std::{
     fs::File,
+    io::Read,
     io::Write,
     mem,
     os::fd::{FromRawFd, RawFd},
@@ -43,6 +44,16 @@ on property:init.svc.zygote=stopped
     mem::forget(file)
 }
 
+pub fn inject_custom_rc(mut rc_list: Vec<String>, fd: RawFd, tmp_dir: &Utf8CStr) {
+    let mut file = unsafe { File::from_raw_fd(fd) };
+    rc_list.iter().for_each(|rc| {
+        let rc = rc.replace("${MAGISKTMP}", tmp_dir.as_str());
+        write!(file, "\n{}\n", rc).ok();
+    });
+    mem::forget(file);
+    rc_list.clear();
+}
+
 pub struct OverlayAttr(Utf8CString, Utf8CString);
 
 impl MagiskInit {
@@ -59,12 +70,55 @@ impl MagiskInit {
         }
     }
 
+    pub(crate) fn load_overlay_rc(&mut self, overlay: &Utf8CStr) {
+        if let Ok(mut dir) = Directory::open(overlay) {
+            let init_rc = FsPathBuf::from(cstr_buf::dynamic(256))
+                .join(overlay)
+                .join("/init.rc");
+            if init_rc.exists() {
+                init_rc.remove().ok();
+            }
+            loop {
+                match dir.read() {
+                    Ok(Some(e)) if (e.is_file() && e.name().ends_with(".rc")) => {
+                        let name = e.name();
+                        let mut path = FsPathBuf::from(cstr_buf::dynamic(256))
+                            .join("/")
+                            .join(e.name());
+                        if path.exists() {
+                            debug!("Replace rc script [{}]", name);
+                        } else {
+                            debug!("Found rc script [{}]", name);
+                            path = FsPathBuf::from(cstr_buf::dynamic(256))
+                                .join(overlay)
+                                .join("/")
+                                .join(e.name());
+                            let mut rc_content = String::new();
+                            if let Ok(mut file) = path.open(O_RDONLY | O_CLOEXEC) {
+                                file.read_to_string(&mut rc_content).ok();
+                                self.rc_list.push(rc_content);
+                                drop(file);
+                                path.remove().ok();
+                            }
+                        }
+                    }
+                    Ok(_) => continue,
+                    Err(_) => break,
+                }
+            }
+        }
+    }
+
     pub(crate) fn handle_modules_rc(&mut self) {
         if let Ok(mut dir) = Directory::open(path!(concatcp!("/data/", PREINITMIRR))) {
             loop {
                 match dir.read() {
                     Ok(Some(e)) if e.is_dir() => {
-                        // format!("/data/{}/{}/", PREINITMIRR, e.name()); // TODO:migrate load overlay rc to rust
+                        let name = e.name();
+                        let path = FsPathBuf::from(cstr_buf::dynamic(256))
+                            .join(path!(concatcp!("/data/", PREINITMIRR)))
+                            .join(name);
+                        self.load_overlay_rc(&path);
                     }
                     Ok(_) => continue,
                     Err(_) => break,
