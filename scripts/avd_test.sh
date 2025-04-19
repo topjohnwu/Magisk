@@ -108,11 +108,7 @@ test_main() {
 
   # Old Linux kernels will not boot with memory larger than 3GB
   local memory
-  if [ $api -lt $huge_ram_min_api ]; then
-    memory=3072
-  else
-    memory=8192
-  fi
+  memory=2048
 
   emu_args="$emu_args_base -memory $memory"
 
