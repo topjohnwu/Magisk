@@ -92,7 +92,7 @@ pub mod ffi {
         fn mount_overlay(self: &mut MagiskInit, dest: Utf8CStrRef);
         fn handle_sepolicy(self: &mut MagiskInit);
         fn restore_overlay_contexts(self: &MagiskInit);
-        fn load_overlay_rc(self: &mut MagiskInit, overlay: &Utf8CStrRef);
+        fn load_overlay_rc(self: &mut MagiskInit, overlay: &Utf8CStrRef, module_path: &Utf8CStrRef);
         fn handle_modules_rc(self: &mut MagiskInit, root_dir: &Utf8CStrRef);
     }
     unsafe extern "C++" {

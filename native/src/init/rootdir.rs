@@ -66,7 +66,7 @@ impl MagiskInit {
         }
     }
 
-    pub(crate) fn load_overlay_rc(&mut self, overlay: &Utf8CStr) {
+    pub(crate) fn load_overlay_rc(&mut self, overlay: &Utf8CStr, module_path: &Utf8CStr) {
         if let Ok(mut dir) = Directory::open(overlay) {
             let init_rc = cstr::buf::dynamic(256)
                 .join_path(overlay)
@@ -78,24 +78,40 @@ impl MagiskInit {
             loop {
                 match dir.read() {
                     Ok(None) => break,
-                    Ok(Some(e)) if e.is_file() && e.name().ends_with(".rc") => {
-                        let name = e.name();
-                        let mut path = cstr::buf::dynamic(256).join_path("/").join_path(name);
-                        if path.exists() {
-                            debug!("Replace rc script [{}]", name);
-                        } else {
-                            debug!("Found rc script [{}]", name);
-                            path = cstr::buf::dynamic(256).join_path(overlay).join_path(name);
-                            let mut rc_content = String::new();
-                            if let Ok(mut file) = path.open(O_RDONLY | O_CLOEXEC) {
-                                file.read_to_string(&mut rc_content).log_ok();
-                                self.rc_list.push(rc_content);
-                                drop(file);
-                                path.remove().log_ok();
+                    Ok(Some(e)) => {
+                        let recursive = cstr::buf::dynamic(256).join_path(module_path).exists();
+                        if (recursive && e.is_dir()) || e.is_file() {
+                            let buf = &mut cstr::buf::dynamic(256);
+                            e.resolve_path(buf).log_ok();
+                            if e.is_file() && buf.ends_with(".rc") {
+                                let mut path;
+                                if recursive {
+                                    path = cstr::buf::dynamic(256)
+                                        .join_path(buf.replace(module_path.as_str(), ""));
+                                } else {
+                                    path =
+                                        cstr::buf::dynamic(256).join_path("/").join_path(e.name());
+                                }
+                                if path.exists() {
+                                    debug!("Replace rc script [{}] -> [{}]", path, buf);
+                                } else {
+                                    path = cstr::buf::dynamic(256).join_path(buf);
+                                    debug!("Found rc script [{}]", path);
+                                    let mut rc_content = String::new();
+                                    if let Ok(mut file) = path.open(O_RDONLY | O_CLOEXEC) {
+                                        file.read_to_string(&mut rc_content).log_ok();
+                                        self.rc_list.push(rc_content);
+                                        drop(file);
+                                        path.remove().log_ok();
+                                    }
+                                }
+                            } else if e.is_dir() {
+                                self.load_overlay_rc(buf, module_path);
                             }
+                        } else {
+                            continue;
                         }
                     }
-                    Ok(_) => continue,
                     Err(_) => break,
                 }
             }
@@ -108,12 +124,10 @@ impl MagiskInit {
                 match dir.read() {
                     Ok(None) => break,
                     Ok(Some(e)) if e.is_dir() => {
-                        let name = e.name();
-                        let path = cstr::buf::dynamic(256)
-                            .join_path("/data")
-                            .join_path(PREINITMIRR)
-                            .join_path(name);
-                        self.load_overlay_rc(&path);
+                        let buf = &mut cstr::buf::dynamic(256);
+                        e.resolve_path(buf).log_ok();
+                        let path = cstr::buf::dynamic(256).join_path(&mut *buf);
+                        self.load_overlay_rc(&path, buf);
                         let desc_path = cstr::buf::dynamic(256).join_path(root_dir);
                         path.copy_to(&desc_path).log_ok();
                     }

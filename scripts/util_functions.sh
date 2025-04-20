@@ -593,8 +593,10 @@ copy_preinit_files() {
     [ -f "$MODDIR"/remove ] && continue
     [ -f "$MODDIR"/update ] && continue
     find "$MODDIR" -mindepth 1 -type f -name "*.rc" | while read -r file; do
-      mkdir -p "$PREINITDIR/$MODID"
-      cp "$file" "$PREINITDIR/$MODID/"
+      local path="${file%/*}"
+      path="$PREINITDIR/$MODID${path/$MODDIR/}"
+      mkdir -p "$path"
+      cp "$file" "$path/"
     done
   done
 }

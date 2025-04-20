@@ -275,7 +275,7 @@ void MagiskInit::patch_ro_root() noexcept {
         close(dest);
     }
 
-    load_overlay_rc(ROOTOVL);
+    load_overlay_rc(ROOTOVL, "");
     if (access(ROOTOVL "/sbin", F_OK) == 0) {
         // Move files in overlay.d/sbin into tmp_dir
         mv_path(ROOTOVL "/sbin", ".");
@@ -318,7 +318,7 @@ void MagiskInit::patch_rw_root() noexcept {
     link_path("/sbin", "/root");
 
     // Handle overlays
-    load_overlay_rc("/overlay.d");
+    load_overlay_rc("/overlay.d", "");
     mv_path("/overlay.d", "/");
     rm_rf("/data/overlay.d");
     rm_rf("/.backup");
