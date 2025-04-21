@@ -194,10 +194,6 @@ impl FileAttr {
 const XATTR_NAME_SELINUX: &CStr = c"security.selinux";
 
 impl FsPath {
-    pub fn follow_link(&self) -> &FsPathFollow {
-        unsafe { mem::transmute(self) }
-    }
-
     pub fn open(&self, flags: i32) -> OsResult<File> {
         Ok(File::from(open_fd!(self, flags)?))
     }

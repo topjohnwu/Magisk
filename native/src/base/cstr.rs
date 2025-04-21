@@ -125,9 +125,7 @@ impl Default for Utf8CStrBuffer<'static, 4096> {
 
 // Trait definitions
 
-pub trait Utf8CStrBuf:
-    Write + AsRef<Utf8CStr> + AsMut<Utf8CStr> + Deref<Target = Utf8CStr> + DerefMut
-{
+pub trait Utf8CStrBuf: Write + AsRef<Utf8CStr> + Deref<Target = Utf8CStr> {
     // The length of the string without the terminating null character.
     // assert_true(len <= capacity - 1)
     fn len(&self) -> usize;
@@ -143,6 +141,7 @@ pub trait Utf8CStrBuf:
     // is capacity - 1, because the last byte is reserved for the terminating null character.
     fn capacity(&self) -> usize;
     fn clear(&mut self);
+    fn as_mut_ptr(&mut self) -> *mut c_char;
 
     #[inline(always)]
     fn is_empty(&self) -> bool {
@@ -150,52 +149,8 @@ pub trait Utf8CStrBuf:
     }
 }
 
-trait Utf8CStrBufWithSlice: Utf8CStrBuf {
-    fn buf(&self) -> &[u8];
-    unsafe fn mut_buf(&mut self) -> &mut [u8];
-}
-
 trait AsUtf8CStr {
     fn as_utf8_cstr(&self) -> &Utf8CStr;
-    fn as_utf8_cstr_mut(&mut self) -> &mut Utf8CStr;
-}
-
-impl<T: Utf8CStrBufWithSlice> AsUtf8CStr for T {
-    #[inline(always)]
-    fn as_utf8_cstr(&self) -> &Utf8CStr {
-        // SAFETY: the internal buffer is always UTF-8 checked
-        // SAFETY: self.used is guaranteed to always <= SIZE - 1
-        unsafe { Utf8CStr::from_bytes_unchecked(self.buf().get_unchecked(..(self.len() + 1))) }
-    }
-
-    #[inline(always)]
-    fn as_utf8_cstr_mut(&mut self) -> &mut Utf8CStr {
-        // SAFETY: the internal buffer is always UTF-8 checked
-        // SAFETY: self.used is guaranteed to always <= SIZE - 1
-        unsafe {
-            let len = self.len() + 1;
-            Utf8CStr::from_bytes_unchecked_mut(self.mut_buf().get_unchecked_mut(..len))
-        }
-    }
-}
-
-// Implementation for Utf8CString
-
-fn utf8_cstr_append(buf: &mut dyn Utf8CStrBufWithSlice, s: &[u8]) -> usize {
-    let mut used = buf.len();
-    if used >= buf.capacity() - 1 {
-        // Truncate
-        return 0;
-    }
-    let dest = unsafe { &mut buf.mut_buf()[used..] };
-    let len = min(s.len(), dest.len() - 1);
-    if len > 0 {
-        dest[..len].copy_from_slice(&s[..len]);
-    }
-    dest[len] = b'\0';
-    used += len;
-    unsafe { buf.set_len(used) };
-    len
 }
 
 pub trait StringExt {
@@ -257,17 +212,6 @@ impl AsUtf8CStr for Utf8CString {
         // SAFETY: the internal string is always null terminated
         unsafe { mem::transmute(slice::from_raw_parts(self.0.as_ptr(), self.0.len() + 1)) }
     }
-
-    #[inline(always)]
-    fn as_utf8_cstr_mut(&mut self) -> &mut Utf8CStr {
-        // SAFETY: the internal string is always null terminated
-        unsafe {
-            mem::transmute(slice::from_raw_parts_mut(
-                self.0.as_mut_ptr(),
-                self.0.len() + 1,
-            ))
-        }
-    }
 }
 
 impl Utf8CStrBuf for Utf8CString {
@@ -295,6 +239,10 @@ impl Utf8CStrBuf for Utf8CString {
     fn clear(&mut self) {
         self.0.clear();
         self.0.nul_terminate();
+    }
+
+    fn as_mut_ptr(&mut self) -> *mut c_char {
+        self.0.as_mut_ptr().cast()
     }
 }
 
@@ -330,18 +278,6 @@ impl<'a> From<&'a mut [u8]> for Utf8CStrBufRef<'a> {
     }
 }
 
-impl Utf8CStrBufWithSlice for Utf8CStrBufRef<'_> {
-    #[inline(always)]
-    fn buf(&self) -> &[u8] {
-        self.buf
-    }
-
-    #[inline(always)]
-    unsafe fn mut_buf(&mut self) -> &mut [u8] {
-        self.buf
-    }
-}
-
 // UTF-8 validated + null terminated buffer on the stack
 pub struct Utf8CStrBufArr<const N: usize> {
     used: usize,
@@ -354,18 +290,6 @@ impl<const N: usize> Utf8CStrBufArr<N> {
             used: 0,
             buf: [0; N],
         }
-    }
-}
-
-impl<const N: usize> Utf8CStrBufWithSlice for Utf8CStrBufArr<N> {
-    #[inline(always)]
-    fn buf(&self) -> &[u8] {
-        &self.buf
-    }
-
-    #[inline(always)]
-    unsafe fn mut_buf(&mut self) -> &mut [u8] {
-        &mut self.buf
     }
 }
 
@@ -400,7 +324,7 @@ impl Utf8CStr {
         Self::from_cstr(CStr::from_bytes_with_nul(buf)?)
     }
 
-    pub fn from_string(s: &mut String) -> &mut Utf8CStr {
+    pub fn from_string(s: &mut String) -> &Utf8CStr {
         let buf = s.nul_terminate();
         // SAFETY: the null byte is explicitly added to the buffer
         unsafe { mem::transmute(buf) }
@@ -408,11 +332,6 @@ impl Utf8CStr {
 
     #[inline(always)]
     pub const unsafe fn from_bytes_unchecked(buf: &[u8]) -> &Utf8CStr {
-        unsafe { mem::transmute(buf) }
-    }
-
-    #[inline(always)]
-    unsafe fn from_bytes_unchecked_mut(buf: &mut [u8]) -> &mut Utf8CStr {
         unsafe { mem::transmute(buf) }
     }
 
@@ -457,13 +376,6 @@ impl Utf8CStr {
         // SAFETY: The length of the slice is at least 1 due to null termination check
         unsafe { str::from_utf8_unchecked(self.0.get_unchecked(..self.0.len() - 1)) }
     }
-
-    #[inline(always)]
-    pub fn as_str_mut(&mut self) -> &mut str {
-        // SAFETY: Already UTF-8 validated during construction
-        // SAFETY: The length of the slice is at least 1 due to null termination check
-        unsafe { str::from_utf8_unchecked_mut(self.0.get_unchecked_mut(..self.0.len() - 1)) }
-    }
 }
 
 impl Deref for Utf8CStr {
@@ -472,13 +384,6 @@ impl Deref for Utf8CStr {
     #[inline(always)]
     fn deref(&self) -> &str {
         self.as_str()
-    }
-}
-
-impl DerefMut for Utf8CStr {
-    #[inline(always)]
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        self.as_str_mut()
     }
 }
 
@@ -524,44 +429,25 @@ impl FsPath {
         unsafe { mem::transmute(value) }
     }
 
-    #[inline(always)]
-    pub fn from_mut<T: AsMut<Utf8CStr> + ?Sized>(value: &mut T) -> &mut FsPath {
-        unsafe { mem::transmute(value.as_mut()) }
+    pub fn follow_link(&self) -> &FsPathFollow {
+        unsafe { mem::transmute(self) }
     }
 }
 
-impl Deref for FsPath {
-    type Target = Utf8CStr;
-
+impl AsUtf8CStr for FsPath {
     #[inline(always)]
-    fn deref(&self) -> &Utf8CStr {
+    fn as_utf8_cstr(&self) -> &Utf8CStr {
         &self.0
-    }
-}
-
-impl DerefMut for FsPath {
-    #[inline(always)]
-    fn deref_mut(&mut self) -> &mut Utf8CStr {
-        &mut self.0
     }
 }
 
 #[repr(transparent)]
 pub struct FsPathFollow(Utf8CStr);
 
-impl Deref for FsPathFollow {
-    type Target = Utf8CStr;
-
+impl AsUtf8CStr for FsPathFollow {
     #[inline(always)]
-    fn deref(&self) -> &Utf8CStr {
+    fn as_utf8_cstr(&self) -> &Utf8CStr {
         &self.0
-    }
-}
-
-impl DerefMut for FsPathFollow {
-    #[inline(always)]
-    fn deref_mut(&mut self) -> &mut Utf8CStr {
-        &mut self.0
     }
 }
 
@@ -624,15 +510,30 @@ impl<const N: usize> Deref for FsPathBuf<'_, N> {
     }
 }
 
-impl<const N: usize> DerefMut for FsPathBuf<'_, N> {
-    fn deref_mut(&mut self) -> &mut FsPath {
-        FsPath::from_mut(self.0.deref_mut())
-    }
+// impl<T: AsUtf8CStr> Deref<Target = Utf8CStr> for T { ... }
+macro_rules! impl_cstr_deref {
+    ($( ($t:ty, $($g:tt)*) )*) => {$(
+        impl<$($g)*> Deref for $t {
+            type Target = Utf8CStr;
+
+            #[inline(always)]
+            fn deref(&self) -> &Utf8CStr {
+                self.as_utf8_cstr()
+            }
+        }
+    )*}
 }
 
-// Boilerplate trait implementations
+impl_cstr_deref!(
+    (FsPath,)
+    (FsPathFollow,)
+    (Utf8CStrBufRef<'_>,)
+    (Utf8CStrBufArr<N>, const N: usize)
+    (Utf8CString,)
+);
 
-macro_rules! impl_str {
+// impl<T: Deref<Target = Utf8CStr>> BoilerPlate for T { ... }
+macro_rules! impl_cstr_misc {
     ($( ($t:ty, $($g:tt)*) )*) => {$(
         impl<$($g)*> AsRef<Utf8CStr> for $t {
             #[inline(always)]
@@ -709,7 +610,7 @@ macro_rules! impl_str {
     )*}
 }
 
-impl_str!(
+impl_cstr_misc!(
     (Utf8CStr,)
     (FsPath,)
     (FsPathFollow,)
@@ -719,46 +620,31 @@ impl_str!(
     (Utf8CString,)
 );
 
-macro_rules! impl_str_buf {
-    ($( ($t:ty, $($g:tt)*) )*) => {$(
-        impl<$($g)*> Write for $t {
-            #[inline(always)]
-            fn write_str(&mut self, s: &str) -> fmt::Result {
-                self.push_str(s);
-                Ok(())
-            }
-        }
-        impl<$($g)*> Deref for $t {
-            type Target = Utf8CStr;
-
-            #[inline(always)]
-            fn deref(&self) -> &Utf8CStr {
-                self.as_utf8_cstr()
-            }
-        }
-        impl<$($g)*> DerefMut for $t {
-            #[inline(always)]
-            fn deref_mut(&mut self) -> &mut Utf8CStr {
-                self.as_utf8_cstr_mut()
-            }
-        }
-        impl<$($g)*> AsMut<Utf8CStr> for $t {
-            #[inline(always)]
-            fn as_mut(&mut self) -> &mut Utf8CStr {
-                self.as_utf8_cstr_mut()
-            }
-        }
-    )*}
+fn copy_cstr_truncate(dest: &mut [u8], src: &[u8]) -> usize {
+    if dest.len() <= 1 {
+        // Truncate
+        return 0;
+    }
+    let len = min(src.len(), dest.len() - 1);
+    if len > 0 {
+        dest[..len].copy_from_slice(&src[..len]);
+    }
+    dest[len] = b'\0';
+    len
 }
 
-impl_str_buf!(
-    (Utf8CStrBufRef<'_>,)
-    (Utf8CStrBufArr<N>, const N: usize)
-    (Utf8CString,)
-);
-
-macro_rules! impl_str_buf_with_slice {
+// impl<T> AsUtf8CStr for T { ... }
+// impl<T> Utf8CStrBuf for T { ... }
+macro_rules! impl_cstr_buf {
     ($( ($t:ty, $($g:tt)*) )*) => {$(
+        impl<$($g)*> AsUtf8CStr for $t {
+            #[inline(always)]
+            fn as_utf8_cstr(&self) -> &Utf8CStr {
+                // SAFETY: the internal buffer is always UTF-8 checked
+                // SAFETY: self.used is guaranteed to always <= SIZE - 1
+                unsafe { Utf8CStr::from_bytes_unchecked(self.buf.get_unchecked(..(self.used + 1))) }
+            }
+        }
         impl<$($g)*> Utf8CStrBuf for $t {
             #[inline(always)]
             fn len(&self) -> usize {
@@ -770,7 +656,11 @@ macro_rules! impl_str_buf_with_slice {
             }
             #[inline(always)]
             fn push_str(&mut self, s: &str) -> usize {
-                utf8_cstr_append(self, s.as_bytes())
+                // SAFETY: self.used is guaranteed to always <= SIZE - 1
+                let dest = unsafe { self.buf.get_unchecked_mut(self.used..) };
+                let len = copy_cstr_truncate(dest, s.as_bytes());
+                self.used += len;
+                len
             }
             #[inline(always)]
             fn capacity(&self) -> usize {
@@ -781,13 +671,36 @@ macro_rules! impl_str_buf_with_slice {
                 self.buf[0] = b'\0';
                 self.used = 0;
             }
+            #[inline(always)]
+            fn as_mut_ptr(&mut self) -> *mut c_char {
+                self.buf.as_mut_ptr().cast()
+            }
         }
     )*}
 }
 
-impl_str_buf_with_slice!(
+impl_cstr_buf!(
     (Utf8CStrBufRef<'_>,)
     (Utf8CStrBufArr<N>, const N: usize)
+);
+
+// impl<T: Utf8CStrBuf> Write for T { ... }
+macro_rules! impl_cstr_buf_write {
+    ($( ($t:ty, $($g:tt)*) )*) => {$(
+        impl<$($g)*> Write for $t {
+            #[inline(always)]
+            fn write_str(&mut self, s: &str) -> fmt::Result {
+                self.push_str(s);
+                Ok(())
+            }
+        }
+    )*}
+}
+
+impl_cstr_buf_write!(
+    (Utf8CStrBufRef<'_>,)
+    (Utf8CStrBufArr<N>, const N: usize)
+    (Utf8CString,)
 );
 
 #[macro_export]

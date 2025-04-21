@@ -84,7 +84,7 @@ fn file_set_prop(name: &Utf8CStr, value: Option<&Utf8CStr>) -> LoggedResult<()> 
             .join("prop.XXXXXX");
         {
             let mut f = unsafe {
-                mkstemp(tmp.as_mut_ptr())
+                mkstemp(tmp.0.as_mut_ptr())
                     .as_os_result("mkstemp", None, None)
                     .map(|fd| File::from_raw_fd(fd))?
             };
@@ -114,7 +114,7 @@ fn proto_write_props(props: &PersistentProperties) -> LoggedResult<()> {
     let mut tmp = FsPathBuf::default().join(concatcp!(PERSIST_PROP, ".XXXXXX"));
     {
         let f = unsafe {
-            mkstemp(tmp.as_mut_ptr())
+            mkstemp(tmp.0.as_mut_ptr())
                 .as_os_result("mkstemp", None, None)
                 .map(|fd| File::from_raw_fd(fd))?
         };
