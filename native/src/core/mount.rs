@@ -8,7 +8,7 @@ use num_traits::AsPrimitive;
 use base::libc::{c_uint, dev_t};
 use base::{
     FsPath, FsPathBuilder, FsPathMnt, LibcReturn, LoggedResult, MountInfo, ResultExt, Utf8CStr,
-    Utf8CStrBuf, cstr, cstr_buf, debug, info, libc, parse_mount_info, warn,
+    Utf8CStrBuf, cstr, debug, info, libc, parse_mount_info, warn,
 };
 
 use crate::consts::{MODULEMNT, MODULEROOT, PREINITDEV, PREINITMIRR, WORKERDIR};
@@ -21,7 +21,7 @@ pub fn setup_mounts() {
     let magisk_tmp = get_magisk_tmp();
 
     // Mount preinit directory
-    let dev_path = cstr_buf::new::<64>()
+    let dev_path = cstr::buf::new::<64>()
         .join_path(magisk_tmp)
         .join_path(PREINITDEV);
     let mut linked = false;
@@ -33,7 +33,7 @@ pub fn setup_mounts() {
             // What we do instead is to scan through the current mountinfo and find a pre-existing
             // mount point mounting our desired partition, and then bind mount the target folder.
             let preinit_dev = attr.st.st_rdev;
-            let mnt_path = cstr_buf::default()
+            let mnt_path = cstr::buf::default()
                 .join_path(magisk_tmp)
                 .join_path(PREINITMIRR);
             for info in parse_mount_info("self") {
@@ -68,7 +68,7 @@ pub fn setup_mounts() {
     }
 
     // Bind remount module root to clear nosuid
-    let module_mnt = cstr_buf::default()
+    let module_mnt = cstr::buf::default()
         .join_path(magisk_tmp)
         .join_path(MODULEMNT);
     let _: LoggedResult<()> = try {
@@ -81,7 +81,7 @@ pub fn setup_mounts() {
 pub fn clean_mounts() {
     let magisk_tmp = get_magisk_tmp();
 
-    let mut buf = cstr_buf::default();
+    let mut buf = cstr::buf::default();
 
     let module_mnt = buf.append_path(magisk_tmp).append_path(MODULEMNT);
     module_mnt.unmount().log_ok();
@@ -186,7 +186,7 @@ pub fn find_preinit_device() -> String {
         && let Ok(tmp) = std::env::var("MAGISKTMP")
         && !tmp.is_empty()
     {
-        let mut buf = cstr_buf::default();
+        let mut buf = cstr::buf::default();
         let mirror_dir = buf.append_path(&tmp).append_path(PREINITMIRR);
         let preinit_dir = Utf8CStr::from_string(&mut preinit_dir);
         let _: LoggedResult<()> = try {

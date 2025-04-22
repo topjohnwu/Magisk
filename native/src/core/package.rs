@@ -5,7 +5,7 @@ use base::WalkResult::{Abort, Continue, Skip};
 use base::libc::{O_CLOEXEC, O_CREAT, O_RDONLY, O_TRUNC, O_WRONLY};
 use base::{
     BufReadExt, Directory, FsPath, FsPathBuilder, LoggedResult, ReadExt, ResultExt, Utf8CStrBuf,
-    cstr, cstr_buf, error, fd_get_attr, open_fd, warn,
+    cstr, error, fd_get_attr, open_fd, warn,
 };
 use bit_set::BitSet;
 use cxx::CxxString;
@@ -239,7 +239,7 @@ impl TrackedFile {
 
 impl ManagerInfo {
     fn check_dyn(&mut self, daemon: &MagiskD, user: i32, pkg: &str) -> Status {
-        let apk = cstr_buf::default()
+        let apk = cstr::buf::default()
             .join_path(daemon.app_data_dir())
             .join_path_fmt(user)
             .join_path(pkg)
@@ -273,7 +273,7 @@ impl ManagerInfo {
     }
 
     fn check_stub(&mut self, user: i32, pkg: &str) -> Status {
-        let mut apk = cstr_buf::default();
+        let mut apk = cstr::buf::default();
         if find_apk_path(pkg, &mut apk).is_err() {
             return Status::NotInstalled;
         }
@@ -297,7 +297,7 @@ impl ManagerInfo {
     }
 
     fn check_orig(&mut self, user: i32) -> Status {
-        let mut apk = cstr_buf::default();
+        let mut apk = cstr::buf::default();
         if find_apk_path(APP_PACKAGE_NAME, &mut apk).is_err() {
             return Status::NotInstalled;
         }
@@ -441,7 +441,7 @@ impl ManagerInfo {
 
 impl MagiskD {
     fn get_package_uid(&self, user: i32, pkg: &str) -> i32 {
-        let path = cstr_buf::default()
+        let path = cstr::buf::default()
             .join_path(self.app_data_dir())
             .join_path_fmt(user)
             .join_path(pkg);
@@ -453,7 +453,7 @@ impl MagiskD {
     pub fn preserve_stub_apk(&self) {
         let mut info = self.manager_info.lock().unwrap();
 
-        let apk = cstr_buf::default()
+        let apk = cstr::buf::default()
             .join_path(get_magisk_tmp())
             .join_path("stub.apk");
 

@@ -2,7 +2,7 @@
 
 use crate::cxx_extern::readlinkat;
 use crate::{
-    BorrowedDirectory, CxxResultExt, FsPath, LibcReturn, Utf8CStr, cstr_buf, slice_from_ptr,
+    BorrowedDirectory, CxxResultExt, FsPath, LibcReturn, Utf8CStr, cstr, slice_from_ptr,
     slice_from_ptr_mut,
 };
 use libc::{
@@ -30,7 +30,7 @@ unsafe extern "C" fn xrealpath(path: *const c_char, buf: *mut u8, bufsz: usize) 
     unsafe {
         match Utf8CStr::from_ptr(path) {
             Ok(path) => {
-                let mut buf = cstr_buf::wrap_ptr(buf, bufsz);
+                let mut buf = cstr::buf::wrap_ptr(buf, bufsz);
                 path.realpath(&mut buf)
                     .log_cxx()
                     .map_or(-1, |_| buf.len() as isize)
@@ -45,7 +45,7 @@ unsafe extern "C" fn xreadlink(path: *const c_char, buf: *mut u8, bufsz: usize) 
     unsafe {
         match Utf8CStr::from_ptr(path) {
             Ok(path) => {
-                let mut buf = cstr_buf::wrap_ptr(buf, bufsz);
+                let mut buf = cstr::buf::wrap_ptr(buf, bufsz);
                 path.read_link(&mut buf)
                     .log_cxx()
                     .map_or(-1, |_| buf.len() as isize)

@@ -2,7 +2,7 @@ use crate::ffi::MagiskInit;
 use base::libc::{TMPFS_MAGIC, statfs};
 use base::{
     Directory, FsPath, FsPathBuilder, FsPathMnt, LibcReturn, LoggedResult, ResultExt, Utf8CStr,
-    cstr, cstr_buf, debug, libc,
+    cstr, debug, libc,
     libc::{chdir, chroot, execve, exit, mount},
     parse_mount_info, raw_cstr,
 };
@@ -38,7 +38,7 @@ pub(crate) fn switch_root(path: &Utf8CStr) {
 
             let mut target = info.target.clone();
             let target = Utf8CStr::from_string(&mut target);
-            let new_path = cstr_buf::default()
+            let new_path = cstr::buf::default()
                 .join_path(path)
                 .join_path(info.target.trim_start_matches('/'));
             new_path.mkdirs(0o755).ok();

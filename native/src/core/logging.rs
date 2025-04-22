@@ -7,7 +7,7 @@ use base::libc::{
 };
 use base::{
     FsPathBuilder, LOGGER, LogLevel, Logger, ReadExt, Utf8CStr, Utf8CStrBuf, WriteExt,
-    const_format::concatcp, cstr_buf, libc, raw_cstr,
+    const_format::concatcp, cstr, libc, raw_cstr,
 };
 use bytemuck::{Pod, Zeroable, bytes_of, write_zeroes};
 use num_derive::{FromPrimitive, ToPrimitive};
@@ -130,7 +130,7 @@ fn write_log_to_pipe(mut logd: &File, prio: i32, msg: &Utf8CStr) -> io::Result<u
     let io2 = IoSlice::new(msg);
     let result = logd.write_vectored(&[io1, io2]);
     if let Err(ref e) = result {
-        let mut buf = cstr_buf::default();
+        let mut buf = cstr::buf::default();
         buf.write_fmt(format_args!("Cannot write_log_to_pipe: {}", e))
             .ok();
         android_log_write(LogLevel::Error, &buf);
@@ -180,7 +180,7 @@ pub fn zygisk_get_logd() -> i32 {
     let mut fd = ZYGISK_LOGD.load(Ordering::Relaxed);
     if fd < 0 {
         android_logging();
-        let path = cstr_buf::default()
+        let path = cstr::buf::default()
             .join_path(get_magisk_tmp())
             .join_path(LOG_PIPE);
         // Open as RW as sometimes it may block
@@ -268,7 +268,7 @@ extern "C" fn logfile_writer(arg: *mut c_void) -> *mut c_void {
 
         let mut meta = LogMeta::zeroed();
         let mut msg_buf = [0u8; MAX_MSG_LEN];
-        let mut aux = cstr_buf::new::<64>();
+        let mut aux = cstr::buf::new::<64>();
 
         loop {
             // Read request
@@ -357,7 +357,7 @@ pub fn setup_logfile() {
 }
 
 pub fn start_log_daemon() {
-    let path = cstr_buf::default()
+    let path = cstr::buf::default()
         .join_path(get_magisk_tmp())
         .join_path(LOG_PIPE);
 

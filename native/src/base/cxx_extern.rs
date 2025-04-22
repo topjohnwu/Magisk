@@ -8,12 +8,12 @@ use libc::{c_char, mode_t};
 use crate::files::map_file_at;
 pub(crate) use crate::xwrap::*;
 use crate::{
-    CxxResultExt, Directory, FsPath, OsResultStatic, Utf8CStr, clone_attr, cstr, cstr_buf,
-    fclone_attr, fd_path, map_fd, map_file, slice_from_ptr,
+    CxxResultExt, Directory, FsPath, OsResultStatic, Utf8CStr, clone_attr, cstr, fclone_attr,
+    fd_path, map_fd, map_file, slice_from_ptr,
 };
 
 pub(crate) fn fd_path_for_cxx(fd: RawFd, buf: &mut [u8]) -> isize {
-    let mut buf = cstr_buf::wrap(buf);
+    let mut buf = cstr::buf::wrap(buf);
     fd_path(fd, &mut buf)
         .log_cxx()
         .map_or(-1_isize, |_| buf.len() as isize)
@@ -24,7 +24,7 @@ unsafe extern "C" fn canonical_path(path: *const c_char, buf: *mut u8, bufsz: us
     unsafe {
         match Utf8CStr::from_ptr(path) {
             Ok(path) => {
-                let mut buf = cstr_buf::wrap_ptr(buf, bufsz);
+                let mut buf = cstr::buf::wrap_ptr(buf, bufsz);
                 path.realpath(&mut buf)
                     .log_cxx()
                     .map_or(-1_isize, |_| buf.len() as isize)

@@ -7,7 +7,7 @@ use num_derive::{FromPrimitive, ToPrimitive};
 use num_traits::FromPrimitive;
 
 use crate::ffi::LogLevelCxx;
-use crate::{Utf8CStr, cstr_buf};
+use crate::{Utf8CStr, cstr};
 
 // Ugly hack to avoid using enum
 #[allow(non_snake_case, non_upper_case_globals)]
@@ -96,7 +96,7 @@ pub fn log_from_cxx(level: LogLevelCxx, msg: &Utf8CStr) {
 
 pub fn log_with_formatter<F: FnOnce(Formatter) -> fmt::Result>(level: LogLevel, f: F) {
     log_with_writer(level, |write| {
-        let mut buf = cstr_buf::default();
+        let mut buf = cstr::buf::default();
         f(&mut buf).ok();
         write(level, &buf);
     });

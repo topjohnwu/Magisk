@@ -21,7 +21,7 @@ use crate::{FsPath, FsPathMnt, slice_from_ptr_mut};
 // Utf8CStrBufRef: reference to a fixed sized buffer
 // Utf8CStrBufArr<N>: fixed sized buffer allocated on the stack
 //
-// For easier usage, please use the helper functions in cstr_buf.
+// For easier usage, please use the helper functions in cstr::buf.
 //
 // In most cases, these are the types being used
 //
@@ -36,7 +36,7 @@ use crate::{FsPath, FsPathMnt, slice_from_ptr_mut};
 
 // Public helper functions
 
-pub mod cstr_buf {
+pub mod buf {
     use super::{Utf8CStrBufArr, Utf8CStrBufRef, Utf8CString};
 
     #[inline(always)]
@@ -118,7 +118,7 @@ impl<'a> From<&'a mut dyn Utf8CStrBuf> for Utf8CStrBuffer<'a, 0> {
 
 impl Default for Utf8CStrBuffer<'static, 4096> {
     fn default() -> Self {
-        Utf8CStrBuffer::Array(cstr_buf::default())
+        Utf8CStrBuffer::Array(buf::default())
     }
 }
 
