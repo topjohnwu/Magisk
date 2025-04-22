@@ -1,6 +1,6 @@
 use crate::{
     Directory, FsPathFollow, LibcReturn, OsError, OsResult, OsResultStatic, Utf8CStr, Utf8CStrBuf,
-    cstr_buf, errno, error,
+    cstr, errno, error,
 };
 use bytemuck::{Pod, bytes_of, bytes_of_mut};
 use libc::{
@@ -139,7 +139,7 @@ macro_rules! open_fd {
 }
 
 pub fn fd_path(fd: RawFd, buf: &mut dyn Utf8CStrBuf) -> OsResult<'static, ()> {
-    let path = cstr_buf::default()
+    let path = cstr::buf::default()
         .join_path("/proc/self/fd")
         .join_path_fmt(fd);
     path.read_link(buf).map_err(|e| e.set_args(None, None))
@@ -270,7 +270,7 @@ pub trait FsPath: Deref<Target = Utf8CStr> {
             return Ok(());
         }
 
-        let mut path = cstr_buf::default();
+        let mut path = cstr::buf::default();
         let mut components = self.split('/').filter(|s| !s.is_empty());
         loop {
             let Some(s) = components.next() else {
@@ -396,7 +396,7 @@ pub trait FsPath: Deref<Target = Utf8CStr> {
                 let mut dest = path.create(O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0o777)?;
                 std::io::copy(&mut src, &mut dest)?;
             } else if attr.is_symlink() {
-                let mut buf = cstr_buf::default();
+                let mut buf = cstr::buf::default();
                 self.read_link(&mut buf)?;
                 unsafe {
                     libc::symlink(buf.as_ptr(), path.as_ptr()).check_os_err(

@@ -17,7 +17,7 @@ use base::const_format::concatcp;
 use base::libc::{O_CLOEXEC, O_RDONLY};
 use base::{
     Directory, FsPath, FsPathBuilder, LibcReturn, LoggedResult, MappedFile, SilentResultExt,
-    Utf8CStr, Utf8CStrBuf, WalkResult, clone_attr, cstr, cstr_buf, debug, libc::mkstemp,
+    Utf8CStr, Utf8CStrBuf, WalkResult, clone_attr, cstr, debug, libc::mkstemp,
 };
 
 const PERSIST_PROP_DIR: &str = "/data/property";
@@ -68,7 +68,7 @@ fn check_proto() -> bool {
 }
 
 fn file_get_prop(name: &Utf8CStr) -> LoggedResult<String> {
-    let path = cstr_buf::default()
+    let path = cstr::buf::default()
         .join_path(PERSIST_PROP_DIR)
         .join_path(name);
     let mut file = path.open(O_RDONLY | O_CLOEXEC).silent()?;
@@ -79,11 +79,11 @@ fn file_get_prop(name: &Utf8CStr) -> LoggedResult<String> {
 }
 
 fn file_set_prop(name: &Utf8CStr, value: Option<&Utf8CStr>) -> LoggedResult<()> {
-    let path = cstr_buf::default()
+    let path = cstr::buf::default()
         .join_path(PERSIST_PROP_DIR)
         .join_path(name);
     if let Some(value) = value {
-        let mut tmp = cstr_buf::default()
+        let mut tmp = cstr::buf::default()
             .join_path(PERSIST_PROP_DIR)
             .join_path("prop.XXXXXX");
         {
@@ -115,7 +115,7 @@ fn proto_read_props() -> LoggedResult<PersistentProperties> {
 }
 
 fn proto_write_props(props: &PersistentProperties) -> LoggedResult<()> {
-    let mut tmp = cstr_buf::default().join_path(concatcp!(PERSIST_PROP, ".XXXXXX"));
+    let mut tmp = cstr::buf::default().join_path(concatcp!(PERSIST_PROP, ".XXXXXX"));
     {
         let f = unsafe {
             mkstemp(tmp.as_mut_ptr())
