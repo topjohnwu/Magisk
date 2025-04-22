@@ -1,9 +1,10 @@
-use crate::{FsPath, LibcReturn, OsResult, Utf8CStr};
+use crate::{LibcReturn, OsResult, Utf8CStr};
 use libc::c_ulong;
+use std::ops::Deref;
 use std::ptr;
 
-impl FsPath {
-    pub fn bind_mount_to<'a>(&'a self, path: &'a FsPath) -> OsResult<'a, ()> {
+pub trait FsPathMnt: Deref<Target = Utf8CStr> {
+    fn bind_mount_to<'a>(&'a self, path: &'a Utf8CStr) -> OsResult<'a, ()> {
         unsafe {
             libc::mount(
                 self.as_ptr(),
@@ -16,7 +17,7 @@ impl FsPath {
         }
     }
 
-    pub fn remount_with_flags(&self, flags: c_ulong) -> OsResult<()> {
+    fn remount_with_flags(&self, flags: c_ulong) -> OsResult<()> {
         unsafe {
             libc::mount(
                 ptr::null(),
@@ -29,7 +30,7 @@ impl FsPath {
         }
     }
 
-    pub fn remount_with_data(&self, data: &Utf8CStr) -> OsResult<()> {
+    fn remount_with_data(&self, data: &Utf8CStr) -> OsResult<()> {
         unsafe {
             libc::mount(
                 ptr::null(),
@@ -42,7 +43,7 @@ impl FsPath {
         }
     }
 
-    pub fn move_mount_to<'a>(&'a self, path: &'a FsPath) -> OsResult<'a, ()> {
+    fn move_mount_to<'a>(&'a self, path: &'a Utf8CStr) -> OsResult<'a, ()> {
         unsafe {
             libc::mount(
                 self.as_ptr(),
@@ -55,13 +56,13 @@ impl FsPath {
         }
     }
 
-    pub fn unmount(&self) -> OsResult<()> {
+    fn unmount(&self) -> OsResult<()> {
         unsafe {
             libc::umount2(self.as_ptr(), libc::MNT_DETACH).check_os_err("unmount", Some(self), None)
         }
     }
 
-    pub fn set_mount_private(&self, recursive: bool) -> OsResult<()> {
+    fn set_mount_private(&self, recursive: bool) -> OsResult<()> {
         let flag = if recursive { libc::MS_REC } else { 0 };
         unsafe {
             libc::mount(

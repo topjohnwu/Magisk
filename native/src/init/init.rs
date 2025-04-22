@@ -6,9 +6,9 @@ use crate::{
     logging::setup_klog,
 };
 use base::{
-    FsPath, LibcReturn, LoggedResult, ResultExt, info,
+    FsPath, FsPathMnt, LibcReturn, LoggedResult, ResultExt, cstr, info,
     libc::{basename, getpid, mount, umask},
-    path, raw_cstr,
+    raw_cstr,
 };
 use std::{
     ffi::{CStr, c_char},
@@ -41,7 +41,7 @@ impl MagiskInit {
         info!("First Stage Init");
         self.prepare_data();
 
-        if !path!("/sdcard").exists() && !path!("/first_stage_ramdisk/sdcard").exists() {
+        if !cstr!("/sdcard").exists() && !cstr!("/first_stage_ramdisk/sdcard").exists() {
             self.hijack_init_with_switch_root();
             self.restore_ramdisk_init();
         } else {
@@ -54,9 +54,9 @@ impl MagiskInit {
     fn second_stage(&mut self) {
         info!("Second Stage Init");
 
-        path!("/init").unmount().ok();
-        path!("/system/bin/init").unmount().ok(); // just in case
-        path!("/data/init").remove().ok();
+        cstr!("/init").unmount().ok();
+        cstr!("/system/bin/init").unmount().ok(); // just in case
+        cstr!("/data/init").remove().ok();
 
         unsafe {
             // Make sure init dmesg logs won't get messed up
@@ -66,10 +66,10 @@ impl MagiskInit {
         // Some weird devices like meizu, uses 2SI but still have legacy rootfs
         if is_rootfs() {
             // We are still on rootfs, so make sure we will execute the init of the 2nd stage
-            let init_path = path!("/init");
+            let init_path = cstr!("/init");
             init_path.remove().ok();
             init_path
-                .create_symlink_to(path!("/system/bin/init"))
+                .create_symlink_to(cstr!("/system/bin/init"))
                 .log_ok();
             self.patch_rw_root();
         } else {
@@ -98,29 +98,29 @@ impl MagiskInit {
     fn recovery(&self) {
         info!("Ramdisk is recovery, abort");
         self.restore_ramdisk_init();
-        path!("/.backup").remove_all().ok();
+        cstr!("/.backup").remove_all().ok();
     }
 
     fn restore_ramdisk_init(&self) {
-        path!("/init").remove().ok();
+        cstr!("/init").remove().ok();
 
-        let orig_init = FsPath::from(backup_init());
+        let orig_init = backup_init();
 
         if orig_init.exists() {
-            orig_init.rename_to(path!("/init")).log_ok();
+            orig_init.rename_to(cstr!("/init")).log_ok();
         } else {
             // If the backup init is missing, this means that the boot ramdisk
             // was created from scratch, and the real init is in a separate CPIO,
             // which is guaranteed to be placed at /system/bin/init.
-            path!("/init")
-                .create_symlink_to(path!("/system/bin/init"))
+            cstr!("/init")
+                .create_symlink_to(cstr!("/system/bin/init"))
                 .log_ok();
         }
     }
 
     fn start(&mut self) -> LoggedResult<()> {
-        if !path!("/proc/cmdline").exists() {
-            path!("/proc").mkdir(0o755)?;
+        if !cstr!("/proc/cmdline").exists() {
+            cstr!("/proc").mkdir(0o755)?;
             unsafe {
                 mount(
                     raw_cstr!("proc"),
@@ -133,8 +133,8 @@ impl MagiskInit {
             .check_io_err()?;
             self.mount_list.push("/proc".to_string());
         }
-        if !path!("/sys/block").exists() {
-            path!("/sys").mkdir(0o755)?;
+        if !cstr!("/sys/block").exists() {
+            cstr!("/sys").mkdir(0o755)?;
             unsafe {
                 mount(
                     raw_cstr!("sysfs"),
@@ -159,7 +159,7 @@ impl MagiskInit {
             self.legacy_system_as_root();
         } else if self.config.force_normal_boot {
             self.first_stage();
-        } else if path!("/sbin/recovery").exists() || path!("/system/bin/recovery").exists() {
+        } else if cstr!("/sbin/recovery").exists() || cstr!("/system/bin/recovery").exists() {
             self.recovery();
         } else if self.check_two_stage() {
             self.first_stage();

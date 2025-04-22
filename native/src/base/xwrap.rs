@@ -29,10 +29,9 @@ fn ptr_to_str<'a>(ptr: *const c_char) -> Option<&'a str> {
 unsafe extern "C" fn xrealpath(path: *const c_char, buf: *mut u8, bufsz: usize) -> isize {
     unsafe {
         match Utf8CStr::from_ptr(path) {
-            Ok(p) => {
+            Ok(path) => {
                 let mut buf = cstr_buf::wrap_ptr(buf, bufsz);
-                FsPath::from(p)
-                    .realpath(&mut buf)
+                path.realpath(&mut buf)
                     .log_cxx()
                     .map_or(-1, |_| buf.len() as isize)
             }
@@ -45,10 +44,9 @@ unsafe extern "C" fn xrealpath(path: *const c_char, buf: *mut u8, bufsz: usize) 
 unsafe extern "C" fn xreadlink(path: *const c_char, buf: *mut u8, bufsz: usize) -> isize {
     unsafe {
         match Utf8CStr::from_ptr(path) {
-            Ok(p) => {
+            Ok(path) => {
                 let mut buf = cstr_buf::wrap_ptr(buf, bufsz);
-                FsPath::from(p)
-                    .read_link(&mut buf)
+                path.read_link(&mut buf)
                     .log_cxx()
                     .map_or(-1, |_| buf.len() as isize)
             }
@@ -343,7 +341,7 @@ unsafe extern "C" fn xrename(oldname: *const c_char, newname: *const c_char) -> 
 unsafe extern "C" fn xmkdir(path: *const c_char, mode: mode_t) -> i32 {
     unsafe {
         match Utf8CStr::from_ptr(path) {
-            Ok(p) => FsPath::from(p).mkdir(mode).log_cxx().map_or(-1, |_| 0),
+            Ok(path) => path.mkdir(mode).log_cxx().map_or(-1, |_| 0),
             Err(_) => -1,
         }
     }
@@ -353,7 +351,7 @@ unsafe extern "C" fn xmkdir(path: *const c_char, mode: mode_t) -> i32 {
 unsafe extern "C" fn xmkdirs(path: *const c_char, mode: mode_t) -> i32 {
     unsafe {
         match Utf8CStr::from_ptr(path) {
-            Ok(p) => FsPath::from(p).mkdirs(mode).log_cxx().map_or(-1, |_| 0),
+            Ok(path) => path.mkdirs(mode).log_cxx().map_or(-1, |_| 0),
             Err(_) => -1,
         }
     }

@@ -1,10 +1,9 @@
 use crate::consts::{PREINITMIRR, SELINUXMOCK};
-use crate::ffi::{MagiskInit, split_plat_cil};
-use crate::{preload_ack, preload_lib, preload_policy};
+use crate::ffi::{MagiskInit, preload_ack, preload_lib, preload_policy, split_plat_cil};
 use base::const_format::concatcp;
 use base::{
-    BytesExt, FsPath, LibcReturn, LoggedResult, MappedFile, ResultExt, cstr, debug, error, info,
-    libc, path, raw_cstr,
+    BytesExt, FsPath, FsPathMnt, LibcReturn, LoggedResult, MappedFile, ResultExt, Utf8CStr, cstr,
+    debug, error, info, libc, raw_cstr,
 };
 use magiskpolicy::ffi::SePolicy;
 use std::io::{Read, Write};
@@ -12,17 +11,17 @@ use std::ptr;
 use std::thread::sleep;
 use std::time::Duration;
 
-const POLICY_VERSION: &FsPath = path!("/selinux_version");
+const POLICY_VERSION: &Utf8CStr = cstr!("/selinux_version");
 
-const MOCK_VERSION: &FsPath = path!(concatcp!(SELINUXMOCK, "/version"));
-const MOCK_LOAD: &FsPath = path!(concatcp!(SELINUXMOCK, "/load"));
-const MOCK_ENFORCE: &FsPath = path!(concatcp!(SELINUXMOCK, "/enforce"));
-const MOCK_REQPROT: &FsPath = path!(concatcp!(SELINUXMOCK, "/checkreqprot"));
+const MOCK_VERSION: &Utf8CStr = cstr!(concatcp!(SELINUXMOCK, "/version"));
+const MOCK_LOAD: &Utf8CStr = cstr!(concatcp!(SELINUXMOCK, "/load"));
+const MOCK_ENFORCE: &Utf8CStr = cstr!(concatcp!(SELINUXMOCK, "/enforce"));
+const MOCK_REQPROT: &Utf8CStr = cstr!(concatcp!(SELINUXMOCK, "/checkreqprot"));
 
 const SELINUX_MNT: &str = "/sys/fs/selinux";
-const SELINUX_ENFORCE: &FsPath = path!(concatcp!(SELINUX_MNT, "/enforce"));
-const SELINUX_LOAD: &FsPath = path!(concatcp!(SELINUX_MNT, "/load"));
-const SELINUX_REQPROT: &FsPath = path!(concatcp!(SELINUX_MNT, "/checkreqprot"));
+const SELINUX_ENFORCE: &Utf8CStr = cstr!(concatcp!(SELINUX_MNT, "/enforce"));
+const SELINUX_LOAD: &Utf8CStr = cstr!(concatcp!(SELINUX_MNT, "/load"));
+const SELINUX_REQPROT: &Utf8CStr = cstr!(concatcp!(SELINUX_MNT, "/checkreqprot"));
 
 enum SePatchStrategy {
     // 2SI, Android 10+
@@ -49,13 +48,13 @@ enum SePatchStrategy {
 // node, and because both has been replaced with FIFO files, init will block until we
 // handle it, effectively hijacking its control flow until the patched sepolicy is loaded.
 
-fn mock_fifo(target: &FsPath, mock: &FsPath) -> LoggedResult<()> {
+fn mock_fifo(target: &Utf8CStr, mock: &Utf8CStr) -> LoggedResult<()> {
     debug!("Hijack [{}]", target);
     mock.mkfifo(0o666)?;
     mock.bind_mount_to(target).log()
 }
 
-fn mock_file(target: &FsPath, mock: &FsPath) -> LoggedResult<()> {
+fn mock_file(target: &Utf8CStr, mock: &Utf8CStr) -> LoggedResult<()> {
     debug!("Hijack [{}]", target);
     drop(mock.create(libc::O_RDONLY, 0o666)?);
     mock.bind_mount_to(target).log()
@@ -68,7 +67,7 @@ impl MagiskInit {
 
     fn cleanup_and_load(&self, rules: &str) {
         // Cleanup the hijacks
-        path!("/init").unmount().ok();
+        cstr!("/init").unmount().ok();
         SELINUX_LOAD.unmount().log_ok();
         SELINUX_ENFORCE.unmount().ok();
         SELINUX_REQPROT.unmount().ok();
@@ -79,7 +78,7 @@ impl MagiskInit {
         sepol.to_file(SELINUX_LOAD);
 
         // For some reason, restorecon on /init won't work in some cases
-        path!("/init")
+        cstr!("/init")
             .follow_link()
             .set_secontext(cstr!("u:object_r:init_exec:s0"))
             .ok();
@@ -89,10 +88,10 @@ impl MagiskInit {
     }
 
     fn handle_sepolicy_impl(&mut self) -> LoggedResult<()> {
-        path!(SELINUXMOCK).mkdir(0o711)?;
+        cstr!(SELINUXMOCK).mkdir(0o711)?;
 
         let mut rules = String::new();
-        let rule_file = path!(concatcp!("/data/", PREINITMIRR, "/sepolicy.rule"));
+        let rule_file = cstr!(concatcp!("/data/", PREINITMIRR, "/sepolicy.rule"));
         if rule_file.exists() {
             debug!("Loading custom sepolicy patch: [{}]", rule_file);
             rule_file.open(libc::O_RDONLY)?.read_to_string(&mut rules)?;
@@ -102,7 +101,7 @@ impl MagiskInit {
 
         let strat: SePatchStrategy;
 
-        if path!("/system/bin/init").exists() {
+        if cstr!("/system/bin/init").exists() {
             strat = SePatchStrategy::LdPreload;
         } else {
             let init = MappedFile::open(cstr!("/init"))?;
@@ -124,7 +123,7 @@ impl MagiskInit {
             SePatchStrategy::LdPreload => {
                 info!("SePatchStrategy: LD_PRELOAD");
 
-                path!("init-ld").copy_to(preload_lib())?;
+                cstr!("init-ld").copy_to(preload_lib())?;
                 unsafe {
                     libc::setenv(raw_cstr!("LD_PRELOAD"), preload_lib().as_ptr(), 1);
                 }
@@ -137,7 +136,7 @@ impl MagiskInit {
                     // selinuxfs was not already mounted, mount it ourselves
 
                     // Remount procfs with proper options
-                    path!("/proc").remount_with_data(cstr!("hidepid=2,gid=3009"))?;
+                    cstr!("/proc").remount_with_data(cstr!("hidepid=2,gid=3009"))?;
 
                     // Preserve sysfs and procfs
                     self.mount_list.retain(|s| s != "/proc" && s != "/sys");

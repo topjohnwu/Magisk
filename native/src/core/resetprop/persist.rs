@@ -16,8 +16,8 @@ use crate::resetprop::proto::persistent_properties::{
 use base::const_format::concatcp;
 use base::libc::{O_CLOEXEC, O_RDONLY};
 use base::{
-    Directory, FsPathBuf, LibcReturn, LoggedResult, MappedFile, SilentResultExt, Utf8CStr,
-    WalkResult, clone_attr, cstr, debug, libc::mkstemp, path,
+    Directory, FsPath, FsPathBuf, LibcReturn, LoggedResult, MappedFile, SilentResultExt, Utf8CStr,
+    WalkResult, clone_attr, cstr, debug, libc::mkstemp,
 };
 
 const PERSIST_PROP_DIR: &str = "/data/property";
@@ -64,7 +64,7 @@ impl PropExt for PersistentProperties {
 }
 
 fn check_proto() -> bool {
-    path!(PERSIST_PROP).exists()
+    cstr!(PERSIST_PROP).exists()
 }
 
 fn file_get_prop(name: &Utf8CStr) -> LoggedResult<String> {
@@ -121,8 +121,8 @@ fn proto_write_props(props: &PersistentProperties) -> LoggedResult<()> {
         debug!("resetprop: encode with protobuf [{}]", tmp);
         props.write_message(&mut Writer::new(BufWriter::new(f)))?;
     }
-    clone_attr(path!(PERSIST_PROP), &tmp)?;
-    tmp.rename_to(path!(PERSIST_PROP))?;
+    clone_attr(cstr!(PERSIST_PROP), &tmp)?;
+    tmp.rename_to(cstr!(PERSIST_PROP))?;
     Ok(())
 }
 

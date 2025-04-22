@@ -1,10 +1,10 @@
 use base::{
-    LOGGER, LogLevel, Logger, Utf8CStr, cstr,
+    FsPath, LOGGER, LogLevel, Logger, Utf8CStr, cstr,
     libc::{
         O_CLOEXEC, O_RDWR, O_WRONLY, S_IFCHR, STDERR_FILENO, STDIN_FILENO, STDOUT_FILENO, SYS_dup3,
         makedev, mknod, syscall,
     },
-    open_fd, path, raw_cstr,
+    open_fd, raw_cstr,
 };
 use std::{
     fs::File,
@@ -23,7 +23,7 @@ pub fn setup_klog() {
         if fd.is_err() {
             mknod(raw_cstr!("/null"), S_IFCHR | 0o666, makedev(1, 3));
             fd = open_fd!(cstr!("/null"), O_RDWR | O_CLOEXEC);
-            path!("/null").remove().ok();
+            cstr!("/null").remove().ok();
         }
         if let Ok(ref fd) = fd {
             syscall(SYS_dup3, fd, STDIN_FILENO, O_CLOEXEC);
@@ -36,7 +36,7 @@ pub fn setup_klog() {
         if fd.is_err() {
             mknod(raw_cstr!("/kmsg"), S_IFCHR | 0o666, makedev(1, 11));
             fd = open_fd!(cstr!("/kmsg"), O_WRONLY | O_CLOEXEC);
-            path!("/kmsg").remove().ok();
+            cstr!("/kmsg").remove().ok();
         }
         KMSG = fd.map(|fd| fd.into_raw_fd()).unwrap_or(-1);
     }

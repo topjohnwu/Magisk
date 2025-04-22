@@ -279,7 +279,7 @@ impl SePolicy {
 
     pub fn load_rule_file(&mut self, filename: &Utf8CStr) {
         let result: LoggedResult<()> = try {
-            let file = FsPath::from(filename).open(O_RDONLY | O_CLOEXEC)?;
+            let file = filename.open(O_RDONLY | O_CLOEXEC)?;
             let mut reader = BufReader::new(file);
             self.load_rules_from_reader(&mut reader);
         };
