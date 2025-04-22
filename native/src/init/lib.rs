@@ -3,7 +3,6 @@
 #![feature(try_blocks)]
 #![allow(clippy::missing_safety_doc)]
 
-use base::FsPath;
 use logging::setup_klog;
 // Has to be pub so all symbols in that crate is included
 pub use magiskpolicy;
@@ -105,19 +104,4 @@ pub mod ffi {
         unsafe fn find_block(self: &MagiskInit, partname: *const c_char) -> u64;
         unsafe fn patch_fissiond(self: &mut MagiskInit, tmp_path: *const c_char);
     }
-}
-
-#[inline(always)]
-fn preload_lib() -> &'static FsPath {
-    FsPath::from(ffi::preload_lib())
-}
-
-#[inline(always)]
-fn preload_policy() -> &'static FsPath {
-    FsPath::from(ffi::preload_policy())
-}
-
-#[inline(always)]
-fn preload_ack() -> &'static FsPath {
-    FsPath::from(ffi::preload_ack())
 }

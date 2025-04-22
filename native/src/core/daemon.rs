@@ -11,8 +11,8 @@ use crate::package::ManagerInfo;
 use crate::su::SuInfo;
 use base::libc::{O_CLOEXEC, O_RDONLY};
 use base::{
-    AtomicArc, BufReadExt, FsPathBuf, ResultExt, Utf8CStr, cstr, cstr_buf, error, info, libc,
-    open_fd, path,
+    AtomicArc, BufReadExt, FsPath, FsPathBuf, ResultExt, Utf8CStr, cstr, cstr_buf, error, info,
+    libc, open_fd,
 };
 use std::fs::File;
 use std::io::BufReader;
@@ -106,7 +106,7 @@ impl MagiskD {
         self.preserve_stub_apk();
 
         // Check secure dir
-        let secure_dir = path!(SECURE_DIR);
+        let secure_dir = cstr!(SECURE_DIR);
         if !secure_dir.exists() {
             if self.sdk_int < 24 {
                 secure_dir.mkdir(0o700).log_ok();
@@ -173,7 +173,7 @@ impl MagiskD {
         self.set_db_setting(DbEntryKey::BootloopCount, 0).log_ok();
 
         // At this point it's safe to create the folder
-        let secure_dir = path!(SECURE_DIR);
+        let secure_dir = cstr!(SECURE_DIR);
         if !secure_dir.exists() {
             secure_dir.mkdir(0o700).log_ok();
         }
@@ -245,7 +245,7 @@ pub fn daemon_entry() {
     }
 
     let mut sdk_int = -1;
-    if let Ok(file) = path!("/system/build.prop").open(O_RDONLY | O_CLOEXEC) {
+    if let Ok(file) = cstr!("/system/build.prop").open(O_RDONLY | O_CLOEXEC) {
         let mut file = BufReader::new(file);
         file.foreach_props(|key, val| {
             if key == "ro.build.version.sdk" {

@@ -1,9 +1,10 @@
 use crate::ffi::MagiskInit;
 use base::libc::{TMPFS_MAGIC, statfs};
 use base::{
-    Directory, FsPath, FsPathBuf, LibcReturn, LoggedResult, ResultExt, Utf8CStr, cstr, debug, libc,
+    Directory, FsPath, FsPathBuf, FsPathMnt, LibcReturn, LoggedResult, ResultExt, Utf8CStr, cstr,
+    debug, libc,
     libc::{chdir, chroot, execve, exit, mount},
-    parse_mount_info, path, raw_cstr,
+    parse_mount_info, raw_cstr,
 };
 use cxx::CxxString;
 use std::ffi::c_long;
@@ -36,7 +37,7 @@ pub(crate) fn switch_root(path: &Utf8CStr) {
             }
 
             let mut target = info.target.clone();
-            let target = FsPath::from(Utf8CStr::from_string(&mut target));
+            let target = Utf8CStr::from_string(&mut target);
             let new_path = FsPathBuf::default()
                 .join(path)
                 .join(info.target.trim_start_matches('/'));
@@ -46,7 +47,7 @@ pub(crate) fn switch_root(path: &Utf8CStr) {
         }
         unsafe {
             chdir(path.as_ptr()).check_io_err()?;
-            FsPath::from(path).move_mount_to(path!("/"))?;
+            path.move_mount_to(cstr!("/"))?;
             chroot(raw_cstr!("."));
         }
 
@@ -79,7 +80,7 @@ pub(crate) fn is_rootfs() -> bool {
 impl MagiskInit {
     pub(crate) fn prepare_data(&self) {
         debug!("Setup data tmp");
-        path!("/data").mkdir(0o755).log_ok();
+        cstr!("/data").mkdir(0o755).log_ok();
         unsafe {
             mount(
                 raw_cstr!("magisk"),
@@ -92,16 +93,16 @@ impl MagiskInit {
         .check_io_err()
         .log_ok();
 
-        path!("/init").copy_to(path!("/data/magiskinit")).log_ok();
-        path!("/.backup").copy_to(path!("/data/.backup")).log_ok();
-        path!("/overlay.d")
-            .copy_to(path!("/data/overlay.d"))
+        cstr!("/init").copy_to(cstr!("/data/magiskinit")).log_ok();
+        cstr!("/.backup").copy_to(cstr!("/data/.backup")).log_ok();
+        cstr!("/overlay.d")
+            .copy_to(cstr!("/data/overlay.d"))
             .log_ok();
     }
 
     pub(crate) fn exec_init(&mut self) {
         for path in self.mount_list.iter_mut().rev() {
-            let path = FsPath::from(Utf8CStr::from_string(path));
+            let path = Utf8CStr::from_string(path);
             if path.unmount().log().is_ok() {
                 debug!("Unmount [{}]", path);
             }

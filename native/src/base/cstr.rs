@@ -11,8 +11,7 @@ use std::str::Utf8Error;
 use std::{fmt, mem, slice, str};
 use thiserror::Error;
 
-use crate::slice_from_ptr_mut;
-
+use crate::{FsPath, FsPathMnt, slice_from_ptr_mut};
 // Utf8CStr types are UTF-8 validated and null terminated strings.
 //
 // Several Utf8CStr types:
@@ -416,32 +415,6 @@ const_assert_eq!(align_of::<&Utf8CStr>(), align_of::<[usize; 2]>());
 // File system path extensions types
 
 #[repr(transparent)]
-pub struct FsPath(Utf8CStr);
-
-impl FsPath {
-    #[inline(always)]
-    pub fn from<T: AsRef<Utf8CStr> + ?Sized>(value: &T) -> &FsPath {
-        unsafe { mem::transmute(value.as_ref()) }
-    }
-
-    #[inline(always)]
-    pub const fn __from_utfcstr(value: &Utf8CStr) -> &FsPath {
-        unsafe { mem::transmute(value) }
-    }
-
-    pub fn follow_link(&self) -> &FsPathFollow {
-        unsafe { mem::transmute(self) }
-    }
-}
-
-impl AsUtf8CStr for FsPath {
-    #[inline(always)]
-    fn as_utf8_cstr(&self) -> &Utf8CStr {
-        &self.0
-    }
-}
-
-#[repr(transparent)]
 pub struct FsPathFollow(Utf8CStr);
 
 impl AsUtf8CStr for FsPathFollow {
@@ -502,11 +475,10 @@ impl<const N: usize> FsPathBuf<'_, N> {
     }
 }
 
-impl<const N: usize> Deref for FsPathBuf<'_, N> {
-    type Target = FsPath;
-
-    fn deref(&self) -> &FsPath {
-        FsPath::from(self.0.deref())
+impl<const N: usize> AsUtf8CStr for FsPathBuf<'_, N> {
+    #[inline(always)]
+    fn as_utf8_cstr(&self) -> &Utf8CStr {
+        &self.0
     }
 }
 
@@ -525,11 +497,11 @@ macro_rules! impl_cstr_deref {
 }
 
 impl_cstr_deref!(
-    (FsPath,)
-    (FsPathFollow,)
     (Utf8CStrBufRef<'_>,)
     (Utf8CStrBufArr<N>, const N: usize)
     (Utf8CString,)
+    (FsPathFollow,)
+    (FsPathBuf<'_, N>, const N: usize)
 );
 
 // impl<T: Deref<Target = Utf8CStr>> BoilerPlate for T { ... }
@@ -612,12 +584,11 @@ macro_rules! impl_cstr_misc {
 
 impl_cstr_misc!(
     (Utf8CStr,)
-    (FsPath,)
-    (FsPathFollow,)
-    (FsPathBuf<'_, N>, const N: usize)
     (Utf8CStrBufRef<'_>,)
     (Utf8CStrBufArr<N>, const N: usize)
     (Utf8CString,)
+    (FsPathFollow,)
+    (FsPathBuf<'_, N>, const N: usize)
 );
 
 fn copy_cstr_truncate(dest: &mut [u8], src: &[u8]) -> usize {
@@ -703,6 +674,23 @@ impl_cstr_buf_write!(
     (Utf8CString,)
 );
 
+// impl<T: Deref<Target = Utf8CStr>> FsPath for T {}
+// impl<T: Deref<Target = Utf8CStr>> FsPathMnt for T {}
+macro_rules! impl_fs_path {
+    ($( ($t:ty, $($g:tt)*) )*) => {$(
+        impl<$($g)*> FsPath for $t {}
+        impl<$($g)*> FsPathMnt for $t {}
+    )*}
+}
+
+impl_fs_path!(
+    (&Utf8CStr,)
+    (Utf8CStrBufRef<'_>,)
+    (Utf8CStrBufArr<N>, const N: usize)
+    (Utf8CString,)
+    (FsPathBuf<'_, N>, const N: usize)
+);
+
 #[macro_export]
 macro_rules! cstr {
     ($str:expr) => {{
@@ -717,9 +705,4 @@ macro_rules! cstr {
 #[macro_export]
 macro_rules! raw_cstr {
     ($str:expr) => {{ $crate::cstr!($str).as_ptr() }};
-}
-
-#[macro_export]
-macro_rules! path {
-    ($str:expr) => {{ $crate::FsPath::__from_utfcstr($crate::cstr!($str)) }};
 }

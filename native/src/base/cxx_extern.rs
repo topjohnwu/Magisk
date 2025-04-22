@@ -23,11 +23,11 @@ pub(crate) fn fd_path_for_cxx(fd: RawFd, buf: &mut [u8]) -> isize {
 unsafe extern "C" fn canonical_path(path: *const c_char, buf: *mut u8, bufsz: usize) -> isize {
     unsafe {
         match Utf8CStr::from_ptr(path) {
-            Ok(p) => {
+            Ok(path) => {
                 let mut buf = cstr_buf::wrap_ptr(buf, bufsz);
-                FsPath::from(p)
-                    .realpath(&mut buf)
-                    .map_or(-1, |_| buf.len() as isize)
+                path.realpath(&mut buf)
+                    .log_cxx()
+                    .map_or(-1_isize, |_| buf.len() as isize)
             }
             Err(_) => -1,
         }
@@ -38,7 +38,7 @@ unsafe extern "C" fn canonical_path(path: *const c_char, buf: *mut u8, bufsz: us
 unsafe extern "C" fn mkdirs_for_cxx(path: *const c_char, mode: mode_t) -> i32 {
     unsafe {
         match Utf8CStr::from_ptr(path) {
-            Ok(p) => FsPath::from(p).mkdirs(mode).map_or(-1, |_| 0),
+            Ok(path) => path.mkdirs(mode).map_or(-1, |_| 0),
             Err(_) => -1,
         }
     }
@@ -48,7 +48,7 @@ unsafe extern "C" fn mkdirs_for_cxx(path: *const c_char, mode: mode_t) -> i32 {
 unsafe extern "C" fn rm_rf_for_cxx(path: *const c_char) -> bool {
     unsafe {
         match Utf8CStr::from_ptr(path) {
-            Ok(p) => FsPath::from(p).remove_all().is_ok(),
+            Ok(path) => path.remove_all().is_ok(),
             Err(_) => false,
         }
     }
@@ -114,8 +114,6 @@ unsafe extern "C" fn cp_afc_for_cxx(src: *const c_char, dest: *const c_char) -> 
     unsafe {
         if let Ok(src) = Utf8CStr::from_ptr(src) {
             if let Ok(dest) = Utf8CStr::from_ptr(dest) {
-                let src = FsPath::from(src);
-                let dest = FsPath::from(dest);
                 return src.copy_to(dest).log_cxx().is_ok();
             }
         }
@@ -128,8 +126,6 @@ unsafe extern "C" fn mv_path_for_cxx(src: *const c_char, dest: *const c_char) ->
     unsafe {
         if let Ok(src) = Utf8CStr::from_ptr(src) {
             if let Ok(dest) = Utf8CStr::from_ptr(dest) {
-                let src = FsPath::from(src);
-                let dest = FsPath::from(dest);
                 return src.move_to(dest).log_cxx().is_ok();
             }
         }
@@ -142,8 +138,6 @@ unsafe extern "C" fn link_path_for_cxx(src: *const c_char, dest: *const c_char) 
     unsafe {
         if let Ok(src) = Utf8CStr::from_ptr(src) {
             if let Ok(dest) = Utf8CStr::from_ptr(dest) {
-                let src = FsPath::from(src);
-                let dest = FsPath::from(dest);
                 return src.link_to(dest).log_cxx().is_ok();
             }
         }
@@ -156,8 +150,6 @@ unsafe extern "C" fn clone_attr_for_cxx(src: *const c_char, dest: *const c_char)
     unsafe {
         if let Ok(src) = Utf8CStr::from_ptr(src) {
             if let Ok(dest) = Utf8CStr::from_ptr(dest) {
-                let src = FsPath::from(src);
-                let dest = FsPath::from(dest);
                 return clone_attr(src, dest).log_cxx().is_ok();
             }
         }

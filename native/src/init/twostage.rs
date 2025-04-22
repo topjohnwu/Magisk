@@ -1,8 +1,7 @@
 use crate::ffi::MagiskInit;
 use base::{
-    LoggedResult, MappedFile, MutBytesExt, ResultExt, cstr, debug, error,
+    FsPath, FsPathMnt, LoggedResult, MappedFile, MutBytesExt, ResultExt, cstr, debug, error,
     libc::{O_CLOEXEC, O_CREAT, O_RDONLY, O_WRONLY},
-    path,
 };
 use std::io::Write;
 
@@ -29,8 +28,8 @@ pub(crate) fn hexpatch_init_for_second_stage(writable: bool) {
 
     if !writable {
         // If we cannot directly modify /init, we need to bind mount a replacement on top of it
-        let src = path!("/init");
-        let dest = path!("/data/init");
+        let src = cstr!("/init");
+        let dest = cstr!("/data/init");
         let _: LoggedResult<()> = try {
             {
                 let mut fd = dest.create(O_CREAT | O_WRONLY, 0)?;
@@ -70,32 +69,32 @@ impl MagiskInit {
         // /sdcard exists and fallback to using hexpatch.
 
         if self.config.force_normal_boot {
-            path!("/first_stage_ramdisk/storage/self")
+            cstr!("/first_stage_ramdisk/storage/self")
                 .mkdirs(0o755)
                 .log_ok();
-            path!("/first_stage_ramdisk/storage/self/primary")
-                .create_symlink_to(path!("/system/system/bin/init"))
+            cstr!("/first_stage_ramdisk/storage/self/primary")
+                .create_symlink_to(cstr!("/system/system/bin/init"))
                 .log_ok();
             debug!("Symlink /first_stage_ramdisk/storage/self/primary -> /system/system/bin/init");
-            path!("/first_stage_ramdisk/sdcard")
+            cstr!("/first_stage_ramdisk/sdcard")
                 .create(O_RDONLY | O_CREAT | O_CLOEXEC, 0)
                 .log_ok();
         } else {
-            path!("/storage/self").mkdirs(0o755).log_ok();
-            path!("/storage/self/primary")
-                .create_symlink_to(path!("/system/system/bin/init"))
+            cstr!("/storage/self").mkdirs(0o755).log_ok();
+            cstr!("/storage/self/primary")
+                .create_symlink_to(cstr!("/system/system/bin/init"))
                 .log_ok();
             debug!("Symlink /storage/self/primary -> /system/system/bin/init");
         }
-        path!("/init").rename_to(path!("/sdcard")).log_ok();
+        cstr!("/init").rename_to(cstr!("/sdcard")).log_ok();
 
         // First try to mount magiskinit from rootfs to workaround Samsung RKP
-        if path!("/sdcard").bind_mount_to(path!("/sdcard")).is_ok() {
+        if cstr!("/sdcard").bind_mount_to(cstr!("/sdcard")).is_ok() {
             debug!("Bind mount /sdcard -> /sdcard");
         } else {
             // Binding mounting from rootfs is not supported before Linux 3.12
-            path!("/data/magiskinit")
-                .bind_mount_to(path!("/sdcard"))
+            cstr!("/data/magiskinit")
+                .bind_mount_to(cstr!("/sdcard"))
                 .log_ok();
             debug!("Bind mount /data/magiskinit -> /sdcard");
         }

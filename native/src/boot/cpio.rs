@@ -342,13 +342,12 @@ impl Cpio {
         eprintln!("Extracting entry [{}] to [{}]", path, out);
 
         let out = Utf8CStr::from_string(out);
-        let out = FsPath::from(out);
 
         let mut buf = cstr_buf::default();
 
         // Make sure its parent directories exist
         if out.parent(&mut buf) {
-            FsPath::from(&buf).mkdirs(0o755)?;
+            buf.mkdirs(0o755)?;
         }
 
         let mode: mode_t = (entry.mode & 0o777).into();
@@ -362,7 +361,7 @@ impl Cpio {
             S_IFLNK => {
                 buf.clear();
                 buf.push_str(str::from_utf8(entry.data.as_slice())?);
-                out.create_symlink_to(FsPath::from(&buf))?;
+                out.create_symlink_to(&buf)?;
             }
             S_IFBLK | S_IFCHR => {
                 let dev = makedev(entry.rdevmajor.try_into()?, entry.rdevminor.try_into()?);
@@ -399,7 +398,6 @@ impl Cpio {
             return Err(log_err!("path cannot end with / for add"));
         }
         let file = Utf8CStr::from_string(file);
-        let file = FsPath::from(&file);
         let attr = file.get_attr()?;
 
         let mut content = Vec::<u8>::new();
@@ -765,7 +763,7 @@ pub fn cpio_commands(argc: i32, argv: *const *const c_char) -> bool {
             CpioCli::from_args(&["magiskboot", "cpio"], &cmds).on_early_exit(print_cpio_usage);
 
         let file = Utf8CStr::from_string(&mut cli.file);
-        let mut cpio = if FsPath::from(file).exists() {
+        let mut cpio = if file.exists() {
             Cpio::load_from_file(file)?
         } else {
             Cpio::new()

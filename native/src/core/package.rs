@@ -273,11 +273,10 @@ impl ManagerInfo {
     }
 
     fn check_stub(&mut self, user: i32, pkg: &str) -> Status {
-        let mut arr = cstr_buf::default();
-        if find_apk_path(pkg, &mut arr).is_err() {
+        let mut apk = cstr_buf::default();
+        if find_apk_path(pkg, &mut apk).is_err() {
             return Status::NotInstalled;
         }
-        let apk = FsPath::from(&arr);
 
         let cert = match apk.open(O_RDONLY | O_CLOEXEC) {
             Ok(mut fd) => read_certificate(&mut fd, -1),
@@ -286,7 +285,7 @@ impl ManagerInfo {
 
         if cert.is_empty() || (pkg == self.repackaged_pkg && cert != self.repackaged_cert) {
             error!("pkg: repackaged APK signature invalid: {}", apk);
-            uninstall_pkg(apk);
+            uninstall_pkg(&apk);
             return Status::CertMismatch;
         }
 
@@ -298,11 +297,10 @@ impl ManagerInfo {
     }
 
     fn check_orig(&mut self, user: i32) -> Status {
-        let mut arr = cstr_buf::default();
-        if find_apk_path(APP_PACKAGE_NAME, &mut arr).is_err() {
+        let mut apk = cstr_buf::default();
+        if find_apk_path(APP_PACKAGE_NAME, &mut apk).is_err() {
             return Status::NotInstalled;
         }
-        let apk = FsPath::from(&arr);
 
         let cert = match apk.open(O_RDONLY | O_CLOEXEC) {
             Ok(mut fd) => read_certificate(&mut fd, MAGISK_VER_CODE),

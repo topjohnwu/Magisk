@@ -7,8 +7,8 @@ use num_traits::AsPrimitive;
 
 use base::libc::{c_uint, dev_t};
 use base::{
-    FsPath, FsPathBuf, LibcReturn, LoggedResult, MountInfo, ResultExt, Utf8CStr, cstr, cstr_buf,
-    debug, info, libc, parse_mount_info, path, warn,
+    FsPath, FsPathBuf, FsPathMnt, LibcReturn, LoggedResult, MountInfo, ResultExt, Utf8CStr, cstr,
+    cstr_buf, debug, info, libc, parse_mount_info, warn,
 };
 
 use crate::consts::{MODULEMNT, MODULEROOT, PREINITDEV, PREINITMIRR, WORKERDIR};
@@ -44,7 +44,6 @@ pub fn setup_mounts() {
                     let target = Utf8CStr::from_string(&mut target);
                     let mut preinit_dir = resolve_preinit_dir(target);
                     let preinit_dir = Utf8CStr::from_string(&mut preinit_dir);
-                    let preinit_dir = FsPath::from(preinit_dir);
                     let r: LoggedResult<()> = try {
                         preinit_dir.mkdir(0o700)?;
                         mnt_path.mkdirs(0o755)?;
@@ -70,7 +69,7 @@ pub fn setup_mounts() {
     let module_mnt = FsPathBuf::default().join(magisk_tmp).join(MODULEMNT);
     let _: LoggedResult<()> = try {
         module_mnt.mkdir(0o755)?;
-        path!(MODULEROOT).bind_mount_to(&module_mnt)?;
+        cstr!(MODULEROOT).bind_mount_to(&module_mnt)?;
         module_mnt.remount_with_flags(libc::MS_RDONLY)?;
     };
 }
@@ -182,7 +181,7 @@ pub fn find_preinit_device() -> String {
         && !tmp.is_empty()
     {
         let mut mirror_dir = FsPathBuf::default().join(&tmp).join(PREINITMIRR);
-        let preinit_dir = FsPath::from(Utf8CStr::from_string(&mut preinit_dir));
+        let preinit_dir = Utf8CStr::from_string(&mut preinit_dir);
         let _: LoggedResult<()> = try {
             preinit_dir.mkdirs(0o700)?;
             mirror_dir.mkdirs(0o755)?;
