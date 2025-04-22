@@ -6,7 +6,7 @@ use base::libc::{
     localtime_r, pthread_sigmask, sigaddset, sigset_t, sigtimedwait, time_t, timespec, tm,
 };
 use base::{
-    FsPathBuf, LOGGER, LogLevel, Logger, ReadExt, Utf8CStr, Utf8CStrBuf, WriteExt,
+    FsPathBuilder, LOGGER, LogLevel, Logger, ReadExt, Utf8CStr, Utf8CStrBuf, WriteExt,
     const_format::concatcp, cstr_buf, libc, raw_cstr,
 };
 use bytemuck::{Pod, Zeroable, bytes_of, write_zeroes};
@@ -180,7 +180,9 @@ pub fn zygisk_get_logd() -> i32 {
     let mut fd = ZYGISK_LOGD.load(Ordering::Relaxed);
     if fd < 0 {
         android_logging();
-        let path = FsPathBuf::default().join(get_magisk_tmp()).join(LOG_PIPE);
+        let path = cstr_buf::default()
+            .join_path(get_magisk_tmp())
+            .join_path(LOG_PIPE);
         // Open as RW as sometimes it may block
         fd = unsafe { libc::open(path.as_ptr(), O_RDWR | O_CLOEXEC) };
         if fd >= 0 {
@@ -355,7 +357,9 @@ pub fn setup_logfile() {
 }
 
 pub fn start_log_daemon() {
-    let path = FsPathBuf::default().join(get_magisk_tmp()).join(LOG_PIPE);
+    let path = cstr_buf::default()
+        .join_path(get_magisk_tmp())
+        .join_path(LOG_PIPE);
 
     unsafe {
         libc::mkfifo(path.as_ptr(), 0o666);

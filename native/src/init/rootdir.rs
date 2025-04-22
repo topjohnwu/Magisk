@@ -2,7 +2,7 @@ use crate::consts::{ROOTMNT, ROOTOVL};
 use crate::ffi::MagiskInit;
 use base::libc::{O_CREAT, O_RDONLY, O_WRONLY};
 use base::{
-    BufReadExt, Directory, FsPath, FsPathBuf, FsPathMnt, LoggedResult, ResultExt, Utf8CStr,
+    BufReadExt, Directory, FsPath, FsPathBuilder, FsPathMnt, LoggedResult, ResultExt, Utf8CStr,
     Utf8CString, clone_attr, cstr, cstr_buf, debug,
 };
 use std::io::BufReader;
@@ -72,12 +72,8 @@ impl MagiskInit {
                 None => return Ok(()),
                 Some(e) => {
                     let name = e.name();
-                    let src = FsPathBuf::from(cstr_buf::dynamic(256))
-                        .join(src_dir)
-                        .join(name);
-                    let dest = FsPathBuf::from(cstr_buf::dynamic(256))
-                        .join(dest_dir)
-                        .join(name);
+                    let src = cstr_buf::dynamic(256).join_path(src_dir).join_path(name);
+                    let dest = cstr_buf::dynamic(256).join_path(dest_dir).join_path(name);
                     if dest.exists() {
                         if e.is_dir() {
                             // Recursive

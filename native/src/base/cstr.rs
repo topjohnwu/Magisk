@@ -359,11 +359,6 @@ impl Utf8CStr {
     }
 
     #[inline(always)]
-    pub fn as_mut_ptr(&mut self) -> *mut c_char {
-        self.0.as_mut_ptr().cast()
-    }
-
-    #[inline(always)]
     pub fn as_cstr(&self) -> &CStr {
         // SAFETY: Already validated as null terminated during construction
         unsafe { CStr::from_bytes_with_nul_unchecked(&self.0) }
@@ -424,64 +419,6 @@ impl AsUtf8CStr for FsPathFollow {
     }
 }
 
-pub struct FsPathBuf<'a, const N: usize>(pub Utf8CStrBuffer<'a, N>);
-
-impl From<Utf8CString> for FsPathBuf<'static, 0> {
-    fn from(value: Utf8CString) -> Self {
-        FsPathBuf(From::from(value))
-    }
-}
-
-impl<const N: usize> From<Utf8CStrBufArr<N>> for FsPathBuf<'static, N> {
-    fn from(value: Utf8CStrBufArr<N>) -> Self {
-        FsPathBuf(From::from(value))
-    }
-}
-
-impl<'a> From<&'a mut dyn Utf8CStrBuf> for FsPathBuf<'a, 0> {
-    fn from(value: &'a mut dyn Utf8CStrBuf) -> Self {
-        FsPathBuf(From::from(value))
-    }
-}
-
-impl Default for FsPathBuf<'static, 4096> {
-    fn default() -> Self {
-        FsPathBuf(Default::default())
-    }
-}
-
-impl<const N: usize> FsPathBuf<'_, N> {
-    pub fn clear(&mut self) {
-        self.0.clear();
-    }
-
-    pub fn join<T: AsRef<str>>(mut self, path: T) -> Self {
-        fn inner(buf: &mut dyn Utf8CStrBuf, path: &str) {
-            if path.starts_with('/') {
-                buf.clear();
-            }
-            if !buf.is_empty() && !buf.ends_with('/') {
-                buf.push_str("/");
-            }
-            buf.push_str(path);
-        }
-        inner(self.0.deref_mut(), path.as_ref());
-        self
-    }
-
-    pub fn join_fmt<T: Display>(mut self, name: T) -> Self {
-        self.0.write_fmt(format_args!("/{}", name)).ok();
-        self
-    }
-}
-
-impl<const N: usize> AsUtf8CStr for FsPathBuf<'_, N> {
-    #[inline(always)]
-    fn as_utf8_cstr(&self) -> &Utf8CStr {
-        &self.0
-    }
-}
-
 // impl<T: AsUtf8CStr> Deref<Target = Utf8CStr> for T { ... }
 macro_rules! impl_cstr_deref {
     ($( ($t:ty, $($g:tt)*) )*) => {$(
@@ -501,7 +438,6 @@ impl_cstr_deref!(
     (Utf8CStrBufArr<N>, const N: usize)
     (Utf8CString,)
     (FsPathFollow,)
-    (FsPathBuf<'_, N>, const N: usize)
 );
 
 // impl<T: Deref<Target = Utf8CStr>> BoilerPlate for T { ... }
@@ -588,7 +524,6 @@ impl_cstr_misc!(
     (Utf8CStrBufArr<N>, const N: usize)
     (Utf8CString,)
     (FsPathFollow,)
-    (FsPathBuf<'_, N>, const N: usize)
 );
 
 fn copy_cstr_truncate(dest: &mut [u8], src: &[u8]) -> usize {
@@ -688,7 +623,6 @@ impl_fs_path!(
     (Utf8CStrBufRef<'_>,)
     (Utf8CStrBufArr<N>, const N: usize)
     (Utf8CString,)
-    (FsPathBuf<'_, N>, const N: usize)
 );
 
 #[macro_export]

@@ -1,6 +1,6 @@
 use crate::{
-    Directory, FsPathBuf, FsPathFollow, LibcReturn, OsError, OsResult, OsResultStatic, Utf8CStr,
-    Utf8CStrBuf, cstr_buf, errno, error,
+    Directory, FsPathFollow, LibcReturn, OsError, OsResult, OsResultStatic, Utf8CStr, Utf8CStrBuf,
+    cstr_buf, errno, error,
 };
 use bytemuck::{Pod, bytes_of, bytes_of_mut};
 use libc::{
@@ -11,6 +11,7 @@ use mem::MaybeUninit;
 use num_traits::AsPrimitive;
 use std::cmp::min;
 use std::ffi::CStr;
+use std::fmt::Display;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Read, Seek, SeekFrom, Write};
 use std::ops::Deref;
@@ -138,7 +139,9 @@ macro_rules! open_fd {
 }
 
 pub fn fd_path(fd: RawFd, buf: &mut dyn Utf8CStrBuf) -> OsResult<'static, ()> {
-    let path = FsPathBuf::default().join("/proc/self/fd").join_fmt(fd);
+    let path = cstr_buf::default()
+        .join_path("/proc/self/fd")
+        .join_path_fmt(fd);
     path.read_link(buf).map_err(|e| e.set_args(None, None))
 }
 
@@ -267,13 +270,13 @@ pub trait FsPath: Deref<Target = Utf8CStr> {
             return Ok(());
         }
 
-        let mut path = FsPathBuf::default();
+        let mut path = cstr_buf::default();
         let mut components = self.split('/').filter(|s| !s.is_empty());
         loop {
             let Some(s) = components.next() else {
                 break;
             };
-            path = path.join(s);
+            path.append_path(s);
 
             unsafe {
                 if libc::mkdir(path.as_ptr(), mode) < 0 && *errno() != EEXIST {
@@ -545,6 +548,59 @@ impl FsPath for FsPathFollow {
             )
             .check_os_err("setxattr", Some(self), Some(con))
         }
+    }
+}
+
+pub trait FsPathBuilder {
+    fn join_path<T: AsRef<str>>(mut self, path: T) -> Self
+    where
+        Self: Sized,
+    {
+        self.append_path(path);
+        self
+    }
+    fn join_path_fmt<T: Display>(mut self, name: T) -> Self
+    where
+        Self: Sized,
+    {
+        self.append_path_fmt(name);
+        self
+    }
+    fn append_path<T: AsRef<str>>(&mut self, path: T) -> &mut Self;
+    fn append_path_fmt<T: Display>(&mut self, name: T) -> &mut Self;
+}
+
+fn append_path_impl(buf: &mut dyn Utf8CStrBuf, path: &str) {
+    if path.starts_with('/') {
+        buf.clear();
+    }
+    if !buf.is_empty() && !buf.ends_with('/') {
+        buf.push_str("/");
+    }
+    buf.push_str(path);
+}
+
+impl<S: Utf8CStrBuf + Sized> FsPathBuilder for S {
+    fn append_path<T: AsRef<str>>(&mut self, path: T) -> &mut Self {
+        append_path_impl(self, path.as_ref());
+        self
+    }
+
+    fn append_path_fmt<T: Display>(&mut self, name: T) -> &mut Self {
+        self.write_fmt(format_args!("/{}", name)).ok();
+        self
+    }
+}
+
+impl FsPathBuilder for dyn Utf8CStrBuf + '_ {
+    fn append_path<T: AsRef<str>>(&mut self, path: T) -> &mut Self {
+        append_path_impl(self, path.as_ref());
+        self
+    }
+
+    fn append_path_fmt<T: Display>(&mut self, name: T) -> &mut Self {
+        self.write_fmt(format_args!("/{}", name)).ok();
+        self
     }
 }
 
