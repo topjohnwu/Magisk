@@ -1,6 +1,6 @@
 use crate::cxx_extern::readlinkat;
 use crate::{
-    FileAttr, FsPath, FsPathBuf, LibcReturn, OsError, OsResult, OsResultStatic, Utf8CStr,
+    FileAttr, FsPath, FsPathBuilder, LibcReturn, OsError, OsResult, OsResultStatic, Utf8CStr,
     Utf8CStrBuf, cstr_buf, errno, fd_path, fd_set_attr,
 };
 use libc::{EEXIST, O_CLOEXEC, O_CREAT, O_RDONLY, O_TRUNC, O_WRONLY, dirent, mode_t};
@@ -184,7 +184,7 @@ impl Directory {
 
     fn path_at(&self, name: &Utf8CStr, buf: &mut dyn Utf8CStrBuf) -> OsResult<'static, ()> {
         self.path(buf)?;
-        FsPathBuf::from(buf).join(name);
+        buf.append_path(name);
         Ok(())
     }
 }
@@ -247,14 +247,14 @@ impl Directory {
     }
 
     pub fn get_attr_at<'a>(&self, name: &'a Utf8CStr) -> OsResult<'a, FileAttr> {
-        let mut path = FsPathBuf::default();
-        self.path_at(name, path.0.deref_mut())?;
+        let mut path = cstr_buf::default();
+        self.path_at(name, &mut path)?;
         path.get_attr().map_err(|e| e.set_args(Some(name), None))
     }
 
     pub fn set_attr_at<'a>(&self, name: &'a Utf8CStr, attr: &FileAttr) -> OsResult<'a, ()> {
-        let mut path = FsPathBuf::default();
-        self.path_at(name, path.0.deref_mut())?;
+        let mut path = cstr_buf::default();
+        self.path_at(name, &mut path)?;
         path.set_attr(attr)
             .map_err(|e| e.set_args(Some(name), None))
     }
@@ -264,15 +264,15 @@ impl Directory {
         name: &'a Utf8CStr,
         con: &mut dyn Utf8CStrBuf,
     ) -> OsResult<'a, ()> {
-        let mut path = FsPathBuf::default();
-        self.path_at(name, path.0.deref_mut())?;
+        let mut path = cstr_buf::default();
+        self.path_at(name, &mut path)?;
         path.get_secontext(con)
             .map_err(|e| e.set_args(Some(name), None))
     }
 
     pub fn set_secontext_at<'a>(&self, name: &'a Utf8CStr, con: &'a Utf8CStr) -> OsResult<'a, ()> {
-        let mut path = FsPathBuf::default();
-        self.path_at(name, path.0.deref_mut())?;
+        let mut path = cstr_buf::default();
+        self.path_at(name, &mut path)?;
         path.set_secontext(con)
             .map_err(|e| e.set_args(Some(name), Some(con)))
     }

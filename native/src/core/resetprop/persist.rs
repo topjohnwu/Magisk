@@ -16,8 +16,8 @@ use crate::resetprop::proto::persistent_properties::{
 use base::const_format::concatcp;
 use base::libc::{O_CLOEXEC, O_RDONLY};
 use base::{
-    Directory, FsPath, FsPathBuf, LibcReturn, LoggedResult, MappedFile, SilentResultExt, Utf8CStr,
-    WalkResult, clone_attr, cstr, debug, libc::mkstemp,
+    Directory, FsPath, FsPathBuilder, LibcReturn, LoggedResult, MappedFile, SilentResultExt,
+    Utf8CStr, Utf8CStrBuf, WalkResult, clone_attr, cstr, cstr_buf, debug, libc::mkstemp,
 };
 
 const PERSIST_PROP_DIR: &str = "/data/property";
@@ -68,7 +68,9 @@ fn check_proto() -> bool {
 }
 
 fn file_get_prop(name: &Utf8CStr) -> LoggedResult<String> {
-    let path = FsPathBuf::default().join(PERSIST_PROP_DIR).join(name);
+    let path = cstr_buf::default()
+        .join_path(PERSIST_PROP_DIR)
+        .join_path(name);
     let mut file = path.open(O_RDONLY | O_CLOEXEC).silent()?;
     debug!("resetprop: read prop from [{}]", path);
     let mut s = String::new();
@@ -77,14 +79,16 @@ fn file_get_prop(name: &Utf8CStr) -> LoggedResult<String> {
 }
 
 fn file_set_prop(name: &Utf8CStr, value: Option<&Utf8CStr>) -> LoggedResult<()> {
-    let path = FsPathBuf::default().join(PERSIST_PROP_DIR).join(name);
+    let path = cstr_buf::default()
+        .join_path(PERSIST_PROP_DIR)
+        .join_path(name);
     if let Some(value) = value {
-        let mut tmp = FsPathBuf::default()
-            .join(PERSIST_PROP_DIR)
-            .join("prop.XXXXXX");
+        let mut tmp = cstr_buf::default()
+            .join_path(PERSIST_PROP_DIR)
+            .join_path("prop.XXXXXX");
         {
             let mut f = unsafe {
-                mkstemp(tmp.0.as_mut_ptr())
+                mkstemp(tmp.as_mut_ptr())
                     .as_os_result("mkstemp", None, None)
                     .map(|fd| File::from_raw_fd(fd))?
             };
@@ -111,10 +115,10 @@ fn proto_read_props() -> LoggedResult<PersistentProperties> {
 }
 
 fn proto_write_props(props: &PersistentProperties) -> LoggedResult<()> {
-    let mut tmp = FsPathBuf::default().join(concatcp!(PERSIST_PROP, ".XXXXXX"));
+    let mut tmp = cstr_buf::default().join_path(concatcp!(PERSIST_PROP, ".XXXXXX"));
     {
         let f = unsafe {
-            mkstemp(tmp.0.as_mut_ptr())
+            mkstemp(tmp.as_mut_ptr())
                 .as_os_result("mkstemp", None, None)
                 .map(|fd| File::from_raw_fd(fd))?
         };

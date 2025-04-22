@@ -11,7 +11,7 @@ use crate::package::ManagerInfo;
 use crate::su::SuInfo;
 use base::libc::{O_CLOEXEC, O_RDONLY};
 use base::{
-    AtomicArc, BufReadExt, FsPath, FsPathBuf, ResultExt, Utf8CStr, cstr, cstr_buf, error, info,
+    AtomicArc, BufReadExt, FsPath, FsPathBuilder, ResultExt, Utf8CStr, cstr, cstr_buf, error, info,
     libc, open_fd,
 };
 use std::fs::File;
@@ -229,9 +229,9 @@ pub fn daemon_entry() {
         || get_prop(cstr!("ro.product.device"), false).contains("vsoc");
 
     // Load config status
-    let path = FsPathBuf::from(cstr_buf::new::<64>())
-        .join(get_magisk_tmp())
-        .join(MAIN_CONFIG);
+    let path = cstr_buf::new::<64>()
+        .join_path(get_magisk_tmp())
+        .join_path(MAIN_CONFIG);
     let mut is_recovery = false;
     if let Ok(file) = path.open(O_RDONLY | O_CLOEXEC) {
         let mut file = BufReader::new(file);
