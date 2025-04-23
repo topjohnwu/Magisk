@@ -12,9 +12,7 @@ use crate::su::SuInfo;
 use base::libc::{O_CLOEXEC, O_RDONLY};
 use base::{
     AtomicArc, BufReadExt, FsPath, FsPathBuilder, ResultExt, Utf8CStr, cstr, error, info, libc,
-    open_fd,
 };
-use std::fs::File;
 use std::io::BufReader;
 use std::os::unix::net::UnixStream;
 use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
@@ -274,8 +272,7 @@ pub fn daemon_entry() {
 }
 
 fn check_data() -> bool {
-    if let Ok(fd) = open_fd!(cstr!("/proc/mounts"), O_RDONLY | O_CLOEXEC) {
-        let file = File::from(fd);
+    if let Ok(file) = cstr!("/proc/mounts").open(O_RDONLY | O_CLOEXEC) {
         let mut mnt = false;
         BufReader::new(file).foreach_lines(|line| {
             if line.contains(" /data ") && !line.contains("tmpfs") {

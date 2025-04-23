@@ -5,7 +5,7 @@ use base::WalkResult::{Abort, Continue, Skip};
 use base::libc::{O_CLOEXEC, O_CREAT, O_RDONLY, O_TRUNC, O_WRONLY};
 use base::{
     BufReadExt, Directory, FsPath, FsPathBuilder, LoggedResult, ReadExt, ResultExt, Utf8CStrBuf,
-    cstr, error, fd_get_attr, open_fd, warn,
+    cstr, error, fd_get_attr, warn,
 };
 use bit_set::BitSet;
 use cxx::CxxString;
@@ -326,12 +326,9 @@ impl ManagerInfo {
             let tmp_apk = cstr!("/data/stub.apk");
             let result: LoggedResult<()> = try {
                 {
-                    let mut tmp_fd = File::from(open_fd!(
-                        tmp_apk,
-                        O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC,
-                        0o600
-                    )?);
-                    io::copy(stub_fd, &mut tmp_fd)?;
+                    let mut tmp_apk_file =
+                        tmp_apk.create(O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0o600)?;
+                    io::copy(stub_fd, &mut tmp_apk_file)?;
                 }
                 // Seek the fd back to start
                 stub_fd.seek(SeekFrom::Start(0))?;

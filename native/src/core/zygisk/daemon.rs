@@ -6,8 +6,8 @@ use crate::ffi::{
 use crate::socket::{IpcRead, UnixSocketExt};
 use base::libc::{O_CLOEXEC, O_CREAT, O_RDONLY, STDOUT_FILENO};
 use base::{
-    Directory, FsPathBuilder, LoggedError, LoggedResult, ResultExt, WriteExt, cstr, error,
-    fork_dont_care, libc, open_fd, raw_cstr, warn,
+    Directory, FsPath, FsPathBuilder, LoggedError, LoggedResult, ResultExt, WriteExt, cstr, error,
+    fork_dont_care, libc, raw_cstr, warn,
 };
 use std::fmt::Write;
 use std::os::fd::{AsRawFd, FromRawFd, RawFd};
@@ -207,7 +207,7 @@ impl MagiskD {
         let dir = cstr::buf::default()
             .join_path(MODULEROOT)
             .join_path(&module.name);
-        let fd = open_fd!(&dir, O_RDONLY | O_CLOEXEC)?;
+        let fd = dir.open(O_RDONLY | O_CLOEXEC)?;
         client.send_fds(&[fd.as_raw_fd()])?;
         Ok(())
     }

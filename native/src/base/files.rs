@@ -117,7 +117,7 @@ impl<T: Write> WriteExt for T {
     }
 }
 
-pub fn __open_fd_impl(path: &Utf8CStr, flags: i32, mode: mode_t) -> OsResult<OwnedFd> {
+fn open_fd(path: &Utf8CStr, flags: i32, mode: mode_t) -> OsResult<OwnedFd> {
     unsafe {
         let fd = libc::open(path.as_ptr(), flags, mode as c_uint).as_os_result(
             "open",
@@ -128,18 +128,8 @@ pub fn __open_fd_impl(path: &Utf8CStr, flags: i32, mode: mode_t) -> OsResult<Own
     }
 }
 
-#[macro_export]
-macro_rules! open_fd {
-    ($path:expr, $flags:expr) => {
-        $crate::__open_fd_impl($path, $flags, 0)
-    };
-    ($path:expr, $flags:expr, $mode:expr) => {
-        $crate::__open_fd_impl($path, $flags, $mode)
-    };
-}
-
 pub fn fd_path(fd: RawFd, buf: &mut dyn Utf8CStrBuf) -> OsResult<'static, ()> {
-    let path = cstr::buf::default()
+    let path = cstr::buf::new::<64>()
         .join_path("/proc/self/fd")
         .join_path_fmt(fd);
     path.read_link(buf).map_err(|e| e.set_args(None, None))
@@ -203,11 +193,11 @@ pub trait FsPath: Deref<Target = Utf8CStr> {
     }
 
     fn open(&self, flags: i32) -> OsResult<File> {
-        Ok(File::from(open_fd!(self, flags)?))
+        Ok(File::from(open_fd(self, flags, 0)?))
     }
 
     fn create(&self, flags: i32, mode: mode_t) -> OsResult<File> {
-        Ok(File::from(open_fd!(self, O_CREAT | flags, mode)?))
+        Ok(File::from(open_fd(self, O_CREAT | flags, mode)?))
     }
 
     fn exists(&self) -> bool {
@@ -234,7 +224,7 @@ pub trait FsPath: Deref<Target = Utf8CStr> {
     fn remove_all(&self) -> OsResultStatic<()> {
         let attr = self.get_attr()?;
         if attr.is_dir() {
-            let mut dir = Directory::try_from(open_fd!(self, O_RDONLY | O_CLOEXEC)?)?;
+            let mut dir = Directory::try_from(open_fd(self, O_RDONLY | O_CLOEXEC, 0)?)?;
             dir.remove_all()?;
         }
         Ok(self.remove()?)
@@ -291,7 +281,7 @@ pub trait FsPath: Deref<Target = Utf8CStr> {
 
     // Inspired by https://android.googlesource.com/platform/bionic/+/master/libc/bionic/realpath.cpp
     fn realpath(&self, buf: &mut dyn Utf8CStrBuf) -> OsResult<()> {
-        let fd = open_fd!(self, O_PATH | O_CLOEXEC)?;
+        let fd = self.open(O_PATH | O_CLOEXEC)?;
         let mut st1: libc::stat;
         let mut st2: libc::stat;
         let mut skip_check = false;
@@ -851,8 +841,7 @@ fn parse_mount_info_line(line: &str) -> Option<MountInfo> {
 pub fn parse_mount_info(pid: &str) -> Vec<MountInfo> {
     let mut res = vec![];
     let mut path = format!("/proc/{}/mountinfo", pid);
-    if let Ok(fd) = open_fd!(Utf8CStr::from_string(&mut path), O_RDONLY | O_CLOEXEC) {
-        let file = File::from(fd);
+    if let Ok(file) = Utf8CStr::from_string(&mut path).open(O_RDONLY | O_CLOEXEC) {
         BufReader::new(file).foreach_lines(|line| {
             parse_mount_info_line(line)
                 .map(|info| res.push(info))
