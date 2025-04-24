@@ -4,8 +4,8 @@ use crate::ffi::{DbEntryKey, get_magisk_tmp, install_apk, uninstall_pkg};
 use base::WalkResult::{Abort, Continue, Skip};
 use base::libc::{O_CLOEXEC, O_CREAT, O_RDONLY, O_TRUNC, O_WRONLY};
 use base::{
-    BufReadExt, Directory, FsPathBuilder, LoggedResult, ReadExt, ResultExt, Utf8CStrBuf, cstr,
-    error, fd_get_attr, warn,
+    BufReadExt, Directory, FsPathBuilder, LoggedResult, ReadExt, ResultExt, Utf8CStrBuf,
+    Utf8CString, cstr, error, fd_get_attr, warn,
 };
 use bit_set::BitSet;
 use cxx::CxxString;
@@ -14,14 +14,13 @@ use std::fs::File;
 use std::io;
 use std::io::{Cursor, Read, Seek, SeekFrom};
 use std::os::fd::AsRawFd;
-use std::os::unix::fs::MetadataExt;
-use std::path::{Path, PathBuf};
 use std::pin::Pin;
 use std::time::Duration;
 
 const EOCD_MAGIC: u32 = 0x06054B50;
 const APK_SIGNING_BLOCK_MAGIC: [u8; 16] = *b"APK Sig Block 42";
 const SIGNATURE_SCHEME_V2_MAGIC: u32 = 0x7109871A;
+const PACKAGES_XML: &str = "/data/system/packages.xml";
 
 macro_rules! bad_apk {
     ($msg:literal) => {
@@ -152,7 +151,8 @@ fn read_certificate(apk: &mut File, version: i32) -> Vec<u8> {
     res.log().unwrap_or(vec![])
 }
 
-fn find_apk_path(pkg: &str, buf: &mut dyn Utf8CStrBuf) -> LoggedResult<()> {
+fn find_apk_path(pkg: &str) -> LoggedResult<Utf8CString> {
+    let mut buf = cstr::buf::default();
     Directory::open(cstr!("/data/app"))?.pre_order_walk(|e| {
         if !e.is_dir() {
             return Ok(Skip);
@@ -160,7 +160,7 @@ fn find_apk_path(pkg: &str, buf: &mut dyn Utf8CStrBuf) -> LoggedResult<()> {
         let name_bytes = e.name().as_bytes();
         if name_bytes.starts_with(pkg.as_bytes()) && name_bytes[pkg.len()] == b'-' {
             // Found the APK path, we can abort now
-            e.resolve_path(buf)?;
+            e.resolve_path(&mut buf)?;
             return Ok(Abort);
         }
         if name_bytes.starts_with(b"~~") {
@@ -171,7 +171,7 @@ fn find_apk_path(pkg: &str, buf: &mut dyn Utf8CStrBuf) -> LoggedResult<()> {
     if !buf.is_empty() {
         buf.push_str("/base.apk");
     }
-    Ok(())
+    Ok(buf.to_owned())
 }
 
 enum Status {
@@ -204,35 +204,29 @@ impl Default for ManagerInfo {
 
 #[derive(Default)]
 struct TrackedFile {
-    path: PathBuf,
+    path: Utf8CString,
     timestamp: Duration,
 }
 
 impl TrackedFile {
-    fn new<T: AsRef<Path>>(path: T) -> TrackedFile {
-        fn inner(path: &Path) -> TrackedFile {
-            let meta = match path.metadata() {
-                Ok(meta) => meta,
-                Err(_) => return TrackedFile::default(),
-            };
-            let timestamp = Duration::new(meta.ctime() as u64, meta.ctime_nsec() as u32);
-            TrackedFile {
-                path: PathBuf::from(path),
-                timestamp,
-            }
-        }
-        inner(path.as_ref())
+    fn new(path: Utf8CString) -> TrackedFile {
+        let attr = match path.get_attr() {
+            Ok(attr) => attr,
+            Err(_) => return TrackedFile::default(),
+        };
+        let timestamp = Duration::new(attr.st.st_ctime as u64, attr.st.st_ctime_nsec as u32);
+        TrackedFile { path, timestamp }
     }
 
     fn is_same(&self) -> bool {
-        if self.path.as_os_str().is_empty() {
+        if self.path.is_empty() {
             return false;
         }
-        let meta = match self.path.metadata() {
-            Ok(meta) => meta,
+        let attr = match self.path.get_attr() {
+            Ok(attr) => attr,
             Err(_) => return false,
         };
-        let timestamp = Duration::new(meta.ctime() as u64, meta.ctime_nsec() as u32);
+        let timestamp = Duration::new(attr.st.st_ctime as u64, attr.st.st_ctime_nsec as u32);
         timestamp == self.timestamp
     }
 }
@@ -268,15 +262,15 @@ impl ManagerInfo {
         }
 
         self.repackaged_app_id = to_app_id(uid);
-        self.tracked_files.insert(user, TrackedFile::new(apk));
+        self.tracked_files
+            .insert(user, TrackedFile::new(apk.to_owned()));
         Status::Installed
     }
 
     fn check_stub(&mut self, user: i32, pkg: &str) -> Status {
-        let mut apk = cstr::buf::default();
-        if find_apk_path(pkg, &mut apk).is_err() {
+        let Ok(apk) = find_apk_path(pkg) else {
             return Status::NotInstalled;
-        }
+        };
 
         let cert = match apk.open(O_RDONLY | O_CLOEXEC) {
             Ok(mut fd) => read_certificate(&mut fd, -1),
@@ -297,10 +291,9 @@ impl ManagerInfo {
     }
 
     fn check_orig(&mut self, user: i32) -> Status {
-        let mut apk = cstr::buf::default();
-        if find_apk_path(APP_PACKAGE_NAME, &mut apk).is_err() {
+        let Ok(apk) = find_apk_path(APP_PACKAGE_NAME) else {
             return Status::NotInstalled;
-        }
+        };
 
         let cert = match apk.open(O_RDONLY | O_CLOEXEC) {
             Ok(mut fd) => read_certificate(&mut fd, MAGISK_VER_CODE),
@@ -351,14 +344,14 @@ impl ManagerInfo {
             && file.is_same()
         {
             // no APK
-            if file.path == Path::new("/data/system/packages.xml") {
+            if &file.path == PACKAGES_XML {
                 if install && !daemon.is_emulator {
                     self.install_stub();
                 }
                 return (-1, "");
             }
             // dyn APK is still the same
-            if file.path.starts_with(daemon.app_data_dir()) {
+            if file.path.starts_with(daemon.app_data_dir().as_str()) {
                 return (
                     user * AID_USER_OFFSET + self.repackaged_app_id,
                     &self.repackaged_pkg,
@@ -427,7 +420,7 @@ impl ManagerInfo {
 
         // If we cannot find any manager, track packages.xml for new package installs
         self.tracked_files
-            .insert(user, TrackedFile::new("/data/system/packages.xml"));
+            .insert(user, TrackedFile::new(PACKAGES_XML.into()));
 
         if install && !daemon.is_emulator {
             self.install_stub();
