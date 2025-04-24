@@ -12,6 +12,7 @@ use std::{fmt, mem, slice, str};
 use thiserror::Error;
 
 use crate::slice_from_ptr_mut;
+
 // Utf8CStr types are UTF-8 validated and null terminated strings.
 //
 // Several Utf8CStr types:
@@ -148,10 +149,6 @@ pub trait Utf8CStrBuf: Write + AsRef<Utf8CStr> + Deref<Target = Utf8CStr> {
     }
 }
 
-trait AsUtf8CStr {
-    fn as_utf8_cstr(&self) -> &Utf8CStr;
-}
-
 pub trait StringExt {
     fn nul_terminate(&mut self) -> &mut [u8];
 }
@@ -205,9 +202,9 @@ impl Utf8CString {
     }
 }
 
-impl AsUtf8CStr for Utf8CString {
+impl AsRef<Utf8CStr> for Utf8CString {
     #[inline(always)]
-    fn as_utf8_cstr(&self) -> &Utf8CStr {
+    fn as_ref(&self) -> &Utf8CStr {
         // SAFETY: the internal string is always null terminated
         unsafe { mem::transmute(slice::from_raw_parts(self.0.as_ptr(), self.0.len() + 1)) }
     }
@@ -412,14 +409,14 @@ const_assert_eq!(align_of::<&Utf8CStr>(), align_of::<[usize; 2]>());
 #[repr(transparent)]
 pub struct FsPathFollow(Utf8CStr);
 
-impl AsUtf8CStr for FsPathFollow {
+impl AsRef<Utf8CStr> for FsPathFollow {
     #[inline(always)]
-    fn as_utf8_cstr(&self) -> &Utf8CStr {
+    fn as_ref(&self) -> &Utf8CStr {
         &self.0
     }
 }
 
-// impl<T: AsUtf8CStr> Deref<Target = Utf8CStr> for T { ... }
+// impl<T: AsRef<Utf8CStr>> Deref<Target = Utf8CStr> for T { ... }
 macro_rules! impl_cstr_deref {
     ($( ($t:ty, $($g:tt)*) )*) => {$(
         impl<$($g)*> Deref for $t {
@@ -427,7 +424,7 @@ macro_rules! impl_cstr_deref {
 
             #[inline(always)]
             fn deref(&self) -> &Utf8CStr {
-                self.as_utf8_cstr()
+                self.as_ref()
             }
         }
     )*}
@@ -443,12 +440,6 @@ impl_cstr_deref!(
 // impl<T: Deref<Target = Utf8CStr>> BoilerPlate for T { ... }
 macro_rules! impl_cstr_misc {
     ($( ($t:ty, $($g:tt)*) )*) => {$(
-        impl<$($g)*> AsRef<Utf8CStr> for $t {
-            #[inline(always)]
-            fn as_ref(&self) -> &Utf8CStr {
-                self
-            }
-        }
         impl<$($g)*> AsRef<str> for $t {
             #[inline(always)]
             fn as_ref(&self) -> &str {
@@ -539,13 +530,13 @@ fn copy_cstr_truncate(dest: &mut [u8], src: &[u8]) -> usize {
     len
 }
 
-// impl<T> AsUtf8CStr for T { ... }
+// impl<T> AsRef<Utf8CStr> for T { ... }
 // impl<T> Utf8CStrBuf for T { ... }
 macro_rules! impl_cstr_buf {
     ($( ($t:ty, $($g:tt)*) )*) => {$(
-        impl<$($g)*> AsUtf8CStr for $t {
+        impl<$($g)*> AsRef<Utf8CStr> for $t {
             #[inline(always)]
-            fn as_utf8_cstr(&self) -> &Utf8CStr {
+            fn as_ref(&self) -> &Utf8CStr {
                 // SAFETY: the internal buffer is always UTF-8 checked
                 // SAFETY: self.used is guaranteed to always <= SIZE - 1
                 unsafe { Utf8CStr::from_bytes_unchecked(self.buf.get_unchecked(..(self.used + 1))) }
