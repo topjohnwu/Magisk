@@ -4,7 +4,7 @@ use std::borrow::Borrow;
 use std::cmp::min;
 use std::ffi::{CStr, FromBytesWithNulError, OsStr};
 use std::fmt::{Debug, Display, Formatter, Write};
-use std::ops::{Deref, DerefMut};
+use std::ops::Deref;
 use std::os::unix::ffi::OsStrExt;
 use std::path::{Path, PathBuf};
 use std::str::Utf8Error;
@@ -63,63 +63,6 @@ pub mod buf {
     #[inline(always)]
     pub unsafe fn wrap_ptr<'a>(buf: *mut u8, len: usize) -> Utf8CStrBufRef<'a> {
         unsafe { Utf8CStrBufRef::from_ptr(buf, len) }
-    }
-}
-
-// Union type for storing a Utf8CStrBuf value
-
-pub enum Utf8CStrBuffer<'a, const N: usize> {
-    Array(Utf8CStrBufArr<N>),
-    Reference(Utf8CStrBufRef<'a>),
-    Dynamic(Utf8CString),
-    Wrap(&'a mut dyn Utf8CStrBuf),
-}
-
-impl<'a, const N: usize> Deref for Utf8CStrBuffer<'a, N> {
-    type Target = dyn Utf8CStrBuf + 'a;
-
-    fn deref(&self) -> &Self::Target {
-        match self {
-            Utf8CStrBuffer::Array(s) => s,
-            Utf8CStrBuffer::Reference(s) => s,
-            Utf8CStrBuffer::Dynamic(s) => s,
-            Utf8CStrBuffer::Wrap(s) => *s,
-        }
-    }
-}
-
-impl<const N: usize> DerefMut for Utf8CStrBuffer<'_, N> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        match self {
-            Utf8CStrBuffer::Array(s) => s,
-            Utf8CStrBuffer::Reference(s) => s,
-            Utf8CStrBuffer::Dynamic(s) => s,
-            Utf8CStrBuffer::Wrap(s) => *s,
-        }
-    }
-}
-
-impl From<Utf8CString> for Utf8CStrBuffer<'static, 0> {
-    fn from(value: Utf8CString) -> Self {
-        Utf8CStrBuffer::Dynamic(value)
-    }
-}
-
-impl<const N: usize> From<Utf8CStrBufArr<N>> for Utf8CStrBuffer<'static, N> {
-    fn from(value: Utf8CStrBufArr<N>) -> Self {
-        Utf8CStrBuffer::Array(value)
-    }
-}
-
-impl<'a> From<&'a mut dyn Utf8CStrBuf> for Utf8CStrBuffer<'a, 0> {
-    fn from(value: &'a mut dyn Utf8CStrBuf) -> Self {
-        Utf8CStrBuffer::Wrap(value)
-    }
-}
-
-impl Default for Utf8CStrBuffer<'static, 4096> {
-    fn default() -> Self {
-        Utf8CStrBuffer::Array(buf::default())
     }
 }
 
