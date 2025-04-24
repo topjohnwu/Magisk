@@ -1,7 +1,7 @@
 use crate::cxx_extern::readlinkat;
 use crate::{
-    FileAttr, FsPathBuilder, LibcReturn, OsError, OsResult, OsResultStatic, Utf8CStr, Utf8CStrBuf,
-    cstr, errno, fd_path, fd_set_attr,
+    FsPathBuilder, LibcReturn, OsError, OsResult, OsResultStatic, Utf8CStr, Utf8CStrBuf, cstr,
+    errno, fd_path, fd_set_attr,
 };
 use libc::{EEXIST, O_CLOEXEC, O_CREAT, O_RDONLY, O_TRUNC, O_WRONLY, dirent, mode_t};
 use std::fs::File;
@@ -31,7 +31,7 @@ impl DirEntry<'_> {
         }
     }
 
-    pub fn path(&self, buf: &mut dyn Utf8CStrBuf) -> OsResult<'static, ()> {
+    pub fn resolve_path(&self, buf: &mut dyn Utf8CStrBuf) -> OsResult<'static, ()> {
         self.dir.path_at(self.name(), buf)
     }
 
@@ -65,29 +65,11 @@ impl DirEntry<'_> {
 
     pub fn unlink(&self) -> OsResult<()> {
         let flag = if self.is_dir() { libc::AT_REMOVEDIR } else { 0 };
-        unsafe {
-            libc::unlinkat(self.dir.as_raw_fd(), self.d_name.as_ptr(), flag).check_os_err(
-                "unlinkat",
-                Some(self.name()),
-                None,
-            )?;
-        }
-        Ok(())
+        self.dir.unlink_at(self.name(), flag)
     }
 
     pub fn read_link(&self, buf: &mut dyn Utf8CStrBuf) -> OsResult<()> {
-        buf.clear();
-        unsafe {
-            let r = readlinkat(
-                self.dir.as_raw_fd(),
-                self.d_name.as_ptr(),
-                buf.as_mut_ptr().cast(),
-                buf.capacity(),
-            )
-            .as_os_result("readlinkat", Some(self.name()), None)? as usize;
-            buf.set_len(r);
-        }
-        Ok(())
+        self.dir.read_link_at(self.name(), buf)
     }
 
     pub fn open_as_dir(&self) -> OsResult<Directory> {
@@ -99,7 +81,7 @@ impl DirEntry<'_> {
                 None,
             ));
         }
-        self.dir.openat_as_dir(self.name())
+        self.dir.open_as_dir_at(self.name())
     }
 
     pub fn open_as_file(&self, flags: i32) -> OsResult<File> {
@@ -111,15 +93,7 @@ impl DirEntry<'_> {
                 None,
             ));
         }
-        self.dir.openat_as_file(self.name(), flags, 0)
-    }
-
-    pub fn get_attr(&self) -> OsResult<FileAttr> {
-        self.dir.get_attr_at(self.name())
-    }
-
-    pub fn set_attr(&self, attr: &FileAttr) -> OsResult<()> {
-        self.dir.set_attr_at(self.name(), attr)
+        self.dir.open_as_file_at(self.name(), flags, 0)
     }
 }
 
@@ -183,7 +157,7 @@ impl Directory {
     }
 
     fn path_at(&self, name: &Utf8CStr, buf: &mut dyn Utf8CStrBuf) -> OsResult<'static, ()> {
-        self.path(buf)?;
+        self.resolve_path(buf)?;
         buf.append_path(name);
         Ok(())
     }
@@ -231,12 +205,12 @@ impl Directory {
         unsafe { libc::rewinddir(self.inner.as_ptr()) };
     }
 
-    pub fn openat_as_dir<'a>(&self, name: &'a Utf8CStr) -> OsResult<'a, Directory> {
+    pub fn open_as_dir_at<'a>(&self, name: &'a Utf8CStr) -> OsResult<'a, Directory> {
         let fd = self.openat(name, O_RDONLY, 0)?;
         Directory::try_from(fd).map_err(|e| e.set_args(Some(name), None))
     }
 
-    pub fn openat_as_file<'a>(
+    pub fn open_as_file_at<'a>(
         &self,
         name: &'a Utf8CStr,
         flags: i32,
@@ -246,44 +220,58 @@ impl Directory {
         Ok(File::from(fd))
     }
 
-    pub fn get_attr_at<'a>(&self, name: &'a Utf8CStr) -> OsResult<'a, FileAttr> {
-        let mut path = cstr::buf::default();
-        self.path_at(name, &mut path)?;
-        path.get_attr().map_err(|e| e.set_args(Some(name), None))
-    }
-
-    pub fn set_attr_at<'a>(&self, name: &'a Utf8CStr, attr: &FileAttr) -> OsResult<'a, ()> {
-        let mut path = cstr::buf::default();
-        self.path_at(name, &mut path)?;
-        path.set_attr(attr)
-            .map_err(|e| e.set_args(Some(name), None))
-    }
-
-    pub fn get_secontext_at<'a>(
+    pub fn read_link_at<'a>(
         &self,
         name: &'a Utf8CStr,
-        con: &mut dyn Utf8CStrBuf,
+        buf: &mut dyn Utf8CStrBuf,
     ) -> OsResult<'a, ()> {
-        let mut path = cstr::buf::default();
-        self.path_at(name, &mut path)?;
-        path.get_secontext(con)
-            .map_err(|e| e.set_args(Some(name), None))
+        buf.clear();
+        unsafe {
+            let r = readlinkat(
+                self.as_raw_fd(),
+                name.as_ptr(),
+                buf.as_mut_ptr().cast(),
+                buf.capacity(),
+            )
+            .as_os_result("readlinkat", Some(name), None)? as usize;
+            buf.set_len(r);
+        }
+        Ok(())
     }
 
-    pub fn set_secontext_at<'a>(&self, name: &'a Utf8CStr, con: &'a Utf8CStr) -> OsResult<'a, ()> {
-        let mut path = cstr::buf::default();
-        self.path_at(name, &mut path)?;
-        path.set_secontext(con)
-            .map_err(|e| e.set_args(Some(name), Some(con)))
-    }
-
-    pub fn mkdirat<'a>(&self, name: &'a Utf8CStr, mode: mode_t) -> OsResult<'a, ()> {
+    pub fn mkdir_at<'a>(&self, name: &'a Utf8CStr, mode: mode_t) -> OsResult<'a, ()> {
         unsafe {
             if libc::mkdirat(self.as_raw_fd(), name.as_ptr(), mode as mode_t) < 0
                 && *errno() != EEXIST
             {
                 return Err(OsError::last_os_error("mkdirat", Some(name), None));
             }
+        }
+        Ok(())
+    }
+
+    // ln -s target self/name
+    pub fn create_symlink_at<'a>(
+        &self,
+        name: &'a Utf8CStr,
+        target: &'a Utf8CStr,
+    ) -> OsResult<'a, ()> {
+        unsafe {
+            libc::symlinkat(target.as_ptr(), self.as_raw_fd(), name.as_ptr()).check_os_err(
+                "symlinkat",
+                Some(target),
+                Some(name),
+            )
+        }
+    }
+
+    pub fn unlink_at<'a>(&self, name: &'a Utf8CStr, flag: i32) -> OsResult<'a, ()> {
+        unsafe {
+            libc::unlinkat(self.as_raw_fd(), name.as_ptr(), flag).check_os_err(
+                "unlinkat",
+                Some(name),
+                None,
+            )?;
         }
         Ok(())
     }
@@ -303,7 +291,7 @@ impl Directory {
         }
     }
 
-    pub fn path(&self, buf: &mut dyn Utf8CStrBuf) -> OsResult<'static, ()> {
+    pub fn resolve_path(&self, buf: &mut dyn Utf8CStrBuf) -> OsResult<'static, ()> {
         fd_path(self.as_raw_fd(), buf)
     }
 
@@ -330,30 +318,8 @@ impl Directory {
     }
 
     pub fn copy_into(&mut self, dir: &Directory) -> OsResultStatic<()> {
-        while let Some(ref e) = self.read()? {
-            let attr = e.get_attr()?;
-            if e.is_dir() {
-                dir.mkdirat(e.name(), 0o777)?;
-                let mut src = e.open_as_dir()?;
-                let dest = dir.openat_as_dir(e.name())?;
-                src.copy_into(&dest)?;
-                fd_set_attr(dest.as_raw_fd(), &attr)?;
-            } else if e.is_file() {
-                let mut src = e.open_as_file(O_RDONLY)?;
-                let mut dest = dir.openat_as_file(e.name(), O_WRONLY | O_CREAT | O_TRUNC, 0o777)?;
-                std::io::copy(&mut src, &mut dest)?;
-                fd_set_attr(dest.as_raw_fd(), &attr)?;
-            } else if e.is_symlink() {
-                let mut target = cstr::buf::default();
-                e.read_link(&mut target)?;
-                unsafe {
-                    libc::symlinkat(target.as_ptr(), dir.as_raw_fd(), e.d_name.as_ptr())
-                        .check_os_err("symlinkat", Some(&target), Some(e.name()))?;
-                }
-                dir.set_attr_at(e.name(), &attr)?;
-            }
-        }
-        Ok(())
+        let mut buf = cstr::buf::default();
+        self.copy_into_impl(dir, &mut buf)
     }
 
     pub fn move_into(&mut self, dir: &Directory) -> OsResultStatic<()> {
@@ -362,7 +328,7 @@ impl Directory {
             if e.is_dir() && dir.contains_path(e.name()) {
                 // Destination folder exists, needs recursive move
                 let mut src = e.open_as_dir()?;
-                let dest = dir.openat_as_dir(e.name())?;
+                let dest = dir.open_as_dir_at(e.name())?;
                 src.move_into(&dest)?;
                 return Ok(e.unlink()?);
             }
@@ -381,29 +347,8 @@ impl Directory {
     }
 
     pub fn link_into(&mut self, dir: &Directory) -> OsResultStatic<()> {
-        let dir_fd = self.as_raw_fd();
-        while let Some(ref e) = self.read()? {
-            if e.is_dir() {
-                dir.mkdirat(e.name(), 0o777)?;
-                let attr = e.get_attr()?;
-                let mut src = e.open_as_dir()?;
-                let dest = dir.openat_as_dir(e.name())?;
-                src.link_into(&dest)?;
-                fd_set_attr(dest.as_raw_fd(), &attr)?;
-            } else {
-                unsafe {
-                    libc::linkat(
-                        dir_fd,
-                        e.d_name.as_ptr(),
-                        dir.as_raw_fd(),
-                        e.d_name.as_ptr(),
-                        0,
-                    )
-                    .check_os_err("linkat", Some(e.name()), None)?;
-                }
-            }
-        }
-        Ok(())
+        let mut buf = cstr::buf::default();
+        self.link_into_impl(dir, &mut buf)
     }
 }
 
@@ -455,6 +400,67 @@ impl Directory {
                 },
             }
         }
+    }
+
+    fn copy_into_impl(
+        &mut self,
+        dest_dir: &Directory,
+        buf: &mut dyn Utf8CStrBuf,
+    ) -> OsResultStatic<()> {
+        while let Some(ref e) = self.read()? {
+            e.resolve_path(buf)?;
+            let attr = buf.get_attr()?;
+            if e.is_dir() {
+                dest_dir.mkdir_at(e.name(), 0o777)?;
+                let mut src = e.open_as_dir()?;
+                let dest = dest_dir.open_as_dir_at(e.name())?;
+                src.copy_into_impl(&dest, buf)?;
+                fd_set_attr(dest.as_raw_fd(), &attr)?;
+            } else if e.is_file() {
+                let mut src = e.open_as_file(O_RDONLY)?;
+                let mut dest =
+                    dest_dir.open_as_file_at(e.name(), O_WRONLY | O_CREAT | O_TRUNC, 0o777)?;
+                std::io::copy(&mut src, &mut dest)?;
+                fd_set_attr(dest.as_raw_fd(), &attr)?;
+            } else if e.is_symlink() {
+                e.read_link(buf)?;
+                dest_dir.create_symlink_at(e.name(), buf)?;
+                dest_dir.path_at(e.name(), buf)?;
+                buf.set_attr(&attr)?;
+            }
+        }
+        Ok(())
+    }
+
+    fn link_into_impl(
+        &mut self,
+        dest_dir: &Directory,
+        buf: &mut dyn Utf8CStrBuf,
+    ) -> OsResultStatic<()> {
+        let dir_fd = self.as_raw_fd();
+        while let Some(ref e) = self.read()? {
+            if e.is_dir() {
+                dest_dir.mkdir_at(e.name(), 0o777)?;
+                e.resolve_path(buf)?;
+                let attr = buf.get_attr()?;
+                let mut src = e.open_as_dir()?;
+                let dest = dest_dir.open_as_dir_at(e.name())?;
+                src.link_into_impl(&dest, buf)?;
+                fd_set_attr(dest.as_raw_fd(), &attr)?;
+            } else {
+                unsafe {
+                    libc::linkat(
+                        dir_fd,
+                        e.d_name.as_ptr(),
+                        dest_dir.as_raw_fd(),
+                        e.d_name.as_ptr(),
+                        0,
+                    )
+                    .check_os_err("linkat", Some(e.name()), None)?;
+                }
+            }
+        }
+        Ok(())
     }
 }
 
