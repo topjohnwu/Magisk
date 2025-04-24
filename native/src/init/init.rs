@@ -6,7 +6,7 @@ use crate::{
     logging::setup_klog,
 };
 use base::{
-    FsPath, FsPathMnt, LibcReturn, LoggedResult, ResultExt, cstr, info,
+    LibcReturn, LoggedResult, ResultExt, cstr, info,
     libc::{basename, getpid, mount, umask},
     raw_cstr,
 };

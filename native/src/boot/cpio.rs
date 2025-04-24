@@ -20,8 +20,8 @@ use base::libc::{
     c_char, dev_t, gid_t, major, makedev, minor, mknod, mode_t, uid_t,
 };
 use base::{
-    BytesExt, EarlyExitExt, FsPath, LoggedResult, MappedFile, ResultExt, Utf8CStr, Utf8CStrBuf,
-    WriteExt, cstr, log_err, map_args,
+    BytesExt, EarlyExitExt, LoggedResult, MappedFile, ResultExt, Utf8CStr, Utf8CStrBuf, WriteExt,
+    cstr, log_err, map_args,
 };
 
 use crate::check_env;

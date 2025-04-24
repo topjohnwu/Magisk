@@ -16,8 +16,8 @@ use crate::resetprop::proto::persistent_properties::{
 use base::const_format::concatcp;
 use base::libc::{O_CLOEXEC, O_RDONLY};
 use base::{
-    Directory, FsPath, FsPathBuilder, LibcReturn, LoggedResult, MappedFile, SilentResultExt,
-    Utf8CStr, Utf8CStrBuf, WalkResult, clone_attr, cstr, debug, libc::mkstemp,
+    Directory, FsPathBuilder, LibcReturn, LoggedResult, MappedFile, SilentResultExt, Utf8CStr,
+    Utf8CStrBuf, WalkResult, clone_attr, cstr, debug, libc::mkstemp,
 };
 
 const PERSIST_PROP_DIR: &str = "/data/property";

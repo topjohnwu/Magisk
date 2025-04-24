@@ -15,7 +15,6 @@ pub use ffi::fork_dont_care;
 pub use files::*;
 pub use logging::*;
 pub use misc::*;
-pub use mount::*;
 pub use result::*;
 
 pub mod cstr;

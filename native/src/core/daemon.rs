@@ -10,9 +10,7 @@ use crate::mount::{clean_mounts, setup_mounts};
 use crate::package::ManagerInfo;
 use crate::su::SuInfo;
 use base::libc::{O_CLOEXEC, O_RDONLY};
-use base::{
-    AtomicArc, BufReadExt, FsPath, FsPathBuilder, ResultExt, Utf8CStr, cstr, error, info, libc,
-};
+use base::{AtomicArc, BufReadExt, FsPathBuilder, ResultExt, Utf8CStr, cstr, error, info, libc};
 use std::io::BufReader;
 use std::os::unix::net::UnixStream;
 use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};

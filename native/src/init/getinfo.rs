@@ -1,5 +1,5 @@
 use crate::ffi::{BootConfig, MagiskInit, backup_init};
-use base::{BytesExt, FsPath, MappedFile, cstr};
+use base::{BytesExt, MappedFile, cstr};
 
 impl BootConfig {
     #[allow(unused_imports, unused_unsafe)]

@@ -2,8 +2,7 @@
 
 use crate::cxx_extern::readlinkat;
 use crate::{
-    BorrowedDirectory, CxxResultExt, FsPath, LibcReturn, Utf8CStr, cstr, slice_from_ptr,
-    slice_from_ptr_mut,
+    BorrowedDirectory, CxxResultExt, LibcReturn, Utf8CStr, cstr, slice_from_ptr, slice_from_ptr_mut,
 };
 use libc::{
     c_char, c_uint, c_ulong, c_void, dev_t, mode_t, nfds_t, off_t, pollfd, sockaddr, socklen_t,

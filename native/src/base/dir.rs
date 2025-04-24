@@ -1,7 +1,7 @@
 use crate::cxx_extern::readlinkat;
 use crate::{
-    FileAttr, FsPath, FsPathBuilder, LibcReturn, OsError, OsResult, OsResultStatic, Utf8CStr,
-    Utf8CStrBuf, cstr, errno, fd_path, fd_set_attr,
+    FileAttr, FsPathBuilder, LibcReturn, OsError, OsResult, OsResultStatic, Utf8CStr, Utf8CStrBuf,
+    cstr, errno, fd_path, fd_set_attr,
 };
 use libc::{EEXIST, O_CLOEXEC, O_CREAT, O_RDONLY, O_TRUNC, O_WRONLY, dirent, mode_t};
 use std::fs::File;

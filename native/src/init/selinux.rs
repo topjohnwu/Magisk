@@ -2,8 +2,8 @@ use crate::consts::{PREINITMIRR, SELINUXMOCK};
 use crate::ffi::{MagiskInit, preload_ack, preload_lib, preload_policy, split_plat_cil};
 use base::const_format::concatcp;
 use base::{
-    BytesExt, FsPath, FsPathMnt, LibcReturn, LoggedResult, MappedFile, ResultExt, Utf8CStr, cstr,
-    debug, error, info, libc, raw_cstr,
+    BytesExt, LibcReturn, LoggedResult, MappedFile, ResultExt, Utf8CStr, cstr, debug, error, info,
+    libc, raw_cstr,
 };
 use magiskpolicy::ffi::SePolicy;
 use std::io::{Read, Write};

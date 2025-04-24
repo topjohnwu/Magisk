@@ -1,6 +1,6 @@
 use crate::ffi::MagiskInit;
 use base::{
-    FsPath, FsPathMnt, LoggedResult, MappedFile, MutBytesExt, ResultExt, cstr, debug, error,
+    LoggedResult, MappedFile, MutBytesExt, ResultExt, cstr, debug, error,
     libc::{O_CLOEXEC, O_CREAT, O_RDONLY, O_WRONLY},
 };
 use std::io::Write;

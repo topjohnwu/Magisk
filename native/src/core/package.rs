@@ -4,8 +4,8 @@ use crate::ffi::{DbEntryKey, get_magisk_tmp, install_apk, uninstall_pkg};
 use base::WalkResult::{Abort, Continue, Skip};
 use base::libc::{O_CLOEXEC, O_CREAT, O_RDONLY, O_TRUNC, O_WRONLY};
 use base::{
-    BufReadExt, Directory, FsPath, FsPathBuilder, LoggedResult, ReadExt, ResultExt, Utf8CStrBuf,
-    cstr, error, fd_get_attr, warn,
+    BufReadExt, Directory, FsPathBuilder, LoggedResult, ReadExt, ResultExt, Utf8CStrBuf, cstr,
+    error, fd_get_attr, warn,
 };
 use bit_set::BitSet;
 use cxx::CxxString;
