@@ -160,7 +160,7 @@ fn find_apk_path(pkg: &str, buf: &mut dyn Utf8CStrBuf) -> LoggedResult<()> {
         let name_bytes = e.name().as_bytes();
         if name_bytes.starts_with(pkg.as_bytes()) && name_bytes[pkg.len()] == b'-' {
             // Found the APK path, we can abort now
-            e.path(buf)?;
+            e.resolve_path(buf)?;
             return Ok(Abort);
         }
         if name_bytes.starts_with(b"~~") {
@@ -515,7 +515,9 @@ impl MagiskD {
                     match user_dir.read()? {
                         None => break,
                         Some(e) => {
-                            let attr = e.get_attr()?;
+                            let mut entry_path = cstr::buf::default();
+                            e.resolve_path(&mut entry_path)?;
+                            let attr = entry_path.get_attr()?;
                             let app_id = to_app_id(attr.st.st_uid as i32);
                             if (AID_APP_START..=AID_APP_END).contains(&app_id) {
                                 let app_no = app_id - AID_APP_START;
