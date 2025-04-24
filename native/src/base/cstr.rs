@@ -192,6 +192,12 @@ impl From<String> for Utf8CString {
     }
 }
 
+impl From<&str> for Utf8CString {
+    fn from(value: &str) -> Self {
+        value.to_string().into()
+    }
+}
+
 impl Borrow<Utf8CStr> for Utf8CString {
     fn borrow(&self) -> &Utf8CStr {
         self.deref()
