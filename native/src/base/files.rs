@@ -415,17 +415,19 @@ impl Utf8CStr {
         Ok(())
     }
 
-    pub fn parent(&self, buf: &mut dyn Utf8CStrBuf) -> bool {
-        buf.clear();
-        if let Some(parent) = Path::new(self.as_str()).parent() {
-            let bytes = parent.as_os_str().as_bytes();
+    pub fn parent_dir(&self) -> Option<&str> {
+        Path::new(self.as_str())
+            .parent()
+            .map(Path::as_os_str)
             // SAFETY: all substring of self is valid UTF-8
-            let parent = unsafe { std::str::from_utf8_unchecked(bytes) };
-            buf.push_str(parent);
-            true
-        } else {
-            false
-        }
+            .map(|s| unsafe { std::str::from_utf8_unchecked(s.as_bytes()) })
+    }
+
+    pub fn file_name(&self) -> Option<&str> {
+        Path::new(self.as_str())
+            .file_name()
+            // SAFETY: all substring of self is valid UTF-8
+            .map(|s| unsafe { std::str::from_utf8_unchecked(s.as_bytes()) })
     }
 
     // ln self path
