@@ -2,8 +2,8 @@ use crate::consts::{ROOTMNT, ROOTOVL};
 use crate::ffi::MagiskInit;
 use base::libc::{O_CREAT, O_RDONLY, O_WRONLY};
 use base::{
-    BufReadExt, Directory, FsPath, FsPathBuilder, FsPathMnt, LoggedResult, ResultExt, Utf8CStr,
-    Utf8CString, clone_attr, cstr, debug,
+    BufReadExt, Directory, FsPathBuilder, LoggedResult, ResultExt, Utf8CStr, Utf8CString,
+    clone_attr, cstr, debug,
 };
 use std::io::BufReader;
 use std::{

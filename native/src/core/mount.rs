@@ -7,8 +7,8 @@ use num_traits::AsPrimitive;
 
 use base::libc::{c_uint, dev_t};
 use base::{
-    FsPath, FsPathBuilder, FsPathMnt, LibcReturn, LoggedResult, MountInfo, ResultExt, Utf8CStr,
-    Utf8CStrBuf, cstr, debug, info, libc, parse_mount_info, warn,
+    FsPathBuilder, LibcReturn, LoggedResult, MountInfo, ResultExt, Utf8CStr, Utf8CStrBuf, cstr,
+    debug, info, libc, parse_mount_info, warn,
 };
 
 use crate::consts::{MODULEMNT, MODULEROOT, PREINITDEV, PREINITMIRR, WORKERDIR};

@@ -1,8 +1,7 @@
 use crate::ffi::MagiskInit;
 use base::libc::{TMPFS_MAGIC, statfs};
 use base::{
-    Directory, FsPath, FsPathBuilder, FsPathMnt, LibcReturn, LoggedResult, ResultExt, Utf8CStr,
-    cstr, debug, libc,
+    Directory, FsPathBuilder, LibcReturn, LoggedResult, ResultExt, Utf8CStr, cstr, debug, libc,
     libc::{chdir, chroot, execve, exit, mount},
     parse_mount_info, raw_cstr,
 };

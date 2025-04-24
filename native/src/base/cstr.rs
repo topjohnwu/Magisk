@@ -11,7 +11,7 @@ use std::str::Utf8Error;
 use std::{fmt, mem, slice, str};
 use thiserror::Error;
 
-use crate::{FsPath, FsPathMnt, slice_from_ptr_mut};
+use crate::slice_from_ptr_mut;
 // Utf8CStr types are UTF-8 validated and null terminated strings.
 //
 // Several Utf8CStr types:
@@ -604,22 +604,6 @@ macro_rules! impl_cstr_buf_write {
 }
 
 impl_cstr_buf_write!(
-    (Utf8CStrBufRef<'_>,)
-    (Utf8CStrBufArr<N>, const N: usize)
-    (Utf8CString,)
-);
-
-// impl<T: Deref<Target = Utf8CStr>> FsPath for T {}
-// impl<T: Deref<Target = Utf8CStr>> FsPathMnt for T {}
-macro_rules! impl_fs_path {
-    ($( ($t:ty, $($g:tt)*) )*) => {$(
-        impl<$($g)*> FsPath for $t {}
-        impl<$($g)*> FsPathMnt for $t {}
-    )*}
-}
-
-impl_fs_path!(
-    (&Utf8CStr,)
     (Utf8CStrBufRef<'_>,)
     (Utf8CStrBufArr<N>, const N: usize)
     (Utf8CString,)

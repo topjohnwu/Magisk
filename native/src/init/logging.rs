@@ -1,5 +1,5 @@
 use base::{
-    FsPath, LOGGER, LogLevel, Logger, SilentResultExt, Utf8CStr, cstr,
+    LOGGER, LogLevel, Logger, SilentResultExt, Utf8CStr, cstr,
     libc::{
         O_CLOEXEC, O_RDWR, O_WRONLY, S_IFCHR, STDERR_FILENO, STDIN_FILENO, STDOUT_FILENO, SYS_dup3,
         makedev, mknod, syscall,

@@ -5,7 +5,7 @@ use std::{iter::Peekable, vec::IntoIter};
 use crate::SePolicy;
 use crate::ffi::Xperm;
 use base::libc::{O_CLOEXEC, O_RDONLY};
-use base::{BufReadExt, FsPath, LoggedResult, Utf8CStr, error, warn};
+use base::{BufReadExt, LoggedResult, Utf8CStr, error, warn};
 
 pub enum Token<'a> {
     AL,
