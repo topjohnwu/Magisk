@@ -346,7 +346,8 @@ impl Cpio {
         let mut buf = cstr::buf::default();
 
         // Make sure its parent directories exist
-        if out.parent(&mut buf) {
+        if let Some(dir) = out.parent_dir() {
+            buf.push_str(dir);
             buf.mkdirs(0o755)?;
         }
 
