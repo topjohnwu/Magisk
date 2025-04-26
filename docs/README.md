@@ -1,14 +1,14 @@
-# Magisk Documentation
+#Magisk文档
 
-- [Installation Instructions](install.md)
-- [Frequently Asked Questions](faq.md)
-- [Release Notes](releases/index.md)
-- [Magisk Changelog](changes.md)
+- [安装说明](INSTALL.md)
+- [常见问题](faq.md)
+- [发行说明](releases/index.md)
+- [Magisk Changelog](CHANGES.md)
 
-The following sections are for developers
+以下部分是为开发人员准备的
 
-- [Building and Developing Magisk](build.md) (for developing Magisk itself)
-- [Developer Guides](guides.md) (for developers **using** Magisk)
-- [Magisk Tools](tools.md)
-- [Internal Details](details.md)
-- [Android Booting Shenanigans](boot.md)
+- [建造和开发Magisk](BUILD.md)(用于开发Magisk本身)
+- [开发人员指南](guides.md)(对于开发人员**正在使用**Magisk)
+- [Magisk工具](tools.md)
+- [内部详细信息](Details.MD)
+- [Android启动Shenanigans](boot.md)
