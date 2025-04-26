@@ -10,7 +10,6 @@
 #include <base.hpp>
 #include <sqlite.hpp>
 #include <core.hpp>
-#include <selinux.hpp>
 
 #include "deny.hpp"
 
@@ -109,10 +108,10 @@ static bool proc_name_match(int pid, string_view name) {
 
 bool proc_context_match(int pid, string_view context) {
     char buf[PATH_MAX];
-    char con[1024];
+    char con[1024] = {0};
 
     sprintf(buf, "/proc/%d", pid);
-    if (lgetfilecon(buf, { con, sizeof(con) }) >= 0) {
+    if (lgetfilecon(buf, byte_data{ con, sizeof(con) })) {
         return str_starts(con, context);
     }
     return false;

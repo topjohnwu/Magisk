@@ -1,7 +1,6 @@
 #include <sys/stat.h>
 
 #include <consts.hpp>
-#include <selinux.hpp>
 #include <base.hpp>
 
 int main(int argc, char *argv[]) {

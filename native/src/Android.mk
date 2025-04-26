@@ -19,7 +19,6 @@ LOCAL_SRC_FILES := \
     core/magisk.cpp \
     core/daemon.cpp \
     core/scripting.cpp \
-    core/selinux.cpp \
     core/sqlite.cpp \
     core/module.cpp \
     core/thread.cpp \

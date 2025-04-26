@@ -85,6 +85,7 @@ pub trait Utf8CStrBuf: Write + AsRef<Utf8CStr> + Deref<Target = Utf8CStr> {
     fn capacity(&self) -> usize;
     fn clear(&mut self);
     fn as_mut_ptr(&mut self) -> *mut c_char;
+    fn truncate(&mut self, new_len: usize);
 
     #[inline(always)]
     fn is_empty(&self) -> bool {
@@ -182,6 +183,11 @@ impl Utf8CStrBuf for Utf8CString {
 
     fn as_mut_ptr(&mut self) -> *mut c_char {
         self.0.as_mut_ptr().cast()
+    }
+
+    fn truncate(&mut self, new_len: usize) {
+        self.0.truncate(new_len);
+        self.0.nul_terminate();
     }
 }
 
@@ -337,6 +343,12 @@ impl ToOwned for Utf8CStr {
     }
 }
 
+impl AsRef<Utf8CStr> for Utf8CStr {
+    fn as_ref(&self) -> &Utf8CStr {
+        self
+    }
+}
+
 // Notice that we only implement ExternType on Utf8CStr *reference*
 unsafe impl ExternType for &Utf8CStr {
     type Id = type_id!("rust::Utf8CStr");
@@ -449,7 +461,7 @@ macro_rules! impl_cstr_misc {
                 self == other.as_cstr()
             }
         }
-        impl<T: AsRef<Utf8CStr>, $($g)*> PartialEq<T> for $t {
+        impl<T: AsRef<Utf8CStr> + ?Sized, $($g)*> PartialEq<T> for $t {
             #[inline(always)]
             fn eq(&self, other: &T) -> bool {
                 self.as_bytes_with_nul() == other.as_ref().as_bytes_with_nul()
@@ -520,6 +532,13 @@ macro_rules! impl_cstr_buf {
             #[inline(always)]
             fn as_mut_ptr(&mut self) -> *mut c_char {
                 self.buf.as_mut_ptr().cast()
+            }
+            fn truncate(&mut self, new_len: usize) {
+                if self.used <= new_len {
+                    return;
+                }
+                self.buf[new_len] = b'\0';
+                self.used = new_len;
             }
         }
     )*}

@@ -7,7 +7,6 @@
 #include <base.hpp>
 #include <consts.hpp>
 #include <core.hpp>
-#include <selinux.hpp>
 
 #include "node.hpp"
 
