@@ -1,3 +1,4 @@
+use crate::consts::{SEPOL_FILE_TYPE, SEPOL_LOG_TYPE, SEPOL_PROC_DOMAIN};
 use crate::{SePolicy, ffi::Xperm};
 use base::{LogLevel, set_log_level_state};
 
@@ -12,22 +13,22 @@ macro_rules! rules {
         vec!["servicemanager", "vndservicemanager", "hwservicemanager"]
     };
     (@args [proc]) => {
-        vec!["magisk"]
+        vec![SEPOL_PROC_DOMAIN]
     };
     (@args [file]) => {
-        vec!["magisk_file"]
+        vec![SEPOL_FILE_TYPE]
     };
     (@args [log]) => {
-        vec!["magisk_log_file"]
+        vec![SEPOL_LOG_TYPE]
     };
     (@args proc) => {
-        "magisk"
+        SEPOL_PROC_DOMAIN
     };
     (@args file) => {
-        "magisk_file"
+        SEPOL_FILE_TYPE
     };
     (@args log) => {
-        "magisk_log_file"
+        SEPOL_LOG_TYPE
     };
     (@args [$($arg:tt)*]) => {
         vec![$($arg)*]

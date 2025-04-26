@@ -6,6 +6,9 @@ use std::fmt::Write;
 
 use crate::ffi::SePolicy;
 
+#[path = "../include/consts.rs"]
+mod consts;
+
 #[cfg(feature = "main")]
 mod cli;
 mod rules;

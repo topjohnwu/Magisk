@@ -2,7 +2,6 @@
 #include <sys/wait.h>
 
 #include <base.hpp>
-#include <selinux.hpp>
 #include <consts.hpp>
 #include <core.hpp>
 

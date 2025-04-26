@@ -8,6 +8,7 @@ use crate::get_prop;
 use crate::logging::{magisk_logging, setup_logfile, start_log_daemon};
 use crate::mount::{clean_mounts, setup_mounts};
 use crate::package::ManagerInfo;
+use crate::selinux::restore_tmpcon;
 use crate::su::SuInfo;
 use base::libc::{O_CLOEXEC, O_RDONLY};
 use base::{AtomicArc, BufReadExt, FsPathBuilder, ResultExt, Utf8CStr, cstr, error, info, libc};
@@ -258,6 +259,8 @@ pub fn daemon_entry() {
             .unwrap_or(-1);
     }
     info!("* Device API level: {}", sdk_int);
+
+    restore_tmpcon().log_ok();
 
     let magiskd = MagiskD {
         sdk_int,

@@ -4,7 +4,6 @@
 
 #include <consts.hpp>
 #include <base.hpp>
-#include <selinux.hpp>
 #include <core.hpp>
 
 using namespace std;
