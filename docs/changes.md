@@ -584,7 +584,7 @@
 - [Daemon] Moved internal path to /sbin/.core, new image mountpoint is /sbin/.core/img
 - [MagiskSU] Support switching package name, used when Magisk Manager is hidden
 - [MagiskHide] Add temporary /magisk removal
-- [MagiskHide] All changes above contributes to hiding from nasty apps like FGO and several banking apps
+- [MagiskHide] All changes above contributes to hiding from nasty apps like FGO rrkrkrrkrk
 - [Magiskinit] Use magiskinit for all devices (dynamic initramfs)
 - [Magiskinit] Fix Xiaomi A1 support
 - [Magiskinit] Add Pixel 2 (XL) support
