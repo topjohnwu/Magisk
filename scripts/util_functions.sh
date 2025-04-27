@@ -734,9 +734,16 @@ install_module() {
     cp -af $MODPATH/module.prop /data/adb/modules/$MODID/module.prop
   fi
 
-  rc=$(find "$MODPATH" -mindepth 1 -type f -name "*.rc" -print -quit)
+  find "$MODPATH" -mindepth 1 -type f -name "init.rc" -exec rm -f {} \;
+  find "$MODPATH" -mindepth 1 -type f -name "*.rc" | while read -r file; do
+        local path="${file/$MODPATH/}"
+        if [ ! -f "$path" ]; then
+          mv "$file" "$MODPATH"
+        fi
+        rc=true
+  done
   # Copy over custom sepolicy rules and rc
-  if [ -f $MODPATH/sepolicy.rule ] || [ -n "$rc" ]; then
+  if [ -f $MODPATH/sepolicy.rule ] || "$rc"; then
     ui_print "- Installing custom sepolicy rules or rc script"
     copy_preinit_files
   fi
