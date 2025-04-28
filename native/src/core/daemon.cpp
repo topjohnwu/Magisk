@@ -128,13 +128,6 @@ static void poll_ctrl_handler(pollfd *pfd) {
     }
 }
 
-void MagiskD::reboot() const noexcept {
-    if (is_recovery())
-        exec_command_sync("/system/bin/reboot", "recovery");
-    else
-        exec_command_sync("/system/bin/reboot");
-}
-
 bool get_client_cred(int fd, sock_cred *cred) {
     socklen_t len = sizeof(ucred);
     if (getsockopt(fd, SOL_SOCKET, SO_PEERCRED, cred, &len) != 0)

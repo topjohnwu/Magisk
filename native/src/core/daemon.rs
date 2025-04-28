@@ -17,6 +17,7 @@ use base::{
 use std::fmt::Write as FmtWrite;
 use std::io::{BufReader, Write};
 use std::os::unix::net::UnixStream;
+use std::process::Command;
 use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 use std::sync::{Mutex, OnceLock};
 
@@ -77,10 +78,6 @@ pub struct MagiskD {
 impl MagiskD {
     pub fn get() -> &'static MagiskD {
         unsafe { MAGISKD.get().unwrap_unchecked() }
-    }
-
-    pub fn is_recovery(&self) -> bool {
-        self.is_recovery
     }
 
     pub fn zygisk_enabled(&self) -> bool {
@@ -216,6 +213,15 @@ impl MagiskD {
                 unsafe { libc::close(client) };
             }
         }
+    }
+
+    pub fn reboot(&self) {
+        if self.is_recovery {
+            Command::new("/system/bin/reboot").arg("recovery").status()
+        } else {
+            Command::new("/system/bin/reboot").status()
+        }
+        .ok();
     }
 }
 
