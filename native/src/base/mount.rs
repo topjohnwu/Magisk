@@ -16,13 +16,26 @@ impl Utf8CStr {
         }
     }
 
-    pub fn remount_with_flags(&self, flags: c_ulong) -> OsResult<()> {
+    pub fn remount_mount_point_flags(&self, flags: c_ulong) -> OsResult<()> {
         unsafe {
             libc::mount(
                 ptr::null(),
                 self.as_ptr(),
                 ptr::null(),
                 libc::MS_BIND | libc::MS_REMOUNT | flags,
+                ptr::null(),
+            )
+            .check_os_err("remount", Some(self), None)
+        }
+    }
+
+    pub fn remount_mount_flags(&self, flags: c_ulong) -> OsResult<()> {
+        unsafe {
+            libc::mount(
+                ptr::null(),
+                self.as_ptr(),
+                ptr::null(),
+                libc::MS_REMOUNT | flags,
                 ptr::null(),
             )
             .check_os_err("remount", Some(self), None)
