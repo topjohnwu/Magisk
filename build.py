@@ -672,6 +672,31 @@ def patch_avd_file():
 
     header(f"Output: {output}")
 
+def patch_device_file():
+    input = Path(args.image)
+    output = Path(args.output)
+
+    header(f"* Patching {input.name}")
+
+    push_files(Path("scripts", "patch_boot.sh"))
+
+    proc = execv([adb_path, "push", input, "/data/local/tmp"])
+    if proc.returncode != 0:
+        error("adb push failed!")
+
+    src_file = f"/data/local/tmp/{input.name}"
+    out_file = "/data/local/tmp/new-boot.img"
+
+    proc = execv([adb_path, "shell", "sh", "/data/local/tmp/patch_boot.sh", src_file])
+    if proc.returncode != 0:
+        error("patch_boot.sh failed!")
+
+    proc = execv([adb_path, "pull", out_file, output])
+    if proc.returncode != 0:
+        error("adb pull failed!")
+
+    header(f"Output: {output}")
+    execv([adb_path, "shell", "rm", "/data/local/tmp/new-boot.img"])
 
 ##########################
 # Config, paths, argparse
@@ -832,6 +857,16 @@ def parse_args():
         "-b", "--build", action="store_true", help="build before patching"
     )
 
+    device_patch_parser = subparsers.add_parser(
+        "device_patch", help="patch device boot.img or init_boot.img"
+    )
+    device_patch_parser.add_argument("image", help="path to boot.img or init_boot.img")
+    device_patch_parser.add_argument("output", help="output file name, default: new-boot.img")
+    device_patch_parser.add_argument("--apk", help="a Magisk APK to use")
+    device_patch_parser.add_argument(
+        "-b", "--build", action="store_true", help="build before patching"
+    )
+
     cargo_parser = subparsers.add_parser(
         "cargo", help="call 'cargo' commands against the project"
     )
@@ -859,6 +894,7 @@ def parse_args():
     test_parser.set_defaults(func=build_test)
     emu_parser.set_defaults(func=setup_avd)
     avd_patch_parser.set_defaults(func=patch_avd_file)
+    device_patch_parser.set_defaults(func=patch_device_file)
     clean_parser.set_defaults(func=cleanup)
     ndk_parser.set_defaults(func=setup_ndk)
 
