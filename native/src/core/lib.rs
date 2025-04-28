@@ -231,7 +231,7 @@ pub mod ffi {
     // FFI for MagiskD
     extern "Rust" {
         type MagiskD;
-        fn is_recovery(&self) -> bool;
+        fn reboot(&self);
         fn sdk_int(&self) -> i32;
         fn zygisk_enabled(&self) -> bool;
         fn boot_stage_handler(&self, client: i32, code: i32);
@@ -253,8 +253,6 @@ pub mod ffi {
         fn get() -> &'static MagiskD;
     }
     unsafe extern "C++" {
-        #[allow(dead_code)]
-        fn reboot(self: &MagiskD);
         fn handle_modules(self: &MagiskD) -> Vec<ModuleInfo>;
     }
 }
