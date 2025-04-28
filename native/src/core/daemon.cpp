@@ -325,29 +325,6 @@ static void handle_request(pollfd *pfd) {
     }
 }
 
-static void switch_cgroup(const char *cgroup, int pid) {
-    char buf[32];
-    ssprintf(buf, sizeof(buf), "%s/cgroup.procs", cgroup);
-    if (access(buf, F_OK) != 0)
-        return;
-    int fd = xopen(buf, O_WRONLY | O_APPEND | O_CLOEXEC);
-    if (fd == -1)
-        return;
-    ssprintf(buf, sizeof(buf), "%d\n", pid);
-    xwrite(fd, buf, strlen(buf));
-    close(fd);
-}
-
-static int setcon(const char *con) {
-    int fd = open("/proc/self/attr/current", O_WRONLY | O_CLOEXEC);
-    if (fd < 0)
-        return fd;
-    size_t len = strlen(con) + 1;
-    int rc = write(fd, con, len);
-    close(fd);
-    return rc != len;
-}
-
 static void daemon_entry() {
     android_logging();
 
@@ -369,49 +346,15 @@ static void daemon_entry() {
     if (fd > STDERR_FILENO)
         close(fd);
 
-    setsid();
-    setcon(MAGISK_PROC_CON);
-
     rust::daemon_entry();
     SDK_INT = MagiskD::Get().sdk_int();
-
-    // Escape from cgroup
-    int pid = getpid();
-    switch_cgroup("/acct", pid);
-    switch_cgroup("/dev/cg2_bpf", pid);
-    switch_cgroup("/sys/fs/cgroup", pid);
-    if (get_prop("ro.config.per_app_memcg") != "false") {
-        switch_cgroup("/dev/memcg/apps", pid);
-    }
 
     // Get self stat
     xstat("/proc/self/exe", &self_st);
 
-    // Samsung workaround  #7887
-    if (access("/system_ext/app/mediatek-res/mediatek-res.apk", F_OK) == 0) {
-        set_prop("ro.vendor.mtk_model", "0");
-    }
-
-    // Cleanups
-    const char *tmp = get_magisk_tmp();
-    char path[64];
-    ssprintf(path, sizeof(path), "%s/" ROOTMNT, tmp);
-    if (access(path, F_OK) == 0) {
-        file_readline(true, path, [](string_view line) -> bool {
-            umount2(line.data(), MNT_DETACH);
-            return true;
-        });
-    }
-    if (getenv("REMOUNT_ROOT")) {
-        xmount(nullptr, "/", nullptr, MS_REMOUNT | MS_RDONLY, nullptr);
-        unsetenv("REMOUNT_ROOT");
-    }
-    ssprintf(path, sizeof(path), "%s/" ROOTOVL, tmp);
-    rm_rf(path);
-
     fd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
     sockaddr_un addr = {.sun_family = AF_LOCAL};
-    ssprintf(addr.sun_path, sizeof(addr.sun_path), "%s/" MAIN_SOCKET, tmp);
+    ssprintf(addr.sun_path, sizeof(addr.sun_path), "%s/" MAIN_SOCKET, get_magisk_tmp());
     unlink(addr.sun_path);
     if (xbind(fd, (sockaddr *) &addr, sizeof(addr)))
         exit(1);

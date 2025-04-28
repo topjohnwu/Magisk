@@ -74,7 +74,7 @@ pub fn setup_mounts() {
     let _: LoggedResult<()> = try {
         module_mnt.mkdir(0o755)?;
         cstr!(MODULEROOT).bind_mount_to(&module_mnt)?;
-        module_mnt.remount_with_flags(libc::MS_RDONLY)?;
+        module_mnt.remount_mount_point_flags(libc::MS_RDONLY)?;
     };
 }
 

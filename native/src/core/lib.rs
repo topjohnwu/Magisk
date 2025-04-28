@@ -137,6 +137,8 @@ pub mod ffi {
         #[cxx_name = "prop_cb"]
         type PropCb;
         unsafe fn get_prop_rs(name: *const c_char, persist: bool) -> String;
+        #[cxx_name = "set_prop"]
+        unsafe fn set_prop_rs(name: *const c_char, value: *const c_char, skip_svc: bool) -> i32;
         unsafe fn prop_cb_exec(
             cb: Pin<&mut PropCb>,
             name: *const c_char,
@@ -276,4 +278,8 @@ impl SuRequest {
 
 pub fn get_prop(name: &Utf8CStr, persist: bool) -> String {
     unsafe { ffi::get_prop_rs(name.as_ptr(), persist) }
+}
+
+pub fn set_prop(name: &Utf8CStr, value: &Utf8CStr, skip_svc: bool) -> bool {
+    unsafe { ffi::set_prop_rs(name.as_ptr(), value.as_ptr(), skip_svc) == 0 }
 }

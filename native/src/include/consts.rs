@@ -32,6 +32,7 @@ pub const SELINUXMOCK: &str = concatcp!(INTERNAL_DIR, "/selinux");
 
 // Unconstrained domain the daemon and root processes run in
 pub const SEPOL_PROC_DOMAIN: &str = "magisk";
+pub const MAGISK_PROC_CON: &str = concatcp!("u:r:", SEPOL_PROC_DOMAIN, ":s0");
 // Unconstrained file type that anyone can access
 pub const SEPOL_FILE_TYPE: &str = "magisk_file";
 // Log pipe that only root and zygote can open
