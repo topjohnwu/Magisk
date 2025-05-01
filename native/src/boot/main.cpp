@@ -2,22 +2,12 @@
 
 #include "boot-rs.hpp"
 #include "magiskboot.hpp"
-#include "compress.hpp"
 
 using namespace std;
 
-#ifdef USE_CRT0
-__BEGIN_DECLS
-int musl_vfprintf(FILE *stream, const char *format, va_list arg);
-int vfprintf(FILE *stream, const char *format, va_list arg) {
-    return musl_vfprintf(stream, format, arg);
-}
-__END_DECLS
-#endif
-
 static void print_formats() {
-    for (int fmt = GZIP; fmt < LZOP; ++fmt) {
-        fprintf(stderr, "%s ", fmt2name[(format_t) fmt]);
+    for (int fmt = +FileFormat::GZIP; fmt < +FileFormat::LZOP; ++fmt) {
+        fprintf(stderr, "%s ", fmt2name[(FileFormat) fmt]);
     }
 }
 
@@ -124,6 +114,93 @@ Supported actions:
 
     fprintf(stderr, "\n\n");
     exit(1);
+}
+
+static void decompress(char *infile, const char *outfile) {
+    bool in_std = infile == "-"sv;
+    bool rm_in = false;
+
+    int in_fd = in_std ? STDIN_FILENO : xopen(infile, O_RDONLY);
+    int out_fd = -1;
+
+    uint8_t buf[4096];
+    size_t len = read(in_fd, buf, sizeof(buf));
+    FileFormat type = check_fmt(buf, len);
+
+    fprintf(stderr, "Detected format: [%s]\n", fmt2name[type]);
+
+    if (!COMPRESSED(type))
+        LOGE("Input file is not a supported compressed type!\n");
+
+    // If user does not provide outfile, infile has to be either
+    // <path>.[ext], or '-'. Outfile will be either <path> or '-'.
+    // If the input does not have proper format, abort.
+
+    char *ext = nullptr;
+    if (outfile == nullptr) {
+        outfile = infile;
+        if (!in_std) {
+            ext = strrchr(infile, '.');
+            if (ext == nullptr || strcmp(ext, fmt2ext[type]) != 0)
+                LOGE("Input file is not a supported type!\n");
+
+            // Strip out extension and remove input
+            *ext = '\0';
+            rm_in = true;
+            fprintf(stderr, "Decompressing to [%s]\n", outfile);
+        }
+    }
+
+    out_fd = outfile == "-"sv ?
+             STDOUT_FILENO :
+             xopen(outfile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (ext) *ext = '.';
+
+    decompress_bytes_fd(type, byte_view{ buf, len }, in_fd, out_fd);
+
+    if (in_fd != STDIN_FILENO) close(in_fd);
+    if (out_fd != STDOUT_FILENO) close(out_fd);
+
+    if (rm_in)
+        unlink(infile);
+}
+
+static void compress(const char *method, const char *infile, const char *outfile) {
+    FileFormat fmt = name2fmt[method];
+    if (fmt == FileFormat::UNKNOWN)
+        LOGE("Unknown compression method: [%s]\n", method);
+
+    bool in_std = infile == "-"sv;
+    bool rm_in = false;
+
+    int in_fd = in_std ? STDIN_FILENO : xopen(infile, O_RDONLY);
+    int out_fd = -1;
+
+    if (outfile == nullptr) {
+        if (in_std) {
+            out_fd = STDOUT_FILENO;
+        } else {
+            // If user does not provide outfile and infile is not
+            // STDIN, output to <infile>.[ext]
+            string tmp(infile);
+            tmp += fmt2ext[fmt];
+            out_fd = xopen(tmp.data(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
+            fprintf(stderr, "Compressing to [%s]\n", tmp.data());
+            rm_in = true;
+        }
+    } else {
+        out_fd = outfile == "-"sv ?
+                 STDOUT_FILENO :
+                 xopen(outfile,  O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    }
+
+    compress_fd(fmt, in_fd, out_fd);
+
+    if (in_fd != STDIN_FILENO) close(in_fd);
+    if (out_fd != STDOUT_FILENO) close(out_fd);
+
+    if (rm_in)
+        unlink(infile);
 }
 
 int main(int argc, char *argv[]) {

@@ -10,9 +10,6 @@
 [submodule "libcxx"]
 	path = native/src/external/libcxx
 	url = https://github.com/topjohnwu/libcxx.git
-[submodule "zopfli"]
-	path = native/src/external/zopfli
-	url = https://github.com/google/zopfli.git
 [submodule "cxx-rs"]
 	path = native/src/external/cxx-rs
 	url = https://github.com/topjohnwu/cxx.git
