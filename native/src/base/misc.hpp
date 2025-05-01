@@ -147,17 +147,12 @@ struct byte_data : public byte_view {
     rust::Vec<size_t> patch(byte_view from, byte_view to);
 };
 
-class byte_stream;
-
 struct heap_data : public byte_data {
     ALLOW_MOVE_ONLY(heap_data)
 
     heap_data() = default;
     explicit heap_data(size_t sz) : byte_data(calloc(sz, 1), sz) {}
     ~heap_data() { free(_buf); }
-
-    // byte_stream needs to reallocate the internal buffer
-    friend byte_stream;
 };
 
 struct owned_fd {
