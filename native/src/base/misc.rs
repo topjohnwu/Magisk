@@ -169,3 +169,61 @@ impl<T: Default> Default for AtomicArc<T> {
         Self::new(Default::default())
     }
 }
+
+pub struct Chunker {
+    chunk: Box<[u8]>,
+    chunk_size: usize,
+    pos: usize,
+}
+
+impl Chunker {
+    pub fn new(chunk_size: usize) -> Self {
+        Chunker {
+            // SAFETY: all bytes will be initialized before it is used, tracked by self.pos
+            chunk: unsafe { Box::new_uninit_slice(chunk_size).assume_init() },
+            chunk_size,
+            pos: 0,
+        }
+    }
+
+    pub fn set_chunk_size(&mut self, chunk_size: usize) {
+        self.chunk_size = chunk_size;
+        self.pos = 0;
+        if self.chunk.len() < chunk_size {
+            self.chunk = unsafe { Box::new_uninit_slice(chunk_size).assume_init() };
+        }
+    }
+
+    // Returns (remaining buf, Option<Chunk>)
+    pub fn add_data<'a, 'b: 'a>(&'a mut self, mut buf: &'b [u8]) -> (&'b [u8], Option<&'a [u8]>) {
+        let mut chunk = None;
+        if self.pos > 0 {
+            // Try to fill the chunk
+            let len = std::cmp::min(self.chunk_size - self.pos, buf.len());
+            self.chunk[self.pos..self.pos + len].copy_from_slice(&buf[..len]);
+            self.pos += len;
+            // If the chunk is filled, consume it
+            if self.pos == self.chunk_size {
+                chunk = Some(&self.chunk[..self.chunk_size]);
+                self.pos = 0;
+            }
+            buf = &buf[len..];
+        } else if buf.len() >= self.chunk_size {
+            // Directly consume a chunk from buf
+            chunk = Some(&buf[..self.chunk_size]);
+            buf = &buf[self.chunk_size..];
+        } else {
+            // Copy buf into chunk
+            self.chunk[self.pos..self.pos + buf.len()].copy_from_slice(buf);
+            self.pos += buf.len();
+            return (&[], None);
+        }
+        (buf, chunk)
+    }
+
+    pub fn get_available(&mut self) -> &[u8] {
+        let chunk = &self.chunk[..self.pos];
+        self.pos = 0;
+        chunk
+    }
+}

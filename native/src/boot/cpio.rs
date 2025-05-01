@@ -25,7 +25,8 @@ use base::{
 };
 
 use crate::check_env;
-use crate::ffi::{unxz, xz};
+use crate::compress::{get_decoder, get_encoder};
+use crate::ffi::FileFormat;
 use crate::patch::{patch_encryption, patch_verity};
 
 #[derive(FromArgs)]
@@ -308,7 +309,7 @@ impl Cpio {
         }
         pos += file.write(
             format!("070701{:08x}{:08x}{:08x}{:08x}{:08x}{:08x}{:08x}{:08x}{:08x}{:08x}{:08x}{:08x}{:08x}",
-                inode, 0o755, 0, 0, 1, 0, 0, 0, 0, 0, 0, 11, 0
+                    inode, 0o755, 0, 0, 1, 0, 0, 0, 0, 0, 0, 11, 0
             ).as_bytes()
         )?;
         pos += file.write("TRAILER!!!\0".as_bytes())?;
@@ -695,12 +696,16 @@ impl CpioEntry {
         if self.mode & S_IFMT != S_IFREG {
             return false;
         }
-        let mut compressed = Vec::new();
-        if !xz(&self.data, &mut compressed) {
+        let mut encoder = get_encoder(FileFormat::XZ, Vec::new());
+        let Ok(data): std::io::Result<Vec<u8>> = (try {
+            encoder.write_all(&self.data)?;
+            encoder.finish()?
+        }) else {
             eprintln!("xz compression failed");
             return false;
-        }
-        self.data = compressed;
+        };
+
+        self.data = data;
         true
     }
 
@@ -708,12 +713,17 @@ impl CpioEntry {
         if self.mode & S_IFMT != S_IFREG {
             return false;
         }
-        let mut decompressed = Vec::new();
-        if !unxz(&self.data, &mut decompressed) {
-            eprintln!("xz decompression failed");
+
+        let mut decoder = get_decoder(FileFormat::XZ, Vec::new());
+        let Ok(data): std::io::Result<Vec<u8>> = (try {
+            decoder.write_all(&self.data)?;
+            decoder.finish()?
+        }) else {
+            eprintln!("xz compression failed");
             return false;
-        }
-        self.data = decompressed;
+        };
+
+        self.data = data;
         true
     }
 }

@@ -1,0 +1,22 @@
+[package]
+name = "lzma-sys"
+version = "0.1.20"
+authors = ["Alex Crichton <alex@alexcrichton.com>"]
+license = "MIT/Apache-2.0"
+repository = "https://github.com/alexcrichton/xz2-rs"
+homepage = "https://github.com/alexcrichton/xz2-rs"
+documentation = "https://docs.rs/lzma-sys"
+description = """
+Raw bindings to liblzma which contains an implementation of LZMA and xz stream
+encoding/decoding.
+
+High level Rust bindings are available in the `xz2` crate.
+"""
+categories = ["external-ffi-bindings"]
+edition = "2018"
+
+[dependencies]
+libc = "0.2.51"
+
+[features]
+static = []
