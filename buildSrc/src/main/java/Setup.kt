@@ -89,6 +89,7 @@ fun Project.setupCommon() {
             resources {
                 excludes += arrayOf(
                     "/META-INF/*",
+                    "/META-INF/androidx/**",
                     "/META-INF/versions/**",
                     "/org/bouncycastle/**",
                     "/org/apache/commons/**",
