@@ -223,6 +223,7 @@ def build_cpp_src(targets: set):
 def run_cargo(cmds):
     ensure_paths()
     env = os.environ.copy()
+    env["PATH"] = f'{env["PATH"]}{os.pathsep}{rust_sysroot}{os.sep}bin'
     env["RUSTUP_TOOLCHAIN"] = str(rust_sysroot)
     env["CARGO_BUILD_RUSTFLAGS"] = f"-Z threads={min(8, cpu_count)}"
     return execv(["cargo", *cmds], env)
