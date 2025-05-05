@@ -297,6 +297,7 @@ pub fn daemon_entry() {
     tmp_path.append_path(ROOTMNT);
     if let Ok(mount_list) = tmp_path.open(O_RDONLY | O_CLOEXEC) {
         BufReader::new(mount_list).foreach_lines(|line| {
+            line.truncate(line.trim_end().len());
             let item = Utf8CStr::from_string(line);
             item.unmount().log_ok();
             true
