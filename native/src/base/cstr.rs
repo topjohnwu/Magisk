@@ -1,7 +1,7 @@
 use cxx::{ExternType, type_id};
 use libc::c_char;
 use std::borrow::Borrow;
-use std::cmp::min;
+use std::cmp::{Ordering, min};
 use std::ffi::{CStr, FromBytesWithNulError, OsStr};
 use std::fmt::{Debug, Display, Formatter, Write};
 use std::ops::Deref;
@@ -465,6 +465,17 @@ macro_rules! impl_cstr_misc {
             #[inline(always)]
             fn eq(&self, other: &T) -> bool {
                 self.as_bytes_with_nul() == other.as_ref().as_bytes_with_nul()
+            }
+        }
+        impl<$($g)*> Eq for $t {}
+        impl<$($g)*> PartialOrd for $t {
+            fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+                Some(self.cmp(other))
+            }
+        }
+        impl<$($g)*> Ord for $t {
+            fn cmp(&self, other: &Self) -> Ordering {
+                self.as_str().cmp(other.as_str())
             }
         }
     )*}
