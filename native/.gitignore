@@ -5,3 +5,4 @@ libs
 /.cxx
 *-rs.cpp
 *-rs.hpp
+/compile_commands.json

@@ -160,6 +160,15 @@ def clean_elf():
     run_cargo(cmds)
 
 
+def collect_ndk_build():
+    for arch in build_abis.keys():
+        arch_dir = Path("native", "libs", arch)
+        out_dir = Path("native", "out", arch)
+        for source in arch_dir.iterdir():
+            target = out_dir / source.name
+            mv(source, target)
+
+
 def run_ndk_build(cmds: list):
     os.chdir("native")
     cmds.append("NDK_PROJECT_PATH=.")
@@ -174,13 +183,6 @@ def run_ndk_build(cmds: list):
     if proc.returncode != 0:
         error("Build binary failed!")
     os.chdir("..")
-
-    for arch in build_abis.keys():
-        arch_dir = Path("native", "libs", arch)
-        out_dir = Path("native", "out", arch)
-        for source in arch_dir.iterdir():
-            target = out_dir / source.name
-            mv(source, target)
 
 
 def build_cpp_src(targets: set):
@@ -203,6 +205,7 @@ def build_cpp_src(targets: set):
 
     if cmds:
         run_ndk_build(cmds)
+        collect_ndk_build()
 
     cmds.clear()
 
@@ -215,6 +218,7 @@ def build_cpp_src(targets: set):
     if cmds:
         cmds.append("B_CRT0=1")
         run_ndk_build(cmds)
+        collect_ndk_build()
 
     if clean:
         clean_elf()
@@ -472,6 +476,7 @@ def cleanup():
             rm(rs_gen)
 
     if "native" in targets:
+        header("* Cleaning native")
         rm_rf(Path("native", "out"))
         rm_rf(Path("tools", "elf-cleaner", "target"))
 
@@ -489,6 +494,33 @@ def build_all():
 ############
 # Utilities
 ############
+
+
+def gen_ide():
+    ensure_paths()
+    args.force_out = True
+
+    # Dump flags for both C++ and Rust code
+    dump_flag_header()
+
+    # Run build.rs to generate Rust/C++ FFI bindings
+    os.chdir(Path("native", "src"))
+    run_cargo(["check"])
+    os.chdir(Path("..", ".."))
+
+    # Generate compilation database
+    run_ndk_build(
+        [
+            "B_MAGISK=1",
+            "B_INIT=1",
+            "B_BOOT=1",
+            "B_POLICY=1",
+            "B_PRELOAD=1",
+            "B_PROP=1",
+            "B_CRT0=1",
+            "compile_commands.json",
+        ]
+    )
 
 
 def clippy_cli():
@@ -801,12 +833,15 @@ def parse_args():
         "wrapper_dir", help="path to setup rustup wrapper binaries"
     )
 
+    gen_parser = subparsers.add_parser("gen", help="generate files for IDE")
+
     # Set callbacks
     all_parser.set_defaults(func=build_all)
     native_parser.set_defaults(func=build_native)
     cargo_parser.set_defaults(func=cargo_cli)
     clippy_parser.set_defaults(func=clippy_cli)
     rustup_parser.set_defaults(func=setup_rustup)
+    gen_parser.set_defaults(func=gen_ide)
     app_parser.set_defaults(func=build_app)
     stub_parser.set_defaults(func=build_stub)
     test_parser.set_defaults(func=build_test)
