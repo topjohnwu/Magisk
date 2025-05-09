@@ -103,11 +103,11 @@ uint64_t MagiskInit::find_block(const char *partname) const noexcept {
     return 0;
 }
 
-void MagiskInit::mount_preinit_dir() const noexcept {
+void MagiskInit::mount_preinit_dir() noexcept {
     if (preinit_dev.empty()) return;
-    auto dev = find_block(preinit_dev.data());
+    auto dev = find_block(preinit_dev.c_str());
     if (dev == 0) {
-        LOGE("Cannot find preinit %s, abort!\n", preinit_dev.data());
+        LOGE("Cannot find preinit %s, abort!\n", preinit_dev.c_str());
         return;
     }
     xmknod(PREINITDEV, S_IFBLK | 0600, dev);
@@ -138,7 +138,7 @@ void MagiskInit::mount_preinit_dir() const noexcept {
         }
         xumount2(MIRRDIR, MNT_DETACH);
     } else {
-        PLOGE("Failed to mount preinit %s\n", preinit_dev.data());
+        PLOGE("Failed to mount preinit %s\n", preinit_dev.c_str());
         unlink(PREINITDEV);
     }
 }
@@ -210,7 +210,7 @@ mount_root:
     return is_two_stage;
 }
 
-void MagiskInit::setup_tmp(const char *path) const noexcept {
+void MagiskInit::setup_tmp(const char *path) noexcept {
     LOGD("Setup Magisk tmp at %s\n", path);
     chdir("/data");
 
