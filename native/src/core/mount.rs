@@ -68,7 +68,7 @@ pub fn setup_module_mount() {
         .join_path(MODULEMNT);
     let _: LoggedResult<()> = try {
         module_mnt.mkdir(0o755)?;
-        cstr!(MODULEROOT).bind_mount_to(&module_mnt)?;
+        cstr!(MODULEROOT).bind_mount_to(&module_mnt, false)?;
         module_mnt.remount_mount_point_flags(libc::MS_RDONLY)?;
     };
 }
