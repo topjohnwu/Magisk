@@ -71,11 +71,14 @@ class InstallViewModel(svc: NetworkService, markwon: Markwon) : BaseViewModel() 
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val file = File(AppContext.cacheDir, "${BuildConfig.APP_VERSION_CODE}.md")
+                val note = Info.remote.magisk.note
                 val text = when {
                     file.exists() -> file.readText()
-                    Const.Url.CHANGELOG_URL.isEmpty() -> ""
+                    Const.APP_IS_CANARY && note.isEmpty() -> ""
+                    Const.APP_IS_CANARY && !note.startsWith("http", true) -> note
                     else -> {
-                        val str = svc.fetchString(Const.Url.CHANGELOG_URL)
+                        val url = if (Const.APP_IS_CANARY) note else Const.Url.CHANGELOG_URL
+                        val str = svc.fetchString(url)
                         file.writeText(str)
                         str
                     }

@@ -27,11 +27,16 @@ data class ModuleJson(
 )
 
 @JsonClass(generateAdapter = true)
-data class CommitInfo(
-    val sha: String
+data class ReleaseAssets(
+    val name: String,
+    val browser_download_url: String,
 )
 
 @JsonClass(generateAdapter = true)
-data class BranchInfo(
-    val commit: CommitInfo
+data class Release(
+    val tag_name: String,
+    val name: String,
+    val prerelease: Boolean,
+    val assets: List<ReleaseAssets>,
+    val body: String,
 )
