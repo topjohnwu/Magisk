@@ -1,12 +1,9 @@
-use base::{
-    error,
-    libc::{
-        cfmakeraw, close, pipe, poll, pollfd, raise, read, sigaddset,
-        sigemptyset, signalfd, signalfd_siginfo, sigprocmask, sigset_t, splice, tcsetattr, winsize, POLLIN, SFD_CLOEXEC,
-        SIGWINCH, SIG_BLOCK, TCSADRAIN, TCSAFLUSH, TIOCGWINSZ, TIOCSWINSZ,
-    },
-    libc::{tcgetattr, termios, STDIN_FILENO, STDOUT_FILENO},
-    warn,
+use base::{error, libc, warn};
+use libc::{
+    POLLIN, SFD_CLOEXEC, SIG_BLOCK, SIGWINCH, STDIN_FILENO, STDOUT_FILENO, TCSADRAIN, TCSAFLUSH,
+    TIOCGWINSZ, TIOCSWINSZ, cfmakeraw, close, pipe, poll, pollfd, raise, read, sigaddset,
+    sigemptyset, signalfd, signalfd_siginfo, sigprocmask, sigset_t, splice, tcgetattr, tcsetattr,
+    termios, winsize,
 };
 use std::{ffi::c_int, mem::MaybeUninit, ptr::null_mut};
 

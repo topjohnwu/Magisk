@@ -9,9 +9,9 @@
 
 use crate::ffi::SuRequest;
 use crate::socket::Encodable;
-use base::{libc, Utf8CStr};
-use cxx::{type_id, ExternType};
-use daemon::{daemon_entry, MagiskD};
+use base::{Utf8CStr, libc};
+use cxx::{ExternType, type_id};
+use daemon::{MagiskD, daemon_entry};
 use derive::Decodable;
 use logging::{android_logging, setup_logfile, zygisk_close_logd, zygisk_get_logd, zygisk_logging};
 use mount::{find_preinit_device, revert_unmount};
