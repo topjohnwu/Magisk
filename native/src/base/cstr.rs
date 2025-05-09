@@ -68,7 +68,7 @@ pub mod buf {
 
 // Trait definitions
 
-pub trait Utf8CStrBuf: Write + AsRef<Utf8CStr> + Deref<Target = Utf8CStr> {
+pub trait Utf8CStrBuf: Display + Write + AsRef<Utf8CStr> + Deref<Target = Utf8CStr> {
     // The length of the string without the terminating null character.
     // assert_true(len <= capacity - 1)
     fn len(&self) -> usize;
