@@ -8,15 +8,18 @@ import com.topjohnwu.magisk.core.Config.Value.DEBUG_CHANNEL
 import com.topjohnwu.magisk.core.Config.Value.DEFAULT_CHANNEL
 import com.topjohnwu.magisk.core.Config.Value.STABLE_CHANNEL
 import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.core.data.GithubPageServices
+import com.topjohnwu.magisk.core.data.GithubApiServices
 import com.topjohnwu.magisk.core.data.RawServices
+import com.topjohnwu.magisk.core.model.MagiskJson
+import com.topjohnwu.magisk.core.model.Release
+import com.topjohnwu.magisk.core.model.UpdateInfo
 import retrofit2.HttpException
 import timber.log.Timber
 import java.io.IOException
 
 class NetworkService(
-    private val pages: GithubPageServices,
-    private val raw: RawServices
+    private val raw: RawServices,
+    private val api: GithubApiServices,
 ) {
     suspend fun fetchUpdate() = safe {
         var info = when (Config.updateChannel) {
@@ -36,11 +39,39 @@ class NetworkService(
     }
 
     // UpdateInfo
-    private suspend fun fetchStableUpdate() = pages.fetchUpdateJSON("stable.json")
-    private suspend fun fetchBetaUpdate() = pages.fetchUpdateJSON("beta.json")
-    private suspend fun fetchCanaryUpdate() = pages.fetchUpdateJSON("canary.json")
-    private suspend fun fetchDebugUpdate() = pages.fetchUpdateJSON("debug.json")
-    private suspend fun fetchCustomUpdate(url: String) = pages.fetchUpdateJSON(url)
+    private suspend fun fetchStableUpdate(rel: Release? = null): UpdateInfo {
+        val release = rel ?: api.fetchLatestRelease()
+        val name = release.tag_name.drop(1)
+        val info = MagiskJson(
+            name, (name.toFloat() * 1000).toInt(),
+            release.assets[0].browser_download_url, release.body
+        )
+        return UpdateInfo(info)
+    }
+
+    private suspend fun fetchBetaUpdate(): UpdateInfo {
+        val release = api.fetchRelease().find { it.tag_name[0] == 'v' && it.prerelease }
+        return fetchStableUpdate(release)
+    }
+
+    private suspend fun fetchCanaryUpdate(): UpdateInfo {
+        val release = api.fetchRelease().find { it.tag_name.startsWith("canary-") }
+        val info = MagiskJson(
+            release!!.name.substring(8, 16),
+            release.tag_name.drop(7).toInt(),
+            release.assets.find { it.name == "app-release.apk" }!!.browser_download_url,
+            release.body
+        )
+        return UpdateInfo(info)
+    }
+
+    private suspend fun fetchDebugUpdate(): UpdateInfo {
+        val release = fetchCanaryUpdate()
+        val link = release.magisk.link.replace("app-release.apk", "app-debug.apk")
+        return UpdateInfo(release.magisk.copy(link = link))
+    }
+
+    private suspend fun fetchCustomUpdate(url: String) = raw.fetchUpdateJSON(url)
 
     private inline fun <T> safe(factory: () -> T): T? {
         return try {
