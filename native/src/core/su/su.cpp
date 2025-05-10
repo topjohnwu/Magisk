@@ -39,7 +39,7 @@ int quit_signals[] = { SIGALRM, SIGABRT, SIGHUP, SIGPIPE, SIGQUIT, SIGTERM, SIGI
     "Usage: su [options] [-] [user [argument...]]\n\n"
     "Options:\n"
     "  -c, --command COMMAND         Pass COMMAND to the invoked shell\n"
-    "  -i, --interactive             Force pseudo-terminal allocation when using -c\n"
+    "  -i, --interactive             Request allocation of a pseudo terminal\n"
     "  -g, --group GROUP             Specify the primary group\n"
     "  -G, --supp-group GROUP        Specify a supplementary group\n"
     "                                The first specified supplementary group is also used\n"
@@ -224,11 +224,10 @@ int su_client_main(int argc, char *argv[]) {
     }
 
     // Determine which one of our streams are attached to a TTY
-    interactive |= req.command.empty();
     int atty = 0;
-    if (isatty(STDIN_FILENO) && interactive)  atty |= ATTY_IN;
-    if (isatty(STDOUT_FILENO) && interactive) atty |= ATTY_OUT;
-    if (isatty(STDERR_FILENO) && interactive) atty |= ATTY_ERR;
+    if (isatty(STDIN_FILENO))  atty |= ATTY_IN;
+    if (isatty(STDOUT_FILENO)) atty |= ATTY_OUT;
+    if (isatty(STDERR_FILENO)) atty |= ATTY_ERR;
 
     // Send stdin
     send_fd(fd, (atty & ATTY_IN) ? -1 : STDIN_FILENO);
@@ -237,7 +236,7 @@ int su_client_main(int argc, char *argv[]) {
     // Send stderr
     send_fd(fd, (atty & ATTY_ERR) ? -1 : STDERR_FILENO);
 
-    if (atty) {
+    if (atty == (ATTY_IN | ATTY_OUT | ATTY_ERR) || (atty && interactive)) {
         // We need a PTY. Get one.
         write_int(fd, 1);
         ptmx = recv_fd(fd);
