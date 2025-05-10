@@ -92,6 +92,11 @@ class Environment : BaseTest {
         assertTrue(error, etc.mkdirs())
         assertTrue(error, etc.getChildFile("newfile").createNewFile())
 
+        // Create /system/app/EasterEgg/.replace
+        val egg = path.getChildFile("system").getChildFile("app").getChildFile("EasterEgg")
+        assertTrue(error, egg.mkdirs())
+        assertTrue(error, egg.getChildFile(".replace").createNewFile())
+
         // Delete /system/bin/screenrecord
         val bin = path.getChildFile("system").getChildFile("bin")
         assertTrue(error, bin.mkdirs())

@@ -91,6 +91,11 @@ class AdditionalTest : BaseTest {
             "/system/bin/screenrecord should not exist",
             RootUtils.fs.getFile("/system/bin/screenrecord").exists()
         )
+        val egg = RootUtils.fs.getFile("/system/app/EasterEgg").list() ?: arrayOf()
+        assertTrue(
+            "/system/app/EasterEgg should be empty",
+            egg.isEmpty()
+        )
         module!!
         assertTrue("test_01 should be zygisk unloaded", module.zygiskUnloaded)
     }
