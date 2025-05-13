@@ -12,18 +12,14 @@ use std::time::{Duration, Instant};
 #[allow(unused_imports)]
 use std::os::fd::AsRawFd;
 
-const DEFAULT_SHELL: &str = "/system/bin/sh";
-
 impl Default for SuRequest {
     fn default() -> Self {
         SuRequest {
             target_uid: AID_ROOT,
             target_pid: -1,
-            login: false,
             keep_env: false,
             drop_cap: false,
-            shell: DEFAULT_SHELL.to_string(),
-            command: "".to_string(),
+            command: vec![],
             context: "".to_string(),
             gids: vec![],
         }
