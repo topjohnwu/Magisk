@@ -5,7 +5,7 @@ use crate::ffi::{
     exec_module_scripts, get_magisk_tmp, initialize_denylist, setup_magisk_env,
 };
 use crate::logging::{magisk_logging, setup_logfile, start_log_daemon};
-use crate::mount::{clean_mounts, setup_mounts};
+use crate::mount::{clean_mounts, setup_module_mount, setup_preinit_dir};
 use crate::package::ManagerInfo;
 use crate::selinux::restore_tmpcon;
 use crate::su::SuInfo;
@@ -144,7 +144,7 @@ impl MagiskD {
             Ordering::Release,
         );
         initialize_denylist();
-        setup_mounts();
+        setup_module_mount();
         let modules = self.handle_modules();
         self.module_list.set(modules).ok();
         clean_mounts();
@@ -175,6 +175,7 @@ impl MagiskD {
             secure_dir.mkdir(0o700).log_ok();
         }
 
+        setup_preinit_dir();
         self.ensure_manager();
         self.zygisk_reset(true)
     }

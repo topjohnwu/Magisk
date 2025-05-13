@@ -15,16 +15,13 @@ use crate::consts::{MODULEMNT, MODULEROOT, PREINITDEV, PREINITMIRR, WORKERDIR};
 use crate::ffi::{get_magisk_tmp, resolve_preinit_dir, switch_mnt_ns};
 use crate::get_prop;
 
-pub fn setup_mounts() {
-    info!("* Setup internal mounts");
-
+pub fn setup_preinit_dir() {
     let magisk_tmp = get_magisk_tmp();
 
     // Mount preinit directory
     let dev_path = cstr::buf::new::<64>()
         .join_path(magisk_tmp)
         .join_path(PREINITDEV);
-    let mut linked = false;
     if let Ok(attr) = dev_path.get_attr() {
         if attr.st.st_mode & libc::S_IFMT as c_uint == libc::S_IFBLK.as_() {
             // DO NOT mount the block device directly, as we do not know the flags and configs
@@ -53,23 +50,21 @@ pub fn setup_mounts() {
                         mnt_path.create_symlink_to(preinit_dir)?;
                     };
                     if r.is_ok() {
-                        linked = true;
-                        break;
+                        info!("* Found preinit dir: {}", preinit_dir);
+                        return;
                     }
                 }
             }
         }
     }
-    if !linked {
-        warn!("mount: preinit dir not found");
-        dev_path.remove().ok();
-    } else {
-        debug!("mount: preinit dir found");
-    }
 
+    warn!("mount: preinit dir not found");
+}
+
+pub fn setup_module_mount() {
     // Bind remount module root to clear nosuid
     let module_mnt = cstr::buf::default()
-        .join_path(magisk_tmp)
+        .join_path(get_magisk_tmp())
         .join_path(MODULEMNT);
     let _: LoggedResult<()> = try {
         module_mnt.mkdir(0o755)?;

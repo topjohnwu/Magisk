@@ -7,6 +7,7 @@ import androidx.test.uiautomator.By
 import androidx.test.uiautomator.Until
 import com.topjohnwu.magisk.core.model.module.LocalModule
 import com.topjohnwu.magisk.core.utils.RootUtils
+import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -95,6 +96,10 @@ class AdditionalTest : BaseTest {
         assertTrue(
             "/system/app/EasterEgg should be empty",
             egg.isEmpty()
+        )
+        assertTrue(
+            "Module sepolicy.rule is not applied",
+            Shell.cmd("magiskpolicy --print-rules | grep -q magisk_test").exec().isSuccess
         )
         module!!
         assertTrue("test_01 should be zygisk unloaded", module.zygiskUnloaded)

@@ -123,8 +123,7 @@ void MagiskInit::mount_preinit_dir() noexcept {
 
     // Since we are mounting the block device directly, make sure to ONLY mount the partitions
     // as read-only, or else the kernel might crash due to crappy drivers.
-    // After the device boots up, magiskd will properly bind mount the correct partition
-    // on to PREINITMIRR as writable. For more details, check bootstages.cpp
+    // After the device boots up, magiskd will properly symlink the correct path at PREINITMIRR as writable.
     if (mounted || mount(PREINITDEV, MIRRDIR, "ext4", MS_RDONLY, nullptr) == 0 ||
         mount(PREINITDEV, MIRRDIR, "f2fs", MS_RDONLY, nullptr) == 0) {
         string preinit_dir = resolve_preinit_dir(MIRRDIR);
@@ -138,8 +137,9 @@ void MagiskInit::mount_preinit_dir() noexcept {
         }
         xumount2(MIRRDIR, MNT_DETACH);
     } else {
-        PLOGE("Failed to mount preinit %s\n", preinit_dev.c_str());
-        unlink(PREINITDEV);
+        PLOGE("Mount preinit %s", preinit_dev.c_str());
+        // Do NOT delete the block device. Even though we cannot mount it here,
+        // it might get formatted later in the boot process.
     }
 }
 
