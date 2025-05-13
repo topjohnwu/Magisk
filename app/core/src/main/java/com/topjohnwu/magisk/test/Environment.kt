@@ -28,6 +28,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import timber.log.Timber
 import java.io.File
+import java.io.PrintStream
 
 @Keep
 @RunWith(AndroidJUnit4::class)
@@ -106,7 +107,15 @@ class Environment : BaseTest {
         val module = LocalModule(path)
         assertTrue(error, module.zygiskFolder.mkdir())
 
-        assertTrue(error, Shell.cmd("set_default_perm $path").exec().isSuccess)
+        // Add sepolicy patch
+        PrintStream(path.getChildFile("sepolicy.rule").newOutputStream()).use {
+            it.println("type magisk_test domain")
+        }
+
+        assertTrue(error, Shell.cmd(
+            "set_default_perm $path",
+            "copy_preinit_files"
+        ).exec().isSuccess)
     }
 
     private fun setupModule02(root: ExtendedFile) {
