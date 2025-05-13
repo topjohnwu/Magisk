@@ -2,9 +2,9 @@ out
 *.zip
 *.jks
 *.apk
+*.log
 /config.prop
 /notes.md
-/update.sh
 /app/dict.txt
 
 # Built binaries

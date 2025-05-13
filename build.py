@@ -67,6 +67,7 @@ support_abis = {
     "x86_64": "x86_64-linux-android",
     "riscv64": "riscv64-linux-android",
 }
+default_archs = {"armeabi-v7a", "x86", "arm64-v8a", "x86_64"}
 default_targets = {"magisk", "magiskinit", "magiskboot", "magiskpolicy"}
 support_targets = default_targets | {"resetprop"}
 rust_targets = {"magisk", "magiskinit", "magiskboot", "magiskpolicy"}
@@ -498,7 +499,7 @@ def build_all():
 
 def gen_ide():
     ensure_paths()
-    args.force_out = True
+    set_archs({args.abi})
 
     # Dump flags for both C++ and Rust code
     dump_flag_header()
@@ -509,6 +510,7 @@ def gen_ide():
     os.chdir(Path("..", ".."))
 
     # Generate compilation database
+    rm_rf(Path("native", "compile_commands.json"))
     run_ndk_build(
         [
             "B_MAGISK=1",
@@ -525,6 +527,8 @@ def gen_ide():
 
 def clippy_cli():
     args.force_out = True
+    set_archs(default_archs)
+
     os.chdir(Path("native", "src"))
     cmds = ["clippy", "--no-deps", "--target"]
     for triple in build_abis.values():
@@ -726,6 +730,12 @@ def parse_props(file):
     return props
 
 
+def set_archs(archs: set):
+    triples = map(support_abis.get, archs)
+    global build_abis
+    build_abis = dict(zip(archs, triples))
+
+
 def load_config():
     commit_hash = cmd_out(["git", "rev-parse", "--short=8", "HEAD"])
 
@@ -757,12 +767,9 @@ def load_config():
         abiList = re.split("\\s*,\\s*", config["abiList"])
         archs = set(abiList) & support_abis.keys()
     else:
-        archs = {"armeabi-v7a", "x86", "arm64-v8a", "x86_64"}
+        archs = default_archs
 
-    triples = map(support_abis.get, archs)
-
-    global build_abis
-    build_abis = dict(zip(archs, triples))
+    set_archs(archs)
 
 
 def parse_args():
@@ -834,6 +841,7 @@ def parse_args():
     )
 
     gen_parser = subparsers.add_parser("gen", help="generate files for IDE")
+    gen_parser.add_argument("--abi", default="arm64-v8a", help="target ABI to generate")
 
     # Set callbacks
     all_parser.set_defaults(func=build_all)
