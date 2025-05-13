@@ -36,7 +36,7 @@ int quit_signals[] = { SIGALRM, SIGABRT, SIGHUP, SIGPIPE, SIGQUIT, SIGTERM, SIGI
 
     fprintf(stream,
     "MagiskSU\n\n"
-    "Usage: su [options] [-] [user [argument...]]\n\n"
+    "Usage: su [options] [--] [user [argument...]]\n\n"
     "Options:\n"
     "  -s, --shell SHELL             Use SHELL instead of the default " DEFAULT_SHELL "\n"
     "  -i, --interactive             Force pseudo-terminal allocation\n"
@@ -46,12 +46,15 @@ int quit_signals[] = { SIGALRM, SIGABRT, SIGHUP, SIGPIPE, SIGQUIT, SIGTERM, SIGI
     "                                as a primary group if the option -g is not specified\n"
     "  -Z, --context CONTEXT         Change SELinux context\n"
     "  -t, --target PID              PID to take mount namespace from\n"
-    "                                pid 0 means magisk global mount namespace"
+    "                                pid 0 means magisk global mount namespacen\n"
     "  -m, -p,\n"
     "  --preserve-environment        Preserve the entire environment\n"
     "  -v, --version                 Display version number and exit\n"
     "  -V                            Display version code and exit\n"
-    "  -h, --help                    Display this help message and exit\n\n");
+    "  -h, --help                    Display this help message and exit\n\n"
+    "--: Force stop options parsing, and also stop when an unknown option is found\n"
+    "User: The user to switch to (default root), it can be name or uid\n"
+    "Argument: Pass it to the shell as is\n\n");
     exit(status);
 }
 
