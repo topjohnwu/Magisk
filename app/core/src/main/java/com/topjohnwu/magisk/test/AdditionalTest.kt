@@ -7,6 +7,11 @@ import androidx.test.uiautomator.By
 import androidx.test.uiautomator.Until
 import com.topjohnwu.magisk.core.model.module.LocalModule
 import com.topjohnwu.magisk.core.utils.RootUtils
+import com.topjohnwu.magisk.test.Environment.Companion.EMPTY_ZYGISK
+import com.topjohnwu.magisk.test.Environment.Companion.INVALID_ZYGISK
+import com.topjohnwu.magisk.test.Environment.Companion.MOUNT_TEST
+import com.topjohnwu.magisk.test.Environment.Companion.REMOVE_TEST
+import com.topjohnwu.magisk.test.Environment.Companion.SEPOLICY_RULE
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -50,8 +55,9 @@ class AdditionalTest : BaseTest {
 
     @Test
     fun testModuleCount() {
-        var expected = 0
-        if (Environment.testModules()) expected +=2
+        var expected = 2
+        if (Environment.mount()) expected++
+        if (Environment.preinit()) expected++
         if (Environment.lsposed()) expected++
         if (Environment.shamiko()) expected++
         assertEquals("Module count incorrect", expected, modules.size)
@@ -79,11 +85,10 @@ class AdditionalTest : BaseTest {
     }
 
     @Test
-    fun testModule01() {
-        assumeTrue(Environment.testModules())
+    fun testModuleMount() {
+        assumeTrue(Environment.mount())
 
-        val module = modules.find { it.id == "test_01" }
-        assertNotNull("test_01 is not installed", module)
+        assertNotNull("$MOUNT_TEST is not installed", modules.find { it.id == MOUNT_TEST })
         assertTrue(
             "/system/etc/newfile should exist",
             RootUtils.fs.getFile("/system/etc/newfile").exists()
@@ -97,28 +102,37 @@ class AdditionalTest : BaseTest {
             "/system/app/EasterEgg should be empty",
             egg.isEmpty()
         )
+    }
+
+    @Test
+    fun testSepolicyRule() {
+        assumeTrue(Environment.preinit())
+
+        assertNotNull("$SEPOLICY_RULE is not installed", modules.find { it.id == SEPOLICY_RULE })
         assertTrue(
             "Module sepolicy.rule is not applied",
             Shell.cmd("magiskpolicy --print-rules | grep -q magisk_test").exec().isSuccess
         )
-        module!!
-        assertTrue("test_01 should be zygisk unloaded", module.zygiskUnloaded)
     }
 
     @Test
-    fun testModule02() {
-        assumeTrue(Environment.testModules())
-
-        val module = modules.find { it.id == "test_02" }
-        assertNotNull("test_02 is not installed", module)
+    fun testEmptyZygiskModule() {
+        val module = modules.find { it.id == EMPTY_ZYGISK }
+        assertNotNull("$EMPTY_ZYGISK is not installed", module)
         module!!
-        assertTrue("test_02 should be zygisk unloaded", module.zygiskUnloaded)
+        assertTrue("$EMPTY_ZYGISK should be zygisk unloaded", module.zygiskUnloaded)
     }
 
     @Test
-    fun testModule03() {
-        assumeTrue(Environment.testModules())
+    fun testInvalidZygiskModule() {
+        val module = modules.find { it.id == INVALID_ZYGISK }
+        assertNotNull("$INVALID_ZYGISK is not installed", module)
+        module!!
+        assertTrue("$INVALID_ZYGISK should be zygisk unloaded", module.zygiskUnloaded)
+    }
 
-        assertNull("test_03 should be removed", modules.find { it.id == "test_03" })
+    @Test
+    fun testRemoveModule() {
+        assertNull("$REMOVE_TEST should be removed", modules.find { it.id == REMOVE_TEST })
     }
 }
