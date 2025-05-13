@@ -130,11 +130,9 @@ pub mod ffi {
     struct SuRequest {
         target_uid: i32,
         target_pid: i32,
-        login: bool,
         keep_env: bool,
         drop_cap: bool,
-        shell: String,
-        command: String,
+        command: Vec<String>,
         context: String,
         gids: Vec<u32>,
     }

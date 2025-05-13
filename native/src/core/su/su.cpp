@@ -40,26 +40,26 @@ int quit_signals[] = { SIGALRM, SIGABRT, SIGHUP, SIGPIPE, SIGQUIT, SIGTERM, SIGI
 
     fprintf(stream,
     "MagiskSU\n\n"
-    "Usage: su [options] [-] [user [argument...]]\n\n"
+    "Usage: su [options] [--] [user [argument...]]\n\n"
     "Options:\n"
-    "  -c, --command COMMAND         Pass COMMAND to the invoked shell\n"
-    "  -i, --interactive             Force pseudo-terminal allocation when using -c\n"
+    "  -s, --shell SHELL             Use SHELL instead of the default " DEFAULT_SHELL "\n"
+    "  -i, --interactive             Force pseudo-terminal allocation\n"
     "  -g, --group GROUP             Specify the primary group\n"
     "  -G, --supp-group GROUP        Specify a supplementary group\n"
     "                                The first specified supplementary group is also used\n"
     "                                as a primary group if the option -g is not specified\n"
     "  -Z, --context CONTEXT         Change SELinux context\n"
     "  -t, --target PID              PID to take mount namespace from\n"
+    "                                pid 0 means magisk global mount namespace\n"
     "  -d, --drop-cap                Drop all Linux capabilities\n"
-    "  -h, --help                    Display this help message and exit\n"
-    "  -, -l, --login                Pretend the shell to be a login shell\n"
     "  -m, -p,\n"
     "  --preserve-environment        Preserve the entire environment\n"
-    "  -s, --shell SHELL             Use SHELL instead of the default " DEFAULT_SHELL "\n"
     "  -v, --version                 Display version number and exit\n"
     "  -V                            Display version code and exit\n"
-    "  -mm, -M,\n"
-    "  --mount-master                Force run in the global mount namespace\n\n");
+    "  -h, --help                    Display this help message and exit\n\n"
+    "--: Force stop options parsing, and also stop when an unknown option is found\n"
+    "User: The user to switch to (default root), it can be name or uid\n"
+    "Argument: Pass it to the shell as is\n\n");
     exit(status);
 }
 
@@ -87,10 +87,9 @@ static void setup_sighandlers(void (*handler)(int)) {
 }
 
 int su_client_main(int argc, char *argv[]) {
+    opterr = 0;
     option long_opts[] = {
-            { "command",                required_argument,  nullptr, 'c' },
             { "help",                   no_argument,        nullptr, 'h' },
-            { "login",                  no_argument,        nullptr, 'l' },
             { "preserve-environment",   no_argument,        nullptr, 'p' },
             { "shell",                  required_argument,  nullptr, 's' },
             { "version",                no_argument,        nullptr, 'v' },
@@ -116,28 +115,15 @@ int su_client_main(int argc, char *argv[]) {
     }
 
     bool interactive = false;
+    string shell = DEFAULT_SHELL;
 
     int c;
-    while ((c = getopt_long(argc, argv, "c:hlimpds:VvuZ:Mt:g:G:", long_opts, nullptr)) != -1) {
+    while ((c = getopt_long(argc, argv, "+:himpds:VvuZ:Mt:g:G:", long_opts, nullptr)) != -1) {
         switch (c) {
-            case 'c': {
-                string command;
-                for (int i = optind - 1; i < argc; ++i) {
-                    if (!command.empty())
-                        command += ' ';
-                    command += argv[i];
-                }
-                req.command = command;
-                optind = argc;
-                break;
-            }
             case 'h':
                 usage(EXIT_SUCCESS);
             case 'i':
                 interactive = true;
-                break;
-            case 'l':
-                req.login = true;
                 break;
             case 'm':
             case 'p':
@@ -147,7 +133,7 @@ int su_client_main(int argc, char *argv[]) {
                 req.drop_cap = true;
                 break;
             case 's':
-                req.shell = optarg;
+                shell = optarg;
                 break;
             case 'V':
                 printf("%d\n", MAGISK_VER_CODE);
@@ -176,34 +162,46 @@ int su_client_main(int argc, char *argv[]) {
                 break;
             case 'g':
             case 'G': {
-                vector<gid_t> gids;
                 if (int gid = parse_int(optarg); gid >= 0) {
-                    gids.insert(c == 'g' ? gids.begin() : gids.end(), gid);
+                    if (c == 'g' && !req.gids.empty()) {
+                        req.gids.push_back(req.gids[0]);
+                        req.gids[0] = gid;
+                    } else {
+                        req.gids.push_back(gid);
+                    }
                 } else {
                     fprintf(stderr, "Invalid GID: %s\n", optarg);
                     usage(EXIT_FAILURE);
                 }
-                ranges::copy(gids, std::back_inserter(req.gids));
                 break;
             }
-            default:
-                /* Bionic getopt_long doesn't terminate its error output by newline */
-                fprintf(stderr, "\n");
+            case ':':
+                fprintf(stderr, "option '%s' requires an argument\n", argv[optind - 1]);
                 usage(2);
+            case '?':
+                optind--;
+                goto end;
         }
     }
 
-    if (optind < argc && strcmp(argv[optind], "-") == 0) {
-        req.login = true;
-        optind++;
-    }
+end:
     /* username or uid */
     if (optind < argc) {
-        if (const passwd *pw = getpwnam(argv[optind]))
+        if (const passwd *pw = getpwnam(argv[optind])) {
             req.target_uid = pw->pw_uid;
-        else
-            req.target_uid = parse_int(argv[optind]);
-        optind++;
+            optind++;
+        } else if (int uid = parse_int(argv[optind]); uid >= 0) {
+            req.target_uid = uid;
+            optind++;
+        }
+    }
+
+    req.command.emplace_back(shell.c_str());
+    if (optind < argc) {
+        for (int i = optind; i < argc; ++i) {
+            req.command.push_back(argv[i]);
+        }
+        optind = argc;
     }
 
     // Connect to client
@@ -220,7 +218,7 @@ int su_client_main(int argc, char *argv[]) {
     }
 
     // Determine which one of our streams are attached to a TTY
-    interactive |= req.command.empty();
+    interactive |= req.command.size() == 1;
     int atty = 0;
     if (isatty(STDIN_FILENO) && interactive)  atty |= ATTY_IN;
     if (isatty(STDOUT_FILENO) && interactive) atty |= ATTY_OUT;
@@ -407,14 +405,11 @@ void exec_root_shell(int client, int pid, SuRequest &req, MntNsMode mode) {
             break;
     }
 
-    const char *argv[4] = { nullptr };
-
-    argv[0] = req.login ? "-" : req.shell.c_str();
-
-    if (!req.command.empty()) {
-        argv[1] = "-c";
-        argv[2] = req.command.c_str();
+    vector<const char *> argv;
+    for (auto &str: req.command) {
+        argv.push_back(str.c_str());
     }
+    argv.push_back(nullptr);
 
     // Setup environment
     umask(022);
@@ -439,7 +434,7 @@ void exec_root_shell(int client, int pid, SuRequest &req, MntNsMode mode) {
             setenv("HOME", pw->pw_dir, 1);
             setenv("USER", pw->pw_name, 1);
             setenv("LOGNAME", pw->pw_name, 1);
-            setenv("SHELL", req.shell.c_str(), 1);
+            setenv("SHELL", argv[0], 1);
         }
     }
 
@@ -458,7 +453,7 @@ void exec_root_shell(int client, int pid, SuRequest &req, MntNsMode mode) {
     sigemptyset(&block_set);
     sigprocmask(SIG_SETMASK, &block_set, nullptr);
 
-    execvp(req.shell.c_str(), (char **) argv);
-    fprintf(stderr, "Cannot execute %s: %s\n", req.shell.c_str(), strerror(errno));
+    execvp(argv[0], const_cast<char* const*>(argv.data()));
+    fprintf(stderr, "Cannot execute %s: %s\n", argv[0], strerror(errno));
     PLOGE("exec");
 }
