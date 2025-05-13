@@ -41,5 +41,5 @@ android {
 setupStubApk()
 
 dependencies {
-    implementation(project(":app:shared"))
+    implementation(project(":shared"))
 }

@@ -29,7 +29,7 @@ android {
 }
 
 dependencies {
-    api(project(":app:shared"))
+    api(project(":shared"))
 
     api(libs.timber)
     api(libs.markwon.core)

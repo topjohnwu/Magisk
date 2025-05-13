@@ -6,10 +6,7 @@ on:
     paths:
       - "app/**"
       - "native/**"
-      - "buildSrc/**"
       - "build.py"
-      - "gradle.properties"
-      - "gradle/libs.versions.toml"
       - ".github/workflows/build.yml"
   pull_request:
     branches: [master]
@@ -39,7 +36,7 @@ jobs:
         run: ./build.py -v all
 
       - name: Stop gradle daemon
-        run: ./gradlew --stop
+        run: ./app/gradlew --stop
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
@@ -75,7 +72,7 @@ jobs:
         run: python build.py -v -c .github/ci.prop all
 
       - name: Stop gradle daemon
-        run: ./gradlew --stop
+        run: ./app/gradlew --stop
 
   avd-test:
     name: Test API ${{ matrix.version }} (x86_64)
