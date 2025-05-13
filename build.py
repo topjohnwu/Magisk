@@ -71,6 +71,7 @@ default_archs = {"armeabi-v7a", "x86", "arm64-v8a", "x86_64"}
 default_targets = {"magisk", "magiskinit", "magiskboot", "magiskpolicy"}
 support_targets = default_targets | {"resetprop"}
 rust_targets = {"magisk", "magiskinit", "magiskboot", "magiskpolicy"}
+ondk_version = "r29.1"
 
 # Global vars
 config = {}
@@ -318,7 +319,7 @@ def build_native():
     # Verify NDK install
     try:
         with open(Path(ndk_path, "ONDK_VERSION"), "r") as ondk_ver:
-            assert ondk_ver.read().strip(" \t\r\n") == config["ondkVersion"]
+            assert ondk_ver.read().strip(" \t\r\n") == ondk_version
     except:
         error('Unmatched NDK. Please install/upgrade NDK with "build.py ndk"')
 
@@ -383,16 +384,19 @@ def find_jdk():
 def build_apk(module: str):
     ensure_paths()
     env = find_jdk()
+    props = args.config.resolve()
 
+    os.chdir("app")
     build_type = "Release" if args.release else "Debug"
     proc = execv(
         [
             gradlew,
             f"{module}:assemble{build_type}",
-            f"-PconfigPath={args.config.resolve()}",
+            f"-PconfigPath={props}",
         ],
         env=env,
     )
+    os.chdir("..")
     if proc.returncode != 0:
         error(f"Build {module} failed!")
 
@@ -401,7 +405,7 @@ def build_apk(module: str):
     paths = module.split(":")
 
     apk = f"{paths[-1]}-{build_type}.apk"
-    source = Path(*paths, "build", "outputs", "apk", build_type, apk)
+    source = Path("app", *paths, "build", "outputs", "apk", build_type, apk)
     target = config["outdir"] / apk
     mv(source, target)
     return target
@@ -409,7 +413,7 @@ def build_apk(module: str):
 
 def build_app():
     header("* Building the Magisk app")
-    apk = build_apk(":app:apk")
+    apk = build_apk(":apk")
 
     build_type = "release" if args.release else "debug"
 
@@ -428,7 +432,7 @@ def build_app():
 
 def build_stub():
     header("* Building the stub app")
-    apk = build_apk(":app:stub")
+    apk = build_apk(":stub")
     header(f"Output: {apk}")
 
 
@@ -439,7 +443,7 @@ def build_test():
     args.release = True
     try:
         header("* Building the test app")
-        source = build_apk(":app:test")
+        source = build_apk(":test")
         target = source.parent / "test.apk"
         mv(source, target)
         header(f"Output: {target}")
@@ -548,10 +552,9 @@ def cargo_cli():
 
 def setup_ndk():
     ensure_paths()
-    ndk_ver = config["ondkVersion"]
-    url = f"https://github.com/topjohnwu/ondk/releases/download/{ndk_ver}/ondk-{ndk_ver}-{os_name}.tar.xz"
+    url = f"https://github.com/topjohnwu/ondk/releases/download/{ondk_version}/ondk-{ondk_version}-{os_name}.tar.xz"
     ndk_archive = url.split("/")[-1]
-    ondk_path = Path(ndk_root, f"ondk-{ndk_ver}")
+    ondk_path = Path(ndk_root, f"ondk-{ondk_version}")
 
     header(f"* Downloading and extracting {ndk_archive}")
     rm_rf(ondk_path)
@@ -699,7 +702,7 @@ def ensure_paths():
         ndk_path / "toolchains" / "llvm" / "prebuilt" / f"{os_name}-x86_64" / "bin"
     )
     adb_path = sdk_path / "platform-tools" / "adb"
-    gradlew = Path.cwd() / "gradlew"
+    gradlew = Path.cwd() / "app" / "gradlew"
 
 
 # We allow using several functionality with only ADB
@@ -750,8 +753,9 @@ def load_config():
     if args.config.exists():
         config.update(parse_props(args.config))
 
-    if Path("gradle.properties").exists():
-        for key, value in parse_props("gradle.properties").items():
+    gradle_props = Path("app", "gradle.properties")
+    if gradle_props.exists():
+        for key, value in parse_props(gradle_props).items():
             if key.startswith("magisk."):
                 config[key[7:]] = value
 

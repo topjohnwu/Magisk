@@ -151,7 +151,7 @@ fun Project.setupCoreLib() {
         into("src/main/jniLibs")
         for (abi in abiList) {
             into(abi) {
-                from(rootProject.file("native/out/$abi")) {
+                from(File(baseDir, "native/out/$abi")) {
                     include("magiskboot", "magiskinit", "magiskpolicy", "magisk", "libinit-ld.so")
                     rename { if (it.endsWith(".so")) it else "lib$it.so" }
                 }
@@ -173,10 +173,10 @@ fun Project.setupCoreLib() {
 
     val syncResources by tasks.registering(Sync::class) {
         into("src/main/resources/META-INF/com/google/android")
-        from(rootProject.file("scripts/update_binary.sh")) {
+        from(File(baseDir, "scripts/update_binary.sh")) {
             rename { "update-binary" }
         }
-        from(rootProject.file("scripts/flash_script.sh")) {
+        from(File(baseDir, "scripts/flash_script.sh")) {
             rename { "updater-script" }
         }
     }
@@ -187,7 +187,7 @@ fun Project.setupCoreLib() {
         tasks.getByPath("merge${variantCapped}JniLibFolders").dependsOn(downloadBusybox)
         processJavaResourcesProvider.configure { dependsOn(syncResources) }
 
-        val stubTask = tasks.getByPath(":app:stub:comment$variantCapped")
+        val stubTask = tasks.getByPath(":stub:comment$variantCapped")
         val stubApk = stubTask.outputs.files.asFileTree.filter {
             it.name.endsWith(".apk")
         }
@@ -197,14 +197,14 @@ fun Project.setupCoreLib() {
             inputs.property("version", Config.version)
             inputs.property("versionCode", Config.versionCode)
             into("src/${this@all.name}/assets")
-            from(rootProject.file("scripts")) {
+            from(File(baseDir, "scripts")) {
                 include("util_functions.sh", "boot_patch.sh", "addon.d.sh",
                     "app_functions.sh", "uninstaller.sh", "module_installer.sh")
             }
-            from(rootProject.file("tools/bootctl"))
+            from(File(baseDir, "tools/bootctl"))
             into("chromeos") {
-                from(rootProject.file("tools/futility"))
-                from(rootProject.file("tools/keys")) {
+                from(File(baseDir, "tools/futility"))
+                from(File(baseDir, "tools/keys")) {
                     include("kernel_data_key.vbprivk", "kernel.keyblock")
                 }
             }
@@ -294,7 +294,7 @@ fun Project.setupAppCommon() {
         signingConfigs {
             create("config") {
                 Config["keyStore"]?.also {
-                    storeFile = rootProject.file(it)
+                    storeFile = File(baseDir, it)
                     storePassword = Config["keyStorePass"]
                     keyAlias = Config["keyAlias"]
                     keyPassword = Config["keyPass"]

@@ -14,7 +14,7 @@ private val defaultAbis = setOf("armeabi-v7a", "x86", "arm64-v8a", "x86_64")
 object Config {
     operator fun get(key: String): String? {
         val v = props[key] as? String ?: return null
-        return if (v.isBlank()) null else v
+        return v.ifBlank { null }
     }
 
     fun contains(key: String) = get(key) != null
@@ -28,19 +28,21 @@ object Config {
     }
 }
 
+val Project.baseDir: File get() = rootProject.file("..")
+
 class MagiskPlugin : Plugin<Project> {
     override fun apply(project: Project) = project.applyPlugin()
 
     private fun Project.applyPlugin() {
-        initRandom(rootProject.file("app/dict.txt"))
+        initRandom(rootProject.file("dict.txt"))
         props.clear()
         rootProject.file("gradle.properties").inputStream().use { props.load(it) }
         val configPath: String? by this
-        val config = configPath?.let { File(it) } ?: rootProject.file("config.prop")
+        val config = configPath?.let { File(it) } ?: File(baseDir, "config.prop")
         if (config.exists())
             config.inputStream().use { props.load(it) }
 
-        val repo = FileRepository(rootProject.file(".git"))
+        val repo = FileRepository(File(baseDir, ".git"))
         val refId = repo.refDatabase.exactRef("HEAD").objectId
         commitHash = repo.newObjectReader().abbreviate(refId, 8).name()
     }

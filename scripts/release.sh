@@ -11,7 +11,7 @@ CONFIG=config.prop
 NOTES=notes.md
 
 # These are constants, do not modify
-GCONFIG=gradle.properties
+GCONFIG=app/gradle.properties
 README=README.MD
 BUILDCMD="./build.py -c $CONFIG"
 CWD=$(pwd)
