@@ -151,7 +151,7 @@ fun Project.setupCoreLib() {
         into("src/main/jniLibs")
         for (abi in abiList) {
             into(abi) {
-                from(File(baseDir, "native/out/$abi")) {
+                from(rootFile("native/out/$abi")) {
                     include("magiskboot", "magiskinit", "magiskpolicy", "magisk", "libinit-ld.so")
                     rename { if (it.endsWith(".so")) it else "lib$it.so" }
                 }
@@ -173,10 +173,10 @@ fun Project.setupCoreLib() {
 
     val syncResources by tasks.registering(Sync::class) {
         into("src/main/resources/META-INF/com/google/android")
-        from(File(baseDir, "scripts/update_binary.sh")) {
+        from(rootFile("scripts/update_binary.sh")) {
             rename { "update-binary" }
         }
-        from(File(baseDir, "scripts/flash_script.sh")) {
+        from(rootFile("scripts/flash_script.sh")) {
             rename { "updater-script" }
         }
     }
@@ -197,14 +197,14 @@ fun Project.setupCoreLib() {
             inputs.property("version", Config.version)
             inputs.property("versionCode", Config.versionCode)
             into("src/${this@all.name}/assets")
-            from(File(baseDir, "scripts")) {
+            from(rootFile("scripts")) {
                 include("util_functions.sh", "boot_patch.sh", "addon.d.sh",
                     "app_functions.sh", "uninstaller.sh", "module_installer.sh")
             }
-            from(File(baseDir, "tools/bootctl"))
+            from(rootFile("tools/bootctl"))
             into("chromeos") {
-                from(File(baseDir, "tools/futility"))
-                from(File(baseDir, "tools/keys")) {
+                from(rootFile("tools/futility"))
+                from(rootFile("tools/keys")) {
                     include("kernel_data_key.vbprivk", "kernel.keyblock")
                 }
             }
@@ -292,9 +292,9 @@ fun Project.setupAppCommon() {
 
     android {
         signingConfigs {
-            create("config") {
-                Config["keyStore"]?.also {
-                    storeFile = File(baseDir, it)
+            Config["keyStore"]?.also {
+                create("config") {
+                    storeFile = rootFile(it)
                     storePassword = Config["keyStorePass"]
                     keyAlias = Config["keyAlias"]
                     keyPassword = Config["keyPass"]
@@ -310,15 +310,12 @@ fun Project.setupAppCommon() {
         }
 
         buildTypes {
-            signingConfigs["config"].also {
-                debug {
-                    signingConfig = if (it.storeFile?.exists() == true) it
-                    else signingConfigs["debug"]
-                }
-                release {
-                    signingConfig = if (it.storeFile?.exists() == true) it
-                    else signingConfigs["debug"]
-                }
+            val config = signingConfigs.findByName("config") ?: signingConfigs["debug"]
+            debug {
+                signingConfig = config
+            }
+            release {
+                signingConfig = config
             }
         }
 
