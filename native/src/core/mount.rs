@@ -17,45 +17,90 @@ use crate::get_prop;
 
 pub fn setup_preinit_dir() {
     let magisk_tmp = get_magisk_tmp();
+    info!("Step 1: magisk_tmp path: {}", magisk_tmp);
 
     // Mount preinit directory
     let dev_path = cstr::buf::new::<64>()
         .join_path(magisk_tmp)
         .join_path(PREINITDEV);
+    info!("Step 2: dev_path constructed: {}", dev_path);
+
     if let Ok(attr) = dev_path.get_attr() {
+        info!("Step 3: dev_path attributes retrieved: {:?}", attr);
+
         if attr.st.st_mode & libc::S_IFMT as c_uint == libc::S_IFBLK.as_() {
-            // DO NOT mount the block device directly, as we do not know the flags and configs
-            // to properly mount the partition; mounting block devices directly as rw could cause
-            // crashes if the filesystem driver is crap (e.g. some broken F2FS drivers).
-            // What we do instead is to scan through the current mountinfo and find a pre-existing
-            // mount point mounting our desired partition, and then bind mount the target folder.
+            info!("Step 4: dev_path is a block device.");
+
             let preinit_dev = attr.st.st_rdev;
             let mnt_path = cstr::buf::default()
                 .join_path(magisk_tmp)
                 .join_path(PREINITMIRR);
+            info!(
+                "Step 5: preinit_dev: {}, mnt_path: {}",
+                preinit_dev, mnt_path
+            );
+
+            let mut found_preinit_dir = false;
+
             for info in parse_mount_info("self") {
+                info!(
+                    "Step 6: Checking mount info - root: {}, device: {}, fs_option: {}, target: {}",
+                    info.root, info.device, info.fs_option, info.target
+                );
+
                 if info.root == "/" && info.device == preinit_dev {
                     if !info.fs_option.split(',').any(|s| s == "rw") {
-                        // Only care about rw mounts
+                        info!("Step 7: Skipping mount point due to missing 'rw' flag.");
                         continue;
                     }
+
                     let mut target = info.target;
                     let target = Utf8CStr::from_string(&mut target);
                     let mut preinit_dir = resolve_preinit_dir(target);
                     let preinit_dir = Utf8CStr::from_string(&mut preinit_dir);
+                    info!("Step 8: Resolved preinit_dir: {}", preinit_dir);
+
                     let r: LoggedResult<()> = try {
                         preinit_dir.mkdir(0o700)?;
+                        info!(
+                            "Step 9: Created preinit_dir with permissions 0o700: {}",
+                            preinit_dir
+                        );
+
                         mnt_path.mkdirs(0o755)?;
+                        info!("Step 10: Created mnt_path with permissions 0o755: {}", mnt_path);
+
                         mnt_path.remove().ok();
+                        info!("Step 11: Removed existing mnt_path if any: {}", mnt_path);
+
                         mnt_path.create_symlink_to(preinit_dir)?;
+                        info!(
+                            "Step 12: Created symlink from mnt_path to preinit_dir: {} -> {}",
+                            mnt_path, preinit_dir
+                        );
                     };
+
                     if r.is_ok() {
                         info!("* Found preinit dir: {}", preinit_dir);
+                        found_preinit_dir = true;
                         return;
+                    } else {
+                        warn!(
+                            "Step 13: Failed to set up preinit_dir and symlink. Error: {:?}",
+                            r.err()
+                        );
                     }
                 }
             }
+
+            if !found_preinit_dir {
+                warn!("Step 14: No suitable mount point found for preinit directory.");
+            }
+        } else {
+            warn!("Step 15: dev_path is not a block device.");
         }
+    } else {
+        warn!("Step 16: Failed to retrieve attributes for dev_path: {}", dev_path);
     }
 
     warn!("mount: preinit dir not found");
