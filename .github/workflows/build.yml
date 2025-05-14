@@ -194,7 +194,7 @@ jobs:
 
       - name: Run Cuttlefish test
         timeout-minutes: 10
-        run: su $USER -c 'scripts/cuttlefish.sh test'
+        run: sudo -E -u $USER scripts/cuttlefish.sh test
 
       - name: Upload logs on error
         if: ${{ failure() }}
