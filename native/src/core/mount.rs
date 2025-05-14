@@ -26,7 +26,6 @@ pub fn setup_preinit_dir() {
     info!("Step 2: dev_path constructed: {}", dev_path);
 
     if let Ok(attr) = dev_path.get_attr() {
-        info!("Step 3: dev_path attributes retrieved: {:?}", attr);
 
         if attr.st.st_mode & libc::S_IFMT as c_uint == libc::S_IFBLK.as_() {
             info!("Step 4: dev_path is a block device.");
@@ -84,11 +83,6 @@ pub fn setup_preinit_dir() {
                         info!("* Found preinit dir: {}", preinit_dir);
                         found_preinit_dir = true;
                         return;
-                    } else {
-                        warn!(
-                            "Step 13: Failed to set up preinit_dir and symlink. Error: {:?}",
-                            r.err()
-                        );
                     }
                 }
             }
