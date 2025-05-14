@@ -1,5 +1,14 @@
 # Magisk Changelog
 
+### v29.0
+
+- [General] Massive internal refactoring and code migration
+- [App] Support downloading module zip files with XZ compression
+- [App] Disable app animations when system animations are disabled
+- [MagiskMount] Support systemlessly deleting files with modules using blank file nodes
+- [MagiskInit] Redesign sepolicy patching and injection logic
+- [MagiskSU] Better TTY/PTY support
+
 ### v28.1
 
 - [App] Fix stub APK download link
