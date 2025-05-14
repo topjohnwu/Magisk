@@ -487,7 +487,9 @@ def cleanup():
 
     if "app" in targets:
         header("* Cleaning app")
-        execv([gradlew, ":app:clean"], env=find_jdk())
+        os.chdir("app")
+        execv([gradlew, ":clean"], env=find_jdk())
+        os.chdir("..")
 
 
 def build_all():
