@@ -642,11 +642,11 @@ def push_files(script):
 def setup_avd():
     header("* Setting up emulator")
 
-    push_files(Path("scripts", "avd_magisk.sh"))
+    push_files(Path("scripts", "live_setup.sh"))
 
-    proc = execv([adb_path, "shell", "sh", "/data/local/tmp/avd_magisk.sh"])
+    proc = execv([adb_path, "shell", "sh", "/data/local/tmp/live_setup.sh"])
     if proc.returncode != 0:
-        error("avd_magisk.sh failed!")
+        error("live_setup.sh failed!")
 
 
 def patch_avd_file():
@@ -655,7 +655,7 @@ def patch_avd_file():
 
     header(f"* Patching {input.name}")
 
-    push_files(Path("scripts", "avd_patch.sh"))
+    push_files(Path("scripts", "host_patch.sh"))
 
     proc = execv([adb_path, "push", input, "/data/local/tmp"])
     if proc.returncode != 0:
@@ -664,9 +664,9 @@ def patch_avd_file():
     src_file = f"/data/local/tmp/{input.name}"
     out_file = f"{src_file}.magisk"
 
-    proc = execv([adb_path, "shell", "sh", "/data/local/tmp/avd_patch.sh", src_file])
+    proc = execv([adb_path, "shell", "sh", "/data/local/tmp/host_patch.sh", src_file])
     if proc.returncode != 0:
-        error("avd_patch.sh failed!")
+        error("host_patch.sh failed!")
 
     proc = execv([adb_path, "pull", out_file, output])
     if proc.returncode != 0:

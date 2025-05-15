@@ -110,7 +110,7 @@ jobs:
         timeout-minutes: 10
         env:
           AVD_TEST_LOG: 1
-        run: scripts/avd_test.sh ${{ matrix.version }} ${{ matrix.type }}
+        run: scripts/avd.sh test ${{ matrix.version }} ${{ matrix.type }}
 
       - name: Upload logs on error
         if: ${{ failure() }}
@@ -152,7 +152,7 @@ jobs:
         env:
           FORCE_32_BIT: 1
           AVD_TEST_LOG: 1
-        run: scripts/avd_test.sh ${{ matrix.version }}
+        run: scripts/avd.sh test ${{ matrix.version }}
 
       - name: Upload logs on error
         if: ${{ failure() }}
