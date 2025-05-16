@@ -37,7 +37,7 @@ pub(crate) fn hexpatch_init_for_second_stage(writable: bool) {
             }
             let attr = src.follow_link().get_attr()?;
             dest.set_attr(&attr)?;
-            dest.bind_mount_to(src)?;
+            dest.bind_mount_to(src, false)?;
         };
     }
 }
@@ -89,12 +89,15 @@ impl MagiskInit {
         cstr!("/init").rename_to(cstr!("/sdcard")).log_ok();
 
         // First try to mount magiskinit from rootfs to workaround Samsung RKP
-        if cstr!("/sdcard").bind_mount_to(cstr!("/sdcard")).is_ok() {
+        if cstr!("/sdcard")
+            .bind_mount_to(cstr!("/sdcard"), false)
+            .is_ok()
+        {
             debug!("Bind mount /sdcard -> /sdcard");
         } else {
             // Binding mounting from rootfs is not supported before Linux 3.12
             cstr!("/data/magiskinit")
-                .bind_mount_to(cstr!("/sdcard"))
+                .bind_mount_to(cstr!("/sdcard"), false)
                 .log_ok();
             debug!("Bind mount /data/magiskinit -> /sdcard");
         }

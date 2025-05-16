@@ -49,13 +49,13 @@ enum SePatchStrategy {
 fn mock_fifo(target: &Utf8CStr, mock: &Utf8CStr) -> LoggedResult<()> {
     debug!("Hijack [{}]", target);
     mock.mkfifo(0o666)?;
-    mock.bind_mount_to(target).log()
+    mock.bind_mount_to(target, false).log()
 }
 
 fn mock_file(target: &Utf8CStr, mock: &Utf8CStr) -> LoggedResult<()> {
     debug!("Hijack [{}]", target);
     drop(mock.create(libc::O_RDONLY, 0o666)?);
-    mock.bind_mount_to(target).log()
+    mock.bind_mount_to(target, false).log()
 }
 
 impl MagiskInit {

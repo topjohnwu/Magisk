@@ -182,6 +182,10 @@ impl FileAttr {
     pub fn is_socket(&self) -> bool {
         self.is(libc::S_IFSOCK)
     }
+
+    pub fn is_whiteout(&self) -> bool {
+        self.is_char_device() && self.st.st_rdev == 0
+    }
 }
 
 const XATTR_NAME_SELINUX: &CStr = c"security.selinux";

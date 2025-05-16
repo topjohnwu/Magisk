@@ -14,6 +14,7 @@ use cxx::{ExternType, type_id};
 use daemon::{MagiskD, daemon_entry};
 use derive::Decodable;
 use logging::{android_logging, setup_logfile, zygisk_close_logd, zygisk_get_logd, zygisk_logging};
+use module::load_modules;
 use mount::{find_preinit_device, revert_unmount};
 use resetprop::{persist_delete_prop, persist_get_prop, persist_get_props, persist_set_prop};
 use selinux::{lgetfilecon, lsetfilecon, restorecon, setfilecon};
@@ -30,6 +31,7 @@ mod consts;
 mod daemon;
 mod db;
 mod logging;
+mod module;
 mod mount;
 mod package;
 mod resetprop;
@@ -146,6 +148,7 @@ pub mod ffi {
             value: *const c_char,
             serial: u32,
         );
+        unsafe fn load_prop_file(filename: *const c_char, skip_svc: bool);
     }
 
     unsafe extern "C++" {
@@ -220,6 +223,8 @@ pub mod ffi {
 
         #[namespace = "rust"]
         fn daemon_entry();
+        #[namespace = "rust"]
+        fn load_modules(module_list: &[ModuleInfo], zygisk_name: &str);
     }
 
     // Default constructors
@@ -281,4 +286,8 @@ pub fn get_prop(name: &Utf8CStr, persist: bool) -> String {
 
 pub fn set_prop(name: &Utf8CStr, value: &Utf8CStr, skip_svc: bool) -> bool {
     unsafe { ffi::set_prop_rs(name.as_ptr(), value.as_ptr(), skip_svc) == 0 }
+}
+
+pub fn load_prop_file(filename: &Utf8CStr, skip_svc: bool) {
+    unsafe { ffi::load_prop_file(filename.as_ptr(), skip_svc) };
 }

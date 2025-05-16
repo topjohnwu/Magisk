@@ -82,7 +82,7 @@ impl MagiskInit {
                             debug!("Mount [{}] -> [{}]", src, dest);
                             clone_attr(&dest, &src)?;
                             dest.get_secontext(&mut con)?;
-                            src.bind_mount_to(&dest)?;
+                            src.bind_mount_to(&dest, false)?;
                             self.overlay_con
                                 .push(OverlayAttr(dest.to_owned(), con.to_owned()));
                             mount_list.push_str(dest.as_str());

@@ -3,13 +3,14 @@ use libc::c_ulong;
 use std::ptr;
 
 impl Utf8CStr {
-    pub fn bind_mount_to<'a>(&'a self, path: &'a Utf8CStr) -> OsResult<'a, ()> {
+    pub fn bind_mount_to<'a>(&'a self, path: &'a Utf8CStr, rec: bool) -> OsResult<'a, ()> {
+        let flag = if rec { libc::MS_REC } else { 0 };
         unsafe {
             libc::mount(
                 self.as_ptr(),
                 path.as_ptr(),
                 ptr::null(),
-                libc::MS_BIND,
+                libc::MS_BIND | flag,
                 ptr::null(),
             )
             .check_os_err("bind_mount", Some(self), Some(path))
