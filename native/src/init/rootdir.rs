@@ -3,7 +3,7 @@ use crate::ffi::MagiskInit;
 use base::libc::{O_CREAT, O_RDONLY, O_WRONLY};
 use base::{
     BufReadExt, Directory, FsPathBuilder, LoggedResult, ResultExt, Utf8CStr, Utf8CString,
-    clone_attr, cstr, debug,
+    clone_attr, cstr, debug, warn,
 };
 use std::io::BufReader;
 use std::{
