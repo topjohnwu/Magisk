@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--Author: Radoš Milićev (https://github.com/rammba)-->
+<resources>
+    <string name="upgrade_msg">Ažurirajte Magisk da biste završili postavljanje. Preuzmi i instaliraj?</string>
+    <string name="no_internet_msg">Molimo povežite se na internet! Neophodno je ažuriranje Magisk-a.</string>
+    <string name="dling">Preuzimanje</string>
+    <string name="relaunch_app">Molimo pokrenite aplikaciju ponovo</string>
+</resources>
