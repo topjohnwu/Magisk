@@ -47,15 +47,21 @@ pub struct OverlayAttr(Utf8CString, Utf8CString);
 
 impl MagiskInit {
     pub(crate) fn parse_config_file(&mut self) {
+        warn!("parse_config_file: parsing /data/.backup/.magisk");
         if let Ok(fd) = cstr!("/data/.backup/.magisk").open(O_RDONLY) {
+            warn!("parse_config_file: successfully opened /data/.backup/.magisk");
             let mut reader = BufReader::new(fd);
             reader.foreach_props(|key, val| {
+                warn!("parse_config_file: read key=[{}], val=[{}]", key, val);
                 if key == "PREINITDEVICE" {
                     self.preinit_dev = val.to_string();
+                    warn!("parse_config_file: set preinit_dev=[{}]", self.preinit_dev);
                     return false;
                 }
                 true
-            })
+            });
+        } else {
+            warn!("parse_config_file: failed to open /data/.backup/.magisk");
         }
     }
 
