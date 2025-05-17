@@ -1,9 +1,9 @@
 use base::{error, libc, warn};
 use libc::{
-    POLLIN, SFD_CLOEXEC, SIG_BLOCK, SIGWINCH, STDIN_FILENO, STDOUT_FILENO, TCSADRAIN, TCSAFLUSH,
-    TIOCGWINSZ, TIOCSWINSZ, cfmakeraw, close, pipe, poll, pollfd, raise, read, sigaddset,
-    sigemptyset, signalfd, signalfd_siginfo, sigprocmask, sigset_t, splice, tcgetattr, tcsetattr,
-    termios, winsize,
+    F_GETPIPE_SZ, POLLIN, SFD_CLOEXEC, SIG_BLOCK, SIGWINCH, STDIN_FILENO, STDOUT_FILENO, TCSADRAIN,
+    TCSAFLUSH, TIOCGWINSZ, TIOCSWINSZ, cfmakeraw, close, fcntl, pipe, poll, pollfd, raise, read,
+    sigaddset, sigemptyset, signalfd, signalfd_siginfo, sigprocmask, sigset_t, splice, tcgetattr,
+    tcsetattr, termios, winsize,
 };
 use std::{ffi::c_int, mem::MaybeUninit, ptr::null_mut};
 
@@ -72,9 +72,9 @@ fn resize_pty(outfd: i32) {
     }
 }
 
-fn pump_via_pipe(infd: i32, outfd: i32, pipe: &[c_int; 2]) -> bool {
+fn pump_via_pipe(infd: i32, outfd: i32, pipe: &[c_int; 2], pipe_max: usize) -> bool {
     // usize::MAX will EINVAL in some kernels, use i32::MAX in case
-    let s = unsafe { splice(infd, null_mut(), pipe[1], null_mut(), i32::MAX as _, 0) };
+    let s = unsafe { splice(infd, null_mut(), pipe[1], null_mut(), pipe_max, 0) };
     if s < 0 {
         error!("splice error");
         return false;
@@ -128,6 +128,7 @@ pub fn pump_tty(infd: i32, outfd: i32) {
         error!("pipe error");
         return;
     }
+    let pipe_max = unsafe { fcntl(p[1], F_GETPIPE_SZ) } as _;
     'poll: loop {
         let ready = unsafe { poll(pfds.as_mut_ptr(), pfds.len() as _, -1) };
 
@@ -139,9 +140,9 @@ pub fn pump_tty(infd: i32, outfd: i32) {
         for pfd in &pfds {
             if pfd.revents & POLLIN != 0 {
                 let res = if pfd.fd == STDIN_FILENO {
-                    pump_via_pipe(pfd.fd, outfd, &p)
+                    pump_via_pipe(pfd.fd, outfd, &p, pipe_max)
                 } else if pfd.fd == infd {
-                    pump_via_pipe(pfd.fd, STDOUT_FILENO, &p)
+                    pump_via_pipe(pfd.fd, STDOUT_FILENO, &p, pipe_max)
                 } else if pfd.fd == sfd {
                     resize_pty(outfd);
                     let mut buf: [MaybeUninit<u8>; size_of::<signalfd_siginfo>()] =
