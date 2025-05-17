@@ -58,7 +58,6 @@ pub mod ffi {
         fn set_log_level_state_cxx(level: LogLevelCxx, enabled: bool);
         fn exit_on_error(b: bool);
         fn cmdline_logging();
-        fn resize_vec(vec: &mut Vec<u8>, size: usize);
     }
 
     #[namespace = "rust"]
@@ -78,14 +77,5 @@ pub mod ffi {
 fn set_log_level_state_cxx(level: ffi::LogLevelCxx, enabled: bool) {
     if let Some(level) = LogLevel::from_i32(level.repr) {
         set_log_level_state(level, enabled)
-    }
-}
-
-fn resize_vec(vec: &mut Vec<u8>, size: usize) {
-    if size > vec.len() {
-        vec.reserve(size - vec.len());
-    }
-    unsafe {
-        vec.set_len(size);
     }
 }

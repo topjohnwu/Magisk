@@ -17,7 +17,7 @@ static vector<string> rc_list;
 #define NEW_INITRC_DIR  "/system/etc/init/hw"
 #define INIT_RC         "init.rc"
 
-static bool unxz(out_stream &strm, rust::Slice<const uint8_t> bytes) {
+static bool unxz(int fd, rust::Slice<const uint8_t> bytes) {
     uint8_t out[8192];
     xz_crc32_init();
     size_t size = bytes.size();
@@ -36,7 +36,7 @@ static bool unxz(out_stream &strm, rust::Slice<const uint8_t> bytes) {
         ret = xz_dec_run(dec, &b);
         if (ret != XZ_OK && ret != XZ_STREAM_END)
             return false;
-        strm.write(out, b.out_pos);
+        write(fd, out, b.out_pos);
         b.out_pos = 0;
     } while (b.in_pos != size);
     return true;
@@ -241,24 +241,21 @@ static void extract_files(bool sbin) {
         mmap_data magisk(magisk_xz);
         unlink(magisk_xz);
         int fd = xopen("magisk", O_WRONLY | O_CREAT, 0755);
-        fd_stream ch(fd);
-        unxz(ch, magisk);
+        unxz(fd, magisk);
         close(fd);
     }
     if (access(stub_xz, F_OK) == 0) {
         mmap_data stub(stub_xz);
         unlink(stub_xz);
         int fd = xopen("stub.apk", O_WRONLY | O_CREAT, 0);
-        fd_stream ch(fd);
-        unxz(ch, stub);
+        unxz(fd, stub);
         close(fd);
     }
     if (access(init_ld_xz, F_OK) == 0) {
         mmap_data init_ld(init_ld_xz);
         unlink(init_ld_xz);
         int fd = xopen("init-ld", O_WRONLY | O_CREAT, 0);
-        fd_stream ch(fd);
-        unxz(ch, init_ld);
+        unxz(fd, init_ld);
         close(fd);
     }
 }
@@ -407,8 +404,7 @@ int magisk_proxy_main(int, char *argv[]) {
 static void unxz_init(const char *init_xz, const char *init) {
     LOGD("unxz %s -> %s\n", init_xz, init);
     int fd = xopen(init, O_WRONLY | O_CREAT, 0777);
-    fd_stream ch(fd);
-    unxz(ch, mmap_data{init_xz});
+    unxz(fd, mmap_data{init_xz});
     close(fd);
     clone_attr(init_xz, init);
     unlink(init_xz);

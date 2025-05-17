@@ -25,10 +25,13 @@ syn = "2.0.100"
 quote = "1.0.40"
 proc-macro2 = "1.0.94"
 argh = { version = "0.1.13", default-features = false }
-libz-rs-sys = { version = "0.5.0", features = ["export-symbols"] }
-libbz2-rs-sys = { version = "0.1.3" }
 pb-rs = { version = "0.10.0", default-features = false }
 quick-protobuf = "0.8.1"
+flate2 = { version = "1.1.1", default-features = false }
+bzip2 = { version = "0.5.2", default-features = false }
+zopfli = "0.8.2"
+lz4 = "1.28.1"
+xz2 = "0.1.7"
 
 # Rust crypto crates are tied together
 sha1 = "=0.11.0-pre.4"
@@ -48,6 +51,8 @@ sec1 = "=0.8.0-rc.3"
 [patch.crates-io]
 pb-rs = { git = "https://github.com/tafia/quick-protobuf.git" }
 quick-protobuf = { git = "https://github.com/tafia/quick-protobuf.git" }
+lz4-sys = { path = "external/lz4-sys" }
+lzma-sys = { path = "external/lzma-sys" }
 
 [profile.dev]
 opt-level = "z"

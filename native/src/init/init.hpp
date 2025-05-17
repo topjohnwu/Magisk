@@ -10,7 +10,6 @@
 #ifdef __cplusplus
 
 #include <base.hpp>
-#include <stream.hpp>
 #include <sepolicy.hpp>
 
 #include "init-rs.hpp"

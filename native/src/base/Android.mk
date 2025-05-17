@@ -18,7 +18,6 @@ LOCAL_SRC_FILES := \
     files.cpp \
     misc.cpp \
     logging.cpp \
-    stream.cpp \
     base-rs.cpp \
     ../external/cxx-rs/src/cxx.cc
 include $(BUILD_STATIC_LIBRARY)

@@ -1,16 +1,14 @@
+use byteorder::{BigEndian, ReadBytesExt};
+use quick_protobuf::{BytesReader, MessageRead};
 use std::{
     fs::File,
     io::{BufReader, Read, Seek, SeekFrom, Write},
-    os::fd::{AsRawFd, FromRawFd},
+    os::fd::FromRawFd,
 };
 
-use byteorder::{BigEndian, ReadBytesExt};
-use quick_protobuf::{BytesReader, MessageRead};
-
-use crate::{
-    ffi,
-    proto::update_metadata::{DeltaArchiveManifest, mod_InstallOperation::Type},
-};
+use crate::compress::get_decoder;
+use crate::ffi::check_fmt;
+use crate::proto::update_metadata::{DeltaArchiveManifest, mod_InstallOperation::Type};
 use base::{
     LoggedError, LoggedResult, ReadSeekExt, ResultExt, Utf8CStr, WriteExt, error, ffi::Utf8CStrRef,
 };
@@ -168,9 +166,12 @@ fn do_extract_boot_from_payload(
             }
             Type::REPLACE_BZ | Type::REPLACE_XZ => {
                 out_file.seek(SeekFrom::Start(out_offset))?;
-                if !ffi::decompress(data, out_file.as_raw_fd()) {
+                let mut decoder = get_decoder(check_fmt(data), &mut out_file);
+                let Ok(_): std::io::Result<()> = (try {
+                    decoder.write_all(data)?;
+                }) else {
                     return Err(bad_payload!("decompression failed"));
-                }
+                };
             }
             _ => return Err(bad_payload!("unsupported operation type")),
         };
