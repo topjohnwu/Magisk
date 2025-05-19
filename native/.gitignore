@@ -1,8 +1,0 @@
-/build
-obj
-libs
-/.externalNativeBuild
-/.cxx
-*-rs.cpp
-*-rs.hpp
-/compile_commands.json
