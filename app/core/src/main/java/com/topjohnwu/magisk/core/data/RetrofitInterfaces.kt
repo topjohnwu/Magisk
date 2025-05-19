@@ -2,7 +2,7 @@ package com.topjohnwu.magisk.core.data
 
 import com.topjohnwu.magisk.core.model.ModuleJson
 import com.topjohnwu.magisk.core.model.Release
-import com.topjohnwu.magisk.core.model.UpdateInfo
+import com.topjohnwu.magisk.core.model.UpdateJson
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.GET
@@ -25,7 +25,7 @@ interface RawUrl {
     suspend fun fetchModuleJson(@Url url: String): ModuleJson
 
     @GET
-    suspend fun fetchUpdateJson(@Url url: String): UpdateInfo
+    suspend fun fetchUpdateJson(@Url url: String): UpdateJson
 }
 
 interface GithubApiServices {

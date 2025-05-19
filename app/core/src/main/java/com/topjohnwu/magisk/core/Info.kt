@@ -19,12 +19,18 @@ object Info {
 
     var stub: StubApk.Data? = null
 
-    val EMPTY_REMOTE = UpdateInfo()
-    var remote = EMPTY_REMOTE
-    suspend fun getRemote(svc: NetworkService): UpdateInfo? {
-        return if (remote === EMPTY_REMOTE) {
-            svc.fetchUpdate()?.apply { remote = this }
-        } else remote
+    private val EMPTY_UPDATE = UpdateInfo()
+    var update = EMPTY_UPDATE
+        private set
+
+    suspend fun fetchUpdate(svc: NetworkService): UpdateInfo? {
+        return if (update === EMPTY_UPDATE) {
+            svc.fetchUpdate()?.apply { update = this }
+        } else update
+    }
+
+    fun resetUpdate() {
+        update = EMPTY_UPDATE
     }
 
     var isRooted = false

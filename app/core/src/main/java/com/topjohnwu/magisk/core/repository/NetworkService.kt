@@ -10,7 +10,6 @@ import com.topjohnwu.magisk.core.Config.Value.STABLE_CHANNEL
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.data.GithubApiServices
 import com.topjohnwu.magisk.core.data.RawUrl
-import com.topjohnwu.magisk.core.model.MagiskJson
 import com.topjohnwu.magisk.core.model.Release
 import com.topjohnwu.magisk.core.model.UpdateInfo
 import retrofit2.HttpException
@@ -31,7 +30,7 @@ class NetworkService(
             CUSTOM_CHANNEL -> fetchCustomUpdate(Config.customChannelUrl)
             else -> throw IllegalArgumentException()
         }
-        if (info.magisk.versionCode < Info.env.versionCode &&
+        if (info.versionCode < Info.env.versionCode &&
             Config.updateChannel == DEFAULT_CHANNEL) {
             Config.updateChannel = BETA_CHANNEL
             info = fetchBetaUpdate()
@@ -59,23 +58,21 @@ class NetworkService(
     private fun Release.asPublicInfo(): UpdateInfo {
         val version = tag.drop(1)
         val date = createdTime.format(DateTimeFormatter.ofPattern("yyyy.M.d"))
-        val info = MagiskJson(
+        return UpdateInfo(
             version = version,
             versionCode = (version.toFloat() * 1000).toInt(),
             link = assets[0].url,
             note = "## $date $name\n\n$body"
         )
-        return UpdateInfo(info)
     }
 
     private fun Release.asCanaryInfo(assetSelector: String): UpdateInfo {
-        val info = MagiskJson(
+        return UpdateInfo(
             version = name.substring(8, 16),
             versionCode = tag.drop(7).toInt(),
             link = assets.find { it.name == assetSelector }!!.url,
             note = "## $name\n\n$body"
         )
-        return UpdateInfo(info)
     }
 
     private suspend fun fetchStableUpdate() = api.fetchLatestRelease().asPublicInfo()
@@ -90,7 +87,7 @@ class NetworkService(
 
     private suspend fun fetchCustomUpdate(url: String): UpdateInfo {
         val info = raw.fetchUpdateJson(url).magisk
-        return UpdateInfo(info.let { it.copy(note = raw.fetchString(it.note)) })
+        return info.let { it.copy(note = raw.fetchString(it.note)) }
     }
 
     private inline fun <T> safe(factory: () -> T): T? {

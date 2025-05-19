@@ -11,13 +11,13 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME
 
 @JsonClass(generateAdapter = true)
-data class UpdateInfo(
-    val magisk: MagiskJson = MagiskJson(),
+class UpdateJson(
+    val magisk: UpdateInfo = UpdateInfo(),
 )
 
 @Parcelize
 @JsonClass(generateAdapter = true)
-data class MagiskJson(
+data class UpdateInfo(
     val version: String = "",
     val versionCode: Int = -1,
     val link: String = "",

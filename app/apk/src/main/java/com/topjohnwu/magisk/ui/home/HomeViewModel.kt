@@ -91,16 +91,15 @@ class HomeViewModel(
 
     override suspend fun doLoadWork() {
         appState = State.LOADING
-        Info.getRemote(svc)?.apply {
+        Info.fetchUpdate(svc)?.apply {
             appState = when {
-                BuildConfig.APP_VERSION_CODE < magisk.versionCode -> State.OUTDATED
+                BuildConfig.APP_VERSION_CODE < versionCode -> State.OUTDATED
                 else -> State.UP_TO_DATE
             }
 
             val isDebug = Config.updateChannel == Config.Value.DEBUG_CHANNEL
             managerRemoteVersion =
-                ("${magisk.version} (${magisk.versionCode})" +
-                    if (isDebug) " (D)" else "").asText()
+                ("$version (${versionCode})" + if (isDebug) " (D)" else "").asText()
         } ?: run {
             appState = State.INVALID
             managerRemoteVersion = CoreR.string.not_available.asText()

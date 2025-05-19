@@ -74,7 +74,7 @@ class InstallViewModel(svc: NetworkService, markwon: Markwon) : BaseViewModel() 
                 val text = when {
                     file.exists() -> file.readText()
                     else -> {
-                        val str = if (Const.APP_IS_CANARY) Info.remote.magisk.note
+                        val str = if (Const.APP_IS_CANARY) Info.update.note
                         else svc.fetchString(Const.Url.CHANGELOG_URL)
                         file.writeText(str)
                         str

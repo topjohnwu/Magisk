@@ -147,7 +147,7 @@ object UpdateChannel : BaseSettingsItem.Selector() {
         get() = Config.updateChannel
         set(value) {
             Config.updateChannel = value
-            Info.remote = Info.EMPTY_REMOTE
+            Info.resetUpdate()
         }
 
     override val title = CoreR.string.settings_update_channel_title.asText()
@@ -169,7 +169,7 @@ object UpdateChannelUrl : BaseSettingsItem.Input() {
         get() = Config.customChannelUrl
         set(value) {
             Config.customChannelUrl = value
-            Info.remote = Info.EMPTY_REMOTE
+            Info.resetUpdate()
             notifyPropertyChanged(BR.description)
         }
 
