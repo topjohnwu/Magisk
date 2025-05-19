@@ -11,15 +11,9 @@ import java.io.File
 
 class ManagerInstallDialog : MarkDownDialog() {
 
-    private val svc get() = ServiceLocator.networkService
-
     override suspend fun getMarkdownText(): String {
-        val str = Info.remote.magisk.note
-        val text =  if (str.startsWith("http", true)) svc.fetchString(str) else str
+        val text = Info.remote.magisk.note
         // Cache the changelog
-        AppContext.cacheDir.listFiles { _, name -> name.endsWith(".md") }.orEmpty().forEach {
-            it.delete()
-        }
         File(AppContext.cacheDir, "${Info.remote.magisk.versionCode}.md").writeText(text)
         return text
     }

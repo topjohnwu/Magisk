@@ -71,14 +71,11 @@ class InstallViewModel(svc: NetworkService, markwon: Markwon) : BaseViewModel() 
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val file = File(AppContext.cacheDir, "${BuildConfig.APP_VERSION_CODE}.md")
-                val note = Info.remote.magisk.note
                 val text = when {
                     file.exists() -> file.readText()
-                    Const.APP_IS_CANARY && note.isEmpty() -> ""
-                    Const.APP_IS_CANARY && !note.startsWith("http", true) -> note
                     else -> {
-                        val url = if (Const.APP_IS_CANARY) note else Const.Url.CHANGELOG_URL
-                        val str = svc.fetchString(url)
+                        val str = if (Const.APP_IS_CANARY) Info.remote.magisk.note
+                        else svc.fetchString(Const.Url.CHANGELOG_URL)
                         file.writeText(str)
                         str
                     }
@@ -103,13 +100,15 @@ class InstallViewModel(svc: NetworkService, markwon: Markwon) : BaseViewModel() 
     }
 
     override fun onSaveState(state: Bundle) {
-        state.putParcelable(INSTALL_STATE_KEY, InstallState(
-            methodId,
-            step,
-            Config.keepVerity,
-            Config.keepEnc,
-            Config.recovery
-        ))
+        state.putParcelable(
+            INSTALL_STATE_KEY, InstallState(
+                methodId,
+                step,
+                Config.keepVerity,
+                Config.keepEnc,
+                Config.recovery
+            )
+        )
     }
 
     override fun onRestoreState(state: Bundle) {
@@ -127,6 +126,7 @@ class InstallViewModel(svc: NetworkService, markwon: Markwon) : BaseViewModel() 
         override fun onActivityLaunch() {
             AppContext.toast(CoreR.string.patch_file_msg, Toast.LENGTH_LONG)
         }
+
         override fun onActivityResult(result: Uri) {
             uri.value = result
         }

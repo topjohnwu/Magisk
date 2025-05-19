@@ -9,16 +9,17 @@ import com.topjohnwu.magisk.core.Config.Value.DEFAULT_CHANNEL
 import com.topjohnwu.magisk.core.Config.Value.STABLE_CHANNEL
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.data.GithubApiServices
-import com.topjohnwu.magisk.core.data.RawServices
+import com.topjohnwu.magisk.core.data.RawUrl
 import com.topjohnwu.magisk.core.model.MagiskJson
 import com.topjohnwu.magisk.core.model.Release
 import com.topjohnwu.magisk.core.model.UpdateInfo
 import retrofit2.HttpException
 import timber.log.Timber
 import java.io.IOException
+import java.time.format.DateTimeFormatter
 
 class NetworkService(
-    private val raw: RawServices,
+    private val raw: RawUrl,
     private val api: GithubApiServices,
 ) {
     suspend fun fetchUpdate() = safe {
@@ -38,40 +39,59 @@ class NetworkService(
         info
     }
 
-    // UpdateInfo
-    private suspend fun fetchStableUpdate(rel: Release? = null): UpdateInfo {
-        val release = rel ?: api.fetchLatestRelease()
-        val name = release.tag_name.drop(1)
+    // Keep going through all release pages until we find a match
+    private suspend inline fun findRelease(predicate: (Release) -> Boolean): Release? {
+        var page = 1
+        while (true) {
+            val response = api.fetchReleases(page = page)
+            val releases = response.body() ?: throw HttpException(response)
+            // Make sure it's sorted correctly
+            releases.sortByDescending { it.createdTime }
+            releases.find(predicate)?.let { return it }
+            if (response.headers()["link"]?.contains("rel=\"next\"", ignoreCase = true) == true) {
+                page += 1
+            } else {
+                return null
+            }
+        }
+    }
+
+    private fun Release.asPublicInfo(): UpdateInfo {
+        val version = tag.drop(1)
+        val date = createdTime.format(DateTimeFormatter.ofPattern("yyyy.M.d"))
         val info = MagiskJson(
-            name, (name.toFloat() * 1000).toInt(),
-            release.assets[0].browser_download_url, release.body
+            version = version,
+            versionCode = (version.toFloat() * 1000).toInt(),
+            link = assets[0].url,
+            note = "## $date $name\n\n$body"
         )
         return UpdateInfo(info)
     }
 
-    private suspend fun fetchBetaUpdate(): UpdateInfo {
-        val release = api.fetchRelease().find { it.tag_name[0] == 'v' && it.prerelease }
-        return fetchStableUpdate(release)
-    }
-
-    private suspend fun fetchCanaryUpdate(): UpdateInfo {
-        val release = api.fetchRelease().find { it.tag_name.startsWith("canary-") }
+    private fun Release.asCanaryInfo(assetSelector: String): UpdateInfo {
         val info = MagiskJson(
-            release!!.name.substring(8, 16),
-            release.tag_name.drop(7).toInt(),
-            release.assets.find { it.name == "app-release.apk" }!!.browser_download_url,
-            release.body
+            version = name.substring(8, 16),
+            versionCode = tag.drop(7).toInt(),
+            link = assets.find { it.name == assetSelector }!!.url,
+            note = "## $name\n\n$body"
         )
         return UpdateInfo(info)
     }
 
-    private suspend fun fetchDebugUpdate(): UpdateInfo {
-        val release = fetchCanaryUpdate()
-        val link = release.magisk.link.replace("app-release.apk", "app-debug.apk")
-        return UpdateInfo(release.magisk.copy(link = link))
-    }
+    private suspend fun fetchStableUpdate() = api.fetchLatestRelease().asPublicInfo()
 
-    private suspend fun fetchCustomUpdate(url: String) = raw.fetchUpdateJSON(url)
+    private suspend fun fetchBetaUpdate() = findRelease { it.tag[0] == 'v' }!!.asPublicInfo()
+
+    private suspend fun fetchCanary() = findRelease { it.tag.startsWith("canary-") }!!
+
+    private suspend fun fetchCanaryUpdate() = fetchCanary().asCanaryInfo("app-release.apk")
+
+    private suspend fun fetchDebugUpdate() = fetchCanary().asCanaryInfo("app-debug.apk")
+
+    private suspend fun fetchCustomUpdate(url: String): UpdateInfo {
+        val info = raw.fetchUpdateJson(url).magisk
+        return UpdateInfo(info.let { it.copy(note = raw.fetchString(it.note)) })
+    }
 
     private inline fun <T> safe(factory: () -> T): T? {
         return try {
