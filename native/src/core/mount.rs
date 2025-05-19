@@ -46,7 +46,8 @@ pub fn setup_preinit_dir() {
                     let r: LoggedResult<()> = try {
                         preinit_dir.mkdir(0o700)?;
                         mnt_path.mkdirs(0o755)?;
-                        mnt_path.remove().ok();
+                        mnt_path.unmount().ok();
+                        mnt_path.remove()?;
                         mnt_path.create_symlink_to(preinit_dir)?;
                     };
                     if r.is_ok() {
