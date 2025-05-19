@@ -241,6 +241,22 @@ impl MagiskD {
                 _ => uid,
             };
 
+            let mut access = RootSettings::default();
+            self.get_root_settings(eval_uid, &mut access)?;
+
+            // We need to talk to the manager, get the app info
+            let (mgr_uid, mgr_pkg) =
+                if access.policy == SuPolicy::Query || access.log || access.notify {
+                    self.get_manager(to_user_id(eval_uid), true)
+                } else {
+                    (-1, String::new())
+                };
+
+            // If it's the manager, allow it silently
+            if to_app_id(uid) == to_app_id(mgr_uid) {
+                return Arc::new(SuInfo::allow(uid));
+            }
+
             // Check su access settings
             match cfg.root_access {
                 RootAccess::Disabled => {
@@ -261,22 +277,6 @@ impl MagiskD {
                 }
                 _ => {}
             };
-
-            let mut access = RootSettings::default();
-            self.get_root_settings(eval_uid, &mut access)?;
-
-            // We need to talk to the manager, get the app info
-            let (mgr_uid, mgr_pkg) =
-                if access.policy == SuPolicy::Query || access.log || access.notify {
-                    self.get_manager(to_user_id(eval_uid), true)
-                } else {
-                    (-1, String::new())
-                };
-
-            // If it's the manager, allow it silently
-            if to_app_id(uid) == to_app_id(mgr_uid) {
-                return Arc::new(SuInfo::allow(uid));
-            }
 
             // If still not determined, check if manager exists
             if access.policy == SuPolicy::Query && mgr_uid < 0 {
