@@ -1,13 +1,13 @@
 [versions]
 kotlin = "2.1.20"
-android = "8.9.2"
+android = "8.10.0"
 ksp = "2.1.20-1.0.31"
 rikka = "1.3.0"
-navigation = "2.8.9"
+navigation = "2.9.0"
 libsu = "6.0.0"
 moshi = "1.15.2"
 okhttp = "4.12.0"
-retrofit = "2.11.0"
+retrofit = "3.0.0"
 room = "2.7.1"
 
 [libraries]
