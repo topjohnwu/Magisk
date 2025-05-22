@@ -90,6 +90,7 @@ pub mod ffi {
         Query,
         Deny,
         Allow,
+        Restrict,
     }
 
     struct ModuleInfo {
@@ -119,6 +120,7 @@ pub mod ffi {
         target_pid: i32,
         login: bool,
         keep_env: bool,
+        drop_cap: bool,
         shell: String,
         command: String,
         context: String,
