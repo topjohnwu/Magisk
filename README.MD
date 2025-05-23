@@ -33,7 +33,7 @@ Click the icon below to download Magisk apk.
 
 ## Bug Reports
 
-**Only bug reports from Debug builds will be accepted.**
+**Only bug reports from Debug builds will be accepted.** Debug builds are available only for the canary version, not for stable or beta versions.
 
 For installation issues, upload both boot image and install logs.<br>
 For Magisk issues, upload boot logcat or dmesg.<br>
