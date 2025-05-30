@@ -70,7 +70,7 @@ runs:
           .gradle/caches
           .gradle/wrapper
           !.gradle/caches/build-cache-*
-        key: gradle-cache-${{ hashFiles('gradle/**') }}
+        key: gradle-cache-${{ hashFiles('app/gradle/**') }}
         restore-keys: gradle-cache-
 
     - name: Restore Gradle dependencies
