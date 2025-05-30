@@ -1,4 +1,3 @@
-#![feature(format_args_nl)]
 #![feature(try_blocks)]
 #![feature(let_chains)]
 #![feature(fn_traits)]

@@ -1,6 +1,4 @@
 #![allow(clippy::missing_safety_doc)]
-#![feature(format_args_nl)]
-#![feature(io_error_more)]
 
 pub use const_format;
 pub use libc;
