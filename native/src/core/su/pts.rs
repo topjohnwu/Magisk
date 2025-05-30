@@ -144,8 +144,7 @@ pub fn pump_tty(infd: i32, outfd: i32) {
                     pump_via_pipe(pfd.fd, STDOUT_FILENO, &p)
                 } else if pfd.fd == sfd {
                     resize_pty(outfd);
-                    let mut buf: [MaybeUninit<u8>; size_of::<signalfd_siginfo>()] =
-                        MaybeUninit::uninit_array();
+                    let mut buf = [MaybeUninit::<u8>::uninit(); size_of::<signalfd_siginfo>()];
                     if unsafe { read(pfd.fd, buf.as_mut_ptr() as *mut _, buf.len()) } < 0 {
                         error!("read error");
                         false
