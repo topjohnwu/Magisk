@@ -71,7 +71,7 @@ default_archs = {"armeabi-v7a", "x86", "arm64-v8a", "x86_64"}
 default_targets = {"magisk", "magiskinit", "magiskboot", "magiskpolicy"}
 support_targets = default_targets | {"resetprop"}
 rust_targets = {"magisk", "magiskinit", "magiskboot", "magiskpolicy"}
-ondk_version = "r29.1"
+ondk_version = "r28.4"
 
 # Global vars
 config = {}
