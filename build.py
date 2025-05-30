@@ -313,7 +313,7 @@ def dump_flag_header():
     write_if_diff(native_gen_path / "flags.rs", rust_flag_txt)
 
 
-def build_native():
+def ensure_toolchain():
     ensure_paths()
 
     # Verify NDK install
@@ -323,6 +323,17 @@ def build_native():
     except:
         error('Unmatched NDK. Please install/upgrade NDK with "build.py ndk"')
 
+    if sccache := shutil.which("sccache"):
+        os.environ["RUSTC_WRAPPER"] = sccache
+        os.environ["NDK_CCACHE"] = sccache
+        os.environ["CARGO_INCREMENTAL"] = "0"
+    if ccache := shutil.which("ccache"):
+        os.environ["NDK_CCACHE"] = ccache
+
+
+def build_native():
+    ensure_toolchain()
+
     if "targets" not in vars(args) or not args.targets:
         targets = default_targets
     else:
@@ -331,13 +342,6 @@ def build_native():
             return
 
     header("* Building: " + " ".join(targets))
-
-    if sccache := shutil.which("sccache"):
-        os.environ["RUSTC_WRAPPER"] = sccache
-        os.environ["NDK_CCACHE"] = sccache
-        os.environ["CARGO_INCREMENTAL"] = "0"
-    if ccache := shutil.which("ccache"):
-        os.environ["NDK_CCACHE"] = ccache
 
     dump_flag_header()
     build_rust_src(targets)
@@ -532,6 +536,7 @@ def gen_ide():
 
 
 def clippy_cli():
+    ensure_toolchain()
     args.force_out = True
     set_archs(default_archs)
 
