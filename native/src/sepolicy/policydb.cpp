@@ -250,6 +250,7 @@ bool SePolicy::to_file(::rust::Utf8CStr file) const noexcept {
     pf.fp = fp;
     if (policydb_write(impl->db, &pf)) {
         LOGE("Fail to create policy image\n");
+        fclose(fp);
         return false;
     }
     fclose(fp);
