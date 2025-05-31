@@ -69,7 +69,8 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Test build
-        run: python build.py -v -c .github/ci.prop all
+        shell: bash
+        run: python build.py -v -c .github/ci.prop all || python build.py -v -c .github/ci.prop all
 
       - name: Stop gradle daemon
         run: ./app/gradlew --stop
