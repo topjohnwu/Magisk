@@ -3,7 +3,7 @@ use crate::ffi::{ModuleInfo, get_magisk_tmp};
 use crate::load_prop_file;
 use base::{
     Directory, FsPathBuilder, LoggedResult, OsResultStatic, ResultExt, Utf8CStr, Utf8CStrBuf,
-    Utf8CString, clone_attr, cstr, debug, error, info, libc, warn,
+    Utf8CString, WalkResult, clone_attr, cstr, debug, error, info, libc, warn,
 };
 use libc::{MS_RDONLY, O_CLOEXEC, O_CREAT, O_RDONLY};
 use std::collections::BTreeMap;
@@ -371,24 +371,37 @@ fn inject_magisk_bins(system: &mut FsNode) {
         return;
     }
 
-    // If /system/bin node does not exist, use the first suitable directory in PATH
+    // If /system/bin node does not exist, use the directory that contains the least files in
+    // PATH to reduce bind mounts as much as possible
     let path_env = get_path_env();
-    let bin_paths = path_env.split(':').filter_map(|path| {
-        if SECONDARY_READ_ONLY_PARTITIONS
-            .iter()
-            .any(|p| path.starts_with(p.as_str()))
-        {
-            let path = Utf8CString::from(path);
-            if let Ok(attr) = path.get_attr()
-                && (attr.st.st_mode & 0x0001) != 0
-            {
-                return Some(path);
+    let mut candidates = vec![];
+
+    for orig_item in path_env.split(':') {
+        let item = orig_item.trim_start_matches("/system/").trim_start_matches('/');
+        let path = Utf8CString::from(format!("/system/{}", item));
+
+        if let Ok(attr) = path.get_attr() && (attr.st.st_mode & 0x0001) != 0 {
+            if let Ok(mut dir) = Directory::open(&path) {
+                let mut count = 0;
+                if let Err(_) = dir.pre_order_walk(|e| {
+                    if e.is_file() {
+                        count += 1;
+                    }
+                    Ok(WalkResult::Continue)
+                }) {
+                    // Skip, we cannot ensure the result is correct
+                    continue;
+                }
+                candidates.push((item.to_string(), count));
             }
         }
-        None
-    });
-    'path_loop: for path in bin_paths {
-        let components = Path::new(&path)
+    }
+
+    // Sort by amount of files
+    candidates.sort_by_key(|&(_, count)| count);
+
+    'path_loop: for candidate in candidates {
+        let components = Path::new(&candidate.0)
             .components()
             .filter(|c| matches!(c, Component::Normal(_)))
             .filter_map(|c| c.as_os_str().to_str());
