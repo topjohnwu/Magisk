@@ -3,11 +3,14 @@ use crate::ffi::{ModuleInfo, get_magisk_tmp};
 use crate::load_prop_file;
 use base::{
     Directory, FsPathBuilder, LoggedResult, OsResultStatic, ResultExt, Utf8CStr, Utf8CStrBuf,
-    Utf8CString, clone_attr, cstr, debug, error, info, libc, warn,
+    Utf8CString, WalkResult, clone_attr, cstr, debug, error, info, libc, warn,
 };
 use libc::{MS_RDONLY, O_CLOEXEC, O_CREAT, O_RDONLY};
 use std::collections::BTreeMap;
 use std::path::{Component, Path};
+
+const MAGISK_BIN_INJECT_PARTITIONS: [&Utf8CStr; 4] =
+    [cstr!("/system/"), cstr!("/vendor/"), cstr!("/product/"), cstr!("/system_ext/")];
 
 const SECONDARY_READ_ONLY_PARTITIONS: [&Utf8CStr; 3] =
     [cstr!("/vendor"), cstr!("/product"), cstr!("/system_ext")];
@@ -370,31 +373,59 @@ fn inject_magisk_bins(system: &mut FsNode) {
         );
     }
 
-    // First find whether /system/bin exists
-    let bin = system.children().and_then(|c| c.get_mut("bin"));
-    if let Some(FsNode::Directory { children }) = bin {
-        inject(children);
-        return;
+    // Strip /system prefix to insert correct node
+    fn strip_system_prefix(orig_item: &str) -> String {
+        match orig_item.strip_prefix("/system/") {
+            Some(rest) => format!("/{}", rest),
+            None => orig_item.to_string(),
+        }
     }
 
-    // If /system/bin node does not exist, use the first suitable directory in PATH
     let path_env = get_path_env();
-    let bin_paths = path_env.split(':').filter_map(|path| {
-        if SECONDARY_READ_ONLY_PARTITIONS
-            .iter()
-            .any(|p| path.starts_with(p.as_str()))
-        {
-            let path = Utf8CString::from(path);
-            if let Ok(attr) = path.get_attr()
-                && (attr.st.st_mode & 0x0001) != 0
-            {
-                return Some(path);
+    let mut candidates = vec![];
+
+    for orig_item in path_env.split(':') {
+        // Filter not suitbale paths
+        if !MAGISK_BIN_INJECT_PARTITIONS.iter().any(|p| orig_item.starts_with(p.as_str())) {
+            continue;
+        }
+        // Flatten apex path is not suitable too
+        if orig_item.starts_with("/system/apex/") {
+            continue;
+        }
+
+        // Override existing su first
+        let su_path = Utf8CString::from(format!("{}/su", orig_item));
+        if su_path.exists() {
+            let item = strip_system_prefix(orig_item);
+            candidates.push((item, 0));
+            break;
+        }
+
+        let path = Utf8CString::from(orig_item);
+        if let Ok(attr) = path.get_attr() && (attr.st.st_mode & 0x0001) != 0 {
+            if let Ok(mut dir) = Directory::open(&path) {
+                let mut count = 0;
+                if let Err(_) = dir.pre_order_walk(|e| {
+                    if e.is_file() {
+                        count += 1;
+                    }
+                    Ok(WalkResult::Continue)
+                }) {
+                    // Skip, we cannot ensure the result is correct
+                    continue;
+                }
+                let item = strip_system_prefix(orig_item);
+                candidates.push((item, count));
             }
         }
-        None
-    });
-    'path_loop: for path in bin_paths {
-        let components = Path::new(&path)
+    }
+
+    // Sort by amount of files
+    candidates.sort_by_key(|&(_, count)| count);
+
+    'path_loop: for candidate in candidates {
+        let components = Path::new(&candidate.0)
             .components()
             .filter(|c| matches!(c, Component::Normal(_)))
             .filter_map(|c| c.as_os_str().to_str());
