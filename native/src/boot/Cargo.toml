@@ -35,7 +35,3 @@ bzip2 = { workspace = true, features = ["libbz2-rs-sys"] }
 lz4 = { workspace = true }
 xz2 = { workspace = true }
 zopfli = { workspace = true, features = ["gzip"] }
-
-# Pin version to prevent cargo update break builds
-block-buffer = { workspace = true }
-sec1 = { workspace = true }

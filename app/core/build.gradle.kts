@@ -2,6 +2,7 @@ plugins {
     id("com.android.library")
     kotlin("android")
     kotlin("plugin.parcelize")
+    id("dev.zacsweers.moshix")
     id("com.google.devtools.ksp")
 }
 
@@ -47,9 +48,6 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging)
     implementation(libs.okhttp.dnsoverhttps)
-
-    implementation(libs.moshi)
-    ksp(libs.moshi.codegen)
 
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
