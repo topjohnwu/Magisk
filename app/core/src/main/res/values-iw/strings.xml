@@ -3,7 +3,7 @@
     <!--Sections-->
     <string name="modules">מודולים</string>
     <string name="superuser">משתמש על</string>
-    <string name="logs">יומני רישום</string>
+    <string name="logs">Log</string>
     <string name="settings">הגדרות</string>
     <string name="install">התקנה</string>
     <string name="section_home">בית</string>
@@ -12,10 +12,10 @@
 
     <!--Home-->
     <string name="no_connection">אין חיבור זמין</string>
-    <string name="app_changelog">יומן שינויים</string>
+    <string name="app_changelog">רשימת שינויים</string>
     <string name="loading">טוען…</string>
     <string name="update">עדכון</string>
-    <string name="not_available">ל/ז</string>
+    <string name="not_available">לא זמין</string>
     <string name="hide">הסתרה</string>
     <string name="home_package">חבילה</string>
     <string name="home_app_title">יישום</string>
@@ -23,28 +23,28 @@
     <string name="home_support_title">תמיכה בנו</string>
     <string name="home_follow_title">עקבו אחרינו</string>
     <string name="home_item_source">מקור</string>
-    <string name="home_support_content">Magisk היה ותמיד יהיה בעל קוד מקור פתוח. עם זאת באפשרותך להראות לנו שאכפת לך על ידי שליחת תרומה קטנה.</string>
+    <string name="home_support_content">Magisk היה ותמיד יהיה בקוד פתוח. עם זאת באפשרותך להראות לנו שאכפת לך על ידי שליחת תרומה קטנה.</string>
     <string name="home_installed_version">מותקנת</string>
     <string name="home_latest_version">אחרונה</string>
     <string name="invalid_update_channel">ערוץ עדכון לא חוקי</string>
     <string name="uninstall_magisk_title">הסרת Magisk</string>
-    <string name="uninstall_magisk_msg">כל המודולים יושבתו/יוסרו!\nגישת שורש תושבת!\nהנתונים שלך עשויים להיות מוצפנים אם לא הוצפנו כבר!</string>
+    <string name="uninstall_magisk_msg">כל המודולים יושבתו/יוסרו!\nגישת Root תושבת!\nהנתונים שלך עשויים להיות מוצפנים אם לא הוצפנו כבר!</string>
 
     <!--Install-->
     <string name="keep_force_encryption">שמירה על הצפנה בכח</string>
     <string name="keep_dm_verity">שמירה על AVB 2.0/dm-verity</string>
-    <string name="recovery_mode">מצב שחזור</string>
+    <string name="recovery_mode">מצב Recovery</string>
     <string name="install_options_title">אפשרויות</string>
     <string name="install_method_title">שיטה</string>
     <string name="install_next">הבא</string>
     <string name="install_start">צא לדרך</string>
     <string name="manager_download_install">לחיצה להורדה והתקנה</string>
     <string name="direct_install">התקנה ישירה (מומלץ)</string>
-    <string name="install_inactive_slot">התקנה לחריץ לא פעיל (לאחר OTA)</string>
-    <string name="install_inactive_slot_msg">ההתקן שלך ייאלץ אתחול לחריץ הלא פעיל הנוכחי שלך לאחר הפעלה מחדש!\nיש להשתמש באפשרות זו רק לאחר ביצוע OTA בלבד.\nלהמשיך?</string>
+    <string name="install_inactive_slot">התקנה לסלוט לא פעיל (לאחר OTA)</string>
+    <string name="install_inactive_slot_msg">ההתקן שלך ייאלץ אתחול לסלוט הלא פעיל הנוכחי שלך לאחר הפעלה מחדש!\nיש להשתמש באפשרות זו רק לאחר ביצוע OTA בלבד.\nלהמשיך?</string>
     <string name="setup_title">התקנה נוספת</string>
     <string name="select_patch_file">בחירה והתקנת קובץ</string>
-    <string name="patch_file_msg">בחירת תמונה גולמית (*.img) או ODIN tarfile (*.tar) או payload.bin (*.bin)</string>
+    <string name="patch_file_msg">בחירת קובץ גולמי (*.img) או ODIN tarfile (*.tar) או payload.bin (*.bin)</string>
     <string name="reboot_delay_toast">מאתחל בעוד 5 שניות…</string>
     <string name="flash_screen_title">התקנה</string>
 
@@ -67,22 +67,22 @@
     <string name="su_snack_deny">הרשאות משתמש על עבור %1$s נשללו</string>
     <string name="su_snack_notif_on">התראות של %1$s מופעלות</string>
     <string name="su_snack_notif_off">התראות של %1$s מושבתות</string>
-    <string name="su_snack_log_on">יומני רישום עבור %1$s פועלות</string>
-    <string name="su_snack_log_off">יומני רישום עבור %1$s מושבתות</string>
+    <string name="su_snack_log_on">Log עבור %1$s מופעל</string>
+    <string name="su_snack_log_off">Log עבור %1$s מושבת</string>
     <string name="su_revoke_title">להסיר?</string>
     <string name="su_revoke_msg">נא לאשר שלילת הרשאות עבור %1$s?</string>
-    <string name="toast">הרמת כוסית</string>
+    <string name="toast">התראה</string>
     <string name="none">ללא</string>
     <string name="superuser_toggle_notification">התראות</string>
     <string name="superuser_toggle_revoke">הסרה</string>
     <string name="superuser_policy_none">טרם נתבקשו הרשאות משתמש על על ידי יישומים</string>
 
     <!--Logs-->
-    <string name="log_data_none">הינך ללא יומן, יש לנסות להשתמש יותר ביישומי השורש שלך</string>
-    <string name="log_data_magisk_none">יומני רישום Magisk ריקים, זה מוזר</string>
-    <string name="menuSaveLog">שמירת יומן רישום</string>
-    <string name="menuClearLog">ניקוי יומן רישום כעת</string>
-    <string name="logs_cleared">יומני רישום נוקו בהצלחה</string>
+    <string name="log_data_none">אין Log, יש לנסות להשתמש יותר ביישומי הRoot שלך</string>
+    <string name="log_data_magisk_none">Log Magisk ריק, זה מוזר</string>
+    <string name="menuSaveLog">שמירת Log</string>
+    <string name="menuClearLog">ניקוי Log כעת</string>
+    <string name="logs_cleared">Log נוקה בהצלחה</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">יעד UID: %1$d</string>
     <string name="target_pid">מציב ns יעד PID: %s</string>
@@ -100,15 +100,15 @@
     <!--Module-->
     <string name="no_info_provided">(לא סופק מידע)</string>
     <string name="reboot_userspace">אתחול רך</string>
-    <string name="reboot_recovery">אתחול למצב שחזור</string>
-    <string name="reboot_bootloader">אתחול לטוען האתחול</string>
+    <string name="reboot_recovery">אתחול למצב Recovery</string>
+    <string name="reboot_bootloader">אתחול לBootloader</string>
     <string name="reboot_download">אתחול למצב הורדה</string>
     <string name="reboot_edl">אתחול למצב EDL</string>
     <string name="reboot_safe_mode">מצב בטוח</string>
     <string name="module_version_author">%1$s מאת %2$s</string>
     <string name="module_state_remove">הסרה</string>
     <string name="module_action">פעולה</string>
-    <string name="module_state_restore">שחזור</string>
+    <string name="module_state_restore">שיחזור</string>
     <string name="module_action_install_external">התקנה מהאחסון</string>
     <string name="update_available">עדכונים זמינים</string>
     <string name="suspend_text_riru">מודול מושעה כי %1$s מופעל</string>
@@ -129,7 +129,7 @@
     <string name="settings_hide_app_title">הסתרת היישום Magisk</string>
     <string name="settings_hide_app_summary">התקנת יישום מתווך עם מזהה חבילה אקראי ותווית שם מותאמת אישית</string>
     <string name="settings_restore_app_title">שיחזור היישום Magisk</string>
-    <string name="settings_restore_app_summary">ביטול הסתרת היישום ושחזור אל ה-APK המקורי</string>
+    <string name="settings_restore_app_summary">ביטול הסתרת היישום ושיחזור אל ה-APK המקורי</string>
     <string name="language">שפה</string>
     <string name="system_default">(ברירת מחדל מערכת)</string>
     <string name="settings_check_update_title">בדיקת עדכונים</string>
@@ -144,9 +144,9 @@
     <string name="settings_denylist_summary">כל השינויים של Magisk יוחזרו לתהליכים ברשימת הדחייה</string>
     <string name="settings_denylist_config_title">הגדרת רשימת הדחייה</string>
     <string name="settings_denylist_config_summary">בחירת התהליכים שייכללו ברשימת הדחייה</string>
-    <string name="settings_hosts_title">מארחים חסרי מערכת</string>
-    <string name="settings_hosts_summary">מארחים חסרי מערכת תומכים ביישומים חוסמי פרסומות</string>
-    <string name="settings_hosts_toast">הוספת מודול מארחים חסרי מערכת</string>
+    <string name="settings_hosts_title">hosts חסרי מערכת</string>
+    <string name="settings_hosts_summary">hosts חסרי מערכת תומכים ביישומים חוסמי פרסומות</string>
+    <string name="settings_hosts_toast">הוספת מודול hosts חסרי מערכת</string>
     <string name="settings_app_name_hint">שם חדש</string>
     <string name="settings_app_name_helper">היישום יארז מחדש בשם זה</string>
     <string name="settings_app_name_error">פורמט לא חוקי</string>
@@ -181,16 +181,16 @@
     <string name="settings_owner_only">בעל ההתקן בלבד</string>
     <string name="settings_owner_manage">אחראי ניהול ההתקן</string>
     <string name="settings_user_independent">משתמש עצמאי</string>
-    <string name="owner_only_summary">לבעלים בלבד ישנה גישת שורש</string>
-    <string name="owner_manage_summary">הבעלים בלבד יכול לנהל גישת שורש ולקבל הנחיות לבקשה</string>
-    <string name="user_independent_summary">לכל משתמש יש כללי שורש נפרדים משלו</string>
+    <string name="owner_only_summary">לבעלים בלבד ישנה גישת Root</string>
+    <string name="owner_manage_summary">הבעלים בלבד יכול לנהל גישת Root ולקבל הנחיות לבקשה</string>
+    <string name="user_independent_summary">לכל משתמש יש כללי Root נפרדים משלו</string>
     <string name="mount_namespace_mode">מצב הצבת מרחב שם</string>
     <string name="settings_ns_global">מרחב שם גלובלי</string>
     <string name="settings_ns_requester">מרחב שם מורש</string>
     <string name="settings_ns_isolate">מרחב שם מבודד</string>
-    <string name="global_summary">כלל חיבורי השורש משתמשים במרחב שם הגלובלי</string>
-    <string name="requester_summary">חיבורי השורש יירשו את מרחב השם של המבקש</string>
-    <string name="isolate_summary">לכל חיבור שורש יהיה מרחב שם מבודד</string>
+    <string name="global_summary">כלל חיבורי הRoot משתמשים במרחב שם הגלובלי</string>
+    <string name="requester_summary">חיבורי הRoot יירשו את מרחב השם של המבקש</string>
+    <string name="isolate_summary">לכל חיבור Root יהיה מרחב שם מבודד</string>
 
     <!--Notifications-->
     <string name="update_channel">עדכוני Magisk</string>
@@ -225,7 +225,7 @@
     <string name="setup_fail">ההתקנה כשלה</string>
     <string name="env_fix_title">דורש התקנה נוספת</string>
     <string name="env_fix_msg">ההתקן שלך זקוק להתקנה נוספת כדי ש-Magisk יפעל כראוי. האם ברצונך להמשיך ולהפעיל מחדש?</string>
-    <string name="env_full_fix_msg">ההתקן שלך זקוק לצריבה מחדש של Magisk כדי לעבוד כראוי. נא להתקין מחדש את Magisk בתוך היישום, מצב השחזור אינו יכול לקבל מידע נכון על ההתקן.</string>
+    <string name="env_full_fix_msg">ההתקן שלך זקוק לצריבה מחדש של Magisk כדי לעבוד כראוי. נא להתקין מחדש את Magisk בתוך היישום, מצב הRecovery אינו יכול לקבל מידע נכון על ההתקן.</string>
     <string name="setup_msg">הגדרת סביבת ריצה…</string>
     <string name="unsupport_magisk_title">גרסת Magisk אינה נתמכת</string>
     <string name="unsupport_magisk_msg">גרסה זו של היישום אינה תומכת ביישום  Magisk הנמוך מ- %1$s.\n\nהיישום יתנהג כאילו Magisk אינו מותקן,יש לשדרג את Magisk במהירות האפשריות.</string>
@@ -233,7 +233,7 @@
     <string name="unsupport_system_app_msg">הפעלת יישום זה כיישום מערכת אינה נתמך. נא להשיב את היישום כיישום משתמש.</string>
     <string name="unsupport_other_su_msg">התגלתה פקודת \"su\" שאינה שייכת ליישום Magisk נא להסיר את הפקודה שאינה נתמכת.</string>
     <string name="unsupport_external_storage_msg">Magisk מותקן באחסון החיצוני. נא להעביר את היישום לאחסון הפנימי.</string>
-    <string name="unsupport_nonroot_stub_msg">היישום אינו יכול להמשיך לעבוד במצב הנסתר מכיוון שגישת השורש אבדה. נא לשחזר אותו חזרה ל-APK המקורי.</string>
+    <string name="unsupport_nonroot_stub_msg">היישום אינו יכול להמשיך לעבוד במצב הנסתר מכיוון שגישת הRoot אבדה. נא לשחזר אותו חזרה ל-APK המקורי.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">הענת הרשאת אחסון להפעלת פונקציה זו</string>
     <string name="post_notifications_denied">הענקת הרשאה להתראות כדי להפעיל פונקציה זו</string>
