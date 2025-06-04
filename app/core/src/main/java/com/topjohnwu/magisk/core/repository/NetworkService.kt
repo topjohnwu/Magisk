@@ -11,6 +11,7 @@ import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.data.GithubApiServices
 import com.topjohnwu.magisk.core.data.RawUrl
 import com.topjohnwu.magisk.core.model.Release
+import com.topjohnwu.magisk.core.model.ReleaseAssets
 import com.topjohnwu.magisk.core.model.UpdateInfo
 import retrofit2.HttpException
 import timber.log.Timber
@@ -44,6 +45,8 @@ class NetworkService(
         while (true) {
             val response = api.fetchReleases(page = page)
             val releases = response.body() ?: throw HttpException(response)
+            // Remove all non Magisk releases
+            releases.removeAll { it.tag[0] != 'v' && !it.tag.startsWith("canary") }
             // Make sure it's sorted correctly
             releases.sortByDescending { it.createdTime }
             releases.find(predicate)?.let { return it }
@@ -55,35 +58,51 @@ class NetworkService(
         }
     }
 
-    private fun Release.asPublicInfo(): UpdateInfo {
+    suspend fun fetchUpdate(version: Int) = findRelease { it.versionCode == version }?.asInfo()
+
+    private inline fun Release.asInfo(
+        selector: (ReleaseAssets) -> Boolean = {
+            // Default selector picks the non-debug APK
+            it.name.run { endsWith(".apk") && !contains("debug") }
+        }): UpdateInfo {
+        return if (tag[0] == 'v') asPublicInfo(selector)
+        else asCanaryInfo(selector)
+    }
+
+    private inline fun Release.asPublicInfo(selector: (ReleaseAssets) -> Boolean): UpdateInfo {
         val version = tag.drop(1)
         val date = createdTime.format(DateTimeFormatter.ofPattern("yyyy.M.d"))
         return UpdateInfo(
             version = version,
-            versionCode = (version.toFloat() * 1000).toInt(),
-            link = assets[0].url,
+            versionCode = versionCode,
+            link = assets.find(selector)!!.url,
             note = "## $date $name\n\n$body"
         )
     }
 
-    private fun Release.asCanaryInfo(assetSelector: String): UpdateInfo {
+    private inline fun Release.asCanaryInfo(selector: (ReleaseAssets) -> Boolean): UpdateInfo {
         return UpdateInfo(
             version = name.substring(8, 16),
-            versionCode = tag.drop(7).toInt(),
-            link = assets.find { it.name == assetSelector }!!.url,
+            versionCode = versionCode,
+            link = assets.find(selector)!!.url,
             note = "## $name\n\n$body"
         )
     }
 
-    private suspend fun fetchStableUpdate() = api.fetchLatestRelease().asPublicInfo()
+    // Version number: canary == debug >= beta >= stable
 
-    private suspend fun fetchBetaUpdate() = findRelease { it.tag[0] == 'v' }!!.asPublicInfo()
+    // Find the latest non-prerelease
+    private suspend fun fetchStableUpdate() = api.fetchLatestRelease().asInfo()
 
-    private suspend fun fetchCanary() = findRelease { it.tag.startsWith("canary-") }!!
+    // Find the latest non-canary release
+    private suspend fun fetchBetaUpdate() = findRelease { it.tag[0] == 'v' }!!.asInfo()
 
-    private suspend fun fetchCanaryUpdate() = fetchCanary().asCanaryInfo("app-release.apk")
+    // Find the latest release, regardless whether it's prerelease
+    private suspend fun fetchCanary() = findRelease { true }!!
 
-    private suspend fun fetchDebugUpdate() = fetchCanary().asCanaryInfo("app-debug.apk")
+    private suspend fun fetchCanaryUpdate() = fetchCanary().asInfo()
+
+    private suspend fun fetchDebugUpdate() = fetchCanary().asInfo { it.name == "app-debug.apk" }
 
     private suspend fun fetchCustomUpdate(url: String): UpdateInfo {
         val info = raw.fetchUpdateJson(url).magisk

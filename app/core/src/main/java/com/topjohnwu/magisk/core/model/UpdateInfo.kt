@@ -38,18 +38,13 @@ data class ReleaseAssets(
     @Json(name = "browser_download_url") val url: String,
 )
 
-@Retention(AnnotationRetention.RUNTIME)
-@JsonQualifier
-annotation class DateTime
-
 class DateTimeAdapter {
     @ToJson
-    fun toJson(@DateTime date: LocalDateTime): String {
+    fun toJson(date: LocalDateTime): String {
         return date.toString()
     }
 
     @FromJson
-    @DateTime
     fun fromJson(date: String): LocalDateTime {
         return LocalDateTime.parse(date, ISO_OFFSET_DATE_TIME)
     }
@@ -62,5 +57,13 @@ data class Release(
     val prerelease: Boolean,
     val assets: List<ReleaseAssets>,
     val body: String,
-    @Json(name = "created_at") @DateTime val createdTime: LocalDateTime,
-)
+    @Json(name = "created_at") val createdTime: LocalDateTime,
+) {
+    val versionCode: Int get() {
+        return if (tag[0] == 'v') {
+            (tag.drop(1).toFloat() * 1000).toInt()
+        } else {
+            tag.drop(7).toInt()
+        }
+    }
+}
