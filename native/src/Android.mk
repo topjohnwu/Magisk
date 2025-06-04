@@ -6,6 +6,7 @@ LOCAL_PATH := $(call my-dir)
 
 ifdef B_MAGISK
 
+
 include $(CLEAR_VARS)
 LOCAL_MODULE := magisk
 LOCAL_STATIC_LIBRARIES := \
