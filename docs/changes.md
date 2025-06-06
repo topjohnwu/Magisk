@@ -1,3 +1,4 @@
+![IMG_٢٠٢٥٠٥٢٨_١٦٠١٠٨](https://github.com/user-attachments/assets/8e39457e-78eb-4257-9dfc-087628b81088)
 # Magisk Changelog
 
 ### v29.0
