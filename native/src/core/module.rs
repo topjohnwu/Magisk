@@ -92,7 +92,7 @@ impl Drop for PathTracker<'_> {
 enum FsNode {
     Directory { children: FsNodeMap },
     File { src: Utf8CString },
-    Symlink { target: Utf8CString },
+    Symlink { target: Utf8CString, is_magisk_bin: bool },
     Whiteout,
 }
 
@@ -125,6 +125,7 @@ impl FsNode {
                     .entry(entry.name().to_string())
                     .or_insert_with(|| FsNode::Symlink {
                         target: link.to_owned(),
+                        is_magisk_bin: false,
                     });
             } else {
                 if entry.is_char_device() {
@@ -277,6 +278,7 @@ impl FsNode {
                                 entry.name().to_string(),
                                 FsNode::Symlink {
                                     target: link.to_owned(),
+                                    is_magisk_bin: false,
                                 },
                             );
                         } else {
@@ -297,10 +299,11 @@ impl FsNode {
                 }
                 mount_dummy("mount", src, path.tmp, false)?;
             }
-            FsNode::Symlink { target } => {
+            FsNode::Symlink { target, is_magisk_bin } => {
                 module_log!("mklink", path.tmp, target);
                 path.tmp.create_symlink_to(target)?;
-                if path.real.exists() {
+                // Avoid cloneing existing su attributes to our su
+                if !*is_magisk_bin && path.real.exists() {
                     clone_attr(path.real, path.tmp)?;
                 }
             }
@@ -348,18 +351,21 @@ fn inject_magisk_bins(system: &mut FsNode) {
             "su".to_string(),
             FsNode::Symlink {
                 target: Utf8CString::from("./magisk"),
+                is_magisk_bin: true,
             },
         );
         children.insert(
             "resetprop".to_string(),
             FsNode::Symlink {
                 target: Utf8CString::from("./magisk"),
+                is_magisk_bin: true,
             },
         );
         children.insert(
             "supolicy".to_string(),
             FsNode::Symlink {
                 target: Utf8CString::from("./magiskpolicy"),
+                is_magisk_bin: true,
             },
         );
     }
