@@ -13,17 +13,13 @@ use std::os::unix::net::UnixStream;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
-const DEFAULT_SHELL: &str = "/system/bin/sh";
-
 impl Default for SuRequest {
     fn default() -> Self {
         SuRequest {
             target_uid: AID_ROOT,
             target_pid: -1,
-            login: false,
             keep_env: false,
-            shell: DEFAULT_SHELL.to_string(),
-            command: "".to_string(),
+            command: vec![],
             context: "".to_string(),
             gids: vec![],
         }
