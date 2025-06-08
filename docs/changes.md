@@ -23,7 +23,8 @@
 - [General] Add basic support for RISC-V (not built in releases)
 - [General] Use a minimal libc to build static executables (`magiskinit` and `magiskboot`) for smaller sizes
 - [Core] Remove unnecessary mirror for magic mount
-- [Core] Update boot image detection logic to support more devices
+- [Cor
+- e] Update boot image detection logic to support more devices
 - [MagiskInit] Rewrite 2SI logic for injecting `magiskinit` as `init`
 - [MagiskInit] Update preinit partition detection
 - [Zygisk] Update internal JNI hooking implementation
