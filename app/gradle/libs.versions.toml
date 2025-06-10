@@ -10,7 +10,7 @@ retrofit = "3.0.0"
 room = "2.7.1"
 
 [libraries]
-bcpkix = { module = "org.bouncycastle:bcpkix-jdk18on", version = "1.80" }
+bcpkix = { module = "org.bouncycastle:bcpkix-jdk18on", version = "1.81" }
 commons-compress = { module = "org.apache.commons:commons-compress", version = "1.27.1" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 retrofit-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "retrofit" }
@@ -24,11 +24,11 @@ jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version = "7.1.0.20241126
 
 # AndroidX
 activity = { module = "androidx.activity:activity", version = "1.10.1" }
-appcompat = { module = "androidx.appcompat:appcompat", version = "1.7.0" }
+appcompat = { module = "androidx.appcompat:appcompat", version = "1.7.1" }
 core-ktx = { module = "androidx.core:core-ktx", version = "1.16.0" }
 core-splashscreen = { module = "androidx.core:core-splashscreen", version = "1.0.1" }
 constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version = "2.2.1" }
-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version = "1.8.7" }
+fragment-ktx = { module = "androidx.fragment:fragment-ktx", version = "1.8.8" }
 navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigation" }
 navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigation" }
 profileinstaller = { module = "androidx.profileinstaller:profileinstaller", version = "1.4.1" }
