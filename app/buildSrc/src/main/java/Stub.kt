@@ -1,8 +1,11 @@
+import com.android.build.api.artifact.SingleArtifact
 import org.gradle.api.DefaultTask
+import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
+import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
@@ -10,22 +13,25 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
+import org.gradle.kotlin.dsl.assign
+import org.gradle.kotlin.dsl.named
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.PrintStream
 import java.security.SecureRandom
 import java.util.Random
+import java.util.zip.Deflater
+import java.util.zip.DeflaterOutputStream
+import java.util.zip.ZipEntry
+import java.util.zip.ZipFile
+import java.util.zip.ZipOutputStream
 import javax.crypto.Cipher
 import javax.crypto.CipherOutputStream
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 import kotlin.random.asKotlinRandom
 
-// Set non-zero value here to fix the random seed for reproducible builds
-// CI builds are always reproducible
-val RAND_SEED = if (System.getenv("CI") != null) 42 else 0
-private lateinit var RANDOM: Random
 private val kRANDOM get() = RANDOM.asKotlinRandom()
 
 private val c1 = mutableListOf<String>()
@@ -72,7 +78,7 @@ private fun PrintStream.byteField(name: String, bytes: ByteArray) {
 }
 
 @CacheableTask
-abstract class ManifestUpdater: DefaultTask() {
+private abstract class ManifestUpdater: DefaultTask() {
     @get:Input
     abstract val applicationId: Property<String>
 
@@ -182,9 +188,7 @@ abstract class ManifestUpdater: DefaultTask() {
 }
 
 
-fun genStubClasses(factoryOutDir: File, appOutDir: File) {
-    fun String.ind(level: Int) = replaceIndentByMargin("    ".repeat(level))
-
+private fun genStubClasses(factoryOutDir: File, appOutDir: File) {
     val classNameGenerator = sequence {
         fun notJavaKeyword(name: String) = when (name) {
             "do", "if", "for", "int", "new", "try" -> false
@@ -228,7 +232,7 @@ fun genStubClasses(factoryOutDir: File, appOutDir: File) {
     genClass("StubApplication", appOutDir)
 }
 
-fun genEncryptedResources(res: ByteArray, outDir: File) {
+private fun genEncryptedResources(res: ByteArray, outDir: File) {
     val mainPkgDir = File(outDir, "com/topjohnwu/magisk")
     mainPkgDir.mkdirs()
 
@@ -257,5 +261,88 @@ fun genEncryptedResources(res: ByteArray, outDir: File) {
         it.byteField("res", bos.toByteArray())
 
         it.println("}")
+    }
+}
+
+fun Project.setupStubApk() {
+    setupAppCommon()
+
+    androidComponents.onVariants { variant ->
+        val variantName = variant.name
+        val variantCapped = variantName.replaceFirstChar { it.uppercase() }
+        val manifestUpdater =
+            project.tasks.register("${variantName}ManifestProducer", ManifestUpdater::class.java) {
+                dependsOn("generate${variantCapped}ObfuscatedClass")
+                applicationId = variant.applicationId
+                appClassDir.set(layout.buildDirectory.dir("generated/source/app/$variantName"))
+                factoryClassDir.set(layout.buildDirectory.dir("generated/source/factory/$variantName"))
+            }
+        variant.artifacts.use(manifestUpdater)
+            .wiredWithFiles(
+                ManifestUpdater::mergedManifest,
+                ManifestUpdater::outputManifest)
+            .toTransform(SingleArtifact.MERGED_MANIFEST)
+    }
+
+    androidApp.applicationVariants.all {
+        val variantCapped = name.replaceFirstChar { it.uppercase() }
+        val variantLowered = name.lowercase()
+        val outFactoryClassDir = layout.buildDirectory.file("generated/source/factory/${variantLowered}").get().asFile
+        val outAppClassDir = layout.buildDirectory.file("generated/source/app/${variantLowered}").get().asFile
+        val outResDir = layout.buildDirectory.dir("generated/source/res/${variantLowered}").get().asFile
+        val aapt = File(androidApp.sdkDirectory, "build-tools/${androidApp.buildToolsVersion}/aapt2")
+        val apk = layout.buildDirectory.file("intermediates/linked_resources_binary_format/" +
+                "${variantLowered}/process${variantCapped}Resources/linked-resources-binary-format-${variantLowered}.ap_").get().asFile
+
+        val genManifestTask = tasks.register("generate${variantCapped}ObfuscatedClass") {
+            inputs.property("seed", RAND_SEED)
+            outputs.dirs(outFactoryClassDir, outAppClassDir)
+            doLast {
+                outFactoryClassDir.mkdirs()
+                outAppClassDir.mkdirs()
+                genStubClasses(outFactoryClassDir, outAppClassDir)
+            }
+        }
+        registerJavaGeneratingTask(genManifestTask, outFactoryClassDir, outAppClassDir)
+
+        val processResourcesTask = tasks.named("process${variantCapped}Resources") {
+            outputs.dir(outResDir)
+            doLast {
+                val apkTmp = File("${apk}.tmp")
+                exec {
+                    commandLine(aapt, "optimize", "-o", apkTmp, "--collapse-resource-names", apk)
+                }
+
+                val bos = ByteArrayOutputStream()
+                ZipFile(apkTmp).use { src ->
+                    ZipOutputStream(apk.outputStream()).use {
+                        it.setLevel(Deflater.BEST_COMPRESSION)
+                        it.putNextEntry(ZipEntry("AndroidManifest.xml"))
+                        src.getInputStream(src.getEntry("AndroidManifest.xml")).transferTo(it)
+                        it.closeEntry()
+                    }
+                    DeflaterOutputStream(bos, Deflater(Deflater.BEST_COMPRESSION)).use {
+                        src.getInputStream(src.getEntry("resources.arsc")).transferTo(it)
+                    }
+                }
+                apkTmp.delete()
+                genEncryptedResources(bos.toByteArray(), outResDir)
+            }
+        }
+
+        registerJavaGeneratingTask(processResourcesTask, outResDir)
+    }
+    // Override optimizeReleaseResources task
+    val apk = layout.buildDirectory.file("intermediates/linked_resources_binary_format/" +
+            "release/processReleaseResources/linked-resources-binary-format-release.ap_").get().asFile
+    val optRes = layout.buildDirectory.file("intermediates/optimized_processed_res/" +
+            "release/optimizeReleaseResources/resources-release-optimize.ap_").get().asFile
+    afterEvaluate {
+        tasks.named("optimizeReleaseResources") {
+            doLast { apk.copyTo(optRes, true) }
+        }
+    }
+    tasks.named<Delete>("clean") {
+        delete.addAll(listOf("src/debug/AndroidManifest.xml", "src/release/AndroidManifest.xml"))
     }
 }
