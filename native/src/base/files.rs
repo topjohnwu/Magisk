@@ -325,12 +325,11 @@ impl Utf8CStr {
 
     pub fn set_attr<'a>(&'a self, attr: &'a FileAttr) -> OsResult<'a, ()> {
         unsafe {
-            if !attr.is_symlink() {
-                if libc::chmod(self.as_ptr(), (attr.st.st_mode & 0o777).as_()) < 0 {
-                    let self_attr = self.get_attr()?;
-                    if !self_attr.is_symlink() {
-                        return Err(OsError::last_os_error("chmod", Some(self), None));
-                    }
+            if !attr.is_symlink() && libc::chmod(self.as_ptr(), (attr.st.st_mode & 0o777).as_()) < 0
+            {
+                let self_attr = self.get_attr()?;
+                if !self_attr.is_symlink() {
+                    return Err(OsError::last_os_error("chmod", Some(self), None));
                 }
             }
             libc::lchown(self.as_ptr(), attr.st.st_uid, attr.st.st_gid).check_os_err(
