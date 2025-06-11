@@ -165,9 +165,11 @@ static void exec_cmd(const char *action, vector<Extra> &data,
 void app_log(const SuAppRequest &info, SuPolicy policy, bool notify) {
     if (fork_dont_care() == 0) {
         string context = (string) info.request.context;
-        string command = info.request.command.empty()
-            ? (string) info.request.shell
-            : (string) info.request.command;
+        string command;
+        for (auto &str: info.request.command) {
+            if (!command.empty()) command += " ";
+            command += (string) str;
+        }
 
         vector<Extra> extras;
         extras.reserve(9);
