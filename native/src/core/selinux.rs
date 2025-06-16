@@ -83,8 +83,10 @@ pub(crate) fn restore_tmpcon() -> LoggedResult<()> {
     let mut path = cstr::buf::default();
     let mut dir = Directory::open(tmp)?;
     while let Some(ref e) = dir.read()? {
-        e.resolve_path(&mut path)?;
-        path.set_secontext(SYSTEM_CON)?;
+        if !e.is_symlink() {
+            e.resolve_path(&mut path)?;
+            path.set_secontext(SYSTEM_CON)?;
+        }
     }
 
     path.clear();
