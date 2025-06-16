@@ -1,5 +1,4 @@
 #include <cstdio>
-#include <cstdlib>
 
 #include <android/log.h>
 

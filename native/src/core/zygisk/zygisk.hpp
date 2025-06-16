@@ -1,9 +1,6 @@
 #pragma once
 
-#include <sys/mman.h>
-#include <stdint.h>
 #include <jni.h>
-#include <vector>
 #include <core.hpp>
 
 #if defined(__LP64__)

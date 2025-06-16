@@ -1,10 +1,8 @@
 #include <sys/mman.h>
 #include <sys/sendfile.h>
-#include <sys/sysmacros.h>
 #include <linux/fs.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <libgen.h>
 
 #include <base.hpp>
 

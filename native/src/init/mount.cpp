@@ -4,7 +4,6 @@
 #include <libgen.h>
 
 #include <base.hpp>
-#include <flags.h>
 #include <consts.hpp>
 
 #include "init.hpp"

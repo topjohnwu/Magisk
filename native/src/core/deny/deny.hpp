@@ -1,12 +1,6 @@
 #pragma once
 
-#include <pthread.h>
 #include <string_view>
-#include <functional>
-#include <map>
-#include <atomic>
-
-#include <core.hpp>
 
 #define ISOLATED_MAGIC "isolated"
 

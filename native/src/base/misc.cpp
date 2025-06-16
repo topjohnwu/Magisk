@@ -1,9 +1,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/prctl.h>
-#include <sys/sysmacros.h>
 #include <fcntl.h>
-#include <pwd.h>
 #include <unistd.h>
 #include <syscall.h>
 #include <random>

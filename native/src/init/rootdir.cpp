@@ -1,11 +1,9 @@
 #include <sys/mount.h>
 #include <libgen.h>
-#include <sys/sysmacros.h>
 
 #include <sepolicy.hpp>
 #include <consts.hpp>
 #include <base.hpp>
-#include <flags.h>
 #include <xz.h>
 
 #include "init.hpp"

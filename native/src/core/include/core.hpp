@@ -1,10 +1,8 @@
 #pragma once
 
 #include <sys/socket.h>
-#include <pthread.h>
 #include <poll.h>
 #include <string>
-#include <limits>
 #include <atomic>
 #include <functional>
 

@@ -43,6 +43,11 @@ static size_t restore(int fd, const char *filename) {
     return size;
 }
 
+static bool check_env(const char *name) {
+    const char *val = getenv(name);
+    return val != nullptr && val == "true"sv;
+}
+
 void dyn_img_hdr::print() const {
     uint32_t ver = header_version();
     fprintf(stderr, "%-*s [%u]\n", PADDING, "HEADER_VER", ver);

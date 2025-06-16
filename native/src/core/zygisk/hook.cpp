@@ -1,3 +1,4 @@
+#include <sys/mman.h>
 #include <sys/mount.h>
 #include <sys/resource.h>
 #include <dlfcn.h>
