@@ -39,6 +39,11 @@ For installation issues, upload both boot image and install logs.<br>
 For Magisk issues, upload boot logcat or dmesg.<br>
 For Magisk app crashes, record and upload the logcat when the crash occurs.
 
+## Notable Limitations
+
+Zygisk may not work for all ROMs, especially custom ROMs such as GrapheneOS (changed zygote method signature).<br>
+You might try out forks of Zygisk (but beware of their licenses and coding practices, review carefully).<br>
+
 ## Translation Contributions
 
 Default string resources for the Magisk app and its stub APK are located here:
