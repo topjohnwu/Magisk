@@ -12,7 +12,6 @@ NOTES=notes.md
 
 # These are constants, do not modify
 GCONFIG=app/gradle.properties
-README=README.MD
 BUILDCMD="./build.py -c $CONFIG"
 CWD=$(pwd)
 
@@ -36,23 +35,6 @@ ensure_config() {
 disable_version_config() {
   # Comment out version config
   sed -i "s:^version=:# version=:g" $CONFIG
-}
-
-# $1 = tag
-update_readme_canary() {
-  sed -i "s:badge/Magisk-Canary.*:badge/Magisk-Canary-red)](https\://github.com/topjohnwu/Magisk/releases/tag/$1):g" $README
-}
-
-# $1 = tag
-update_readme_beta() {
-  update_readme_canary $1
-  sed -i "s:badge/Magisk%20Beta.*:badge/Magisk%20Beta-${1}-blue)](https\://github.com/topjohnwu/Magisk/releases/tag/$1):g" $README
-}
-
-# $1 = tag
-update_readme_stable() {
-  update_readme_beta $1
-  sed -i "s:badge/Magisk-v.*:badge/Magisk-${1}-blue)](https\://github.com/topjohnwu/Magisk/releases/tag/$1):g" $README
 }
 
 # $1 = tag
@@ -109,7 +91,6 @@ bump_canary_version() {
   code=$((code + 1))
   local tag="canary-$code"
   sed -i "s:versionCode=.*:versionCode=${code}:g" $GCONFIG
-  update_readme_canary $tag
 
   # Commit version code changes
   git add -u .
@@ -143,10 +124,8 @@ set_version() {
   sed -i "1s:.*:## $(date +'%Y.%-m.%-d') Magisk v$ver:" $NOTES
 
   if $stable; then
-    update_readme_stable $tag
     update_stable_json
   else
-    update_readme_beta $tag
     update_beta_json
   fi
 
@@ -215,7 +194,7 @@ upload() {
   tail -n +3 $NOTES > release.md
 
   case $type in
-    "canary" )
+    canary )
       tag="canary-$code"
       title="Magisk ($ver) ($code)"
 
@@ -225,7 +204,7 @@ upload() {
       # Publish release
       gh release create --verify-tag $tag -p -t "$title" -F release.md $out/app-release.apk $out/app-debug.apk $NOTES
       ;;
-    "beta|stable" )
+    beta|stable )
       tag="v$ver"
       title="Magisk v$ver"
 
@@ -274,10 +253,10 @@ git pull
 trap disable_version_config EXIT
 ensure_config
 case $1 in
-  "canary" ) build_canary ;;
-  "beta" ) build_beta $2 ;;
-  "stable" ) build_stable $2 ;;
-  "upload" ) upload $2 ;;
-  "revert" ) revert ;;
+  canary ) build_canary ;;
+  beta   ) build_beta $2 ;;
+  stable ) build_stable $2 ;;
+  upload ) upload $2 ;;
+  revert ) revert ;;
   * ) exit 1 ;;
 esac
