@@ -32,6 +32,7 @@ object Config : PreferenceConfig, DBConfig {
         const val SU_NOTIFICATION = "su_notification"
         const val SU_REAUTH = "su_reauth"
         const val SU_TAPJACK = "su_tapjack"
+        const val SU_RESTRICT = "su_restrict"
         const val CHECK_UPDATES = "check_update"
         const val RELEASE_CHANNEL = "release_channel"
         const val CUSTOM_CHANNEL = "custom_channel"
@@ -147,6 +148,7 @@ object Config : PreferenceConfig, DBConfig {
         }
     var suReAuth by preference(Key.SU_REAUTH, false)
     var suTapjack by preference(Key.SU_TAPJACK, true)
+    var suRestrict by preference(Key.SU_RESTRICT, false)
 
     private const val SU_FINGERPRINT = "su_fingerprint"
     private const val UPDATE_CHANNEL = "update_channel"

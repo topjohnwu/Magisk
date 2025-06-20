@@ -184,6 +184,10 @@ int parse_int(string_view s) {
     return parse_num<int, 10>(s);
 }
 
+uint32_t parse_uint32_hex(string_view s) {
+    return parse_num<uint32_t, 16>(s);
+}
+
 int switch_mnt_ns(int pid) {
     int ret = -1;
     int fd = syscall(__NR_pidfd_open, pid, 0);
