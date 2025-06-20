@@ -63,9 +63,7 @@
     <string-array name="update_channel">
         <item>@string/settings_update_stable</item>
         <item>@string/settings_update_beta</item>
+        <item>@string/settings_update_debug</item>
         <item>@string/settings_update_custom</item>
-        <item>Canary</item>
-        <item>Debug</item>
     </string-array>
-
 </resources>

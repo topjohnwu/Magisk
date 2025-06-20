@@ -1,8 +1,8 @@
 package com.topjohnwu.magisk.core.repository
 
+import com.topjohnwu.magisk.core.BuildConfig
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Config.Value.BETA_CHANNEL
-import com.topjohnwu.magisk.core.Config.Value.CANARY_CHANNEL
 import com.topjohnwu.magisk.core.Config.Value.CUSTOM_CHANNEL
 import com.topjohnwu.magisk.core.Config.Value.DEBUG_CHANNEL
 import com.topjohnwu.magisk.core.Config.Value.DEFAULT_CHANNEL
@@ -24,20 +24,24 @@ class NetworkService(
 ) {
     suspend fun fetchUpdate() = safe {
         var info = when (Config.updateChannel) {
-            DEFAULT_CHANNEL, STABLE_CHANNEL -> fetchStableUpdate()
+            DEFAULT_CHANNEL -> if (BuildConfig.DEBUG) fetchDebugUpdate() else fetchStableUpdate()
+            STABLE_CHANNEL -> fetchStableUpdate()
             BETA_CHANNEL -> fetchBetaUpdate()
-            CANARY_CHANNEL -> fetchCanaryUpdate()
             DEBUG_CHANNEL -> fetchDebugUpdate()
             CUSTOM_CHANNEL -> fetchCustomUpdate(Config.customChannelUrl)
             else -> throw IllegalArgumentException()
         }
         if (info.versionCode < Info.env.versionCode &&
-            Config.updateChannel == DEFAULT_CHANNEL) {
+            Config.updateChannel == DEFAULT_CHANNEL &&
+            !BuildConfig.DEBUG
+        ) {
             Config.updateChannel = BETA_CHANNEL
             info = fetchBetaUpdate()
         }
         info
     }
+
+    suspend fun fetchUpdate(version: Int) = findRelease { it.versionCode == version }.asInfo()
 
     // Keep going through all release pages until we find a match
     private suspend inline fun findRelease(predicate: (Release) -> Boolean): Release? {
@@ -58,14 +62,13 @@ class NetworkService(
         }
     }
 
-    suspend fun fetchUpdate(version: Int) = findRelease { it.versionCode == version }?.asInfo()
-
-    private inline fun Release.asInfo(
+    private inline fun Release?.asInfo(
         selector: (ReleaseAssets) -> Boolean = {
             // Default selector picks the non-debug APK
             it.name.run { endsWith(".apk") && !contains("debug") }
         }): UpdateInfo {
-        return if (tag[0] == 'v') asPublicInfo(selector)
+        return if (this == null) UpdateInfo()
+        else if (tag[0] == 'v') asPublicInfo(selector)
         else asCanaryInfo(selector)
     }
 
@@ -89,20 +92,16 @@ class NetworkService(
         )
     }
 
-    // Version number: canary == debug >= beta >= stable
+    // Version number: debug == beta >= stable
 
     // Find the latest non-prerelease
     private suspend fun fetchStableUpdate() = api.fetchLatestRelease().asInfo()
 
-    // Find the latest non-canary release
-    private suspend fun fetchBetaUpdate() = findRelease { it.tag[0] == 'v' }!!.asInfo()
-
     // Find the latest release, regardless whether it's prerelease
-    private suspend fun fetchCanary() = findRelease { true }!!
+    private suspend fun fetchBetaUpdate() = findRelease { true }.asInfo()
 
-    private suspend fun fetchCanaryUpdate() = fetchCanary().asInfo()
-
-    private suspend fun fetchDebugUpdate() = fetchCanary().asInfo { it.name == "app-debug.apk" }
+    private suspend fun fetchDebugUpdate() =
+        findRelease { true }.asInfo { it.name == "app-debug.apk" }
 
     private suspend fun fetchCustomUpdate(url: String): UpdateInfo {
         val info = raw.fetchUpdateJson(url).magisk

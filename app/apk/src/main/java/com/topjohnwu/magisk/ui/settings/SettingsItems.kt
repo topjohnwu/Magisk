@@ -151,15 +151,7 @@ object UpdateChannel : BaseSettingsItem.Selector() {
         }
 
     override val title = CoreR.string.settings_update_channel_title.asText()
-
     override val entryRes = CoreR.array.update_channel
-    override fun entries(res: Resources): Array<String> {
-        return super.entries(res).let {
-            if (!Const.APP_IS_CANARY && !BuildConfig.DEBUG)
-                it.copyOfRange(0, Config.Value.CANARY_CHANNEL)
-            else it
-        }
-    }
 }
 
 object UpdateChannelUrl : BaseSettingsItem.Input() {

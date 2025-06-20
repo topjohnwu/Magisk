@@ -14,9 +14,8 @@ import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.core.AppContext
-import com.topjohnwu.magisk.core.BuildConfig
+import com.topjohnwu.magisk.core.BuildConfig.APP_VERSION_CODE
 import com.topjohnwu.magisk.core.Config
-import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.base.ContentResultCallback
 import com.topjohnwu.magisk.core.ktx.toast
@@ -70,17 +69,16 @@ class InstallViewModel(svc: NetworkService, markwon: Markwon) : BaseViewModel() 
     init {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val file = File(AppContext.cacheDir, "${BuildConfig.APP_VERSION_CODE}.md")
-                val text = when {
-                    file.exists() -> file.readText()
+                val noteFile = File(AppContext.cacheDir, "${APP_VERSION_CODE}.md")
+                val noteText = when {
+                    noteFile.exists() -> noteFile.readText()
                     else -> {
-                        val str = if (Const.APP_IS_CANARY) Info.update.note
-                        else svc.fetchString(Const.Url.CHANGELOG_URL)
-                        file.writeText(str)
-                        str
+                        val note = svc.fetchUpdate(APP_VERSION_CODE).note
+                        noteFile.writeText(note)
+                        note
                     }
                 }
-                val spanned = markwon.toMarkdown(text)
+                val spanned = markwon.toMarkdown(noteText)
                 withContext(Dispatchers.Main) {
                     notes = spanned
                 }

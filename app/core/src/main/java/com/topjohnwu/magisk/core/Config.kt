@@ -33,7 +33,7 @@ object Config : PreferenceConfig, DBConfig {
         const val SU_REAUTH = "su_reauth"
         const val SU_TAPJACK = "su_tapjack"
         const val CHECK_UPDATES = "check_update"
-        const val UPDATE_CHANNEL = "update_channel"
+        const val RELEASE_CHANNEL = "release_channel"
         const val CUSTOM_CHANNEL = "custom_channel"
         const val LOCALE = "locale"
         const val DARK_THEME = "dark_theme_extended"
@@ -48,7 +48,7 @@ object Config : PreferenceConfig, DBConfig {
             SU_AUTO_RESPONSE, SU_REAUTH, SU_TAPJACK)
     }
 
-    object Value {
+    object OldValue {
         // Update channels
         const val DEFAULT_CHANNEL = -1
         const val STABLE_CHANNEL = 0
@@ -56,6 +56,15 @@ object Config : PreferenceConfig, DBConfig {
         const val CUSTOM_CHANNEL = 2
         const val CANARY_CHANNEL = 3
         const val DEBUG_CHANNEL = 4
+    }
+
+    object Value {
+        // Update channels
+        const val DEFAULT_CHANNEL = -1
+        const val STABLE_CHANNEL = 0
+        const val BETA_CHANNEL = 1
+        const val DEBUG_CHANNEL = 2
+        const val CUSTOM_CHANNEL = 3
 
         // root access mode
         const val ROOT_ACCESS_DISABLED = 0
@@ -86,14 +95,6 @@ object Config : PreferenceConfig, DBConfig {
         val TIMEOUT_LIST = longArrayOf(0, -1, 10, 20, 30, 60)
     }
 
-    private val defaultChannel =
-        if (BuildConfig.DEBUG)
-            Value.DEBUG_CHANNEL
-        else if (Const.APP_IS_CANARY)
-            Value.CANARY_CHANNEL
-        else
-            Value.DEFAULT_CHANNEL
-
     @JvmField var keepVerity = false
     @JvmField var keepEnc = false
     @JvmField var recovery = false
@@ -109,7 +110,7 @@ object Config : PreferenceConfig, DBConfig {
     private var checkUpdatePrefs by preference(Key.CHECK_UPDATES, true)
     private var localePrefs by preference(Key.LOCALE, "")
     var doh by preference(Key.DOH, false)
-    var updateChannel by preferenceStrInt(Key.UPDATE_CHANNEL, defaultChannel)
+    var updateChannel by preference(Key.RELEASE_CHANNEL, Value.DEFAULT_CHANNEL)
     var customChannelUrl by preference(Key.CUSTOM_CHANNEL, "")
     var downloadDir by preference(Key.DOWNLOAD_DIR, "")
     var randName by preference(Key.RAND_NAME, true)
@@ -148,6 +149,7 @@ object Config : PreferenceConfig, DBConfig {
     var suTapjack by preference(Key.SU_TAPJACK, true)
 
     private const val SU_FINGERPRINT = "su_fingerprint"
+    private const val UPDATE_CHANNEL = "update_channel"
 
     fun toBundle(): Bundle {
         val map = prefs.all - Key.NO_MIGRATION
@@ -183,17 +185,23 @@ object Config : PreferenceConfig, DBConfig {
         }
 
         prefs.edit {
-            // Settings migration
+            // Migrate su_fingerprint
             if (prefs.getBoolean(SU_FINGERPRINT, false))
                 suBiometric = true
             remove(SU_FINGERPRINT)
-            prefs.getString(Key.UPDATE_CHANNEL, null).also {
-                if (it == null ||
-                    it.toInt() > Value.DEBUG_CHANNEL ||
-                    it.toInt() < Value.DEFAULT_CHANNEL) {
-                    putString(Key.UPDATE_CHANNEL, defaultChannel.toString())
+
+            // Migrate update_channel
+            prefs.getString(UPDATE_CHANNEL, null)?.let {
+                val channel = when (it.toInt()) {
+                    OldValue.STABLE_CHANNEL -> Value.STABLE_CHANNEL
+                    OldValue.CANARY_CHANNEL, OldValue.BETA_CHANNEL -> Value.BETA_CHANNEL
+                    OldValue.DEBUG_CHANNEL -> Value.DEBUG_CHANNEL
+                    OldValue.CUSTOM_CHANNEL -> Value.CUSTOM_CHANNEL
+                    else -> Value.DEFAULT_CHANNEL
                 }
+                putInt(Key.RELEASE_CHANNEL, channel)
             }
+            remove(UPDATE_CHANNEL)
         }
     }
 }
