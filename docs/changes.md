@@ -2,7 +2,7 @@
 
 ### v29.0
 
-- [General] Massive internal refactoring and code migration
+ [General] Massive internal refactoring and code migration
 - [App] Support downloading module zip files with XZ compression
 - [App] Disable app animations when system animations are disabled
 - [MagiskMount] Support systemlessly deleting files with modules using blank file nodes
