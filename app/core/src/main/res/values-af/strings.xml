@@ -1,5 +1,7 @@
+<!--AFRIKAANS--><!--af-->
 <resources>
 
+    <!--Sections-->
     <string name="modules">Modules</string>
     <string name="superuser">Supergebruiker</string>
     <string name="logs">Loglêers</string>
@@ -9,6 +11,7 @@
     <string name="section_theme">Temas</string>
     <string name="denylist">Weierlys</string>
 
+    <!--Home-->
     <string name="no_connection">Geen verbinding beskikbaar nie</string>
     <string name="app_changelog">Veranderingslogboek</string>
     <string name="loading">Laai tans…</string>
@@ -29,6 +32,7 @@
     <string name="uninstall_magisk_title">Deïnstalleer Magisk</string>
     <string name="uninstall_magisk_msg">Alle modules sal gedeaktiveer/verwyder word!\nWorteltoegang sal verwyder word!\nEnige interne stoorplek wat deur die gebruik van Magisk ontkripteer is, sal weer geënkripteer word!</string>
 
+    <!--Install-->
     <string name="keep_force_encryption">Behou gedwonge enkripsie</string>
     <string name="keep_dm_verity">Behou AVB 2.0/dm-verity</string>
     <string name="recovery_mode">Herstelmodus</string>
@@ -46,6 +50,7 @@
     <string name="reboot_delay_toast">Herlaai binne 5 sekondes…</string>
     <string name="flash_screen_title">Installasie</string>
 
+    <!--Superuser-->
     <string name="su_request_title">Supergebruiker Versoek</string>
     <string name="touch_filtered_warning">Omdat 'n toepassing 'n Supergebruiker-versoek verberg, kan Magisk nie jou antwoord verifieer nie</string>
     <string name="deny">Weier</string>
@@ -75,6 +80,7 @@
     <string name="superuser_toggle_revoke">Herroep</string>
     <string name="superuser_policy_none">Geen toepassings het nog Supergebruiker-toestemming gevra nie.</string>
 
+    <!--Logs-->
     <string name="log_data_none">Jy is log-vry, probeer jou worteltoepassings meer gebruik</string>
     <string name="log_data_magisk_none">Magisk-loglêers is leeg, dis vreemd</string>
     <string name="menuSaveLog">Stoor loglêer</string>
@@ -86,11 +92,15 @@
     <string name="selinux_context">SELinux konteks: %s</string>
     <string name="supp_group">Aanvullende groep: %s</string>
 
+    <!--SafetyNet-->
+
+    <!--MagiskHide-->
     <string name="show_system_app">Wys stelseltoepassings</string>
     <string name="show_os_app">Wys OS-toepassings</string>
     <string name="hide_filter_hint">Filtreer volgens naam</string>
     <string name="hide_search">Soek</string>
 
+    <!--Module-->
     <string name="no_info_provided">(Geen inligting verskaf nie)</string>
     <string name="reboot_userspace">Sagte herlaai</string>
     <string name="reboot_recovery">Herlaai na Herstel</string>
@@ -111,6 +121,7 @@
     <string name="confirm_install">Installeer module %1$s?</string>
     <string name="confirm_install_title">Installasiebevestiging</string>
 
+    <!--Settings-->
     <string name="settings_dark_mode_title">Temamodus</string>
     <string name="settings_dark_mode_message">Kies modus wat die beste by jou styl pas!</string>
     <string name="settings_dark_mode_light">Altyd Lig</string>
@@ -187,6 +198,7 @@
     <string name="requester_summary">Wortelsessies sal hul versoeker se naamruimte erf</string>
     <string name="isolate_summary">Elke wortelsessie sal sy eie geïsoleerde naamruimte hê</string>
 
+    <!--Notifications-->
     <string name="update_channel">Magisk-opdaterings</string>
     <string name="progress_channel">Vorderingskennisgewings</string>
     <string name="updated_channel">Opdatering Voltooi</string>
@@ -196,6 +208,7 @@
     <string name="updated_title">Magisk Opgedateer</string>
     <string name="updated_text">Tik om toep oop te maak</string>
 
+    <!--Toasts, Dialogs-->
     <string name="yes">Ja</string>
     <string name="no">Nee</string>
     <string name="repo_install_title">Installeer %1$s %2$s(%3$d)</string>
@@ -236,6 +249,5 @@
     <string name="app_not_found">Geen toep gevind om hierdie aksie te hanteer nie</string>
     <string name="reboot_apply_change">Herlaai om veranderinge toe te pas</string>
     <string name="restore_app_confirmation">Dit sal die versteekte toep terug na die oorspronklike toep herstel. Wil jy dit regtig doen?</string>
-
+    
 </resources>
-      
