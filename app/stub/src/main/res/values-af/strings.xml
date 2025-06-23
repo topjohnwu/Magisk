@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="upgrade_msg">Gradeer op na volle Magisk om die opstelling te voltooi. Laai af en installeer?</string>
+    <string name="no_internet_msg">Koppel asseblief aan die internet! Opgradering na volle Magisk word vereis.</string>
+    <string name="dling">Besig om af te laai</string>
+    <string name="relaunch_app">Herlaai asseblief die toepassing handmatig</string>
+</resources>
