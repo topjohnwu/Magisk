@@ -1,11 +1,18 @@
 # Magisk Changelog
 
+### v30.0
+
+- [General] Various minor bug fixes
+- [Core] Migrate module implementation to Rust
+- [Core] Improve Magisk specific files injection logic
+- [MagiskBoot] Migrate compression code to Rust
+
 ### v29.0
 
 - [General] Massive internal refactoring and code migration
 - [App] Support downloading module zip files with XZ compression
 - [App] Disable app animations when system animations are disabled
-- [MagiskMount] Support systemlessly deleting files with modules using blank file nodes
+- [Core] Support systemlessly deleting files with modules using blank file nodes
 - [MagiskInit] Redesign sepolicy patching and injection logic
 - [MagiskSU] Better TTY/PTY support
 
