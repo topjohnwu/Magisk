@@ -9,8 +9,12 @@ use libc::{MS_RDONLY, O_CLOEXEC, O_CREAT, O_RDONLY};
 use std::collections::BTreeMap;
 use std::path::{Component, Path};
 
-const MAGISK_BIN_INJECT_PARTITIONS: [&Utf8CStr; 4] =
-    [cstr!("/system/"), cstr!("/vendor/"), cstr!("/product/"), cstr!("/system_ext/")];
+const MAGISK_BIN_INJECT_PARTITIONS: [&Utf8CStr; 4] = [
+    cstr!("/system/"),
+    cstr!("/vendor/"),
+    cstr!("/product/"),
+    cstr!("/system_ext/"),
+];
 
 const SECONDARY_READ_ONLY_PARTITIONS: [&Utf8CStr; 3] =
     [cstr!("/vendor"), cstr!("/product"), cstr!("/system_ext")];
@@ -93,9 +97,16 @@ impl Drop for PathTracker<'_> {
 }
 
 enum FsNode {
-    Directory { children: FsNodeMap },
-    File { src: Utf8CString },
-    Symlink { target: Utf8CString, is_magisk_bin: bool },
+    Directory {
+        children: FsNodeMap,
+    },
+    File {
+        src: Utf8CString,
+    },
+    Symlink {
+        target: Utf8CString,
+        is_magisk_bin: bool,
+    },
     Whiteout,
 }
 
@@ -302,7 +313,10 @@ impl FsNode {
                 }
                 mount_dummy("mount", src, path.tmp, false)?;
             }
-            FsNode::Symlink { target, is_magisk_bin } => {
+            FsNode::Symlink {
+                target,
+                is_magisk_bin,
+            } => {
                 module_log!("mklink", path.tmp, target);
                 path.tmp.create_symlink_to(target)?;
                 // Avoid cloneing existing su attributes to our su
@@ -386,7 +400,10 @@ fn inject_magisk_bins(system: &mut FsNode) {
 
     for orig_item in path_env.split(':') {
         // Filter not suitbale paths
-        if !MAGISK_BIN_INJECT_PARTITIONS.iter().any(|p| orig_item.starts_with(p.as_str())) {
+        if !MAGISK_BIN_INJECT_PARTITIONS
+            .iter()
+            .any(|p| orig_item.starts_with(p.as_str()))
+        {
             continue;
         }
         // Flatten apex path is not suitable too
@@ -403,7 +420,9 @@ fn inject_magisk_bins(system: &mut FsNode) {
         }
 
         let path = Utf8CString::from(orig_item);
-        if let Ok(attr) = path.get_attr() && (attr.st.st_mode & 0x0001) != 0 {
+        if let Ok(attr) = path.get_attr()
+            && (attr.st.st_mode & 0x0001) != 0
+        {
             if let Ok(mut dir) = Directory::open(&path) {
                 let mut count = 0;
                 if let Err(_) = dir.pre_order_walk(|e| {
