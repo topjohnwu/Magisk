@@ -98,8 +98,8 @@ class Environment : BaseTest {
         val error = "$MOUNT_TEST setup failed"
         val path = root.getChildFile(MOUNT_TEST)
 
-        // Create /system/etc/newfile
-        val etc = path.getChildFile("system").getChildFile("etc")
+        // Create /system/fonts/newfile
+        val etc = path.getChildFile("system").getChildFile("fonts")
         assertTrue(error, etc.mkdirs())
         assertTrue(error, etc.getChildFile("newfile").createNewFile())
 
@@ -114,6 +114,10 @@ class Environment : BaseTest {
         assertTrue(error, Shell.cmd("mknod $bin/screenrecord c 0 0").exec().isSuccess)
 
         assertTrue(error, Shell.cmd("set_default_perm $path").exec().isSuccess)
+    }
+
+    private fun setupSystemlessHost() {
+        assertTrue("hosts setup failed", Shell.cmd("add_hosts_module").exec().isSuccess)
     }
 
     private fun setupSepolicyRuleModule(root: ExtendedFile) {
@@ -215,6 +219,7 @@ class Environment : BaseTest {
         val root = RootUtils.fs.getFile(Const.MODULE_PATH)
         if (mount()) { setupMountTest(root) }
         if (preinit()) { setupSepolicyRuleModule(root) }
+        setupSystemlessHost()
         setupEmptyZygiskModule(root)
         setupInvalidZygiskModule(root)
         setupRemoveModule(root)

@@ -55,7 +55,7 @@ class AdditionalTest : BaseTest {
 
     @Test
     fun testModuleCount() {
-        var expected = 2
+        var expected = 3
         if (Environment.mount()) expected++
         if (Environment.preinit()) expected++
         if (Environment.lsposed()) expected++
@@ -90,8 +90,8 @@ class AdditionalTest : BaseTest {
 
         assertNotNull("$MOUNT_TEST is not installed", modules.find { it.id == MOUNT_TEST })
         assertTrue(
-            "/system/etc/newfile should exist",
-            RootUtils.fs.getFile("/system/etc/newfile").exists()
+            "/system/fonts/newfile should exist",
+            RootUtils.fs.getFile("/system/fonts/newfile").exists()
         )
         assertFalse(
             "/system/bin/screenrecord should not exist",
