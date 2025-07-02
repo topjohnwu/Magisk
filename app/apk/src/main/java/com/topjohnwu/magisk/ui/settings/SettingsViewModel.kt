@@ -83,7 +83,7 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Handler {
                 // Can hide overlay windows on 12.0+
                 list.remove(Tapjack)
             }
-            if (Const.Version.isCanary()) {
+            if (Const.Version.atLeast_30_1()) {
                 list.add(Restrict)
             }
         }
