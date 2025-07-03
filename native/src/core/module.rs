@@ -127,16 +127,10 @@ impl FilePaths<'_> {
 }
 
 enum FsNode {
-    Directory {
-        children: FsNodeMap,
-    },
-    File {
-        src: Utf8CString,
-    },
-    Symlink {
-        target: Utf8CString,
-        is_magisk_bin: bool,
-    },
+    Directory { children: FsNodeMap },
+    File { src: Utf8CString },
+    Symlink { target: Utf8CString },
+    MagiskLink,
     Whiteout,
 }
 
@@ -168,7 +162,6 @@ impl FsNode {
                     .entry(entry.name().to_string())
                     .or_insert_with(|| FsNode::Symlink {
                         target: link.to_owned(),
-                        is_magisk_bin: false,
                     });
             } else {
                 if entry.is_char_device() {
@@ -208,7 +201,7 @@ impl FsNode {
                     true
                 }
             }
-            FsNode::Symlink { .. } | FsNode::Whiteout => true,
+            _ => true,
         }
     }
 
@@ -263,7 +256,7 @@ impl FsNode {
             FsNode::File { src } => {
                 bind_mount("mount", src, path.real(), false)?;
             }
-            FsNode::Symlink { .. } | FsNode::Whiteout => {
+            _ => {
                 error!("Unable to handle '{}': parent should be tmpfs", path.real());
             }
         }
@@ -324,7 +317,6 @@ impl FsNode {
                                 entry.name().to_string(),
                                 FsNode::Symlink {
                                     target: link.to_owned(),
-                                    is_magisk_bin: false,
                                 },
                             );
                         } else {
@@ -342,15 +334,22 @@ impl FsNode {
             FsNode::File { src } => {
                 mount_dummy("mount", src, path.worker(), false)?;
             }
-            FsNode::Symlink {
-                target,
-                is_magisk_bin,
-            } => {
+            FsNode::Symlink { target } => {
                 module_log!("mklink", path.worker(), target);
                 path.worker().create_symlink_to(target)?;
-                // Avoid cloning existing su attributes to our su
-                if !*is_magisk_bin && path.real().exists() {
+                if path.real().exists() {
                     clone_attr(path.real(), path.worker())?;
+                }
+            }
+            FsNode::MagiskLink => {
+                if let Some(name) = path.real().file_name()
+                    && name == "supolicy"
+                {
+                    module_log!("mklink", path.worker(), "./magiskpolicy");
+                    path.worker().create_symlink_to(cstr!("./magiskpolicy"))?;
+                } else {
+                    module_log!("mklink", path.worker(), "./magisk");
+                    path.worker().create_symlink_to(cstr!("./magisk"))?;
                 }
             }
             FsNode::Whiteout => {
@@ -392,28 +391,9 @@ fn inject_magisk_bins(system: &mut FsNode) {
         );
 
         // Inject applet symlinks
-
-        children.insert(
-            "su".to_string(),
-            FsNode::Symlink {
-                target: Utf8CString::from("./magisk"),
-                is_magisk_bin: true,
-            },
-        );
-        children.insert(
-            "resetprop".to_string(),
-            FsNode::Symlink {
-                target: Utf8CString::from("./magisk"),
-                is_magisk_bin: true,
-            },
-        );
-        children.insert(
-            "supolicy".to_string(),
-            FsNode::Symlink {
-                target: Utf8CString::from("./magiskpolicy"),
-                is_magisk_bin: true,
-            },
-        );
+        children.insert("su".to_string(), FsNode::MagiskLink);
+        children.insert("resetprop".to_string(), FsNode::MagiskLink);
+        children.insert("supolicy".to_string(), FsNode::MagiskLink);
     }
 
     // Strip /system prefix to insert correct node
