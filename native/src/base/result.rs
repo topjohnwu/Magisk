@@ -171,7 +171,7 @@ impl<T, E: Display> Loggable<T> for Result<T, E> {
                         write!(w, "[{}:{}] ", caller.file(), caller.line())?;
                     }
                     f(w)?;
-                    writeln!(w, ": {:#}", e)
+                    writeln!(w, ": {e:#}")
                 });
                 Err(LoggedError::default())
             }
@@ -366,7 +366,7 @@ impl Display for OsError<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let error = self.as_io_error();
         if self.name.is_empty() {
-            write!(f, "{:#}", error)
+            write!(f, "{error:#}")
         } else {
             match (self.arg1.ok(), self.arg2.ok()) {
                 (Some(arg1), Some(arg2)) => {

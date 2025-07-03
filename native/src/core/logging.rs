@@ -131,7 +131,7 @@ fn write_log_to_pipe(mut logd: &File, prio: i32, msg: &Utf8CStr) -> io::Result<u
     let result = logd.write_vectored(&[io1, io2]);
     if let Err(ref e) = result {
         let mut buf = cstr::buf::default();
-        buf.write_fmt(format_args!("Cannot write_log_to_pipe: {}", e))
+        buf.write_fmt(format_args!("Cannot write_log_to_pipe: {e}"))
             .ok();
         android_log_write(LogLevel::Error, &buf);
     }
@@ -142,11 +142,11 @@ static MAGISK_LOGD_FD: Mutex<Option<Arc<File>>> = Mutex::new(None);
 
 fn with_logd_fd<R, F: FnOnce(&File) -> io::Result<R>>(f: F) {
     let fd = MAGISK_LOGD_FD.lock().unwrap().clone();
-    if let Some(logd) = fd {
-        if f(&logd).is_err() {
-            // If any error occurs, shut down the logd pipe
-            *MAGISK_LOGD_FD.lock().unwrap() = None;
-        }
+    if let Some(logd) = fd
+        && f(&logd).is_err()
+    {
+        // If any error occurs, shut down the logd pipe
+        *MAGISK_LOGD_FD.lock().unwrap() = None;
     }
 }
 

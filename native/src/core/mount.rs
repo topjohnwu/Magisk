@@ -22,37 +22,37 @@ pub fn setup_preinit_dir() {
     let dev_path = cstr::buf::new::<64>()
         .join_path(magisk_tmp)
         .join_path(PREINITDEV);
-    if let Ok(attr) = dev_path.get_attr() {
-        if attr.st.st_mode & libc::S_IFMT as c_uint == libc::S_IFBLK.as_() {
-            // DO NOT mount the block device directly, as we do not know the flags and configs
-            // to properly mount the partition; mounting block devices directly as rw could cause
-            // crashes if the filesystem driver is crap (e.g. some broken F2FS drivers).
-            // What we do instead is to scan through the current mountinfo and find a pre-existing
-            // mount point mounting our desired partition, and then bind mount the target folder.
-            let preinit_dev = attr.st.st_rdev;
-            let mnt_path = cstr::buf::default()
-                .join_path(magisk_tmp)
-                .join_path(PREINITMIRR);
-            for info in parse_mount_info("self") {
-                if info.root == "/" && info.device == preinit_dev {
-                    if !info.fs_option.split(',').any(|s| s == "rw") {
-                        // Only care about rw mounts
-                        continue;
-                    }
-                    let mut target = info.target;
-                    let target = Utf8CStr::from_string(&mut target);
-                    let mut preinit_dir = resolve_preinit_dir(target);
-                    let preinit_dir = Utf8CStr::from_string(&mut preinit_dir);
-                    let r: LoggedResult<()> = try {
-                        preinit_dir.mkdir(0o700)?;
-                        mnt_path.mkdirs(0o755)?;
-                        mnt_path.remove().ok();
-                        mnt_path.create_symlink_to(preinit_dir)?;
-                    };
-                    if r.is_ok() {
-                        info!("* Found preinit dir: {}", preinit_dir);
-                        return;
-                    }
+    if let Ok(attr) = dev_path.get_attr()
+        && attr.st.st_mode & libc::S_IFMT as c_uint == libc::S_IFBLK.as_()
+    {
+        // DO NOT mount the block device directly, as we do not know the flags and configs
+        // to properly mount the partition; mounting block devices directly as rw could cause
+        // crashes if the filesystem driver is crap (e.g. some broken F2FS drivers).
+        // What we do instead is to scan through the current mountinfo and find a pre-existing
+        // mount point mounting our desired partition, and then bind mount the target folder.
+        let preinit_dev = attr.st.st_rdev;
+        let mnt_path = cstr::buf::default()
+            .join_path(magisk_tmp)
+            .join_path(PREINITMIRR);
+        for info in parse_mount_info("self") {
+            if info.root == "/" && info.device == preinit_dev {
+                if !info.fs_option.split(',').any(|s| s == "rw") {
+                    // Only care about rw mounts
+                    continue;
+                }
+                let mut target = info.target;
+                let target = Utf8CStr::from_string(&mut target);
+                let mut preinit_dir = resolve_preinit_dir(target);
+                let preinit_dir = Utf8CStr::from_string(&mut preinit_dir);
+                let r: LoggedResult<()> = try {
+                    preinit_dir.mkdir(0o700)?;
+                    mnt_path.mkdirs(0o755)?;
+                    mnt_path.remove().ok();
+                    mnt_path.create_symlink_to(preinit_dir)?;
+                };
+                if r.is_ok() {
+                    info!("* Found preinit dir: {}", preinit_dir);
+                    return;
                 }
             }
         }
@@ -238,10 +238,10 @@ pub fn revert_unmount(pid: i32) {
     let mut prev: Option<PathBuf> = None;
     targets.sort();
     targets.retain(|target| {
-        if let Some(prev) = &prev {
-            if Path::new(target).starts_with(prev) {
-                return false;
-            }
+        if let Some(prev) = &prev
+            && Path::new(target).starts_with(prev)
+        {
+            return false;
         }
         prev = Some(PathBuf::from(target.clone()));
         true

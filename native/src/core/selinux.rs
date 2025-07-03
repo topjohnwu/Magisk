@@ -55,10 +55,9 @@ pub(crate) fn restorecon() {
     if let Ok(mut file) = cstr!("/sys/fs/selinux/context")
         .open(O_WRONLY | O_CLOEXEC)
         .log()
+        && file.write_all(ADB_CON.as_bytes_with_nul()).is_ok()
     {
-        if file.write_all(ADB_CON.as_bytes_with_nul()).is_ok() {
-            cstr!(SECURE_DIR).set_secontext(ADB_CON).log_ok();
-        }
+        cstr!(SECURE_DIR).set_secontext(ADB_CON).log_ok();
     }
 
     let mut path = cstr::buf::default();

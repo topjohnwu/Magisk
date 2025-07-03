@@ -583,7 +583,7 @@ impl<S: Utf8CStrBuf + Sized> FsPathBuilder for S {
     }
 
     fn append_path_fmt<T: Display>(&mut self, name: T) -> &mut Self {
-        self.write_fmt(format_args!("/{}", name)).ok();
+        self.write_fmt(format_args!("/{name}")).ok();
         self
     }
 }
@@ -595,7 +595,7 @@ impl FsPathBuilder for dyn Utf8CStrBuf + '_ {
     }
 
     fn append_path_fmt<T: Display>(&mut self, name: T) -> &mut Self {
-        self.write_fmt(format_args!("/{}", name)).ok();
+        self.write_fmt(format_args!("/{name}")).ok();
         self
     }
 }
@@ -846,7 +846,7 @@ fn parse_mount_info_line(line: &str) -> Option<MountInfo> {
 
 pub fn parse_mount_info(pid: &str) -> Vec<MountInfo> {
     let mut res = vec![];
-    let mut path = format!("/proc/{}/mountinfo", pid);
+    let mut path = format!("/proc/{pid}/mountinfo");
     if let Ok(file) = Utf8CStr::from_string(&mut path).open(O_RDONLY | O_CLOEXEC) {
         BufReader::new(file).foreach_lines(|line| {
             parse_mount_info_line(line)

@@ -45,7 +45,7 @@ fn remove_pattern(buf: &mut [u8], pattern_matcher: unsafe fn(&[u8]) -> Option<us
                 let skipped = buf.get_unchecked(read..(read + len));
                 // SAFETY: all matching patterns are ASCII bytes
                 let skipped = std::str::from_utf8_unchecked(skipped);
-                eprintln!("Remove pattern [{}]", skipped);
+                eprintln!("Remove pattern [{skipped}]");
                 sz -= len;
                 read += len;
             } else {
@@ -114,7 +114,7 @@ pub fn hexpatch(file: &[u8], from: &[u8], to: &[u8]) -> bool {
 
         let v = map.patch(pattern.as_slice(), patch.as_slice());
         for off in &v {
-            eprintln!("Patch @ {:#010X} [{}] -> [{}]", off, from, to);
+            eprintln!("Patch @ {off:#010X} [{from}] -> [{to}]");
         }
         !v.is_empty()
     };

@@ -52,13 +52,12 @@ fn set_stdin_raw() -> bool {
 
 pub fn restore_stdin() -> bool {
     unsafe {
-        if let Some(ref termios) = OLD_STDIN {
-            if tcsetattr(STDIN_FILENO, TCSAFLUSH, termios) < 0
-                && tcsetattr(STDIN_FILENO, TCSADRAIN, termios) < 0
-            {
-                warn!("Failed to restore terminal attributes");
-                return false;
-            }
+        if let Some(ref termios) = OLD_STDIN
+            && tcsetattr(STDIN_FILENO, TCSAFLUSH, termios) < 0
+            && tcsetattr(STDIN_FILENO, TCSADRAIN, termios) < 0
+        {
+            warn!("Failed to restore terminal attributes");
+            return false;
         }
         OLD_STDIN = None;
         true

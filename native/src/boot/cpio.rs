@@ -269,13 +269,13 @@ impl Cpio {
     }
 
     fn load_from_file(path: &Utf8CStr) -> LoggedResult<Self> {
-        eprintln!("Loading cpio: [{}]", path);
+        eprintln!("Loading cpio: [{path}]");
         let file = MappedFile::open(path)?;
         Self::load_from_data(file.as_ref())
     }
 
     fn dump(&self, path: &str) -> LoggedResult<()> {
-        eprintln!("Dumping cpio: [{}]", path);
+        eprintln!("Dumping cpio: [{path}]");
         let mut file = File::create(path)?;
         let mut pos = 0usize;
         let mut inode = 300000i64;
@@ -320,13 +320,13 @@ impl Cpio {
     fn rm(&mut self, path: &str, recursive: bool) {
         let path = norm_path(path);
         if self.entries.remove(&path).is_some() {
-            eprintln!("Removed entry [{}]", path);
+            eprintln!("Removed entry [{path}]");
         }
         if recursive {
             let path = path + "/";
             self.entries.retain(|k, _| {
                 if k.starts_with(&path) {
-                    eprintln!("Removed entry [{}]", k);
+                    eprintln!("Removed entry [{k}]");
                     false
                 } else {
                     true
@@ -340,7 +340,7 @@ impl Cpio {
             .entries
             .get(path)
             .ok_or_else(|| log_err!("No such file"))?;
-        eprintln!("Extracting entry [{}] to [{}]", path, out);
+        eprintln!("Extracting entry [{path}] to [{out}]");
 
         let out = Utf8CStr::from_string(out);
 
@@ -435,7 +435,7 @@ impl Cpio {
                 data: content,
             }),
         );
-        eprintln!("Add file [{}] ({:04o})", path, mode);
+        eprintln!("Add file [{path}] ({mode:04o})");
         Ok(())
     }
 
@@ -451,7 +451,7 @@ impl Cpio {
                 data: vec![],
             }),
         );
-        eprintln!("Create directory [{}] ({:04o})", dir, mode);
+        eprintln!("Create directory [{dir}] ({mode:04o})");
     }
 
     fn ln(&mut self, src: &str, dst: &str) {
@@ -466,7 +466,7 @@ impl Cpio {
                 data: norm_path(src).as_bytes().to_vec(),
             }),
         );
-        eprintln!("Create symlink [{}] -> [{}]", dst, src);
+        eprintln!("Create symlink [{dst}] -> [{src}]");
     }
 
     fn mv(&mut self, from: &str, to: &str) -> LoggedResult<()> {
@@ -475,7 +475,7 @@ impl Cpio {
             .remove(&norm_path(from))
             .ok_or_else(|| log_err!("no such entry {}", from))?;
         self.entries.insert(norm_path(to), entry);
-        eprintln!("Move [{}] -> [{}]", from, to);
+        eprintln!("Move [{from}] -> [{to}]");
         Ok(())
     }
 
@@ -498,7 +498,7 @@ impl Cpio {
             if !recursive && !p.is_empty() && p.matches('/').count() > 1 {
                 continue;
             }
-            println!("{}\t{}", entry, name);
+            println!("{entry}\t{name}");
         }
     }
 }
@@ -511,8 +511,7 @@ impl Cpio {
         let keep_verity = check_env("KEEPVERITY");
         let keep_force_encrypt = check_env("KEEPFORCEENCRYPT");
         eprintln!(
-            "Patch with flag KEEPVERITY=[{}] KEEPFORCEENCRYPT=[{}]",
-            keep_verity, keep_force_encrypt
+            "Patch with flag KEEPVERITY=[{keep_verity}] KEEPFORCEENCRYPT=[{keep_force_encrypt}]"
         );
         self.entries.retain(|name, entry| {
             let fstab = (!keep_verity || !keep_force_encrypt)
@@ -523,7 +522,7 @@ impl Cpio {
                 && name.starts_with("fstab");
             if !keep_verity {
                 if fstab {
-                    eprintln!("Found fstab file [{}]", name);
+                    eprintln!("Found fstab file [{name}]");
                     let len = patch_verity(entry.data.as_mut_slice());
                     if len != entry.data.len() {
                         entry.data.resize(len, 0);
@@ -581,7 +580,7 @@ impl Cpio {
                     } else {
                         &name[8..]
                     };
-                    eprintln!("Restore [{}] -> [{}]", name, new_name);
+                    eprintln!("Restore [{name}] -> [{new_name}]");
                     backups.insert(new_name.to_string(), entry);
                 }
             });
@@ -658,16 +657,16 @@ impl Cpio {
             match action {
                 Action::Backup(name, mut entry) => {
                     let backup = if !skip_compress && entry.compress() {
-                        format!(".backup/{}.xz", name)
+                        format!(".backup/{name}.xz")
                     } else {
-                        format!(".backup/{}", name)
+                        format!(".backup/{name}")
                     };
-                    eprintln!("Backup [{}] -> [{}]", name, backup);
+                    eprintln!("Backup [{name}] -> [{backup}]");
                     backups.insert(backup, entry);
                 }
                 Action::Record(name) => {
-                    eprintln!("Record new entry: [{}] -> [.backup/.rmlist]", name);
-                    rm_list.push_str(&format!("{}\0", name));
+                    eprintln!("Record new entry: [{name}] -> [.backup/.rmlist]");
+                    rm_list.push_str(&format!("{name}\0"));
                 }
                 Action::Noop => {}
             }

@@ -504,7 +504,7 @@ impl Display for Token<'_> {
             Token::ST => f.write_char('*'),
             Token::TL => f.write_char('~'),
             Token::HP => f.write_char('-'),
-            Token::HX(n) => f.write_fmt(format_args!("{:06X}", n)),
+            Token::HX(n) => f.write_fmt(format_args!("{n:06X}")),
             Token::ID(s) => f.write_str(s),
         }
     }
