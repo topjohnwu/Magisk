@@ -170,10 +170,10 @@ impl MagiskD {
         client.write_pod(&flags)?;
 
         // Next send modules
-        if zygisk_should_load_module(flags) {
-            if let Some(module_fds) = self.get_module_fds(is_64_bit) {
-                client.send_fds(&module_fds)?;
-            }
+        if zygisk_should_load_module(flags)
+            && let Some(module_fds) = self.get_module_fds(is_64_bit)
+        {
+            client.send_fds(&module_fds)?;
         }
 
         // If we're not in system_server, we are done

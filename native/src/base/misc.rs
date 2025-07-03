@@ -99,7 +99,7 @@ impl<T> EarlyExitExt<T> for Result<T, EarlyExit> {
                     exit(0)
                 }
                 Err(_) => {
-                    eprintln!("{}", output);
+                    eprintln!("{output}");
                     print_help_msg();
                     exit(1)
                 }

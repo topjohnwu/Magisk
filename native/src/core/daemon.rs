@@ -336,7 +336,7 @@ fn switch_cgroup(cgroup: &str, pid: i32) {
     }
     if let Ok(mut file) = buf.open(O_WRONLY | O_APPEND | O_CLOEXEC) {
         buf.clear();
-        buf.write_fmt(format_args!("{}", pid)).ok();
+        buf.write_fmt(format_args!("{pid}")).ok();
         file.write_all(buf.as_bytes()).log_ok();
     }
 }

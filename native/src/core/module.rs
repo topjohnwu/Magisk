@@ -399,7 +399,7 @@ fn inject_magisk_bins(system: &mut FsNode) {
     // Strip /system prefix to insert correct node
     fn strip_system_prefix(orig_item: &str) -> String {
         match orig_item.strip_prefix("/system/") {
-            Some(rest) => format!("/{}", rest),
+            Some(rest) => format!("/{rest}"),
             None => orig_item.to_string(),
         }
     }
@@ -421,7 +421,7 @@ fn inject_magisk_bins(system: &mut FsNode) {
         }
 
         // Override existing su first
-        let su_path = Utf8CString::from(format!("{}/su", orig_item));
+        let su_path = Utf8CString::from(format!("{orig_item}/su"));
         if su_path.exists() {
             let item = strip_system_prefix(orig_item);
             candidates.push((item, 0));
@@ -431,21 +431,23 @@ fn inject_magisk_bins(system: &mut FsNode) {
         let path = Utf8CString::from(orig_item);
         if let Ok(attr) = path.get_attr()
             && (attr.st.st_mode & 0x0001) != 0
+            && let Ok(mut dir) = Directory::open(&path)
         {
-            if let Ok(mut dir) = Directory::open(&path) {
-                let mut count = 0;
-                if let Err(_) = dir.pre_order_walk(|e| {
+            let mut count = 0;
+            if dir
+                .pre_order_walk(|e| {
                     if e.is_file() {
                         count += 1;
                     }
                     Ok(WalkResult::Continue)
-                }) {
-                    // Skip, we cannot ensure the result is correct
-                    continue;
-                }
-                let item = strip_system_prefix(orig_item);
-                candidates.push((item, count));
+                })
+                .is_err()
+            {
+                // Skip, we cannot ensure the result is correct
+                continue;
             }
+            let item = strip_system_prefix(orig_item);
+            candidates.push((item, count));
         }
     }
 

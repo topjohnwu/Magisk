@@ -34,7 +34,7 @@ fn do_extract_boot_from_payload(
     let mut reader = BufReader::new(if in_path == "-" {
         unsafe { File::from_raw_fd(0) }
     } else {
-        File::open(in_path).log_with_msg(|w| write!(w, "Cannot open '{}'", in_path))?
+        File::open(in_path).log_with_msg(|w| write!(w, "Cannot open '{in_path}'"))?
     });
 
     let buf = &mut [0u8; 4];
@@ -107,7 +107,7 @@ fn do_extract_boot_from_payload(
     };
 
     let mut out_file =
-        File::create(out_path).log_with_msg(|w| write!(w, "Cannot write to '{}'", out_path))?;
+        File::create(out_path).log_with_msg(|w| write!(w, "Cannot write to '{out_path}'"))?;
 
     // Skip the manifest signature
     reader.skip(manifest_sig_len as usize)?;
