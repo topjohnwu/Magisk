@@ -53,6 +53,7 @@
     <string name="touch_filtered_warning">Como um app está ocultando uma solicitação de SuperUsuário, o Magisk não pode verificar sua resposta.</string>
     <string name="deny">Negar</string>
     <string name="prompt">Perguntar</string>
+    <string name="restrict">Restringir</string>
     <string name="grant">Permitir</string>
     <string name="su_warning">Permite acesso total ao seu dispositivo.\nNão permita se você não tiver certeza do que está fazendo!</string>
     <string name="forever">Sempre</string>
@@ -170,6 +171,8 @@
     <string name="settings_su_auth_title">Autenticação de usuário</string>
     <string name="settings_su_auth_summary">Solicite autenticação de usuário durante solicitações de SuperUsuário</string>
     <string name="settings_su_auth_insecure">Nenhum método de autenticação está configurado no dispositivo</string>
+    <string name="settings_su_restrict_title">Restringir recursos root</string>
+    <string name="settings_su_restrict_summary">Restringirá novos apps de SuperUsuário por padrão. Aviso: isso quebrará a maioria dos apps. Não ative se você não souber o que está fazendo.</string>
     <string name="settings_customization">Personalizações</string>
     <string name="setting_add_shortcut_summary">Adicione um atalho na tela inicial, caso o nome e o ícone sejam difíceis de reconhecer logo após ocultar o app.</string>
     <string name="settings_doh_title">DNS sobre HTTPS</string>

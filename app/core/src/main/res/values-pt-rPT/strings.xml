@@ -53,6 +53,7 @@
     <string name="touch_filtered_warning">Como um app está a ocultar um pedido de SuperUsuário, o Magisk não consegue verificar a sua resposta.</string>
     <string name="deny">Negar</string>
     <string name="prompt">Perguntar</string>
+    <string name="restrict">Restringir</string>
     <string name="grant">Permitir</string>
     <string name="su_warning">Permite o acesso total ao seu dispositivo.\nNão o permita se não tiver a certeza do que está a fazer!</string>
     <string name="forever">Sempre</string>
@@ -129,7 +130,7 @@
     <string name="settings_restore_app_title">Restaurar app do Magisk</string>
     <string name="settings_restore_app_summary">Desoculta o app do Magisk e restaura o APK original</string>
     <string name="language">Idioma</string>
-    <string name="system_default">(Padrão do sistema)</string>
+    <string name="system_default">(Predefinição do sistema)</string>
     <string name="settings_check_update_title">Verificar por atualizações</string>
     <string name="settings_check_update_summary">Verifique automaticamente se há atualizações ao abrir o app</string>
     <string name="settings_update_channel_title">Canal de atualização</string>
@@ -170,6 +171,8 @@
     <string name="settings_su_auth_title">Autenticação de usuário</string>
     <string name="settings_su_auth_summary">Solicite autenticação de usuário durante pedidos de SuperUsuário</string>
     <string name="settings_su_auth_insecure">Nenhum método de autenticação está configurado no dispositivo</string>
+    <string name="settings_su_restrict_title">Restringir recursos root</string>
+    <string name="settings_su_restrict_summary">Restringirá novos apps de SuperUsuário por predefinição. Aviso: isto quebrará a maioria dos apps. Não ative se você não souber o que está a fazer.</string>
     <string name="settings_customization">Personalizações</string>
     <string name="setting_add_shortcut_summary">Adicione um atalho no ecrã inicial, caso o nome e o ícone sejam difíceis de reconhecer logo após ocultar o app.</string>
     <string name="settings_doh_title">DNS sobre HTTPS</string>
