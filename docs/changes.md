@@ -1,5 +1,10 @@
 # Magisk Changelog
 
+### v30.1
+
+- [Core] Fix bug in module mounting implementation
+- [MagiskSU] Add ability to restrict Linux capabilities even if running as root (uid=0)
+
 ### v30.0
 
 - [General] Various minor bug fixes
