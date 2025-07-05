@@ -10,13 +10,13 @@ import com.topjohnwu.magisk.core.Config.Value.STABLE_CHANNEL
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.data.GithubApiServices
 import com.topjohnwu.magisk.core.data.RawUrl
+import com.topjohnwu.magisk.core.ktx.dateFormat
 import com.topjohnwu.magisk.core.model.Release
 import com.topjohnwu.magisk.core.model.ReleaseAssets
 import com.topjohnwu.magisk.core.model.UpdateInfo
 import retrofit2.HttpException
 import timber.log.Timber
 import java.io.IOException
-import java.time.format.DateTimeFormatter
 
 class NetworkService(
     private val raw: RawUrl,
@@ -74,7 +74,7 @@ class NetworkService(
 
     private inline fun Release.asPublicInfo(selector: (ReleaseAssets) -> Boolean): UpdateInfo {
         val version = tag.drop(1)
-        val date = createdTime.format(DateTimeFormatter.ofPattern("yyyy.M.d"))
+        val date = dateFormat.format(createdTime)
         return UpdateInfo(
             version = version,
             versionCode = versionCode,
