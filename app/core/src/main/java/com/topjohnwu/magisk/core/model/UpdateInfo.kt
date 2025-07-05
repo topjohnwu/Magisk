@@ -7,8 +7,7 @@ import com.squareup.moshi.JsonClass
 import com.squareup.moshi.JsonQualifier
 import com.squareup.moshi.ToJson
 import kotlinx.parcelize.Parcelize
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME
+import java.time.Instant
 
 @JsonClass(generateAdapter = true)
 class UpdateJson(
@@ -40,13 +39,13 @@ data class ReleaseAssets(
 
 class DateTimeAdapter {
     @ToJson
-    fun toJson(date: LocalDateTime): String {
+    fun toJson(date: Instant): String {
         return date.toString()
     }
 
     @FromJson
-    fun fromJson(date: String): LocalDateTime {
-        return LocalDateTime.parse(date, ISO_OFFSET_DATE_TIME)
+    fun fromJson(date: String): Instant {
+        return Instant.parse(date)
     }
 }
 
@@ -57,7 +56,7 @@ data class Release(
     val prerelease: Boolean,
     val assets: List<ReleaseAssets>,
     val body: String,
-    @Json(name = "created_at") val createdTime: LocalDateTime,
+    @Json(name = "created_at") val createdTime: Instant,
 ) {
     val versionCode: Int get() {
         return if (tag[0] == 'v') {
