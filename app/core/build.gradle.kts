@@ -27,10 +27,15 @@ android {
         aidl = true
         buildConfig = true
     }
+
+    compileOptions {
+        isCoreLibraryDesugaringEnabled = true
+    }
 }
 
 dependencies {
     api(project(":shared"))
+    coreLibraryDesugaring(libs.jdk.libs)
 
     api(libs.timber)
     api(libs.markwon.core)
