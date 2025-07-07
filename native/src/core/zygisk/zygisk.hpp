@@ -3,6 +3,9 @@
 #include <jni.h>
 #include <core.hpp>
 
+#define ZYGISKLDR       "libzygisk.so"
+#define NBPROP          "ro.dalvik.vm.native.bridge"
+
 #if defined(__LP64__)
 #define ZLOGD(...) LOGD("zygisk64: " __VA_ARGS__)
 #define ZLOGE(...) LOGE("zygisk64: " __VA_ARGS__)

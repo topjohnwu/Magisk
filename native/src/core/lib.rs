@@ -12,7 +12,6 @@ use cxx::{ExternType, type_id};
 use daemon::{MagiskD, daemon_entry};
 use derive::Decodable;
 use logging::{android_logging, setup_logfile, zygisk_close_logd, zygisk_get_logd, zygisk_logging};
-use module::load_modules;
 use mount::{find_preinit_device, revert_unmount};
 use resetprop::{persist_delete_prop, persist_get_prop, persist_get_props, persist_set_prop};
 use selinux::{lgetfilecon, lsetfilecon, restorecon, setfilecon};
@@ -173,6 +172,7 @@ pub mod ffi {
         fn uninstall_pkg(apk: Utf8CStrRef);
         fn update_deny_flags(uid: i32, process: &str, flags: &mut u32);
         fn initialize_denylist();
+        fn get_zygisk_lib_name() -> &'static str;
         fn restore_zygisk_prop();
         fn switch_mnt_ns(pid: i32) -> i32;
         fn app_request(req: &SuAppRequest) -> i32;
@@ -223,8 +223,6 @@ pub mod ffi {
 
         #[namespace = "rust"]
         fn daemon_entry();
-        #[namespace = "rust"]
-        fn load_modules(module_list: &[ModuleInfo], zygisk_name: &str);
     }
 
     // Default constructors
@@ -259,7 +257,7 @@ pub mod ffi {
         fn get() -> &'static MagiskD;
     }
     unsafe extern "C++" {
-        fn handle_modules(self: &MagiskD) -> Vec<ModuleInfo>;
+        fn load_modules(self: &MagiskD) -> Vec<ModuleInfo>;
     }
 }
 

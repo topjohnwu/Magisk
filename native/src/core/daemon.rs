@@ -145,8 +145,9 @@ impl MagiskD {
         );
         initialize_denylist();
         setup_module_mount();
-        let modules = self.handle_modules();
+        let modules = self.load_modules();
         self.module_list.set(modules).ok();
+        self.apply_modules();
         clean_mounts();
 
         false
