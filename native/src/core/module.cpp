@@ -125,7 +125,7 @@ static rust::Vec<ModuleInfo> collect_modules(bool zygisk_enabled, bool open_zygi
             }
             return fd;
         };
-        std::for_each(modules.begin(),modules.end(), [&](ModuleInfo &info) {
+        ranges::for_each(modules, [&](ModuleInfo &info) {
             info.z32 = convert_to_memfd(info.z32);
             info.z64 = convert_to_memfd(info.z64);
         });
@@ -133,28 +133,15 @@ static rust::Vec<ModuleInfo> collect_modules(bool zygisk_enabled, bool open_zygi
     return modules;
 }
 
-rust::Vec<ModuleInfo> MagiskD::handle_modules() const noexcept {
+rust::Vec<ModuleInfo> MagiskD::load_modules() const noexcept {
     bool zygisk = zygisk_enabled();
     prepare_modules();
     exec_module_scripts("post-fs-data", collect_modules(zygisk, false));
     // Recollect modules (module scripts could remove itself)
     auto list = collect_modules(zygisk, true);
-
     if (zygisk) {
-        string native_bridge_orig = get_prop(NBPROP);
-        if (native_bridge_orig.empty()) {
-            native_bridge_orig = "0";
-        }
-        native_bridge = native_bridge_orig != "0" ? ZYGISKLDR + native_bridge_orig : ZYGISKLDR;
-        set_prop(NBPROP, native_bridge.data());
-        // Whether Huawei's Maple compiler is enabled.
-        // If so, system server will be created by a special Zygote which ignores the native bridge
-        // and make system server out of our control. Avoid it by disabling.
-        if (get_prop("ro.maple.enable") == "1") {
-            set_prop("ro.maple.enable", "0");
-        }
+        set_zygisk_prop();
     }
-    rust::load_modules(rust::Slice<const ModuleInfo>(list), zygisk ? native_bridge : "");
     return list;
 }
 

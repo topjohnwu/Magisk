@@ -1,8 +1,6 @@
 #pragma once
 
 #define JAVA_PACKAGE_NAME "com.topjohnwu.magisk"
-#define ZYGISKLDR       "libzygisk.so"
-#define NBPROP          "ro.dalvik.vm.native.bridge"
 #define SECURE_DIR      "/data/adb"
 #define MODULEROOT      SECURE_DIR "/modules"
 #define MODULEUPGRADE   SECURE_DIR "/modules_update"

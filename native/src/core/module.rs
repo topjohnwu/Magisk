@@ -1,5 +1,6 @@
 use crate::consts::{MODULEMNT, MODULEROOT, WORKERDIR};
-use crate::ffi::{ModuleInfo, get_magisk_tmp};
+use crate::daemon::MagiskD;
+use crate::ffi::{get_magisk_tmp, get_zygisk_lib_name};
 use crate::load_prop_file;
 use base::{
     Directory, FsPathBuilder, LoggedResult, OsResultStatic, ResultExt, Utf8CStr, Utf8CStrBuf,
@@ -487,7 +488,9 @@ fn inject_magisk_bins(system: &mut FsNode) {
     }
 }
 
-fn inject_zygisk_bins(system: &mut FsNode, name: &str) {
+fn inject_zygisk_bins(system: &mut FsNode) {
+    let name = get_zygisk_lib_name();
+
     #[cfg(target_pointer_width = "64")]
     let has_32_bit = cstr!("/system/bin/linker").exists();
 
@@ -543,110 +546,112 @@ fn inject_zygisk_bins(system: &mut FsNode, name: &str) {
     }
 }
 
-pub fn load_modules(module_list: &[ModuleInfo], zygisk_name: &str) {
-    let mut system = FsNode::new_dir();
+impl MagiskD {
+    pub fn apply_modules(&self) {
+        let mut system = FsNode::new_dir();
 
-    // Build all the base "prefix" paths
-    let mut root = cstr::buf::default().join_path("/");
+        // Build all the base "prefix" paths
+        let mut root = cstr::buf::default().join_path("/");
 
-    let mut module_dir = cstr::buf::default().join_path(MODULEROOT);
+        let mut module_dir = cstr::buf::default().join_path(MODULEROOT);
 
-    let mut module_mnt = cstr::buf::default()
-        .join_path(get_magisk_tmp())
-        .join_path(MODULEMNT);
+        let mut module_mnt = cstr::buf::default()
+            .join_path(get_magisk_tmp())
+            .join_path(MODULEMNT);
 
-    let mut worker = cstr::buf::default()
-        .join_path(get_magisk_tmp())
-        .join_path(WORKERDIR);
+        let mut worker = cstr::buf::default()
+            .join_path(get_magisk_tmp())
+            .join_path(WORKERDIR);
 
-    // Create a collection of all relevant paths
-    let mut root_paths = FilePaths {
-        real: PathTracker::from(&mut root),
-        worker: PathTracker::from(&mut worker),
-        module_mnt: PathTracker::from(&mut module_mnt),
-        module_root: PathTracker::from(&mut module_dir),
-    };
+        // Create a collection of all relevant paths
+        let mut root_paths = FilePaths {
+            real: PathTracker::from(&mut root),
+            worker: PathTracker::from(&mut worker),
+            module_mnt: PathTracker::from(&mut module_mnt),
+            module_root: PathTracker::from(&mut module_dir),
+        };
 
-    // Step 1: Create virtual filesystem tree
-    //
-    // In this step, there is zero logic applied during tree construction; we simply collect
-    // and record the union of all module filesystem trees under each of their /system directory.
+        // Step 1: Create virtual filesystem tree
+        //
+        // In this step, there is zero logic applied during tree construction; we simply collect and
+        // record the union of all module filesystem trees under each of their /system directory.
 
-    for info in module_list {
-        let mut module_paths = root_paths.append(&info.name);
-        {
-            // Read props
-            let prop = module_paths.append("system.prop");
-            if prop.module().exists() {
-                // Do NOT go through property service as it could cause boot lock
-                load_prop_file(prop.module(), true);
-            }
-        }
-        {
-            // Check whether skip mounting
-            let skip = module_paths.append("skip_mount");
-            if skip.module().exists() {
-                continue;
-            }
-        }
-        {
-            // Double check whether the system folder exists
-            let sys = module_paths.append("system");
-            if sys.module().exists() {
-                info!("{}: loading module files", &info.name);
-                system.collect(sys).log_ok();
-            }
-        }
-    }
-
-    // Step 2: Inject custom files
-    //
-    // Magisk provides some built-in functionality that requires augmenting the filesystem.
-    // We expose several cmdline tools (e.g. su) into PATH, and the zygisk shared library
-    // has to also be added into the default LD_LIBRARY_PATH for code injection.
-    // We directly inject file nodes into the virtual filesystem tree we built in the previous
-    // step, treating Magisk just like a special "module".
-
-    if get_magisk_tmp() != "/sbin" || get_path_env().split(":").all(|s| s != "/sbin") {
-        inject_magisk_bins(&mut system);
-    }
-    if !zygisk_name.is_empty() {
-        inject_zygisk_bins(&mut system, zygisk_name);
-    }
-
-    // Step 3: Extract all supported read-only partition roots
-    //
-    // For simplicity and backwards compatibility on older Android versions, when constructing
-    // Magisk modules, we always assume that there is only a single read-only partition mounted
-    // at /system. However, on modern Android there are actually multiple read-only partitions
-    // mounted at their respective paths. We need to extract these subtrees out of the main
-    // tree and treat them as individual trees.
-
-    let mut roots = BTreeMap::new(); /* mapOf(partition_name -> FsNode) */
-    if let FsNode::Directory { children } = &mut system {
-        for dir in SECONDARY_READ_ONLY_PARTITIONS {
-            // Only treat these nodes as root iff it is actually a directory in rootdir
-            if let Ok(attr) = dir.get_attr()
-                && attr.is_dir()
+        for info in self.module_list.get().iter().flat_map(|v| v.iter()) {
+            let mut module_paths = root_paths.append(&info.name);
             {
-                let name = dir.trim_start_matches('/');
-                if let Some(root) = children.remove(name) {
-                    roots.insert(name, root);
+                // Read props
+                let prop = module_paths.append("system.prop");
+                if prop.module().exists() {
+                    // Do NOT go through property service as it could cause boot lock
+                    load_prop_file(prop.module(), true);
+                }
+            }
+            {
+                // Check whether skip mounting
+                let skip = module_paths.append("skip_mount");
+                if skip.module().exists() {
+                    continue;
+                }
+            }
+            {
+                // Double check whether the system folder exists
+                let sys = module_paths.append("system");
+                if sys.module().exists() {
+                    info!("{}: loading module files", &info.name);
+                    system.collect(sys).log_ok();
                 }
             }
         }
-    }
-    roots.insert("system", system);
 
-    for (dir, mut root) in roots {
-        // Step 4: Convert virtual filesystem tree into concrete operations
+        // Step 2: Inject custom files
         //
-        // Compare the virtual filesystem tree we constructed against the real filesystem
-        // structure on-device to generate a series of "operations".
-        // The "core" of the logic is to decide which directories need to be rebuilt in the
-        // tmpfs worker directory, and real sub-nodes need to be mirrored inside it.
+        // Magisk provides some built-in functionality that requires augmenting the filesystem.
+        // We expose several cmdline tools (e.g. su) into PATH, and the zygisk shared library
+        // has to also be added into the default LD_LIBRARY_PATH for code injection.
+        // We directly inject file nodes into the virtual filesystem tree we built in the previous
+        // step, treating Magisk just like a special "module".
 
-        let path = root_paths.append(dir);
-        root.commit(path, true).log_ok();
+        if get_magisk_tmp() != "/sbin" || get_path_env().split(":").all(|s| s != "/sbin") {
+            inject_magisk_bins(&mut system);
+        }
+        if self.zygisk_enabled() {
+            inject_zygisk_bins(&mut system);
+        }
+
+        // Step 3: Extract all supported read-only partition roots
+        //
+        // For simplicity and backwards compatibility on older Android versions, when constructing
+        // Magisk modules, we always assume that there is only a single read-only partition mounted
+        // at /system. However, on modern Android there are actually multiple read-only partitions
+        // mounted at their respective paths. We need to extract these subtrees out of the main
+        // tree and treat them as individual trees.
+
+        let mut roots = BTreeMap::new(); /* mapOf(partition_name -> FsNode) */
+        if let FsNode::Directory { children } = &mut system {
+            for dir in SECONDARY_READ_ONLY_PARTITIONS {
+                // Only treat these nodes as root iff it is actually a directory in rootdir
+                if let Ok(attr) = dir.get_attr()
+                    && attr.is_dir()
+                {
+                    let name = dir.trim_start_matches('/');
+                    if let Some(root) = children.remove(name) {
+                        roots.insert(name, root);
+                    }
+                }
+            }
+        }
+        roots.insert("system", system);
+
+        for (dir, mut root) in roots {
+            // Step 4: Convert virtual filesystem tree into concrete operations
+            //
+            // Compare the virtual filesystem tree we constructed against the real filesystem
+            // structure on-device to generate a series of "operations".
+            // The "core" of the logic is to decide which directories need to be rebuilt in the
+            // tmpfs worker directory, and real sub-nodes need to be mirrored inside it.
+
+            let path = root_paths.append(dir);
+            root.commit(path, true).log_ok();
+        }
     }
 }
