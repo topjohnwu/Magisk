@@ -1,11 +1,11 @@
 [versions]
-kotlin = "2.1.21"
-android = "8.11.0"
-ksp = "2.1.21-2.0.1"
+kotlin = "2.2.0"
+android = "8.11.1"
+ksp = "2.2.0-2.0.2"
 rikka = "1.3.0"
-navigation = "2.9.0"
+navigation = "2.9.1"
 libsu = "6.0.0"
-okhttp = "4.12.0"
+okhttp = "5.1.0"
 retrofit = "3.0.0"
 room = "2.7.2"
 
@@ -62,6 +62,6 @@ android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref
 ksp-plugin = { module = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
 navigation-safe-args-plugin = { module = "androidx.navigation:navigation-safe-args-gradle-plugin", version.ref = "navigation" }
 lsparanoid-plugin = { module = "org.lsposed.lsparanoid:gradle-plugin", version = "0.6.0" }
-moshi-plugin = { module = "dev.zacsweers.moshix:dev.zacsweers.moshix.gradle.plugin", version = "0.30.0" }
+moshi-plugin = { module = "dev.zacsweers.moshix:dev.zacsweers.moshix.gradle.plugin", version = "0.31.0" }
 
 [plugins]
