@@ -31,7 +31,7 @@ fdt = { workspace = true }
 bytemuck = { workspace = true, features = ["derive", "min_const_generics"] }
 num-traits = { workspace = true }
 flate2 = { workspace = true, features = ["zlib-rs"] }
-bzip2 = { workspace = true, features = ["libbz2-rs-sys"] }
+bzip2 = { workspace = true }
 lz4 = { workspace = true }
 xz2 = { workspace = true }
 zopfli = { workspace = true, features = ["gzip"] }
