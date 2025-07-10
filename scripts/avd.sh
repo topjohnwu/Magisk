@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -e
+shopt -s extglob
 . scripts/test_common.sh
 
 emu_port=5682
@@ -88,11 +89,12 @@ resolve_vars() {
   # Determine API level
   local api
   case $ver in
-    [0-9]*) api=$ver ;;
+    +([0-9])) api=$ver ;;
     TiramisuPrivacySandbox) api=33 ;;
     UpsideDownCakePrivacySandbox) api=34 ;;
     VanillaIceCream) api=35 ;;
     Baklava) api=36 ;;
+    36*CANARY) api=36 ;;
     *)
       print_error "! Unknown system image version '$ver'"
       exit 1
@@ -131,11 +133,15 @@ resolve_vars() {
   dump_vars $arg_list
 }
 
-setup_emu() {
+dl_emu() {
   local avd_pkg=$1
-
   yes | "$sdk" --licenses > /dev/null 2>&1
   "$sdk" --channel=3 platform-tools emulator $avd_pkg
+}
+
+setup_emu() {
+  local avd_pkg=$1
+  dl_emu $avd_pkg
   echo no | "$avd" create avd -f -n test -k $avd_pkg
 }
 
@@ -211,7 +217,15 @@ run_main() {
   local avd_pkg
   eval $(resolve_vars "emu_args avd_pkg" $1 $2)
   setup_emu "$avd_pkg"
+  print_title "* Launching $avd_pkg"
   "$emu" @test $emu_args 2>/dev/null
+}
+
+dl_main() {
+  local avd_pkg
+  eval $(resolve_vars "avd_pkg" $1 $2)
+  print_title "* Downloading $avd_pkg"
+  dl_emu "$avd_pkg"
 }
 
 case "$1" in
@@ -226,6 +240,10 @@ case "$1" in
     shift
     trap cleanup EXIT
     run_main "$@"
+    ;;
+  dl )
+    shift
+    dl_main "$@"
     ;;
   * )
     print_error "Unknown argument '$1'"
