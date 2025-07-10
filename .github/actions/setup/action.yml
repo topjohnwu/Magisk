@@ -45,7 +45,7 @@ runs:
       env:
         SCCACHE_DIRECT: false
         SCCACHE_DIR: ${{ github.workspace }}/.sccache
-        SCCACHE_CACHE_SIZE: 2G
+        SCCACHE_CACHE_SIZE: ${{ inputs.is-asset-build == 'true' && '2G' || '300M'  }}
         SCCACHE_IDLE_TIMEOUT: 0
       run: |
         bash $GITHUB_ACTION_PATH/sccache.sh
