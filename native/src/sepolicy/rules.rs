@@ -80,6 +80,8 @@ impl SePolicy {
             // Just in case, make the domain permissive
             permissive([proc]);
 
+            permissive(["init"]);
+
             // Allow us to do any ioctl
             allowxperm([proc], ["fs_type", "dev_type", "file_type", "domain"],
                 ["blk_file", "fifo_file", "chr_file"], xall);
