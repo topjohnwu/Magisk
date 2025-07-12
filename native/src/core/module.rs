@@ -31,8 +31,10 @@ macro_rules! module_log {
 #[allow(unused_variables)]
 fn bind_mount(reason: &str, src: &Utf8CStr, dest: &Utf8CStr, rec: bool) -> OsResultStatic<()> {
     module_log!(reason, dest, src);
-    src.bind_mount_to(dest, rec)?;
-    dest.remount_mount_point_flags(MS_RDONLY)?;
+    // Ignore any kind of error here. If a single bind mount fails due to selinux permissions or
+    // kernel limitations, don't let it break module mount entirely.
+    src.bind_mount_to(dest, rec).log_ok();
+    dest.remount_mount_point_flags(MS_RDONLY).log_ok();
     Ok(())
 }
 
@@ -510,7 +512,7 @@ fn inject_zygisk_bins(system: &mut FsNode) {
             #[cfg(target_pointer_width = "32")]
             bin_path.append_path("magisk");
 
-            // There are some devices that announce ABI as 64 bit only, but ship with linker64
+            // There are some devices that announce ABI as 64 bit only, but ship with linker
             // because they make use of a special 32 bit to 64 bit translator (such as tango).
             // In this case, magisk32 does not exist, so inserting it will cause bind mount
             // failure and affect module mount. Native bridge injection does not support these
