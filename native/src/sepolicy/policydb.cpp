@@ -2,14 +2,13 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <fcntl.h>
 #include <unistd.h>
 
 #include <cil/cil.h>
 
 #include <base.hpp>
-#include <stream.hpp>
 
+using namespace std;
 
 #define SHALEN 64
 static bool cmp_sha256(const char *a, const char *b) {
@@ -230,20 +229,30 @@ sepol_impl::~sepol_impl() {
     free(db);
 }
 
+static int vec_write(void *v, const char *buf, int len) {
+    auto vec = static_cast<vector<char> *>(v);
+    vec->insert(vec->end(), buf, buf + len);
+    return len;
+}
+
 bool SePolicy::to_file(::rust::Utf8CStr file) const noexcept {
     // No partial writes are allowed to /sys/fs/selinux/load, thus the reason why we
     // first dump everything into memory, then directly call write system call
-    heap_data data;
-    auto fp = make_stream_fp<byte_stream>(data);
+    vector<char> out;
+    FILE *fp = funopen(&out, nullptr, vec_write, nullptr, nullptr);
+    // Since we're directly writing to memory, disable buffering
+    setbuf(fp, nullptr);
 
     policy_file_t pf;
     policy_file_init(&pf);
     pf.type = PF_USE_STDIO;
-    pf.fp = fp.get();
+    pf.fp = fp;
     if (policydb_write(impl->db, &pf)) {
         LOGE("Fail to create policy image\n");
+        fclose(fp);
         return false;
     }
+    fclose(fp);
 
     int fd = xopen(file.data(), O_WRONLY | O_CREAT | O_CLOEXEC, 0644);
     if (fd < 0)
@@ -251,7 +260,7 @@ bool SePolicy::to_file(::rust::Utf8CStr file) const noexcept {
     if (struct stat st{}; xfstat(fd, &st) == 0 && st.st_size > 0) {
         ftruncate(fd, 0);
     }
-    xwrite(fd, data.buf(), data.sz());
+    xwrite(fd, out.data(), out.size());
 
     close(fd);
     return true;

@@ -1,5 +1,3 @@
-#![feature(format_args_nl)]
-#![feature(once_cell_try)]
 #![feature(try_blocks)]
 #![allow(clippy::missing_safety_doc)]
 
@@ -102,9 +100,9 @@ pub mod ffi {
         fn patch_ro_root(self: &mut MagiskInit);
 
         // Used in C++
-        unsafe fn setup_tmp(self: &MagiskInit, path: *const c_char);
+        unsafe fn setup_tmp(self: &mut MagiskInit, path: *const c_char);
         fn collect_devices(self: &MagiskInit);
-        fn mount_preinit_dir(self: &MagiskInit);
+        fn mount_preinit_dir(self: &mut MagiskInit);
         unsafe fn find_block(self: &MagiskInit, partname: *const c_char) -> u64;
         unsafe fn patch_rc_scripts(self: &MagiskInit, src_path: *const c_char, tmp_path: *const c_char, writable: bool) -> bool;
         unsafe fn patch_fissiond(self: &mut MagiskInit, tmp_path: *const c_char);

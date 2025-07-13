@@ -131,9 +131,9 @@ fn print_node(node: &FdtNode) {
                     }
                 );
             } else if size > MAX_PRINT_LEN {
-                println!("[{}]: <bytes>({})", name, size);
+                println!("[{name}]: <bytes>({size})");
             } else {
-                println!("[{}]: {:02x?}", name, value);
+                println!("[{name}]: {value:02x?}");
             }
         }
 
@@ -154,7 +154,7 @@ fn for_each_fdt<F: FnMut(usize, Fdt) -> LoggedResult<()>>(
     rw: bool,
     mut f: F,
 ) -> LoggedResult<()> {
-    eprintln!("Loading dtbs from [{}]", file);
+    eprintln!("Loading dtbs from [{file}]");
     let file = if rw {
         MappedFile::open_rw(file)?
     } else {
@@ -173,7 +173,7 @@ fn for_each_fdt<F: FnMut(usize, Fdt) -> LoggedResult<()>>(
         }
         let fdt = match Fdt::new(slice) {
             Err(FdtError::BufferTooSmall) => {
-                eprintln!("dtb.{:04} is truncated", dtb_num);
+                eprintln!("dtb.{dtb_num:04} is truncated");
                 break;
             }
             Ok(fdt) => fdt,
@@ -198,11 +198,11 @@ fn dtb_print(file: &Utf8CStr, fstab: bool) -> LoggedResult<()> {
     for_each_fdt(file, false, |n, fdt| {
         if fstab {
             if let Some(fstab) = find_fstab(&fdt) {
-                eprintln!("Found fstab in dtb.{:04}", n);
+                eprintln!("Found fstab in dtb.{n:04}");
                 print_node(&fstab);
             }
         } else if let Some(mut root) = fdt.find_node("/") {
-            eprintln!("Printing dtb.{:04}", n);
+            eprintln!("Printing dtb.{n:04}");
             if root.name.is_empty() {
                 root.name = "/";
             }
@@ -248,7 +248,7 @@ fn dtb_patch(file: &Utf8CStr) -> LoggedResult<bool> {
                             &mut *std::mem::transmute::<&[u8], &UnsafeCell<[u8]>>(w).get()
                         };
                         w[..=4].copy_from_slice(b"want");
-                        eprintln!("Patch [skip_initramfs] -> [want_initramfs] in dtb.{:04}", n);
+                        eprintln!("Patch [skip_initramfs] -> [want_initramfs] in dtb.{n:04}");
                         patched = true;
                     }
                 });

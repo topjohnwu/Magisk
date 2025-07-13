@@ -4,11 +4,13 @@ import android.graphics.drawable.Drawable
 import androidx.databinding.Bindable
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.model.su.SuPolicy
 import com.topjohnwu.magisk.databinding.DiffItem
 import com.topjohnwu.magisk.databinding.ItemWrapper
 import com.topjohnwu.magisk.databinding.ObservableRvItem
 import com.topjohnwu.magisk.databinding.set
+import com.topjohnwu.magisk.core.R as CoreR
 
 class PolicyRvItem(
     private val viewModel: SuperuserViewModel,
@@ -33,13 +35,33 @@ class PolicyRvItem(
     var isExpanded = false
         set(value) = set(value, field, { field = it }, BR.expanded)
 
+    val showSlider = Config.suRestrict || item.policy == SuPolicy.RESTRICT
+
     @get:Bindable
     var isEnabled
-        get() = item.policy == SuPolicy.ALLOW
+        get() = item.policy >= SuPolicy.ALLOW
         set(value) = setImpl(value, isEnabled) {
             notifyPropertyChanged(BR.enabled)
-            viewModel.togglePolicy(this, value)
+            viewModel.updatePolicy(this, if (it) SuPolicy.ALLOW else SuPolicy.DENY)
         }
+
+    @get:Bindable
+    var sliderValue
+        get() = item.policy
+        set(value) = setImpl(value, sliderValue) {
+            notifyPropertyChanged(BR.sliderValue)
+            notifyPropertyChanged(BR.enabled)
+            viewModel.updatePolicy(this, it)
+        }
+
+    val sliderValueToPolicyString: (Float) -> Int = { value ->
+        when (value.toInt()) {
+            1 -> CoreR.string.deny
+            2 -> CoreR.string.restrict
+            3 -> CoreR.string.grant
+            else -> CoreR.string.deny
+        }
+    }
 
     @get:Bindable
     var shouldNotify

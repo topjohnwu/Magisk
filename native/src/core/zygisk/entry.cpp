@@ -10,7 +10,7 @@
 
 using namespace std;
 
-string native_bridge = "0";
+static string zygisk_lib_name = "0";
 
 static void zygiskd(int socket) {
     if (getuid() != 0 || fcntl(socket, F_GETFD) < 0)
@@ -110,10 +110,29 @@ extern "C" [[maybe_unused]] NativeBridgeCallbacks NativeBridgeItf {
     },
 };
 
+rust::Str get_zygisk_lib_name() {
+    return zygisk_lib_name;
+}
+
+void set_zygisk_prop() {
+    string native_bridge_orig = get_prop(NBPROP);
+    if (native_bridge_orig.empty()) {
+        native_bridge_orig = "0";
+    }
+    zygisk_lib_name = native_bridge_orig == "0" ? ZYGISKLDR : ZYGISKLDR + native_bridge_orig;
+    set_prop(NBPROP, zygisk_lib_name.data());
+    // Whether Huawei's Maple compiler is enabled.
+    // If so, system server will be created by a special Zygote which ignores the native bridge
+    // and make system server out of our control. Avoid it by disabling.
+    if (get_prop("ro.maple.enable") == "1") {
+        set_prop("ro.maple.enable", "0");
+    }
+}
+
 void restore_zygisk_prop() {
     string native_bridge_orig = "0";
-    if (native_bridge.length() > strlen(ZYGISKLDR)) {
-        native_bridge_orig = native_bridge.substr(strlen(ZYGISKLDR));
+    if (zygisk_lib_name.length() > strlen(ZYGISKLDR)) {
+        native_bridge_orig = zygisk_lib_name.substr(strlen(ZYGISKLDR));
     }
     set_prop(NBPROP, native_bridge_orig.data());
 }

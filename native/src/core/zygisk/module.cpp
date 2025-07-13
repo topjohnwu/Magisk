@@ -1,3 +1,4 @@
+#include <sys/mman.h>
 #include <android/dlext.h>
 #include <dlfcn.h>
 

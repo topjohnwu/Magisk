@@ -1,9 +1,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/prctl.h>
-#include <sys/sysmacros.h>
 #include <fcntl.h>
-#include <pwd.h>
 #include <unistd.h>
 #include <syscall.h>
 #include <random>
@@ -184,6 +182,10 @@ static T parse_num(string_view s) {
  */
 int parse_int(string_view s) {
     return parse_num<int, 10>(s);
+}
+
+uint32_t parse_uint32_hex(string_view s) {
+    return parse_num<uint32_t, 16>(s);
 }
 
 int switch_mnt_ns(int pid) {

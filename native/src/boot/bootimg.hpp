@@ -610,9 +610,9 @@ struct boot_img {
     std::bitset<BOOT_FLAGS_MAX> flags;
 
     // The format of kernel, ramdisk and extra
-    format_t k_fmt = UNKNOWN;
-    format_t r_fmt = UNKNOWN;
-    format_t e_fmt = UNKNOWN;
+    FileFormat k_fmt;
+    FileFormat r_fmt;
+    FileFormat e_fmt;
 
     /*************************************************************
      * Following pointers points within the read-only mmap region
@@ -672,8 +672,8 @@ struct boot_img {
     boot_img(const char *);
     ~boot_img();
 
-    bool parse_image(const uint8_t *addr, format_t type);
-    std::pair<const uint8_t *, dyn_img_hdr *> create_hdr(const uint8_t *addr, format_t type);
+    bool parse_image(const uint8_t *addr, FileFormat type);
+    std::pair<const uint8_t *, dyn_img_hdr *> create_hdr(const uint8_t *addr, FileFormat type);
 
     // Rust FFI
     rust::Slice<const uint8_t> get_payload() const { return payload; }

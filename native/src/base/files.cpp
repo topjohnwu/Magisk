@@ -1,10 +1,8 @@
 #include <sys/mman.h>
 #include <sys/sendfile.h>
-#include <sys/sysmacros.h>
 #include <linux/fs.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <libgen.h>
 
 #include <base.hpp>
 
@@ -143,7 +141,7 @@ string resolve_preinit_dir(const char *base_dir) {
     if (access((dir + "/unencrypted").data(), F_OK) == 0) {
         dir += "/unencrypted/magisk";
     } else if (access((dir + "/adb").data(), F_OK) == 0) {
-        dir += "/adb/modules";
+        dir += "/adb";
     } else if (access((dir + "/watchdog").data(), F_OK) == 0) {
         dir += "/watchdog/magisk";
     } else {

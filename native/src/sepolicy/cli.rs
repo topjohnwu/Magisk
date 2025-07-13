@@ -42,7 +42,7 @@ fn print_usage(cmd: &str) {
     eprintln!(
         r#"MagiskPolicy - SELinux Policy Patch Tool
 
-Usage: {} [--options...] [policy statements...]
+Usage: {cmd} [--options...] [policy statements...]
 
 Options:
    --help            show help message for policy statements
@@ -60,8 +60,7 @@ Options:
 
 If neither --load, --load-split, nor --compile-split is specified,
 it will load from current live policies (/sys/fs/selinux/policy)
-"#,
-        cmd
+"#
     );
 
     format_statement_help(&mut FmtAdaptor(&mut stderr())).ok();

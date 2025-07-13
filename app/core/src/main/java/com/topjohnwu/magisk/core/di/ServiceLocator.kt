@@ -35,8 +35,8 @@ object ServiceLocator {
     val markwon by lazy { createMarkwon(AppContext) }
     val networkService by lazy {
         NetworkService(
-            createApiService(retrofit, Const.Url.GITHUB_PAGE_URL),
-            createApiService(retrofit, Const.Url.GITHUB_RAW_URL),
+            createApiService(retrofit, Const.Url.INVALID_URL),
+            createApiService(retrofit, Const.Url.GITHUB_API_URL),
         )
     }
 }

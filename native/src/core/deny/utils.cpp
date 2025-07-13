@@ -7,7 +7,6 @@
 #include <set>
 
 #include <consts.hpp>
-#include <base.hpp>
 #include <sqlite.hpp>
 #include <core.hpp>
 

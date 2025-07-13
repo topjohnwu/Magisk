@@ -1,4 +1,3 @@
-#![feature(format_args_nl)]
 #![feature(try_blocks)]
 
 pub use base;

@@ -16,13 +16,7 @@ Some highlight features:
 
 ## Downloads
 
-[Github](https://github.com/topjohnwu/Magisk/) is the only source where you can get official Magisk information and downloads.
-
-Click the icon below to download Magisk apk.
-
-[![](https://img.shields.io/badge/Magisk-v28.1-blue)](https://github.com/topjohnwu/Magisk/releases/tag/v28.1)
-[![](https://img.shields.io/badge/Magisk%20Beta-v28.1-blue)](https://github.com/topjohnwu/Magisk/releases/tag/v28.1)
-[![](https://img.shields.io/badge/Magisk-Canary-red)](https://github.com/topjohnwu/Magisk/releases/tag/canary-28104)
+[Github](https://github.com/topjohnwu/Magisk/releases) is the only source where you can get official Magisk information and downloads.
 
 ## Useful Links
 

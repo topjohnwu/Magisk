@@ -11,8 +11,6 @@ use std::ptr;
 use std::thread::sleep;
 use std::time::Duration;
 
-const POLICY_VERSION: &Utf8CStr = cstr!("/selinux_version");
-
 const MOCK_VERSION: &Utf8CStr = cstr!(concatcp!(SELINUXMOCK, "/version"));
 const MOCK_LOAD: &Utf8CStr = cstr!(concatcp!(SELINUXMOCK, "/load"));
 const MOCK_ENFORCE: &Utf8CStr = cstr!(concatcp!(SELINUXMOCK, "/enforce"));
@@ -51,13 +49,13 @@ enum SePatchStrategy {
 fn mock_fifo(target: &Utf8CStr, mock: &Utf8CStr) -> LoggedResult<()> {
     debug!("Hijack [{}]", target);
     mock.mkfifo(0o666)?;
-    mock.bind_mount_to(target).log()
+    mock.bind_mount_to(target, false).log()
 }
 
 fn mock_file(target: &Utf8CStr, mock: &Utf8CStr) -> LoggedResult<()> {
     debug!("Hijack [{}]", target);
     drop(mock.create(libc::O_RDONLY, 0o666)?);
-    mock.bind_mount_to(target).log()
+    mock.bind_mount_to(target, false).log()
 }
 
 impl MagiskInit {
@@ -91,6 +89,7 @@ impl MagiskInit {
         cstr!(SELINUXMOCK).mkdir(0o711)?;
 
         let mut rules = String::new();
+        let mut policy_ver = cstr!("/selinux_version");
         let rule_file = cstr!(concatcp!("/data/", PREINITMIRR, "/sepolicy.rule"));
         if rule_file.exists() {
             debug!("Loading custom sepolicy patch: [{}]", rule_file);
@@ -108,8 +107,12 @@ impl MagiskInit {
             if init.contains(split_plat_cil().as_str().as_bytes()) {
                 // Supports split policy
                 strat = SePatchStrategy::SelinuxFs;
-            } else if init.contains(POLICY_VERSION.as_bytes()) {
+            } else if init.contains(policy_ver.as_bytes()) {
                 // Does not support split policy, hijack /selinux_version
+                strat = SePatchStrategy::Legacy;
+            } else if init.contains(cstr!("/sepolicy_version").as_bytes()) {
+                // Samsung custom path
+                policy_ver = cstr!("/sepolicy_version");
                 strat = SePatchStrategy::Legacy;
             } else {
                 error!("Unknown sepolicy setup, abort...");
@@ -160,15 +163,15 @@ impl MagiskInit {
             SePatchStrategy::Legacy => {
                 info!("SePatchStrategy: LEGACY");
 
-                if !POLICY_VERSION.exists() {
+                if !policy_ver.exists() {
                     // The file does not exist, create one
-                    drop(POLICY_VERSION.create(libc::O_RDONLY, 0o666)?);
+                    drop(policy_ver.create(libc::O_RDONLY, 0o666)?);
                 }
 
                 // The only purpose of this is to block init's control flow after it mounts
                 // selinuxfs and before it calls security_load_policy().
-                // selinux_android_load_policy() -> set_policy_index() -> open(POLICY_VERSION)
-                mock_fifo(POLICY_VERSION, MOCK_VERSION)?;
+                // selinux_android_load_policy() -> set_policy_index() -> open(policy_ver)
+                mock_fifo(policy_ver, MOCK_VERSION)?;
             }
         }
 
@@ -203,7 +206,7 @@ impl MagiskInit {
             // This will unblock init at selinux_android_load_policy() -> set_policy_index().
             drop(MOCK_VERSION.open(libc::O_WRONLY)?);
 
-            POLICY_VERSION.unmount()?;
+            policy_ver.unmount()?;
 
             // libselinux does not read /selinux_version after open; instead it mmap the file,
             // which can never succeed on FIFO files. This is fine as set_policy_index() will just

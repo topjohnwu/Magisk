@@ -1,0 +1,67 @@
+[versions]
+kotlin = "2.2.0"
+android = "8.11.1"
+ksp = "2.2.0-2.0.2"
+rikka = "1.3.0"
+navigation = "2.9.1"
+libsu = "6.0.0"
+okhttp = "5.1.0"
+retrofit = "3.0.0"
+room = "2.7.2"
+
+[libraries]
+bcpkix = { module = "org.bouncycastle:bcpkix-jdk18on", version = "1.81" }
+commons-compress = { module = "org.apache.commons:commons-compress", version = "1.27.1" }
+retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+retrofit-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "retrofit" }
+retrofit-scalars = { module = "com.squareup.retrofit2:converter-scalars", version.ref = "retrofit" }
+markwon-core = { module = "io.noties.markwon:core", version = "4.6.2" }
+okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
+okhttp-dnsoverhttps = { module = "com.squareup.okhttp3:okhttp-dnsoverhttps", version.ref = "okhttp" }
+okhttp-logging = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp" }
+timber = { module = "com.jakewharton.timber:timber", version = "5.0.1" }
+jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version = "7.1.0.202411261347-r" }
+
+# AndroidX
+activity = { module = "androidx.activity:activity", version = "1.10.1" }
+appcompat = { module = "androidx.appcompat:appcompat", version = "1.7.1" }
+core-ktx = { module = "androidx.core:core-ktx", version = "1.16.0" }
+core-splashscreen = { module = "androidx.core:core-splashscreen", version = "1.0.1" }
+constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version = "2.2.1" }
+fragment-ktx = { module = "androidx.fragment:fragment-ktx", version = "1.8.8" }
+navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigation" }
+navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigation" }
+profileinstaller = { module = "androidx.profileinstaller:profileinstaller", version = "1.4.1" }
+recyclerview = { module = "androidx.recyclerview:recyclerview", version = "1.4.0" }
+room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version = "1.1.0" }
+transition = { module = "androidx.transition:transition", version = "1.6.0" }
+collection-ktx = { module = "androidx.collection:collection-ktx", version = "1.5.0" }
+material = { module = "com.google.android.material:material", version = "1.12.0" }
+jdk-libs = { module = "com.android.tools:desugar_jdk_libs_nio", version = "2.1.5" }
+test-runner = { module = "androidx.test:runner", version = "1.6.2" }
+test-rules = { module = "androidx.test:rules", version = "1.6.1" }
+test-junit = { module = "androidx.test.ext:junit", version = "1.2.1" }
+test-uiautomator = { module = "androidx.test.uiautomator:uiautomator", version = "2.3.0" }
+
+# topjohnwu
+indeterminate-checkbox = { module = "com.github.topjohnwu:indeterminate-checkbox", version = "1.0.7" }
+libsu-core = { module = "com.github.topjohnwu.libsu:core", version.ref = "libsu" }
+libsu-service = { module = "com.github.topjohnwu.libsu:service", version.ref = "libsu" }
+libsu-nio = { module = "com.github.topjohnwu.libsu:nio", version.ref = "libsu" }
+
+# Rikka
+rikka-recyclerview = { module = "dev.rikka.rikkax.recyclerview:recyclerview-ktx", version = "1.3.2" }
+rikka-layoutinflater = { module = "dev.rikka.rikkax.layoutinflater:layoutinflater", version.ref = "rikka" }
+rikka-insets = { module = "dev.rikka.rikkax.insets:insets", version.ref = "rikka" }
+
+# Build plugins
+android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "android" }
+ksp-plugin = { module = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
+navigation-safe-args-plugin = { module = "androidx.navigation:navigation-safe-args-gradle-plugin", version.ref = "navigation" }
+lsparanoid-plugin = { module = "org.lsposed.lsparanoid:gradle-plugin", version = "0.6.0" }
+moshi-plugin = { module = "dev.zacsweers.moshix:dev.zacsweers.moshix.gradle.plugin", version = "0.31.0" }
+
+[plugins]

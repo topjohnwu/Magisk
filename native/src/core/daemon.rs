@@ -5,7 +5,7 @@ use crate::ffi::{
     exec_module_scripts, get_magisk_tmp, initialize_denylist, setup_magisk_env,
 };
 use crate::logging::{magisk_logging, setup_logfile, start_log_daemon};
-use crate::mount::{clean_mounts, setup_mounts};
+use crate::mount::{clean_mounts, setup_module_mount, setup_preinit_dir};
 use crate::package::ManagerInfo;
 use crate::selinux::restore_tmpcon;
 use crate::su::SuInfo;
@@ -144,9 +144,10 @@ impl MagiskD {
             Ordering::Release,
         );
         initialize_denylist();
-        setup_mounts();
-        let modules = self.handle_modules();
+        setup_module_mount();
+        let modules = self.load_modules();
         self.module_list.set(modules).ok();
+        self.apply_modules();
         clean_mounts();
 
         false
@@ -175,6 +176,7 @@ impl MagiskD {
             secure_dir.mkdir(0o700).log_ok();
         }
 
+        setup_preinit_dir();
         self.ensure_manager();
         self.zygisk_reset(true)
     }
@@ -335,7 +337,7 @@ fn switch_cgroup(cgroup: &str, pid: i32) {
     }
     if let Ok(mut file) = buf.open(O_WRONLY | O_APPEND | O_CLOEXEC) {
         buf.clear();
-        buf.write_fmt(format_args!("{}", pid)).ok();
+        buf.write_fmt(format_args!("{pid}")).ok();
         file.write_all(buf.as_bytes()).log_ok();
     }
 }

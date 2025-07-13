@@ -2,33 +2,10 @@
 
 #include <string_view>
 
-typedef enum {
-    UNKNOWN,
-/* Boot formats */
-    CHROMEOS,
-    AOSP,
-    AOSP_VENDOR,
-    DHTB,
-    BLOB,
-/* Compression formats */
-    GZIP,
-    ZOPFLI,
-    XZ,
-    LZMA,
-    BZIP2,
-    LZ4,
-    LZ4_LEGACY,
-    LZ4_LG,
-/* Unsupported compression */
-    LZOP,
-/* Misc */
-    MTK,
-    DTB,
-    ZIMAGE,
-} format_t;
+enum class FileFormat : ::std::uint8_t;
 
-#define COMPRESSED(fmt)      ((fmt) >= GZIP && (fmt) < LZOP)
-#define COMPRESSED_ANY(fmt)  ((fmt) >= GZIP && (fmt) <= LZOP)
+#define COMPRESSED(fmt)      ((+fmt) >= +FileFormat::GZIP && (+fmt) < +FileFormat::LZOP)
+#define COMPRESSED_ANY(fmt)  ((+fmt) >= +FileFormat::GZIP && (+fmt) <= +FileFormat::LZOP)
 
 #define BUFFER_MATCH(buf, s) (memcmp(buf, s, sizeof(s) - 1) == 0)
 #define BUFFER_CONTAIN(buf, sz, s) (memmem(buf, sz, s, sizeof(s) - 1) != nullptr)
@@ -66,20 +43,24 @@ typedef enum {
 
 class Fmt2Name {
 public:
-    const char *operator[](format_t fmt);
+    const char *operator[](FileFormat fmt);
 };
 
 class Fmt2Ext {
 public:
-    const char *operator[](format_t fmt);
+    const char *operator[](FileFormat fmt);
 };
 
 class Name2Fmt {
 public:
-    format_t operator[](std::string_view name);
+    FileFormat operator[](std::string_view name);
 };
 
-format_t check_fmt(const void *buf, size_t len);
+FileFormat check_fmt(const void *buf, size_t len);
+
+static inline FileFormat check_fmt(rust::Slice<const uint8_t> bytes) {
+    return check_fmt(bytes.data(), bytes.size());
+}
 
 extern Name2Fmt name2fmt;
 extern Fmt2Name fmt2name;

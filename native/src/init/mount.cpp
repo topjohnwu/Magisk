@@ -4,7 +4,6 @@
 #include <libgen.h>
 
 #include <base.hpp>
-#include <flags.h>
 #include <consts.hpp>
 
 #include "init.hpp"
@@ -103,11 +102,11 @@ uint64_t MagiskInit::find_block(const char *partname) const noexcept {
     return 0;
 }
 
-void MagiskInit::mount_preinit_dir() const noexcept {
+void MagiskInit::mount_preinit_dir() noexcept {
     if (preinit_dev.empty()) return;
-    auto dev = find_block(preinit_dev.data());
+    auto dev = find_block(preinit_dev.c_str());
     if (dev == 0) {
-        LOGE("Cannot find preinit %s, abort!\n", preinit_dev.data());
+        LOGE("Cannot find preinit %s, abort!\n", preinit_dev.c_str());
         return;
     }
     xmknod(PREINITDEV, S_IFBLK | 0600, dev);
@@ -123,8 +122,7 @@ void MagiskInit::mount_preinit_dir() const noexcept {
 
     // Since we are mounting the block device directly, make sure to ONLY mount the partitions
     // as read-only, or else the kernel might crash due to crappy drivers.
-    // After the device boots up, magiskd will properly bind mount the correct partition
-    // on to PREINITMIRR as writable. For more details, check bootstages.cpp
+    // After the device boots up, magiskd will properly symlink the correct path at PREINITMIRR as writable.
     if (mounted || mount(PREINITDEV, MIRRDIR, "ext4", MS_RDONLY, nullptr) == 0 ||
         mount(PREINITDEV, MIRRDIR, "f2fs", MS_RDONLY, nullptr) == 0) {
         string preinit_dir = resolve_preinit_dir(MIRRDIR);
@@ -138,8 +136,9 @@ void MagiskInit::mount_preinit_dir() const noexcept {
         }
         xumount2(MIRRDIR, MNT_DETACH);
     } else {
-        PLOGE("Failed to mount preinit %s\n", preinit_dev.data());
-        unlink(PREINITDEV);
+        PLOGE("Mount preinit %s", preinit_dev.c_str());
+        // Do NOT delete the block device. Even though we cannot mount it here,
+        // it might get formatted later in the boot process.
     }
 }
 
@@ -210,7 +209,7 @@ mount_root:
     return is_two_stage;
 }
 
-void MagiskInit::setup_tmp(const char *path) const noexcept {
+void MagiskInit::setup_tmp(const char *path) noexcept {
     LOGD("Setup Magisk tmp at %s\n", path);
     chdir("/data");
 

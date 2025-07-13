@@ -17,7 +17,7 @@ impl<T, E: Display> ResultExt<T> for Result<T, E> {
         match self {
             Ok(r) => r,
             Err(e) => {
-                eprintln!("error occurred: {}", e);
+                eprintln!("error occurred: {e}");
                 process::exit(1);
             }
         }
@@ -40,6 +40,6 @@ pub fn gen_cxx_binding(name: &str) {
     println!("cargo:rerun-if-changed=lib.rs");
     let opt = Opt::default();
     let code = cxx_gen::generate_header_and_cc_with_path("lib.rs", &opt);
-    write_if_diff(format!("{}.cpp", name), code.implementation.as_slice()).ok_or_exit();
-    write_if_diff(format!("{}.hpp", name), code.header.as_slice()).ok_or_exit();
+    write_if_diff(format!("{name}.cpp"), code.implementation.as_slice()).ok_or_exit();
+    write_if_diff(format!("{name}.hpp"), code.header.as_slice()).ok_or_exit();
 }

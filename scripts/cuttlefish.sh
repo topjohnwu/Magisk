@@ -85,11 +85,11 @@ test_main() {
   adb wait-for-device
 
   # Patch and test debug build
-  ./build.py avd_patch "$CF_HOME/init_boot.img" magisk_patched.img
+  ./build.py -v avd_patch "$CF_HOME/init_boot.img" magisk_patched.img
   test_cf debug
 
   # Patch and test release build
-  ./build.py -r avd_patch "$CF_HOME/init_boot.img" magisk_patched.img
+  ./build.py -vr avd_patch "$CF_HOME/init_boot.img" magisk_patched.img
   test_cf release
 
   # Cleanup

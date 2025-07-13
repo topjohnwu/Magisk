@@ -28,6 +28,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import timber.log.Timber
 import java.io.File
+import java.io.PrintStream
 
 @Keep
 @RunWith(AndroidJUnit4::class)
@@ -39,9 +40,14 @@ class Environment : BaseTest {
         fun before() = BaseTest.prerequisite()
 
         // The kernel running on emulators < API 26 does not play well with
-        // magic mount. Skip module tests on those legacy platforms.
-        fun testModules(): Boolean {
+        // magic mount. Skip mount_test on those legacy platforms.
+        fun mount(): Boolean {
             return Build.VERSION.SDK_INT >= 26
+        }
+
+        // It is possible that there are no suitable preinit partition to use
+        fun preinit(): Boolean {
+            return Shell.cmd("magisk --preinit-device").exec().isSuccess
         }
 
         fun lsposed(): Boolean {
@@ -53,6 +59,11 @@ class Environment : BaseTest {
         }
 
         private const val MODULE_ERROR = "Module zip processing incorrect"
+        const val MOUNT_TEST = "mount_test"
+        const val SEPOLICY_RULE = "sepolicy_rule"
+        const val INVALID_ZYGISK = "invalid_zygisk"
+        const val REMOVE_TEST = "remove_test"
+        const val EMPTY_ZYGISK = "empty_zygisk"
     }
 
     object TimberLog : CallbackList<String>(Runnable::run) {
@@ -83,30 +94,60 @@ class Environment : BaseTest {
         }
     }
 
-    private fun setupModule01(root: ExtendedFile) {
-        val error = "test_01 setup failed"
-        val path = root.getChildFile("test_01")
+    private fun setupMountTest(root: ExtendedFile) {
+        val error = "$MOUNT_TEST setup failed"
+        val path = root.getChildFile(MOUNT_TEST)
 
-        // Create /system/etc/newfile
-        val etc = path.getChildFile("system").getChildFile("etc")
+        // Create /system/fonts/newfile
+        val etc = path.getChildFile("system").getChildFile("fonts")
         assertTrue(error, etc.mkdirs())
         assertTrue(error, etc.getChildFile("newfile").createNewFile())
+
+        // Create /system/app/EasterEgg/.replace
+        val egg = path.getChildFile("system").getChildFile("app").getChildFile("EasterEgg")
+        assertTrue(error, egg.mkdirs())
+        assertTrue(error, egg.getChildFile(".replace").createNewFile())
 
         // Delete /system/bin/screenrecord
         val bin = path.getChildFile("system").getChildFile("bin")
         assertTrue(error, bin.mkdirs())
         assertTrue(error, Shell.cmd("mknod $bin/screenrecord c 0 0").exec().isSuccess)
 
-        // Create an empty zygisk folder
-        val module = LocalModule(path)
-        assertTrue(error, module.zygiskFolder.mkdir())
-
         assertTrue(error, Shell.cmd("set_default_perm $path").exec().isSuccess)
     }
 
-    private fun setupModule02(root: ExtendedFile) {
-        val error = "test_02 setup failed"
-        val path = root.getChildFile("test_02")
+    private fun setupSystemlessHost() {
+        assertTrue("hosts setup failed", Shell.cmd("add_hosts_module").exec().isSuccess)
+    }
+
+    private fun setupSepolicyRuleModule(root: ExtendedFile) {
+        val error = "$SEPOLICY_RULE setup failed"
+        val path = root.getChildFile(SEPOLICY_RULE)
+        assertTrue(error, path.mkdirs())
+
+        // Add sepolicy patch
+        PrintStream(path.getChildFile("sepolicy.rule").newOutputStream()).use {
+            it.println("type magisk_test domain")
+        }
+
+        assertTrue(error, Shell.cmd(
+            "set_default_perm $path",
+            "copy_preinit_files"
+        ).exec().isSuccess)
+    }
+
+    private fun setupEmptyZygiskModule(root: ExtendedFile) {
+        val error = "$EMPTY_ZYGISK setup failed"
+        val path = root.getChildFile(EMPTY_ZYGISK)
+
+        // Create an empty zygisk folder
+        val module = LocalModule(path)
+        assertTrue(error, module.zygiskFolder.mkdirs())
+    }
+
+    private fun setupInvalidZygiskModule(root: ExtendedFile) {
+        val error = "$INVALID_ZYGISK setup failed"
+        val path = root.getChildFile(INVALID_ZYGISK)
 
         // Create invalid zygisk libraries
         val module = LocalModule(path)
@@ -119,9 +160,9 @@ class Environment : BaseTest {
         assertTrue(error, Shell.cmd("set_default_perm $path").exec().isSuccess)
     }
 
-    private fun setupModule03(root: ExtendedFile) {
-        val error = "test_03 setup failed"
-        val path = root.getChildFile("test_03")
+    private fun setupRemoveModule(root: ExtendedFile) {
+        val error = "$REMOVE_TEST setup failed"
+        val path = root.getChildFile(REMOVE_TEST)
 
         // Create a new module but mark is as "remove"
         val module = LocalModule(path)
@@ -175,12 +216,13 @@ class Environment : BaseTest {
             }
         }
 
-        if (testModules()) {
-            val root = RootUtils.fs.getFile(Const.MODULE_PATH)
-            setupModule01(root)
-            setupModule02(root)
-            setupModule03(root)
-        }
+        val root = RootUtils.fs.getFile(Const.MODULE_PATH)
+        if (mount()) { setupMountTest(root) }
+        if (preinit()) { setupSepolicyRuleModule(root) }
+        setupSystemlessHost()
+        setupEmptyZygiskModule(root)
+        setupInvalidZygiskModule(root)
+        setupRemoveModule(root)
     }
 
     @Test

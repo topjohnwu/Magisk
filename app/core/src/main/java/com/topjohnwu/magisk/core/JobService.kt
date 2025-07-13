@@ -75,9 +75,8 @@ class JobService : BaseJobService() {
 
     private fun checkUpdate(params: JobParameters): Boolean {
         GlobalScope.launch(Dispatchers.IO) {
-            ServiceLocator.networkService.fetchUpdate()?.let {
-                Info.remote = it
-                if (Info.env.isActive && BuildConfig.APP_VERSION_CODE < it.magisk.versionCode)
+            Info.fetchUpdate(ServiceLocator.networkService)?.let {
+                if (Info.env.isActive && BuildConfig.APP_VERSION_CODE < it.versionCode)
                     Notifications.updateAvailable()
                 jobFinished(params, false)
             }

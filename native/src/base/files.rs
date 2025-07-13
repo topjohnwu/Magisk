@@ -182,6 +182,10 @@ impl FileAttr {
     pub fn is_socket(&self) -> bool {
         self.is(libc::S_IFSOCK)
     }
+
+    pub fn is_whiteout(&self) -> bool {
+        self.is_char_device() && self.st.st_rdev == 0
+    }
 }
 
 const XATTR_NAME_SELINUX: &CStr = c"security.selinux";
@@ -321,12 +325,12 @@ impl Utf8CStr {
 
     pub fn set_attr<'a>(&'a self, attr: &'a FileAttr) -> OsResult<'a, ()> {
         unsafe {
-            if !attr.is_symlink() {
-                libc::chmod(self.as_ptr(), (attr.st.st_mode & 0o777).as_()).check_os_err(
-                    "chmod",
-                    Some(self),
-                    None,
-                )?;
+            if !attr.is_symlink() && libc::chmod(self.as_ptr(), (attr.st.st_mode & 0o777).as_()) < 0
+            {
+                let self_attr = self.get_attr()?;
+                if !self_attr.is_symlink() {
+                    return Err(OsError::last_os_error("chmod", Some(self), None));
+                }
             }
             libc::lchown(self.as_ptr(), attr.st.st_uid, attr.st.st_gid).check_os_err(
                 "lchown",
@@ -579,7 +583,7 @@ impl<S: Utf8CStrBuf + Sized> FsPathBuilder for S {
     }
 
     fn append_path_fmt<T: Display>(&mut self, name: T) -> &mut Self {
-        self.write_fmt(format_args!("/{}", name)).ok();
+        self.write_fmt(format_args!("/{name}")).ok();
         self
     }
 }
@@ -591,7 +595,7 @@ impl FsPathBuilder for dyn Utf8CStrBuf + '_ {
     }
 
     fn append_path_fmt<T: Display>(&mut self, name: T) -> &mut Self {
-        self.write_fmt(format_args!("/{}", name)).ok();
+        self.write_fmt(format_args!("/{name}")).ok();
         self
     }
 }
@@ -842,7 +846,7 @@ fn parse_mount_info_line(line: &str) -> Option<MountInfo> {
 
 pub fn parse_mount_info(pid: &str) -> Vec<MountInfo> {
     let mut res = vec![];
-    let mut path = format!("/proc/{}/mountinfo", pid);
+    let mut path = format!("/proc/{pid}/mountinfo");
     if let Ok(file) = Utf8CStr::from_string(&mut path).open(O_RDONLY | O_CLOEXEC) {
         BufReader::new(file).foreach_lines(|line| {
             parse_mount_info_line(line)

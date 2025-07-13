@@ -46,6 +46,9 @@ Available applets:
     exit(1);
 }
 
+#define quote(s) #s
+#define str(s)   quote(s)
+
 int magisk_main(int argc, char *argv[]) {
     if (argc < 2)
         usage();

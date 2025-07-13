@@ -1,7 +1,6 @@
 #pragma once
 
 #include <regex.h>
-#include <bitset>
 #include <list>
 
 #include "api.hpp"

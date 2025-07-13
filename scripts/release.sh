@@ -2,17 +2,15 @@
 set -e
 
 # On macOS, gsed is required (brew install gnu-sed)
-# Required tools: jq, gh
+# Required tools: gh
 # The GitHub cli (gh) has to be properly authenticated
 
 # These variables can be modified as needed
-MAGISK_FILES=../magisk-files
 CONFIG=config.prop
 NOTES=notes.md
 
 # These are constants, do not modify
-GCONFIG=gradle.properties
-README=README.MD
+GCONFIG=app/gradle.properties
 BUILDCMD="./build.py -c $CONFIG"
 CWD=$(pwd)
 
@@ -23,7 +21,7 @@ grep_prop() {
   sed -n "$REGEX" $FILES | head -n 1
 }
 
-enable_version_config() {
+ensure_config() {
   # Make sure version is not commented out and exists
   sed -i "s:^# version=:version=:g" $CONFIG
   if ! grep -qE '^version=' $CONFIG; then
@@ -38,63 +36,12 @@ disable_version_config() {
   sed -i "s:^version=:# version=:g" $CONFIG
 }
 
-# $1 = tag
-update_readme_stable() {
-  sed -i "s:badge/Magisk-v.*:badge/Magisk-${1}-blue)](https\://github.com/topjohnwu/Magisk/releases/tag/$1):g" $README
-}
-
-# $1 = tag
-update_readme_beta() {
-  sed -i "s:badge/Magisk%20Beta.*:badge/Magisk%20Beta-${1}-blue)](https\://github.com/topjohnwu/Magisk/releases/tag/$1):g" $README
-}
-
-# $1 = tag
-update_readme_canary() {
-  sed -i "s:badge/Magisk-Canary.*:badge/Magisk-Canary-red)](https\://github.com/topjohnwu/Magisk/releases/tag/$1):g" $README
-}
-
-gen_link() {
-  echo "https://github.com/topjohnwu/Magisk/releases/download/$1/$2"
-}
-
-update_canary_json() {
-  local ver=$(grep_prop version $CONFIG)
-  local code=$(grep_prop magisk.versionCode $GCONFIG)
-  local tag="canary-$code"
-  local json
-
-  json=$MAGISK_FILES/canary.json
-  jq ".magisk.version=\"$ver\"|.magisk.versionCode=\"$code\"|
-  .magisk.link=\"$(gen_link $tag app-release.apk)\"|
-  .magisk.note=\"$(gen_link $tag notes.md)\"" $json > ${json}.tmp
-  mv ${json}.tmp $json
-
-  json=$MAGISK_FILES/debug.json
-  jq ".magisk.version=\"$ver\"|.magisk.versionCode=\"$code\"|
-  .magisk.link=\"$(gen_link $tag app-debug.apk)\"|
-  .magisk.note=\"$(gen_link $tag notes.md)\"" $json > ${json}.tmp
-  mv ${json}.tmp $json
-}
-
-# $1 = json path
-update_release_json() {
-  local json=$1
-  local ver=$(grep_prop version $CONFIG)
-  local code=$(grep_prop magisk.versionCode $GCONFIG)
-
-  jq ".magisk.version=\"$ver\"|.magisk.versionCode=\"$code\"|
-  .magisk.link=\"$(gen_link v${ver} Magisk-v${ver}.apk)\"|
-  .magisk.note=\"https://topjohnwu.github.io/Magisk/releases/${code}.md\"" $json > ${json}.tmp
-  mv ${json}.tmp $json
-}
-
-build_canary() {
+bump_canary_version() {
   # Update version code
   local code=$(grep_prop magisk.versionCode $GCONFIG)
   code=$((code + 1))
   local tag="canary-$code"
   sed -i "s:versionCode=.*:versionCode=${code}:g" $GCONFIG
-  update_readme_canary $tag
 
   # Commit version code changes
   git add -u .
@@ -105,72 +52,50 @@ build_canary() {
   # Update version name
   local ver=$(git rev-parse --short=8 HEAD)
   sed -i "s:version=.*:version=${ver}:g" $CONFIG
-  sed -i "s:## Magisk (.*:## Magisk (${ver}) (${code}):g" $NOTES
-
-  # Update and commit JSON
-  update_canary_json
-  cd $MAGISK_FILES
-  git add -u .
-  git status
-  git commit -m "Update Canary Channel: Upstream to $ver"
-  cd $CWD
-
-  # Build
-  $BUILDCMD clean
-  $BUILDCMD all
-  $BUILDCMD -r all
+  sed -i "1s:.*:## Magisk (${ver}) (${code}):" $NOTES
 }
 
-# $1 = ver, $2 = stable?
-build_release() {
-  # Update version configs
+# $1 = ver
+set_version() {
   local ver=$1
-  local stable=$2
   local code=$(echo - | awk "{ print $ver * 1000 }")
   local tag="v$ver"
+
   sed -i "s:versionCode=.*:versionCode=${code}:g" $GCONFIG
   sed -i "s:version=.*:version=${ver}:g" $CONFIG
-
-  # Update and commit JSON
-  if $stable; then
-    update_readme_stable $tag
-    update_readme_beta $tag
-    update_release_json $MAGISK_FILES/stable.json
-    cp -vf $MAGISK_FILES/stable.json $MAGISK_FILES/beta.json
-  else
-    update_readme_beta $tag
-    update_release_json $MAGISK_FILES/beta.json
-  fi
-  cd $MAGISK_FILES
-  git add -u .
-  git status
-  git commit -m "Release Magisk v$ver"
-  cd $CWD
+  sed -i "1s:.*:## $(date +'%Y.%-m.%-d') Magisk v$ver:" $NOTES
 
   # Commit version code changes
   git add -u .
   git status
   git commit -m "Release Magisk v$ver" -m "[skip ci]"
   git tag $tag
+}
 
-  # Build
+build_apk() {
   $BUILDCMD clean
+  $BUILDCMD all
   $BUILDCMD -r all
 }
 
-stable() {
-  [ -z $1 ] && exit 1
-  local ver=$1
-  build_release $ver true
+build_canary() {
+  bump_canary_version
+  build_apk
 }
 
-beta() {
+# $1 = ver
+build_public() {
   [ -z $1 ] && exit 1
   local ver=$1
-  build_release $ver false
+  set_version $ver
+  build_apk
 }
 
-pub() {
+upload() {
+  # Verify pattern
+  [[ "$1" =~ canary|beta|stable ]]
+  local type=$1
+
   gh auth status
 
   local latest_tag=$(git describe --abbrev=0 --tags)
@@ -186,45 +111,47 @@ pub() {
   git push origin master
   git push --tags
 
-  if [ $(($code % 100)) -ne 0 ]; then
-    tag="canary-$code"
-    title="Magisk ($ver) ($code)"
+  # Prepare release notes
+  tail -n +3 $NOTES > release.md
 
-    # Assert tag format
-    [ $latest_tag = $tag ]
+  case $type in
+    canary )
+      tag="canary-$code"
+      title="Magisk ($ver) ($code)"
 
-    # Publish release
-    tail -n +3 $NOTES > release.md
-    gh release create --verify-tag $tag -p -t "$title" -F release.md $out/app-release.apk $out/app-debug.apk $NOTES
-  else
-    tag="v$ver"
-    title="Magisk v$ver"
+      # Assert tag format
+      [ $latest_tag = $tag ]
 
-    # Assert tag format
-    [ $latest_tag = $tag ]
+      # Publish release
+      gh release create --verify-tag $tag -p -t "$title" -F release.md $out/app-release.apk $out/app-debug.apk $NOTES
+      ;;
+    beta|stable )
+      tag="v$ver"
+      title="Magisk v$ver"
 
-    # Publish release
-    tail -n +3 docs/releases/$code.md > release.md
-    local release_apk="Magisk-v${ver}.apk"
-    cp $out/app-release.apk $release_apk
-    gh release create --verify-tag $tag -t "$title" -F release.md $release_apk
-    rm -f $release_apk
+      # Assert tag format
+      [ $latest_tag = $tag ]
+
+      # Publish release
+      local release_apk="Magisk-v${ver}.apk"
+      cp $out/app-release.apk $release_apk
+      gh release create --verify-tag $tag -p -t "$title" -F release.md $release_apk $out/app-debug.apk $NOTES
+      rm -f $release_apk
+      ;;
+  esac
+
+  # If publishing stable, make it not prerelease and explicitly latest
+  if [ $type = "stable" ]; then
+    gh release edit $tag --prerelease=false --latest
   fi
 
   rm -f release.md
-  cd $MAGISK_FILES
-  git push origin master
-  cd $CWD
 }
 
 revert() {
   local latest_tag=$(git describe --abbrev=0 --tags)
-
   git tag -d $latest_tag
   git reset --hard HEAD~
-  cd $MAGISK_FILES
-  git reset --hard HEAD~
-  cd $CWD
 }
 
 # Use GNU sed on macOS
@@ -236,12 +163,11 @@ fi
 git pull
 
 trap disable_version_config EXIT
-enable_version_config
+ensure_config
 case $1 in
-  "canary" ) build_canary ;;
-  "stable" ) stable $2 ;;
-  "beta" ) beta $2 ;;
-  "pub" ) pub ;;
-  "revert" ) revert ;;
+  canary ) build_canary ;;
+  public ) build_public $2 ;;
+  upload ) upload $2 ;;
+  revert ) revert ;;
   * ) exit 1 ;;
 esac

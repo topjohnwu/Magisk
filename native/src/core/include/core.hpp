@@ -1,10 +1,8 @@
 #pragma once
 
 #include <sys/socket.h>
-#include <pthread.h>
 #include <poll.h>
 #include <string>
-#include <limits>
 #include <atomic>
 #include <functional>
 
@@ -30,14 +28,16 @@ enum class RespondCode : int {
 
 struct ModuleInfo;
 
-extern std::string native_bridge;
-
 // Daemon
 int connect_daemon(int req, bool create = false);
 const char *get_magisk_tmp();
 void unlock_blocks();
 bool setup_magisk_env();
 bool check_key_combo();
+
+// Zygisk daemon
+rust::Str get_zygisk_lib_name();
+void set_zygisk_prop();
 void restore_zygisk_prop();
 
 // Sockets
