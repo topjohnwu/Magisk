@@ -53,8 +53,9 @@
     <string name="touch_filtered_warning">Como um app está ocultando uma solicitação de SuperUsuário, o Magisk não pode verificar sua resposta.</string>
     <string name="deny">Negar</string>
     <string name="prompt">Perguntar</string>
+    <string name="restrict">Restringir</string>
     <string name="grant">Permitir</string>
-    <string name="su_warning">Permite acesso total ao seu aparelho.\nNão permita se você não tiver certeza do que está fazendo!</string>
+    <string name="su_warning">Permite acesso total ao seu dispositivo.\nNão permita se você não tiver certeza do que está fazendo!</string>
     <string name="forever">Sempre</string>
     <string name="once">Uma vez</string>
     <string name="tenmin">10 mins</string>
@@ -63,19 +64,19 @@
     <string name="sixtymin">60 mins</string>
     <string name="su_allow_toast">%1$s foi permitido o acesso de SuperUsuário</string>
     <string name="su_deny_toast">%1$s foi negado o acesso de SuperUsuário</string>
-    <string name="su_snack_grant">Os acessos de SuperUsuário de %1$s foram concedidos</string>
+    <string name="su_snack_grant">Os acessos de SuperUsuário de %1$s foram permitidos</string>
     <string name="su_snack_deny">Os acessos de SuperUsuário de %1$s foram negados</string>
     <string name="su_snack_notif_on">As notificações de %1$s foram ativadas</string>
     <string name="su_snack_notif_off">As notificações de %1$s foram desativadas</string>
     <string name="su_snack_log_on">Os registros de %1$s foram ativados</string>
     <string name="su_snack_log_off">Os registros de %1$s foram desativados</string>
     <string name="su_revoke_title">Revogar?</string>
-    <string name="su_revoke_msg">Confirmar a remoção do acesso de SuperUsuário de %1$s?</string>
+    <string name="su_revoke_msg">Confirme para revogar os acessos de SuperUsuário de %1$s</string>
     <string name="toast">Notificação (Pop-up)</string>
     <string name="none">Nenhum</string>
     <string name="superuser_toggle_notification">Notificações</string>
     <string name="superuser_toggle_revoke">Revogar</string>
-    <string name="superuser_policy_none">Nenhum app solicitou permissão de SuperUsuário ainda</string>
+    <string name="superuser_policy_none">Nenhum app solicitou permissão de SuperUsuário ainda.</string>
 
     <!--Logs-->
     <string name="log_data_none">Não há registros. Tente usar mais seus apps root.</string>
@@ -135,6 +136,7 @@
     <string name="settings_update_channel_title">Canal de atualização</string>
     <string name="settings_update_stable">Estável</string>
     <string name="settings_update_beta">Beta</string>
+    <string name="settings_update_debug">Debug</string>
     <string name="settings_update_custom">Personalizado</string>
     <string name="settings_update_custom_msg">Insira um URL de canal personalizado</string>
     <string name="settings_zygisk_summary">Executa partes do Magisk no Zygote</string>
@@ -169,6 +171,8 @@
     <string name="settings_su_auth_title">Autenticação de usuário</string>
     <string name="settings_su_auth_summary">Solicite autenticação de usuário durante solicitações de SuperUsuário</string>
     <string name="settings_su_auth_insecure">Nenhum método de autenticação está configurado no dispositivo</string>
+    <string name="settings_su_restrict_title">Restringir recursos root</string>
+    <string name="settings_su_restrict_summary">Restringirá novos apps de SuperUsuário por padrão. Aviso: isso quebrará a maioria dos apps. Não ative se você não souber o que está fazendo.</string>
     <string name="settings_customization">Personalizações</string>
     <string name="setting_add_shortcut_summary">Adicione um atalho na tela inicial, caso o nome e o ícone sejam difíceis de reconhecer logo após ocultar o app.</string>
     <string name="settings_doh_title">DNS sobre HTTPS</string>
@@ -235,7 +239,7 @@
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Conceda permissão de armazenamento para ativar esta funcionalidade</string>
     <string name="post_notifications_denied">Conceda permissão às notificações para ativar esta funcionalidade</string>
-    <string name="install_unknown_denied">Permita a opção "Instalar apps de fontes desconhecidas" para ativar esta funcionalidade</string>
+    <string name="install_unknown_denied">Permita a opção \"Instalar apps de fontes desconhecidas\" para ativar esta funcionalidade</string>
     <string name="add_shortcut_title">Adicionar atalho à tela inicial</string>
     <string name="add_shortcut_msg">Após ocultar o app do Magisk, seu nome e ícone ficarão difíceis de reconhecer. Deseja adicionar um atalho na tela inicial?</string>
     <string name="app_not_found">Nenhum app encontrado para realizar esta ação</string>

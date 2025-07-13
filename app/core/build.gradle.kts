@@ -2,6 +2,7 @@ plugins {
     id("com.android.library")
     kotlin("android")
     kotlin("plugin.parcelize")
+    id("dev.zacsweers.moshix")
     id("com.google.devtools.ksp")
 }
 
@@ -26,10 +27,15 @@ android {
         aidl = true
         buildConfig = true
     }
+
+    compileOptions {
+        isCoreLibraryDesugaringEnabled = true
+    }
 }
 
 dependencies {
     api(project(":shared"))
+    coreLibraryDesugaring(libs.jdk.libs)
 
     api(libs.timber)
     api(libs.markwon.core)
@@ -47,9 +53,6 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging)
     implementation(libs.okhttp.dnsoverhttps)
-
-    implementation(libs.moshi)
-    ksp(libs.moshi.codegen)
 
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)

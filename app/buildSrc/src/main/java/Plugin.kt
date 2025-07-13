@@ -5,6 +5,12 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.provideDelegate
 import java.io.File
 import java.util.Properties
+import java.util.Random
+
+// Set non-zero value here to fix the random seed for reproducible builds
+// CI builds are always reproducible
+val RAND_SEED = if (System.getenv("CI") != null) 42 else 0
+lateinit var RANDOM: Random
 
 private val props = Properties()
 private var commitHash = ""
@@ -28,7 +34,11 @@ object Config {
     }
 }
 
-val Project.baseDir: File get() = rootProject.file("..")
+fun Project.rootFile(path: String): File {
+    val file = File(path)
+    return if (file.isAbsolute) file
+    else File(rootProject.file(".."), path)
+}
 
 class MagiskPlugin : Plugin<Project> {
     override fun apply(project: Project) = project.applyPlugin()
@@ -38,11 +48,11 @@ class MagiskPlugin : Plugin<Project> {
         props.clear()
         rootProject.file("gradle.properties").inputStream().use { props.load(it) }
         val configPath: String? by this
-        val config = configPath?.let { File(it) } ?: File(baseDir, "config.prop")
+        val config = rootFile(configPath ?: "config.prop")
         if (config.exists())
             config.inputStream().use { props.load(it) }
 
-        val repo = FileRepository(File(baseDir, ".git"))
+        val repo = FileRepository(rootFile(".git"))
         val refId = repo.refDatabase.exactRef("HEAD").objectId
         commitHash = repo.newObjectReader().abbreviate(refId, 8).name()
     }

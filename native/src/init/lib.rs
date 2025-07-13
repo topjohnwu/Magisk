@@ -1,5 +1,3 @@
-#![feature(format_args_nl)]
-#![feature(once_cell_try)]
 #![feature(try_blocks)]
 #![allow(clippy::missing_safety_doc)]
 

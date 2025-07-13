@@ -1,10 +1,8 @@
-#![feature(format_args_nl)]
 #![feature(try_blocks)]
 #![feature(let_chains)]
 #![feature(fn_traits)]
 #![feature(unix_socket_ancillary_data)]
 #![feature(unix_socket_peek)]
-#![feature(maybe_uninit_uninit_array)]
 #![allow(clippy::missing_safety_doc)]
 
 use crate::ffi::SuRequest;
@@ -30,6 +28,7 @@ mod consts;
 mod daemon;
 mod db;
 mod logging;
+mod module;
 mod mount;
 mod package;
 mod resetprop;
@@ -88,6 +87,7 @@ pub mod ffi {
         Query,
         Deny,
         Allow,
+        Restrict,
     }
 
     struct ModuleInfo {
@@ -117,6 +117,7 @@ pub mod ffi {
         target_pid: i32,
         login: bool,
         keep_env: bool,
+        drop_cap: bool,
         shell: String,
         command: String,
         context: String,
@@ -146,6 +147,7 @@ pub mod ffi {
             value: *const c_char,
             serial: u32,
         );
+        unsafe fn load_prop_file(filename: *const c_char, skip_svc: bool);
     }
 
     unsafe extern "C++" {
@@ -170,6 +172,7 @@ pub mod ffi {
         fn uninstall_pkg(apk: Utf8CStrRef);
         fn update_deny_flags(uid: i32, process: &str, flags: &mut u32);
         fn initialize_denylist();
+        fn get_zygisk_lib_name() -> &'static str;
         fn restore_zygisk_prop();
         fn switch_mnt_ns(pid: i32) -> i32;
         fn app_request(req: &SuAppRequest) -> i32;
@@ -254,7 +257,7 @@ pub mod ffi {
         fn get() -> &'static MagiskD;
     }
     unsafe extern "C++" {
-        fn handle_modules(self: &MagiskD) -> Vec<ModuleInfo>;
+        fn load_modules(self: &MagiskD) -> Vec<ModuleInfo>;
     }
 }
 
@@ -281,4 +284,8 @@ pub fn get_prop(name: &Utf8CStr, persist: bool) -> String {
 
 pub fn set_prop(name: &Utf8CStr, value: &Utf8CStr, skip_svc: bool) -> bool {
     unsafe { ffi::set_prop_rs(name.as_ptr(), value.as_ptr(), skip_svc) == 0 }
+}
+
+pub fn load_prop_file(filename: &Utf8CStr, skip_svc: bool) {
+    unsafe { ffi::load_prop_file(filename.as_ptr(), skip_svc) };
 }

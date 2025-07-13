@@ -71,7 +71,7 @@ default_archs = {"armeabi-v7a", "x86", "arm64-v8a", "x86_64"}
 default_targets = {"magisk", "magiskinit", "magiskboot", "magiskpolicy"}
 support_targets = default_targets | {"resetprop"}
 rust_targets = {"magisk", "magiskinit", "magiskboot", "magiskpolicy"}
-ondk_version = "r29.1"
+ondk_version = "r28.5"
 
 # Global vars
 config = {}
@@ -291,15 +291,7 @@ def write_if_diff(file_name: Path, text: str):
 
 
 def dump_flag_header():
-    flag_txt = textwrap.dedent(
-        """\
-        #pragma once
-        #define quote(s)            #s
-        #define str(s)              quote(s)
-        #define MAGISK_FULL_VER     MAGISK_VERSION "(" str(MAGISK_VER_CODE) ")"
-        #define NAME_WITH_VER(name) str(name) " " MAGISK_FULL_VER
-        """
-    )
+    flag_txt = "#pragma once\n"
     flag_txt += f'#define MAGISK_VERSION      "{config["version"]}"\n'
     flag_txt += f'#define MAGISK_VER_CODE     {config["versionCode"]}\n'
     flag_txt += f"#define MAGISK_DEBUG        {0 if args.release else 1}\n"
@@ -313,7 +305,7 @@ def dump_flag_header():
     write_if_diff(native_gen_path / "flags.rs", rust_flag_txt)
 
 
-def build_native():
+def ensure_toolchain():
     ensure_paths()
 
     # Verify NDK install
@@ -323,6 +315,17 @@ def build_native():
     except:
         error('Unmatched NDK. Please install/upgrade NDK with "build.py ndk"')
 
+    if sccache := shutil.which("sccache"):
+        os.environ["RUSTC_WRAPPER"] = sccache
+        os.environ["NDK_CCACHE"] = sccache
+        os.environ["CARGO_INCREMENTAL"] = "0"
+    if ccache := shutil.which("ccache"):
+        os.environ["NDK_CCACHE"] = ccache
+
+
+def build_native():
+    ensure_toolchain()
+
     if "targets" not in vars(args) or not args.targets:
         targets = default_targets
     else:
@@ -331,13 +334,6 @@ def build_native():
             return
 
     header("* Building: " + " ".join(targets))
-
-    if sccache := shutil.which("sccache"):
-        os.environ["RUSTC_WRAPPER"] = sccache
-        os.environ["NDK_CCACHE"] = sccache
-        os.environ["CARGO_INCREMENTAL"] = "0"
-    if ccache := shutil.which("ccache"):
-        os.environ["NDK_CCACHE"] = ccache
 
     dump_flag_header()
     build_rust_src(targets)
@@ -487,7 +483,9 @@ def cleanup():
 
     if "app" in targets:
         header("* Cleaning app")
-        execv([gradlew, ":app:clean"], env=find_jdk())
+        os.chdir("app")
+        execv([gradlew, ":clean"], env=find_jdk())
+        os.chdir("..")
 
 
 def build_all():
@@ -530,6 +528,7 @@ def gen_ide():
 
 
 def clippy_cli():
+    ensure_toolchain()
     args.force_out = True
     set_archs(default_archs)
 
@@ -640,11 +639,11 @@ def push_files(script):
 def setup_avd():
     header("* Setting up emulator")
 
-    push_files(Path("scripts", "avd_magisk.sh"))
+    push_files(Path("scripts", "live_setup.sh"))
 
-    proc = execv([adb_path, "shell", "sh", "/data/local/tmp/avd_magisk.sh"])
+    proc = execv([adb_path, "shell", "sh", "/data/local/tmp/live_setup.sh"])
     if proc.returncode != 0:
-        error("avd_magisk.sh failed!")
+        error("live_setup.sh failed!")
 
 
 def patch_avd_file():
@@ -653,7 +652,7 @@ def patch_avd_file():
 
     header(f"* Patching {input.name}")
 
-    push_files(Path("scripts", "avd_patch.sh"))
+    push_files(Path("scripts", "host_patch.sh"))
 
     proc = execv([adb_path, "push", input, "/data/local/tmp"])
     if proc.returncode != 0:
@@ -662,9 +661,9 @@ def patch_avd_file():
     src_file = f"/data/local/tmp/{input.name}"
     out_file = f"{src_file}.magisk"
 
-    proc = execv([adb_path, "shell", "sh", "/data/local/tmp/avd_patch.sh", src_file])
+    proc = execv([adb_path, "shell", "sh", "/data/local/tmp/host_patch.sh", src_file])
     if proc.returncode != 0:
-        error("avd_patch.sh failed!")
+        error("host_patch.sh failed!")
 
     proc = execv([adb_path, "pull", out_file, output])
     if proc.returncode != 0:

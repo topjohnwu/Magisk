@@ -167,10 +167,10 @@ pub fn persist_get_props(mut prop_cb: Pin<&mut PropCb>) {
         } else {
             let mut dir = Directory::open(cstr!(PERSIST_PROP_DIR))?;
             dir.pre_order_walk(|e| {
-                if e.is_file() {
-                    if let Ok(mut value) = file_get_prop(e.name()) {
-                        prop_cb.exec(e.name(), Utf8CStr::from_string(&mut value));
-                    }
+                if e.is_file()
+                    && let Ok(mut value) = file_get_prop(e.name())
+                {
+                    prop_cb.exec(e.name(), Utf8CStr::from_string(&mut value));
                 }
                 // Do not traverse recursively
                 Ok(WalkResult::Skip)

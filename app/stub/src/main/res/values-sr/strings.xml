@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--Author: Radoš Milićev (https://github.com/rammba)-->
 <resources>
     <string name="upgrade_msg">Ажурирајте Magisk да бисте завршили постављање. Преузми и инсталирај?</string>
     <string name="no_internet_msg">Молимо повежите се на интернет! Неопходно је ажурирање Magisk-а.</string>

@@ -1,4 +1,4 @@
-use crate::consts::{DATABIN, LOG_PIPE, MAGISK_LOG_CON, MODULEROOT, SECURE_DIR};
+use crate::consts::{DATABIN, LOG_PIPE, MAGISK_LOG_CON, MAGISKDB, MODULEROOT, SECURE_DIR};
 use crate::ffi::get_magisk_tmp;
 use base::libc::{O_CLOEXEC, O_WRONLY};
 use base::{Directory, FsPathBuilder, LoggedResult, ResultExt, Utf8CStr, Utf8CStrBuf, cstr, libc};
@@ -55,10 +55,9 @@ pub(crate) fn restorecon() {
     if let Ok(mut file) = cstr!("/sys/fs/selinux/context")
         .open(O_WRONLY | O_CLOEXEC)
         .log()
+        && file.write_all(ADB_CON.as_bytes_with_nul()).is_ok()
     {
-        if file.write_all(ADB_CON.as_bytes_with_nul()).is_ok() {
-            cstr!(SECURE_DIR).set_secontext(ADB_CON).log_ok();
-        }
+        cstr!(SECURE_DIR).set_secontext(ADB_CON).log_ok();
     }
 
     let mut path = cstr::buf::default();
@@ -70,6 +69,7 @@ pub(crate) fn restorecon() {
     path.clear();
     path.push_str(DATABIN);
     restore_syscon(&mut path).log_ok();
+    unsafe { libc::chmod(cstr!(MAGISKDB).as_ptr(), 0o000) };
 }
 
 pub(crate) fn restore_tmpcon() -> LoggedResult<()> {
@@ -83,8 +83,10 @@ pub(crate) fn restore_tmpcon() -> LoggedResult<()> {
     let mut path = cstr::buf::default();
     let mut dir = Directory::open(tmp)?;
     while let Some(ref e) = dir.read()? {
-        e.resolve_path(&mut path)?;
-        path.set_secontext(SYSTEM_CON)?;
+        if !e.is_symlink() {
+            e.resolve_path(&mut path)?;
+            path.set_secontext(SYSTEM_CON).log_ok();
+        }
     }
 
     path.clear();

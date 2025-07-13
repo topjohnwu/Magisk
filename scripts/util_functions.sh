@@ -663,6 +663,7 @@ install_module() {
   # Create mod paths
   rm -rf $MODPATH
   mkdir -p $MODPATH
+  chcon u:object_r:system_file:s0 $MODPATH
 
   if is_legacy_script; then
     unzip -oj "$ZIPFILE" module.prop install.sh uninstall.sh 'common/*' -d $TMPDIR >&2

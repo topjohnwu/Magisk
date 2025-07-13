@@ -147,19 +147,11 @@ object UpdateChannel : BaseSettingsItem.Selector() {
         get() = Config.updateChannel
         set(value) {
             Config.updateChannel = value
-            Info.remote = Info.EMPTY_REMOTE
+            Info.resetUpdate()
         }
 
     override val title = CoreR.string.settings_update_channel_title.asText()
-
     override val entryRes = CoreR.array.update_channel
-    override fun entries(res: Resources): Array<String> {
-        return super.entries(res).let {
-            if (!Const.APP_IS_CANARY && !BuildConfig.DEBUG)
-                it.copyOfRange(0, Config.Value.CANARY_CHANNEL)
-            else it
-        }
-    }
 }
 
 object UpdateChannelUrl : BaseSettingsItem.Input() {
@@ -169,7 +161,7 @@ object UpdateChannelUrl : BaseSettingsItem.Input() {
         get() = Config.customChannelUrl
         set(value) {
             Config.customChannelUrl = value
-            Info.remote = Info.EMPTY_REMOTE
+            Info.resetUpdate()
             notifyPropertyChanged(BR.description)
         }
 
@@ -330,6 +322,12 @@ object Reauthenticate : BaseSettingsItem.Toggle() {
     override var value by Config::suReAuth
 
     override fun refresh() {
-        isEnabled = Build.VERSION.SDK_INT < Build.VERSION_CODES.O && Info.showSuperUser
+        isEnabled = Build.VERSION.SDK_INT < Build.VERSION_CODES.O
     }
+}
+
+object Restrict : BaseSettingsItem.Toggle() {
+    override val title = CoreR.string.settings_su_restrict_title.asText()
+    override val description = CoreR.string.settings_su_restrict_summary.asText()
+    override var value by Config::suRestrict
 }

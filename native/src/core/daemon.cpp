@@ -218,13 +218,7 @@ static void handle_request_sync(int client, int code) {
         denylist_handler(-1, nullptr);
 
         // Restore native bridge property
-        auto nb = get_prop(NBPROP);
-        auto len = sizeof(ZYGISKLDR) - 1;
-        if (nb == ZYGISKLDR) {
-            set_prop(NBPROP, "0");
-        } else if (nb.size() > len) {
-            set_prop(NBPROP, nb.data() + len);
-        }
+        restore_zygisk_prop();
 
         write_int(client, 0);
 

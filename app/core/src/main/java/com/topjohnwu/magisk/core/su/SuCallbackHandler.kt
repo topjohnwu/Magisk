@@ -70,7 +70,7 @@ object SuCallbackHandler {
         }.getOrNull() ?: createSuLog(fromUid, toUid, pid, command, policy, target, seContext, gids)
 
         if (notify)
-            notify(context, log.action == SuPolicy.ALLOW, log.appName)
+            notify(context, log.action >= SuPolicy.ALLOW, log.appName)
 
         runBlocking { ServiceLocator.logRepo.insert(log) }
     }
@@ -86,7 +86,7 @@ object SuCallbackHandler {
             pm.getPackageInfo(uid, pid)?.applicationInfo?.getLabel(pm)
         }.getOrNull() ?: "[UID] $uid"
 
-        notify(context, policy == SuPolicy.ALLOW, appName)
+        notify(context, policy >= SuPolicy.ALLOW, appName)
     }
 
     private fun notify(context: Context, granted: Boolean, appName: String) {

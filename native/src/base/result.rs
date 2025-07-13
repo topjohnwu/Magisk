@@ -24,7 +24,7 @@ pub type LoggedResult<T> = Result<T, LoggedError>;
 #[macro_export]
 macro_rules! log_err {
     ($($args:tt)+) => {{
-        $crate::log_with_args($crate::LogLevel::Error, format_args_nl!($($args)+));
+        $crate::error!($($args)+);
         $crate::LoggedError::default()
     }};
 }
@@ -148,12 +148,9 @@ impl<T, E: Display> Loggable<T> for Result<T, E> {
             Ok(v) => Ok(v),
             Err(e) => {
                 if let Some(caller) = caller {
-                    log_with_args(
-                        level,
-                        format_args_nl!("[{}:{}] {:#}", caller.file(), caller.line(), e),
-                    );
+                    log_with_args!(level, "[{}:{}] {:#}", caller.file(), caller.line(), e);
                 } else {
-                    log_with_args(level, format_args_nl!("{:#}", e));
+                    log_with_args!(level, "{:#}", e);
                 }
                 Err(LoggedError::default())
             }
@@ -174,7 +171,7 @@ impl<T, E: Display> Loggable<T> for Result<T, E> {
                         write!(w, "[{}:{}] ", caller.file(), caller.line())?;
                     }
                     f(w)?;
-                    writeln!(w, ": {:#}", e)
+                    writeln!(w, ": {e:#}")
                 });
                 Err(LoggedError::default())
             }
@@ -186,7 +183,7 @@ impl<T, E: Display> Loggable<T> for Result<T, E> {
 impl<T: Display> From<T> for LoggedError {
     #[cfg(not(debug_assertions))]
     fn from(e: T) -> Self {
-        log_with_args(LogLevel::Error, format_args_nl!("{:#}", e));
+        log_with_args!(LogLevel::Error, "{:#}", e);
         LoggedError::default()
     }
 
@@ -194,9 +191,12 @@ impl<T: Display> From<T> for LoggedError {
     #[cfg(debug_assertions)]
     fn from(e: T) -> Self {
         let caller = Location::caller();
-        log_with_args(
+        log_with_args!(
             LogLevel::Error,
-            format_args_nl!("[{}:{}] {:#}", caller.file(), caller.line(), e),
+            "[{}:{}] {:#}",
+            caller.file(),
+            caller.line(),
+            e
         );
         LoggedError::default()
     }
@@ -366,7 +366,7 @@ impl Display for OsError<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let error = self.as_io_error();
         if self.name.is_empty() {
-            write!(f, "{:#}", error)
+            write!(f, "{error:#}")
         } else {
             match (self.arg1.ok(), self.arg2.ok()) {
                 (Some(arg1), Some(arg2)) => {

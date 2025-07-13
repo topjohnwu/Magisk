@@ -1,8 +1,7 @@
 #include <sys/wait.h>
 #include <sys/mount.h>
 
-#include <consts.hpp>
-#include <base.hpp>
+#include <core.hpp>
 
 #include "deny.hpp"
 

@@ -1,5 +1,4 @@
 use std::fmt;
-use std::fmt::Arguments;
 use std::io::{Write, stderr, stdout};
 use std::process::exit;
 
@@ -102,10 +101,6 @@ pub fn log_with_formatter<F: FnOnce(Formatter) -> fmt::Result>(level: LogLevel, 
     });
 }
 
-pub fn log_with_args(level: LogLevel, args: Arguments) {
-    log_with_formatter(level, |w| w.write_fmt(args));
-}
-
 pub fn cmdline_logging() {
     fn cmdline_write(level: LogLevel, msg: &Utf8CStr) {
         if matches!(level, LogLevel::Info) {
@@ -125,23 +120,30 @@ pub fn cmdline_logging() {
 }
 
 #[macro_export]
+macro_rules! log_with_args {
+    ($level:expr, $($args:tt)+) => {
+        $crate::log_with_formatter($level, |w| writeln!(w, $($args)+))
+    }
+}
+
+#[macro_export]
 macro_rules! error {
     ($($args:tt)+) => {
-        $crate::log_with_args($crate::LogLevel::Error, format_args_nl!($($args)+))
+        $crate::log_with_formatter($crate::LogLevel::Error, |w| writeln!(w, $($args)+))
     }
 }
 
 #[macro_export]
 macro_rules! warn {
     ($($args:tt)+) => {
-        $crate::log_with_args($crate::LogLevel::Warn, format_args_nl!($($args)+))
+        $crate::log_with_formatter($crate::LogLevel::Warn, |w| writeln!(w, $($args)+))
     }
 }
 
 #[macro_export]
 macro_rules! info {
     ($($args:tt)+) => {
-        $crate::log_with_args($crate::LogLevel::Info, format_args_nl!($($args)+))
+        $crate::log_with_formatter($crate::LogLevel::Info, |w| writeln!(w, $($args)+))
     }
 }
 
@@ -149,7 +151,7 @@ macro_rules! info {
 #[macro_export]
 macro_rules! debug {
     ($($args:tt)+) => {
-        $crate::log_with_args($crate::LogLevel::Debug, format_args_nl!($($args)+))
+        $crate::log_with_formatter($crate::LogLevel::Debug, |w| writeln!(w, $($args)+))
     }
 }
 

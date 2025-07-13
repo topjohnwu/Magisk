@@ -30,9 +30,8 @@ der = { workspace = true, features = ["derive", "pem"] }
 fdt = { workspace = true }
 bytemuck = { workspace = true, features = ["derive", "min_const_generics"] }
 num-traits = { workspace = true }
-libz-rs-sys = { workspace = true }
-libbz2-rs-sys = { workspace = true }
-
-# Pin version to prevent cargo update break builds
-block-buffer = { workspace = true }
-sec1 = { workspace = true }
+flate2 = { workspace = true, features = ["zlib-rs"] }
+bzip2 = { workspace = true }
+lz4 = { workspace = true }
+xz2 = { workspace = true }
+zopfli = { workspace = true, features = ["gzip"] }

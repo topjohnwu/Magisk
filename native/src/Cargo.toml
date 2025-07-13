@@ -10,44 +10,45 @@ edition = "2024"
 [workspace.dependencies]
 cxx = { path = "external/cxx-rs" }
 cxx-gen = { path = "external/cxx-rs/gen/lib" }
-libc = "0.2.171"
-cfg-if = "1.0.0"
+libc = "0.2.174"
+cfg-if = "1.0.1"
 num-traits = "0.2.19"
 num-derive = "0.4.2"
 thiserror = "2.0.12"
 byteorder = "1.5.0"
 size = "0.5.0"
-bytemuck = "1.22.0"
+bytemuck = "1.23.1"
 fdt = "0.1.5"
 const_format = "0.2.34"
 bit-set = "0.8.0"
-syn = "2.0.100"
+syn = "2.0.104"
 quote = "1.0.40"
-proc-macro2 = "1.0.94"
+proc-macro2 = "1.0.95"
 argh = { version = "0.1.13", default-features = false }
-libz-rs-sys = { version = "0.5.0", features = ["export-symbols"] }
-libbz2-rs-sys = { version = "0.1.3" }
 pb-rs = { version = "0.10.0", default-features = false }
 quick-protobuf = "0.8.1"
+flate2 = { version = "1.1.2", default-features = false }
+bzip2 = { version = "0.6.0" }
+zopfli = "0.8.2"
+lz4 = "1.28.1"
+xz2 = "0.1.7"
 
 # Rust crypto crates are tied together
-sha1 = "=0.11.0-pre.4"
-sha2 = "=0.11.0-pre.4"
-digest = "=0.11.0-pre.9"
-p256 = "0.14.0-pre.2"
-p384 = "0.14.0-pre.2"
-p521 = "0.14.0-pre.2"
-rsa = "0.10.0-pre.4"
-x509-cert = "0.3.0-pre.0"
-der = "0.8.0-rc.1"
-
-# Pin version to prevent cargo update breaking builds
-block-buffer = "=0.11.0-rc.3"
-sec1 = "=0.8.0-rc.3"
+sha1 = "0.11.0-rc.0"
+sha2 = "0.11.0-rc.0"
+digest = "0.11.0-rc.0"
+p256 = "0.14.0-pre.9"
+p384 = "0.14.0-pre.9"
+p521 = "0.14.0-pre.9"
+rsa = "0.10.0-rc.3"
+x509-cert = "0.3.0-rc.1"
+der = "0.8.0-rc.7"
 
 [patch.crates-io]
 pb-rs = { git = "https://github.com/tafia/quick-protobuf.git" }
 quick-protobuf = { git = "https://github.com/tafia/quick-protobuf.git" }
+lz4-sys = { path = "external/lz4-sys" }
+lzma-sys = { path = "external/lzma-sys" }
 
 [profile.dev]
 opt-level = "z"

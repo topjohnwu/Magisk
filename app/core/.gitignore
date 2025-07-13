@@ -1,4 +1,3 @@
 /build
-src/*/assets
-src/*/jniLibs
-src/*/resources
+src/debug
+src/release
