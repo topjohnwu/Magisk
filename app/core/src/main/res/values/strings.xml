@@ -116,6 +116,9 @@
     <string name="module_empty">No module installed</string>
     <string name="confirm_install">Install module %1$s?</string>
     <string name="confirm_install_title">Install confirmation</string>
+    <string name="module_reinstall_title">Reinstall Module</string>
+    <string name="module_reinstall_message">This module is already up-to-date. Do you want to redownload and reinstall it?</string>
+    <string name="module_reinstall">Reinstall</string>
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Theme mode</string>
