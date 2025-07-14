@@ -29,13 +29,12 @@ macro_rules! module_log {
 }
 
 #[allow(unused_variables)]
-fn bind_mount(reason: &str, src: &Utf8CStr, dest: &Utf8CStr, rec: bool) -> OsResultStatic<()> {
+fn bind_mount(reason: &str, src: &Utf8CStr, dest: &Utf8CStr, rec: bool) {
     module_log!(reason, dest, src);
     // Ignore any kind of error here. If a single bind mount fails due to selinux permissions or
     // kernel limitations, don't let it break module mount entirely.
     src.bind_mount_to(dest, rec).log_ok();
     dest.remount_mount_point_flags(MS_RDONLY).log_ok();
-    Ok(())
 }
 
 fn mount_dummy(reason: &str, src: &Utf8CStr, dest: &Utf8CStr, is_dir: bool) -> OsResultStatic<()> {
@@ -44,7 +43,8 @@ fn mount_dummy(reason: &str, src: &Utf8CStr, dest: &Utf8CStr, is_dir: bool) -> O
     } else {
         dest.create(O_CREAT | O_RDONLY | O_CLOEXEC, 0o000)?;
     }
-    bind_mount(reason, src, dest, false)
+    bind_mount(reason, src, dest, false);
+    Ok(())
 }
 
 // File path that act like a stack, popping out the last element
@@ -248,7 +248,7 @@ impl FsNode {
                     self.commit_tmpfs(path.reborrow())?;
                     // Transitioning from non-tmpfs to tmpfs, we need to actually mount the
                     // worker dir to dest after all children are committed.
-                    bind_mount("move", path.worker(), path.real(), true)?;
+                    bind_mount("move", path.worker(), path.real(), true);
                 } else {
                     for (name, node) in children {
                         let path = path.append(name);
@@ -257,7 +257,7 @@ impl FsNode {
                 }
             }
             FsNode::File { src } => {
-                bind_mount("mount", src, path.real(), false)?;
+                bind_mount("mount", src, path.real(), false);
             }
             _ => {
                 error!("Unable to handle '{}': parent should be tmpfs", path.real());
@@ -292,7 +292,7 @@ impl FsNode {
                                     &src,
                                     path.real(),
                                     matches!(node, FsNode::Directory { .. }),
-                                )?;
+                                );
                             }
                             _ => node.commit_tmpfs(path)?,
                         }
