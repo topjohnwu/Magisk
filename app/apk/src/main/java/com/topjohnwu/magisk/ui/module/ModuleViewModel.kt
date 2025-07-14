@@ -19,6 +19,7 @@ import com.topjohnwu.magisk.databinding.diffList
 import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.dialog.LocalModuleInstallDialog
 import com.topjohnwu.magisk.dialog.OnlineModuleInstallDialog
+import com.topjohnwu.magisk.dialog.ReinstallConfirmationDialog
 import com.topjohnwu.magisk.events.GetContentEvent
 import com.topjohnwu.magisk.events.SnackbarEvent
 import kotlinx.coroutines.Dispatchers
@@ -89,6 +90,15 @@ class ModuleViewModel : AsyncLoadViewModel() {
 
     fun requestInstallLocalModule(uri: Uri, displayName: String) {
         LocalModuleInstallDialog(this, uri, displayName).show()
+    }
+
+    fun onUpdateClicked(item: LocalModuleRvItem) {
+        val updateInfo = item.item.updateInfo ?: return
+        if (item.updateReady) {
+            downloadPressed(updateInfo)
+        } else {
+            ReinstallConfirmationDialog(this, updateInfo).show()
+        }
     }
 
     @Parcelize
