@@ -132,7 +132,7 @@
 
                 <Button
                     android:id="@+id/module_update"
-                    style="@style/Widget.Foundation.Button.Text"
+                    style="@style/WidgetFoundation.Button.Text"
                     goneUnless="@{item.showUpdate}"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
