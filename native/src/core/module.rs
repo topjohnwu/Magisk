@@ -287,10 +287,10 @@ impl FsNode {
                         match node {
                             FsNode::Directory { .. } | FsNode::File { .. } => {
                                 let src = Utf8CString::from(base_dir).join_path(name);
-                                bind_mount(
+                                mount_dummy(
                                     "mount",
                                     &src,
-                                    path.real(),
+                                    path.worker(),
                                     matches!(node, FsNode::Directory { .. }),
                                 );
                             }
