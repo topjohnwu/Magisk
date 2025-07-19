@@ -15,6 +15,7 @@ import com.topjohnwu.magisk.test.Environment.Companion.SEPOLICY_RULE
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.runBlocking
 import org.junit.After
+import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -98,9 +99,10 @@ class AdditionalTest : BaseTest {
             RootUtils.fs.getFile("/system/bin/screenrecord").exists()
         )
         val egg = RootUtils.fs.getFile("/system/app/EasterEgg").list() ?: arrayOf()
-        assertTrue(
-            "/system/app/EasterEgg should be empty",
-            egg.isEmpty()
+        assertArrayEquals(
+            "/system/app/EasterEgg should be replaced",
+            egg,
+            arrayOf("newfile")
         )
     }
 

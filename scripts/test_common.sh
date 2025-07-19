@@ -30,8 +30,16 @@ print_error() {
 # $1 = TestClass#method
 # $2 = component
 am_instrument() {
+  set +x
   local out=$(adb shell am instrument -w --user 0 -e class "$1" "$2")
-  grep -q 'OK (' <<< "$out"
+  echo "$out"
+  if grep -q 'OK (' <<< "$out"; then
+    set -x
+    return 0
+  else
+    set -x
+    return 1
+  fi
 }
 
 # $1 = pkg

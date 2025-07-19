@@ -292,7 +292,7 @@ impl FsNode {
                                     &src,
                                     path.worker(),
                                     matches!(node, FsNode::Directory { .. }),
-                                );
+                                )?;
                             }
                             _ => node.commit_tmpfs(path)?,
                         }
