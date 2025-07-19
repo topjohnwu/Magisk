@@ -108,6 +108,9 @@ class Environment : BaseTest {
         assertTrue(error, egg.mkdirs())
         assertTrue(error, egg.getChildFile(".replace").createNewFile())
 
+        // Create /system/app/EasterEgg/newfile
+        assertTrue(error, egg.getChildFile("newfile").createNewFile())
+
         // Delete /system/bin/screenrecord
         val bin = path.getChildFile("system").getChildFile("bin")
         assertTrue(error, bin.mkdirs())
