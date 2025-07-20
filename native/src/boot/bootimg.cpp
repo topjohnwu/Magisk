@@ -523,10 +523,8 @@ bool boot_img::parse_image(const uint8_t *p, FileFormat type) {
         } else if (tail.sz() >= 16 && BUFFER_MATCH(tail.buf(), LG_BUMP_MAGIC)) {
             fprintf(stderr, "LG_BUMP_IMAGE\n");
             flags[LG_BUMP_FLAG] = true;
-        }
-
-        // Check if the image is signed
-        if (verify()) {
+        } else if (!(tail.sz() >= 4 && BUFFER_MATCH(tail.buf(), AVB_MAGIC)) && verify()) {
+            // Check if the image is avb 1.0 signed
             fprintf(stderr, "AVB1_SIGNED\n");
             flags[AVB1_SIGNED_FLAG] = true;
         }
