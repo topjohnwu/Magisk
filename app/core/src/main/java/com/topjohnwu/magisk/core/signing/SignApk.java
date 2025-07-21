@@ -59,7 +59,7 @@ public class SignApk {
     private static final String CERT_SIG_MULTI_NAME = "META-INF/CERT%d.%s";
 
     // bitmasks for which hash algorithms we need the manifest to include.
-    private static final int USE_SHA1 = 1;
+    private static final int USE_SHA-256 = 1;
     private static final int USE_SHA256 = 2;
 
     /**
@@ -72,13 +72,13 @@ public class SignApk {
                     Pattern.quote(JarFile.MANIFEST_NAME) + ")$");
 
     /**
-     * Return one of USE_SHA1 or USE_SHA256 according to the signature
+     * Return one of USE_SHA-256 or USE_SHA256 according to the signature
      * algorithm specified in the cert.
      */
     private static int getDigestAlgorithm(X509Certificate cert) {
         String sigAlg = cert.getSigAlgName().toUpperCase(Locale.US);
-        if ("SHA1WITHRSA".equals(sigAlg) || "MD5WITHRSA".equals(sigAlg)) {
-            return USE_SHA1;
+        if ("SHA-256WITHRSA".equals(sigAlg) || "MD5WITHRSA".equals(sigAlg)) {
+            return USE_SHA-256;
         } else if (sigAlg.startsWith("SHA256WITH")) {
             return USE_SHA256;
         } else {
@@ -96,7 +96,7 @@ public class SignApk {
             if (getDigestAlgorithm(cert) == USE_SHA256) {
                 return "SHA256withRSA";
             } else {
-                return "SHA1withRSA";
+                return "SHA-256withRSA";
             }
         } else if ("EC".equalsIgnoreCase(keyType)) {
             return "SHA256withECDSA";
@@ -123,8 +123,8 @@ public class SignApk {
 
         MessageDigest md_sha1 = null;
         MessageDigest md_sha256 = null;
-        if ((hashes & USE_SHA1) != 0) {
-            md_sha1 = MessageDigest.getInstance("SHA1");
+        if ((hashes & USE_SHA-256) != 0) {
+            md_sha1 = MessageDigest.getInstance("SHA-256");
         }
         if ((hashes & USE_SHA256) != 0) {
             md_sha256 = MessageDigest.getInstance("SHA256");
@@ -168,9 +168,9 @@ public class SignApk {
                         i.remove();
                     }
                 }
-                // Add SHA-1 digest if requested
+                // Add SHA-256 digest if requested
                 if (md_sha1 != null) {
-                    attr.putValue("SHA1-Digest",
+                    attr.putValue("SHA-256-Digest",
                             new String(Base64.encode(md_sha1.digest()), "ASCII"));
                 }
                 // Add SHA-256 digest if requested
@@ -204,14 +204,14 @@ public class SignApk {
                 ApkSignerV2.SF_ATTRIBUTE_ANDROID_APK_SIGNED_NAME,
                 ApkSignerV2.SF_ATTRIBUTE_ANDROID_APK_SIGNED_VALUE);
 
-        MessageDigest md = MessageDigest.getInstance(hash == USE_SHA256 ? "SHA256" : "SHA1");
+        MessageDigest md = MessageDigest.getInstance(hash == USE_SHA256 ? "SHA256" : "SHA-256");
         PrintStream print = new PrintStream(new DigestOutputStream(new ByteArrayOutputStream(), md),
                 true, "UTF-8");
 
         // Digest of the entire manifest
         manifest.write(print);
         print.flush();
-        main.putValue(hash == USE_SHA256 ? "SHA-256-Digest-Manifest" : "SHA1-Digest-Manifest",
+        main.putValue(hash == USE_SHA256 ? "SHA-256-Digest-Manifest" : "SHA-256-Digest-Manifest",
                 new String(Base64.encode(md.digest()), "ASCII"));
 
         Map<String, Attributes> entries = manifest.getEntries();
@@ -225,7 +225,7 @@ public class SignApk {
             print.flush();
 
             Attributes sfAttr = new Attributes();
-            sfAttr.putValue(hash == USE_SHA256 ? "SHA-256-Digest" : "SHA1-Digest",
+            sfAttr.putValue(hash == USE_SHA256 ? "SHA-256-Digest" : "SHA-256-Digest",
                     new String(Base64.encode(md.digest()), "ASCII"));
             sf.getEntries().put(entry.getKey(), sfAttr);
         }
