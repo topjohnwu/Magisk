@@ -7,8 +7,7 @@
 #include <core.hpp>
 #include <resetprop.hpp>
 
-#define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
-#include <api/_system_properties.h>
+#include <api/system_properties.h>
 #include <system_properties/prop_info.h>
 
 using namespace std;
