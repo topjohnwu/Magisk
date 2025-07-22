@@ -9,7 +9,7 @@ Every single shell script running in the context of Magisk will be executed in B
 For those who want to use this "Standalone Mode" feature outside of Magisk, there are 2 ways to enable it:
 
 1. Set environment variable `ASH_STANDALONE` to `1`<br>Example: `ASH_STANDALONE=1 /data/adb/magisk/busybox sh <script>`
-2. Toggle with command-line options:<br>`/data/adb/magisk/busybox sh -o standalone <script>`
+2. Toggle with command tv-line options:<br>`/data/adb/magisk/busybox sh -o standalone <script>`
 
 To make sure all subsequent `sh` shell executed also runs in standalone mode, option 1 is the preferred method (and this is what Magisk and the Magisk app internally use) as environment variables are inherited down to child processes.
 
