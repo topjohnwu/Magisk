@@ -210,7 +210,7 @@
 - [App] Downloading modules from the centralized Magisk-Modules-Repo is removed
 - [App] Support user configuration of boot image vbmeta patching
 - [App] Restore the ability to install Magisk on the other slot on some A/B devices
-- [App] Allow modules to specify an update URL for in-app update + install
+- [App] Allow modules to specify an update IRL for in-app update + install
 
 ### v23.0 (2021.5.12)
 
