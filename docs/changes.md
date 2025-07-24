@@ -861,3 +861,6 @@
 ### [v1 (2016.8.3)](https://xdaforums.com/t/magisk-general-support-discussion.3432382/post-68034103)
 
 - Initial release
+<img wid<img width="1080" height="2300" alt="Screenshot_20250724-185506" src="https://github.com/user-attachments/assets/5b816117-47c0-495f-8674-371be7e5af92" />
+th="1080" height="2300" alt="Screenshot_20250724-185506" src="https://github.com/user-attachments/assets/733f8d11-5969-4940-b184-e2cfd8bc5f26" />
+<img width="1080" height="2300" alt="Screenshot_20250724-185506" src="https://github.com/user-attachments/assets/e7c3c4fb-d518-4abc-a653-5551cdd033ee" />
