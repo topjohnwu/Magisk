@@ -18,12 +18,6 @@ gradlePlugin {
     }
 }
 
-kotlin {
-    compilerOptions {
-        languageVersion = KotlinVersion.KOTLIN_2_0
-    }
-}
-
 dependencies {
     implementation(kotlin("gradle-plugin", libs.versions.kotlin.get()))
     implementation(libs.android.gradle.plugin)
