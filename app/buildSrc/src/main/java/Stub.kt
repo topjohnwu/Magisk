@@ -309,9 +309,9 @@ fun Project.setupStubApk() {
             outputs.dir(outResDir)
             doLast {
                 val apkTmp = File("${apk}.tmp")
-                exec {
+                providers.exec {
                     commandLine(aapt, "optimize", "-o", apkTmp, "--collapse-resource-names", apk)
-                }
+                }.result.get()
 
                 val bos = ByteArrayOutputStream()
                 ZipFile(apkTmp).use { src ->

@@ -38,3 +38,4 @@
 -allowaccessmodification
 
 -dontwarn org.junit.**
+-dontwarn org.apache.**
