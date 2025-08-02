@@ -309,7 +309,7 @@ impl Directory {
         self.pre_order_walk_impl(&mut f)
     }
 
-    pub fn remove_all(&mut self) -> OsResultStatic<()> {
+    pub fn remove_all(mut self) -> OsResultStatic<()> {
         self.post_order_walk(|e| {
             e.unlink()?;
             Ok(WalkResult::Continue)

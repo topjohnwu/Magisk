@@ -11,32 +11,6 @@ using namespace std;
  * Filesystem operations
  ************************/
 
-static void prepare_modules() {
-    // Upgrade modules
-    if (auto dir = open_dir(MODULEUPGRADE); dir) {
-        int ufd = dirfd(dir.get());
-        int mfd = xopen(MODULEROOT, O_RDONLY | O_CLOEXEC);
-        for (dirent *entry; (entry = xreaddir(dir.get()));) {
-            if (entry->d_type == DT_DIR) {
-                // Cleanup old module if exists
-                if (faccessat(mfd, entry->d_name, F_OK, 0) == 0) {
-                    int modfd = xopenat(mfd, entry->d_name, O_RDONLY | O_CLOEXEC);
-                    if (faccessat(modfd, "disable", F_OK, 0) == 0) {
-                        auto disable = entry->d_name + "/disable"s;
-                        close(xopenat(ufd, disable.data(), O_RDONLY | O_CREAT | O_CLOEXEC, 0));
-                    }
-                    frm_rf(modfd);
-                    unlinkat(mfd, entry->d_name, AT_REMOVEDIR);
-                }
-                LOGI("Upgrade / New module: %s\n", entry->d_name);
-                renameat(ufd, entry->d_name, mfd, entry->d_name);
-            }
-        }
-        close(mfd);
-        rm_rf(MODULEUPGRADE);
-    }
-}
-
 template<typename Func>
 static void foreach_module(Func fn) {
     auto dir = open_dir(MODULEROOT);
@@ -135,7 +109,6 @@ static rust::Vec<ModuleInfo> collect_modules(bool zygisk_enabled, bool open_zygi
 
 rust::Vec<ModuleInfo> MagiskD::load_modules() const noexcept {
     bool zygisk = zygisk_enabled();
-    prepare_modules();
     exec_module_scripts("post-fs-data", collect_modules(zygisk, false));
     // Recollect modules (module scripts could remove itself)
     auto list = collect_modules(zygisk, true);

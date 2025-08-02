@@ -1,13 +1,15 @@
-use crate::consts::{MODULEMNT, MODULEROOT, WORKERDIR};
+use crate::consts::{MODULEMNT, MODULEROOT, MODULEUPGRADE, WORKERDIR};
 use crate::daemon::MagiskD;
-use crate::ffi::{get_magisk_tmp, get_zygisk_lib_name};
+use crate::ffi::{ModuleInfo, get_magisk_tmp, get_zygisk_lib_name};
 use crate::load_prop_file;
+use crate::mount::setup_module_mount;
 use base::{
-    Directory, FsPathBuilder, LoggedResult, OsResultStatic, ResultExt, Utf8CStr, Utf8CStrBuf,
-    Utf8CString, WalkResult, clone_attr, cstr, debug, error, info, libc, warn,
+    Directory, FsPathBuilder, LibcReturn, LoggedResult, OsResultStatic, ResultExt, Utf8CStr,
+    Utf8CStrBuf, Utf8CString, WalkResult, clone_attr, cstr, debug, error, info, libc, warn,
 };
-use libc::{MS_RDONLY, O_CLOEXEC, O_CREAT, O_RDONLY};
+use libc::{AT_REMOVEDIR, MS_RDONLY, O_CLOEXEC, O_CREAT, O_RDONLY};
 use std::collections::BTreeMap;
+use std::os::fd::AsRawFd;
 use std::path::{Component, Path};
 
 const MAGISK_BIN_INJECT_PARTITIONS: [&Utf8CStr; 4] = [
@@ -548,8 +550,48 @@ fn inject_zygisk_bins(system: &mut FsNode) {
     }
 }
 
+fn prepare_modules() -> LoggedResult<()> {
+    let mut upgrade = Directory::open(cstr!(MODULEUPGRADE))?;
+    let ufd = upgrade.as_raw_fd();
+    let root = Directory::open(cstr!(MODULEROOT))?;
+    while let Some(ref e) = upgrade.read()? {
+        if !e.is_dir() {
+            continue;
+        }
+        let module_name = e.name();
+        let mut disable = false;
+        // Cleanup old module if exists
+        if root.contains_path(module_name) {
+            let module = root.open_as_dir_at(module_name)?;
+            // If the old module is disabled, we need to also disable the new one
+            disable = module.contains_path(cstr!("disable"));
+            module.remove_all()?;
+            root.unlink_at(module_name, AT_REMOVEDIR)?;
+        }
+        info!("Upgrade / New module: {module_name}");
+        unsafe {
+            libc::renameat(
+                ufd,
+                module_name.as_ptr(),
+                root.as_raw_fd(),
+                module_name.as_ptr(),
+            )
+            .check_os_err("renameat", Some(module_name), None)?;
+        }
+        if disable {
+            let path = cstr::buf::default()
+                .join_path(module_name)
+                .join_path("disable");
+            let _ = root.open_as_file_at(&path, O_RDONLY | O_CREAT | O_CLOEXEC, 0)?;
+        }
+    }
+    upgrade.remove_all()?;
+    cstr!(MODULEUPGRADE).remove()?;
+    Ok(())
+}
+
 impl MagiskD {
-    pub fn apply_modules(&self) {
+    fn apply_modules(&self, module_list: &[ModuleInfo]) {
         let mut system = FsNode::new_dir();
 
         // Build all the base "prefix" paths
@@ -578,7 +620,7 @@ impl MagiskD {
         // In this step, there is zero logic applied during tree construction; we simply collect and
         // record the union of all module filesystem trees under each of their /system directory.
 
-        for info in self.module_list.get().iter().flat_map(|v| v.iter()) {
+        for info in module_list {
             let mut module_paths = root_paths.append(&info.name);
             {
                 // Read props
@@ -655,5 +697,13 @@ impl MagiskD {
             let path = root_paths.append(dir);
             root.commit(path, true).log_ok();
         }
+    }
+
+    pub fn handle_modules(&self) {
+        setup_module_mount();
+        prepare_modules().ok();
+        let modules = self.load_modules();
+        self.apply_modules(&modules);
+        self.module_list.set(modules).ok();
     }
 }
