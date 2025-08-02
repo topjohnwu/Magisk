@@ -21,7 +21,7 @@ pub(crate) fn switch_root(path: &Utf8CStr) {
     let res: LoggedResult<()> = try {
         debug!("Switch root to {}", path);
         let mut mounts = BTreeSet::new();
-        let mut rootfs = Directory::open(cstr!("/"))?;
+        let rootfs = Directory::open(cstr!("/"))?;
         for info in parse_mount_info("self") {
             if info.target == "/" || info.target.as_str() == path.as_str() {
                 continue;
