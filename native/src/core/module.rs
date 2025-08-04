@@ -1,16 +1,21 @@
 use crate::consts::{MODULEMNT, MODULEROOT, MODULEUPGRADE, WORKERDIR};
 use crate::daemon::MagiskD;
-use crate::ffi::{ModuleInfo, exec_script, get_magisk_tmp, get_zygisk_lib_name, load_prop_file};
+use crate::ffi::{
+    ModuleInfo, exec_module_scripts, exec_script, get_magisk_tmp, get_zygisk_lib_name,
+    load_prop_file, set_zygisk_prop,
+};
 use crate::mount::setup_module_mount;
 use base::{
     DirEntry, Directory, FsPathBuilder, LibcReturn, LoggedResult, OsResultStatic, ResultExt,
     Utf8CStr, Utf8CStrBuf, Utf8CString, WalkResult, clone_attr, cstr, debug, error, info, libc,
-    warn,
+    raw_cstr, warn,
 };
 use libc::{AT_REMOVEDIR, MS_RDONLY, O_CLOEXEC, O_CREAT, O_RDONLY};
 use std::collections::BTreeMap;
-use std::os::fd::AsRawFd;
+use std::os::fd::{AsRawFd, IntoRawFd};
 use std::path::{Component, Path};
+use std::ptr;
+use std::sync::atomic::Ordering;
 
 const MAGISK_BIN_INJECT_PARTITIONS: [&Utf8CStr; 4] = [
     cstr!("/system/"),
@@ -698,7 +703,7 @@ fn upgrade_modules() -> LoggedResult<()> {
     Ok(())
 }
 
-fn for_each_module(func: impl Fn(&DirEntry) -> LoggedResult<()>) -> LoggedResult<()> {
+fn for_each_module(mut func: impl FnMut(&DirEntry) -> LoggedResult<()>) -> LoggedResult<()> {
     let mut root = Directory::open(cstr!(MODULEROOT))?;
     while let Some(ref e) = root.read()? {
         if e.is_dir() && e.name() != ".core" {
@@ -717,15 +722,19 @@ pub fn disable_modules() {
     .log_ok();
 }
 
+fn run_uninstall_script(module_name: &Utf8CStr) {
+    let script = cstr::buf::default()
+        .join_path(MODULEROOT)
+        .join_path(module_name)
+        .join_path("uninstall.sh");
+    exec_script(&script);
+}
+
 pub fn remove_modules() {
     for_each_module(|e| {
         let dir = e.open_as_dir()?;
         if dir.contains_path(cstr!("uninstall.sh")) {
-            let script = cstr::buf::default()
-                .join_path(MODULEROOT)
-                .join_path(e.name())
-                .join_path("uninstall.sh");
-            exec_script(&script);
+            run_uninstall_script(e.name());
         }
         Ok(())
     })
@@ -733,12 +742,141 @@ pub fn remove_modules() {
     cstr!(MODULEROOT).remove_all().log_ok();
 }
 
+fn collect_modules(zygisk_enabled: bool, open_zygisk: bool) -> Vec<ModuleInfo> {
+    let mut modules = Vec::new();
+
+    #[allow(unused_mut)] // It's possible that z32 and z64 are unused
+    for_each_module(|e| {
+        let name = e.name();
+        let dir = e.open_as_dir()?;
+        if dir.contains_path(cstr!("remove")) {
+            info!("{name}: remove");
+            if dir.contains_path(cstr!("uninstall.sh")) {
+                run_uninstall_script(name);
+            }
+            dir.remove_all()?;
+            e.unlink()?;
+            return Ok(());
+        }
+        dir.unlink_at(cstr!("update"), 0).ok();
+        if dir.contains_path(cstr!("disable")) {
+            return Ok(());
+        }
+
+        let mut z32 = -1;
+        let mut z64 = -1;
+
+        let is_zygisk = dir.contains_path(cstr!("zygisk"));
+
+        if zygisk_enabled {
+            // Riru and its modules are not compatible with zygisk
+            if name == "riru-core" || dir.contains_path(cstr!("riru")) {
+                return Ok(());
+            }
+
+            fn open_fd_safe(dir: &Directory, name: &Utf8CStr) -> i32 {
+                dir.open_as_file_at(name, O_RDONLY | O_CLOEXEC, 0)
+                    .log()
+                    .map(IntoRawFd::into_raw_fd)
+                    .unwrap_or(-1)
+            }
+
+            if open_zygisk && is_zygisk {
+                #[cfg(target_arch = "arm")]
+                {
+                    z32 = open_fd_safe(&dir, cstr!("zygisk/armeabi-v7a.so"));
+                }
+                #[cfg(target_arch = "aarch64")]
+                {
+                    z32 = open_fd_safe(&dir, cstr!("zygisk/armeabi-v7a.so"));
+                    z64 = open_fd_safe(&dir, cstr!("zygisk/arm64-v8a.so"));
+                }
+                #[cfg(target_arch = "x86")]
+                {
+                    z32 = open_fd_safe(&dir, cstr!("zygisk/x86.so"));
+                }
+                #[cfg(target_arch = "x86_64")]
+                {
+                    z32 = open_fd_safe(&dir, cstr!("zygisk/x86.so"));
+                    z64 = open_fd_safe(&dir, cstr!("zygisk/x86_64.so"));
+                }
+                #[cfg(target_arch = "riscv64")]
+                {
+                    z64 = open_fd_safe(&dir, cstr!("zygisk/riscv64.so"));
+                }
+                dir.unlink_at(cstr!("zygisk/unloaded"), 0).ok();
+            }
+        } else {
+            // Ignore zygisk modules when zygisk is not enabled
+            if is_zygisk {
+                info!("{name}: ignore");
+                return Ok(());
+            }
+        }
+        modules.push(ModuleInfo {
+            name: name.to_string(),
+            z32,
+            z64,
+        });
+        Ok(())
+    })
+    .log_ok();
+
+    if zygisk_enabled && open_zygisk {
+        let mut use_memfd = true;
+        let mut convert_to_memfd = |fd: i32| -> i32 {
+            if fd < 0 {
+                return fd;
+            }
+            if use_memfd {
+                let memfd = unsafe {
+                    libc::syscall(
+                        libc::SYS_memfd_create,
+                        raw_cstr!("jit-cache"),
+                        libc::MFD_CLOEXEC,
+                    ) as i32
+                };
+                if memfd >= 0 {
+                    unsafe {
+                        if libc::sendfile(memfd, fd, ptr::null_mut(), i32::MAX as usize) < 0 {
+                            libc::close(memfd);
+                        } else {
+                            libc::close(fd);
+                            return memfd;
+                        }
+                    }
+                }
+                // Some error occurred, don't try again
+                use_memfd = false;
+            }
+            fd
+        };
+
+        modules.iter_mut().for_each(|m| {
+            m.z32 = convert_to_memfd(m.z32);
+            m.z64 = convert_to_memfd(m.z64);
+        });
+    }
+
+    modules
+}
+
 impl MagiskD {
     pub fn handle_modules(&self) {
         setup_module_mount();
         upgrade_modules().ok();
-        let modules = self.load_modules();
-        apply_modules(self.zygisk_enabled(), &modules);
+
+        let zygisk = self.zygisk_enabled.load(Ordering::Acquire);
+        let modules = collect_modules(zygisk, false);
+        exec_module_scripts(cstr!("post-fs-data"), &modules);
+
+        // Recollect modules (module scripts could remove itself)
+        let modules = collect_modules(zygisk, true);
+        if zygisk {
+            set_zygisk_prop();
+        }
+        apply_modules(zygisk, &modules);
+
         self.module_list.set(modules).ok();
     }
 }

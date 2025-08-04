@@ -20,7 +20,6 @@ LOCAL_SRC_FILES := \
     core/daemon.cpp \
     core/scripting.cpp \
     core/sqlite.cpp \
-    core/module.cpp \
     core/thread.cpp \
     core/core-rs.cpp \
     core/resetprop/resetprop.cpp \

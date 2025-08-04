@@ -158,6 +158,7 @@ pub mod ffi {
         fn update_deny_flags(uid: i32, process: &str, flags: &mut u32);
         fn initialize_denylist();
         fn get_zygisk_lib_name() -> &'static str;
+        fn set_zygisk_prop();
         fn restore_zygisk_prop();
         fn switch_mnt_ns(pid: i32) -> i32;
         fn app_request(req: &SuAppRequest) -> i32;
@@ -253,9 +254,6 @@ pub mod ffi {
         #[Self = MagiskD]
         #[cxx_name = "Get"]
         fn get() -> &'static MagiskD;
-    }
-    unsafe extern "C++" {
-        fn load_modules(self: &MagiskD) -> Vec<ModuleInfo>;
     }
 }
 
