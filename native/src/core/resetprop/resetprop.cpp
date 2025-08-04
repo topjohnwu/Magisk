@@ -429,8 +429,8 @@ static StringType get_prop_impl(const char *name, bool persist) {
     return get_prop<StringType>(name, flags);
 }
 
-rust::String get_prop_rs(const char *name, bool persist) {
-    return get_prop_impl<rust::String>(name, persist);
+rust::String get_prop_rs(rust::Utf8CStr name, bool persist) {
+    return get_prop_impl<rust::String>(name.data(), persist);
 }
 
 string get_prop(const char *name, bool persist) {
