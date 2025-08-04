@@ -40,10 +40,6 @@ mount_partitions
 check_data
 $DATA_DE || abort "! Cannot access /data, please uninstall with the Magisk app"
 get_flags
-find_boot_image
-
-[ -z $BOOTIMAGE ] && abort "! Unable to detect target image"
-ui_print "- Target image: $BOOTIMAGE"
 
 # Detect version and architecture
 api_level_arch_detect
@@ -56,6 +52,14 @@ for file in lib*.so; do mv "$file" "${file:3:${#file}-6}"; done
 cd /
 cp -af $CHROMEDIR/. $BINDIR/chromeos
 chmod -R 755 $BINDIR
+
+cd $BINDIR
+# make sure to detect boot image after setting bin dir
+# since it now needs magiskboot
+find_boot_image
+
+[ -z $BOOTIMAGE ] && abort "! Unable to detect target image"
+ui_print "- Target image: $BOOTIMAGE"
 
 ############
 # Uninstall

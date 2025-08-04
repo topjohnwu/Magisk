@@ -376,8 +376,20 @@ find_boot_image() {
     # partition still uses Android 12 GKI or previous kernels, so we need to explicitly detect that scenario.
     BOOTIMAGE="/dev/block/by-name/init_boot$SLOT"
   elif [ -e "/dev/block/by-name/boot$SLOT" ]; then
-    # Standard location since AOSP Android 10+
-    BOOTIMAGE="/dev/block/by-name/boot$SLOT"
+    ./magiskboot unpack -n "/dev/block/by-name/boot$SLOT"
+    if [ -e "ramdisk.cpio" ]; then
+      # Standard location since AOSP Android 10+
+      BOOTIMAGE="/dev/block/by-name/boot$SLOT"
+      ./magiskboot cleanup
+    elif [ -e "/dev/block/by-name/vendor_boot$SLOT" ]; then
+      # Check if the required ramdisk is in vendor_boot instead for some special cases
+      ./magiskboot unpack -n "/dev/block/by-name/vendor_boot$SLOT"
+      # For some pixel or xiaomi devices
+      if [ -e "./vendor_ramdisk/init_boot.cpio" ] || [ -e "./vendor_ramdisk/ramdisk.cpio" ]; then
+        BOOTIMAGE="/dev/block/by-name/vendor_boot$SLOT"
+      fi
+      ./magiskboot cleanup
+    fi
   elif [ -n "$SLOT" ]; then
     # Fallback for A/B devices running < Android 10
     BOOTIMAGE=$(find_block "ramdisk$SLOT" "boot$SLOT")
