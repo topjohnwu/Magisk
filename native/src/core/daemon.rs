@@ -1,15 +1,15 @@
 use crate::consts::{MAGISK_FULL_VER, MAGISK_PROC_CON, MAIN_CONFIG, ROOTMNT, ROOTOVL, SECURE_DIR};
 use crate::db::Sqlite3;
 use crate::ffi::{
-    DbEntryKey, ModuleInfo, RequestCode, check_key_combo, disable_modules, exec_common_scripts,
-    exec_module_scripts, get_magisk_tmp, initialize_denylist, setup_magisk_env,
+    DbEntryKey, ModuleInfo, RequestCode, check_key_combo, exec_common_scripts, exec_module_scripts,
+    get_magisk_tmp, get_prop, initialize_denylist, set_prop, setup_magisk_env,
 };
 use crate::logging::{magisk_logging, setup_logfile, start_log_daemon};
+use crate::module::disable_modules;
 use crate::mount::{clean_mounts, setup_preinit_dir};
 use crate::package::ManagerInfo;
 use crate::selinux::restore_tmpcon;
 use crate::su::SuInfo;
-use crate::{get_prop, set_prop};
 use base::libc::{O_APPEND, O_CLOEXEC, O_RDONLY, O_WRONLY};
 use base::{
     AtomicArc, BufReadExt, FsPathBuilder, ResultExt, Utf8CStr, Utf8CStrBuf, cstr, error, info, libc,

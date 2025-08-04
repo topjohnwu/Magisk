@@ -12,8 +12,7 @@ use base::{
 };
 
 use crate::consts::{MODULEMNT, MODULEROOT, PREINITDEV, PREINITMIRR, WORKERDIR};
-use crate::ffi::{get_magisk_tmp, resolve_preinit_dir, switch_mnt_ns};
-use crate::get_prop;
+use crate::ffi::{get_magisk_tmp, get_prop, resolve_preinit_dir, switch_mnt_ns};
 
 pub fn setup_preinit_dir() {
     let magisk_tmp = get_magisk_tmp();
