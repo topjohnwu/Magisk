@@ -136,5 +136,9 @@ class AdditionalTest : BaseTest {
     @Test
     fun testRemoveModule() {
         assertNull("$REMOVE_TEST should be removed", modules.find { it.id == REMOVE_TEST })
+        assertTrue(
+            "Uninstaller of $REMOVE_TEST should be run",
+            RootUtils.fs.getFile(Environment.REMOVE_TEST_MARKER).exists()
+        )
     }
 }
