@@ -118,24 +118,6 @@ EOF
   cd /
 }
 
-add_hosts_module() {
-  # Do not touch existing hosts module
-  [ -d /data/adb/modules/hosts ] && return
-  cd /data/adb/modules
-  mkdir -p hosts/system/etc
-  cat << EOF > hosts/module.prop
-id=hosts
-name=Systemless Hosts
-version=1.0
-versionCode=1
-author=Magisk
-description=Magisk app built-in systemless hosts module
-EOF
-  magisk --clone /system/etc/hosts hosts/system/etc/hosts
-  touch hosts/update
-  cd /
-}
-
 # $1 = APK
 # $2 = package name
 adb_pm_install() {

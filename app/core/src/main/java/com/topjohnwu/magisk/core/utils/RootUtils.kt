@@ -7,11 +7,14 @@ import android.content.ServiceConnection
 import android.os.IBinder
 import android.system.Os
 import androidx.core.content.getSystemService
+import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils
 import com.topjohnwu.superuser.ipc.RootService
 import com.topjohnwu.superuser.nio.FileSystemManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
 import java.util.concurrent.locks.AbstractQueuedSynchronizer
@@ -43,16 +46,7 @@ class RootUtils(stub: Any?) : RootService() {
         return object : IRootUtils.Stub() {
             override fun getAppProcess(pid: Int) = safe(null) { getAppProcessImpl(pid) }
             override fun getFileSystem(): IBinder = FileSystemManager.getService()
-        }
-    }
-
-    private inline fun <T> safe(default: T, block: () -> T): T {
-        return try {
-            block()
-        } catch (e: Throwable) {
-            // The process died unexpectedly
-            Timber.e(e)
-            default
+            override fun addSystemlessHosts() = safe(false) { addSystemlessHostsImpl() }
         }
     }
 
@@ -76,6 +70,26 @@ class RootUtils(stub: Any?) : RootService() {
             }
         }
         return null
+    }
+
+    private fun addSystemlessHostsImpl(): Boolean {
+        val module = File(Const.MODULE_PATH, "hosts")
+        if (module.exists()) return true
+        val hosts = File(module, "system/etc/hosts")
+        if (!hosts.parentFile.mkdirs()) return false
+        File(module, "module.prop").outputStream().writer().use {
+            it.write("""
+                id=hosts
+                name=Systemless Hosts
+                version=1.0
+                versionCode=1
+                author=Magisk
+                description=Magisk app built-in systemless hosts module
+            """.trimIndent())
+        }
+        File("/system/etc/hosts").copyTo(hosts)
+        File(module, "update").createNewFile()
+        return true
     }
 
     object Connection : AbstractQueuedSynchronizer(), ServiceConnection {
@@ -131,11 +145,25 @@ class RootUtils(stub: Any?) : RootService() {
                 return field
             }
             private set
-        var obj: IRootUtils? = null
+        private var obj: IRootUtils? = null
             get() {
                 Connection.await()
                 return field
             }
-            private set
+
+        fun getAppProcess(pid: Int) = safe(null) { obj?.getAppProcess(pid) }
+
+        suspend fun addSystemlessHosts() =
+            withContext(Dispatchers.IO) { safe(false) { obj?.addSystemlessHosts() ?: false } }
+
+        private inline fun <T> safe(default: T, block: () -> T): T {
+            return try {
+                block()
+            } catch (e: Throwable) {
+                // The process died unexpectedly
+                Timber.e(e)
+                default
+            }
+        }
     }
 }

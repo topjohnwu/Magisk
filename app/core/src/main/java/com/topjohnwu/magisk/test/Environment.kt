@@ -123,7 +123,9 @@ class Environment : BaseTest {
     }
 
     private fun setupSystemlessHost() {
-        assertTrue("hosts setup failed", Shell.cmd("add_hosts_module").exec().isSuccess)
+        val error = "hosts setup failed"
+        assertTrue(error, runBlocking { RootUtils.addSystemlessHosts() })
+        assertTrue(error, RootUtils.fs.getFile(Const.MODULE_PATH).getChildFile("hosts").exists())
     }
 
     private fun setupSepolicyRuleModule(root: ExtendedFile) {

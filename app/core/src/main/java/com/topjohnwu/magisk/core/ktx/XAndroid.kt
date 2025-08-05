@@ -109,7 +109,7 @@ fun PackageManager.getPackageInfo(uid: Int, pid: Int): PackageInfo? {
             return null
         }
         // Try to find package name from PID
-        val proc = RootUtils.obj?.getAppProcess(pid)
+        val proc = RootUtils.getAppProcess(pid)
         if (proc == null) {
             if (uid == Process.SHELL_UID) {
                 // It is possible that some apps installed are sharing UID with shell.
