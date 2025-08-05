@@ -58,11 +58,13 @@ class Environment : BaseTest {
             return Build.VERSION.SDK_INT >= 27
         }
 
+        private const val MODULE_UPDATE_PATH  = "/data/adb/modules_update"
         private const val MODULE_ERROR = "Module zip processing incorrect"
         const val MOUNT_TEST = "mount_test"
         const val SEPOLICY_RULE = "sepolicy_rule"
         const val INVALID_ZYGISK = "invalid_zygisk"
         const val REMOVE_TEST = "remove_test"
+        const val REMOVE_TEST_MARKER = "/dev/.remove_test_removed"
         const val EMPTY_ZYGISK = "empty_zygisk"
     }
 
@@ -170,6 +172,10 @@ class Environment : BaseTest {
         // Create a new module but mark is as "remove"
         val module = LocalModule(path)
         assertTrue(error, path.mkdirs())
+        // Create uninstaller script
+        path.getChildFile("uninstall.sh").newOutputStream().writer().use {
+            it.write("touch $REMOVE_TEST_MARKER")
+        }
         assertTrue(error, path.getChildFile("service.sh").createNewFile())
         module.remove = true
 
@@ -220,11 +226,12 @@ class Environment : BaseTest {
         }
 
         val root = RootUtils.fs.getFile(Const.MODULE_PATH)
-        if (mount()) { setupMountTest(root) }
-        if (preinit()) { setupSepolicyRuleModule(root) }
+        val update = RootUtils.fs.getFile(MODULE_UPDATE_PATH)
+        if (mount()) { setupMountTest(update) }
+        if (preinit()) { setupSepolicyRuleModule(update) }
         setupSystemlessHost()
-        setupEmptyZygiskModule(root)
-        setupInvalidZygiskModule(root)
+        setupEmptyZygiskModule(update)
+        setupInvalidZygiskModule(update)
         setupRemoveModule(root)
     }
 
