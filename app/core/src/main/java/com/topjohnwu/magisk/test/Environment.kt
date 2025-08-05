@@ -66,6 +66,7 @@ class Environment : BaseTest {
         const val REMOVE_TEST = "remove_test"
         const val REMOVE_TEST_MARKER = "/dev/.remove_test_removed"
         const val EMPTY_ZYGISK = "empty_zygisk"
+        const val UPGRADE_TEST = "upgrade_test"
     }
 
     object TimberLog : CallbackList<String>(Runnable::run) {
@@ -182,6 +183,29 @@ class Environment : BaseTest {
         assertTrue(error, Shell.cmd("set_default_perm $path").exec().isSuccess)
     }
 
+    private fun setupUpgradeModule(root: ExtendedFile, update: ExtendedFile) {
+        val error = "$UPGRADE_TEST setup failed"
+        val oldPath = root.getChildFile(UPGRADE_TEST)
+        val newPath = update.getChildFile(UPGRADE_TEST)
+
+        // Create an existing module but mark as "disable
+        val module = LocalModule(oldPath)
+        assertTrue(error, oldPath.mkdirs())
+        module.enable = false
+        // Install service.sh into the old module
+        assertTrue(error, oldPath.getChildFile("service.sh").createNewFile())
+
+        // Create an upgrade module
+        assertTrue(error, newPath.mkdirs())
+        // Install post-fs-data.sh into the new module
+        assertTrue(error, newPath.getChildFile("post-fs-data.sh").createNewFile())
+
+        assertTrue(error, Shell.cmd(
+            "set_default_perm $oldPath",
+            "set_default_perm $newPath",
+        ).exec().isSuccess)
+    }
+
     @Test
     fun setupEnvironment() {
         runBlocking {
@@ -233,6 +257,7 @@ class Environment : BaseTest {
         setupEmptyZygiskModule(update)
         setupInvalidZygiskModule(update)
         setupRemoveModule(root)
+        setupUpgradeModule(root, update)
     }
 
     @Test

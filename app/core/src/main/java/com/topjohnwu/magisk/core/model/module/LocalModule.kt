@@ -13,7 +13,7 @@ import java.io.IOException
 import java.util.Locale
 
 data class LocalModule(
-    private val base: ExtendedFile,
+    val base: ExtendedFile,
 ) : Module() {
     private val svc get() = ServiceLocator.networkService
 
