@@ -12,6 +12,7 @@ import com.topjohnwu.magisk.test.Environment.Companion.INVALID_ZYGISK
 import com.topjohnwu.magisk.test.Environment.Companion.MOUNT_TEST
 import com.topjohnwu.magisk.test.Environment.Companion.REMOVE_TEST
 import com.topjohnwu.magisk.test.Environment.Companion.SEPOLICY_RULE
+import com.topjohnwu.magisk.test.Environment.Companion.UPGRADE_TEST
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -56,7 +57,7 @@ class AdditionalTest : BaseTest {
 
     @Test
     fun testModuleCount() {
-        var expected = 3
+        var expected = 4
         if (Environment.mount()) expected++
         if (Environment.preinit()) expected++
         if (Environment.lsposed()) expected++
@@ -139,6 +140,22 @@ class AdditionalTest : BaseTest {
         assertTrue(
             "Uninstaller of $REMOVE_TEST should be run",
             RootUtils.fs.getFile(Environment.REMOVE_TEST_MARKER).exists()
+        )
+    }
+
+    @Test
+    fun testModuleUpgrade() {
+        val module = modules.find { it.id == UPGRADE_TEST }
+        assertNotNull("$UPGRADE_TEST is not installed", module)
+        module!!
+        assertFalse("$UPGRADE_TEST should be disabled", module.enable)
+        assertTrue(
+            "$UPGRADE_TEST should be updated",
+            module.base.getChildFile("post-fs-data.sh").exists()
+        )
+        assertFalse(
+            "$UPGRADE_TEST should be updated",
+            module.base.getChildFile("service.sh").exists()
         )
     }
 }
