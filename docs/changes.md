@@ -1,5 +1,11 @@
 # Magisk Changelog
 
+### v30.2 (2025.8.6)
+
+- [Core] Fix an edge case breaking modules when overlayfs is involved
+- [Core] Fix module `.replace` functionality in certain situations
+- [resetprop] Reduce property modification traces
+
 ### v30.1 (2025.7.3)
 
 - [Core] Fix bug in module mounting implementation
