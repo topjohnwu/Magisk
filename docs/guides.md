@@ -4,7 +4,8 @@
 
 Magisk ships with a feature complete BusyBox binary (including full SELinux support). The executable is located at `/data/adb/magisk/busybox`. Magisk's BusyBox supports runtime toggle-able "ASH Standalone Shell Mode". What this standalone mode means is that when running in the `ash` shell of BusyBox, every single command will directly use the applet within BusyBox, regardless of what is set as `PATH`. For example, commands like `ls`, `rm`, `chmod` will **NOT** use what is in `PATH` (in the case of Android by default it will be `/system/bin/ls`, `/system/bin/rm`, and `/system/bin/chmod` respectively), but will instead directly call internal BusyBox applets. This makes sure that scripts always run in a predictable environment and always have the full suite of commands no matter which Android version it is running on. To force a command _not_ to use BusyBox, you have to call the executable with full paths.
 
-Every single shell script running in the context of Magisk will be executed in BusyBox's `ash` shell with standalone mode enabled. For what is relevant to 3rd party developers, this includes all boot scripts and module installation scripts.
+Every single shell script running in the ![8eb1ca2b666627977f2c4ad2465ceb31](https://github.com/user-attachments/assets/419d7e9d-6776-4f90-8a1f-7143b6d9d834)
+context of Magisk will be executed in BusyBox's `ash` shell with standalone mode enabled. For what is relevant to 3rd party developers, this includes all boot scripts and module installation scripts.
 
 For those who want to use this "Standalone Mode" feature outside of Magisk, there are 2 ways to enable it:
 
