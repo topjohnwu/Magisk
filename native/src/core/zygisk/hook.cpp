@@ -496,7 +496,7 @@ void HookContext::hook_jni_methods(JNIEnv *env, const char *clz, JNIMethods meth
             auto &new_method = new_methods[i];
             if (new_method.fnPtr == method.fnPtr) {
                 auto &old_method = old_methods[i];
-                ZLOGD("replace %s#%s%s %p -> %p\n", clz, method.name, method.signature, old_method.fnPtr, method.fnPtr);
+                ZLOGV("replace %s#%s%s %p -> %p\n", clz, method.name, method.signature, old_method.fnPtr, method.fnPtr);
                 method.fnPtr = old_method.fnPtr;
                 break;
             }
