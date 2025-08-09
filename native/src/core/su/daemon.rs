@@ -1,13 +1,10 @@
 use crate::UCred;
 use crate::daemon::{AID_ROOT, AID_SHELL, MagiskD, to_app_id, to_user_id};
 use crate::db::{DbSettings, MultiuserMode, RootAccess};
-use crate::ffi::{
-    SuAppRequest, SuPolicy, SuRequest, app_log, app_notify, app_request, exec_root_shell,
-};
+use crate::ffi::{SuAppRequest, SuPolicy, SuRequest, exec_root_shell};
 use crate::socket::IpcRead;
 use crate::su::db::RootSettings;
 use base::{LoggedResult, ResultExt, WriteExt, debug, error, exit_on_error, libc, warn};
-use std::fs::File;
 use std::os::fd::{FromRawFd, IntoRawFd};
 use std::os::unix::net::UnixStream;
 use std::sync::{Arc, Mutex};
@@ -145,11 +142,7 @@ impl MagiskD {
             let mut access = info.access.lock().unwrap();
 
             if access.settings.policy == SuPolicy::Query {
-                let fd = app_request(&app_req);
-                if fd < 0 {
-                    access.settings.policy = SuPolicy::Deny;
-                } else {
-                    let mut fd = unsafe { File::from_raw_fd(fd) };
+                if let Ok(mut fd) = self.app_request(&app_req) {
                     access.settings.policy = SuPolicy {
                         repr: fd
                             .read_decodable::<i32>()
@@ -157,13 +150,15 @@ impl MagiskD {
                             .map(i32::from_be)
                             .unwrap_or(SuPolicy::Deny.repr),
                     };
+                } else {
+                    access.settings.policy = SuPolicy::Deny;
                 }
             }
 
             if access.settings.log {
-                app_log(&app_req, access.settings.policy, access.settings.notify);
+                self.app_log(&app_req, access.settings.policy, access.settings.notify);
             } else if access.settings.notify {
-                app_notify(&app_req, access.settings.policy);
+                self.app_notify(&app_req, access.settings.policy);
             }
 
             // Before unlocking, refresh the timestamp

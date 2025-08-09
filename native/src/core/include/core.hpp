@@ -112,9 +112,6 @@ void update_deny_flags(int uid, rust::Str process, uint32_t &flags);
 
 // MagiskSU
 void exec_root_shell(int client, int pid, SuRequest &req, MntNsMode mode);
-void app_log(const SuAppRequest &info, SuPolicy policy, bool notify);
-void app_notify(const SuAppRequest &info, SuPolicy policy);
-int app_request(const SuAppRequest &info);
 
 // Rust bindings
 static inline rust::Utf8CStr get_magisk_tmp_rs() { return get_magisk_tmp(); }

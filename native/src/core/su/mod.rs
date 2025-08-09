@@ -1,3 +1,4 @@
+mod connect;
 mod daemon;
 mod db;
 mod pts;
