@@ -376,7 +376,7 @@ fn get_path_env() -> String {
         .unwrap_or_default()
 }
 
-fn inject_magisk_bins(system: &mut FsNode) {
+fn inject_magisk_bins(system: &mut FsNode, is_emulator: bool) {
     fn inject(children: &mut FsNodeMap) {
         let mut path = cstr::buf::default().join_path(get_magisk_tmp());
 
@@ -418,7 +418,7 @@ fn inject_magisk_bins(system: &mut FsNode) {
     let mut candidates = vec![];
 
     for orig_item in path_env.split(':') {
-        // Filter not suitbale paths
+        // Filter non-suitable paths
         if !MAGISK_BIN_INJECT_PARTITIONS
             .iter()
             .any(|p| orig_item.starts_with(p.as_str()))
@@ -427,6 +427,11 @@ fn inject_magisk_bins(system: &mut FsNode) {
         }
         // Flatten apex path is not suitable too
         if orig_item.starts_with("/system/apex/") {
+            continue;
+        }
+
+        // We want to keep /system/xbin/su on emulators (for debugging)
+        if is_emulator && orig_item.starts_with("/system/xbin") {
             continue;
         }
 
@@ -555,7 +560,7 @@ fn inject_zygisk_bins(system: &mut FsNode) {
     }
 }
 
-fn apply_modules(zygisk: bool, module_list: &[ModuleInfo]) {
+fn apply_modules(zygisk: bool, module_list: &[ModuleInfo], is_emulator: bool) {
     let mut system = FsNode::new_dir();
 
     // Build all the base "prefix" paths
@@ -620,7 +625,7 @@ fn apply_modules(zygisk: bool, module_list: &[ModuleInfo]) {
     // step, treating Magisk just like a special "module".
 
     if get_magisk_tmp() != "/sbin" || get_path_env().split(":").all(|s| s != "/sbin") {
-        inject_magisk_bins(&mut system);
+        inject_magisk_bins(&mut system, is_emulator);
     }
     if zygisk {
         inject_zygisk_bins(&mut system);
@@ -875,7 +880,7 @@ impl MagiskD {
         if zygisk {
             set_zygisk_prop();
         }
-        apply_modules(zygisk, &modules);
+        apply_modules(zygisk, &modules, self.is_emulator);
 
         self.module_list.set(modules).ok();
     }
