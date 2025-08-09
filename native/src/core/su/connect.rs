@@ -12,21 +12,21 @@ use libc::pollfd as PollFd;
 use num_traits::AsPrimitive;
 use std::{fmt::Write, fs::File, os::fd::AsRawFd, process::Command, process::exit};
 
-struct Extra {
+struct Extra<'a> {
     key: &'static str,
-    value: ExtraVal,
+    value: ExtraVal<'a>,
 }
 
-enum ExtraVal {
+enum ExtraVal<'a> {
     Int(i32),
     Bool(bool),
-    Str(String),
-    IntList(Vec<u32>),
+    Str(&'a str),
+    IntList(&'a [u32]),
 }
 
-impl Extra {
+impl Extra<'_> {
     fn add_intent(&self, cmd: &mut Command) {
-        match &self.value {
+        match self.value {
             Int(i) => {
                 cmd.args(["--ei", self.key, &i.to_string()]);
             }
@@ -48,7 +48,7 @@ impl Extra {
 
     fn add_bind(&self, cmd: &mut Command) {
         let mut tmp: String;
-        match &self.value {
+        match self.value {
             Int(i) => {
                 tmp = format!("{}:i:{}", self.key, i);
             }
@@ -71,7 +71,7 @@ impl Extra {
     }
 
     fn add_bind_legacy(&self, cmd: &mut Command) {
-        match &self.value {
+        match self.value {
             Str(s) => {
                 let tmp = format!("{}:s:{}", self.key, s);
                 cmd.args(["--extra", &tmp]);
@@ -179,7 +179,7 @@ impl SuAppContext<'_> {
             let extras = [
                 Extra {
                     key: "fifo",
-                    value: Str(fifo.to_string()),
+                    value: Str(&fifo),
                 },
                 Extra {
                     key: "uid",
@@ -271,15 +271,15 @@ impl SuAppContext<'_> {
             },
             Extra {
                 key: "context",
-                value: Str(self.request.context.clone()),
+                value: Str(&self.request.context),
             },
             Extra {
                 key: "gids",
-                value: IntList(self.request.gids.clone()),
+                value: IntList(&self.request.gids),
             },
             Extra {
                 key: "command",
-                value: Str(command.clone()),
+                value: Str(command),
             },
             Extra {
                 key: "notify",
