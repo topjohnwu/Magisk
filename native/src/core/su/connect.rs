@@ -1,10 +1,12 @@
+use super::SuInfo;
+use super::db::RootSettings;
 use crate::consts::{INTERNAL_DIR, MAGISK_FILE_CON};
-use crate::daemon::{MagiskD, to_user_id};
-use crate::ffi::{SuAppRequest, SuPolicy, get_magisk_tmp};
+use crate::daemon::to_user_id;
+use crate::ffi::{SuPolicy, SuRequest, get_magisk_tmp};
+use crate::socket::IpcRead;
 use ExtraVal::{Bool, Int, IntList, Str};
 use base::{
-    BytesExt, FileAttr, LibcReturn, LoggedResult, OsError, ResultExt, cstr, fork_dont_care, info,
-    libc,
+    BytesExt, FileAttr, LibcReturn, LoggedResult, OsError, ResultExt, cstr, fork_dont_care, libc,
 };
 use libc::pollfd as PollFd;
 use num_traits::AsPrimitive;
@@ -79,19 +81,21 @@ impl Extra {
     }
 }
 
-impl MagiskD {
-    fn exec_cmd(
-        &self,
-        action: &'static str,
-        extras: &[Extra],
-        info: &SuAppRequest,
-        use_provider: bool,
-    ) {
-        let user = to_user_id(info.eval_uid);
+pub(super) struct SuAppContext<'a> {
+    pub(super) cred: libc::ucred,
+    pub(super) request: &'a SuRequest,
+    pub(super) info: &'a SuInfo,
+    pub(super) settings: &'a mut RootSettings,
+    pub(super) sdk_int: i32,
+}
+
+impl SuAppContext<'_> {
+    fn exec_cmd(&self, action: &'static str, extras: &[Extra], use_provider: bool) {
+        let user = to_user_id(self.info.eval_uid);
         let user = user.to_string();
 
         if use_provider {
-            let provider = format!("content://{}.provider", info.mgr_pkg);
+            let provider = format!("content://{}.provider", self.info.mgr_pkg);
             let mut cmd = Command::new("/system/bin/app_process");
             cmd.args([
                 "/system/bin",
@@ -104,7 +108,7 @@ impl MagiskD {
                 "--method",
                 action,
             ]);
-            if self.sdk_int() >= 30 {
+            if self.sdk_int >= 30 {
                 extras.iter().for_each(|e| e.add_bind(&mut cmd))
             } else {
                 extras.iter().for_each(|e| e.add_bind_legacy(&mut cmd))
@@ -126,7 +130,7 @@ impl MagiskD {
             "com.android.commands.am.Am",
             "start",
             "-p",
-            info.mgr_pkg,
+            &self.info.mgr_pkg,
             "--user",
             &user,
             "-a",
@@ -152,21 +156,21 @@ impl MagiskD {
         }
     }
 
-    pub fn app_request(&self, info: &SuAppRequest) -> LoggedResult<File> {
+    fn app_request(&mut self) {
         let mut fifo = cstr::buf::new::<64>();
         fifo.write_fmt(format_args!(
             "{}/{}/su_request_{}",
             get_magisk_tmp(),
             INTERNAL_DIR,
-            info.pid
+            self.cred.pid
         ))
         .ok();
 
         let fd: LoggedResult<File> = try {
             let mut attr = FileAttr::new();
             attr.st.st_mode = 0o600;
-            attr.st.st_uid = info.mgr_uid.as_();
-            attr.st.st_gid = info.mgr_uid.as_();
+            attr.st.st_uid = self.info.mgr_uid.as_();
+            attr.st.st_gid = self.info.mgr_uid.as_();
             attr.con.write_str(MAGISK_FILE_CON).ok();
 
             fifo.mkfifo(0o600)?;
@@ -179,14 +183,14 @@ impl MagiskD {
                 },
                 Extra {
                     key: "uid",
-                    value: Int(info.eval_uid),
+                    value: Int(self.info.eval_uid),
                 },
                 Extra {
                     key: "pid",
-                    value: Int(info.pid),
+                    value: Int(self.cred.pid),
                 },
             ];
-            self.exec_cmd("request", &extras, info, false);
+            self.exec_cmd("request", &extras, false);
 
             // Open with O_RDWR to prevent FIFO open block
             let fd = fifo.open(libc::O_RDWR | libc::O_CLOEXEC)?;
@@ -206,68 +210,72 @@ impl MagiskD {
         };
 
         fifo.remove().log_ok();
-        fd
+
+        if let Ok(mut fd) = fd {
+            self.settings.policy = SuPolicy {
+                repr: fd
+                    .read_decodable::<i32>()
+                    .log()
+                    .map(i32::from_be)
+                    .unwrap_or(SuPolicy::Deny.repr),
+            };
+        } else {
+            self.settings.policy = SuPolicy::Deny;
+        };
     }
 
-    pub fn app_notify(&self, info: &SuAppRequest, policy: SuPolicy) {
-        if fork_dont_care() != 0 {
-            return;
-        }
+    fn app_notify(&self) {
         let extras = [
             Extra {
                 key: "from.uid",
-                value: Int(info.uid),
+                value: Int(self.cred.uid.as_()),
             },
             Extra {
                 key: "pid",
-                value: Int(info.pid),
+                value: Int(self.cred.pid.as_()),
             },
             Extra {
                 key: "policy",
-                value: Int(policy.repr),
+                value: Int(self.settings.policy.repr),
             },
         ];
-        self.exec_cmd("notify", &extras, info, true);
-        exit(0);
+        self.exec_cmd("notify", &extras, true);
     }
 
-    pub fn app_log(&self, info: &SuAppRequest, policy: SuPolicy, notify: bool) {
-        if fork_dont_care() != 0 {
-            return;
-        }
-        let command = if info.request.command.is_empty() {
-            &info.request.shell
+    fn app_log(&self) {
+        let command = if self.request.command.is_empty() {
+            &self.request.shell
         } else {
-            &info.request.command
+            &self.request.command
         };
         let extras = [
             Extra {
                 key: "from.uid",
-                value: Int(info.uid),
+                value: Int(self.cred.uid.as_()),
             },
             Extra {
                 key: "to.uid",
-                value: Int(info.request.target_uid),
+                value: Int(self.request.target_uid),
             },
             Extra {
                 key: "pid",
-                value: Int(info.pid),
+                value: Int(self.cred.pid.as_()),
             },
             Extra {
                 key: "policy",
-                value: Int(policy.repr),
+                value: Int(self.settings.policy.repr),
             },
             Extra {
                 key: "target",
-                value: Int(info.request.target_pid),
+                value: Int(self.request.target_pid),
             },
             Extra {
                 key: "context",
-                value: Str(info.request.context.clone()),
+                value: Str(self.request.context.clone()),
             },
             Extra {
                 key: "gids",
-                value: IntList(info.request.gids.clone()),
+                value: IntList(self.request.gids.clone()),
             },
             Extra {
                 key: "command",
@@ -275,10 +283,33 @@ impl MagiskD {
             },
             Extra {
                 key: "notify",
-                value: Bool(notify),
+                value: Bool(self.settings.notify),
             },
         ];
-        self.exec_cmd("log", &extras, info, true);
+        self.exec_cmd("log", &extras, true);
+    }
+
+    pub(super) fn connect_app(&mut self) {
+        // If policy is undetermined, show dialog for user consent
+        if self.settings.policy == SuPolicy::Query {
+            self.app_request();
+        }
+
+        if !self.settings.log && !self.settings.notify {
+            return;
+        }
+
+        if fork_dont_care() != 0 {
+            return;
+        }
+
+        // Notify su usage to application
+        if self.settings.log {
+            self.app_log();
+        } else if self.settings.notify {
+            self.app_notify();
+        }
+
         exit(0);
     }
 }
