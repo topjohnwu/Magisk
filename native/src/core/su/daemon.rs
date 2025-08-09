@@ -1,9 +1,10 @@
+use super::connect::SuAppContext;
+use super::db::RootSettings;
 use crate::UCred;
 use crate::daemon::{AID_ROOT, AID_SHELL, MagiskD, to_app_id, to_user_id};
 use crate::db::{DbSettings, MultiuserMode, RootAccess};
-use crate::ffi::{SuAppRequest, SuPolicy, SuRequest, exec_root_shell};
+use crate::ffi::{SuPolicy, SuRequest, exec_root_shell};
 use crate::socket::IpcRead;
-use crate::su::db::RootSettings;
 use base::{LoggedResult, ResultExt, WriteExt, debug, error, exit_on_error, libc, warn};
 use std::os::fd::{FromRawFd, IntoRawFd};
 use std::os::unix::net::UnixStream;
@@ -29,11 +30,11 @@ impl Default for SuRequest {
 }
 
 pub struct SuInfo {
-    uid: i32,
-    eval_uid: i32,
+    pub(super) uid: i32,
+    pub(super) eval_uid: i32,
+    pub(super) mgr_pkg: String,
+    pub(super) mgr_uid: i32,
     cfg: DbSettings,
-    mgr_pkg: String,
-    mgr_uid: i32,
     access: Mutex<AccessInfo>,
 }
 
@@ -129,37 +130,18 @@ impl MagiskD {
         };
 
         let info = self.get_su_info(cred.uid as i32);
-        let app_req = SuAppRequest {
-            uid: cred.uid as i32,
-            pid: cred.pid,
-            eval_uid: info.eval_uid,
-            mgr_pkg: &info.mgr_pkg,
-            mgr_uid: info.mgr_uid,
-            request: &req,
-        };
-
         {
             let mut access = info.access.lock().unwrap();
 
-            if access.settings.policy == SuPolicy::Query {
-                if let Ok(mut fd) = self.app_request(&app_req) {
-                    access.settings.policy = SuPolicy {
-                        repr: fd
-                            .read_decodable::<i32>()
-                            .log()
-                            .map(i32::from_be)
-                            .unwrap_or(SuPolicy::Deny.repr),
-                    };
-                } else {
-                    access.settings.policy = SuPolicy::Deny;
-                }
-            }
-
-            if access.settings.log {
-                self.app_log(&app_req, access.settings.policy, access.settings.notify);
-            } else if access.settings.notify {
-                self.app_notify(&app_req, access.settings.policy);
-            }
+            // Talk to su manager
+            let mut app = SuAppContext {
+                cred,
+                request: &req,
+                info: &info,
+                settings: &mut access.settings,
+                sdk_int: self.sdk_int(),
+            };
+            app.connect_app();
 
             // Before unlocking, refresh the timestamp
             access.refresh();
@@ -286,9 +268,9 @@ impl MagiskD {
             Arc::new(SuInfo {
                 uid,
                 eval_uid,
-                cfg,
                 mgr_pkg,
                 mgr_uid,
+                cfg,
                 access: Mutex::new(AccessInfo::new(access)),
             })
         };

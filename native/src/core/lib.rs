@@ -125,15 +125,6 @@ pub mod ffi {
         gids: Vec<u32>,
     }
 
-    struct SuAppRequest<'a> {
-        uid: i32,
-        pid: i32,
-        eval_uid: i32,
-        mgr_pkg: &'a str,
-        mgr_uid: i32,
-        request: &'a SuRequest,
-    }
-
     unsafe extern "C++" {
         #[namespace = "rust"]
         #[cxx_name = "Utf8CStr"]
