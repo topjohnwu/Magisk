@@ -20,7 +20,7 @@ pub const DATABIN: &str = concatcp!(SECURE_DIR, "/magisk");
 pub const MAGISKDB: &str = concatcp!(SECURE_DIR, "/magisk.db");
 
 // tmpfs paths
-const INTERNAL_DIR: &str = ".magisk";
+pub const INTERNAL_DIR: &str = ".magisk";
 pub const MAIN_CONFIG: &str = concatcp!(INTERNAL_DIR, "/config");
 pub const PREINITMIRR: &str = concatcp!(INTERNAL_DIR, "/preinit");
 pub const MODULEMNT: &str = concatcp!(INTERNAL_DIR, "/modules");
@@ -37,6 +37,7 @@ pub const SEPOL_PROC_DOMAIN: &str = "magisk";
 pub const MAGISK_PROC_CON: &str = concatcp!("u:r:", SEPOL_PROC_DOMAIN, ":s0");
 // Unconstrained file type that anyone can access
 pub const SEPOL_FILE_TYPE: &str = "magisk_file";
+pub const MAGISK_FILE_CON: &str = concatcp!("u:object_r:", SEPOL_FILE_TYPE, ":s0");
 // Log pipe that only root and zygote can open
 pub const SEPOL_LOG_TYPE: &str = "magisk_log_file";
 pub const MAGISK_LOG_CON: &str = concatcp!("u:object_r:", SEPOL_LOG_TYPE, ":s0");
