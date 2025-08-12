@@ -16,10 +16,6 @@ interface ItemWrapper<E> {
     val item: E
 }
 
-interface ViewAwareItem {
-    fun onBind(binding: ViewDataBinding, recyclerView: RecyclerView)
-}
-
 interface DiffItem<T : Any> {
 
     fun itemSameAs(other: T): Boolean {

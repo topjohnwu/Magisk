@@ -52,10 +52,6 @@ class RvItemAdapter<T: RvItem>(
         }
         holder.binding.lifecycleOwner = lifecycleOwner
         holder.binding.executePendingBindings()
-        recyclerView?.let {
-            if (item is ViewAwareItem)
-                item.onBind(holder.binding, it)
-        }
     }
 
     override fun getItemCount() = items.size
