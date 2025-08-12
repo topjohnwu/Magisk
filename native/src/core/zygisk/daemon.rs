@@ -89,6 +89,8 @@ impl MagiskD {
 
         if restore {
             restore_zygisk_prop();
+        } else{
+            set_zygisk_prop();
         }
     }
 
