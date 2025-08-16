@@ -2,7 +2,7 @@
 #   AVD MagiskInit Setup
 #####################################################################
 #
-# Support API level: 23 - 35
+# Support API level: 23 - 36
 #
 # With an emulator booted and accessible via ADB, usage:
 # ./build.py avd_patch path/to/booted/avd-image/ramdisk.img
