@@ -82,9 +82,10 @@ abstract class MagiskInstallImpl protected constructor(
 
     private fun findImage(slot: String): Boolean {
         val bootPath = (
-            "(RECOVERYMODE=${Config.recovery} " +
+            "cd $installDir && " +
+            "RECOVERYMODE=${Config.recovery} " +
             "SLOT=$slot find_boot_image; " +
-            "echo \$BOOTIMAGE)").fsh()
+            "echo \$BOOTIMAGE").fsh()
         if (bootPath.isEmpty()) {
             console.add("! Unable to detect target image")
             return false
@@ -579,14 +580,14 @@ abstract class MagiskInstallImpl protected constructor(
 
     protected suspend fun patchFile(file: Uri) = extractFiles() && processFile(file)
 
-    protected suspend fun direct() = findImage() && extractFiles() && patchBoot() && flashBoot()
+    protected suspend fun direct() = extractFiles() && findImage() && patchBoot() && flashBoot()
 
     protected suspend fun secondSlot() =
-        findSecondary() && extractFiles() && patchBoot() && flashBoot() && postOTA()
+        extractFiles() && findSecondary() && patchBoot() && flashBoot() && postOTA()
 
     protected suspend fun fixEnv() = extractFiles() && "fix_env $installDir".sh().isSuccess
 
-    protected fun restore() = findImage() && "restore_imgs $srcBoot".sh().isSuccess
+    protected suspend fun restore() = extractFiles() && findImage() && "restore_imgs $srcBoot".sh().isSuccess
 
     protected fun uninstall() = "run_uninstaller $AppApkPath".sh().isSuccess
 
