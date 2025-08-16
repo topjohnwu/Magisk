@@ -13,7 +13,7 @@ emu_args=
 emu_pid=
 
 atd_min_api=30
-atd_max_api=35
+atd_max_api=36
 huge_ram_min_api=26
 
 case $(uname -m) in
