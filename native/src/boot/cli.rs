@@ -7,8 +7,8 @@ use crate::payload::extract_boot_from_payload;
 use crate::sign::sha1_hash;
 use argh::FromArgs;
 use base::{
-    EarlyExitExt, LoggedResult, MappedFile, ResultExt, Utf8CStr, cmdline_logging, cstr,
-    libc::umask, log_err, map_args,
+    CmdArgs, EarlyExitExt, LoggedResult, MappedFile, ResultExt, Utf8CStr, cmdline_logging, cstr,
+    libc::umask, log_err,
 };
 use std::ffi::c_char;
 use std::str::FromStr;
@@ -264,7 +264,7 @@ pub extern "C" fn main(argc: i32, argv: *const *const c_char, _envp: *const *con
     cmdline_logging();
     unsafe { umask(0) };
     let res: LoggedResult<()> = try {
-        let mut cmds = map_args(argc, argv)?;
+        let mut cmds = CmdArgs::new(argc, argv).0;
         if argc < 2 {
             print_usage(cmds.first().unwrap_or(&"magiskboot"));
             return 1;

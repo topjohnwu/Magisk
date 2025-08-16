@@ -1,13 +1,16 @@
-use crate::{StrErr, Utf8CStr, ffi};
+use crate::{Utf8CStr, cstr, ffi};
 use argh::EarlyExit;
 use libc::c_char;
-use std::fmt::Arguments;
-use std::io::Write;
-use std::mem::ManuallyDrop;
-use std::process::exit;
-use std::sync::Arc;
-use std::sync::atomic::{AtomicPtr, Ordering};
-use std::{fmt, slice, str};
+use std::{
+    fmt,
+    fmt::Arguments,
+    io::Write,
+    mem::ManuallyDrop,
+    process::exit,
+    slice, str,
+    sync::Arc,
+    sync::atomic::{AtomicPtr, Ordering},
+};
 
 pub fn errno() -> &'static mut i32 {
     unsafe { &mut *libc::__errno() }
@@ -74,15 +77,6 @@ impl<T: AsMut<[u8]> + ?Sized> MutBytesExt for T {
     fn patch(&mut self, from: &[u8], to: &[u8]) -> Vec<usize> {
         ffi::mut_u8_patch(self.as_mut(), from, to)
     }
-}
-
-// SAFETY: libc guarantees argc and argv are properly setup and are static
-#[allow(clippy::not_unsafe_ptr_arg_deref)]
-pub fn map_args(argc: i32, argv: *const *const c_char) -> Result<Vec<&'static str>, StrErr> {
-    unsafe { slice::from_raw_parts(argv, argc as usize) }
-        .iter()
-        .map(|s| unsafe { Utf8CStr::from_ptr(*s) }.map(|s| s.as_str()))
-        .collect()
 }
 
 pub trait EarlyExitExt<T> {
@@ -225,5 +219,37 @@ impl Chunker {
         let chunk = &self.chunk[..self.pos];
         self.pos = 0;
         chunk
+    }
+}
+
+pub struct CmdArgs(pub Vec<&'static str>);
+
+impl CmdArgs {
+    #[allow(clippy::not_unsafe_ptr_arg_deref)]
+    pub fn new(argc: i32, argv: *const *const c_char) -> CmdArgs {
+        CmdArgs(
+            // SAFETY: libc guarantees argc and argv are properly setup and are static
+            unsafe { slice::from_raw_parts(argv, argc as usize) }
+                .iter()
+                .map(|s| unsafe { Utf8CStr::from_ptr(*s) })
+                .map(|r| r.unwrap_or(cstr!("<invalid>")))
+                .map(Utf8CStr::as_str)
+                .collect(),
+        )
+    }
+
+    pub fn as_slice(&self) -> &[&'static str] {
+        self.0.as_slice()
+    }
+
+    pub fn iter(&self) -> slice::Iter<'_, &'static str> {
+        self.0.iter()
+    }
+
+    pub fn cstr_iter(&self) -> impl Iterator<Item = &'static Utf8CStr> {
+        // SAFETY: libc guarantees null terminated strings
+        self.0
+            .iter()
+            .map(|s| unsafe { Utf8CStr::from_raw_parts(s.as_ptr().cast(), s.len() + 1) })
     }
 }
