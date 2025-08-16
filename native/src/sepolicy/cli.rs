@@ -2,8 +2,8 @@ use crate::ffi::SePolicy;
 use crate::statement::format_statement_help;
 use argh::FromArgs;
 use base::{
-    EarlyExitExt, FmtAdaptor, LoggedResult, Utf8CStr, cmdline_logging, cstr, libc::umask, log_err,
-    map_args,
+    CmdArgs, EarlyExitExt, FmtAdaptor, LoggedResult, Utf8CStr, cmdline_logging, cstr, libc::umask,
+    log_err,
 };
 use std::ffi::c_char;
 use std::io::stderr;
@@ -79,7 +79,8 @@ pub unsafe extern "C" fn main(
     }
 
     let res: LoggedResult<()> = try {
-        let cmds = map_args(argc, argv)?;
+        let cmds = CmdArgs::new(argc, argv);
+        let cmds = cmds.as_slice();
         if argc < 2 {
             print_usage(cmds.first().unwrap_or(&"magiskpolicy"));
             return 1;

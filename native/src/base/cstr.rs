@@ -300,6 +300,13 @@ impl Utf8CStr {
         }
     }
 
+    pub unsafe fn from_raw_parts<'a>(ptr: *const c_char, len: usize) -> &'a Utf8CStr {
+        unsafe {
+            let bytes = slice::from_raw_parts(ptr.cast(), len);
+            Self::from_bytes_unchecked(bytes)
+        }
+    }
+
     #[inline(always)]
     pub fn as_bytes_with_nul(&self) -> &[u8] {
         &self.0
