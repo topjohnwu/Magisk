@@ -32,9 +32,6 @@ on nonencrypted
 
 on property:sys.boot_completed=1
     exec {0} 0 0 -- {1}/magisk --boot-complete
-
-on property:init.svc.zygote=stopped
-    exec {0} 0 0 -- {1}/magisk --zygote-restart
 "#,
         "u:r:magisk:s0", tmp_dir
     )
