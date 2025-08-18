@@ -94,7 +94,7 @@ resolve_vars() {
     UpsideDownCakePrivacySandbox) api=34 ;;
     VanillaIceCream) api=35 ;;
     Baklava) api=36 ;;
-    36*CANARY) api=36 ;;
+    36*CANARY) api=10000 ;;
     *)
       print_error "! Unknown system image version '$ver'"
       exit 1
