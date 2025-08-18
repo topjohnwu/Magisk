@@ -1,4 +1,4 @@
-# Magisk Changelog
+Kññ# Magisk Changelog
 
 ### v30.2 (2025.8.6)
 
@@ -864,6 +864,8 @@
 - Remove sepolicy patches that uses SuperSU's supolicy tool; it is now using a minimal set of modifications
 - Removed Magisk Manager in Magisk patch, it is now included in Magisk phh's superuser only
 
-### [v1 (2016.8.3)](https://xdaforums.com/t/magisk-general-support-discussion.3432382/post-68034103)
+### [v1 (2016.8.3)](https://xdaforums.com/t
+Root
+/magisk-general-support-discussion.3432382/post-68034103)
 
 - Initial release
