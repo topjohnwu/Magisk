@@ -5,6 +5,7 @@
 #include <fcntl.h>
 #include <dirent.h>
 #include <set>
+#include <map>
 
 #include <consts.hpp>
 #include <sqlite.hpp>

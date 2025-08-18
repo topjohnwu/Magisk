@@ -167,15 +167,16 @@ pub mod ffi {
 
         include!("include/resetprop.hpp");
 
-        #[cxx_name = "prop_cb"]
-        type PropCb;
+        #[cxx_name = "prop_callback"]
+        type PropCallback;
+        fn exec(self: Pin<&mut PropCallback>, name: Utf8CStrRef, value: Utf8CStrRef);
+
         #[cxx_name = "get_prop_rs"]
         fn get_prop(name: Utf8CStrRef, persist: bool) -> String;
         #[cxx_name = "set_prop_rs"]
         fn set_prop(name: Utf8CStrRef, value: Utf8CStrRef, skip_svc: bool) -> i32;
         #[cxx_name = "load_prop_file_rs"]
         fn load_prop_file(filename: Utf8CStrRef, skip_svc: bool);
-        fn prop_cb_exec(cb: Pin<&mut PropCb>, name: Utf8CStrRef, value: Utf8CStrRef, serial: u32);
     }
 
     extern "Rust" {
@@ -188,8 +189,8 @@ pub mod ffi {
         fn revert_unmount(pid: i32);
         fn remove_modules();
         fn zygisk_should_load_module(flags: u32) -> bool;
-        unsafe fn persist_get_prop(name: Utf8CStrRef, prop_cb: Pin<&mut PropCb>);
-        unsafe fn persist_get_props(prop_cb: Pin<&mut PropCb>);
+        unsafe fn persist_get_prop(name: Utf8CStrRef, prop_cb: Pin<&mut PropCallback>);
+        unsafe fn persist_get_props(prop_cb: Pin<&mut PropCallback>);
         unsafe fn persist_delete_prop(name: Utf8CStrRef) -> bool;
         unsafe fn persist_set_prop(name: Utf8CStrRef, value: Utf8CStrRef) -> bool;
         fn send_fd(socket: i32, fd: i32) -> bool;

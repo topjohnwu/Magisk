@@ -2,14 +2,13 @@ use std::io::Read;
 use std::{
     fs::File,
     io::{BufWriter, Write},
-    ops::{Deref, DerefMut},
     os::fd::FromRawFd,
     pin::Pin,
 };
 
 use quick_protobuf::{BytesReader, MessageRead, MessageWrite, Writer};
 
-use crate::ffi::{PropCb, prop_cb_exec};
+use crate::ffi::PropCallback;
 use crate::resetprop::proto::persistent_properties::{
     PersistentProperties, mod_PersistentProperties::PersistentPropertyRecord,
 };
@@ -23,30 +22,6 @@ use base::{
 const PERSIST_PROP_DIR: &str = "/data/property";
 const PERSIST_PROP: &str = concatcp!(PERSIST_PROP_DIR, "/persistent_properties");
 
-trait PropCbExec {
-    fn exec(&mut self, name: &Utf8CStr, value: &Utf8CStr);
-}
-
-impl PropCbExec for Pin<&mut PropCb> {
-    fn exec(&mut self, name: &Utf8CStr, value: &Utf8CStr) {
-        prop_cb_exec(self.as_mut(), name, value, u32::MAX)
-    }
-}
-
-impl Deref for PersistentProperties {
-    type Target = Vec<PersistentPropertyRecord>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.properties
-    }
-}
-
-impl DerefMut for PersistentProperties {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.properties
-    }
-}
-
 trait PropExt {
     fn find_index(&self, name: &Utf8CStr) -> Result<usize, usize>;
     fn find(&mut self, name: &Utf8CStr) -> LoggedResult<&mut PersistentPropertyRecord>;
@@ -54,12 +29,13 @@ trait PropExt {
 
 impl PropExt for PersistentProperties {
     fn find_index(&self, name: &Utf8CStr) -> Result<usize, usize> {
-        self.binary_search_by(|p| p.name.as_deref().cmp(&Some(name.deref())))
+        self.properties
+            .binary_search_by(|p| p.name.as_deref().cmp(&Some(name.as_str())))
     }
 
     fn find(&mut self, name: &Utf8CStr) -> LoggedResult<&mut PersistentPropertyRecord> {
         let idx = self.find_index(name).silent()?;
-        Ok(&mut self[idx])
+        Ok(&mut self.properties[idx])
     }
 }
 
@@ -110,7 +86,9 @@ fn proto_read_props() -> LoggedResult<PersistentProperties> {
     let mut r = BytesReader::from_bytes(m);
     let mut props = PersistentProperties::from_reader(&mut r, m)?;
     // Keep the list sorted for binary search
-    props.sort_unstable_by(|a, b| a.name.cmp(&b.name));
+    props
+        .properties
+        .sort_unstable_by(|a, b| a.name.cmp(&b.name));
     Ok(props)
 }
 
@@ -130,7 +108,7 @@ fn proto_write_props(props: &PersistentProperties) -> LoggedResult<()> {
     Ok(())
 }
 
-pub fn persist_get_prop(name: &Utf8CStr, mut prop_cb: Pin<&mut PropCb>) {
+pub fn persist_get_prop(name: &Utf8CStr, prop_cb: Pin<&mut PropCallback>) {
     let res: LoggedResult<()> = try {
         if check_proto() {
             let mut props = proto_read_props()?;
@@ -151,17 +129,19 @@ pub fn persist_get_prop(name: &Utf8CStr, mut prop_cb: Pin<&mut PropCb>) {
     res.ok();
 }
 
-pub fn persist_get_props(mut prop_cb: Pin<&mut PropCb>) {
+pub fn persist_get_props(mut prop_cb: Pin<&mut PropCallback>) {
     let res: LoggedResult<()> = try {
         if check_proto() {
             let mut props = proto_read_props()?;
-            props.iter_mut().for_each(|prop| {
+            props.properties.iter_mut().for_each(|prop| {
                 if let PersistentPropertyRecord {
                     name: Some(n),
                     value: Some(v),
                 } = prop
                 {
-                    prop_cb.exec(Utf8CStr::from_string(n), Utf8CStr::from_string(v));
+                    prop_cb
+                        .as_mut()
+                        .exec(Utf8CStr::from_string(n), Utf8CStr::from_string(v));
                 }
             });
         } else {
@@ -170,7 +150,9 @@ pub fn persist_get_props(mut prop_cb: Pin<&mut PropCb>) {
                 if e.is_file()
                     && let Ok(mut value) = file_get_prop(e.name())
                 {
-                    prop_cb.exec(e.name(), Utf8CStr::from_string(&mut value));
+                    prop_cb
+                        .as_mut()
+                        .exec(e.name(), Utf8CStr::from_string(&mut value));
                 }
                 // Do not traverse recursively
                 Ok(WalkResult::Skip)
@@ -185,7 +167,7 @@ pub fn persist_delete_prop(name: &Utf8CStr) -> bool {
         if check_proto() {
             let mut props = proto_read_props()?;
             let idx = props.find_index(name).silent()?;
-            props.remove(idx);
+            props.properties.remove(idx);
             proto_write_props(&props)?;
         } else {
             file_set_prop(name, None)?;
@@ -199,8 +181,8 @@ pub fn persist_set_prop(name: &Utf8CStr, value: &Utf8CStr) -> bool {
         if check_proto() {
             let mut props = proto_read_props()?;
             match props.find_index(name) {
-                Ok(idx) => props[idx].value = Some(value.to_string()),
-                Err(idx) => props.insert(
+                Ok(idx) => props.properties[idx].value = Some(value.to_string()),
+                Err(idx) => props.properties.insert(
                     idx,
                     PersistentPropertyRecord {
                         name: Some(name.to_string()),
