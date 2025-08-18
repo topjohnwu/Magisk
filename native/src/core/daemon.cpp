@@ -4,6 +4,7 @@
 #include <sys/mount.h>
 #include <sys/sysmacros.h>
 #include <linux/input.h>
+#include <map>
 
 #include <consts.hpp>
 #include <base.hpp>

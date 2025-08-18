@@ -14,7 +14,6 @@ using namespace std;
 
 #ifdef APPLET_STUB_MAIN
 #define system_property_set             __system_property_set
-#define system_property_read(...)
 #define system_property_find            __system_property_find
 #define system_property_read_callback   __system_property_read_callback
 #define system_property_foreach         __system_property_foreach
@@ -111,30 +110,21 @@ illegal:
     return false;
 }
 
-static void read_prop_with_cb(const prop_info *pi, void *cb) {
-    if (system_property_read_callback) {
-        auto callback = [](void *cb, const char *name, const char *value, uint32_t serial) {
-            static_cast<prop_cb*>(cb)->exec(name, value, serial);
-        };
-        system_property_read_callback(pi, callback, cb);
-    } else {
-        char name[PROP_NAME_MAX];
-        char value[PROP_VALUE_MAX];
-        name[0] = '\0';
-        value[0] = '\0';
-        system_property_read(pi, name, value);
-        static_cast<prop_cb*>(cb)->exec(name, value, pi->serial);
-    }
+void prop_callback::read(const prop_info *pi) {
+    auto fn = [](void *cb, const char *name, const char *value, uint32_t serial) {
+        static_cast<prop_callback*>(cb)->exec(name, value, serial);
+    };
+    system_property_read_callback(pi, fn, this);
 }
 
 template<class StringType>
-struct prop_to_string : prop_cb {
+struct prop_to_string : prop_callback {
     void exec(const char *, const char *value, uint32_t s) override {
         val = value;
         serial = s;
     }
     StringType val;
-    uint32_t serial;
+    uint32_t serial = 0;
 };
 
 template<> void prop_to_string<rust::String>::exec(const char *, const char *value, uint32_t s) {
@@ -212,7 +202,7 @@ static StringType get_prop(const char *name, PropFlags flags) {
 
     if (!flags.isPersistOnly()) {
         if (auto pi = system_property_find(name)) {
-            read_prop_with_cb(pi, &cb);
+            cb.read(pi);
             LOGD("resetprop: get prop [%s]: [%s]\n", name, cb.val.c_str());
         }
     }
@@ -238,13 +228,13 @@ static StringType wait_prop(const char *name, const char *old_value) {
     }
 
     prop_to_string<StringType> cb;
-    read_prop_with_cb(pi, &cb);
+    cb.read(pi);
 
     while (old_value == nullptr || cb.val == old_value) {
         LOGD("resetprop: waiting for prop [%s]\n", name);
         uint32_t new_serial;
         system_property_wait(pi, cb.serial, &new_serial, nullptr);
-        read_prop_with_cb(pi, &cb);
+        cb.read(pi);
         if (old_value == nullptr) break;
     }
 
@@ -252,14 +242,23 @@ static StringType wait_prop(const char *name, const char *old_value) {
     return cb.val;
 }
 
+struct prop_collector : prop_callback {
+    void exec(const char *name, const char *value, uint32_t) override {
+        list.insert({name, value});
+    }
+    map<string, string> list;
+};
+
 static void print_props(PropFlags flags) {
-    prop_list list;
-    prop_collector collector(list);
-    if (!flags.isPersistOnly())
-        system_property_foreach(read_prop_with_cb, &collector);
+    prop_collector collector;
+    if (!flags.isPersistOnly()) {
+        system_property_foreach([](const prop_info *pi, void *cb) {
+            static_cast<prop_callback*>(cb)->read(pi);
+        }, &collector);
+    }
     if (flags.isPersist())
         persist_get_props(collector);
-    for (auto &[key, val] : list) {
+    for (auto &[key, val] : collector.list) {
         const char *v = flags.isContext() ?
                 (__system_property_get_context(key.data()) ?: "") :
                 val.data();
@@ -305,6 +304,17 @@ struct Initialize {
             // The platform API only exist on API 26+
             system_property_wait = __system_property_wait;
         }
+        if (system_property_read_callback == nullptr) {
+            // The platform API only exist on API 26+, create a polyfill
+            system_property_read_callback = [](const prop_info *pi, auto fn, void *cookie) {
+                char name[PROP_NAME_MAX];
+                char value[PROP_VALUE_MAX];
+                name[0] = '\0';
+                value[0] = '\0';
+                system_property_read(pi, name, value);
+                fn(cookie, name, value, pi->serial);
+            };
+        }
 #endif
         if (__system_properties_init()) {
             LOGE("resetprop: __system_properties_init error\n");
@@ -313,7 +323,7 @@ struct Initialize {
 };
 
 static void InitOnce() {
-    static struct Initialize init;
+    static Initialize init;
 }
 
 #define consume_next(val)    \

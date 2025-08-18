@@ -1,22 +1,17 @@
 #pragma once
 
 #include <string>
-#include <map>
 #include <cxx.h>
 
-struct prop_cb {
+struct prop_info;
+
+struct prop_callback {
+    virtual ~prop_callback() = default;
     virtual void exec(const char *name, const char *value, uint32_t serial) = 0;
-};
-
-using prop_list = std::map<std::string, std::string>;
-
-struct prop_collector : prop_cb {
-    explicit prop_collector(prop_list &list) : list(list) {}
-    void exec(const char *name, const char *value, uint32_t) override {
-        list.insert({name, value});
+    void exec(Utf8CStr name, Utf8CStr value) {
+        exec(name.data(), value.data(), INT_MAX);
     }
-private:
-    prop_list &list;
+    void read(const prop_info *pi);
 };
 
 // System properties
@@ -32,7 +27,4 @@ static inline int set_prop_rs(Utf8CStr name, Utf8CStr value, bool skip_svc) {
 }
 static inline void load_prop_file_rs(Utf8CStr filename, bool skip_svc) {
     load_prop_file(filename.data(), skip_svc);
-}
-static inline void prop_cb_exec(prop_cb &cb, Utf8CStr name, Utf8CStr value, uint32_t serial) {
-    cb.exec(name.data(), value.data(), serial);
 }

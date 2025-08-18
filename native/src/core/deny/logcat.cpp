@@ -2,6 +2,7 @@
 #include <android/log.h>
 #include <sys/syscall.h>
 #include <string>
+#include <map>
 
 #include <core.hpp>
 
