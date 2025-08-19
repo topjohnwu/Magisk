@@ -551,8 +551,8 @@ bool boot_img::verify(const char *cert) const {
     return rust::verify_boot_image(*this, cert);
 }
 
-int split_image_dtb(const char *filename, bool skip_decomp) {
-    mmap_data img(filename);
+int split_image_dtb(rust::Utf8CStr filename, bool skip_decomp) {
+    mmap_data img(filename.data());
 
     if (size_t off = find_dtb_offset(img.buf(), img.sz()); off > 0) {
         FileFormat fmt = check_fmt_lg(img.buf(), img.sz());
@@ -566,13 +566,13 @@ int split_image_dtb(const char *filename, bool skip_decomp) {
         dump(img.buf() + off, img.sz() - off, KER_DTB_FILE);
         return 0;
     } else {
-        fprintf(stderr, "Cannot find DTB in %s\n", filename);
+        fprintf(stderr, "Cannot find DTB in %s\n", filename.data());
         return 1;
     }
 }
 
-int unpack(const char *image, bool skip_decomp, bool hdr) {
-    const boot_img boot(image);
+int unpack(rust::Utf8CStr image, bool skip_decomp, bool hdr) {
+    const boot_img boot(image.data());
 
     if (hdr)
         boot.hdr->dump_hdr_file();
@@ -656,9 +656,9 @@ write_zero(fd, align_padding(lseek(fd, 0, SEEK_CUR) - off.header, page_size))
 
 #define file_align() file_align_with(boot.hdr->page_size())
 
-void repack(const char *src_img, const char *out_img, bool skip_comp) {
-    const boot_img boot(src_img);
-    fprintf(stderr, "Repack to boot image: [%s]\n", out_img);
+void repack(rust::Utf8CStr src_img, rust::Utf8CStr out_img, bool skip_comp) {
+    const boot_img boot(src_img.data());
+    fprintf(stderr, "Repack to boot image: [%s]\n", out_img.data());
 
     struct {
         uint32_t header;
@@ -687,7 +687,7 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
      ***************/
 
     // Create new image
-    int fd = creat(out_img, 0644);
+    int fd = creat(out_img.data(), 0644);
 
     if (boot.flags[DHTB_FLAG]) {
         // Skip DHTB header
@@ -899,7 +899,7 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
      ******************/
 
     // Map output image as rw
-    mmap_data out(out_img, true);
+    mmap_data out(out_img.data(), true);
 
     // MTK headers
     if (boot.flags[MTK_KERNEL]) {
@@ -997,8 +997,8 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
     close(fd);
 }
 
-int verify(const char *image, const char *cert) {
-    const boot_img boot(image);
+int verify(rust::Utf8CStr image, const char *cert) {
+    const boot_img boot(image.data());
     if (cert == nullptr) {
         // Boot image parsing already checks if the image is signed
         return boot.flags[AVB1_SIGNED_FLAG] ? 0 : 1;
@@ -1008,14 +1008,14 @@ int verify(const char *image, const char *cert) {
     }
 }
 
-int sign(const char *image, const char *name, const char *cert, const char *key) {
-    const boot_img boot(image);
-    auto sig = rust::sign_boot_image(boot.payload, name, cert, key);
+int sign(rust::Utf8CStr image, rust::Utf8CStr name, const char *cert, const char *key) {
+    const boot_img boot(image.data());
+    auto sig = rust::sign_boot_image(boot.payload, name.data(), cert, key);
     if (sig.empty())
         return 1;
 
     auto eof = boot.tail.buf() - boot.map.buf();
-    int fd = xopen(image, O_WRONLY | O_CLOEXEC);
+    int fd = xopen(image.data(), O_WRONLY | O_CLOEXEC);
     if (lseek(fd, eof, SEEK_SET) != eof || xwrite(fd, sig.data(), sig.size()) != sig.size()) {
         close(fd);
         return 1;

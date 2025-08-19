@@ -46,11 +46,6 @@ public:
     const char *operator[](FileFormat fmt);
 };
 
-class Fmt2Ext {
-public:
-    const char *operator[](FileFormat fmt);
-};
-
 class Name2Fmt {
 public:
     FileFormat operator[](std::string_view name);
@@ -62,6 +57,4 @@ static inline FileFormat check_fmt(rust::Slice<const uint8_t> bytes) {
     return check_fmt(bytes.data(), bytes.size());
 }
 
-extern Name2Fmt name2fmt;
 extern Fmt2Name fmt2name;
-extern Fmt2Ext fmt2ext;
