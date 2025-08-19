@@ -1,9 +1,7 @@
 #include "boot-rs.hpp"
 #include "format.hpp"
 
-Name2Fmt name2fmt;
 Fmt2Name fmt2name;
-Fmt2Ext fmt2ext;
 
 #define CHECKED_MATCH(s) (len >= (sizeof(s) - 1) && BUFFER_MATCH(buf, s))
 
@@ -71,41 +69,4 @@ const char *Fmt2Name::operator[](FileFormat fmt) {
         default:
             return "raw";
     }
-}
-
-const char *Fmt2Ext::operator[](FileFormat fmt) {
-    switch (fmt) {
-        case FileFormat::GZIP:
-        case FileFormat::ZOPFLI:
-            return ".gz";
-        case FileFormat::LZOP:
-            return ".lzo";
-        case FileFormat::XZ:
-            return ".xz";
-        case FileFormat::LZMA:
-            return ".lzma";
-        case FileFormat::BZIP2:
-            return ".bz2";
-        case FileFormat::LZ4:
-        case FileFormat::LZ4_LEGACY:
-        case FileFormat::LZ4_LG:
-            return ".lz4";
-        default:
-            return "";
-    }
-}
-
-#define CHECK(s, f) else if (name == s) return f;
-
-FileFormat Name2Fmt::operator[](std::string_view name) {
-    if (0) {}
-    CHECK("gzip", FileFormat::GZIP)
-    CHECK("zopfli", FileFormat::ZOPFLI)
-    CHECK("xz", FileFormat::XZ)
-    CHECK("lzma", FileFormat::LZMA)
-    CHECK("bzip2", FileFormat::BZIP2)
-    CHECK("lz4", FileFormat::LZ4)
-    CHECK("lz4_legacy", FileFormat::LZ4_LEGACY)
-    CHECK("lz4_lg", FileFormat::LZ4_LG)
-    else return FileFormat::UNKNOWN;
 }

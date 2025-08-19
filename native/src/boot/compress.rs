@@ -1,5 +1,6 @@
-use crate::ffi::FileFormat;
-use base::{Chunker, LoggedResult, WriteExt};
+use crate::ffi::{FileFormat, check_fmt};
+use base::libc::{O_RDONLY, O_TRUNC, O_WRONLY};
+use base::{Chunker, LoggedResult, Utf8CStr, WriteExt, error, log_err};
 use bytemuck::bytes_of_mut;
 use bzip2::{Compression as BzCompression, write::BzDecoder, write::BzEncoder};
 use flate2::{Compression as GzCompression, write::GzEncoder, write::MultiGzDecoder};
@@ -9,11 +10,11 @@ use lz4::{
 };
 use std::cell::Cell;
 use std::fs::File;
-use std::io::{BufWriter, Read, Write};
+use std::io::{BufWriter, Read, Stdin, Stdout, Write, stdin, stdout};
 use std::mem::ManuallyDrop;
 use std::num::NonZeroU64;
 use std::ops::DerefMut;
-use std::os::fd::{FromRawFd, RawFd};
+use std::os::fd::{AsRawFd, FromRawFd, RawFd};
 use xz2::{
     stream::{Check as LzmaCheck, Filters as LzmaFilters, LzmaOptions, Stream as LzmaStream},
     write::{XzDecoder, XzEncoder},
@@ -423,4 +424,117 @@ pub fn decompress_bytes(format: FileFormat, in_bytes: &[u8], out_fd: RawFd) {
         decoder.write_all(in_bytes)?;
         decoder.finish()?;
     };
+}
+
+enum AsRawFdFile {
+    Stdin(Stdin),
+    Stdout(Stdout),
+    File(File),
+}
+
+impl AsRawFd for AsRawFdFile {
+    fn as_raw_fd(&self) -> RawFd {
+        match self {
+            AsRawFdFile::Stdin(stdin) => stdin.as_raw_fd(),
+            AsRawFdFile::Stdout(stdout) => stdout.as_raw_fd(),
+            AsRawFdFile::File(file) => file.as_raw_fd(),
+        }
+    }
+}
+
+pub(crate) fn decompress(infile: &mut String, outfile: Option<&mut String>) -> LoggedResult<()> {
+    let in_std = infile == "-";
+    let mut rm_in = false;
+
+    let raw_in = if in_std {
+        AsRawFdFile::Stdin(stdin())
+    } else {
+        AsRawFdFile::File(Utf8CStr::from_string(infile).open(O_RDONLY)?)
+    };
+
+    let mut buf = [0u8; 4096];
+
+    let mut in_file = unsafe { File::from_raw_fd(raw_in.as_raw_fd()) };
+    let _ = in_file.read(&mut buf)?;
+
+    let format = check_fmt(&buf);
+
+    eprintln!("Detected format: {format}");
+
+    if !format.is_compressed() {
+        return Err(log_err!("Input file is not a supported type!"));
+    }
+
+    let raw_out = if let Some(outfile) = outfile {
+        if outfile == "-" {
+            AsRawFdFile::Stdout(stdout())
+        } else {
+            AsRawFdFile::File(Utf8CStr::from_string(outfile).create(O_WRONLY | O_TRUNC, 0o644)?)
+        }
+    } else if in_std {
+        AsRawFdFile::Stdout(stdout())
+    } else {
+        // strip the extension
+        rm_in = true;
+        let mut outfile = if let Some((outfile, ext)) = infile.rsplit_once('.') {
+            if ext != format.ext() {
+                Err(log_err!("Input file is not a supported type!"))?;
+            }
+            outfile.to_owned()
+        } else {
+            infile.clone()
+        };
+        eprintln!("Decompressing to [{outfile}]");
+
+        AsRawFdFile::File(Utf8CStr::from_string(&mut outfile).create(O_WRONLY | O_TRUNC, 0o644)?)
+    };
+
+    decompress_bytes_fd(format, &buf, raw_in.as_raw_fd(), raw_out.as_raw_fd());
+
+    if rm_in {
+        Utf8CStr::from_string(infile).remove()?;
+    }
+
+    Ok(())
+}
+
+pub(crate) fn compress(
+    method: FileFormat,
+    infile: &mut String,
+    outfile: Option<&mut String>,
+) -> LoggedResult<()> {
+    if method == FileFormat::UNKNOWN {
+        error!("Unsupported compression format");
+    }
+
+    let in_std = infile == "-";
+    let mut rm_in = false;
+
+    let raw_in = if in_std {
+        AsRawFdFile::Stdin(stdin())
+    } else {
+        AsRawFdFile::File(Utf8CStr::from_string(infile).open(O_RDONLY)?)
+    };
+
+    let raw_out = if let Some(outfile) = outfile {
+        if outfile == "-" {
+            AsRawFdFile::Stdout(stdout())
+        } else {
+            AsRawFdFile::File(Utf8CStr::from_string(outfile).create(O_WRONLY | O_TRUNC, 0o644)?)
+        }
+    } else if in_std {
+        AsRawFdFile::Stdout(stdout())
+    } else {
+        let mut outfile = format!("{infile}.{}", method.ext());
+        eprintln!("Compressing to [{outfile}]");
+        rm_in = true;
+        AsRawFdFile::File(Utf8CStr::from_string(&mut outfile).create(O_WRONLY | O_TRUNC, 0o644)?)
+    };
+
+    compress_fd(method, raw_in.as_raw_fd(), raw_out.as_raw_fd());
+
+    if rm_in {
+        Utf8CStr::from_string(infile).remove()?;
+    }
+    Ok(())
 }

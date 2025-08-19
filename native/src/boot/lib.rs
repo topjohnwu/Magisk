@@ -4,12 +4,8 @@
 #![feature(try_blocks)]
 
 pub use base;
-use compress::{compress_bytes, compress_fd, decompress_bytes, decompress_bytes_fd};
-use cpio::cpio_commands;
-use dtb::dtb_commands;
-use patch::hexpatch;
-use payload::extract_boot_from_payload;
-use sign::{SHA, get_sha, sha1_hash, sha256_hash, sign_boot_image, verify_boot_image};
+use compress::{compress_bytes, decompress_bytes};
+use sign::{SHA, get_sha, sha256_hash, sign_boot_image, verify_boot_image};
 use std::env;
 
 mod compress;
@@ -18,6 +14,8 @@ mod dtb;
 mod patch;
 mod payload;
 // Suppress warnings in generated code
+mod cli;
+mod format;
 #[allow(warnings)]
 mod proto;
 mod sign;
@@ -68,6 +66,19 @@ pub mod ffi {
         fn payload(self: &BootImage) -> &[u8];
         #[cxx_name = "get_tail"]
         fn tail(self: &BootImage) -> &[u8];
+
+        include!("magiskboot.hpp");
+        fn cleanup();
+        fn unpack(image: Utf8CStrRef, skip_decomp: bool, hdr: bool) -> i32;
+        fn repack(src_img: Utf8CStrRef, out_img: Utf8CStrRef, skip_comp: bool);
+        unsafe fn verify(image: Utf8CStrRef, cert: *const c_char) -> i32;
+        unsafe fn sign(
+            image: Utf8CStrRef,
+            name: Utf8CStrRef,
+            cert: *const c_char,
+            key: *const c_char,
+        ) -> i32;
+        fn split_image_dtb(filename: Utf8CStrRef, skip_decomp: bool) -> i32;
     }
 
     extern "Rust" {
@@ -76,33 +87,22 @@ pub mod ffi {
         fn update(self: &mut SHA, data: &[u8]);
         fn finalize_into(self: &mut SHA, out: &mut [u8]);
         fn output_size(self: &SHA) -> usize;
-        fn sha1_hash(data: &[u8], out: &mut [u8]);
         fn sha256_hash(data: &[u8], out: &mut [u8]);
 
-        fn hexpatch(file: &[u8], from: &[u8], to: &[u8]) -> bool;
-        fn compress_fd(format: FileFormat, in_fd: i32, out_fd: i32);
         fn compress_bytes(format: FileFormat, in_bytes: &[u8], out_fd: i32);
         fn decompress_bytes(format: FileFormat, in_bytes: &[u8], out_fd: i32);
-        fn decompress_bytes_fd(format: FileFormat, in_bytes: &[u8], in_fd: i32, out_fd: i32);
     }
 
     #[namespace = "rust"]
     #[allow(unused_unsafe)]
     extern "Rust" {
-        fn extract_boot_from_payload(
-            partition: Utf8CStrRef,
-            in_path: Utf8CStrRef,
-            out_path: Utf8CStrRef,
-        ) -> bool;
-        unsafe fn cpio_commands(argc: i32, argv: *const *const c_char) -> bool;
-        unsafe fn verify_boot_image(img: &BootImage, cert: *const c_char) -> bool;
         unsafe fn sign_boot_image(
             payload: &[u8],
             name: *const c_char,
             cert: *const c_char,
             key: *const c_char,
         ) -> Vec<u8>;
-        unsafe fn dtb_commands(argc: i32, argv: *const *const c_char) -> bool;
+        unsafe fn verify_boot_image(img: &BootImage, cert: *const c_char) -> bool;
     }
 }
 
