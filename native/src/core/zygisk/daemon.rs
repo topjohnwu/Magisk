@@ -1,12 +1,12 @@
 use crate::consts::MODULEROOT;
 use crate::daemon::{MagiskD, to_user_id};
 use crate::ffi::{
-    ZygiskRequest, ZygiskStateFlags, get_magisk_tmp, restore_zygisk_prop, set_zygisk_prop, update_deny_flags,
+    ZygiskRequest, ZygiskStateFlags, get_magisk_tmp, get_prop, set_prop, update_deny_flags,
 };
 use crate::socket::{IpcRead, UnixSocketExt};
 use base::libc::{O_CLOEXEC, O_CREAT, O_RDONLY, STDOUT_FILENO};
 use base::{
-    Directory, FsPathBuilder, LoggedError, LoggedResult, ResultExt, WriteExt, cstr, error,
+    Directory, FsPathBuilder, LoggedError, LoggedResult, ResultExt, Utf8CStr, WriteExt, cstr,
     fork_dont_care, libc, raw_cstr, warn,
 };
 use std::fmt::Write;
@@ -15,6 +15,8 @@ use std::os::unix::net::UnixStream;
 use std::ptr;
 use std::sync::atomic::Ordering;
 
+const NBPROP: &Utf8CStr = cstr!("ro.dalvik.vm.native.bridge");
+const ZYGISKLDR: &str = "libzygisk.so";
 const UNMOUNT_MASK: u32 =
     ZygiskStateFlags::ProcessOnDenyList.repr | ZygiskStateFlags::DenyListEnforced.repr;
 
@@ -56,6 +58,105 @@ fn exec_zygiskd(is_64_bit: bool, remote: UnixStream) {
     }
 }
 
+#[derive(Default)]
+pub struct ZygiskState {
+    pub lib_name: String,
+    sockets: (Option<UnixStream>, Option<UnixStream>),
+    start_count: u32 = 1,
+}
+
+impl ZygiskState {
+    fn connect_zygiskd(&mut self, mut client: UnixStream, daemon: &MagiskD) -> LoggedResult<()> {
+        let is_64_bit: bool = client.read_decodable()?;
+        let socket = if is_64_bit {
+            &mut self.sockets.1
+        } else {
+            &mut self.sockets.0
+        };
+
+        if let Some(fd) = socket {
+            // Make sure the socket is still valid
+            let mut pfd = libc::pollfd {
+                fd: fd.as_raw_fd(),
+                events: 0,
+                revents: 0,
+            };
+            if unsafe { libc::poll(&mut pfd, 1, 0) } != 0 || pfd.revents != 0 {
+                // Any revent means error
+                *socket = None;
+            }
+        }
+
+        let socket = if let Some(fd) = socket {
+            fd
+        } else {
+            // Create a new socket pair and fork zygiskd process
+            let (local, remote) = UnixStream::pair()?;
+            if fork_dont_care() == 0 {
+                exec_zygiskd(is_64_bit, remote);
+            }
+            *socket = Some(local);
+            let local = socket.as_mut().unwrap();
+            if let Some(module_fds) = daemon.get_module_fds(is_64_bit) {
+                local.send_fds(&module_fds)?;
+            }
+            if local.read_decodable::<i32>()? != 0 {
+                Err(LoggedError::default())?;
+            }
+            local
+        };
+        socket.send_fds(&[client.as_raw_fd()])?;
+        Ok(())
+    }
+
+    pub fn reset(&mut self, mut restore: bool) {
+        if restore {
+            self.start_count = 1;
+        } else {
+            self.sockets = (None, None);
+            self.start_count += 1;
+            if self.start_count > 3 {
+                warn!("zygote crashed too many times, rolling-back");
+                restore = true;
+            }
+        }
+
+        if restore {
+            self.restore_prop();
+        } else {
+            self.set_prop();
+        }
+    }
+
+    pub fn set_prop(&mut self) {
+        if !self.lib_name.is_empty() {
+            return;
+        }
+        let orig = get_prop(NBPROP, false);
+        self.lib_name = if orig.is_empty() || orig == "0" {
+            ZYGISKLDR.to_string()
+        } else {
+            orig + ZYGISKLDR
+        };
+        set_prop(NBPROP, Utf8CStr::from_string(&mut self.lib_name), false);
+        // Whether Huawei's Maple compiler is enabled.
+        // If so, system server will be created by a special Zygote which ignores the native bridge
+        // and make system server out of our control. Avoid it by disabling.
+        if get_prop(cstr!("ro.maple.enable"), false) == "1" {
+            set_prop(cstr!("ro.maple.enable"), cstr!("0"), false);
+        }
+    }
+
+    fn restore_prop(&mut self) {
+        let mut orig = "0".to_string();
+        if self.lib_name.len() > ZYGISKLDR.len() {
+            orig = self.lib_name[ZYGISKLDR.len()..].to_string();
+        }
+        set_prop(NBPROP, Utf8CStr::from_string(&mut orig), false);
+        self.lib_name.clear();
+    }
+}
+
 impl MagiskD {
     pub fn zygisk_handler(&self, client: i32) {
         let mut client = unsafe { UnixStream::from_raw_fd(client) };
@@ -65,33 +166,16 @@ impl MagiskD {
             };
             match code {
                 ZygiskRequest::GetInfo => self.get_process_info(client)?,
-                ZygiskRequest::ConnectCompanion => self.connect_zygiskd(client),
+                ZygiskRequest::ConnectCompanion => self
+                    .zygisk
+                    .lock()
+                    .unwrap()
+                    .connect_zygiskd(client, self)
+                    .log_with_msg(|w| w.write_str("zygiskd startup error"))?,
                 ZygiskRequest::GetModDir => self.get_mod_dir(client)?,
                 _ => {}
             }
         };
-    }
-
-    pub fn zygisk_reset(&self, mut restore: bool) {
-        if !self.zygisk_enabled.load(Ordering::Acquire) {
-            return;
-        }
-
-        if restore {
-            self.zygote_start_count.store(1, Ordering::Release);
-        } else {
-            *self.zygiskd_sockets.lock().unwrap() = (None, None);
-            if self.zygote_start_count.fetch_add(1, Ordering::AcqRel) > 3 {
-                warn!("zygote crashes too many times, rolling-back");
-                restore = true;
-            }
-        }
-
-        if restore {
-            restore_zygisk_prop();
-        } else {
-            set_zygisk_prop();
-        }
     }
 
     fn get_module_fds(&self, is_64_bit: bool) -> Option<Vec<RawFd>> {
@@ -105,54 +189,6 @@ impl MagiskD {
                 .map(|fd| if fd < 0 { STDOUT_FILENO } else { fd })
                 .collect()
         })
-    }
-
-    fn connect_zygiskd(&self, mut client: UnixStream) {
-        let mut zygiskd_sockets = self.zygiskd_sockets.lock().unwrap();
-        let result: LoggedResult<()> = try {
-            let is_64_bit: bool = client.read_decodable()?;
-            let socket = if is_64_bit {
-                &mut zygiskd_sockets.1
-            } else {
-                &mut zygiskd_sockets.0
-            };
-
-            if let Some(fd) = socket {
-                // Make sure the socket is still valid
-                let mut pfd = libc::pollfd {
-                    fd: fd.as_raw_fd(),
-                    events: 0,
-                    revents: 0,
-                };
-                if unsafe { libc::poll(&mut pfd, 1, 0) } != 0 || pfd.revents != 0 {
-                    // Any revent means error
-                    *socket = None;
-                }
-            }
-
-            let socket = if let Some(fd) = socket {
-                fd
-            } else {
-                // Create a new socket pair and fork zygiskd process
-                let (local, remote) = UnixStream::pair()?;
-                if fork_dont_care() == 0 {
-                    exec_zygiskd(is_64_bit, remote);
-                }
-                *socket = Some(local);
-                let local = socket.as_mut().unwrap();
-                if let Some(module_fds) = self.get_module_fds(is_64_bit) {
-                    local.send_fds(&module_fds)?;
-                }
-                if local.read_decodable::<i32>()? != 0 {
-                    Err(LoggedError::default())?;
-                }
-                local
-            };
-            socket.send_fds(&[client.as_raw_fd()])?;
-        };
-        if result.is_err() {
-            error!("zygiskd startup error");
-        }
     }
 
     fn get_process_info(&self, mut client: UnixStream) -> LoggedResult<()> {
@@ -212,5 +248,20 @@ impl MagiskD {
         let fd = dir.open(O_RDONLY | O_CLOEXEC)?;
         client.send_fds(&[fd.as_raw_fd()])?;
         Ok(())
+    }
+}
+
+// FFI to C++
+impl MagiskD {
+    pub fn zygisk_enabled(&self) -> bool {
+        self.zygisk_enabled.load(Ordering::Acquire)
+    }
+
+    pub fn zygisk_reset(&self, restore: bool) {
+        self.zygisk.lock().unwrap().reset(restore);
+    }
+
+    pub fn restore_zygisk_prop(&self) {
+        self.zygisk.lock().unwrap().restore_prop();
     }
 }

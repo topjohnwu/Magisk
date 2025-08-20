@@ -1,3 +1,3 @@
 mod daemon;
 
-pub use daemon::zygisk_should_load_module;
+pub use daemon::{ZygiskState, zygisk_should_load_module};

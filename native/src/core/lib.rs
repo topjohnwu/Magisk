@@ -3,6 +3,7 @@
 #![feature(fn_traits)]
 #![feature(unix_socket_ancillary_data)]
 #![feature(unix_socket_peek)]
+#![feature(default_field_values)]
 #![allow(clippy::missing_safety_doc)]
 
 use crate::ffi::SuRequest;
@@ -148,9 +149,6 @@ pub mod ffi {
         fn uninstall_pkg(apk: Utf8CStrRef);
         fn update_deny_flags(uid: i32, process: &str, flags: &mut u32);
         fn initialize_denylist();
-        fn get_zygisk_lib_name() -> &'static str;
-        fn set_zygisk_prop();
-        fn restore_zygisk_prop();
         fn switch_mnt_ns(pid: i32) -> i32;
         fn exec_root_shell(client: i32, pid: i32, req: &mut SuRequest, mode: MntNsMode);
 
@@ -228,6 +226,7 @@ pub mod ffi {
         fn boot_stage_handler(&self, client: i32, code: i32);
         fn zygisk_handler(&self, client: i32);
         fn zygisk_reset(&self, restore: bool);
+        fn restore_zygisk_prop(&self);
         fn prune_su_access(&self);
         fn su_daemon_handler(&self, client: i32, cred: &UCred);
         #[cxx_name = "get_manager"]
