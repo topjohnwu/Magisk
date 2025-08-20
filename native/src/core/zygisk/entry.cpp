@@ -115,7 +115,7 @@ rust::Str get_zygisk_lib_name() {
 }
 
 void set_zygisk_prop() {
-    string native_bridge_orig = get_prop(NBPROP);
+    static string native_bridge_orig = get_prop(NBPROP);
     if (native_bridge_orig.empty()) {
         native_bridge_orig = "0";
     }
