@@ -10,7 +10,7 @@
 
 using namespace std;
 
-static string zygisk_lib_name = "0";
+static string zygisk_lib_name;
 
 static void zygiskd(int socket) {
     if (getuid() != 0 || fcntl(socket, F_GETFD) < 0)
@@ -115,6 +115,8 @@ rust::Str get_zygisk_lib_name() {
 }
 
 void set_zygisk_prop() {
+    if (!zygisk_lib_name.empty())
+        return;
     string native_bridge_orig = get_prop(NBPROP);
     if (native_bridge_orig.empty()) {
         native_bridge_orig = "0";
@@ -135,4 +137,5 @@ void restore_zygisk_prop() {
         native_bridge_orig = zygisk_lib_name.substr(strlen(ZYGISKLDR));
     }
     set_prop(NBPROP, native_bridge_orig.data());
+    zygisk_lib_name.clear();
 }
