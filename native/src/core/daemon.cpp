@@ -218,7 +218,7 @@ static void handle_request_sync(int client, int code) {
         denylist_handler(-1, nullptr);
 
         // Restore native bridge property
-        restore_zygisk_prop();
+        MagiskD::Get().restore_zygisk_prop();
 
         write_int(client, 0);
 

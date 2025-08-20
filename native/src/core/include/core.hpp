@@ -35,11 +35,6 @@ void unlock_blocks();
 bool setup_magisk_env();
 bool check_key_combo();
 
-// Zygisk daemon
-rust::Str get_zygisk_lib_name();
-void set_zygisk_prop();
-void restore_zygisk_prop();
-
 // Sockets
 struct sock_cred : public ucred {
     std::string context;

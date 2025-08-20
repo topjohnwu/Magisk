@@ -10,15 +10,15 @@ use crate::mount::{clean_mounts, setup_preinit_dir};
 use crate::package::ManagerInfo;
 use crate::selinux::restore_tmpcon;
 use crate::su::SuInfo;
+use crate::zygisk::ZygiskState;
 use base::libc::{O_APPEND, O_CLOEXEC, O_RDONLY, O_WRONLY};
 use base::{
     AtomicArc, BufReadExt, FsPathBuilder, ResultExt, Utf8CStr, Utf8CStrBuf, cstr, error, info, libc,
 };
 use std::fmt::Write as FmtWrite;
 use std::io::{BufReader, Write};
-use std::os::unix::net::UnixStream;
 use std::process::Command;
-use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Mutex, OnceLock};
 
 // Global magiskd singleton
@@ -66,9 +66,8 @@ pub struct MagiskD {
     pub manager_info: Mutex<ManagerInfo>,
     boot_stage_lock: Mutex<BootStateFlags>,
     pub module_list: OnceLock<Vec<ModuleInfo>>,
-    pub zygiskd_sockets: Mutex<(Option<UnixStream>, Option<UnixStream>)>,
     pub zygisk_enabled: AtomicBool,
-    pub zygote_start_count: AtomicU32,
+    pub zygisk: Mutex<ZygiskState>,
     pub cached_su_info: AtomicArc<SuInfo>,
     sdk_int: i32,
     pub is_emulator: bool,
@@ -78,10 +77,6 @@ pub struct MagiskD {
 impl MagiskD {
     pub fn get() -> &'static MagiskD {
         unsafe { MAGISKD.get().unwrap_unchecked() }
-    }
-
-    pub fn zygisk_enabled(&self) -> bool {
-        self.zygisk_enabled.load(Ordering::Acquire)
     }
 
     pub fn sdk_int(&self) -> i32 {
@@ -175,7 +170,7 @@ impl MagiskD {
 
         setup_preinit_dir();
         self.ensure_manager();
-        self.zygisk_reset(true)
+        self.zygisk.lock().unwrap().reset(true);
     }
 
     pub fn boot_stage_handler(&self, client: i32, code: i32) {
@@ -319,7 +314,6 @@ pub fn daemon_entry() {
         sdk_int,
         is_emulator,
         is_recovery,
-        zygote_start_count: AtomicU32::new(1),
         ..Default::default()
     };
     MAGISKD.set(magiskd).ok();
