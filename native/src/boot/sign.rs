@@ -25,8 +25,7 @@ use x509_cert::der::Any;
 use x509_cert::der::asn1::{OctetString, PrintableString};
 use x509_cert::spki::AlgorithmIdentifier;
 
-use base::libc::c_char;
-use base::{LoggedResult, MappedFile, ResultExt, StrErr, Utf8CStr, log_err};
+use base::{LoggedError, LoggedResult, MappedFile, ResultExt, Utf8CStr, cstr, log_err};
 
 use crate::ffi::BootImage;
 
@@ -265,23 +264,27 @@ impl BootSignature {
     }
 }
 
-pub fn verify_boot_image(img: &BootImage, cert: *const c_char) -> bool {
-    let res: LoggedResult<()> = try {
-        let tail = img.tail();
+impl BootImage {
+    pub fn verify(&self, cert: Option<&Utf8CStr>) -> LoggedResult<()> {
+        let tail = self.tail();
+        if tail.starts_with(b"AVB0") {
+            return Err(LoggedError::default());
+        }
+
         // Don't use BootSignature::from_der because tail might have trailing zeros
         let mut reader = SliceReader::new(tail)?;
         let mut sig = BootSignature::decode(&mut reader)?;
-        match unsafe { Utf8CStr::from_ptr(cert) } {
-            Ok(s) => {
-                let pem = MappedFile::open(s)?;
-                sig.certificate = Certificate::from_pem(pem)?;
-            }
-            Err(StrErr::NullPointerError) => {}
-            Err(e) => Err(e)?,
+        if let Some(s) = cert {
+            let pem = MappedFile::open(s)?;
+            sig.certificate = Certificate::from_pem(pem)?;
         };
-        sig.verify(img.payload())?;
-    };
-    res.is_ok()
+
+        sig.verify(self.payload()).log()
+    }
+
+    pub fn verify_for_cxx(&self) -> bool {
+        self.verify(None).is_ok()
+    }
 }
 
 enum Bytes {
@@ -303,47 +306,44 @@ const VERITY_PK8: &[u8] = include_bytes!("../../../tools/keys/verity.pk8");
 
 pub fn sign_boot_image(
     payload: &[u8],
-    name: *const c_char,
-    cert: *const c_char,
-    key: *const c_char,
-) -> Vec<u8> {
-    let res: LoggedResult<Vec<u8>> = try {
-        // Process arguments
-        let name = unsafe { Utf8CStr::from_ptr(name) }?;
-        let cert = match unsafe { Utf8CStr::from_ptr(cert) } {
-            Ok(s) => Bytes::Mapped(MappedFile::open(s)?),
-            Err(StrErr::NullPointerError) => Bytes::Slice(VERITY_PEM),
-            Err(e) => Err(e)?,
-        };
-        let key = match unsafe { Utf8CStr::from_ptr(key) } {
-            Ok(s) => Bytes::Mapped(MappedFile::open(s)?),
-            Err(StrErr::NullPointerError) => Bytes::Slice(VERITY_PK8),
-            Err(e) => Err(e)?,
-        };
-
-        // Parse cert and private key
-        let cert = Certificate::from_pem(cert)?;
-        let mut signer = Signer::from_private_key(key.as_ref())?;
-
-        // Sign image
-        let attr = AuthenticatedAttributes {
-            target: PrintableString::new(name.as_bytes())?,
-            length: payload.len() as u64,
-        };
-        signer.update(payload);
-        signer.update(attr.to_der()?.as_slice());
-        let sig = signer.sign()?;
-
-        // Create BootSignature DER
-        let alg_id = cert.signature_algorithm().clone();
-        let sig = BootSignature {
-            format_version: 1,
-            certificate: cert,
-            algorithm_identifier: alg_id,
-            authenticated_attributes: attr,
-            signature: OctetString::new(sig)?,
-        };
-        sig.to_der()?
+    name: &Utf8CStr,
+    cert: Option<&Utf8CStr>,
+    key: Option<&Utf8CStr>,
+) -> LoggedResult<Vec<u8>> {
+    let cert = match cert {
+        Some(s) => Bytes::Mapped(MappedFile::open(s)?),
+        None => Bytes::Slice(VERITY_PEM),
     };
-    res.unwrap_or_default()
+    let key = match key {
+        Some(s) => Bytes::Mapped(MappedFile::open(s)?),
+        None => Bytes::Slice(VERITY_PK8),
+    };
+
+    // Parse cert and private key
+    let cert = Certificate::from_pem(cert)?;
+    let mut signer = Signer::from_private_key(key.as_ref())?;
+
+    // Sign image
+    let attr = AuthenticatedAttributes {
+        target: PrintableString::new(name.as_bytes())?,
+        length: payload.len() as u64,
+    };
+    signer.update(payload);
+    signer.update(attr.to_der()?.as_slice());
+    let sig = signer.sign()?;
+
+    // Create BootSignature DER
+    let alg_id = cert.signature_algorithm().clone();
+    let sig = BootSignature {
+        format_version: 1,
+        certificate: cert,
+        algorithm_identifier: alg_id,
+        authenticated_attributes: attr,
+        signature: OctetString::new(sig)?,
+    };
+    sig.to_der().log()
+}
+
+pub fn sign_payload_for_cxx(payload: &[u8]) -> Vec<u8> {
+    sign_boot_image(payload, cstr!("/boot"), None, None).unwrap_or_default()
 }

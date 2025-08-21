@@ -5,7 +5,8 @@
 
 pub use base;
 use compress::{compress_bytes, decompress_bytes};
-use sign::{SHA, get_sha, sha256_hash, sign_boot_image, verify_boot_image};
+use format::fmt2name;
+use sign::{SHA, get_sha, sha256_hash, sign_payload_for_cxx};
 use std::env;
 
 mod compress;
@@ -59,25 +60,10 @@ pub mod ffi {
         include!("format.hpp");
         fn check_fmt(buf: &[u8]) -> FileFormat;
 
-        include!("bootimg.hpp");
-        #[cxx_name = "boot_img"]
-        type BootImage;
-        #[cxx_name = "get_payload"]
-        fn payload(self: &BootImage) -> &[u8];
-        #[cxx_name = "get_tail"]
-        fn tail(self: &BootImage) -> &[u8];
-
         include!("magiskboot.hpp");
         fn cleanup();
         fn unpack(image: Utf8CStrRef, skip_decomp: bool, hdr: bool) -> i32;
         fn repack(src_img: Utf8CStrRef, out_img: Utf8CStrRef, skip_comp: bool);
-        unsafe fn verify(image: Utf8CStrRef, cert: *const c_char) -> i32;
-        unsafe fn sign(
-            image: Utf8CStrRef,
-            name: Utf8CStrRef,
-            cert: *const c_char,
-            key: *const c_char,
-        ) -> i32;
         fn split_image_dtb(filename: Utf8CStrRef, skip_decomp: bool) -> i32;
     }
 
@@ -91,18 +77,32 @@ pub mod ffi {
 
         fn compress_bytes(format: FileFormat, in_bytes: &[u8], out_fd: i32);
         fn decompress_bytes(format: FileFormat, in_bytes: &[u8], out_fd: i32);
+        fn fmt2name(fmt: FileFormat) -> *const c_char;
+
+        #[cxx_name = "sign_payload"]
+        fn sign_payload_for_cxx(payload: &[u8]) -> Vec<u8>;
     }
 
-    #[namespace = "rust"]
-    #[allow(unused_unsafe)]
+    // BootImage FFI
+    unsafe extern "C++" {
+        include!("bootimg.hpp");
+        #[cxx_name = "boot_img"]
+        type BootImage;
+
+        #[cxx_name = "get_payload"]
+        fn payload(self: &BootImage) -> &[u8];
+        #[cxx_name = "get_tail"]
+        fn tail(self: &BootImage) -> &[u8];
+        fn is_signed(self: &BootImage) -> bool;
+        fn tail_off(self: &BootImage) -> u64;
+
+        #[Self = BootImage]
+        #[cxx_name = "create"]
+        fn new(img: Utf8CStrRef) -> UniquePtr<BootImage>;
+    }
     extern "Rust" {
-        unsafe fn sign_boot_image(
-            payload: &[u8],
-            name: *const c_char,
-            cert: *const c_char,
-            key: *const c_char,
-        ) -> Vec<u8>;
-        unsafe fn verify_boot_image(img: &BootImage, cert: *const c_char) -> bool;
+        #[cxx_name = "verify"]
+        fn verify_for_cxx(self: &BootImage) -> bool;
     }
 }
 

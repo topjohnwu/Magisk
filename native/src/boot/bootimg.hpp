@@ -676,7 +676,12 @@ struct boot_img {
     std::pair<const uint8_t *, dyn_img_hdr *> create_hdr(const uint8_t *addr, FileFormat type);
 
     // Rust FFI
+    static std::unique_ptr<boot_img> create(rust::Utf8CStr name) { return std::make_unique<boot_img>(name.c_str()); }
     rust::Slice<const uint8_t> get_payload() const { return payload; }
     rust::Slice<const uint8_t> get_tail() const { return tail; }
-    bool verify(const char *cert = nullptr) const;
+    bool is_signed() const { return flags[AVB1_SIGNED_FLAG]; }
+    uint64_t tail_off() const { return tail.buf() - map.buf(); }
+
+    // Implemented in Rust
+    bool verify() const noexcept;
 };

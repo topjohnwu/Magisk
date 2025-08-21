@@ -1,7 +1,5 @@
 #pragma once
 
-#include <string_view>
-
 enum class FileFormat : ::std::uint8_t;
 
 #define COMPRESSED(fmt)      ((+fmt) >= +FileFormat::GZIP && (+fmt) < +FileFormat::LZOP)
@@ -9,6 +7,7 @@ enum class FileFormat : ::std::uint8_t;
 
 #define BUFFER_MATCH(buf, s) (memcmp(buf, s, sizeof(s) - 1) == 0)
 #define BUFFER_CONTAIN(buf, sz, s) (memmem(buf, sz, s, sizeof(s) - 1) != nullptr)
+#define CHECKED_MATCH(s) (len >= (sizeof(s) - 1) && BUFFER_MATCH(buf, s))
 
 #define BOOT_MAGIC      "ANDROID!"
 #define VENDOR_BOOT_MAGIC "VNDRBOOT"
@@ -41,20 +40,8 @@ enum class FileFormat : ::std::uint8_t;
 #define AVB_MAGIC "AVB0"
 #define ZIMAGE_MAGIC "\x18\x28\x6f\x01"
 
-class Fmt2Name {
-public:
-    const char *operator[](FileFormat fmt);
-};
-
-class Name2Fmt {
-public:
-    FileFormat operator[](std::string_view name);
-};
-
 FileFormat check_fmt(const void *buf, size_t len);
 
 static inline FileFormat check_fmt(rust::Slice<const uint8_t> bytes) {
     return check_fmt(bytes.data(), bytes.size());
 }
-
-extern Fmt2Name fmt2name;
