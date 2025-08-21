@@ -23,12 +23,12 @@ impl FromStr for FileFormat {
 
 impl Display for FileFormat {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        f.write_str(self.to_cstr())
+        f.write_str(self.as_cstr())
     }
 }
 
 impl FileFormat {
-    fn to_cstr(&self) -> &'static Utf8CStr {
+    fn as_cstr(&self) -> &'static Utf8CStr {
         match *self {
             Self::GZIP => cstr!("gzip"),
             Self::ZOPFLI => cstr!("zopfli"),
@@ -44,10 +44,6 @@ impl FileFormat {
             _ => cstr!("raw"),
         }
     }
-}
-
-pub fn fmt2name(fmt: FileFormat) -> *const libc::c_char {
-    fmt.to_cstr().as_ptr()
 }
 
 impl FileFormat {
@@ -68,7 +64,6 @@ impl FileFormat {
             *self,
             Self::GZIP
                 | Self::ZOPFLI
-                | Self::LZOP
                 | Self::XZ
                 | Self::LZMA
                 | Self::BZIP2
@@ -88,9 +83,22 @@ impl FileFormat {
             Self::LZ4,
             Self::LZ4_LEGACY,
             Self::LZ4_LG,
-            Self::LZOP,
         ]
         .map(|f| f.to_string())
         .join(" ")
     }
+}
+
+// C++ FFI
+
+pub fn fmt2name(fmt: FileFormat) -> *const libc::c_char {
+    fmt.as_cstr().as_ptr()
+}
+
+pub fn fmt_compressed(fmt: FileFormat) -> bool {
+    fmt.is_compressed()
+}
+
+pub fn fmt_compressed_any(fmt: FileFormat) -> bool {
+    fmt.is_compressed() || matches!(fmt, FileFormat::LZOP)
 }
