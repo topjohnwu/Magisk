@@ -87,7 +87,6 @@ LOCAL_STATIC_LIBRARIES := \
 
 LOCAL_SRC_FILES := \
     boot/bootimg.cpp \
-    boot/format.cpp \
     boot/boot-rs.cpp
 
 LOCAL_LDFLAGS := -static

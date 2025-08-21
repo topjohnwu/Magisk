@@ -1,4 +1,5 @@
 use crate::ffi::FileFormat;
+use base::{Utf8CStr, cstr, libc};
 use std::fmt::{Display, Formatter};
 use std::str::FromStr;
 
@@ -22,21 +23,31 @@ impl FromStr for FileFormat {
 
 impl Display for FileFormat {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.to_cstr())
+    }
+}
+
+impl FileFormat {
+    fn to_cstr(&self) -> &'static Utf8CStr {
         match *self {
-            Self::GZIP => write!(f, "gzip"),
-            Self::ZOPFLI => write!(f, "zopfli"),
-            Self::LZOP => write!(f, "lzop"),
-            Self::XZ => write!(f, "xz"),
-            Self::LZMA => write!(f, "lzma"),
-            Self::BZIP2 => write!(f, "bzip2"),
-            Self::LZ4 => write!(f, "lz4"),
-            Self::LZ4_LEGACY => write!(f, "lz4_legacy"),
-            Self::LZ4_LG => write!(f, "lz4_lg"),
-            Self::DTB => write!(f, "dtb"),
-            Self::ZIMAGE => write!(f, "zimage"),
-            _ => write!(f, "raw"),
+            Self::GZIP => cstr!("gzip"),
+            Self::ZOPFLI => cstr!("zopfli"),
+            Self::LZOP => cstr!("lzop"),
+            Self::XZ => cstr!("xz"),
+            Self::LZMA => cstr!("lzma"),
+            Self::BZIP2 => cstr!("bzip2"),
+            Self::LZ4 => cstr!("lz4"),
+            Self::LZ4_LEGACY => cstr!("lz4_legacy"),
+            Self::LZ4_LG => cstr!("lz4_lg"),
+            Self::DTB => cstr!("dtb"),
+            Self::ZIMAGE => cstr!("zimage"),
+            _ => cstr!("raw"),
         }
     }
+}
+
+pub fn fmt2name(fmt: FileFormat) -> *const libc::c_char {
+    fmt.to_cstr().as_ptr()
 }
 
 impl FileFormat {
