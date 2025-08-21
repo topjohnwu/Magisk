@@ -243,7 +243,6 @@ Supported actions:
     If [outfile] is not specified, then <infile> will be replaced
     with another file suffixed with a matching file extension.
     Supported formats:
-
     {1}
 
   decompress <infile> [outfile]
@@ -252,7 +251,6 @@ Supported actions:
     If [outfile] is not specified, then <infile> will be replaced
     with another file removing its archive format file extension.
     Supported formats:
-
     {1}
 "#,
         cmd,

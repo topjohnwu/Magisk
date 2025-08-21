@@ -5,18 +5,18 @@
 
 pub use base;
 use compress::{compress_bytes, decompress_bytes};
-use format::fmt2name;
+use format::{fmt_compressed, fmt_compressed_any, fmt2name};
 use sign::{SHA, get_sha, sha256_hash, sign_payload_for_cxx};
 use std::env;
 
+mod cli;
 mod compress;
 mod cpio;
 mod dtb;
+mod format;
 mod patch;
 mod payload;
 // Suppress warnings in generated code
-mod cli;
-mod format;
 #[allow(warnings)]
 mod proto;
 mod sign;
@@ -78,6 +78,8 @@ pub mod ffi {
         fn compress_bytes(format: FileFormat, in_bytes: &[u8], out_fd: i32);
         fn decompress_bytes(format: FileFormat, in_bytes: &[u8], out_fd: i32);
         fn fmt2name(fmt: FileFormat) -> *const c_char;
+        fn fmt_compressed(fmt: FileFormat) -> bool;
+        fn fmt_compressed_any(fmt: FileFormat) -> bool;
 
         #[cxx_name = "sign_payload"]
         fn sign_payload_for_cxx(payload: &[u8]) -> Vec<u8>;

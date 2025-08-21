@@ -588,7 +588,7 @@ int split_image_dtb(rust::Utf8CStr filename, bool skip_decomp) {
 
     if (size_t off = find_dtb_offset(img.buf(), img.sz()); off > 0) {
         FileFormat fmt = check_fmt_lg(img.buf(), img.sz());
-        if (!skip_decomp && COMPRESSED(fmt)) {
+        if (!skip_decomp && fmt_compressed(fmt)) {
             int fd = creat(KERNEL_FILE, 0644);
             decompress(fmt, fd, img.buf(), off);
             close(fd);
@@ -610,7 +610,7 @@ int unpack(rust::Utf8CStr image, bool skip_decomp, bool hdr) {
         boot.hdr->dump_hdr_file();
 
     // Dump kernel
-    if (!skip_decomp && COMPRESSED(boot.k_fmt)) {
+    if (!skip_decomp && fmt_compressed(boot.k_fmt)) {
         if (boot.hdr->kernel_size() != 0) {
             int fd = creat(KERNEL_FILE, 0644);
             decompress(boot.k_fmt, fd, boot.kernel, boot.hdr->kernel_size());
@@ -641,13 +641,13 @@ int unpack(rust::Utf8CStr image, bool skip_decomp, bool hdr) {
             }
             owned_fd fd = xopenat(dirfd, file_name, O_CREAT | O_TRUNC | O_WRONLY | O_CLOEXEC, 0644);
             FileFormat fmt = check_fmt_lg(boot.ramdisk + it.ramdisk_offset, it.ramdisk_size);
-            if (!skip_decomp && COMPRESSED(fmt)) {
+            if (!skip_decomp && fmt_compressed(fmt)) {
                 decompress(fmt, fd, boot.ramdisk + it.ramdisk_offset, it.ramdisk_size);
             } else {
                 xwrite(fd, boot.ramdisk + it.ramdisk_offset, it.ramdisk_size);
             }
         }
-    } else if (!skip_decomp && COMPRESSED(boot.r_fmt)) {
+    } else if (!skip_decomp && fmt_compressed(boot.r_fmt)) {
         if (boot.hdr->ramdisk_size() != 0) {
             int fd = creat(RAMDISK_FILE, 0644);
             decompress(boot.r_fmt, fd, boot.ramdisk, boot.hdr->ramdisk_size());
@@ -661,7 +661,7 @@ int unpack(rust::Utf8CStr image, bool skip_decomp, bool hdr) {
     dump(boot.second, boot.hdr->second_size(), SECOND_FILE);
 
     // Dump extra
-    if (!skip_decomp && COMPRESSED(boot.e_fmt)) {
+    if (!skip_decomp && fmt_compressed(boot.e_fmt)) {
         if (boot.hdr->extra_size() != 0) {
             int fd = creat(EXTRA_FILE, 0644);
             decompress(boot.e_fmt, fd, boot.extra, boot.hdr->extra_size());
@@ -748,7 +748,7 @@ void repack(rust::Utf8CStr src_img, rust::Utf8CStr out_img, bool skip_comp) {
     }
     if (access(KERNEL_FILE, R_OK) == 0) {
         mmap_data m(KERNEL_FILE);
-        if (!skip_comp && !COMPRESSED_ANY(check_fmt(m.buf(), m.sz())) && COMPRESSED(boot.k_fmt)) {
+        if (!skip_comp && !fmt_compressed_any(check_fmt(m.buf(), m.sz())) && fmt_compressed(boot.k_fmt)) {
             // Always use zopfli for zImage compression
             auto fmt = (boot.flags[ZIMAGE_KERNEL] && boot.k_fmt == FileFormat::GZIP) ? FileFormat::ZOPFLI : boot.k_fmt;
             hdr->kernel_size() = compress_len(fmt, m, fd);
@@ -816,7 +816,7 @@ void repack(rust::Utf8CStr src_img, rust::Utf8CStr out_img, bool skip_comp) {
             mmap_data m(dirfd, file_name);
             FileFormat fmt = check_fmt_lg(boot.ramdisk + it.ramdisk_offset, it.ramdisk_size);
             it.ramdisk_offset = ramdisk_offset;
-            if (!skip_comp && !COMPRESSED_ANY(check_fmt(m.buf(), m.sz())) && COMPRESSED(fmt)) {
+            if (!skip_comp && !fmt_compressed_any(check_fmt(m.buf(), m.sz())) && fmt_compressed(fmt)) {
                 it.ramdisk_size = compress_len(fmt, m, fd);
             } else {
                 it.ramdisk_size = xwrite(fd, m.buf(), m.sz());
@@ -836,7 +836,7 @@ void repack(rust::Utf8CStr src_img, rust::Utf8CStr out_img, bool skip_comp) {
             fprintf(stderr, "RAMDISK_FMT: [%s] -> [%s]\n", fmt2name(r_fmt), fmt2name(FileFormat::LZ4_LEGACY));
             r_fmt = FileFormat::LZ4_LEGACY;
         }
-        if (!skip_comp && !COMPRESSED_ANY(check_fmt(m.buf(), m.sz())) && COMPRESSED(r_fmt)) {
+        if (!skip_comp && !fmt_compressed_any(check_fmt(m.buf(), m.sz())) && fmt_compressed(r_fmt)) {
             hdr->ramdisk_size() = compress_len(r_fmt, m, fd);
         } else {
             hdr->ramdisk_size() = xwrite(fd, m.buf(), m.sz());
@@ -855,7 +855,7 @@ void repack(rust::Utf8CStr src_img, rust::Utf8CStr out_img, bool skip_comp) {
     off.extra = lseek(fd, 0, SEEK_CUR);
     if (access(EXTRA_FILE, R_OK) == 0) {
         mmap_data m(EXTRA_FILE);
-        if (!skip_comp && !COMPRESSED_ANY(check_fmt(m.buf(), m.sz())) && COMPRESSED(boot.e_fmt)) {
+        if (!skip_comp && !fmt_compressed_any(check_fmt(m.buf(), m.sz())) && fmt_compressed(boot.e_fmt)) {
             hdr->extra_size() = compress_len(boot.e_fmt, m, fd);
         } else {
             hdr->extra_size() = xwrite(fd, m.buf(), m.sz());

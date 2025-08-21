@@ -2,9 +2,6 @@
 
 enum class FileFormat : ::std::uint8_t;
 
-#define COMPRESSED(fmt)      ((+fmt) >= +FileFormat::GZIP && (+fmt) < +FileFormat::LZOP)
-#define COMPRESSED_ANY(fmt)  ((+fmt) >= +FileFormat::GZIP && (+fmt) <= +FileFormat::LZOP)
-
 #define BUFFER_MATCH(buf, s) (memcmp(buf, s, sizeof(s) - 1) == 0)
 #define BUFFER_CONTAIN(buf, sz, s) (memmem(buf, sz, s, sizeof(s) - 1) != nullptr)
 #define CHECKED_MATCH(s) (len >= (sizeof(s) - 1) && BUFFER_MATCH(buf, s))
