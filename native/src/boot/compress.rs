@@ -9,6 +9,7 @@ use lz4::{
     BlockMode, BlockSize, ContentChecksum, Decoder as LZ4FrameDecoder, Encoder as LZ4FrameEncoder,
     EncoderBuilder as LZ4FrameEncoderBuilder, block::CompressionMode, liblz4::BlockChecksum,
 };
+use lzma_rust2::{CheckType, LZMAOptions, LZMAReader, LZMAWriter, XZOptions, XZReader, XZWriter};
 use std::cmp::min;
 use std::fmt::Write as FmtWrite;
 use std::fs::File;
@@ -17,11 +18,6 @@ use std::mem::ManuallyDrop;
 use std::num::NonZeroU64;
 use std::ops::DerefMut;
 use std::os::fd::{FromRawFd, RawFd};
-use xz2::{
-    read::XzDecoder,
-    stream::{Check as LzmaCheck, Filters as LzmaFilters, LzmaOptions, Stream as LzmaStream},
-    write::XzEncoder,
-};
 use zopfli::{BlockType, GzipEncoder as ZopFliEncoder, Options as ZopfliOptions};
 
 pub trait WriteFinish<W: Write>: Write {
@@ -40,7 +36,7 @@ macro_rules! finish_impl {
     )*}
 }
 
-finish_impl!(GzEncoder<W>, BzEncoder<W>, XzEncoder<W>);
+finish_impl!(GzEncoder<W>, BzEncoder<W>, XZWriter<W>, LZMAWriter<W>);
 
 impl<W: Write> WriteFinish<W> for BufWriter<ZopFliEncoder<W>> {
     fn finish(self: Box<Self>) -> std::io::Result<W> {
@@ -219,16 +215,12 @@ impl<R: Read> Read for LZ4BlockDecoder<R> {
 pub fn get_encoder<'a, W: Write + 'a>(format: FileFormat, w: W) -> Box<dyn WriteFinish<W> + 'a> {
     match format {
         FileFormat::XZ => {
-            let opt = LzmaOptions::new_preset(9).unwrap();
-            let stream =
-                LzmaStream::new_stream_encoder(LzmaFilters::new().lzma2(&opt), LzmaCheck::Crc32)
-                    .unwrap();
-            Box::new(XzEncoder::new_stream(w, stream))
+            let mut opt = XZOptions::with_preset(9);
+            opt.set_check_sum_type(CheckType::Crc32);
+            Box::new(XZWriter::new(w, opt).unwrap())
         }
         FileFormat::LZMA => {
-            let opt = LzmaOptions::new_preset(9).unwrap();
-            let stream = LzmaStream::new_lzma_encoder(&opt).unwrap();
-            Box::new(XzEncoder::new_stream(w, stream))
+            Box::new(LZMAWriter::new_use_header(w, &LZMAOptions::with_preset(9), None).unwrap())
         }
         FileFormat::BZIP2 => Box::new(BzEncoder::new(w, BzCompression::best())),
         FileFormat::LZ4 => {
@@ -261,10 +253,8 @@ pub fn get_encoder<'a, W: Write + 'a>(format: FileFormat, w: W) -> Box<dyn Write
 
 pub fn get_decoder<'a, R: Read + 'a>(format: FileFormat, r: R) -> Box<dyn Read + 'a> {
     match format {
-        FileFormat::XZ | FileFormat::LZMA => {
-            let stream = LzmaStream::new_auto_decoder(u64::MAX, 0).unwrap();
-            Box::new(XzDecoder::new_stream(r, stream))
-        }
+        FileFormat::XZ => Box::new(XZReader::new(r, true)),
+        FileFormat::LZMA => Box::new(LZMAReader::new_mem_limit(r, u32::MAX, None).unwrap()),
         FileFormat::BZIP2 => Box::new(BzDecoder::new(r)),
         FileFormat::LZ4 => Box::new(LZ4FrameDecoder::new(r).unwrap()),
         FileFormat::LZ4_LG | FileFormat::LZ4_LEGACY => Box::new(LZ4BlockDecoder::new(r)),

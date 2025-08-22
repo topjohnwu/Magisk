@@ -31,7 +31,7 @@ flate2 = { version = "1.1.2", default-features = false }
 bzip2 = { version = "0.6.0" }
 zopfli = "0.8.2"
 lz4 = "1.28.1"
-xz2 = "0.1.7"
+lzma-rust2 = { version = "0.10", default-features = false, features = ["xz", "std", "encoder", "optimization"]}
 
 # Rust crypto crates are tied together
 sha1 = "0.11.0-rc.0"
@@ -48,7 +48,6 @@ der = "0.8.0-rc.7"
 pb-rs = { git = "https://github.com/tafia/quick-protobuf.git" }
 quick-protobuf = { git = "https://github.com/tafia/quick-protobuf.git" }
 lz4-sys = { path = "external/lz4-sys" }
-lzma-sys = { path = "external/lzma-sys" }
 
 [profile.dev]
 opt-level = "z"
