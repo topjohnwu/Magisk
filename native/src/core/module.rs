@@ -4,8 +4,8 @@ use crate::ffi::{ModuleInfo, exec_module_scripts, exec_script, get_magisk_tmp, l
 use crate::mount::setup_module_mount;
 use base::{
     DirEntry, Directory, FsPathBuilder, LibcReturn, LoggedResult, OsResultStatic, ResultExt,
-    Utf8CStr, Utf8CStrBuf, Utf8CString, WalkResult, clone_attr, cstr, debug, error, info, libc,
-    raw_cstr, warn,
+    SilentResultExt, Utf8CStr, Utf8CStrBuf, Utf8CString, WalkResult, clone_attr, cstr, debug,
+    error, info, libc, raw_cstr, warn,
 };
 use libc::{AT_REMOVEDIR, MS_RDONLY, O_CLOEXEC, O_CREAT, O_RDONLY};
 use std::collections::BTreeMap;
@@ -556,7 +556,7 @@ fn inject_zygisk_bins(name: &str, system: &mut FsNode) {
 }
 
 fn upgrade_modules() -> LoggedResult<()> {
-    let mut upgrade = Directory::open(cstr!(MODULEUPGRADE))?;
+    let mut upgrade = Directory::open(cstr!(MODULEUPGRADE)).silent()?;
     let ufd = upgrade.as_raw_fd();
     let root = Directory::open(cstr!(MODULEROOT))?;
     while let Some(e) = upgrade.read()? {
