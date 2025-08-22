@@ -20,8 +20,8 @@ use base::libc::{
     dev_t, gid_t, major, makedev, minor, mknod, mode_t, uid_t,
 };
 use base::{
-    BytesExt, EarlyExitExt, LoggedError, LoggedResult, MappedFile, ResultExt, Utf8CStr,
-    Utf8CStrBuf, WriteExt, cstr, error, log_err,
+    BytesExt, EarlyExitExt, LoggedResult, MappedFile, OptionExt, ResultExt, Utf8CStr, Utf8CStrBuf,
+    WriteExt, cstr, log_err,
 };
 
 use crate::check_env;
@@ -328,10 +328,10 @@ impl Cpio {
     }
 
     fn extract_entry(&self, path: &str, out: &mut String) -> LoggedResult<()> {
-        let entry = self.entries.get(path).ok_or_else(|| {
-            error!("No such file");
-            LoggedError::default()
-        })?;
+        let entry = self
+            .entries
+            .get(path)
+            .ok_or_log_msg(|w| w.write_str("No such file"))?;
         eprintln!("Extracting entry [{path}] to [{out}]");
 
         let out = Utf8CStr::from_string(out);
@@ -462,10 +462,10 @@ impl Cpio {
     }
 
     fn mv(&mut self, from: &str, to: &str) -> LoggedResult<()> {
-        let entry = self.entries.remove(&norm_path(from)).ok_or_else(|| {
-            error!("no such entry {}", from);
-            LoggedError::default()
-        })?;
+        let entry = self
+            .entries
+            .remove(&norm_path(from))
+            .ok_or_log_msg(|w| w.write_fmt(format_args!("No such entry {from}")))?;
         self.entries.insert(norm_path(to), entry);
         eprintln!("Move [{from}] -> [{to}]");
         Ok(())
@@ -813,10 +813,8 @@ fn x8u(x: &[u8; 8]) -> LoggedResult<u32> {
     let s = str::from_utf8(x).log_with_msg(|w| w.write_str("bad cpio header"))?;
     for c in s.chars() {
         ret = ret * 16
-            + c.to_digit(16).ok_or_else(|| {
-                error!("bad cpio header");
-                LoggedError::default()
-            })?;
+            + c.to_digit(16)
+                .ok_or_log_msg(|w| w.write_str("bad cpio header"))?;
     }
     Ok(ret)
 }
