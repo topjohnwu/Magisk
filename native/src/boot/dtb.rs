@@ -264,8 +264,7 @@ fn dtb_patch(file: &Utf8CStr) -> LoggedResult<bool> {
     Ok(patched)
 }
 
-pub(crate) fn dtb_commands(file: &mut String, action: &DtbAction) -> LoggedResult<bool> {
-    let file = Utf8CStr::from_string(file);
+pub(crate) fn dtb_commands(file: &Utf8CStr, action: &DtbAction) -> LoggedResult<bool> {
     match action {
         DtbAction::Print(Print { fstab }) => {
             dtb_print(file, *fstab)?;
