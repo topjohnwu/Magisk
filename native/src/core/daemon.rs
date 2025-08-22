@@ -307,7 +307,7 @@ pub fn daemon_entry() {
 
     // Remove all pre-init overlay files to free-up memory
     tmp_path.append_path(ROOTOVL);
-    tmp_path.remove_all().log_ok();
+    tmp_path.remove_all().ok();
     tmp_path.truncate(magisk_tmp.len());
 
     let magiskd = MagiskD {
