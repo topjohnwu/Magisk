@@ -5,8 +5,6 @@
 #include <bitset>
 #include <cxx.h>
 
-#include "format.hpp"
-
 /******************
  * Special Headers
  *****************/
