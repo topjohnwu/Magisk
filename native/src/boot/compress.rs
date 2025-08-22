@@ -462,7 +462,7 @@ pub(crate) fn decompress(infile: &mut String, outfile: Option<&mut String>) -> L
     eprintln!("Detected format: {format}");
 
     if !format.is_compressed() {
-        return Err(log_err!("Input file is not a supported type!"));
+        return log_err!("Input file is not a supported type!");
     }
 
     let raw_out = if let Some(outfile) = outfile {
@@ -478,7 +478,7 @@ pub(crate) fn decompress(infile: &mut String, outfile: Option<&mut String>) -> L
         rm_in = true;
         let mut outfile = if let Some((outfile, ext)) = infile.rsplit_once('.') {
             if ext != format.ext() {
-                Err(log_err!("Input file is not a supported type!"))?;
+                log_err!("Input file is not a supported type!")?;
             }
             outfile.to_owned()
         } else {

@@ -23,9 +23,12 @@ pub type LoggedResult<T> = Result<T, LoggedError>;
 
 #[macro_export]
 macro_rules! log_err {
+    () => {{
+        Err($crate::LoggedError::default())
+    }};
     ($($args:tt)+) => {{
         $crate::error!($($args)+);
-        $crate::LoggedError::default()
+        Err($crate::LoggedError::default())
     }};
 }
 

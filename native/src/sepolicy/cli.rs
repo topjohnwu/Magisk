@@ -92,10 +92,10 @@ pub unsafe extern "C" fn main(
             (None, true, false) => SePolicy::from_split(),
             (None, false, true) => SePolicy::compile_split(),
             (None, false, false) => SePolicy::from_file(cstr!("/sys/fs/selinux/policy")),
-            _ => Err(log_err!("Multiple load source supplied"))?,
+            _ => log_err!("Multiple load source supplied")?,
         };
         if sepol._impl.is_null() {
-            Err(log_err!("Cannot load policy"))?;
+            log_err!("Cannot load policy")?;
         }
 
         if cli.print_rules {
@@ -105,7 +105,7 @@ pub unsafe extern "C" fn main(
                 || cli.live
                 || cli.save.is_some()
             {
-                Err(log_err!("Cannot print rules with other options"))?;
+                log_err!("Cannot print rules with other options")?;
             }
             sepol.print_rules();
             return 0;
@@ -124,12 +124,12 @@ pub unsafe extern "C" fn main(
         }
 
         if cli.live && !sepol.to_file(cstr!("/sys/fs/selinux/load")) {
-            Err(log_err!("Cannot apply policy"))?;
+            log_err!("Cannot apply policy")?;
         }
 
         if let Some(file) = &mut cli.save {
             if !sepol.to_file(Utf8CStr::from_string(file)) {
-                Err(log_err!("Cannot dump policy to {}", file))?;
+                log_err!("Cannot dump policy to {}", file)?;
             }
         }
     };
