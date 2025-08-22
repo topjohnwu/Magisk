@@ -33,25 +33,19 @@ macro_rules! log_err {
 }
 
 // Any result or option can be silenced
-pub trait SilentResultExt<T> {
+pub trait SilentLogExt<T> {
     fn silent(self) -> LoggedResult<T>;
 }
 
-impl<T, E> SilentResultExt<T> for Result<T, E> {
+impl<T, E> SilentLogExt<T> for Result<T, E> {
     fn silent(self) -> LoggedResult<T> {
-        match self {
-            Ok(v) => Ok(v),
-            Err(_) => Err(LoggedError::default()),
-        }
+        self.map_err(|_| LoggedError::default())
     }
 }
 
-impl<T> SilentResultExt<T> for Option<T> {
+impl<T> SilentLogExt<T> for Option<T> {
     fn silent(self) -> LoggedResult<T> {
-        match self {
-            Some(v) => Ok(v),
-            None => Err(LoggedError::default()),
-        }
+        self.ok_or_else(LoggedError::default)
     }
 }
 
@@ -67,142 +61,170 @@ pub(crate) trait CxxResultExt<T> {
     fn log_cxx(self) -> LoggedResult<T>;
 }
 
-trait Loggable<T> {
-    fn do_log(self, level: LogLevel, caller: Option<&'static Location>) -> LoggedResult<T>;
+// Public API for converting Option to LoggedResult
+pub trait OptionExt<T> {
+    fn ok_or_log(self) -> LoggedResult<T>;
+    fn ok_or_log_msg<F: FnOnce(Formatter) -> fmt::Result>(self, f: F) -> LoggedResult<T>;
+}
+
+impl<T> OptionExt<T> for Option<T> {
+    #[inline(always)]
+    fn ok_or_log(self) -> LoggedResult<T> {
+        self.ok_or_else(LoggedError::default)
+    }
+
+    #[cfg(not(debug_assertions))]
+    fn ok_or_log_msg<F: FnOnce(Formatter) -> fmt::Result>(self, f: F) -> LoggedResult<T> {
+        self.ok_or_else(|| {
+            do_log_msg(LogLevel::Error, None, f);
+            LoggedError::default()
+        })
+    }
+
+    #[track_caller]
+    #[cfg(debug_assertions)]
+    fn ok_or_log_msg<F: FnOnce(Formatter) -> fmt::Result>(self, f: F) -> LoggedResult<T> {
+        let caller = Some(Location::caller());
+        self.ok_or_else(|| {
+            do_log_msg(LogLevel::Error, caller, f);
+            LoggedError::default()
+        })
+    }
+}
+
+trait Loggable {
+    fn do_log(self, level: LogLevel, caller: Option<&'static Location>) -> LoggedError;
     fn do_log_msg<F: FnOnce(Formatter) -> fmt::Result>(
         self,
         level: LogLevel,
         caller: Option<&'static Location>,
         f: F,
-    ) -> LoggedResult<T>;
+    ) -> LoggedError;
 }
 
-impl<T, R: Loggable<T>> CxxResultExt<T> for R {
+impl<T, E: Loggable> CxxResultExt<T> for Result<T, E> {
     fn log_cxx(self) -> LoggedResult<T> {
-        self.do_log(LogLevel::ErrorCxx, None)
+        self.map_err(|e| e.do_log(LogLevel::ErrorCxx, None))
     }
 }
 
-impl<T, R: Loggable<T>> ResultExt<T> for R {
+impl<T, E: Loggable> ResultExt<T> for Result<T, E> {
     #[cfg(not(debug_assertions))]
     fn log(self) -> LoggedResult<T> {
-        self.do_log(LogLevel::Error, None)
+        self.map_err(|e| e.do_log(LogLevel::Error, None))
     }
 
     #[track_caller]
     #[cfg(debug_assertions)]
     fn log(self) -> LoggedResult<T> {
-        self.do_log(LogLevel::Error, Some(Location::caller()))
+        let caller = Some(Location::caller());
+        self.map_err(|e| e.do_log(LogLevel::Error, caller))
     }
 
     #[cfg(not(debug_assertions))]
     fn log_with_msg<F: FnOnce(Formatter) -> fmt::Result>(self, f: F) -> LoggedResult<T> {
-        self.do_log_msg(LogLevel::Error, None, f)
+        self.map_err(|e| e.do_log_msg(LogLevel::Error, None, f))
     }
 
     #[track_caller]
     #[cfg(debug_assertions)]
     fn log_with_msg<F: FnOnce(Formatter) -> fmt::Result>(self, f: F) -> LoggedResult<T> {
-        self.do_log_msg(LogLevel::Error, Some(Location::caller()), f)
+        let caller = Some(Location::caller());
+        self.map_err(|e| e.do_log_msg(LogLevel::Error, caller, f))
     }
 
     #[cfg(not(debug_assertions))]
     fn log_ok(self) {
-        self.log().ok();
+        self.map_err(|e| e.do_log(LogLevel::Error, None)).ok();
     }
 
     #[track_caller]
     #[cfg(debug_assertions)]
     fn log_ok(self) {
-        self.do_log(LogLevel::Error, Some(Location::caller())).ok();
+        let caller = Some(Location::caller());
+        self.map_err(|e| e.do_log(LogLevel::Error, caller)).ok();
     }
 }
 
-impl<T> Loggable<T> for LoggedResult<T> {
-    fn do_log(self, _: LogLevel, _: Option<&'static Location>) -> LoggedResult<T> {
+impl<T> ResultExt<T> for LoggedResult<T> {
+    fn log(self) -> LoggedResult<T> {
         self
     }
 
-    fn do_log_msg<F: FnOnce(Formatter) -> fmt::Result>(
-        self,
-        level: LogLevel,
-        caller: Option<&'static Location>,
-        f: F,
-    ) -> LoggedResult<T> {
-        match self {
-            Ok(v) => Ok(v),
-            Err(_) => {
-                log_with_formatter(level, |w| {
-                    if let Some(caller) = caller {
-                        write!(w, "[{}:{}] ", caller.file(), caller.line())?;
-                    }
-                    f(w)?;
-                    w.write_char('\n')
-                });
-                Err(LoggedError::default())
-            }
-        }
+    #[cfg(not(debug_assertions))]
+    fn log_with_msg<F: FnOnce(Formatter) -> fmt::Result>(self, f: F) -> LoggedResult<T> {
+        do_log_msg(LogLevel::Error, None, f);
+        self
     }
+
+    #[track_caller]
+    #[cfg(debug_assertions)]
+    fn log_with_msg<F: FnOnce(Formatter) -> fmt::Result>(self, f: F) -> LoggedResult<T> {
+        let caller = Some(Location::caller());
+        do_log_msg(LogLevel::Error, caller, f);
+        self
+    }
+
+    fn log_ok(self) {}
 }
 
-impl<T, E: Display> Loggable<T> for Result<T, E> {
-    fn do_log(self, level: LogLevel, caller: Option<&'static Location>) -> LoggedResult<T> {
-        match self {
-            Ok(v) => Ok(v),
-            Err(e) => {
-                if let Some(caller) = caller {
-                    log_with_args!(level, "[{}:{}] {:#}", caller.file(), caller.line(), e);
-                } else {
-                    log_with_args!(level, "{:#}", e);
-                }
-                Err(LoggedError::default())
-            }
-        }
-    }
-
-    fn do_log_msg<F: FnOnce(Formatter) -> fmt::Result>(
-        self,
-        level: LogLevel,
-        caller: Option<&'static Location>,
-        f: F,
-    ) -> LoggedResult<T> {
-        match self {
-            Ok(v) => Ok(v),
-            Err(e) => {
-                log_with_formatter(level, |w| {
-                    if let Some(caller) = caller {
-                        write!(w, "[{}:{}] ", caller.file(), caller.line())?;
-                    }
-                    f(w)?;
-                    writeln!(w, ": {e:#}")
-                });
-                Err(LoggedError::default())
-            }
-        }
-    }
-}
-
-// Automatically convert all printable errors to LoggedError to support `?` operator
-impl<T: Display> From<T> for LoggedError {
+// Allow converting Loggable errors to LoggedError to support `?` operator
+impl<T: Loggable> From<T> for LoggedError {
     #[cfg(not(debug_assertions))]
     fn from(e: T) -> Self {
-        log_with_args!(LogLevel::Error, "{:#}", e);
-        LoggedError::default()
+        e.do_log(LogLevel::Error, None)
     }
 
     #[track_caller]
     #[cfg(debug_assertions)]
     fn from(e: T) -> Self {
-        let caller = Location::caller();
-        log_with_args!(
-            LogLevel::Error,
-            "[{}:{}] {:#}",
-            caller.file(),
-            caller.line(),
-            e
-        );
+        let caller = Some(Location::caller());
+        e.do_log(LogLevel::Error, caller)
+    }
+}
+
+// Actual logging implementation
+
+// Make all printable objects Loggable
+impl<T: Display> Loggable for T {
+    fn do_log(self, level: LogLevel, caller: Option<&'static Location>) -> LoggedError {
+        if let Some(caller) = caller {
+            log_with_args!(level, "[{}:{}] {:#}", caller.file(), caller.line(), self);
+        } else {
+            log_with_args!(level, "{:#}", self);
+        }
         LoggedError::default()
     }
+
+    fn do_log_msg<F: FnOnce(Formatter) -> fmt::Result>(
+        self,
+        level: LogLevel,
+        caller: Option<&'static Location>,
+        f: F,
+    ) -> LoggedError {
+        log_with_formatter(level, |w| {
+            if let Some(caller) = caller {
+                write!(w, "[{}:{}] ", caller.file(), caller.line())?;
+            }
+            f(w)?;
+            writeln!(w, ": {self:#}")
+        });
+        LoggedError::default()
+    }
+}
+
+fn do_log_msg<F: FnOnce(Formatter) -> fmt::Result>(
+    level: LogLevel,
+    caller: Option<&'static Location>,
+    f: F,
+) {
+    log_with_formatter(level, |w| {
+        if let Some(caller) = caller {
+            write!(w, "[{}:{}] ", caller.file(), caller.line())?;
+        }
+        f(w)?;
+        w.write_char('\n')
+    });
 }
 
 // Check libc return value and map to Result

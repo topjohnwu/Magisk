@@ -16,7 +16,7 @@ use crate::resetprop::proto::persistent_properties::{
 use base::const_format::concatcp;
 use base::libc::{O_CLOEXEC, O_RDONLY};
 use base::{
-    Directory, FsPathBuilder, LibcReturn, LoggedResult, MappedFile, SilentResultExt, Utf8CStr,
+    Directory, FsPathBuilder, LibcReturn, LoggedResult, MappedFile, SilentLogExt, Utf8CStr,
     Utf8CStrBuf, WalkResult, clone_attr, cstr, debug, libc::mkstemp,
 };
 
