@@ -296,156 +296,145 @@ fn sign_cmd(
     Ok(())
 }
 
+fn boot_main(cmds: CmdArgs) -> LoggedResult<i32> {
+    let mut cmds = cmds.0;
+    if cmds.len() < 2 {
+        print_usage(cmds.first().unwrap_or(&"magiskboot"));
+        return log_err!();
+    }
+
+    if cmds[1].starts_with("--") {
+        cmds[1] = &cmds[1][2..];
+    }
+
+    if let Some(fmt) = str::strip_prefix(cmds[1], "compress=") {
+        cmds.insert(1, "compress");
+        cmds.insert(2, "-f");
+        cmds[3] = fmt;
+    }
+
+    let mut cli = Cli::from_args(&[cmds[0]], &cmds[1..]).on_early_exit(|| match cmds.get(1) {
+        Some(&"dtb") => print_dtb_usage(),
+        Some(&"cpio") => print_cpio_usage(),
+        _ => print_usage(cmds[0]),
+    });
+    match cli.action {
+        Action::Unpack(Unpack {
+            no_decompress,
+            dump_header,
+            ref mut img,
+        }) => {
+            return Ok(unpack(
+                Utf8CStr::from_string(img),
+                no_decompress,
+                dump_header,
+            ));
+        }
+        Action::Repack(Repack {
+            no_compress,
+            mut img,
+            mut out,
+        }) => {
+            repack(
+                Utf8CStr::from_string(&mut img),
+                Utf8CStr::from_string(&mut out),
+                no_compress,
+            );
+        }
+        Action::Verify(Verify { mut img, mut cert }) => {
+            if !verify_cmd(
+                Utf8CStr::from_string(&mut img),
+                cert.as_mut().map(Utf8CStr::from_string),
+            ) {
+                return log_err!();
+            }
+        }
+        Action::Sign(Sign { mut img, mut args }) => {
+            let mut iter = args.iter_mut();
+            sign_cmd(
+                Utf8CStr::from_string(&mut img),
+                iter.next().map(Utf8CStr::from_string),
+                iter.next().map(Utf8CStr::from_string),
+                iter.next().map(Utf8CStr::from_string),
+            )?;
+        }
+        Action::Extract(Extract { payload, args }) => {
+            if args.len() > 2 {
+                log_err!("Too many arguments")?;
+            }
+            extract_boot_from_payload(
+                &payload,
+                args.first().map(|x| x.as_str()),
+                args.get(1).map(|x| x.as_str()),
+            )
+            .log_with_msg(|w| w.write_str("Failed to extract from payload"))?;
+        }
+        Action::HexPatch(HexPatch {
+            mut file,
+            mut src,
+            mut dest,
+        }) => {
+            if !hexpatch(
+                &mut file,
+                Utf8CStr::from_string(&mut src),
+                Utf8CStr::from_string(&mut dest),
+            ) {
+                log_err!("Failed to patch")?;
+            }
+        }
+        Action::Cpio(Cpio { mut file, mut cmds }) => {
+            cpio_commands(Utf8CStr::from_string(&mut file), &mut cmds)
+                .log_with_msg(|w| w.write_str("Failed to process cpio"))?;
+        }
+        Action::Dtb(Dtb { mut file, action }) => {
+            return dtb_commands(Utf8CStr::from_string(&mut file), &action)
+                .map(|b| if b { 0 } else { 1 })
+                .log_with_msg(|w| w.write_str("Failed to process dtb"));
+        }
+        Action::Split(Split {
+            no_decompress,
+            mut file,
+        }) => {
+            return Ok(split_image_dtb(
+                Utf8CStr::from_string(&mut file),
+                no_decompress,
+            ));
+        }
+        Action::Sha1(Sha1 { mut file }) => {
+            let file = MappedFile::open(Utf8CStr::from_string(&mut file))?;
+            let mut sha1 = [0u8; 20];
+            sha1_hash(file.as_ref(), &mut sha1);
+            for byte in &sha1 {
+                print!("{byte:02x}");
+            }
+            println!();
+        }
+        Action::Cleanup(_) => {
+            eprintln!("Cleaning up...");
+            cleanup();
+        }
+        Action::Decompress(Decompress { mut file, mut out }) => {
+            decompress(&mut file, out.as_mut())?;
+        }
+        Action::Compress(Compress {
+            ref mut file,
+            ref format,
+            ref mut out,
+        }) => {
+            compress(
+                FileFormat::from_str(format).unwrap_or(FileFormat::UNKNOWN),
+                file,
+                out.as_mut(),
+            )?;
+        }
+    }
+    Ok(0)
+}
+
 #[unsafe(no_mangle)]
 pub extern "C" fn main(argc: i32, argv: *const *const c_char, _envp: *const *const c_char) -> i32 {
     cmdline_logging();
     unsafe { umask(0) };
-    let res: LoggedResult<()> = try {
-        let mut cmds = CmdArgs::new(argc, argv).0;
-        if argc < 2 {
-            print_usage(cmds.first().unwrap_or(&"magiskboot"));
-            return 1;
-        }
-
-        if cmds[1].starts_with("--") {
-            cmds[1] = &cmds[1][2..];
-        }
-
-        if let Some(fmt) = str::strip_prefix(cmds[1], "compress=") {
-            cmds.insert(1, "compress");
-            cmds.insert(2, "-f");
-            cmds[3] = fmt;
-        }
-
-        let mut cli = Cli::from_args(&[cmds[0]], &cmds[1..]).on_early_exit(|| match cmds.get(1) {
-            Some(&"dtb") => print_dtb_usage(),
-            Some(&"cpio") => print_cpio_usage(),
-            _ => print_usage(cmds[0]),
-        });
-        match cli.action {
-            Action::Unpack(Unpack {
-                no_decompress,
-                dump_header,
-                ref mut img,
-            }) => return unpack(Utf8CStr::from_string(img), no_decompress, dump_header),
-            Action::Repack(Repack {
-                no_compress,
-                ref mut img,
-                ref mut out,
-            }) => {
-                repack(
-                    Utf8CStr::from_string(img),
-                    Utf8CStr::from_string(out),
-                    no_compress,
-                );
-            }
-            Action::Verify(Verify { mut img, mut cert }) => {
-                return if verify_cmd(
-                    Utf8CStr::from_string(&mut img),
-                    cert.as_mut().map(Utf8CStr::from_string),
-                ) {
-                    0
-                } else {
-                    1
-                };
-            }
-            Action::Sign(Sign { mut img, mut args }) => {
-                let mut iter = args.iter_mut();
-                sign_cmd(
-                    Utf8CStr::from_string(&mut img),
-                    iter.next().map(Utf8CStr::from_string),
-                    iter.next().map(Utf8CStr::from_string),
-                    iter.next().map(Utf8CStr::from_string),
-                )?;
-            }
-            Action::Extract(Extract {
-                ref payload,
-                ref args,
-            }) => {
-                if args.len() > 2 {
-                    log_err!("Too many arguments")?;
-                }
-                extract_boot_from_payload(
-                    payload,
-                    args.first().map(|x| x.as_str()),
-                    args.get(1).map(|x| x.as_str()),
-                )
-                .log_with_msg(|w| w.write_str("Failed to extract from payload"))?;
-            }
-            Action::HexPatch(HexPatch {
-                ref mut file,
-                ref mut src,
-                ref mut dest,
-            }) => {
-                if !hexpatch(
-                    file,
-                    Utf8CStr::from_string(src),
-                    Utf8CStr::from_string(dest),
-                ) {
-                    log_err!("Failed to patch")?;
-                }
-            }
-            Action::Cpio(Cpio {
-                ref mut file,
-                ref mut cmds,
-            }) => {
-                return if cpio_commands(file, cmds)
-                    .log_with_msg(|w| w.write_str("Failed to process cpio"))?
-                {
-                    0
-                } else {
-                    1
-                };
-            }
-            Action::Dtb(Dtb {
-                ref mut file,
-                ref action,
-            }) => {
-                return if dtb_commands(file, action)
-                    .log_with_msg(|w| w.write_str("Failed to process dtb"))?
-                {
-                    0
-                } else {
-                    1
-                };
-            }
-            Action::Split(Split {
-                no_decompress,
-                ref mut file,
-            }) => {
-                return split_image_dtb(Utf8CStr::from_string(file), no_decompress);
-            }
-            Action::Sha1(Sha1 { ref mut file }) => {
-                let file = MappedFile::open(Utf8CStr::from_string(file))?;
-                let mut sha1 = [0u8; 20];
-                sha1_hash(file.as_ref(), &mut sha1);
-                for byte in &sha1 {
-                    print!("{byte:02x}");
-                }
-                println!();
-            }
-            Action::Cleanup(_) => {
-                eprintln!("Cleaning up...");
-                cleanup();
-            }
-            Action::Decompress(Decompress {
-                ref mut file,
-                ref mut out,
-            }) => {
-                decompress(file, out.as_mut())?;
-            }
-            Action::Compress(Compress {
-                ref mut file,
-                ref format,
-                ref mut out,
-            }) => {
-                compress(
-                    FileFormat::from_str(format).unwrap_or(FileFormat::UNKNOWN),
-                    file,
-                    out.as_mut(),
-                )?;
-            }
-        }
-    };
-    if res.is_ok() { 0 } else { 1 }
+    let cmds = CmdArgs::new(argc, argv);
+    boot_main(cmds).unwrap_or(1)
 }

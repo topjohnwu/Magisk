@@ -753,8 +753,7 @@ impl Display for CpioEntry {
     }
 }
 
-pub(crate) fn cpio_commands(file: &mut String, cmds: &mut Vec<String>) -> LoggedResult<bool> {
-    let file = Utf8CStr::from_string(file);
+pub(crate) fn cpio_commands(file: &Utf8CStr, cmds: &mut Vec<String>) -> LoggedResult<()> {
     let mut cpio = if file.exists() {
         Cpio::load_from_file(file)?
     } else {
@@ -779,7 +778,11 @@ pub(crate) fn cpio_commands(file: &mut String, cmds: &mut Vec<String>) -> Logged
             CpioAction::Restore(_) => cpio.restore()?,
             CpioAction::Patch(_) => cpio.patch(),
             CpioAction::Exists(Exists { path }) => {
-                return Ok(cpio.exists(path));
+                return if cpio.exists(path) {
+                    Ok(())
+                } else {
+                    log_err!()
+                };
             }
             CpioAction::Backup(Backup {
                 origin,
@@ -799,12 +802,12 @@ pub(crate) fn cpio_commands(file: &mut String, cmds: &mut Vec<String>) -> Logged
             }
             CpioAction::List(List { path, recursive }) => {
                 cpio.ls(path.as_str(), *recursive);
-                return Ok(true);
+                return Ok(());
             }
         };
     }
     cpio.dump(file)?;
-    Ok(true)
+    Ok(())
 }
 
 fn x8u(x: &[u8; 8]) -> LoggedResult<u32> {
