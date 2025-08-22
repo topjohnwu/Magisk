@@ -363,7 +363,7 @@ pub extern "C" fn main(argc: i32, argv: *const *const c_char, _envp: *const *con
                 ref args,
             }) => {
                 if args.len() > 2 {
-                    Err(log_err!("Too many arguments"))?;
+                    log_err!("Too many arguments")?;
                 }
                 extract_boot_from_payload(
                     payload,
@@ -382,7 +382,7 @@ pub extern "C" fn main(argc: i32, argv: *const *const c_char, _envp: *const *con
                     Utf8CStr::from_string(src),
                     Utf8CStr::from_string(dest),
                 ) {
-                    Err(log_err!("Failed to patch"))?;
+                    log_err!("Failed to patch")?;
                 }
             }
             Action::Cpio(Cpio {

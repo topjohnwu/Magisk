@@ -25,7 +25,7 @@ use x509_cert::der::Any;
 use x509_cert::der::asn1::{OctetString, PrintableString};
 use x509_cert::spki::AlgorithmIdentifier;
 
-use base::{LoggedError, LoggedResult, MappedFile, ResultExt, Utf8CStr, cstr, log_err};
+use base::{LoggedResult, MappedFile, ResultExt, Utf8CStr, cstr, log_err};
 
 use crate::ffi::BootImage;
 
@@ -116,7 +116,7 @@ impl Verifier {
             digest = Box::<Sha512>::default();
             VerifyingKey::SHA521withECDSA(ec)
         } else {
-            return Err(log_err!("Unsupported private key"));
+            return log_err!("Unsupported private key");
         };
         Ok(Verifier { digest, key })
     }
@@ -177,7 +177,7 @@ impl Signer {
                             SigningKey::SHA521withECDSA(ec)
                         }
                         _ => {
-                            return Err(log_err!("Unsupported private key"));
+                            return log_err!("Unsupported private key");
                         }
                     },
                 },
@@ -248,7 +248,7 @@ struct BootSignature {
 impl BootSignature {
     fn verify(self, payload: &[u8]) -> LoggedResult<()> {
         if self.authenticated_attributes.length as usize != payload.len() {
-            return Err(log_err!("Invalid image size"));
+            return log_err!("Invalid image size");
         }
         let mut verifier = Verifier::from_public_key(
             self.certificate
@@ -268,7 +268,7 @@ impl BootImage {
     pub fn verify(&self, cert: Option<&Utf8CStr>) -> LoggedResult<()> {
         let tail = self.tail();
         if tail.starts_with(b"AVB0") {
-            return Err(LoggedError::default());
+            return log_err!();
         }
 
         // Don't use BootSignature::from_der because tail might have trailing zeros

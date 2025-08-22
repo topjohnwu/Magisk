@@ -20,8 +20,8 @@ use base::libc::{
     dev_t, gid_t, major, makedev, minor, mknod, mode_t, uid_t,
 };
 use base::{
-    BytesExt, EarlyExitExt, LoggedResult, MappedFile, ResultExt, Utf8CStr, Utf8CStrBuf, WriteExt,
-    cstr, log_err,
+    BytesExt, EarlyExitExt, LoggedError, LoggedResult, MappedFile, ResultExt, Utf8CStr,
+    Utf8CStrBuf, WriteExt, cstr, error, log_err,
 };
 
 use crate::check_env;
@@ -227,7 +227,7 @@ impl Cpio {
             let hdr_sz = size_of::<CpioHeader>();
             let hdr = from_bytes::<CpioHeader>(&data[pos..(pos + hdr_sz)]);
             if &hdr.magic != b"070701" {
-                return Err(log_err!("invalid cpio magic"));
+                return log_err!("invalid cpio magic");
             }
             pos += hdr_sz;
             let name_sz = x8u(&hdr.namesize)? as usize;
@@ -328,10 +328,10 @@ impl Cpio {
     }
 
     fn extract_entry(&self, path: &str, out: &mut String) -> LoggedResult<()> {
-        let entry = self
-            .entries
-            .get(path)
-            .ok_or_else(|| log_err!("No such file"))?;
+        let entry = self.entries.get(path).ok_or_else(|| {
+            error!("No such file");
+            LoggedError::default()
+        })?;
         eprintln!("Extracting entry [{path}] to [{out}]");
 
         let out = Utf8CStr::from_string(out);
@@ -362,7 +362,7 @@ impl Cpio {
                 unsafe { mknod(out.as_ptr().cast(), entry.mode, dev) };
             }
             _ => {
-                return Err(log_err!("unknown entry type"));
+                return log_err!("unknown entry type");
             }
         }
         Ok(())
@@ -389,7 +389,7 @@ impl Cpio {
 
     fn add(&mut self, mode: mode_t, path: &str, file: &mut String) -> LoggedResult<()> {
         if path.ends_with('/') {
-            return Err(log_err!("path cannot end with / for add"));
+            return log_err!("path cannot end with / for add");
         }
         let file = Utf8CStr::from_string(file);
         let attr = file.get_attr()?;
@@ -412,7 +412,7 @@ impl Cpio {
             } else if attr.is_char_device() {
                 mode | S_IFCHR
             } else {
-                return Err(log_err!("unsupported file type"));
+                return log_err!("unsupported file type");
             }
         };
 
@@ -462,10 +462,10 @@ impl Cpio {
     }
 
     fn mv(&mut self, from: &str, to: &str) -> LoggedResult<()> {
-        let entry = self
-            .entries
-            .remove(&norm_path(from))
-            .ok_or_else(|| log_err!("no such entry {}", from))?;
+        let entry = self.entries.remove(&norm_path(from)).ok_or_else(|| {
+            error!("no such entry {}", from);
+            LoggedError::default()
+        })?;
         self.entries.insert(norm_path(to), entry);
         eprintln!("Move [{from}] -> [{to}]");
         Ok(())
@@ -792,7 +792,7 @@ pub(crate) fn cpio_commands(file: &mut String, cmds: &mut Vec<String>) -> Logged
             CpioAction::Add(Add { mode, path, file }) => cpio.add(*mode, path, file)?,
             CpioAction::Extract(Extract { paths }) => {
                 if !paths.is_empty() && paths.len() != 2 {
-                    Err(log_err!("invalid arguments"))?;
+                    log_err!("invalid arguments")?;
                 }
                 let mut it = paths.iter_mut();
                 cpio.extract(it.next(), it.next())?;
@@ -812,7 +812,11 @@ fn x8u(x: &[u8; 8]) -> LoggedResult<u32> {
     let mut ret = 0u32;
     let s = str::from_utf8(x).log_with_msg(|w| w.write_str("bad cpio header"))?;
     for c in s.chars() {
-        ret = ret * 16 + c.to_digit(16).ok_or_else(|| log_err!("bad cpio header"))?;
+        ret = ret * 16
+            + c.to_digit(16).ok_or_else(|| {
+                error!("bad cpio header");
+                LoggedError::default()
+            })?;
     }
     Ok(ret)
 }
