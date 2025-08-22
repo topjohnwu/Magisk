@@ -33,5 +33,5 @@ num-traits = { workspace = true }
 flate2 = { workspace = true, features = ["zlib-rs"] }
 bzip2 = { workspace = true }
 lz4 = { workspace = true }
-xz2 = { workspace = true }
+lzma-rust2 = { workspace = true }
 zopfli = { workspace = true, features = ["gzip"] }
