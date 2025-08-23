@@ -153,16 +153,14 @@ impl<T> ResultExt<T> for LoggedResult<T> {
 
     #[cfg(not(debug_assertions))]
     fn log_with_msg<F: FnOnce(Formatter) -> fmt::Result>(self, f: F) -> LoggedResult<T> {
-        do_log_msg(LogLevel::Error, None, f);
-        self
+        self.inspect_err(|_| do_log_msg(LogLevel::Error, None, f))
     }
 
     #[track_caller]
     #[cfg(debug_assertions)]
     fn log_with_msg<F: FnOnce(Formatter) -> fmt::Result>(self, f: F) -> LoggedResult<T> {
         let caller = Some(Location::caller());
-        do_log_msg(LogLevel::Error, caller, f);
-        self
+        self.inspect_err(|_| do_log_msg(LogLevel::Error, caller, f))
     }
 
     fn log_ok(self) {}
