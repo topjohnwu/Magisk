@@ -116,6 +116,26 @@ impl<T: Write> WriteExt for T {
     }
 }
 
+pub enum FileOrStd {
+    StdIn,
+    StdOut,
+    StdErr,
+    File(File),
+}
+
+impl FileOrStd {
+    pub fn as_file(&self) -> &File {
+        let raw_fd_ref: &'static RawFd = match self {
+            FileOrStd::StdIn => &0,
+            FileOrStd::StdOut => &1,
+            FileOrStd::StdErr => &2,
+            FileOrStd::File(file) => return file,
+        };
+        // SAFETY: File is guaranteed to have the same ABI as RawFd
+        unsafe { mem::transmute(raw_fd_ref) }
+    }
+}
+
 fn open_fd(path: &Utf8CStr, flags: i32, mode: mode_t) -> OsResult<OwnedFd> {
     unsafe {
         let fd = libc::open(path.as_ptr(), flags, mode as c_uint).as_os_result(

@@ -1,6 +1,6 @@
 use crate::ffi::{FileFormat, check_fmt};
 use base::libc::{O_RDONLY, O_TRUNC, O_WRONLY};
-use base::{Chunker, LoggedResult, Utf8CStr, WriteExt, error, log_err};
+use base::{Chunker, FileOrStd, LoggedResult, Utf8CStr, Utf8CString, WriteExt, error, log_err};
 use bytemuck::bytes_of_mut;
 use bzip2::{Compression as BzCompression, write::BzDecoder, write::BzEncoder};
 use flate2::{Compression as GzCompression, write::GzEncoder, write::MultiGzDecoder};
@@ -9,12 +9,13 @@ use lz4::{
     EncoderBuilder as LZ4FrameEncoderBuilder, block::CompressionMode, liblz4::BlockChecksum,
 };
 use std::cell::Cell;
+use std::fmt::Write as FmtWrite;
 use std::fs::File;
-use std::io::{BufWriter, Read, Write, stdin, stdout};
+use std::io::{BufWriter, Read, Write};
 use std::mem::ManuallyDrop;
 use std::num::NonZeroU64;
 use std::ops::DerefMut;
-use std::os::fd::{AsFd, AsRawFd, FromRawFd, RawFd};
+use std::os::fd::{FromRawFd, RawFd};
 use xz2::{
     stream::{Check as LzmaCheck, Filters as LzmaFilters, LzmaOptions, Stream as LzmaStream},
     write::{XzDecoder, XzEncoder},
@@ -383,29 +384,6 @@ pub fn get_decoder<'a, W: Write + 'a>(format: FileFormat, w: W) -> Box<dyn Write
 
 // C++ FFI
 
-pub fn compress_fd(format: FileFormat, in_fd: RawFd, out_fd: RawFd) {
-    let mut in_file = unsafe { ManuallyDrop::new(File::from_raw_fd(in_fd)) };
-    let mut out_file = unsafe { ManuallyDrop::new(File::from_raw_fd(out_fd)) };
-
-    let mut encoder = get_encoder(format, out_file.deref_mut());
-    let _: LoggedResult<()> = try {
-        std::io::copy(in_file.deref_mut(), encoder.as_mut())?;
-        encoder.finish()?;
-    };
-}
-
-pub fn decompress_bytes_fd(format: FileFormat, in_bytes: &[u8], in_fd: RawFd, out_fd: RawFd) {
-    let mut in_file = unsafe { ManuallyDrop::new(File::from_raw_fd(in_fd)) };
-    let mut out_file = unsafe { ManuallyDrop::new(File::from_raw_fd(out_fd)) };
-
-    let mut decoder = get_decoder(format, out_file.deref_mut());
-    let _: LoggedResult<()> = try {
-        decoder.write_all(in_bytes)?;
-        std::io::copy(in_file.deref_mut(), decoder.as_mut())?;
-        decoder.finish()?;
-    };
-}
-
 pub fn compress_bytes(format: FileFormat, in_bytes: &[u8], out_fd: RawFd) {
     let mut out_file = unsafe { ManuallyDrop::new(File::from_raw_fd(out_fd)) };
 
@@ -426,22 +404,31 @@ pub fn decompress_bytes(format: FileFormat, in_bytes: &[u8], out_fd: RawFd) {
     };
 }
 
-pub(crate) fn decompress(infile: &mut String, outfile: Option<&mut String>) -> LoggedResult<()> {
+// Command-line entry points
+
+pub(crate) fn decompress_cmd(
+    infile: &mut String,
+    outfile: Option<&mut String>,
+) -> LoggedResult<()> {
+    let infile = Utf8CStr::from_string(infile);
+    let outfile = outfile.map(Utf8CStr::from_string);
+
     let in_std = infile == "-";
     let mut rm_in = false;
 
     let mut buf = [0u8; 4096];
-    let raw_in = if in_std {
-        super let mut stdin = stdin();
-        let _ = stdin.read(&mut buf)?;
-        stdin.as_fd()
+
+    let input = if in_std {
+        FileOrStd::StdIn
     } else {
-        super let mut infile = Utf8CStr::from_string(infile).open(O_RDONLY)?;
-        let _ = infile.read(&mut buf)?;
-        infile.as_fd()
+        FileOrStd::File(infile.open(O_RDONLY)?)
     };
 
-    let format = check_fmt(&buf);
+    // First read some bytes for format detection
+    let len = input.as_file().read(&mut buf)?;
+    let buf = &buf[..len];
+
+    let format = check_fmt(buf);
 
     eprintln!("Detected format: {format}");
 
@@ -449,44 +436,46 @@ pub(crate) fn decompress(infile: &mut String, outfile: Option<&mut String>) -> L
         return log_err!("Input file is not a supported type!");
     }
 
-    let raw_out = if let Some(outfile) = outfile {
+    // If user did not provide outfile, infile has to be either
+    // <path>.[ext], or "-". Outfile will be either <path> or "-".
+    // If the input does not have proper format, abort.
+
+    let output = if let Some(outfile) = outfile {
         if outfile == "-" {
-            super let stdout = stdout();
-            stdout.as_fd()
+            FileOrStd::StdOut
         } else {
-            super let outfile = Utf8CStr::from_string(outfile).create(O_WRONLY | O_TRUNC, 0o644)?;
-            outfile.as_fd()
+            FileOrStd::File(outfile.create(O_WRONLY | O_TRUNC, 0o644)?)
         }
     } else if in_std {
-        super let stdout = stdout();
-        stdout.as_fd()
+        FileOrStd::StdOut
     } else {
-        // strip the extension
-        rm_in = true;
-        let mut outfile = if let Some((outfile, ext)) = infile.rsplit_once('.') {
-            if ext != format.ext() {
-                log_err!("Input file is not a supported type!")?;
-            }
-            outfile.to_owned()
+        // Strip out extension and remove input
+        let outfile = if let Some((outfile, ext)) = infile.rsplit_once('.')
+            && ext == format.ext()
+        {
+            Utf8CString::from(outfile)
         } else {
-            infile.clone()
+            return log_err!("Input file is not a supported type!");
         };
-        eprintln!("Decompressing to [{outfile}]");
 
-        super let outfile = Utf8CStr::from_string(&mut outfile).create(O_WRONLY | O_TRUNC, 0o644)?;
-        outfile.as_fd()
+        rm_in = true;
+        eprintln!("Decompressing to [{outfile}]");
+        FileOrStd::File(outfile.create(O_WRONLY | O_TRUNC, 0o644)?)
     };
 
-    decompress_bytes_fd(format, &buf, raw_in.as_raw_fd(), raw_out.as_raw_fd());
+    let mut decoder = get_decoder(format, output.as_file());
+    decoder.write_all(buf)?;
+    std::io::copy(&mut input.as_file(), decoder.as_mut())?;
+    decoder.finish()?;
 
     if rm_in {
-        Utf8CStr::from_string(infile).remove()?;
+        infile.remove()?;
     }
 
     Ok(())
 }
 
-pub(crate) fn compress(
+pub(crate) fn compress_cmd(
     method: FileFormat,
     infile: &mut String,
     outfile: Option<&mut String>,
@@ -495,40 +484,43 @@ pub(crate) fn compress(
         error!("Unsupported compression format");
     }
 
+    let infile = Utf8CStr::from_string(infile);
+    let outfile = outfile.map(Utf8CStr::from_string);
+
     let in_std = infile == "-";
     let mut rm_in = false;
 
-    let raw_in = if in_std {
-        super let stdin = stdin();
-        stdin.as_fd()
+    let input = if in_std {
+        FileOrStd::StdIn
     } else {
-        super let infile = Utf8CStr::from_string(infile).open(O_RDONLY)?;
-        infile.as_fd()
+        FileOrStd::File(infile.open(O_RDONLY)?)
     };
 
-    let raw_out = if let Some(outfile) = outfile {
+    let output = if let Some(outfile) = outfile {
         if outfile == "-" {
-            super let stdout = stdout();
-            stdout.as_fd()
+            FileOrStd::StdOut
         } else {
-            super let outfile = Utf8CStr::from_string(outfile).create(O_WRONLY | O_TRUNC, 0o644)?;
-            outfile.as_fd()
+            FileOrStd::File(outfile.create(O_WRONLY | O_TRUNC, 0o644)?)
         }
     } else if in_std {
-        super let stdout = stdout();
-        stdout.as_fd()
+        FileOrStd::StdOut
     } else {
-        let mut outfile = format!("{infile}.{}", method.ext());
+        let mut outfile = Utf8CString::default();
+        outfile.write_str(infile).ok();
+        outfile.write_char('.').ok();
+        outfile.write_str(method.ext()).ok();
         eprintln!("Compressing to [{outfile}]");
         rm_in = true;
-        super let outfile = Utf8CStr::from_string(&mut outfile).create(O_WRONLY | O_TRUNC, 0o644)?;
-        outfile.as_fd()
+        let outfile = outfile.create(O_WRONLY | O_TRUNC, 0o644)?;
+        FileOrStd::File(outfile)
     };
 
-    compress_fd(method, raw_in.as_raw_fd(), raw_out.as_raw_fd());
+    let mut encoder = get_encoder(method, output.as_file());
+    std::io::copy(&mut input.as_file(), encoder.as_mut())?;
+    encoder.finish()?;
 
     if rm_in {
-        Utf8CStr::from_string(infile).remove()?;
+        infile.remove()?;
     }
     Ok(())
 }
