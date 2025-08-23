@@ -49,12 +49,12 @@ impl FileFormat {
 impl FileFormat {
     pub fn ext(&self) -> &'static str {
         match *self {
-            Self::GZIP | Self::ZOPFLI => ".gz",
-            Self::LZOP => ".lzo",
-            Self::XZ => ".xz",
-            Self::LZMA => ".lzma",
-            Self::BZIP2 => ".bz2",
-            Self::LZ4 | Self::LZ4_LEGACY | Self::LZ4_LG => ".lz4",
+            Self::GZIP | Self::ZOPFLI => "gz",
+            Self::LZOP => "lzo",
+            Self::XZ => "xz",
+            Self::LZMA => "lzma",
+            Self::BZIP2 => "bz2",
+            Self::LZ4 | Self::LZ4_LEGACY | Self::LZ4_LG => "lz4",
             _ => "",
         }
     }

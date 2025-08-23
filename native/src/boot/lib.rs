@@ -2,7 +2,6 @@
 #![feature(btree_extract_if)]
 #![feature(iter_intersperse)]
 #![feature(try_blocks)]
-#![feature(super_let)]
 
 pub use base;
 use compress::{compress_bytes, decompress_bytes};

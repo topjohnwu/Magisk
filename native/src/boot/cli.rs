@@ -1,4 +1,4 @@
-use crate::compress::{compress, decompress};
+use crate::compress::{compress_cmd, decompress_cmd};
 use crate::cpio::{cpio_commands, print_cpio_usage};
 use crate::dtb::{DtbAction, dtb_commands, print_dtb_usage};
 use crate::ffi::{BootImage, FileFormat, cleanup, repack, split_image_dtb, unpack};
@@ -414,14 +414,14 @@ fn boot_main(cmds: CmdArgs) -> LoggedResult<i32> {
             cleanup();
         }
         Action::Decompress(Decompress { mut file, mut out }) => {
-            decompress(&mut file, out.as_mut())?;
+            decompress_cmd(&mut file, out.as_mut())?;
         }
         Action::Compress(Compress {
             ref mut file,
             ref format,
             ref mut out,
         }) => {
-            compress(
+            compress_cmd(
                 FileFormat::from_str(format).unwrap_or(FileFormat::UNKNOWN),
                 file,
                 out.as_mut(),
