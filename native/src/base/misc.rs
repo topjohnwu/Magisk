@@ -1,5 +1,5 @@
 use crate::{Utf8CStr, cstr, ffi};
-use argh::EarlyExit;
+use argh::{EarlyExit, MissingRequirements};
 use libc::c_char;
 use std::{
     fmt,
@@ -98,6 +98,51 @@ impl<T> EarlyExitExt<T> for Result<T, EarlyExit> {
                     exit(1)
                 }
             },
+        }
+    }
+}
+
+pub struct PositionalArgParser<'a>(pub slice::Iter<'a, &'a str>);
+
+impl PositionalArgParser<'_> {
+    pub fn required(&mut self, field_name: &'static str) -> Result<String, EarlyExit> {
+        if let Some(next) = self.0.next() {
+            Ok(next.to_string())
+        } else {
+            let mut missing = MissingRequirements::default();
+            missing.missing_positional_arg(field_name);
+            missing.err_on_any()?;
+            unreachable!()
+        }
+    }
+
+    pub fn optional(&mut self) -> Option<String> {
+        self.0.next().map(ToString::to_string)
+    }
+
+    pub fn last_required(&mut self, field_name: &'static str) -> Result<String, EarlyExit> {
+        let r = self.required(field_name)?;
+        self.ensure_end()?;
+        Ok(r)
+    }
+
+    pub fn last_optional(&mut self) -> Result<Option<String>, EarlyExit> {
+        let r = self.optional();
+        if r.is_none() {
+            return Ok(r);
+        }
+        self.ensure_end()?;
+        Ok(r)
+    }
+
+    fn ensure_end(&mut self) -> Result<(), EarlyExit> {
+        if self.0.len() == 0 {
+            Ok(())
+        } else {
+            Err(EarlyExit::from(format!(
+                "Unrecognized argument: {}\n",
+                self.0.next().unwrap()
+            )))
         }
     }
 }

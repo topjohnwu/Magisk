@@ -5,10 +5,10 @@ use crate::ffi::{BootImage, FileFormat, cleanup, repack, split_image_dtb, unpack
 use crate::patch::hexpatch;
 use crate::payload::extract_boot_from_payload;
 use crate::sign::{sha1_hash, sign_boot_image};
-use argh::FromArgs;
+use argh::{CommandInfo, EarlyExit, FromArgs, SubCommand};
 use base::{
-    CmdArgs, EarlyExitExt, LoggedResult, MappedFile, ResultExt, Utf8CStr, WriteExt,
-    cmdline_logging, cstr, libc, libc::umask, log_err,
+    CmdArgs, EarlyExitExt, LoggedResult, MappedFile, PositionalArgParser, ResultExt, Utf8CStr,
+    WriteExt, cmdline_logging, cstr, libc, libc::umask, log_err,
 };
 use std::ffi::c_char;
 use std::io::{Seek, SeekFrom, Write};
@@ -78,13 +78,28 @@ struct Sign {
     args: Vec<String>,
 }
 
-#[derive(FromArgs)]
-#[argh(subcommand, name = "extract")]
 struct Extract {
-    #[argh(positional)]
     payload: String,
-    #[argh(positional)]
-    args: Vec<String>,
+    partition: Option<String>,
+    outfile: Option<String>,
+}
+
+impl FromArgs for Extract {
+    fn from_args(_command_name: &[&str], args: &[&str]) -> Result<Self, EarlyExit> {
+        let mut parse = PositionalArgParser(args.iter());
+        Ok(Extract {
+            payload: parse.required("payload.bin")?,
+            partition: parse.optional(),
+            outfile: parse.last_optional()?,
+        })
+    }
+}
+
+impl SubCommand for Extract {
+    const COMMAND: &'static CommandInfo = &CommandInfo {
+        name: "extract",
+        description: "",
+    };
 }
 
 #[derive(FromArgs)]
@@ -136,24 +151,59 @@ struct Sha1 {
 #[argh(subcommand, name = "cleanup")]
 struct Cleanup {}
 
-#[derive(FromArgs)]
-#[argh(subcommand, name = "compress")]
 struct Compress {
-    #[argh(option, short = 'f', default = r#""gzip".to_string()"#)]
-    format: String,
-    #[argh(positional)]
+    format: FileFormat,
     file: String,
-    #[argh(positional)]
     out: Option<String>,
 }
 
-#[derive(FromArgs)]
-#[argh(subcommand, name = "decompress")]
+impl FromArgs for Compress {
+    fn from_args(command_name: &[&str], args: &[&str]) -> Result<Self, EarlyExit> {
+        let cmd = command_name.last().copied().unwrap_or_default();
+        let fmt = cmd.strip_prefix("compress=").unwrap_or("gzip");
+
+        let Ok(fmt) = FileFormat::from_str(fmt) else {
+            return Err(EarlyExit::from(format!(
+                "Unsupported or unknown compression format: {fmt}\n"
+            )));
+        };
+
+        let mut iter = PositionalArgParser(args.iter());
+        Ok(Compress {
+            format: fmt,
+            file: iter.required("infile")?,
+            out: iter.last_optional()?,
+        })
+    }
+}
+
+impl SubCommand for Compress {
+    const COMMAND: &'static CommandInfo = &CommandInfo {
+        name: "compress",
+        description: "",
+    };
+}
+
 struct Decompress {
-    #[argh(positional)]
     file: String,
-    #[argh(positional)]
     out: Option<String>,
+}
+
+impl FromArgs for Decompress {
+    fn from_args(_command_name: &[&str], args: &[&str]) -> Result<Self, EarlyExit> {
+        let mut iter = PositionalArgParser(args.iter());
+        Ok(Decompress {
+            file: iter.required("infile")?,
+            out: iter.last_optional()?,
+        })
+    }
+}
+
+impl SubCommand for Decompress {
+    const COMMAND: &'static CommandInfo = &CommandInfo {
+        name: "decompress",
+        description: "",
+    };
 }
 
 fn print_usage(cmd: &str) {
@@ -307,17 +357,20 @@ fn boot_main(cmds: CmdArgs) -> LoggedResult<i32> {
         cmds[1] = &cmds[1][2..];
     }
 
-    if let Some(fmt) = str::strip_prefix(cmds[1], "compress=") {
-        cmds.insert(1, "compress");
-        cmds.insert(2, "-f");
-        cmds[3] = fmt;
+    let mut cli = if cmds[1].starts_with("compress=") {
+        // Skip the main parser, directly parse the subcommand
+        Compress::from_args(&cmds[..2], &cmds[2..]).map(|compress| Cli {
+            action: Action::Compress(compress),
+        })
+    } else {
+        Cli::from_args(&[cmds[0]], &cmds[1..])
     }
-
-    let mut cli = Cli::from_args(&[cmds[0]], &cmds[1..]).on_early_exit(|| match cmds.get(1) {
-        Some(&"dtb") => print_dtb_usage(),
-        Some(&"cpio") => print_cpio_usage(),
+    .on_early_exit(|| match cmds[1] {
+        "dtb" => print_dtb_usage(),
+        "cpio" => print_cpio_usage(),
         _ => print_usage(cmds[0]),
     });
+
     match cli.action {
         Action::Unpack(Unpack {
             no_decompress,
@@ -358,16 +411,13 @@ fn boot_main(cmds: CmdArgs) -> LoggedResult<i32> {
                 iter.next().map(Utf8CStr::from_string),
             )?;
         }
-        Action::Extract(Extract { payload, args }) => {
-            if args.len() > 2 {
-                log_err!("Too many arguments")?;
-            }
-            extract_boot_from_payload(
-                &payload,
-                args.first().map(|x| x.as_str()),
-                args.get(1).map(|x| x.as_str()),
-            )
-            .log_with_msg(|w| w.write_str("Failed to extract from payload"))?;
+        Action::Extract(Extract {
+            payload,
+            partition,
+            outfile,
+        }) => {
+            extract_boot_from_payload(&payload, partition.as_deref(), outfile.as_deref())
+                .log_with_msg(|w| w.write_str("Failed to extract from payload"))?;
         }
         Action::HexPatch(HexPatch {
             mut file,
@@ -417,15 +467,11 @@ fn boot_main(cmds: CmdArgs) -> LoggedResult<i32> {
             decompress_cmd(&mut file, out.as_mut())?;
         }
         Action::Compress(Compress {
-            ref mut file,
-            ref format,
-            ref mut out,
+            format,
+            mut file,
+            mut out,
         }) => {
-            compress_cmd(
-                FileFormat::from_str(format).unwrap_or(FileFormat::UNKNOWN),
-                file,
-                out.as_mut(),
-            )?;
+            compress_cmd(format, &mut file, out.as_mut())?;
         }
     }
     Ok(0)

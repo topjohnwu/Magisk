@@ -1,6 +1,6 @@
 use crate::ffi::{FileFormat, check_fmt};
 use base::libc::{O_RDONLY, O_TRUNC, O_WRONLY};
-use base::{Chunker, FileOrStd, LoggedResult, Utf8CStr, Utf8CString, WriteExt, error, log_err};
+use base::{Chunker, FileOrStd, LoggedResult, Utf8CStr, Utf8CString, WriteExt, log_err};
 use bytemuck::bytes_of_mut;
 use bzip2::{Compression as BzCompression, write::BzDecoder, write::BzEncoder};
 use flate2::{Compression as GzCompression, write::GzEncoder, write::MultiGzDecoder};
@@ -480,10 +480,6 @@ pub(crate) fn compress_cmd(
     infile: &mut String,
     outfile: Option<&mut String>,
 ) -> LoggedResult<()> {
-    if method == FileFormat::UNKNOWN {
-        error!("Unsupported compression format");
-    }
-
     let infile = Utf8CStr::from_string(infile);
     let outfile = outfile.map(Utf8CStr::from_string);
 
