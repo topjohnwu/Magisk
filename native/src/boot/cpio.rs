@@ -4,7 +4,7 @@ use std::cmp::Ordering;
 use std::collections::{BTreeMap, HashMap};
 use std::fmt::{Display, Formatter};
 use std::fs::File;
-use std::io::{Read, Write};
+use std::io::{Cursor, Read, Write};
 use std::mem::size_of;
 use std::process::exit;
 use std::str;
@@ -705,10 +705,11 @@ impl CpioEntry {
             return false;
         }
 
-        let mut decoder = get_decoder(FileFormat::XZ, Vec::new());
         let Ok(data): std::io::Result<Vec<u8>> = (try {
-            decoder.write_all(&self.data)?;
-            decoder.finish()?
+            let mut decoder = get_decoder(FileFormat::XZ, Cursor::new(&self.data));
+            let mut data = Vec::new();
+            std::io::copy(decoder.as_mut(), &mut data)?;
+            data
         }) else {
             eprintln!("xz compression failed");
             return false;
