@@ -584,6 +584,21 @@ copy_preinit_files() {
     cat $r
     echo
   done > $PREINITDIR/sepolicy.rule
+
+  # Copy all enabled rc
+  find "$PREINITDIR/" -mindepth 1 -maxdepth 1 -type d -exec rm -rf {} \;
+  find /data/adb/modules* -mindepth 1 -maxdepth 1 -type d 2>/dev/null | while read -r MODDIR; do
+    local MODID=$(basename "$MODDIR")
+    [ -f "$MODDIR"/disable ] && continue
+    [ -f "$MODDIR"/remove ] && continue
+    [ -f "$MODDIR"/update ] && continue
+    find "$MODDIR" -mindepth 1 -type f -name "*.rc" | while read -r file; do
+      local path="${file%/*}"
+      path="$PREINITDIR/$MODID${path/$MODDIR/}"
+      mkdir -p "$path"
+      cp "$file" "$path/"
+    done
+  done
 }
 
 #################
@@ -720,9 +735,17 @@ install_module() {
     cp -af $MODPATH/module.prop /data/adb/modules/$MODID/module.prop
   fi
 
-  # Copy over custom sepolicy rules
-  if [ -f $MODPATH/sepolicy.rule ]; then
-    ui_print "- Installing custom sepolicy rules"
+  find "$MODPATH" -mindepth 1 -type f -name "init.rc" -exec rm -f {} \;
+  find "$MODPATH" -mindepth 1 -type f -name "*.rc" | while read -r file; do
+        local path="${file/$MODPATH/}"
+        if [ ! -f "$path" ]; then
+          mv "$file" "$MODPATH"
+        fi
+        rc=true
+  done
+  # Copy over custom sepolicy rules and rc
+  if [ -f $MODPATH/sepolicy.rule ] || "$rc"; then
+    ui_print "- Installing custom sepolicy rules or rc script"
     copy_preinit_files
   fi
 
