@@ -243,7 +243,7 @@ pub fn daemon_entry() {
         .join_path(MAIN_CONFIG);
     let mut is_recovery = false;
     if let Ok(main_config) = tmp_path.open(O_RDONLY | O_CLOEXEC) {
-        BufReader::new(main_config).foreach_props(|key, val| {
+        BufReader::new(main_config).for_each_prop(|key, val| {
             if key == "RECOVERYMODE" {
                 is_recovery = val == "true";
                 return false;
@@ -255,7 +255,7 @@ pub fn daemon_entry() {
 
     let mut sdk_int = -1;
     if let Ok(build_prop) = cstr!("/system/build.prop").open(O_RDONLY | O_CLOEXEC) {
-        BufReader::new(build_prop).foreach_props(|key, val| {
+        BufReader::new(build_prop).for_each_prop(|key, val| {
             if key == "ro.build.version.sdk" {
                 sdk_int = val.parse::<i32>().unwrap_or(-1);
                 return false;
@@ -290,7 +290,7 @@ pub fn daemon_entry() {
     // Cleanup pre-init mounts
     tmp_path.append_path(ROOTMNT);
     if let Ok(mount_list) = tmp_path.open(O_RDONLY | O_CLOEXEC) {
-        BufReader::new(mount_list).foreach_lines(|line| {
+        BufReader::new(mount_list).for_each_line(|line| {
             line.truncate(line.trim_end().len());
             let item = Utf8CStr::from_string(line);
             item.unmount().log_ok();
@@ -336,7 +336,7 @@ fn switch_cgroup(cgroup: &str, pid: i32) {
 fn check_data() -> bool {
     if let Ok(file) = cstr!("/proc/mounts").open(O_RDONLY | O_CLOEXEC) {
         let mut mnt = false;
-        BufReader::new(file).foreach_lines(|line| {
+        BufReader::new(file).for_each_line(|line| {
             if line.contains(" /data ") && !line.contains("tmpfs") {
                 mnt = true;
                 return false;

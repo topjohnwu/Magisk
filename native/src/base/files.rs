@@ -57,12 +57,12 @@ impl<T: Read + Seek> ReadSeekExt for T {
 }
 
 pub trait BufReadExt {
-    fn foreach_lines<F: FnMut(&mut String) -> bool>(&mut self, f: F);
-    fn foreach_props<F: FnMut(&str, &str) -> bool>(&mut self, f: F);
+    fn for_each_line<F: FnMut(&mut String) -> bool>(&mut self, f: F);
+    fn for_each_prop<F: FnMut(&str, &str) -> bool>(&mut self, f: F);
 }
 
 impl<T: BufRead> BufReadExt for T {
-    fn foreach_lines<F: FnMut(&mut String) -> bool>(&mut self, mut f: F) {
+    fn for_each_line<F: FnMut(&mut String) -> bool>(&mut self, mut f: F) {
         let mut buf = String::new();
         loop {
             match self.read_line(&mut buf) {
@@ -81,8 +81,11 @@ impl<T: BufRead> BufReadExt for T {
         }
     }
 
-    fn foreach_props<F: FnMut(&str, &str) -> bool>(&mut self, mut f: F) {
-        self.foreach_lines(|line| {
+    fn for_each_prop<F: FnMut(&str, &str) -> bool>(&mut self, mut f: F) {
+        self.for_each_line(|line| {
+            // Reserve an additional byte, because this string will be manually
+            // null terminated on the C++ side, and it may need more space.
+            line.reserve(1);
             let line = line.trim();
             if line.starts_with('#') {
                 return true;
@@ -874,7 +877,7 @@ pub fn parse_mount_info(pid: &str) -> Vec<MountInfo> {
     let mut res = vec![];
     let mut path = format!("/proc/{pid}/mountinfo");
     if let Ok(file) = Utf8CStr::from_string(&mut path).open(O_RDONLY | O_CLOEXEC) {
-        BufReader::new(file).foreach_lines(|line| {
+        BufReader::new(file).for_each_line(|line| {
             parse_mount_info_line(line)
                 .map(|info| res.push(info))
                 .is_some()

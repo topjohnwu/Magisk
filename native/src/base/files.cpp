@@ -8,15 +8,6 @@
 
 using namespace std;
 
-int fd_pathat(int dirfd, const char *name, char *path, size_t size) {
-    if (fd_path(dirfd, byte_data(path, size)) < 0)
-        return -1;
-    auto len = strlen(path);
-    path[len] = '/';
-    strscpy(path + len + 1, name, size - len - 1);
-    return 0;
-}
-
 void full_read(int fd, string &str) {
     char buf[4096];
     for (ssize_t len; (len = xread(fd, buf, sizeof(buf))) > 0;)
@@ -50,53 +41,6 @@ void write_zero(int fd, size_t size) {
         write(fd, buf, len);
         size -= len;
     }
-}
-
-void file_readline(bool trim, FILE *fp, const function<bool(string_view)> &fn) {
-    size_t len = 1024;
-    char *buf = (char *) malloc(len);
-    char *start;
-    ssize_t read;
-    while ((read = getline(&buf, &len, fp)) >= 0) {
-        start = buf;
-        if (trim) {
-            while (read && "\n\r "sv.find(buf[read - 1]) != string::npos)
-                --read;
-            buf[read] = '\0';
-            while (*start == ' ')
-                ++start;
-        }
-        if (!fn(start))
-            break;
-    }
-    free(buf);
-}
-
-void file_readline(bool trim, const char *file, const function<bool(string_view)> &fn) {
-    if (auto fp = open_file(file, "re"))
-        file_readline(trim, fp.get(), fn);
-}
-
-void file_readline(const char *file, const function<bool(string_view)> &fn) {
-    file_readline(false, file, fn);
-}
-
-void parse_prop_file(FILE *fp, const function<bool(string_view, string_view)> &fn) {
-    file_readline(true, fp, [&](string_view line_view) -> bool {
-        char *line = (char *) line_view.data();
-        if (line[0] == '#')
-            return true;
-        char *eql = strchr(line, '=');
-        if (eql == nullptr || eql == line)
-            return true;
-        *eql = '\0';
-        return fn(line, eql + 1);
-    });
-}
-
-void parse_prop_file(const char *file, const function<bool(string_view, string_view)> &fn) {
-    if (auto fp = open_file(file, "re"))
-        parse_prop_file(fp.get(), fn);
 }
 
 sDIR make_dir(DIR *dp) {

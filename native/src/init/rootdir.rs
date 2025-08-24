@@ -46,7 +46,7 @@ impl MagiskInit {
     pub(crate) fn parse_config_file(&mut self) {
         if let Ok(fd) = cstr!("/data/.backup/.magisk").open(O_RDONLY) {
             let mut reader = BufReader::new(fd);
-            reader.foreach_props(|key, val| {
+            reader.for_each_prop(|key, val| {
                 if key == "PREINITDEVICE" {
                     self.preinit_dev = val.to_string();
                     return false;

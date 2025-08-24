@@ -283,7 +283,8 @@ struct Utf8CStr {
     const char *c_str() const { return this->data(); }
     size_t size() const { return this->length(); }
     bool empty() const { return this->length() == 0 ; }
-    operator std::string_view() { return {data(), length()}; }
+    operator std::string_view() const { return {data(), length()}; }
+    bool operator==(std::string_view rhs) const { return std::string_view{data(), length()} == rhs; }
 
 private:
 #pragma clang diagnostic push
@@ -293,3 +294,18 @@ private:
 };
 
 } // namespace rust
+
+// Bindings for std::function to be callable from Rust
+struct FnBoolStrStr : public std::function<bool(rust::Str, rust::Str)> {
+    using std::function<bool(rust::Str, rust::Str)>::function;
+    bool call(rust::Str a, rust::Str b) const {
+        return operator()(a, b);
+    }
+};
+
+struct FnBoolString : public std::function<bool(rust::String&)> {
+    using std::function<bool(rust::String&)>::function;
+    bool call(rust::String &s) const {
+        return operator()(s);
+    }
+};
