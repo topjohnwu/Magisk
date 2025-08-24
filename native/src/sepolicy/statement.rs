@@ -287,7 +287,7 @@ impl SePolicy {
     }
 
     fn load_rules_from_reader<T: BufRead>(&mut self, reader: &mut T) {
-        reader.foreach_lines(|line| {
+        reader.for_each_line(|line| {
             self.parse_statement(line);
             true
         });

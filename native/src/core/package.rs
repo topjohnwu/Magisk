@@ -88,7 +88,7 @@ fn read_certificate(apk: &mut File, version: i32) -> Vec<u8> {
             apk.read_exact(&mut comment)?;
             let mut comment = Cursor::new(&comment);
             let mut apk_ver = 0;
-            comment.foreach_props(|k, v| {
+            comment.for_each_prop(|k, v| {
                 if k == "versionCode" {
                     apk_ver = v.parse::<i32>().unwrap_or(0);
                     false

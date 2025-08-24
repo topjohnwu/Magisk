@@ -60,14 +60,14 @@ static bool patch_rc_scripts(const char *src_path, const char *tmp_path, bool wr
 
     // First patch init.rc
     {
-        auto src = xopen_file(xopenat(src_fd, INIT_RC, O_RDONLY | O_CLOEXEC, 0), "re");
-        if (!src) return false;
+        owned_fd src_rc = xopenat(src_fd, INIT_RC, O_RDONLY | O_CLOEXEC, 0);
+        if (src_rc < 0) return false;
         if (writable) unlinkat(src_fd, INIT_RC, 0);
-        auto dest = xopen_file(
+        auto dest_rc = xopen_file(
                 xopenat(dest_fd, INIT_RC, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0), "we");
-        if (!dest) return false;
+        if (!dest_rc) return false;
         LOGD("Patching " INIT_RC " in %s\n", src_path);
-        file_readline(false, src.get(), [&dest](string_view line) -> bool {
+        file_readline(src_rc, [&dest_rc](string_view line) -> bool {
             // Do not start vaultkeeper
             if (str_contains(line, "start vaultkeeper")) {
                 LOGD("Remove vaultkeeper\n");
@@ -76,59 +76,59 @@ static bool patch_rc_scripts(const char *src_path, const char *tmp_path, bool wr
             // Do not run flash_recovery
             if (line.starts_with("service flash_recovery")) {
                 LOGD("Remove flash_recovery\n");
-                fprintf(dest.get(), "service flash_recovery /system/bin/true\n");
+                fprintf(dest_rc.get(), "service flash_recovery /system/bin/true\n");
                 return true;
             }
             // Samsung's persist.sys.zygote.early will cause Zygote to start before post-fs-data
             if (line.starts_with("on property:persist.sys.zygote.early=")) {
                 LOGD("Invalidate persist.sys.zygote.early\n");
-                fprintf(dest.get(), "on property:persist.sys.zygote.early.xxxxx=true\n");
+                fprintf(dest_rc.get(), "on property:persist.sys.zygote.early.xxxxx=true\n");
                 return true;
             }
             // Else just write the line
-            fprintf(dest.get(), "%s", line.data());
+            fprintf(dest_rc.get(), "%s", line.data());
             return true;
         });
 
-        fprintf(dest.get(), "\n");
+        fprintf(dest_rc.get(), "\n");
 
         // Inject custom rc scripts
         for (auto &script : rc_list) {
             // Replace template arguments of rc scripts with dynamic paths
             replace_all(script, "${MAGISKTMP}", tmp_path);
-            fprintf(dest.get(), "\n%s\n", script.data());
+            fprintf(dest_rc.get(), "\n%s\n", script.data());
         }
         rc_list.clear();
 
         // Inject Magisk rc scripts
-        rust::inject_magisk_rc(fileno(dest.get()), tmp_path);
+        rust::inject_magisk_rc(fileno(dest_rc.get()), tmp_path);
 
-        fclone_attr(fileno(src.get()), fileno(dest.get()));
+        fclone_attr(src_rc, fileno(dest_rc.get()));
     }
 
     // Then patch init.zygote*.rc
     for (dirent *entry; (entry = readdir(src_dir.get()));) {
         auto name = std::string_view(entry->d_name);
         if (!name.starts_with("init.zygote") || !name.ends_with(".rc")) continue;
-        auto src = xopen_file(xopenat(src_fd, name.data(), O_RDONLY | O_CLOEXEC, 0), "re");
-        if (!src) continue;
+        owned_fd src_rc = xopenat(src_fd, name.data(), O_RDONLY | O_CLOEXEC, 0);
+        if (src_rc < 0) continue;
         if (writable) unlinkat(src_fd, name.data(), 0);
-        auto dest = xopen_file(
+        auto dest_rc = xopen_file(
                 xopenat(dest_fd, name.data(), O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0), "we");
-        if (!dest) continue;
+        if (!dest_rc) continue;
         LOGD("Patching %s in %s\n", name.data(), src_path);
-        file_readline(false, src.get(), [&dest, &tmp_path](string_view line) -> bool {
+        file_readline(src_rc, [&dest_rc, &tmp_path](string_view line) -> bool {
             if (line.starts_with("service zygote ")) {
                 LOGD("Inject zygote restart\n");
-                fprintf(dest.get(), "%s", line.data());
-                fprintf(dest.get(),
+                fprintf(dest_rc.get(), "%s", line.data());
+                fprintf(dest_rc.get(),
                         "    onrestart exec " MAGISK_PROC_CON " 0 0 -- %s/magisk --zygote-restart\n", tmp_path);
                 return true;
             }
-            fprintf(dest.get(), "%s", line.data());
+            fprintf(dest_rc.get(), "%s", line.data());
             return true;
         });
-        fclone_attr(fileno(src.get()), fileno(dest.get()));
+        fclone_attr(src_rc, fileno(dest_rc.get()));
     }
 
     return faccessat(src_fd, "init.fission_host.rc", F_OK, 0) == 0;
