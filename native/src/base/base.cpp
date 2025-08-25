@@ -1,6 +1,8 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/prctl.h>
+#include <sys/mman.h>
+#include <android/log.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <syscall.h>
@@ -10,6 +12,21 @@
 #include <base.hpp>
 
 using namespace std;
+
+#ifndef __call_bypassing_fortify
+#define __call_bypassing_fortify(fn) (&fn)
+#endif
+
+// Override libc++ new implementation to optimize final build size
+
+void* operator new(std::size_t s) { return std::malloc(s); }
+void* operator new[](std::size_t s) { return std::malloc(s); }
+void  operator delete(void *p) { std::free(p); }
+void  operator delete[](void *p) { std::free(p); }
+void* operator new(std::size_t s, const std::nothrow_t&) noexcept { return std::malloc(s); }
+void* operator new[](std::size_t s, const std::nothrow_t&) noexcept { return std::malloc(s); }
+void  operator delete(void *p, const std::nothrow_t&) noexcept { std::free(p); }
+void  operator delete[](void *p, const std::nothrow_t&) noexcept { std::free(p); }
 
 bool byte_view::contains(byte_view pattern) const {
     return _buf != nullptr && memmem(_buf, _sz, pattern._buf, pattern._sz) != nullptr;
@@ -248,6 +265,155 @@ int ssprintf(char *dest, size_t size, const char *fmt, ...) {
 size_t strscpy(char *dest, const char *src, size_t size) {
     return std::min(strlcpy(dest, src, size), size - 1);
 }
+
+#undef vsnprintf
+static int fmt_and_log_with_rs(LogLevel level, const char *fmt, va_list ap) {
+    constexpr int sz = 4096;
+    char buf[sz];
+    buf[0] = '\0';
+    // Fortify logs when a fatal error occurs. Do not run through fortify again
+    int len = std::min(__call_bypassing_fortify(vsnprintf)(buf, sz, fmt, ap), sz - 1);
+    log_with_rs(level, rust::Utf8CStr(buf, len + 1));
+    return len;
+}
+
+// Used to override external C library logging
+extern "C" int magisk_log_print(int prio, const char *tag, const char *fmt, ...) {
+    LogLevel level;
+    switch (prio) {
+    case ANDROID_LOG_DEBUG:
+        level = LogLevel::Debug;
+        break;
+    case ANDROID_LOG_INFO:
+        level = LogLevel::Info;
+        break;
+    case ANDROID_LOG_WARN:
+        level = LogLevel::Warn;
+        break;
+    case ANDROID_LOG_ERROR:
+        level = LogLevel::ErrorCxx;
+        break;
+    default:
+        return 0;
+    }
+
+    char fmt_buf[4096];
+    auto len = strscpy(fmt_buf, tag, sizeof(fmt_buf) - 1);
+    // Prevent format specifications in the tag
+    std::replace(fmt_buf, fmt_buf + len, '%', '_');
+    len = ssprintf(fmt_buf + len, sizeof(fmt_buf) - len - 1, ": %s", fmt) + len;
+    // Ensure the fmt string always ends with newline
+    if (fmt_buf[len - 1] != '\n') {
+        fmt_buf[len] = '\n';
+        fmt_buf[len + 1] = '\0';
+    }
+    va_list argv;
+    va_start(argv, fmt);
+    int ret = fmt_and_log_with_rs(level, fmt_buf, argv);
+    va_end(argv);
+    return ret;
+}
+
+#define LOG_BODY(level)   \
+    va_list argv;         \
+    va_start(argv, fmt);  \
+    fmt_and_log_with_rs(LogLevel::level, fmt, argv); \
+    va_end(argv);         \
+
+// LTO will optimize out the NOP function
+#if MAGISK_DEBUG
+void LOGD(const char *fmt, ...) { LOG_BODY(Debug) }
+#else
+void LOGD(const char *fmt, ...) {}
+#endif
+void LOGI(const char *fmt, ...) { LOG_BODY(Info) }
+void LOGW(const char *fmt, ...) { LOG_BODY(Warn) }
+void LOGE(const char *fmt, ...) { LOG_BODY(ErrorCxx) }
+
+// Export raw symbol to fortify compat
+extern "C" void __vloge(const char* fmt, va_list ap) {
+    fmt_and_log_with_rs(LogLevel::ErrorCxx, fmt, ap);
+}
+
+string full_read(int fd) {
+    string str;
+    char buf[4096];
+    for (ssize_t len; (len = xread(fd, buf, sizeof(buf))) > 0;)
+        str.insert(str.end(), buf, buf + len);
+    return str;
+}
+
+string full_read(const char *filename) {
+    string str;
+    if (int fd = xopen(filename, O_RDONLY | O_CLOEXEC); fd >= 0) {
+        str = full_read(fd);
+        close(fd);
+    }
+    return str;
+}
+
+void write_zero(int fd, size_t size) {
+    char buf[4096] = {0};
+    size_t len;
+    while (size > 0) {
+        len = sizeof(buf) > size ? size : sizeof(buf);
+        write(fd, buf, len);
+        size -= len;
+    }
+}
+
+sDIR make_dir(DIR *dp) {
+    return sDIR(dp, [](DIR *dp){ return dp ? closedir(dp) : 1; });
+}
+
+sFILE make_file(FILE *fp) {
+    return sFILE(fp, [](FILE *fp){ return fp ? fclose(fp) : 1; });
+}
+
+mmap_data::mmap_data(const char *name, bool rw) {
+    auto slice = rust::map_file(name, rw);
+    if (!slice.empty()) {
+        _buf = slice.data();
+        _sz = slice.size();
+    }
+}
+
+mmap_data::mmap_data(int dirfd, const char *name, bool rw) {
+    auto slice = rust::map_file_at(dirfd, name, rw);
+    if (!slice.empty()) {
+        _buf = slice.data();
+        _sz = slice.size();
+    }
+}
+
+mmap_data::mmap_data(int fd, size_t sz, bool rw) {
+    auto slice = rust::map_fd(fd, sz, rw);
+    if (!slice.empty()) {
+        _buf = slice.data();
+        _sz = slice.size();
+    }
+}
+
+mmap_data::~mmap_data() {
+    if (_buf)
+        munmap(_buf, _sz);
+}
+
+string resolve_preinit_dir(const char *base_dir) {
+    string dir = base_dir;
+    if (access((dir + "/unencrypted").data(), F_OK) == 0) {
+        dir += "/unencrypted/magisk";
+    } else if (access((dir + "/adb").data(), F_OK) == 0) {
+        dir += "/adb";
+    } else if (access((dir + "/watchdog").data(), F_OK) == 0) {
+        dir += "/watchdog/magisk";
+    } else {
+        dir += "/magisk";
+    }
+    return dir;
+}
+
+// FFI for Utf8CStr
 
 extern "C" void cxx$utf8str$new(rust::Utf8CStr *self, const void *s, size_t len);
 extern "C" const char *cxx$utf8str$ptr(const rust::Utf8CStr *self);

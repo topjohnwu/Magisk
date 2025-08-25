@@ -14,10 +14,7 @@ LOCAL_EXPORT_STATIC_LIBRARIES := libcxx
 LOCAL_STATIC_LIBRARIES := libcxx
 LOCAL_CFLAGS := -DRUST_CXX_NO_EXCEPTIONS
 LOCAL_SRC_FILES := \
-    new.cpp \
-    files.cpp \
-    misc.cpp \
-    logging.cpp \
+    base.cpp \
     base-rs.cpp \
     ../external/cxx-rs/src/cxx.cc
 include $(BUILD_STATIC_LIBRARY)
