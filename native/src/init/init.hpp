@@ -15,23 +15,23 @@
 #include "init-rs.hpp"
 
 int magisk_proxy_main(int, char *argv[]);
-rust::Utf8CStr backup_init();
+Utf8CStr backup_init();
 
 // Expose some constants to Rust
 
-static inline rust::Utf8CStr split_plat_cil() {
+static inline Utf8CStr split_plat_cil() {
     return SPLIT_PLAT_CIL;
 };
 
-static inline rust::Utf8CStr preload_lib() {
+static inline Utf8CStr preload_lib() {
     return PRELOAD_LIB;
 }
 
-static inline rust::Utf8CStr preload_policy() {
+static inline Utf8CStr preload_policy() {
     return PRELOAD_POLICY;
 }
 
-static inline rust::Utf8CStr preload_ack() {
+static inline Utf8CStr preload_ack() {
     return PRELOAD_ACK;
 }
 

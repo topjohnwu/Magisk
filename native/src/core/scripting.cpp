@@ -74,7 +74,7 @@ if (pfs) { \
     exit(0); \
 }
 
-void exec_common_scripts(rust::Utf8CStr stage) {
+void exec_common_scripts(Utf8CStr stage) {
     LOGI("* Running %s.d scripts\n", stage.c_str());
     char path[4096];
     char *name = path + sprintf(path, SECURE_DIR "/%s.d", stage.c_str());
@@ -116,12 +116,12 @@ static bool operator>(const timespec &a, const timespec &b) {
     return a.tv_nsec > b.tv_nsec;
 }
 
-void exec_module_scripts(rust::Utf8CStr stage, const rust::Vec<ModuleInfo> &module_list) {
+void exec_module_scripts(Utf8CStr stage, const rust::Vec<ModuleInfo> &module_list) {
     LOGI("* Running module %s scripts\n", stage.c_str());
     if (module_list.empty())
         return;
 
-    bool pfs = (string_view) stage == "post-fs-data";
+    bool pfs = stage == "post-fs-data";
     if (pfs) {
         timespec now{};
         clock_gettime(CLOCK_MONOTONIC, &now);
@@ -157,7 +157,7 @@ appops set %s REQUEST_INSTALL_PACKAGES allow
 rm -f $APK
 )EOF";
 
-void install_apk(rust::Utf8CStr apk) {
+void install_apk(Utf8CStr apk) {
     setfilecon(apk.c_str(), MAGISK_FILE_CON);
     char cmds[sizeof(install_script) + 4096];
     ssprintf(cmds, sizeof(cmds), install_script, apk.c_str(), JAVA_PACKAGE_NAME);
@@ -170,7 +170,7 @@ log -t Magisk "pm_uninstall: $PKG"
 log -t Magisk "pm_uninstall: $(pm uninstall $PKG 2>&1)"
 )EOF";
 
-void uninstall_pkg(rust::Utf8CStr pkg) {
+void uninstall_pkg(Utf8CStr pkg) {
     char cmds[sizeof(uninstall_script) + 256];
     ssprintf(cmds, sizeof(cmds), uninstall_script, pkg.c_str());
     exec_command_async("/system/bin/sh", "-c", cmds);

@@ -136,21 +136,6 @@ int parse_int(std::string_view s);
 using thread_entry = void *(*)(void *);
 extern "C" int new_daemon_thread(thread_entry entry, void *arg = nullptr);
 
-static inline bool str_contains(std::string_view s, std::string_view ss) {
-    return s.find(ss) != std::string::npos;
-}
-static inline bool str_starts(std::string_view s, std::string_view ss) {
-    return s.size() >= ss.size() && s.compare(0, ss.size(), ss) == 0;
-}
-static inline bool str_ends(std::string_view s, std::string_view ss) {
-    return s.size() >= ss.size() && s.compare(s.size() - ss.size(), std::string::npos, ss) == 0;
-}
-static inline std::string ltrim(std::string &&s) {
-    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
-        return !std::isspace(ch);
-    }));
-    return std::move(s);
-}
 static inline std::string rtrim(std::string &&s) {
     s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
         return !std::isspace(ch) && ch != '\0';
@@ -222,8 +207,6 @@ constexpr auto operator+(T e) noexcept ->
     return static_cast<std::underlying_type_t<T>>(e);
 }
 
-namespace rust {
-
 struct Utf8CStr {
     const char *data() const;
     size_t length() const;
@@ -236,8 +219,9 @@ struct Utf8CStr {
     const char *c_str() const { return this->data(); }
     size_t size() const { return this->length(); }
     bool empty() const { return this->length() == 0 ; }
-    operator std::string_view() const { return {data(), length()}; }
-    bool operator==(std::string_view rhs) const { return std::string_view{data(), length()} == rhs; }
+    std::string_view sv() const { return {data(), length()}; }
+    operator std::string_view() const { return sv(); }
+    bool operator==(std::string_view rhs) const { return sv() == rhs; }
 
 private:
 #pragma clang diagnostic push
@@ -245,8 +229,6 @@ private:
     std::array<std::uintptr_t, 2> repr;
 #pragma clang diagnostic pop
 };
-
-} // namespace rust
 
 // Bindings for std::function to be callable from Rust
 
@@ -257,10 +239,10 @@ struct FnBoolStrStr : public CxxFnBoolStrStr {
         return operator()(a, b);
     }
 };
-using CxxFnBoolString = std::function<bool(rust::String&)>;
-struct FnBoolString : public CxxFnBoolString {
-    using CxxFnBoolString::function;
-    bool call(rust::String &s) const {
+using CxxFnBoolStr = std::function<bool(Utf8CStr)>;
+struct FnBoolStr : public CxxFnBoolStr {
+    using CxxFnBoolStr::function;
+    bool call(Utf8CStr s) const {
         return operator()(s);
     }
 };

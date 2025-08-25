@@ -143,6 +143,10 @@ template<> void prop_to_string<rust::String>::exec(const char *, const char *val
     serial = s;
 }
 
+static bool str_starts(std::string_view s, std::string_view ss) {
+    return s.starts_with(ss);
+}
+
 static int set_prop(const char *name, const char *value, PropFlags flags) {
     if (!check_legal_property_name(name))
         return 1;
@@ -429,7 +433,7 @@ static StringType get_prop_impl(const char *name, bool persist) {
     return get_prop<StringType>(name, flags);
 }
 
-rust::String get_prop_rs(rust::Utf8CStr name, bool persist) {
+rust::String get_prop_rs(Utf8CStr name, bool persist) {
     return get_prop_impl<rust::String>(name.data(), persist);
 }
 

@@ -301,7 +301,8 @@ static bool proc_is_restricted(pid_t pid) {
     uint32_t data[_LINUX_CAPABILITY_U32S_3] = {};
     ssprintf(buf, sizeof(buf), "/proc/%d/status", pid);
     owned_fd status_fd = xopen(buf, O_RDONLY | O_CLOEXEC);
-    file_readline(status_fd, [&](string_view line) -> bool {
+    file_readline(status_fd, [&](Utf8CStr s) -> bool {
+        string_view line = s;
         if (line.starts_with(bnd)) {
             auto p = line.begin();
             advance(p, bnd.size());

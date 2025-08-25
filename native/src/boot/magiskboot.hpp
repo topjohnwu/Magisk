@@ -1,5 +1,7 @@
 #pragma once
 
+#include <base.hpp>
+
 #define HEADER_FILE     "header"
 #define KERNEL_FILE     "kernel"
 #define RAMDISK_FILE    "ramdisk.cpio"
@@ -47,11 +49,11 @@
 #define AVB_MAGIC "AVB0"
 #define ZIMAGE_MAGIC "\x18\x28\x6f\x01"
 
-enum class FileFormat : ::std::uint8_t;
+enum class FileFormat : uint8_t;
 
-int unpack(rust::Utf8CStr image, bool skip_decomp = false, bool hdr = false);
-void repack(rust::Utf8CStr src_img, rust::Utf8CStr out_img, bool skip_comp = false);
-int split_image_dtb(rust::Utf8CStr filename, bool skip_decomp = false);
+int unpack(Utf8CStr image, bool skip_decomp = false, bool hdr = false);
+void repack(Utf8CStr src_img, Utf8CStr out_img, bool skip_comp = false);
+int split_image_dtb(Utf8CStr filename, bool skip_decomp = false);
 void cleanup();
 FileFormat check_fmt(const void *buf, size_t len);
 

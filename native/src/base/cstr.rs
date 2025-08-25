@@ -369,7 +369,7 @@ impl AsRef<Utf8CStr> for Utf8CStr {
 
 // Notice that we only implement ExternType on Utf8CStr *reference*
 unsafe impl ExternType for &Utf8CStr {
-    type Id = type_id!("rust::Utf8CStr");
+    type Id = type_id!("Utf8CStr");
     type Kind = cxx::kind::Trivial;
 }
 
