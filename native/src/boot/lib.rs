@@ -49,15 +49,11 @@ pub mod ffi {
     }
 
     unsafe extern "C++" {
-        include!("../base/include/base.hpp");
+        include!("magiskboot.hpp");
 
-        #[namespace = "rust"]
         #[cxx_name = "Utf8CStr"]
         type Utf8CStrRef<'a> = base::ffi::Utf8CStrRef<'a>;
-    }
 
-    unsafe extern "C++" {
-        include!("magiskboot.hpp");
         fn cleanup();
         fn unpack(image: Utf8CStrRef, skip_decomp: bool, hdr: bool) -> i32;
         fn repack(src_img: Utf8CStrRef, out_img: Utf8CStrRef, skip_comp: bool);

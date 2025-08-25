@@ -38,22 +38,18 @@ std::string full_read(const char *filename);
 void write_zero(int fd, size_t size);
 std::string resolve_preinit_dir(const char *base_dir);
 
-// Functor = function<bool(string_view)>
-template <typename Functor>
-void file_readline(int fd, Functor &&fn) {
-    file_readline_rs(fd, [&](rust::String &line) -> bool {
-        return fn(std::string_view(line.c_str(), line.size()));
-    });
-}
-
-// Functor = function<bool(string_view, string_view)>
+// Functor = function<bool(Utf8CStr, Utf8CStr)>
 template <typename Functor>
 void parse_prop_file(const char *file, Functor &&fn) {
     parse_prop_file_rs(file, [&](rust::Str key, rust::Str val) -> bool {
-        // Null terminate all strings
+        // We perform the null termination here in C++ because it's very difficult to do it
+        // right in Rust due to pointer provenance. Trying to dereference a pointer without
+        // the correct provenance in Rust, even in unsafe code, is undefined behavior.
+        // However on the C++ side, there are fewer restrictions on pointers, so the const_cast here
+        // will not trigger UB in the compiler.
         *(const_cast<char *>(key.data()) + key.size()) = '\0';
         *(const_cast<char *>(val.data()) + val.size()) = '\0';
-        return fn(std::string_view(key.data(), key.size()), std::string_view(val.data(), val.size()));
+        return fn(Utf8CStr(key.data(), key.size() + 1), Utf8CStr(val.data(), val.size() + 1));
     });
 }
 

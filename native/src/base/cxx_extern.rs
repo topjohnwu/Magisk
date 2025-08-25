@@ -9,7 +9,7 @@ use std::os::fd::{BorrowedFd, FromRawFd, OwnedFd, RawFd};
 use cfg_if::cfg_if;
 use libc::{O_RDONLY, c_char, mode_t};
 
-use crate::ffi::{FnBoolStrStr, FnBoolString};
+use crate::ffi::{FnBoolStr, FnBoolStrStr};
 use crate::files::map_file_at;
 pub(crate) use crate::xwrap::*;
 use crate::{
@@ -183,7 +183,7 @@ pub(crate) fn parse_prop_file_rs(name: &Utf8CStr, f: &FnBoolStrStr) {
     }
 }
 
-pub(crate) fn file_readline_rs(fd: RawFd, f: &FnBoolString) {
+pub(crate) fn file_readline_for_cxx(fd: RawFd, f: &FnBoolStr) {
     let mut fd = ManuallyDrop::new(unsafe { File::from_raw_fd(fd) });
-    BufReader::new(fd.deref_mut()).for_each_line(|line| f.call(line));
+    BufReader::new(fd.deref_mut()).for_each_line(|line| f.call(Utf8CStr::from_string(line)));
 }

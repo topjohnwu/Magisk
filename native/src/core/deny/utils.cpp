@@ -90,9 +90,10 @@ static void crawl_procfs(const F &fn) {
     }
 }
 
-static inline bool str_eql(string_view a, string_view b) { return a == b; }
+static bool str_eql(string_view a, string_view b) { return a == b; }
+static bool str_starts_with(string_view a, string_view b) { return a.starts_with(b); }
 
-template<bool str_op(string_view, string_view) = &str_eql>
+template<bool str_op(string_view, string_view) = str_eql>
 static bool proc_name_match(int pid, string_view name) {
     char buf[4019];
     sprintf(buf, "/proc/%d/cmdline", pid);
@@ -111,7 +112,7 @@ bool proc_context_match(int pid, string_view context) {
 
     sprintf(buf, "/proc/%d", pid);
     if (lgetfilecon(buf, byte_data{ con, sizeof(con) })) {
-        return str_starts(con, context);
+        return string_view(con).starts_with(context);
     }
     return false;
 }
@@ -173,7 +174,7 @@ static bool add_hide_set(const char *pkg, const char *proc) {
         return true;
     if (str_eql(pkg, ISOLATED_MAGIC)) {
         // Kill all matching isolated processes
-        kill_process<&proc_name_match<str_starts>>(proc, true);
+        kill_process<&proc_name_match<str_starts_with>>(proc, true);
     } else {
         kill_process(proc);
     }
@@ -411,7 +412,7 @@ bool is_deny_target(int uid, string_view process) {
     if (app_id >= 90000) {
         if (auto it = pkg_to_procs.find(ISOLATED_MAGIC); it != pkg_to_procs.end()) {
             for (const auto &s : it->second) {
-                if (str_starts(process, s))
+                if (process.starts_with(s))
                     return true;
             }
         }

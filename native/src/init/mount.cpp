@@ -30,15 +30,15 @@ static void parse_device(devinfo *dev, const char *uevent) {
     dev->devpath[0] = '\0';
     dev->dmname[0] = '\0';
     dev->devname[0] = '\0';
-    parse_prop_file(uevent, [=](string_view key, string_view value) -> bool {
+    parse_prop_file(uevent, [=](Utf8CStr key, Utf8CStr value) -> bool {
         if (key == "MAJOR")
-            dev->major = parse_int(value.data());
+            dev->major = parse_int(value);
         else if (key == "MINOR")
-            dev->minor = parse_int(value.data());
+            dev->minor = parse_int(value);
         else if (key == "DEVNAME")
-            strscpy(dev->devname, value.data(), sizeof(dev->devname));
+            strscpy(dev->devname, value.c_str(), sizeof(dev->devname));
         else if (key == "PARTNAME")
-            strscpy(dev->partname, value.data(), sizeof(dev->devname));
+            strscpy(dev->partname, value.c_str(), sizeof(dev->devname));
 
         return true;
     });

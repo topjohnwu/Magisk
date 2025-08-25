@@ -41,7 +41,6 @@ pub mod ffi {
     unsafe extern "C++" {
         include!("misc.hpp");
 
-        #[namespace = "rust"]
         #[cxx_name = "Utf8CStr"]
         type Utf8CStrRef<'a> = &'a crate::cstr::Utf8CStr;
 
@@ -51,8 +50,8 @@ pub mod ffi {
         type FnBoolStrStr;
         fn call(self: &FnBoolStrStr, key: &str, value: &str) -> bool;
 
-        type FnBoolString;
-        fn call(self: &FnBoolString, key: &mut String) -> bool;
+        type FnBoolStr;
+        fn call(self: &FnBoolStr, key: Utf8CStrRef) -> bool;
     }
 
     extern "Rust" {
@@ -63,7 +62,8 @@ pub mod ffi {
         fn exit_on_error(b: bool);
         fn cmdline_logging();
         fn parse_prop_file_rs(name: Utf8CStrRef, f: &FnBoolStrStr);
-        fn file_readline_rs(fd: i32, f: &FnBoolString);
+        #[cxx_name = "file_readline"]
+        fn file_readline_for_cxx(fd: i32, f: &FnBoolStr);
     }
 
     #[namespace = "rust"]

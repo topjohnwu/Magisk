@@ -156,7 +156,7 @@ void dyn_img_hdr::dump_hdr_file() const {
 }
 
 void dyn_img_hdr::load_hdr_file() {
-    parse_prop_file(HEADER_FILE, [=, this](string_view key, string_view value) -> bool {
+    parse_prop_file(HEADER_FILE, [=, this](Utf8CStr key, Utf8CStr value) -> bool {
         if (key == "name" && name()) {
             memset(name(), 0, 16);
             memcpy(name(), value.data(), value.length() > 15 ? 15 : value.length());
@@ -166,7 +166,7 @@ void dyn_img_hdr::load_hdr_file() {
             if (value.length() > BOOT_ARGS_SIZE) {
                 memcpy(cmdline(), value.data(), BOOT_ARGS_SIZE);
                 auto len = std::min(value.length() - BOOT_ARGS_SIZE, (size_t) BOOT_EXTRA_ARGS_SIZE);
-                memcpy(extra_cmdline(), &value[BOOT_ARGS_SIZE], len);
+                memcpy(extra_cmdline(), value.data() + BOOT_ARGS_SIZE, len);
             } else {
                 memcpy(cmdline(), value.data(), value.length());
             }
@@ -583,7 +583,7 @@ bool boot_img::parse_image(const uint8_t *p, FileFormat type) {
     return true;
 }
 
-int split_image_dtb(rust::Utf8CStr filename, bool skip_decomp) {
+int split_image_dtb(Utf8CStr filename, bool skip_decomp) {
     mmap_data img(filename.data());
 
     if (size_t off = find_dtb_offset(img.data(), img.size()); off > 0) {
@@ -603,7 +603,7 @@ int split_image_dtb(rust::Utf8CStr filename, bool skip_decomp) {
     }
 }
 
-int unpack(rust::Utf8CStr image, bool skip_decomp, bool hdr) {
+int unpack(Utf8CStr image, bool skip_decomp, bool hdr) {
     const boot_img boot(image.data());
 
     if (hdr)
@@ -688,7 +688,7 @@ write_zero(fd, align_padding(lseek(fd, 0, SEEK_CUR) - off.header, page_size))
 
 #define file_align() file_align_with(boot.hdr->page_size())
 
-void repack(rust::Utf8CStr src_img, rust::Utf8CStr out_img, bool skip_comp) {
+void repack(Utf8CStr src_img, Utf8CStr out_img, bool skip_comp) {
     const boot_img boot(src_img.data());
     fprintf(stderr, "Repack to boot image: [%s]\n", out_img.data());
 

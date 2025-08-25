@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
     cmdline_logging();
     init_argv0(argc, argv);
 
-    string_view argv0 = basename(argv[0]);
+    Utf8CStr argv0 = basename(argv[0]);
 
     umask(0);
 
@@ -63,6 +63,6 @@ int main(int argc, char *argv[]) {
             return app.fn(argc, argv);
         }
     }
-    fprintf(stderr, "%s: applet not found\n", argv0.data());
+    fprintf(stderr, "%s: applet not found\n", argv0.c_str());
     return 1;
 }

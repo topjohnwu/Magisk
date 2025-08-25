@@ -389,7 +389,7 @@ int connect_daemon(int req, bool create) {
 
         char buf[64];
         xreadlink("/proc/self/exe", buf, sizeof(buf));
-        if (tmp[0] == '\0' || !str_starts(buf, tmp)) {
+        if (tmp[0] == '\0' || !string_view(buf).starts_with(tmp)) {
             LOGE("Start daemon on magisk tmpfs\n");
             close(fd);
             return -1;

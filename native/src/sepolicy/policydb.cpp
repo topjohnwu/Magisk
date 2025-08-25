@@ -97,7 +97,7 @@ SePolicy SePolicy::from_data(rust::Slice<const uint8_t> data) noexcept {
     return {std::make_unique<sepol_impl>(db)};
 }
 
-SePolicy SePolicy::from_file(::rust::Utf8CStr file) noexcept {
+SePolicy SePolicy::from_file(::Utf8CStr file) noexcept {
     LOGD("Load policy from: %.*s\n", static_cast<int>(file.size()), file.data());
 
     policy_file_t pf;
@@ -235,7 +235,7 @@ static int vec_write(void *v, const char *buf, int len) {
     return len;
 }
 
-bool SePolicy::to_file(::rust::Utf8CStr file) const noexcept {
+bool SePolicy::to_file(::Utf8CStr file) const noexcept {
     // No partial writes are allowed to /sys/fs/selinux/load, thus the reason why we
     // first dump everything into memory, then directly call write system call
     vector<char> out;

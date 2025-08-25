@@ -49,7 +49,6 @@ pub mod ffi {
     unsafe extern "C++" {
         include!("init.hpp");
 
-        #[namespace = "rust"]
         #[cxx_name = "Utf8CStr"]
         type Utf8CStrRef<'a> = base::ffi::Utf8CStrRef<'a>;
 
