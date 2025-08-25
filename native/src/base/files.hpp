@@ -1,24 +1,12 @@
 #pragma once
 
 #include <sys/stat.h>
+#include <linux/fs.h>
 #include <functional>
 #include <string_view>
 #include <string>
-#include <vector>
 
-#include <linux/fs.h>
-#include "misc.hpp"
-
-template <typename T>
-static inline T align_to(T v, int a) {
-    static_assert(std::is_integral<T>::value);
-    return (v + a - 1) / a * a;
-}
-
-template <typename T>
-static inline T align_padding(T v, int a) {
-    return align_to(v, a) - v;
-}
+#include "base-rs.hpp"
 
 struct mmap_data : public byte_data {
     static_assert((sizeof(void *) == 8 && BLKGETSIZE64 == 0x80081272) ||
@@ -45,12 +33,6 @@ bool fclone_attr(int src, int dest);
 
 } // extern "C"
 
-static inline ssize_t realpath(
-        const char * __restrict__ path, char * __restrict__ buf, size_t bufsiz) {
-    return canonical_path(path, buf, bufsiz);
-}
-void full_read(int fd, std::string &str);
-void full_read(const char *filename, std::string &str);
 std::string full_read(int fd);
 std::string full_read(const char *filename);
 void write_zero(int fd, size_t size);

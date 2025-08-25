@@ -345,6 +345,17 @@ struct vendor_ramdisk_table_entry_v4 {
  * Polymorphic Universal Header
  *******************************/
 
+template <typename T>
+static T align_to(T v, int a) {
+    static_assert(std::is_integral_v<T>);
+    return (v + a - 1) / a * a;
+}
+
+template <typename T>
+static T align_padding(T v, int a) {
+    return align_to(v, a) - v;
+}
+
 #define decl_val(name, len) \
 virtual uint##len##_t name() const { return 0; }
 
@@ -678,7 +689,7 @@ struct boot_img {
     rust::Slice<const uint8_t> get_payload() const { return payload; }
     rust::Slice<const uint8_t> get_tail() const { return tail; }
     bool is_signed() const { return flags[AVB1_SIGNED_FLAG]; }
-    uint64_t tail_off() const { return tail.buf() - map.buf(); }
+    uint64_t tail_off() const { return tail.data() - map.data(); }
 
     // Implemented in Rust
     bool verify() const noexcept;

@@ -27,7 +27,6 @@ int xlisten(int sockfd, int backlog);
 int xaccept4(int sockfd, struct sockaddr *addr, socklen_t *addrlen, int flags);
 int xstat(const char *pathname, struct stat *buf);
 int xfstat(int fd, struct stat *buf);
-int xdup(int fd);
 int xdup2(int oldfd, int newfd);
 ssize_t xreadlink(const char * __restrict__ pathname, char * __restrict__ buf, size_t bufsiz);
 ssize_t xreadlinkat(
@@ -42,7 +41,6 @@ int xmkdir(const char *pathname, mode_t mode);
 int xmkdirs(const char *pathname, mode_t mode);
 ssize_t xsendfile(int out_fd, int in_fd, off_t *offset, size_t count);
 pid_t xfork();
-int xpoll(pollfd *fds, nfds_t nfds, int timeout);
 ssize_t xrealpath(const char * __restrict__ path, char * __restrict__ buf, size_t bufsiz);
 int xmknod(const char * pathname, mode_t mode, dev_t dev);
 
