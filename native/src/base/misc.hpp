@@ -5,7 +5,6 @@
 #include <functional>
 #include <string_view>
 #include <bitset>
-#include <random>
 #include <cxx.h>
 
 #include "xwrap.hpp"
@@ -46,30 +45,11 @@ private:
     Func fn;
 };
 
-template <typename T>
-class reversed_container {
-public:
-    reversed_container(T &base) : base(base) {}
-    decltype(std::declval<T>().rbegin()) begin() { return base.rbegin(); }
-    decltype(std::declval<T>().crbegin()) begin() const { return base.crbegin(); }
-    decltype(std::declval<T>().crbegin()) cbegin() const { return base.crbegin(); }
-    decltype(std::declval<T>().rend()) end() { return base.rend(); }
-    decltype(std::declval<T>().crend()) end() const { return base.crend(); }
-    decltype(std::declval<T>().crend()) cend() const { return base.crend(); }
-private:
-    T &base;
-};
-
-template <typename T>
-reversed_container<T> reversed(T &base) {
-    return reversed_container<T>(base);
-}
+template<class T>
+static void default_new(T *&p) { p = new T(); }
 
 template<class T>
-static inline void default_new(T *&p) { p = new T(); }
-
-template<class T>
-static inline void default_new(std::unique_ptr<T> &p) { p.reset(new T()); }
+static void default_new(std::unique_ptr<T> &p) { p.reset(new T()); }
 
 struct StringCmp {
     using is_transparent = void;
@@ -78,49 +58,32 @@ struct StringCmp {
 
 struct heap_data;
 
+using ByteSlice = rust::Slice<const uint8_t>;
+using MutByteSlice = rust::Slice<uint8_t>;
+
 // Interchangeable as `&[u8]` in Rust
 struct byte_view {
     byte_view() : _buf(nullptr), _sz(0) {}
     byte_view(const void *buf, size_t sz) : _buf((uint8_t *) buf), _sz(sz) {}
 
-    // byte_view, or any of its subclass, can be copied as byte_view
+    // byte_view, or any of its subclasses, can be copied as byte_view
     byte_view(const byte_view &o) : _buf(o._buf), _sz(o._sz) {}
 
-    // Bridging to Rust slice
-    byte_view(rust::Slice<const uint8_t> o) : byte_view(o.data(), o.size()) {}
-    operator rust::Slice<const uint8_t>() const { return rust::Slice<const uint8_t>(_buf, _sz); }
+    // Transparent conversion to Rust slice
+    byte_view(const ByteSlice o) : byte_view(o.data(), o.size()) {}
+    operator ByteSlice() const { return {_buf, _sz}; }
 
-    // String as bytes
-    byte_view(const char *s, bool with_nul = true)
-    : byte_view(std::string_view(s), with_nul, false) {}
-    byte_view(const std::string &s, bool with_nul = true)
-    : byte_view(std::string_view(s), with_nul, false) {}
-    byte_view(std::string_view s, bool with_nul = true)
-    : byte_view(s, with_nul, true /* string_view is not guaranteed to null terminate */ ) {}
+    // String as bytes, including null terminator
+    byte_view(const char *s) : byte_view(s, strlen(s) + 1) {}
 
-    // Vector as bytes
-    byte_view(const std::vector<uint8_t> &v) : byte_view(v.data(), v.size()) {}
-
-    const uint8_t *buf() const { return _buf; }
-    size_t sz() const { return _sz; }
-
+    const uint8_t *data() const { return _buf; }
+    size_t size() const { return _sz; }
     bool contains(byte_view pattern) const;
-    bool equals(byte_view o) const;
-    heap_data clone() const;
+    bool operator==(byte_view rhs) const;
 
 protected:
     uint8_t *_buf;
     size_t _sz;
-
-private:
-    byte_view(std::string_view s, bool with_nul, bool check_nul)
-    : byte_view(static_cast<const void *>(s.data()), s.length()) {
-        if (with_nul) {
-            if (check_nul && s[s.length()] != '\0')
-                return;
-            ++_sz;
-        }
-    }
 };
 
 // Interchangeable as `&mut [u8]` in Rust
@@ -128,23 +91,18 @@ struct byte_data : public byte_view {
     byte_data() = default;
     byte_data(void *buf, size_t sz) : byte_view(buf, sz) {}
 
-    // byte_data, or any of its subclass, can be copied as byte_data
+    // byte_data, or any of its subclasses, can be copied as byte_data
     byte_data(const byte_data &o) : byte_data(o._buf, o._sz) {}
 
-    // Transparent conversion from common C++ types to mutable byte references
-    byte_data(std::string &s, bool with_nul = true)
-    : byte_data(s.data(), with_nul ? s.length() + 1 : s.length()) {}
-    byte_data(std::vector<uint8_t> &v) : byte_data(v.data(), v.size()) {}
+    // Transparent conversion to Rust slice
+    byte_data(const MutByteSlice o) : byte_data(o.data(), o.size()) {}
+    operator MutByteSlice() const { return {_buf, _sz}; }
 
-    // Bridging to Rust slice
-    byte_data(rust::Slice<uint8_t> o) : byte_data(o.data(), o.size()) {}
-    operator rust::Slice<uint8_t>() { return rust::Slice<uint8_t>(_buf, _sz); }
-
-    using byte_view::buf;
-    uint8_t *buf() { return _buf; }
+    using byte_view::data;
+    uint8_t *data() const { return _buf; }
 
     void swap(byte_data &o);
-    rust::Vec<size_t> patch(byte_view from, byte_view to);
+    rust::Vec<size_t> patch(byte_view from, byte_view to) const;
 };
 
 struct heap_data : public byte_data {
@@ -170,10 +128,7 @@ private:
     int fd;
 };
 
-rust::Vec<size_t> mut_u8_patch(
-        rust::Slice<uint8_t> buf,
-        rust::Slice<const uint8_t> from,
-        rust::Slice<const uint8_t> to);
+rust::Vec<size_t> mut_u8_patch(MutByteSlice buf, ByteSlice from, ByteSlice to);
 
 uint32_t parse_uint32_hex(std::string_view s);
 int parse_int(std::string_view s);
@@ -276,9 +231,7 @@ struct Utf8CStr {
 
     Utf8CStr() : Utf8CStr("", 1) {};
     Utf8CStr(const Utf8CStr &o) = default;
-    Utf8CStr(Utf8CStr &&o) = default;
     Utf8CStr(const char *s) : Utf8CStr(s, strlen(s) + 1) {};
-    Utf8CStr(std::string_view s) : Utf8CStr(s.data(), s.length() + 1) {};
     Utf8CStr(std::string s) : Utf8CStr(s.data(), s.length() + 1) {};
     const char *c_str() const { return this->data(); }
     size_t size() const { return this->length(); }
@@ -296,15 +249,17 @@ private:
 } // namespace rust
 
 // Bindings for std::function to be callable from Rust
-struct FnBoolStrStr : public std::function<bool(rust::Str, rust::Str)> {
-    using std::function<bool(rust::Str, rust::Str)>::function;
+
+using CxxFnBoolStrStr = std::function<bool(rust::Str, rust::Str)>;
+struct FnBoolStrStr : public CxxFnBoolStrStr {
+    using CxxFnBoolStrStr::function;
     bool call(rust::Str a, rust::Str b) const {
         return operator()(a, b);
     }
 };
-
-struct FnBoolString : public std::function<bool(rust::String&)> {
-    using std::function<bool(rust::String&)>::function;
+using CxxFnBoolString = std::function<bool(rust::String&)>;
+struct FnBoolString : public CxxFnBoolString {
+    using CxxFnBoolString::function;
     bool call(rust::String &s) const {
         return operator()(s);
     }

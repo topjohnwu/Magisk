@@ -15,14 +15,8 @@ bool byte_view::contains(byte_view pattern) const {
     return _buf != nullptr && memmem(_buf, _sz, pattern._buf, pattern._sz) != nullptr;
 }
 
-bool byte_view::equals(byte_view o) const {
-    return _sz == o._sz && memcmp(_buf, o._buf, _sz) == 0;
-}
-
-heap_data byte_view::clone() const {
-    heap_data copy(_sz);
-    memcpy(copy._buf, _buf, _sz);
-    return copy;
+bool byte_view::operator==(byte_view rhs) const {
+    return _sz == rhs._sz && memcmp(_buf, rhs._buf, _sz) == 0;
 }
 
 void byte_data::swap(byte_data &o) {
@@ -30,28 +24,25 @@ void byte_data::swap(byte_data &o) {
     std::swap(_sz, o._sz);
 }
 
-rust::Vec<size_t> byte_data::patch(byte_view from, byte_view to) {
+rust::Vec<size_t> byte_data::patch(byte_view from, byte_view to) const {
     rust::Vec<size_t> v;
     if (_buf == nullptr)
         return v;
     auto p = _buf;
     auto eof = _buf + _sz;
     while (p < eof) {
-        p = static_cast<uint8_t *>(memmem(p, eof - p, from.buf(), from.sz()));
+        p = static_cast<uint8_t *>(memmem(p, eof - p, from.data(), from.size()));
         if (p == nullptr)
             return v;
-        memset(p, 0, from.sz());
-        memcpy(p, to.buf(), to.sz());
+        memset(p, 0, from.size());
+        memcpy(p, to.data(), to.size());
         v.push_back(p - _buf);
-        p += from.sz();
+        p += from.size();
     }
     return v;
 }
 
-rust::Vec<size_t> mut_u8_patch(
-        rust::Slice<uint8_t> buf,
-        rust::Slice<const uint8_t> from,
-        rust::Slice<const uint8_t> to) {
+rust::Vec<size_t> mut_u8_patch(MutByteSlice buf, ByteSlice from, ByteSlice to) {
     byte_data data(buf);
     return data.patch(from, to);
 }

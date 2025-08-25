@@ -446,7 +446,7 @@ void exec_root_shell(int client, int pid, SuRequest &req, MntNsMode mode) {
     char path[32];
     ssprintf(path, sizeof(path), "/proc/%d/cwd", pid);
     char cwd[4096];
-    if (realpath(path, cwd, sizeof(cwd)) > 0)
+    if (canonical_path(path, cwd, sizeof(cwd)) > 0)
         chdir(cwd);
     ssprintf(path, sizeof(path), "/proc/%d/environ", pid);
     auto env = full_read(path);

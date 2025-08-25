@@ -69,8 +69,6 @@ pub mod ffi {
     #[namespace = "rust"]
     extern "Rust" {
         fn xpipe2(fds: &mut [i32; 2], flags: i32) -> i32;
-        #[cxx_name = "fd_path"]
-        fn fd_path_for_cxx(fd: i32, buf: &mut [u8]) -> isize;
         #[cxx_name = "map_file"]
         fn map_file_for_cxx(path: Utf8CStrRef, rw: bool) -> &'static mut [u8];
         #[cxx_name = "map_file_at"]

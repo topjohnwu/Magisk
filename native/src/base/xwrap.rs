@@ -4,9 +4,7 @@ use crate::cxx_extern::readlinkat;
 use crate::{
     BorrowedDirectory, CxxResultExt, LibcReturn, Utf8CStr, cstr, slice_from_ptr, slice_from_ptr_mut,
 };
-use libc::{
-    c_char, c_uint, c_ulong, c_void, dev_t, mode_t, nfds_t, off_t, pollfd, sockaddr, socklen_t,
-};
+use libc::{c_char, c_uint, c_ulong, c_void, dev_t, mode_t, off_t, sockaddr, socklen_t};
 use std::ffi::CStr;
 use std::fs::File;
 use std::io::{Read, Write};
@@ -271,16 +269,6 @@ unsafe extern "C" fn xfstat(fd: RawFd, buf: *mut libc::stat) -> i32 {
 }
 
 #[unsafe(no_mangle)]
-extern "C" fn xdup(oldfd: RawFd) -> RawFd {
-    unsafe {
-        libc::dup(oldfd)
-            .as_os_result("dup", None, None)
-            .log_cxx()
-            .unwrap_or(-1)
-    }
-}
-
-#[unsafe(no_mangle)]
 extern "C" fn xdup2(oldfd: RawFd, newfd: RawFd) -> RawFd {
     unsafe {
         libc::dup2(oldfd, newfd)
@@ -376,16 +364,6 @@ extern "C" fn xfork() -> i32 {
     unsafe {
         libc::fork()
             .as_os_result("fork", None, None)
-            .log_cxx()
-            .unwrap_or(-1)
-    }
-}
-
-#[unsafe(no_mangle)]
-unsafe extern "C" fn xpoll(fds: *mut pollfd, nfds: nfds_t, timeout: i32) -> i32 {
-    unsafe {
-        libc::poll(fds, nfds, timeout)
-            .as_os_result("poll", None, None)
             .log_cxx()
             .unwrap_or(-1)
     }

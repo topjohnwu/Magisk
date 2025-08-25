@@ -74,7 +74,7 @@ static bool check_precompiled(const char *precompiled) {
 
 static void load_cil(struct cil_db *db, const char *file) {
     mmap_data d(file);
-    cil_add_file(db, file, (const char *) d.buf(), d.sz());
+    cil_add_file(db, file, (const char *) d.data(), d.size());
     LOGD("cil_add [%s]\n", file);
 }
 

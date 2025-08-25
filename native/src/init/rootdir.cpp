@@ -147,7 +147,7 @@ void MagiskInit::patch_fissiond(const char *tmp_path) noexcept {
         }
         mkdirs(ROOTOVL "/system/bin", 0755);
         if (auto target_fissiond = xopen_file(ROOTOVL "/system/bin/fissiond", "we")) {
-            fwrite(fissiond.buf(), 1, fissiond.sz(), target_fissiond.get());
+            fwrite(fissiond.data(), 1, fissiond.size(), target_fissiond.get());
             clone_attr("/system/bin/fissiond", ROOTOVL "/system/bin/fissiond");
         }
     }
@@ -160,8 +160,7 @@ void MagiskInit::patch_fissiond(const char *tmp_path) noexcept {
         LOGD("hijacked isolated\n");
         xumount2("/sys/devices/system/cpu/isolated", MNT_DETACH);
         unlink(INTLROOT "/isolated");
-        string content;
-        full_read(fileno(hijack.get()), content);
+        string content = full_read(fileno(hijack.get()));
         {
             string target = "/dev/cells/cell2"s + tmp_path;
             xmkdirs(target.data(), 0);
@@ -299,7 +298,7 @@ void MagiskInit::patch_ro_root() noexcept {
             LOGD("Patch @ %08zX [android,fstab] -> [xxx]\n", off);
         }
         int dest = xopen(ROOTOVL "/init", O_CREAT | O_WRONLY | O_CLOEXEC, 0);
-        xwrite(dest, init.buf(), init.sz());
+        xwrite(dest, init.data(), init.size());
         fclone_attr(src, dest);
         close(src);
         close(dest);
