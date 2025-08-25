@@ -4,10 +4,7 @@ set -e
 shopt -s extglob
 . scripts/test_common.sh
 
-emu_port=5682
-export ANDROID_SERIAL="emulator-$emu_port"
-
-emu_args_base="-no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -read-only -no-snapshot -port $emu_port -cores $core_count"
+emu_args_base="-no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -read-only -no-snapshot -cores $core_count"
 log_args="-show-kernel -logcat '' -logcat-output logcat.log"
 emu_args=
 emu_pid=
@@ -174,6 +171,11 @@ test_emu() {
 test_main() {
   local avd_pkg ramdisk
   eval $(resolve_vars "emu_args avd_pkg ramdisk" $1 $2)
+
+  # Specify an explicit port so that tests can run with other emulators running at the same time
+  local emu_port=5682
+  emu_args="$emu_args -port $emu_port"
+  export ANDROID_SERIAL="emulator-$emu_port"
 
   setup_emu "$avd_pkg"
 
