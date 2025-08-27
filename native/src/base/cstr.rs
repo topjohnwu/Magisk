@@ -7,7 +7,7 @@ use std::fmt::{Debug, Display, Formatter, Write};
 use std::ops::Deref;
 use std::os::unix::ffi::OsStrExt;
 use std::path::{Path, PathBuf};
-use std::str::Utf8Error;
+use std::str::{FromStr, Utf8Error};
 use std::{fmt, mem, slice, str};
 use thiserror::Error;
 
@@ -200,7 +200,18 @@ impl From<String> for Utf8CString {
 
 impl From<&str> for Utf8CString {
     fn from(value: &str) -> Self {
-        value.to_string().into()
+        let mut s = String::with_capacity(value.len() + 1);
+        s.push_str(value);
+        s.nul_terminate();
+        Utf8CString(s)
+    }
+}
+
+impl FromStr for Utf8CString {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(s.into())
     }
 }
 

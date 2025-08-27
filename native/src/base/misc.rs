@@ -1,4 +1,4 @@
-use crate::{Utf8CStr, cstr, ffi};
+use crate::{Utf8CStr, Utf8CString, cstr, ffi};
 use argh::{EarlyExit, MissingRequirements};
 use libc::c_char;
 use std::{
@@ -105,9 +105,9 @@ impl<T> EarlyExitExt<T> for Result<T, EarlyExit> {
 pub struct PositionalArgParser<'a>(pub slice::Iter<'a, &'a str>);
 
 impl PositionalArgParser<'_> {
-    pub fn required(&mut self, field_name: &'static str) -> Result<String, EarlyExit> {
+    pub fn required(&mut self, field_name: &'static str) -> Result<Utf8CString, EarlyExit> {
         if let Some(next) = self.0.next() {
-            Ok(next.to_string())
+            Ok((*next).into())
         } else {
             let mut missing = MissingRequirements::default();
             missing.missing_positional_arg(field_name);
@@ -116,17 +116,17 @@ impl PositionalArgParser<'_> {
         }
     }
 
-    pub fn optional(&mut self) -> Option<String> {
-        self.0.next().map(ToString::to_string)
+    pub fn optional(&mut self) -> Option<Utf8CString> {
+        self.0.next().map(|s| (*s).into())
     }
 
-    pub fn last_required(&mut self, field_name: &'static str) -> Result<String, EarlyExit> {
+    pub fn last_required(&mut self, field_name: &'static str) -> Result<Utf8CString, EarlyExit> {
         let r = self.required(field_name)?;
         self.ensure_end()?;
         Ok(r)
     }
 
-    pub fn last_optional(&mut self) -> Result<Option<String>, EarlyExit> {
+    pub fn last_optional(&mut self) -> Result<Option<Utf8CString>, EarlyExit> {
         let r = self.optional();
         if r.is_none() {
             return Ok(r);

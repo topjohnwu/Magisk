@@ -102,9 +102,9 @@ fn hex2byte(hex: &[u8]) -> Vec<u8> {
     v
 }
 
-pub fn hexpatch(file: &mut String, from: &Utf8CStr, to: &Utf8CStr) -> bool {
+pub fn hexpatch(file: &Utf8CStr, from: &Utf8CStr, to: &Utf8CStr) -> bool {
     let res: LoggedResult<bool> = try {
-        let mut map = MappedFile::open_rw(Utf8CStr::from_string(file))?;
+        let mut map = MappedFile::open_rw(file)?;
         let pattern = hex2byte(from.as_bytes());
         let patch = hex2byte(to.as_bytes());
 

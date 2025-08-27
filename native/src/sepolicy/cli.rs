@@ -2,8 +2,8 @@ use crate::ffi::SePolicy;
 use crate::statement::format_statement_help;
 use argh::FromArgs;
 use base::{
-    CmdArgs, EarlyExitExt, FmtAdaptor, LoggedResult, Utf8CStr, cmdline_logging, cstr, libc::umask,
-    log_err,
+    CmdArgs, EarlyExitExt, FmtAdaptor, LoggedResult, Utf8CString, cmdline_logging, cstr,
+    libc::umask, log_err,
 };
 use std::ffi::c_char;
 use std::io::stderr;
@@ -26,13 +26,13 @@ struct Cli {
     print_rules: bool,
 
     #[argh(option)]
-    load: Option<String>,
+    load: Option<Utf8CString>,
 
     #[argh(option)]
-    save: Option<String>,
+    save: Option<Utf8CString>,
 
     #[argh(option)]
-    apply: Vec<String>,
+    apply: Vec<Utf8CString>,
 
     #[argh(positional)]
     polices: Vec<String>,
@@ -85,10 +85,10 @@ pub unsafe extern "C" fn main(
             print_usage(cmds.first().unwrap_or(&"magiskpolicy"));
             return 1;
         }
-        let mut cli = Cli::from_args(&[cmds[0]], &cmds[1..]).on_early_exit(|| print_usage(cmds[0]));
+        let cli = Cli::from_args(&[cmds[0]], &cmds[1..]).on_early_exit(|| print_usage(cmds[0]));
 
-        let mut sepol = match (&mut cli.load, cli.load_split, cli.compile_split) {
-            (Some(file), false, false) => SePolicy::from_file(Utf8CStr::from_string(file)),
+        let mut sepol = match (cli.load, cli.load_split, cli.compile_split) {
+            (Some(file), false, false) => SePolicy::from_file(&file),
             (None, true, false) => SePolicy::from_split(),
             (None, false, true) => SePolicy::compile_split(),
             (None, false, false) => SePolicy::from_file(cstr!("/sys/fs/selinux/policy")),
@@ -115,8 +115,8 @@ pub unsafe extern "C" fn main(
             sepol.magisk_rules();
         }
 
-        for file in &mut cli.apply {
-            sepol.load_rule_file(Utf8CStr::from_string(file));
+        for file in cli.apply {
+            sepol.load_rule_file(&file);
         }
 
         for statement in &cli.polices {
@@ -127,8 +127,8 @@ pub unsafe extern "C" fn main(
             log_err!("Cannot apply policy")?;
         }
 
-        if let Some(file) = &mut cli.save {
-            if !sepol.to_file(Utf8CStr::from_string(file)) {
+        if let Some(file) = cli.save {
+            if !sepol.to_file(&file) {
                 log_err!("Cannot dump policy to {}", file)?;
             }
         }
