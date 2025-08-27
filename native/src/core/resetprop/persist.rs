@@ -3,12 +3,11 @@ use std::{
     fs::File,
     io::{BufWriter, Write},
     os::fd::FromRawFd,
-    pin::Pin,
 };
 
 use quick_protobuf::{BytesReader, MessageRead, MessageWrite, Writer};
 
-use crate::ffi::PropCallback;
+use crate::resetprop::PropReader;
 use crate::resetprop::proto::persistent_properties::{
     PersistentProperties, mod_PersistentProperties::PersistentPropertyRecord,
 };
@@ -16,7 +15,7 @@ use base::const_format::concatcp;
 use base::libc::{O_CLOEXEC, O_RDONLY};
 use base::{
     Directory, FsPathBuilder, LibcReturn, LoggedResult, MappedFile, SilentLogExt, Utf8CStr,
-    Utf8CStrBuf, WalkResult, clone_attr, cstr, debug, libc::mkstemp,
+    Utf8CStrBuf, WalkResult, clone_attr, cstr, debug, libc::mkstemp, log_err,
 };
 
 const PERSIST_PROP_DIR: &str = "/data/property";
@@ -24,7 +23,7 @@ const PERSIST_PROP: &str = concatcp!(PERSIST_PROP_DIR, "/persistent_properties")
 
 trait PropExt {
     fn find_index(&self, name: &Utf8CStr) -> Result<usize, usize>;
-    fn find(&mut self, name: &Utf8CStr) -> LoggedResult<&mut PersistentPropertyRecord>;
+    fn find(self, name: &Utf8CStr) -> Option<PersistentPropertyRecord>;
 }
 
 impl PropExt for PersistentProperties {
@@ -33,9 +32,9 @@ impl PropExt for PersistentProperties {
             .binary_search_by(|p| p.name.as_deref().cmp(&Some(name.as_str())))
     }
 
-    fn find(&mut self, name: &Utf8CStr) -> LoggedResult<&mut PersistentPropertyRecord> {
-        let idx = self.find_index(name).silent()?;
-        Ok(&mut self.properties[idx])
+    fn find(self, name: &Utf8CStr) -> Option<PersistentPropertyRecord> {
+        let idx = self.find_index(name).ok()?;
+        self.properties.into_iter().nth(idx)
     }
 }
 
@@ -108,92 +107,80 @@ fn proto_write_props(props: &PersistentProperties) -> LoggedResult<()> {
     Ok(())
 }
 
-pub fn persist_get_prop(name: &Utf8CStr, prop_cb: Pin<&mut PropCallback>) {
-    let res: LoggedResult<()> = try {
-        if check_proto() {
-            let mut props = proto_read_props()?;
-            let prop = props.find(name)?;
+pub(super) fn persist_get_prop(key: &Utf8CStr) -> LoggedResult<String> {
+    if check_proto() {
+        let props = proto_read_props()?;
+        let prop = props.find(key).silent()?;
+        if let PersistentPropertyRecord {
+            name: Some(_),
+            value: Some(v),
+        } = prop
+        {
+            return Ok(v);
+        }
+    } else {
+        let value = file_get_prop(key)?;
+        debug!("resetprop: get persist prop [{}]=[{}]", key, value);
+        return Ok(value);
+    }
+    log_err!()
+}
+
+pub(super) fn persist_get_all_props(reader: &mut PropReader) -> LoggedResult<()> {
+    if check_proto() {
+        let props = proto_read_props()?;
+        props.properties.into_iter().for_each(|prop| {
             if let PersistentPropertyRecord {
                 name: Some(n),
                 value: Some(v),
             } = prop
             {
-                prop_cb.exec(Utf8CStr::from_string(n), Utf8CStr::from_string(v));
+                reader.put_str(n, v, 0);
             }
-        } else {
-            let mut value = file_get_prop(name)?;
-            prop_cb.exec(name, Utf8CStr::from_string(&mut value));
-            debug!("resetprop: found prop [{}] = [{}]", name, value);
-        }
-    };
-    res.ok();
-}
-
-pub fn persist_get_props(mut prop_cb: Pin<&mut PropCallback>) {
-    let res: LoggedResult<()> = try {
-        if check_proto() {
-            let mut props = proto_read_props()?;
-            props.properties.iter_mut().for_each(|prop| {
-                if let PersistentPropertyRecord {
-                    name: Some(n),
-                    value: Some(v),
-                } = prop
-                {
-                    prop_cb
-                        .as_mut()
-                        .exec(Utf8CStr::from_string(n), Utf8CStr::from_string(v));
-                }
-            });
-        } else {
-            let mut dir = Directory::open(cstr!(PERSIST_PROP_DIR))?;
-            dir.pre_order_walk(|e| {
-                if e.is_file()
-                    && let Ok(mut value) = file_get_prop(e.name())
-                {
-                    prop_cb
-                        .as_mut()
-                        .exec(e.name(), Utf8CStr::from_string(&mut value));
-                }
-                // Do not traverse recursively
-                Ok(WalkResult::Skip)
-            })?;
-        }
-    };
-    res.ok();
-}
-
-pub fn persist_delete_prop(name: &Utf8CStr) -> bool {
-    let res: LoggedResult<()> = try {
-        if check_proto() {
-            let mut props = proto_read_props()?;
-            let idx = props.find_index(name).silent()?;
-            props.properties.remove(idx);
-            proto_write_props(&props)?;
-        } else {
-            file_set_prop(name, None)?;
-        }
-    };
-    res.is_ok()
-}
-
-pub fn persist_set_prop(name: &Utf8CStr, value: &Utf8CStr) -> bool {
-    let res: LoggedResult<()> = try {
-        if check_proto() {
-            let mut props = proto_read_props()?;
-            match props.find_index(name) {
-                Ok(idx) => props.properties[idx].value = Some(value.to_string()),
-                Err(idx) => props.properties.insert(
-                    idx,
-                    PersistentPropertyRecord {
-                        name: Some(name.to_string()),
-                        value: Some(value.to_string()),
-                    },
-                ),
+        });
+    } else {
+        let mut dir = Directory::open(cstr!(PERSIST_PROP_DIR))?;
+        dir.pre_order_walk(|e| {
+            if e.is_file()
+                && let Ok(value) = file_get_prop(e.name())
+            {
+                reader.put_str(e.name().to_string(), value, 0);
             }
-            proto_write_props(&props)?;
-        } else {
-            file_set_prop(name, Some(value))?;
+            // Do not traverse recursively
+            Ok(WalkResult::Skip)
+        })?;
+    }
+    Ok(())
+}
+
+pub(super) fn persist_delete_prop(key: &Utf8CStr) -> LoggedResult<()> {
+    if check_proto() {
+        let mut props = proto_read_props()?;
+        let idx = props.find_index(key).silent()?;
+        props.properties.remove(idx);
+        proto_write_props(&props)?;
+    } else {
+        file_set_prop(key, None)?;
+    }
+    Ok(())
+}
+
+pub(super) fn persist_set_prop(key: &Utf8CStr, val: &Utf8CStr) -> LoggedResult<()> {
+    if check_proto() {
+        let mut props = proto_read_props()?;
+        match props.find_index(key) {
+            Ok(idx) => props.properties[idx].value = Some(val.to_string()),
+            Err(idx) => props.properties.insert(
+                idx,
+                PersistentPropertyRecord {
+                    name: Some(key.to_string()),
+                    value: Some(val.to_string()),
+                },
+            ),
         }
-    };
-    res.is_ok()
+        proto_write_props(&props)?;
+    } else {
+        file_set_prop(key, Some(val))?;
+    }
+    Ok(())
 }

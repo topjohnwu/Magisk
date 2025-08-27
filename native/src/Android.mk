@@ -22,7 +22,7 @@ LOCAL_SRC_FILES := \
     core/sqlite.cpp \
     core/thread.cpp \
     core/core-rs.cpp \
-    core/resetprop/resetprop.cpp \
+    core/resetprop/sys.cpp \
     core/su/su.cpp \
     core/zygisk/entry.cpp \
     core/zygisk/module.cpp \
@@ -123,7 +123,7 @@ LOCAL_STATIC_LIBRARIES := \
 
 LOCAL_SRC_FILES := \
     core/applet_stub.cpp \
-    core/resetprop/resetprop.cpp \
+    core/resetprop/sys.cpp \
     core/core-rs.cpp
 
 LOCAL_CFLAGS := -DAPPLET_STUB_MAIN=resetprop_main

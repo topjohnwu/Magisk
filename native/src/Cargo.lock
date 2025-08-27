@@ -601,6 +601,7 @@ dependencies = [
 name = "magisk"
 version = "0.0.0"
 dependencies = [
+ "argh",
  "base",
  "bit-set",
  "bytemuck",

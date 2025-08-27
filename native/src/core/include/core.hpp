@@ -17,6 +17,11 @@
 #define to_app_id(uid)  (uid % AID_USER_OFFSET)
 #define to_user_id(uid) (uid / AID_USER_OFFSET)
 
+// Multi-call entrypoints
+int magisk_main(int argc, char *argv[]);
+int su_client_main(int argc, char *argv[]);
+int zygisk_main(int argc, char *argv[]);
+
 // Return codes for daemon
 enum class RespondCode : int {
     ERROR = -1,

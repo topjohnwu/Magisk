@@ -1,7 +1,4 @@
-#include <sys/stat.h>
-
-#include <consts.hpp>
-#include <base.hpp>
+#include <core.hpp>
 
 int main(int argc, char *argv[]) {
     if (argc < 1)

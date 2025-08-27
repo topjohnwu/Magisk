@@ -2,12 +2,13 @@ use crate::consts::{MAGISK_FULL_VER, MAGISK_PROC_CON, MAIN_CONFIG, ROOTMNT, ROOT
 use crate::db::Sqlite3;
 use crate::ffi::{
     DbEntryKey, ModuleInfo, RequestCode, check_key_combo, exec_common_scripts, exec_module_scripts,
-    get_magisk_tmp, get_prop, initialize_denylist, set_prop, setup_magisk_env,
+    get_magisk_tmp, initialize_denylist, setup_magisk_env,
 };
 use crate::logging::{magisk_logging, setup_logfile, start_log_daemon};
 use crate::module::disable_modules;
 use crate::mount::{clean_mounts, setup_preinit_dir};
 use crate::package::ManagerInfo;
+use crate::resetprop::{get_prop, set_prop};
 use crate::selinux::restore_tmpcon;
 use crate::su::SuInfo;
 use crate::zygisk::ZygiskState;
@@ -121,8 +122,8 @@ impl MagiskD {
             .log()
             .ok();
         let safe_mode = boot_cnt >= 2
-            || get_prop(cstr!("persist.sys.safemode"), true) == "1"
-            || get_prop(cstr!("ro.sys.safemode"), false) == "1"
+            || get_prop(cstr!("persist.sys.safemode")) == "1"
+            || get_prop(cstr!("ro.sys.safemode")) == "1"
             || check_key_combo();
 
         if safe_mode {
@@ -232,9 +233,9 @@ pub fn daemon_entry() {
     magisk_logging();
     info!("Magisk {} daemon started", MAGISK_FULL_VER);
 
-    let is_emulator = get_prop(cstr!("ro.kernel.qemu"), false) == "1"
-        || get_prop(cstr!("ro.boot.qemu"), false) == "1"
-        || get_prop(cstr!("ro.product.device"), false).contains("vsoc");
+    let is_emulator = get_prop(cstr!("ro.kernel.qemu")) == "1"
+        || get_prop(cstr!("ro.boot.qemu")) == "1"
+        || get_prop(cstr!("ro.product.device")).contains("vsoc");
 
     // Load config status
     let magisk_tmp = get_magisk_tmp();
@@ -265,7 +266,7 @@ pub fn daemon_entry() {
     }
     if sdk_int < 0 {
         // In case some devices do not store this info in build.prop, fallback to getprop
-        sdk_int = get_prop(cstr!("ro.build.version.sdk"), false)
+        sdk_int = get_prop(cstr!("ro.build.version.sdk"))
             .parse::<i32>()
             .unwrap_or(-1);
     }
@@ -278,13 +279,13 @@ pub fn daemon_entry() {
     switch_cgroup("/acct", pid);
     switch_cgroup("/dev/cg2_bpf", pid);
     switch_cgroup("/sys/fs/cgroup", pid);
-    if get_prop(cstr!("ro.config.per_app_memcg"), false) != "false" {
+    if get_prop(cstr!("ro.config.per_app_memcg")) != "false" {
         switch_cgroup("/dev/memcg/apps", pid);
     }
 
     // Samsung workaround #7887
     if cstr!("/system_ext/app/mediatek-res/mediatek-res.apk").exists() {
-        set_prop(cstr!("ro.vendor.mtk_model"), cstr!("0"), false);
+        set_prop(cstr!("ro.vendor.mtk_model"), cstr!("0"));
     }
 
     // Cleanup pre-init mounts
@@ -346,14 +347,14 @@ fn check_data() -> bool {
         if !mnt {
             return false;
         }
-        let crypto = get_prop(cstr!("ro.crypto.state"), false);
+        let crypto = get_prop(cstr!("ro.crypto.state"));
         return if !crypto.is_empty() {
             if crypto != "encrypted" {
                 // Unencrypted, we can directly access data
                 true
             } else {
                 // Encrypted, check whether vold is started
-                !get_prop(cstr!("init.svc.vold"), false).is_empty()
+                !get_prop(cstr!("init.svc.vold")).is_empty()
             }
         } else {
             // ro.crypto.state is not set, assume it's unencrypted
