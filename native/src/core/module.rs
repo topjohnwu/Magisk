@@ -1,7 +1,8 @@
 use crate::consts::{MODULEMNT, MODULEROOT, MODULEUPGRADE, WORKERDIR};
 use crate::daemon::MagiskD;
-use crate::ffi::{ModuleInfo, exec_module_scripts, exec_script, get_magisk_tmp, load_prop_file};
+use crate::ffi::{ModuleInfo, exec_module_scripts, exec_script, get_magisk_tmp};
 use crate::mount::setup_module_mount;
+use crate::resetprop::load_prop_file;
 use base::{
     DirEntry, Directory, FsPathBuilder, LibcReturn, LoggedResult, OsResultStatic, ResultExt,
     SilentLogExt, Utf8CStr, Utf8CStrBuf, Utf8CString, WalkResult, clone_attr, cstr, debug, error,
@@ -804,8 +805,7 @@ impl MagiskD {
                 // Read props
                 let prop = module_paths.append("system.prop");
                 if prop.module().exists() {
-                    // Do NOT go through property service as it could cause boot lock
-                    load_prop_file(prop.module(), true);
+                    load_prop_file(prop.module());
                 }
             }
             {

@@ -1,8 +1,7 @@
 use crate::consts::MODULEROOT;
 use crate::daemon::{MagiskD, to_user_id};
-use crate::ffi::{
-    ZygiskRequest, ZygiskStateFlags, get_magisk_tmp, get_prop, set_prop, update_deny_flags,
-};
+use crate::ffi::{ZygiskRequest, ZygiskStateFlags, get_magisk_tmp, update_deny_flags};
+use crate::resetprop::{get_prop, set_prop};
 use crate::socket::{IpcRead, UnixSocketExt};
 use base::libc::{O_CLOEXEC, O_CREAT, O_RDONLY, STDOUT_FILENO};
 use base::{
@@ -132,18 +131,18 @@ impl ZygiskState {
         if !self.lib_name.is_empty() {
             return;
         }
-        let orig = get_prop(NBPROP, false);
+        let orig = get_prop(NBPROP);
         self.lib_name = if orig.is_empty() || orig == "0" {
             ZYGISKLDR.to_string()
         } else {
             orig + ZYGISKLDR
         };
-        set_prop(NBPROP, Utf8CStr::from_string(&mut self.lib_name), false);
+        set_prop(NBPROP, Utf8CStr::from_string(&mut self.lib_name));
         // Whether Huawei's Maple compiler is enabled.
         // If so, system server will be created by a special Zygote which ignores the native bridge
         // and make system server out of our control. Avoid it by disabling.
-        if get_prop(cstr!("ro.maple.enable"), false) == "1" {
-            set_prop(cstr!("ro.maple.enable"), cstr!("0"), false);
+        if get_prop(cstr!("ro.maple.enable")) == "1" {
+            set_prop(cstr!("ro.maple.enable"), cstr!("0"));
         }
     }
 
@@ -152,7 +151,7 @@ impl ZygiskState {
         if self.lib_name.len() > ZYGISKLDR.len() {
             orig = self.lib_name[ZYGISKLDR.len()..].to_string();
         }
-        set_prop(NBPROP, Utf8CStr::from_string(&mut orig), false);
+        set_prop(NBPROP, Utf8CStr::from_string(&mut orig));
         self.lib_name.clear();
     }
 }

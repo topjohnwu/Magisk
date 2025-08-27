@@ -366,7 +366,7 @@ void HookContext::post_native_bridge_load(void *handle) {
     auto nb = get_prop(NBPROP);
     auto len = sizeof(ZYGISKLDR) - 1;
     if (nb.size() > len) {
-        arg.load_native_bridge(nb.data() + len, arg.callbacks);
+        arg.load_native_bridge(nb.c_str() + len, arg.callbacks);
     }
     runtime_callbacks = arg.callbacks;
 }

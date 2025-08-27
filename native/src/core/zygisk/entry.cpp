@@ -2,7 +2,6 @@
 #include <android/dlext.h>
 #include <dlfcn.h>
 
-#include <consts.hpp>
 #include <base.hpp>
 #include <core.hpp>
 

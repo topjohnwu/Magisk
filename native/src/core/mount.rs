@@ -12,7 +12,8 @@ use base::{
 };
 
 use crate::consts::{MODULEMNT, MODULEROOT, PREINITDEV, PREINITMIRR, WORKERDIR};
-use crate::ffi::{get_magisk_tmp, get_prop, resolve_preinit_dir, switch_mnt_ns};
+use crate::ffi::{get_magisk_tmp, resolve_preinit_dir, switch_mnt_ns};
+use crate::resetprop::get_prop;
 
 pub fn setup_preinit_dir() {
     let magisk_tmp = get_magisk_tmp();
@@ -109,11 +110,11 @@ enum EncryptType {
 }
 
 pub fn find_preinit_device() -> String {
-    let encrypt_type = if get_prop(cstr!("ro.crypto.state"), false) != "encrypted" {
+    let encrypt_type = if get_prop(cstr!("ro.crypto.state")) != "encrypted" {
         EncryptType::None
-    } else if get_prop(cstr!("ro.crypto.type"), false) == "block" {
+    } else if get_prop(cstr!("ro.crypto.type")) == "block" {
         EncryptType::Block
-    } else if get_prop(cstr!("ro.crypto.metadata.enabled"), false) == "true" {
+    } else if get_prop(cstr!("ro.crypto.metadata.enabled")) == "true" {
         EncryptType::Metadata
     } else {
         EncryptType::File

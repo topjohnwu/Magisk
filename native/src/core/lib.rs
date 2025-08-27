@@ -15,7 +15,7 @@ use derive::Decodable;
 use logging::{android_logging, setup_logfile, zygisk_close_logd, zygisk_get_logd, zygisk_logging};
 use module::remove_modules;
 use mount::{find_preinit_device, revert_unmount};
-use resetprop::{persist_delete_prop, persist_get_prop, persist_get_props, persist_set_prop};
+use resetprop::{get_prop, resetprop_main};
 use selinux::{lgetfilecon, lsetfilecon, restorecon, setfilecon};
 use socket::{recv_fd, recv_fds, send_fd, send_fds};
 use std::fs::File;
@@ -164,19 +164,6 @@ pub mod ffi {
         fn get_text(self: &DbValues, index: i32) -> &str;
         fn bind_text(self: Pin<&mut DbStatement>, index: i32, val: &str) -> i32;
         fn bind_int64(self: Pin<&mut DbStatement>, index: i32, val: i64) -> i32;
-
-        include!("include/resetprop.hpp");
-
-        #[cxx_name = "prop_callback"]
-        type PropCallback;
-        fn exec(self: Pin<&mut PropCallback>, name: Utf8CStrRef, value: Utf8CStrRef);
-
-        #[cxx_name = "get_prop_rs"]
-        fn get_prop(name: Utf8CStrRef, persist: bool) -> String;
-        #[cxx_name = "set_prop_rs"]
-        fn set_prop(name: Utf8CStrRef, value: Utf8CStrRef, skip_svc: bool) -> i32;
-        #[cxx_name = "load_prop_file_rs"]
-        fn load_prop_file(filename: Utf8CStrRef, skip_svc: bool);
     }
 
     extern "Rust" {
@@ -189,10 +176,6 @@ pub mod ffi {
         fn revert_unmount(pid: i32);
         fn remove_modules();
         fn zygisk_should_load_module(flags: u32) -> bool;
-        unsafe fn persist_get_prop(name: Utf8CStrRef, prop_cb: Pin<&mut PropCallback>);
-        unsafe fn persist_get_props(prop_cb: Pin<&mut PropCallback>);
-        unsafe fn persist_delete_prop(name: Utf8CStrRef) -> bool;
-        unsafe fn persist_set_prop(name: Utf8CStrRef, value: Utf8CStrRef) -> bool;
         fn send_fd(socket: i32, fd: i32) -> bool;
         fn send_fds(socket: i32, fds: &[i32]) -> bool;
         fn recv_fd(socket: i32) -> i32;
@@ -205,6 +188,9 @@ pub mod ffi {
         fn lgetfilecon(path: Utf8CStrRef, con: &mut [u8]) -> bool;
         fn setfilecon(path: Utf8CStrRef, con: Utf8CStrRef) -> bool;
         fn lsetfilecon(path: Utf8CStrRef, con: Utf8CStrRef) -> bool;
+
+        fn get_prop(name: Utf8CStrRef) -> String;
+        unsafe fn resetprop_main(argc: i32, argv: *mut *mut c_char) -> i32;
 
         #[namespace = "rust"]
         fn daemon_entry();
