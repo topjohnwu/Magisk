@@ -8,7 +8,7 @@ use crate::sign::{sha1_hash, sign_boot_image};
 use argh::{CommandInfo, EarlyExit, FromArgs, SubCommand};
 use base::{
     CmdArgs, EarlyExitExt, LoggedResult, MappedFile, PositionalArgParser, ResultExt, Utf8CStr,
-    WriteExt, cmdline_logging, cstr, libc, libc::umask, log_err,
+    Utf8CString, WriteExt, cmdline_logging, cstr, libc, libc::umask, log_err,
 };
 use std::ffi::c_char;
 use std::io::{Seek, SeekFrom, Write};
@@ -46,7 +46,7 @@ struct Unpack {
     #[argh(switch, short = 'h')]
     dump_header: bool,
     #[argh(positional)]
-    img: String,
+    img: Utf8CString,
 }
 
 #[derive(FromArgs)]
@@ -55,33 +55,33 @@ struct Repack {
     #[argh(switch, short = 'n')]
     no_compress: bool,
     #[argh(positional)]
-    img: String,
-    #[argh(positional, default = r#""new-boot.img".to_string()"#)]
-    out: String,
+    img: Utf8CString,
+    #[argh(positional, default = r#"Utf8CString::from("new-boot.img")"#)]
+    out: Utf8CString,
 }
 
 #[derive(FromArgs)]
 #[argh(subcommand, name = "verify")]
 struct Verify {
     #[argh(positional)]
-    img: String,
+    img: Utf8CString,
     #[argh(positional)]
-    cert: Option<String>,
+    cert: Option<Utf8CString>,
 }
 
 #[derive(FromArgs)]
 #[argh(subcommand, name = "sign")]
 struct Sign {
     #[argh(positional)]
-    img: String,
+    img: Utf8CString,
     #[argh(positional)]
-    args: Vec<String>,
+    args: Vec<Utf8CString>,
 }
 
 struct Extract {
-    payload: String,
-    partition: Option<String>,
-    outfile: Option<String>,
+    payload: Utf8CString,
+    partition: Option<Utf8CString>,
+    outfile: Option<Utf8CString>,
 }
 
 impl FromArgs for Extract {
@@ -106,18 +106,18 @@ impl SubCommand for Extract {
 #[argh(subcommand, name = "hexpatch")]
 struct HexPatch {
     #[argh(positional)]
-    file: String,
+    file: Utf8CString,
     #[argh(positional)]
-    src: String,
+    src: Utf8CString,
     #[argh(positional)]
-    dest: String,
+    dest: Utf8CString,
 }
 
 #[derive(FromArgs)]
 #[argh(subcommand, name = "cpio")]
 struct Cpio {
     #[argh(positional)]
-    file: String,
+    file: Utf8CString,
     #[argh(positional)]
     cmds: Vec<String>,
 }
@@ -126,7 +126,7 @@ struct Cpio {
 #[argh(subcommand, name = "dtb")]
 struct Dtb {
     #[argh(positional)]
-    file: String,
+    file: Utf8CString,
     #[argh(subcommand)]
     action: DtbAction,
 }
@@ -137,14 +137,14 @@ struct Split {
     #[argh(switch, short = 'n')]
     no_decompress: bool,
     #[argh(positional)]
-    file: String,
+    file: Utf8CString,
 }
 
 #[derive(FromArgs)]
 #[argh(subcommand, name = "sha1")]
 struct Sha1 {
     #[argh(positional)]
-    file: String,
+    file: Utf8CString,
 }
 
 #[derive(FromArgs)]
@@ -153,8 +153,8 @@ struct Cleanup {}
 
 struct Compress {
     format: FileFormat,
-    file: String,
-    out: Option<String>,
+    file: Utf8CString,
+    out: Option<Utf8CString>,
 }
 
 impl FromArgs for Compress {
@@ -185,8 +185,8 @@ impl SubCommand for Compress {
 }
 
 struct Decompress {
-    file: String,
-    out: Option<String>,
+    file: Utf8CString,
+    out: Option<Utf8CString>,
 }
 
 impl FromArgs for Decompress {
@@ -357,7 +357,7 @@ fn boot_main(cmds: CmdArgs) -> LoggedResult<i32> {
         cmds[1] = &cmds[1][2..];
     }
 
-    let mut cli = if cmds[1].starts_with("compress=") {
+    let cli = if cmds[1].starts_with("compress=") {
         // Skip the main parser, directly parse the subcommand
         Compress::from_args(&cmds[..2], &cmds[2..]).map(|compress| Cli {
             action: Action::Compress(compress),
@@ -375,40 +375,29 @@ fn boot_main(cmds: CmdArgs) -> LoggedResult<i32> {
         Action::Unpack(Unpack {
             no_decompress,
             dump_header,
-            ref mut img,
+            img,
         }) => {
-            return Ok(unpack(
-                Utf8CStr::from_string(img),
-                no_decompress,
-                dump_header,
-            ));
+            return Ok(unpack(&img, no_decompress, dump_header));
         }
         Action::Repack(Repack {
             no_compress,
-            mut img,
-            mut out,
+            img,
+            out,
         }) => {
-            repack(
-                Utf8CStr::from_string(&mut img),
-                Utf8CStr::from_string(&mut out),
-                no_compress,
-            );
+            repack(&img, &out, no_compress);
         }
-        Action::Verify(Verify { mut img, mut cert }) => {
-            if !verify_cmd(
-                Utf8CStr::from_string(&mut img),
-                cert.as_mut().map(Utf8CStr::from_string),
-            ) {
+        Action::Verify(Verify { img, cert }) => {
+            if !verify_cmd(&img, cert.as_deref()) {
                 return log_err!();
             }
         }
-        Action::Sign(Sign { mut img, mut args }) => {
-            let mut iter = args.iter_mut();
+        Action::Sign(Sign { img, args }) => {
+            let mut iter = args.iter();
             sign_cmd(
-                Utf8CStr::from_string(&mut img),
-                iter.next().map(Utf8CStr::from_string),
-                iter.next().map(Utf8CStr::from_string),
-                iter.next().map(Utf8CStr::from_string),
+                &img,
+                iter.next().map(AsRef::as_ref),
+                iter.next().map(AsRef::as_ref),
+                iter.next().map(AsRef::as_ref),
             )?;
         }
         Action::Extract(Extract {
@@ -416,42 +405,34 @@ fn boot_main(cmds: CmdArgs) -> LoggedResult<i32> {
             partition,
             outfile,
         }) => {
-            extract_boot_from_payload(&payload, partition.as_deref(), outfile.as_deref())
-                .log_with_msg(|w| w.write_str("Failed to extract from payload"))?;
+            extract_boot_from_payload(
+                &payload,
+                partition.as_ref().map(AsRef::as_ref),
+                outfile.as_ref().map(AsRef::as_ref),
+            )
+            .log_with_msg(|w| w.write_str("Failed to extract from payload"))?;
         }
-        Action::HexPatch(HexPatch {
-            mut file,
-            mut src,
-            mut dest,
-        }) => {
-            if !hexpatch(
-                &mut file,
-                Utf8CStr::from_string(&mut src),
-                Utf8CStr::from_string(&mut dest),
-            ) {
+        Action::HexPatch(HexPatch { file, src, dest }) => {
+            if !hexpatch(&file, &src, &dest) {
                 log_err!("Failed to patch")?;
             }
         }
-        Action::Cpio(Cpio { mut file, mut cmds }) => {
-            cpio_commands(Utf8CStr::from_string(&mut file), &mut cmds)
-                .log_with_msg(|w| w.write_str("Failed to process cpio"))?;
+        Action::Cpio(Cpio { file, cmds }) => {
+            cpio_commands(&file, &cmds).log_with_msg(|w| w.write_str("Failed to process cpio"))?;
         }
-        Action::Dtb(Dtb { mut file, action }) => {
-            return dtb_commands(Utf8CStr::from_string(&mut file), &action)
+        Action::Dtb(Dtb { file, action }) => {
+            return dtb_commands(&file, &action)
                 .map(|b| if b { 0 } else { 1 })
                 .log_with_msg(|w| w.write_str("Failed to process dtb"));
         }
         Action::Split(Split {
             no_decompress,
-            mut file,
+            file,
         }) => {
-            return Ok(split_image_dtb(
-                Utf8CStr::from_string(&mut file),
-                no_decompress,
-            ));
+            return Ok(split_image_dtb(&file, no_decompress));
         }
-        Action::Sha1(Sha1 { mut file }) => {
-            let file = MappedFile::open(Utf8CStr::from_string(&mut file))?;
+        Action::Sha1(Sha1 { file }) => {
+            let file = MappedFile::open(&file)?;
             let mut sha1 = [0u8; 20];
             sha1_hash(file.as_ref(), &mut sha1);
             for byte in &sha1 {
@@ -463,15 +444,11 @@ fn boot_main(cmds: CmdArgs) -> LoggedResult<i32> {
             eprintln!("Cleaning up...");
             cleanup();
         }
-        Action::Decompress(Decompress { mut file, mut out }) => {
-            decompress_cmd(&mut file, out.as_mut())?;
+        Action::Decompress(Decompress { file, out }) => {
+            decompress_cmd(&file, out.as_deref())?;
         }
-        Action::Compress(Compress {
-            format,
-            mut file,
-            mut out,
-        }) => {
-            compress_cmd(format, &mut file, out.as_mut())?;
+        Action::Compress(Compress { format, file, out }) => {
+            compress_cmd(format, &file, out.as_deref())?;
         }
     }
     Ok(0)

@@ -284,13 +284,7 @@ pub fn decompress_bytes(format: FileFormat, in_bytes: &[u8], out_fd: RawFd) {
 
 // Command-line entry points
 
-pub(crate) fn decompress_cmd(
-    infile: &mut String,
-    outfile: Option<&mut String>,
-) -> LoggedResult<()> {
-    let infile = Utf8CStr::from_string(infile);
-    let outfile = outfile.map(Utf8CStr::from_string);
-
+pub(crate) fn decompress_cmd(infile: &Utf8CStr, outfile: Option<&Utf8CStr>) -> LoggedResult<()> {
     let in_std = infile == "-";
     let mut rm_in = false;
 
@@ -353,12 +347,9 @@ pub(crate) fn decompress_cmd(
 
 pub(crate) fn compress_cmd(
     method: FileFormat,
-    infile: &mut String,
-    outfile: Option<&mut String>,
+    infile: &Utf8CStr,
+    outfile: Option<&Utf8CStr>,
 ) -> LoggedResult<()> {
-    let infile = Utf8CStr::from_string(infile);
-    let outfile = outfile.map(Utf8CStr::from_string);
-
     let in_std = infile == "-";
     let mut rm_in = false;
 

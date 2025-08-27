@@ -754,7 +754,7 @@ impl Display for CpioEntry {
     }
 }
 
-pub(crate) fn cpio_commands(file: &Utf8CStr, cmds: &mut Vec<String>) -> LoggedResult<()> {
+pub(crate) fn cpio_commands(file: &Utf8CStr, cmds: &Vec<String>) -> LoggedResult<()> {
     let mut cpio = if file.exists() {
         Cpio::load_from_file(file)?
     } else {
