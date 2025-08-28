@@ -200,10 +200,11 @@ checksum = "b94f61472cee1439c0b966b47e3aca9ae07e45d070759512cd390ea2bebc6675"
 
 [[package]]
 name = "codespan-reporting"
-version = "0.11.1"
+version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3538270d33cc669650c4b093848450d380def10c331d38c768e34cac80576e6e"
+checksum = "fe6d2e5af09e8c8ad56c969f2157a3d4238cebc7c55f0a517728c38f7b200f81"
 dependencies = [
+ "serde",
  "termcolor",
  "unicode-width",
 ]
@@ -313,7 +314,7 @@ dependencies = [
 
 [[package]]
 name = "cxx"
-version = "1.0.137"
+version = "1.0.170"
 dependencies = [
  "cc",
  "cxxbridge-cmd",
@@ -324,9 +325,10 @@ dependencies = [
 
 [[package]]
 name = "cxx-gen"
-version = "0.7.137"
+version = "0.7.170"
 dependencies = [
  "codespan-reporting",
+ "indexmap",
  "proc-macro2",
  "quote",
  "syn",
@@ -334,10 +336,11 @@ dependencies = [
 
 [[package]]
 name = "cxxbridge-cmd"
-version = "1.0.137"
+version = "1.0.170"
 dependencies = [
  "clap",
  "codespan-reporting",
+ "indexmap",
  "proc-macro2",
  "quote",
  "syn",
@@ -345,12 +348,13 @@ dependencies = [
 
 [[package]]
 name = "cxxbridge-flags"
-version = "1.0.137"
+version = "1.0.170"
 
 [[package]]
 name = "cxxbridge-macro"
-version = "1.0.137"
+version = "1.0.170"
 dependencies = [
+ "indexmap",
  "proc-macro2",
  "quote",
  "rustversion",
@@ -448,6 +452,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "equivalent"
+version = "1.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "877a4ace8713b0bcf2a4e7eec82529c029f1d0619886d18145fea96c3ffe5c0f"
+
+[[package]]
 name = "fdt"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -482,9 +492,9 @@ dependencies = [
 
 [[package]]
 name = "foldhash"
-version = "0.1.5"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d9c4f5dac5e15c24eb999c26181a6ca40b39fe946cbe4c263c7209467bc83af2"
+checksum = "77ce24cb58228fbb8aa041425bb1050850ac19177686ea6e0f41a70416f56fdb"
 
 [[package]]
 name = "generic-array"
@@ -520,6 +530,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "hashbrown"
+version = "0.15.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9229cfe53dfd69f0609a49f65461bd93001ea1ef889cd5529dd176593f5338a1"
+
+[[package]]
 name = "hmac"
 version = "0.13.0-rc.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -536,6 +552,16 @@ checksum = "891d15931895091dea5c47afa5b3c9a01ba634b311919fd4d41388fa0e3d76af"
 dependencies = [
  "typenum",
  "zeroize",
+]
+
+[[package]]
+name = "indexmap"
+version = "2.11.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f2481980430f9f78649238835720ddccc57e52df14ffce1c6f37391d61b563e9"
+dependencies = [
+ "equivalent",
+ "hashbrown",
 ]
 
 [[package]]

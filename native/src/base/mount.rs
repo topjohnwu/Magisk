@@ -17,7 +17,7 @@ impl Utf8CStr {
         }
     }
 
-    pub fn remount_mount_point_flags(&self, flags: c_ulong) -> OsResult<()> {
+    pub fn remount_mount_point_flags(&self, flags: c_ulong) -> OsResult<'_, ()> {
         unsafe {
             libc::mount(
                 ptr::null(),
@@ -30,7 +30,7 @@ impl Utf8CStr {
         }
     }
 
-    pub fn remount_mount_flags(&self, flags: c_ulong) -> OsResult<()> {
+    pub fn remount_mount_flags(&self, flags: c_ulong) -> OsResult<'_, ()> {
         unsafe {
             libc::mount(
                 ptr::null(),
@@ -43,7 +43,7 @@ impl Utf8CStr {
         }
     }
 
-    pub fn remount_with_data(&self, data: &Utf8CStr) -> OsResult<()> {
+    pub fn remount_with_data(&self, data: &Utf8CStr) -> OsResult<'_, ()> {
         unsafe {
             libc::mount(
                 ptr::null(),
@@ -69,13 +69,13 @@ impl Utf8CStr {
         }
     }
 
-    pub fn unmount(&self) -> OsResult<()> {
+    pub fn unmount(&self) -> OsResult<'_, ()> {
         unsafe {
             libc::umount2(self.as_ptr(), libc::MNT_DETACH).check_os_err("unmount", Some(self), None)
         }
     }
 
-    pub fn set_mount_private(&self, recursive: bool) -> OsResult<()> {
+    pub fn set_mount_private(&self, recursive: bool) -> OsResult<'_, ()> {
         let flag = if recursive { libc::MS_REC } else { 0 };
         unsafe {
             libc::mount(

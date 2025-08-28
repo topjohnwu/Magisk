@@ -70,7 +70,7 @@ impl PathTracker<'_> {
         PathTracker { path, len }
     }
 
-    fn append(&mut self, name: &str) -> PathTracker {
+    fn append(&mut self, name: &str) -> PathTracker<'_> {
         let len = self.path.len();
         self.path.append_path(name);
         PathTracker {
@@ -79,7 +79,7 @@ impl PathTracker<'_> {
         }
     }
 
-    fn reborrow(&mut self) -> PathTracker {
+    fn reborrow(&mut self) -> PathTracker<'_> {
         Self::from(self.path)
     }
 }
@@ -99,7 +99,7 @@ struct FilePaths<'a> {
 }
 
 impl FilePaths<'_> {
-    fn append(&mut self, name: &str) -> FilePaths {
+    fn append(&mut self, name: &str) -> FilePaths<'_> {
         FilePaths {
             real: self.real.append(name),
             worker: self.worker.append(name),
@@ -108,7 +108,7 @@ impl FilePaths<'_> {
         }
     }
 
-    fn reborrow(&mut self) -> FilePaths {
+    fn reborrow(&mut self) -> FilePaths<'_> {
         FilePaths {
             real: self.real.reborrow(),
             worker: self.worker.reborrow(),

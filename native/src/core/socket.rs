@@ -7,6 +7,7 @@ use std::os::fd::{FromRawFd, IntoRawFd, OwnedFd, RawFd};
 use std::os::unix::net::{AncillaryData, SocketAncillary, UnixStream};
 
 pub trait Encodable {
+    #[allow(dead_code)]
     fn encoded_len(&self) -> usize;
     fn encode(&self, w: &mut impl Write) -> io::Result<()>;
 }

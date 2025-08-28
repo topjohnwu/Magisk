@@ -210,12 +210,11 @@ fn dtb_test(file: &Utf8CStr) -> LoggedResult<bool> {
                 if child.name != "system" {
                     continue;
                 }
-                if let Some(mount_point) = child.property("mnt_point") {
-                    if mount_point.value == b"/system_root\0" {
+                if let Some(mount_point) = child.property("mnt_point")
+                    && mount_point.value == b"/system_root\0" {
                         ret = false;
                         break;
                     }
-                }
             }
         }
         Ok(())

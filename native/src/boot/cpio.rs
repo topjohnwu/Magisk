@@ -560,7 +560,7 @@ impl Cpio {
         let mut backups = HashMap::<String, Box<CpioEntry>>::new();
         let mut rm_list = String::new();
         self.entries
-            .extract_if(|name, _| name.starts_with(".backup/"))
+            .extract_if(.., |name, _| name.starts_with(".backup/"))
             .for_each(|(name, mut entry)| {
                 if name == ".backup/.rmlist" {
                     if let Ok(data) = str::from_utf8(&entry.data) {

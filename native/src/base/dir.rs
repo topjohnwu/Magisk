@@ -63,16 +63,16 @@ impl DirEntry<'_> {
         self.d_type == libc::DT_SOCK
     }
 
-    pub fn unlink(&self) -> OsResult<()> {
+    pub fn unlink(&self) -> OsResult<'_, ()> {
         let flag = if self.is_dir() { libc::AT_REMOVEDIR } else { 0 };
         self.dir.unlink_at(self.name(), flag)
     }
 
-    pub fn read_link(&self, buf: &mut dyn Utf8CStrBuf) -> OsResult<()> {
+    pub fn read_link(&self, buf: &mut dyn Utf8CStrBuf) -> OsResult<'_, ()> {
         self.dir.read_link_at(self.name(), buf)
     }
 
-    pub fn open_as_dir(&self) -> OsResult<Directory> {
+    pub fn open_as_dir(&self) -> OsResult<'_, Directory> {
         if !self.is_dir() {
             return Err(OsError::with_os_error(
                 libc::ENOTDIR,
@@ -84,7 +84,7 @@ impl DirEntry<'_> {
         self.dir.open_as_dir_at(self.name())
     }
 
-    pub fn open_as_file(&self, flags: i32) -> OsResult<File> {
+    pub fn open_as_file(&self, flags: i32) -> OsResult<'_, File> {
         if self.is_dir() {
             return Err(OsError::with_os_error(
                 libc::EISDIR,
@@ -141,7 +141,7 @@ pub enum WalkResult {
 }
 
 impl Directory {
-    fn borrow(&self) -> BorrowedDirectory {
+    fn borrow(&self) -> BorrowedDirectory<'_> {
         BorrowedDirectory {
             inner: self.inner,
             phantom: PhantomData,
@@ -164,13 +164,13 @@ impl Directory {
 }
 
 impl Directory {
-    pub fn open(path: &Utf8CStr) -> OsResult<Directory> {
+    pub fn open(path: &Utf8CStr) -> OsResult<'_, Directory> {
         let dirp = unsafe { libc::opendir(path.as_ptr()) };
         let dirp = dirp.as_os_result("opendir", Some(path), None)?;
         Ok(Directory { inner: dirp })
     }
 
-    pub fn read(&mut self) -> OsResult<'static, Option<DirEntry>> {
+    pub fn read(&mut self) -> OsResult<'static, Option<DirEntry<'_>>> {
         *errno() = 0;
         let e = unsafe { libc::readdir(self.inner.as_ptr()) };
         if e.is_null() {
@@ -481,7 +481,7 @@ impl AsRawFd for Directory {
 }
 
 impl AsFd for Directory {
-    fn as_fd(&self) -> BorrowedFd {
+    fn as_fd(&self) -> BorrowedFd<'_> {
         unsafe { BorrowedFd::borrow_raw(self.as_raw_fd()) }
     }
 }

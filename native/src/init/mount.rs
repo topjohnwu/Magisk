@@ -29,11 +29,9 @@ pub(crate) fn switch_root(path: &Utf8CStr) {
             if let Some(last_mount) = mounts
                 .range::<String, _>((Unbounded, Excluded(&info.target)))
                 .last()
-            {
-                if info.target.starts_with(&format!("{}/", *last_mount)) {
+                && info.target.starts_with(&format!("{}/", *last_mount)) {
                     continue;
                 }
-            }
 
             let mut target = info.target.clone();
             let target = Utf8CStr::from_string(&mut target);

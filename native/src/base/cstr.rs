@@ -56,7 +56,7 @@ pub mod buf {
     }
 
     #[inline(always)]
-    pub fn wrap(buf: &mut [u8]) -> Utf8CStrBufRef {
+    pub fn wrap(buf: &mut [u8]) -> Utf8CStrBufRef<'_> {
         Utf8CStrBufRef::from(buf)
     }
 

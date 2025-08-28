@@ -202,10 +202,10 @@ fn parse_xperms<'a>(tokens: &mut Tokens<'a>) -> ParseResult<'a, Vec<Xperm>> {
 }
 
 fn match_string<'a>(tokens: &mut Tokens<'a>, pattern: &str) -> ParseResult<'a, ()> {
-    if let Some(Token::ID(s)) = tokens.next() {
-        if s == pattern {
-            return Ok(());
-        }
+    if let Some(Token::ID(s)) = tokens.next()
+        && s == pattern
+    {
+        return Ok(());
     }
     Err(ParseError::General)
 }
@@ -263,7 +263,7 @@ fn extract_token<'a>(s: &'a str, tokens: &mut Vec<Token<'a>>) {
     }
 }
 
-fn tokenize_statement(statement: &str) -> Vec<Token> {
+fn tokenize_statement(statement: &str) -> Vec<Token<'_>> {
     let mut tokens = Vec::new();
     for s in statement.split_whitespace() {
         extract_token(s, &mut tokens);

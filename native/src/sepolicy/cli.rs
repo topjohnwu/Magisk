@@ -127,11 +127,10 @@ pub unsafe extern "C" fn main(
             log_err!("Cannot apply policy")?;
         }
 
-        if let Some(file) = cli.save {
-            if !sepol.to_file(&file) {
+        if let Some(file) = cli.save
+            && !sepol.to_file(&file) {
                 log_err!("Cannot dump policy to {}", file)?;
             }
-        }
     };
     if res.is_ok() { 0 } else { 1 }
 }
