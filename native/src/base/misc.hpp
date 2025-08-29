@@ -5,7 +5,7 @@
 #include <functional>
 #include <string_view>
 #include <bitset>
-#include <cxx.h>
+#include <rust/cxx.h>
 
 #include "xwrap.hpp"
 

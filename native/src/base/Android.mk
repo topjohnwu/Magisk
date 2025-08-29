@@ -7,7 +7,6 @@ LOCAL_MODULE := libbase
 LOCAL_C_INCLUDES := \
     src/include \
     $(LOCAL_PATH)/include \
-    src/external/cxx-rs/include \
     out/generated
 LOCAL_EXPORT_C_INCLUDES := $(LOCAL_C_INCLUDES)
 LOCAL_EXPORT_STATIC_LIBRARIES := libcxx

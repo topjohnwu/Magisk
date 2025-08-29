@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <utility>
 #include <bitset>
-#include <cxx.h>
+#include <rust/cxx.h>
 
 /******************
  * Special Headers

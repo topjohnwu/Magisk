@@ -6,7 +6,7 @@ use std::io::Write;
 use std::path::Path;
 use std::{fs, io, process};
 
-use cxx_gen::Opt;
+use cxx_gen::{Include, IncludeKind, Opt};
 
 trait ResultExt<T> {
     fn ok_or_exit(self) -> T;
@@ -38,7 +38,12 @@ fn write_if_diff<P: AsRef<Path>>(path: P, bytes: &[u8]) -> io::Result<()> {
 
 pub fn gen_cxx_binding(name: &str) {
     println!("cargo:rerun-if-changed=lib.rs");
-    let opt = Opt::default();
+    let mut opt = Opt::default();
+    opt.cxx_impl_annotations = Some("[[gnu::always_inline]]".to_string());
+    opt.include.push(Include {
+        path: "rust/cxx.h".to_string(),
+        kind: IncludeKind::Bracketed,
+    });
     let code = cxx_gen::generate_header_and_cc_with_path("lib.rs", &opt);
     write_if_diff(format!("{name}.cpp"), code.implementation.as_slice()).ok_or_exit();
     write_if_diff(format!("{name}.hpp"), code.header.as_slice()).ok_or_exit();

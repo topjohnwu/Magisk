@@ -2,7 +2,7 @@
 
 #include <functional>
 
-#include <cxx.h>
+#include <rust/cxx.h>
 
 #define SQLITE_OPEN_READWRITE        0x00000002  /* Ok for sqlite3_open_v2() */
 #define SQLITE_OPEN_CREATE           0x00000004  /* Ok for sqlite3_open_v2() */

@@ -4,7 +4,7 @@
 
 #include <map>
 #include <string_view>
-#include <cxx.h>
+#include <rust/cxx.h>
 
 #include <sepol/policydb/policydb.h>
 
