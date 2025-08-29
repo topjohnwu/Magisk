@@ -281,25 +281,27 @@ Actions:
 An applet of `magisk`, the MagiskSU entry point. Good old `su` command.
 
 ```
-Usage: su [options] [-] [user [argument...]]
+Usage: su [options] [--] [user [argument...]]
 
 Options:
-  -c, --command COMMAND         Pass COMMAND to the invoked shell
+  -s, --shell SHELL             Use SHELL instead of the default /system/bin/sh
+  -i, --interactive             Force pseudo-terminal allocation
   -g, --group GROUP             Specify the primary group
-  -G, --supp-group GROUP        Specify a supplementary group.
+  -G, --supp-group GROUP        Specify a supplementary group
                                 The first specified supplementary group is also used
-                                as a primary group if the option -g is not specified.
+                                as a primary group if the option -g is not specified
   -Z, --context CONTEXT         Change SELinux context
   -t, --target PID              PID to take mount namespace from
-  -h, --help                    Display this help message and exit
-  -, -l, --login                Pretend the shell to be a login shell
+                                pid 0 means magisk global mount namespacen
   -m, -p,
   --preserve-environment        Preserve the entire environment
-  -s, --shell SHELL             Use SHELL instead of the default /system/bin/sh
   -v, --version                 Display version number and exit
   -V                            Display version code and exit
-  -mm, -M,
-  --mount-master                Force run in the global mount namespace
+  -h, --help                    Display this help message and exit
+
+--: Force stop options parsing, and also stop when an unknown option is found
+User: The user to switch to (default root), it can be name or uid
+Argument: Pass it to the shell as is
 ```
 
 ### resetprop
