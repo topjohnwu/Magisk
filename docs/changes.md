@@ -22,7 +22,7 @@
 
 - [General] Massive internal refactoring and code migration
 - [App] Support downloading module zip files with XZ compression
-- [App] Disable app animations when system animations are disabled
+- [App] Disable app anuimations when system animations are disabled
 - [Core] Support systemlessly deleting files with modules using blank file nodes
 - [MagiskInit] Redesign sepolicy patching and injection logic
 - [MagiskSU] Better TTY/PTY support
