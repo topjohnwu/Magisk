@@ -6,10 +6,13 @@ use crate::db::{DbSettings, MultiuserMode, RootAccess};
 use crate::ffi::{SuPolicy, SuRequest, exec_root_shell};
 use crate::socket::IpcRead;
 use base::{LoggedResult, ResultExt, WriteExt, debug, error, exit_on_error, libc, warn};
-use std::os::fd::{FromRawFd, IntoRawFd};
+use std::os::fd::{IntoRawFd, OwnedFd};
 use std::os::unix::net::UnixStream;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
+
+#[allow(unused_imports)]
+use std::os::fd::AsRawFd;
 
 const DEFAULT_SHELL: &str = "/system/bin/sh";
 
@@ -111,14 +114,16 @@ impl AccessInfo {
 }
 
 impl MagiskD {
-    pub fn su_daemon_handler(&self, client: i32, cred: &UCred) {
+    pub fn su_daemon_handler(&self, client: OwnedFd, cred: &UCred) {
         let cred = cred.0;
         debug!(
             "su: request from uid=[{}], pid=[{}], client=[{}]",
-            cred.uid, cred.pid, client
+            cred.uid,
+            cred.pid,
+            client.as_raw_fd()
         );
 
-        let mut client = unsafe { UnixStream::from_raw_fd(client) };
+        let mut client = UnixStream::from(client);
 
         let mut req = match client.read_decodable::<SuRequest>().log() {
             Ok(req) => req,

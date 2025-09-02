@@ -12,12 +12,11 @@ use base::libc;
 use cxx::{ExternType, type_id};
 use daemon::{MagiskD, daemon_entry};
 use derive::Decodable;
-use logging::{android_logging, setup_logfile, zygisk_close_logd, zygisk_get_logd, zygisk_logging};
-use module::remove_modules;
+use logging::{android_logging, zygisk_close_logd, zygisk_get_logd, zygisk_logging};
 use mount::{find_preinit_device, revert_unmount};
 use resetprop::{get_prop, resetprop_main};
 use selinux::{lgetfilecon, lsetfilecon, restorecon, setfilecon};
-use socket::{recv_fd, recv_fds, send_fd, send_fds};
+use socket::{recv_fd, recv_fds, send_fd};
 use std::fs::File;
 use std::mem::ManuallyDrop;
 use std::ops::DerefMut;
@@ -151,6 +150,10 @@ pub mod ffi {
         fn switch_mnt_ns(pid: i32) -> i32;
         fn exec_root_shell(client: i32, pid: i32, req: &mut SuRequest, mode: MntNsMode);
 
+        // Denylist
+        fn denylist_handler(client: i32);
+        fn scan_deny_apps();
+
         include!("include/sqlite.hpp");
 
         type sqlite3;
@@ -171,13 +174,10 @@ pub mod ffi {
         fn zygisk_logging();
         fn zygisk_close_logd();
         fn zygisk_get_logd() -> i32;
-        fn setup_logfile();
         fn find_preinit_device() -> String;
         fn revert_unmount(pid: i32);
-        fn remove_modules();
         fn zygisk_should_load_module(flags: u32) -> bool;
         fn send_fd(socket: i32, fd: i32) -> bool;
-        fn send_fds(socket: i32, fds: &[i32]) -> bool;
         fn recv_fd(socket: i32) -> i32;
         fn recv_fds(socket: i32) -> Vec<i32>;
         fn write_to_fd(self: &SuRequest, fd: i32);
@@ -206,23 +206,14 @@ pub mod ffi {
     // FFI for MagiskD
     extern "Rust" {
         type MagiskD;
-        fn reboot(&self);
         fn sdk_int(&self) -> i32;
         fn zygisk_enabled(&self) -> bool;
         fn boot_stage_handler(&self, client: i32, code: i32);
-        fn zygisk_handler(&self, client: i32);
-        fn zygisk_reset(&self, restore: bool);
-        fn restore_zygisk_prop(&self);
-        fn prune_su_access(&self);
-        fn su_daemon_handler(&self, client: i32, cred: &UCred);
-        #[cxx_name = "get_manager"]
-        unsafe fn get_manager_for_cxx(&self, user: i32, ptr: *mut CxxString, install: bool) -> i32;
-
+        fn handle_request_sync(&self, client: i32, code: i32);
+        fn handle_request_async(&self, client: i32, code: i32, cred: &UCred);
         fn get_db_setting(&self, key: DbEntryKey) -> i32;
         #[cxx_name = "set_db_setting"]
         fn set_db_setting_for_cxx(&self, key: DbEntryKey, value: i32) -> bool;
-        #[cxx_name = "db_exec"]
-        fn db_exec_for_cxx(&self, client_fd: i32);
 
         #[Self = MagiskD]
         #[cxx_name = "Get"]

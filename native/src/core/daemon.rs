@@ -1,24 +1,33 @@
-use crate::consts::{MAGISK_FULL_VER, MAGISK_PROC_CON, MAIN_CONFIG, ROOTMNT, ROOTOVL, SECURE_DIR};
+use crate::UCred;
+use crate::consts::{
+    MAGISK_FULL_VER, MAGISK_PROC_CON, MAGISK_VER_CODE, MAGISK_VERSION, MAIN_CONFIG, ROOTMNT,
+    ROOTOVL, SECURE_DIR,
+};
 use crate::db::Sqlite3;
 use crate::ffi::{
-    DbEntryKey, ModuleInfo, RequestCode, check_key_combo, exec_common_scripts, exec_module_scripts,
-    get_magisk_tmp, initialize_denylist, setup_magisk_env,
+    DbEntryKey, ModuleInfo, RequestCode, check_key_combo, denylist_handler, exec_common_scripts,
+    exec_module_scripts, get_magisk_tmp, initialize_denylist, scan_deny_apps, setup_magisk_env,
 };
 use crate::logging::{magisk_logging, setup_logfile, start_log_daemon};
-use crate::module::disable_modules;
+use crate::module::{disable_modules, remove_modules};
 use crate::mount::{clean_mounts, setup_preinit_dir};
 use crate::package::ManagerInfo;
 use crate::resetprop::{get_prop, set_prop};
 use crate::selinux::restore_tmpcon;
+use crate::socket::IpcWrite;
 use crate::su::SuInfo;
 use crate::zygisk::ZygiskState;
+use base::const_format::concatcp;
 use base::libc::{O_APPEND, O_CLOEXEC, O_RDONLY, O_WRONLY};
 use base::{
-    AtomicArc, BufReadExt, FsPathBuilder, ResultExt, Utf8CStr, Utf8CStrBuf, cstr, error, info, libc,
+    AtomicArc, BufReadExt, FsPathBuilder, ReadExt, ResultExt, Utf8CStr, Utf8CStrBuf, WriteExt,
+    cstr, error, info, libc,
 };
 use std::fmt::Write as FmtWrite;
+use std::fs::File;
 use std::io::{BufReader, Write};
-use std::process::Command;
+use std::os::fd::{FromRawFd, IntoRawFd, OwnedFd};
+use std::process::{Command, exit};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Mutex, OnceLock};
 
@@ -175,6 +184,8 @@ impl MagiskD {
     }
 
     pub fn boot_stage_handler(&self, client: i32, code: i32) {
+        // Take ownership
+        let client = unsafe { OwnedFd::from_raw_fd(client) };
         // Make sure boot stage execution is always serialized
         let mut state = self.boot_stage_lock.lock().unwrap();
 
@@ -187,10 +198,9 @@ impl MagiskD {
                     }
                     state.set(BootState::PostFsDataDone);
                 }
-                unsafe { libc::close(client) };
             }
             RequestCode::LATE_START => {
-                unsafe { libc::close(client) };
+                drop(client);
                 if state.contains(BootState::PostFsDataDone) && !state.contains(BootState::SafeMode)
                 {
                     self.late_start();
@@ -198,15 +208,85 @@ impl MagiskD {
                 }
             }
             RequestCode::BOOT_COMPLETE => {
-                unsafe { libc::close(client) };
+                drop(client);
                 if state.contains(BootState::PostFsDataDone) {
                     state.set(BootState::BootComplete);
                     self.boot_complete()
                 }
             }
-            _ => {
-                unsafe { libc::close(client) };
+            _ => {}
+        }
+    }
+
+    pub fn handle_request_sync(&self, client: i32, code: i32) {
+        // Take ownership
+        let mut client = unsafe { File::from_raw_fd(client) };
+        let code = RequestCode { repr: code };
+        match code {
+            RequestCode::CHECK_VERSION => {
+                #[cfg(debug_assertions)]
+                let s = concatcp!(MAGISK_VERSION, ":MAGISK:D");
+                #[cfg(not(debug_assertions))]
+                let s = concatcp!(MAGISK_VERSION, ":MAGISK:R");
+
+                client.write_encodable(s).log_ok();
             }
+            RequestCode::CHECK_VERSION_CODE => {
+                client.write_pod(&MAGISK_VER_CODE).log_ok();
+            }
+            RequestCode::START_DAEMON => {
+                setup_logfile();
+            }
+            RequestCode::STOP_DAEMON => {
+                // Unmount all overlays
+                denylist_handler(-1);
+
+                // Restore native bridge property
+                self.zygisk.lock().unwrap().restore_prop();
+
+                client.write_pod(&0).log_ok();
+
+                // Terminate the daemon!
+                exit(0);
+            }
+            _ => {}
+        }
+    }
+
+    pub fn handle_request_async(&self, client: i32, code: i32, cred: &UCred) {
+        // Take ownership
+        let client = unsafe { OwnedFd::from_raw_fd(client) };
+        let code = RequestCode { repr: code };
+        match code {
+            RequestCode::DENYLIST => {
+                denylist_handler(client.into_raw_fd());
+            }
+            RequestCode::SUPERUSER => {
+                self.su_daemon_handler(client, cred);
+            }
+            RequestCode::ZYGOTE_RESTART => {
+                info!("** zygote restarted");
+                self.prune_su_access();
+                scan_deny_apps();
+                self.zygisk.lock().unwrap().reset(false);
+            }
+            RequestCode::SQLITE_CMD => {
+                self.db_exec_for_cli(client).ok();
+            }
+            RequestCode::REMOVE_MODULES => {
+                let mut file = File::from(client);
+                let mut do_reboot: i32 = 0;
+                file.read_pod(&mut do_reboot).log_ok();
+                remove_modules();
+                file.write_pod(&0).log_ok();
+                if do_reboot != 0 {
+                    self.reboot();
+                }
+            }
+            RequestCode::ZYGISK => {
+                self.zygisk_handler(client);
+            }
+            _ => {}
         }
     }
 
@@ -231,7 +311,7 @@ pub fn daemon_entry() {
 
     start_log_daemon();
     magisk_logging();
-    info!("Magisk {} daemon started", MAGISK_FULL_VER);
+    info!("Magisk {MAGISK_FULL_VER} daemon started");
 
     let is_emulator = get_prop(cstr!("ro.kernel.qemu")) == "1"
         || get_prop(cstr!("ro.boot.qemu")) == "1"

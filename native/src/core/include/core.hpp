@@ -90,7 +90,7 @@ void init_thread_pool();
 void exec_task(std::function<void()> &&task);
 
 // Daemon handlers
-void denylist_handler(int client, const sock_cred *cred);
+void denylist_handler(int client);
 
 // Scripting
 void install_apk(Utf8CStr apk);

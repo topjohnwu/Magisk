@@ -8,13 +8,11 @@ use base::{
     Utf8CString, cstr, error, fd_get_attr, warn,
 };
 use bit_set::BitSet;
-use cxx::CxxString;
 use std::collections::BTreeMap;
 use std::fs::File;
 use std::io;
 use std::io::{Cursor, Read, Seek, SeekFrom};
 use std::os::fd::AsRawFd;
-use std::pin::Pin;
 use std::time::Duration;
 
 const EOCD_MAGIC: u32 = 0x06054B50;
@@ -472,19 +470,6 @@ impl MagiskD {
     pub fn ensure_manager(&self) {
         let mut info = self.manager_info.lock().unwrap();
         let _ = info.get_manager(self, 0, true);
-    }
-
-    pub unsafe fn get_manager_for_cxx(&self, user: i32, ptr: *mut CxxString, install: bool) -> i32 {
-        unsafe {
-            let mut info = self.manager_info.lock().unwrap();
-            let (uid, pkg) = info.get_manager(self, user, install);
-            if let Some(str) = ptr.as_mut() {
-                let mut str = Pin::new_unchecked(str);
-                str.as_mut().clear();
-                str.push_str(pkg);
-            }
-            uid
-        }
     }
 
     // app_id = app_no + AID_APP_START
