@@ -111,9 +111,10 @@ pub(crate) unsafe fn readlinkat(
 unsafe extern "C" fn cp_afc_for_cxx(src: *const c_char, dest: *const c_char) -> bool {
     unsafe {
         if let Ok(src) = Utf8CStr::from_ptr(src)
-            && let Ok(dest) = Utf8CStr::from_ptr(dest) {
-                return src.copy_to(dest).log_cxx().is_ok();
-            }
+            && let Ok(dest) = Utf8CStr::from_ptr(dest)
+        {
+            return src.copy_to(dest).log_cxx().is_ok();
+        }
         false
     }
 }
@@ -122,9 +123,10 @@ unsafe extern "C" fn cp_afc_for_cxx(src: *const c_char, dest: *const c_char) -> 
 unsafe extern "C" fn mv_path_for_cxx(src: *const c_char, dest: *const c_char) -> bool {
     unsafe {
         if let Ok(src) = Utf8CStr::from_ptr(src)
-            && let Ok(dest) = Utf8CStr::from_ptr(dest) {
-                return src.move_to(dest).log_cxx().is_ok();
-            }
+            && let Ok(dest) = Utf8CStr::from_ptr(dest)
+        {
+            return src.move_to(dest).log_cxx().is_ok();
+        }
         false
     }
 }
@@ -133,9 +135,10 @@ unsafe extern "C" fn mv_path_for_cxx(src: *const c_char, dest: *const c_char) ->
 unsafe extern "C" fn link_path_for_cxx(src: *const c_char, dest: *const c_char) -> bool {
     unsafe {
         if let Ok(src) = Utf8CStr::from_ptr(src)
-            && let Ok(dest) = Utf8CStr::from_ptr(dest) {
-                return src.link_to(dest).log_cxx().is_ok();
-            }
+            && let Ok(dest) = Utf8CStr::from_ptr(dest)
+        {
+            return src.link_to(dest).log_cxx().is_ok();
+        }
         false
     }
 }
@@ -144,9 +147,10 @@ unsafe extern "C" fn link_path_for_cxx(src: *const c_char, dest: *const c_char) 
 unsafe extern "C" fn clone_attr_for_cxx(src: *const c_char, dest: *const c_char) -> bool {
     unsafe {
         if let Ok(src) = Utf8CStr::from_ptr(src)
-            && let Ok(dest) = Utf8CStr::from_ptr(dest) {
-                return clone_attr(src, dest).log_cxx().is_ok();
-            }
+            && let Ok(dest) = Utf8CStr::from_ptr(dest)
+        {
+            return clone_attr(src, dest).log_cxx().is_ok();
+        }
         false
     }
 }
