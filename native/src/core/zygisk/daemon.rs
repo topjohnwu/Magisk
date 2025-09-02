@@ -9,7 +9,7 @@ use base::{
     libc, log_err, raw_cstr, warn,
 };
 use std::fmt::Write;
-use std::os::fd::{AsRawFd, FromRawFd, RawFd};
+use std::os::fd::{AsRawFd, OwnedFd, RawFd};
 use std::os::unix::net::UnixStream;
 use std::ptr;
 use std::sync::atomic::Ordering;
@@ -146,7 +146,7 @@ impl ZygiskState {
         }
     }
 
-    fn restore_prop(&mut self) {
+    pub fn restore_prop(&mut self) {
         let mut orig = "0".to_string();
         if self.lib_name.len() > ZYGISKLDR.len() {
             orig = self.lib_name[ZYGISKLDR.len()..].to_string();
@@ -157,8 +157,8 @@ impl ZygiskState {
 }
 
 impl MagiskD {
-    pub fn zygisk_handler(&self, client: i32) {
-        let mut client = unsafe { UnixStream::from_raw_fd(client) };
+    pub fn zygisk_handler(&self, client: OwnedFd) {
+        let mut client = UnixStream::from(client);
         let _: LoggedResult<()> = try {
             let code = ZygiskRequest {
                 repr: client.read_decodable()?,
@@ -254,13 +254,5 @@ impl MagiskD {
 impl MagiskD {
     pub fn zygisk_enabled(&self) -> bool {
         self.zygisk_enabled.load(Ordering::Acquire)
-    }
-
-    pub fn zygisk_reset(&self, restore: bool) {
-        self.zygisk.lock().unwrap().reset(restore);
-    }
-
-    pub fn restore_zygisk_prop(&self) {
-        self.zygisk.lock().unwrap().restore_prop();
     }
 }

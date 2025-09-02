@@ -236,11 +236,6 @@ pub fn send_fd(socket: RawFd, fd: RawFd) -> bool {
     }
 }
 
-pub fn send_fds(socket: RawFd, fds: &[RawFd]) -> bool {
-    let mut socket = ManuallyDrop::new(unsafe { UnixStream::from_raw_fd(socket) });
-    socket.send_fds(fds).log().is_ok()
-}
-
 pub fn recv_fd(socket: RawFd) -> RawFd {
     let mut socket = ManuallyDrop::new(unsafe { UnixStream::from_raw_fd(socket) });
     socket

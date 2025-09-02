@@ -161,76 +161,6 @@ void write_string(int fd, string_view str) {
     xwrite(fd, str.data(), str.size());
 }
 
-static void handle_request_async(int client, int code, const sock_cred &cred) {
-    auto &daemon = MagiskD::Get();
-    switch (code) {
-    case +RequestCode::DENYLIST:
-        denylist_handler(client, &cred);
-        break;
-    case +RequestCode::SUPERUSER:
-        daemon.su_daemon_handler(client, cred);
-        break;
-    case +RequestCode::ZYGOTE_RESTART: {
-        LOGI("** zygote restarted\n");
-        daemon.prune_su_access();
-        scan_deny_apps();
-        daemon.zygisk_reset(false);
-        close(client);
-        break;
-    }
-    case +RequestCode::SQLITE_CMD:
-        daemon.db_exec(client);
-        break;
-    case +RequestCode::REMOVE_MODULES: {
-        int do_reboot = read_int(client);
-        remove_modules();
-        write_int(client, 0);
-        close(client);
-        if (do_reboot) {
-            daemon.reboot();
-        }
-        break;
-    }
-    case +RequestCode::ZYGISK:
-        daemon.zygisk_handler(client);
-        break;
-    default:
-        __builtin_unreachable();
-    }
-}
-
-static void handle_request_sync(int client, int code) {
-    switch (code) {
-    case +RequestCode::CHECK_VERSION:
-#if MAGISK_DEBUG
-        write_string(client, MAGISK_VERSION ":MAGISK:D");
-#else
-        write_string(client, MAGISK_VERSION ":MAGISK:R");
-#endif
-        break;
-    case +RequestCode::CHECK_VERSION_CODE:
-        write_int(client, MAGISK_VER_CODE);
-        break;
-    case +RequestCode::START_DAEMON:
-        setup_logfile();
-        break;
-    case +RequestCode::STOP_DAEMON: {
-        // Unmount all overlays
-        denylist_handler(-1, nullptr);
-
-        // Restore native bridge property
-        MagiskD::Get().restore_zygisk_prop();
-
-        write_int(client, 0);
-
-        // Terminate the daemon!
-        exit(0);
-    }
-    default:
-        __builtin_unreachable();
-    }
-}
-
 static bool is_client(pid_t pid) {
     // Verify caller is the same as server
     char path[32];
@@ -244,16 +174,13 @@ static void handle_request(pollfd *pfd) {
 
     // Verify client credentials
     sock_cred cred;
-    bool is_root;
-    bool is_zygote;
-    int code;
 
     if (!get_client_cred(client, &cred)) {
         // Client died
         return;
     }
-    is_root = cred.uid == AID_ROOT;
-    is_zygote = cred.context == "u:r:zygote:s0";
+    bool is_root = cred.uid == AID_ROOT;
+    bool is_zygote = cred.context == "u:r:zygote:s0";
 
     if (!is_root && !is_zygote && !is_client(cred.pid)) {
         // Unsupported client state
@@ -261,7 +188,7 @@ static void handle_request(pollfd *pfd) {
         return;
     }
 
-    code = read_int(client);
+    int code = read_int(client);
     if (code < 0 || code >= +RequestCode::END ||
         code == +RequestCode::_SYNC_BARRIER_ ||
         code == +RequestCode::_STAGE_BARRIER_) {
@@ -303,9 +230,11 @@ static void handle_request(pollfd *pfd) {
     write_int(client, +RespondCode::OK);
 
     if (code < +RequestCode::_SYNC_BARRIER_) {
-        handle_request_sync(client, code);
+        MagiskD::Get().handle_request_sync(client.release(), code);
     } else if (code < +RequestCode::_STAGE_BARRIER_) {
-        exec_task([=, fd = client.release()] { handle_request_async(fd, code, cred); });
+        exec_task([=, fd = client.release()] {
+            MagiskD::Get().handle_request_async(fd, code, cred);
+        });
     } else {
         exec_task([=, fd = client.release()] {
             MagiskD::Get().boot_stage_handler(fd, code);
@@ -499,7 +428,7 @@ void unlock_blocks() {
 
 bool check_key_combo() {
     uint8_t bitmask[(KEY_MAX + 1) / 8];
-    vector<int> events;
+    vector<owned_fd> events;
     constexpr char name[] = "/dev/.ev";
 
     // First collect candidate events that accepts volume down
@@ -513,19 +442,17 @@ bool check_key_combo() {
         memset(bitmask, 0, sizeof(bitmask));
         ioctl(fd, EVIOCGBIT(EV_KEY, sizeof(bitmask)), bitmask);
         if (test_bit(KEY_VOLUMEDOWN, bitmask))
-            events.push_back(fd);
+            events.emplace_back(fd);
         else
             close(fd);
     }
     if (events.empty())
         return false;
 
-    run_finally fin([&]{ std::for_each(events.begin(), events.end(), close); });
-
     // Check if volume down key is held continuously for more than 3 seconds
     for (int i = 0; i < 300; ++i) {
         bool pressed = false;
-        for (const int &fd : events) {
+        for (int fd : events) {
             memset(bitmask, 0, sizeof(bitmask));
             ioctl(fd, EVIOCGKEY(sizeof(bitmask)), bitmask);
             if (test_bit(KEY_VOLUMEDOWN, bitmask)) {
