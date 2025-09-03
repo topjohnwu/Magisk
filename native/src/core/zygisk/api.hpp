@@ -236,6 +236,9 @@ struct Api {
     // or in the root companion process (assuming that you sent the fd over the socket).
     // Both restrictions are due to SELinux and UID.
     //
+    // Module should also make sure zygote is allowed to read module dir (e.g. module dir has
+    // system_file context) due to SELinux restrictions on socket messages.
+    //
     // Returns -1 if errors occurred.
     int getModuleDir();
 
