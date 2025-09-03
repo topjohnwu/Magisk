@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 - 2023, John Wu (@topjohnwu)
+ * Copyright 2017 - 2025, John Wu (@topjohnwu)
  * Copyright 2015, Pierre-Hugues Husson <phh@phh.me>
  * Copyright 2010, Adam Shanks (@ChainsDD)
  * Copyright 2008, Zinx Verituse (@zinxv)
@@ -76,9 +76,7 @@ static void sighandler(int sig) {
     close(STDERR_FILENO);
 
     // Put back all the default handlers
-    struct sigaction act;
-
-    memset(&act, 0, sizeof(act));
+    struct sigaction act{};
     act.sa_handler = SIG_DFL;
     for (int i = 0; quit_signals[i]; ++i) {
         sigaction(quit_signals[i], &act, nullptr);
@@ -86,8 +84,7 @@ static void sighandler(int sig) {
 }
 
 static void setup_sighandlers(void (*handler)(int)) {
-    struct sigaction act;
-    memset(&act, 0, sizeof(act));
+    struct sigaction act{};
     act.sa_handler = handler;
     for (int i = 0; quit_signals[i]; ++i) {
         sigaction(quit_signals[i], &act, nullptr);
@@ -95,8 +92,7 @@ static void setup_sighandlers(void (*handler)(int)) {
 }
 
 int su_client_main(int argc, char *argv[]) {
-    int c;
-    struct option long_opts[] = {
+    option long_opts[] = {
             { "command",                required_argument,  nullptr, 'c' },
             { "help",                   no_argument,        nullptr, 'h' },
             { "login",                  no_argument,        nullptr, 'l' },
@@ -126,6 +122,7 @@ int su_client_main(int argc, char *argv[]) {
 
     bool interactive = false;
 
+    int c;
     while ((c = getopt_long(argc, argv, "c:hlimpds:VvuZ:Mt:g:G:", long_opts, nullptr)) != -1) {
         switch (c) {
             case 'c': {
@@ -191,7 +188,7 @@ int su_client_main(int argc, char *argv[]) {
                     fprintf(stderr, "Invalid GID: %s\n", optarg);
                     usage(EXIT_FAILURE);
                 }
-                std::copy(gids.begin(), gids.end(), std::back_inserter(req.gids));
+                ranges::copy(gids, std::back_inserter(req.gids));
                 break;
             }
             default:
@@ -207,19 +204,15 @@ int su_client_main(int argc, char *argv[]) {
     }
     /* username or uid */
     if (optind < argc) {
-        struct passwd *pw;
-        pw = getpwnam(argv[optind]);
-        if (pw)
+        if (const passwd *pw = getpwnam(argv[optind]))
             req.target_uid = pw->pw_uid;
         else
             req.target_uid = parse_int(argv[optind]);
         optind++;
     }
 
-    int ptmx, fd;
-
     // Connect to client
-    fd = connect_daemon(+RequestCode::SUPERUSER);
+    owned_fd fd = connect_daemon(+RequestCode::SUPERUSER);
 
     // Send request
     req.write_to_fd(fd);
@@ -248,23 +241,17 @@ int su_client_main(int argc, char *argv[]) {
     if (atty) {
         // We need a PTY. Get one.
         write_int(fd, 1);
-        ptmx = recv_fd(fd);
-    } else {
-        write_int(fd, 0);
-    }
-
-    if (atty) {
+        int ptmx = recv_fd(fd);
         setup_sighandlers(sighandler);
         // if stdin is not a tty, if we pump to ptmx, our process may intercept the input to ptmx and
         // output to stdout, which cause the target process lost input.
         pump_tty(ptmx, (atty & ATTY_IN) ? ptmx : -1);
+    } else {
+        write_int(fd, 0);
     }
 
     // Get the exit code
-    int code = read_int(fd);
-    close(fd);
-
-    return code;
+    return read_int(fd);
 }
 
 static void drop_caps() {
