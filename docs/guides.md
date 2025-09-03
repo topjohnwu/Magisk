@@ -1,4 +1,4 @@
-# Developer Guides
+# Developer Guidelines
 
 ## BusyBox
 
