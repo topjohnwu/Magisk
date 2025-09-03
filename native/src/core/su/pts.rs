@@ -1,13 +1,24 @@
-use base::{error, libc, warn};
-use libc::{
-    POLLIN, SFD_CLOEXEC, SIG_BLOCK, SIGWINCH, STDIN_FILENO, STDOUT_FILENO, TCSADRAIN, TCSAFLUSH,
-    TIOCGWINSZ, TIOCSWINSZ, cfmakeraw, close, pipe, poll, pollfd, raise, read, sigaddset,
-    sigemptyset, signalfd, signalfd_siginfo, sigprocmask, sigset_t, splice, tcgetattr, tcsetattr,
-    termios, winsize,
+use base::libc::ssize_t;
+use base::{
+    LibcReturn, LoggedResult, OsResult, PipeFd, ReadExt, ResultExt, error, libc, log_err,
+    make_pipe, warn,
 };
-use std::{ffi::c_int, mem::MaybeUninit, ptr::null_mut};
+use bytemuck::{Pod, Zeroable};
+use libc::{
+    O_CLOEXEC, POLLIN, SFD_CLOEXEC, SIG_BLOCK, SIGWINCH, STDIN_FILENO, STDOUT_FILENO, TCSADRAIN,
+    TCSAFLUSH, TIOCGWINSZ, TIOCSWINSZ, cfmakeraw, close, poll, pollfd, raise, sigaddset,
+    sigemptyset, signalfd, signalfd_siginfo, sigprocmask, sigset_t, tcgetattr, tcsetattr, termios,
+    winsize,
+};
+use std::fs::File;
+use std::io::{Read, Write};
+use std::mem::{ManuallyDrop, MaybeUninit};
+use std::os::fd::{AsRawFd, FromRawFd, RawFd};
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::{ffi::c_int, ptr::null_mut};
 
 static mut OLD_STDIN: Option<termios> = None;
+static SHOULD_USE_SPLICE: AtomicBool = AtomicBool::new(true);
 const TIOCGPTN: u32 = 0x80045430;
 
 unsafe extern "C" {
@@ -71,34 +82,55 @@ fn resize_pty(outfd: i32) {
     }
 }
 
-fn pump_via_pipe(infd: i32, outfd: i32, pipe: &[c_int; 2]) -> bool {
-    // usize::MAX will EINVAL in some kernels, use i32::MAX in case
-    let s = unsafe { splice(infd, null_mut(), pipe[1], null_mut(), i32::MAX as _, 0) };
-    if s < 0 {
-        error!("splice error");
-        return false;
-    }
-    if s == 0 {
-        return true;
-    }
-    let s = unsafe { splice(pipe[0], null_mut(), outfd, null_mut(), s as usize, 0) };
-    if s < 0 {
-        error!("splice error");
-        return false;
-    }
-    true
+fn splice(fd_in: RawFd, fd_out: RawFd, len: usize, flags: u32) -> OsResult<'static, ssize_t> {
+    unsafe { libc::splice(fd_in, null_mut(), fd_out, null_mut(), len, flags) }
+        .as_os_result("splice", None, None)
 }
+
+fn pump_via_copy(infd: RawFd, outfd: RawFd) -> LoggedResult<()> {
+    let mut buf = MaybeUninit::<[u8; 4096]>::uninit();
+    let buf = unsafe { buf.assume_init_mut() };
+    let mut infd = ManuallyDrop::new(unsafe { File::from_raw_fd(infd) });
+    let mut outfd = ManuallyDrop::new(unsafe { File::from_raw_fd(outfd) });
+    let len = infd.read(buf)?;
+    outfd.write_all(&buf[..len])?;
+    Ok(())
+}
+
+fn pump_via_splice(infd: RawFd, outfd: RawFd, pipe: &PipeFd) -> LoggedResult<()> {
+    if !SHOULD_USE_SPLICE.load(Ordering::Acquire) {
+        return pump_via_copy(infd, outfd);
+    }
+
+    // The pipe capacity is by default 16 pages, let's just use 65536
+    let Ok(len) = splice(infd, pipe.write.as_raw_fd(), 65536_usize, 0) else {
+        // If splice failed, stop using splice and fallback to userspace copy
+        SHOULD_USE_SPLICE.store(false, Ordering::Release);
+        return pump_via_copy(infd, outfd);
+    };
+    if len == 0 {
+        return Ok(());
+    }
+    splice(pipe.read.as_raw_fd(), outfd, len as usize, 0)?;
+    Ok(())
+}
+
+#[derive(Copy, Clone)]
+#[repr(transparent)]
+struct SignalFdInfo(signalfd_siginfo);
+unsafe impl Zeroable for SignalFdInfo {}
+unsafe impl Pod for SignalFdInfo {}
 
 pub fn pump_tty(infd: i32, outfd: i32) {
     set_stdin_raw();
 
-    let sfd = unsafe {
+    let signal_fd = unsafe {
         let mut mask: sigset_t = std::mem::zeroed();
         sigemptyset(&mut mask);
         sigaddset(&mut mask, SIGWINCH);
-        if sigprocmask(SIG_BLOCK, &mask, null_mut()) < 0 {
-            error!("sigprocmask");
-        }
+        sigprocmask(SIG_BLOCK, &mask, null_mut())
+            .check_os_err("sigprocmask", None, None)
+            .log_ok();
         signalfd(-1, &mask, SFD_CLOEXEC)
     };
 
@@ -116,17 +148,16 @@ pub fn pump_tty(infd: i32, outfd: i32) {
             revents: 0,
         },
         pollfd {
-            fd: sfd,
+            fd: signal_fd,
             events: POLLIN,
             revents: 0,
         },
     ];
 
-    let mut p: [c_int; 2] = [0; 2];
-    if unsafe { pipe(&mut p as *mut c_int) } < 0 {
-        error!("pipe error");
+    let Ok(pipe_fd) = make_pipe(O_CLOEXEC).log() else {
         return;
-    }
+    };
+
     'poll: loop {
         let ready = unsafe { poll(pfds.as_mut_ptr(), pfds.len() as _, -1) };
 
@@ -138,22 +169,18 @@ pub fn pump_tty(infd: i32, outfd: i32) {
         for pfd in &pfds {
             if pfd.revents & POLLIN != 0 {
                 let res = if pfd.fd == STDIN_FILENO {
-                    pump_via_pipe(pfd.fd, outfd, &p)
+                    pump_via_splice(STDIN_FILENO, outfd, &pipe_fd)
                 } else if pfd.fd == infd {
-                    pump_via_pipe(pfd.fd, STDOUT_FILENO, &p)
-                } else if pfd.fd == sfd {
+                    pump_via_splice(infd, STDOUT_FILENO, &pipe_fd)
+                } else if pfd.fd == signal_fd {
                     resize_pty(outfd);
-                    let mut buf = [MaybeUninit::<u8>::uninit(); size_of::<signalfd_siginfo>()];
-                    if unsafe { read(pfd.fd, buf.as_mut_ptr() as *mut _, buf.len()) } < 0 {
-                        error!("read error");
-                        false
-                    } else {
-                        true
-                    }
+                    let mut info = SignalFdInfo::zeroed();
+                    let mut fd = ManuallyDrop::new(unsafe { File::from_raw_fd(signal_fd) });
+                    fd.read_pod(&mut info).log()
                 } else {
-                    false
+                    log_err!()
                 };
-                if !res {
+                if res.is_err() {
                     break 'poll;
                 }
             } else if pfd.revents != 0 && pfd.fd == infd {

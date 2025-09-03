@@ -885,3 +885,19 @@ pub fn parse_mount_info(pid: &str) -> Vec<MountInfo> {
     }
     res
 }
+
+pub struct PipeFd {
+    pub read: OwnedFd,
+    pub write: OwnedFd,
+}
+
+pub fn make_pipe(flags: i32) -> OsResult<'static, PipeFd> {
+    let mut pipefd: [RawFd; 2] = [0; 2];
+    unsafe {
+        libc::pipe2(pipefd.as_mut_ptr(), flags).check_os_err("pipe2", None, None)?;
+        Ok(PipeFd {
+            read: OwnedFd::from_raw_fd(pipefd[0]),
+            write: OwnedFd::from_raw_fd(pipefd[1]),
+        })
+    }
+}
