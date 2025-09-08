@@ -529,7 +529,10 @@ def gen_ide():
 def clippy_cli():
     ensure_toolchain()
     args.force_out = True
-    set_archs(default_archs)
+    if args.abi:
+        set_archs({args.abi})
+    else:
+        set_archs(default_archs)
 
     os.chdir(Path("native", "src"))
     cmds = ["clippy", "--no-deps", "--target"]
@@ -836,6 +839,7 @@ def parse_args():
     cargo_parser.add_argument("commands", nargs=argparse.REMAINDER)
 
     clippy_parser = subparsers.add_parser("clippy", help="run clippy on Rust sources")
+    clippy_parser.add_argument("--abi", help="target ABI to generate")
 
     rustup_parser = subparsers.add_parser("rustup", help="setup rustup wrapper")
     rustup_parser.add_argument(
