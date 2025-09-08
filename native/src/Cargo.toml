@@ -31,23 +31,25 @@ flate2 = { version = "1.1.2", default-features = false }
 bzip2 = { version = "0.6.0" }
 zopfli = "0.8.2"
 lz4 = "1.28.1"
-lzma-rust2 = { version = "0.11.0", default-features = false, features = ["xz", "std", "encoder", "optimization"] }
+lzma-rust2 = { version = "0.13.0", default-features = false, features = ["xz", "std", "encoder", "optimization"] }
 
 # Rust crypto crates are tied together
-sha1 = "0.11.0-rc.0"
-sha2 = "0.11.0-rc.0"
-digest = "0.11.0-rc.0"
-p256 = "0.14.0-pre.9"
-p384 = "0.14.0-pre.9"
-p521 = "0.14.0-pre.9"
-rsa = "=0.10.0-rc.3"
+sha1 = "0.11.0-rc.2"
+sha2 = "0.11.0-rc.2"
+digest = "0.11.0-rc.1"
+p256 = "0.14.0-pre.10"
+p384 = "0.14.0-pre.10"
+p521 = "0.14.0-pre.10"
+rsa = "0.10.0-rc.6"
 x509-cert = "0.3.0-rc.1"
-der = "=0.8.0-rc.7"
+der = "0.8.0-rc.8"
 
 [patch.crates-io]
 pb-rs = { git = "https://github.com/tafia/quick-protobuf.git" }
 quick-protobuf = { git = "https://github.com/tafia/quick-protobuf.git" }
 lz4-sys = { path = "external/lz4-sys" }
+x509-cert = { git = "https://github.com/RustCrypto/formats.git", rev = "cfacd3efed49b28f38e69612221b8af5f33a5cbf" }
+der_derive = { git = "https://github.com/RustCrypto/formats.git", rev = "cfacd3efed49b28f38e69612221b8af5f33a5cbf" }
 
 [profile.dev]
 opt-level = "z"
