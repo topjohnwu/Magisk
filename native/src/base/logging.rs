@@ -21,7 +21,6 @@ mod LogFlag {
 #[derive(Copy, Clone, FromPrimitive, ToPrimitive)]
 #[repr(i32)]
 pub enum LogLevel {
-    ErrorCxx = LogLevelCxx::ErrorCxx.repr,
     Error = LogLevelCxx::Error.repr,
     Warn = LogLevelCxx::Warn.repr,
     Info = LogLevelCxx::Info.repr,
@@ -57,7 +56,7 @@ pub fn exit_on_error(b: bool) {
 impl LogLevel {
     fn as_disable_flag(&self) -> u32 {
         match *self {
-            LogLevel::Error | LogLevel::ErrorCxx => LogFlag::DisableError,
+            LogLevel::Error => LogFlag::DisableError,
             LogLevel::Warn => LogFlag::DisableWarn,
             LogLevel::Info => LogFlag::DisableInfo,
             LogLevel::Debug => LogFlag::DisableDebug,
@@ -82,7 +81,7 @@ fn log_with_writer<F: FnOnce(LogWriter)>(level: LogLevel, f: F) {
         return;
     }
     f(logger.write);
-    if matches!(level, LogLevel::ErrorCxx) && (logger.flags & LogFlag::ExitOnError) != 0 {
+    if (logger.flags & LogFlag::ExitOnError) != 0 {
         exit(-1);
     }
 }

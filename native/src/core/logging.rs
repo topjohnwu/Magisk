@@ -50,7 +50,7 @@ unsafe extern "C" {
 
 fn level_to_prio(level: LogLevel) -> i32 {
     match level {
-        LogLevel::Error | LogLevel::ErrorCxx => ALogPriority::ANDROID_LOG_ERROR as i32,
+        LogLevel::Error => ALogPriority::ANDROID_LOG_ERROR as i32,
         LogLevel::Warn => ALogPriority::ANDROID_LOG_WARN as i32,
         LogLevel::Info => ALogPriority::ANDROID_LOG_INFO as i32,
         LogLevel::Debug => ALogPriority::ANDROID_LOG_DEBUG as i32,

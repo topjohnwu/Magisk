@@ -13,9 +13,6 @@ use thiserror::Error;
 // log and convert to LoggedResult.
 //
 // To log an error with more information, use `ResultExt::log_with_msg()`.
-//
-// The "cxx" method variants in `CxxResultExt` are only used for C++ interop and
-// should not be used directly in any Rust code.
 
 #[derive(Default)]
 pub struct LoggedError {}
@@ -54,11 +51,6 @@ pub trait ResultExt<T> {
     fn log(self) -> LoggedResult<T>;
     fn log_with_msg<F: FnOnce(Formatter) -> fmt::Result>(self, f: F) -> LoggedResult<T>;
     fn log_ok(self);
-}
-
-// Internal C++ bridging logging routines
-pub(crate) trait CxxResultExt<T> {
-    fn log_cxx(self) -> LoggedResult<T>;
 }
 
 // Public API for converting Option to LoggedResult
@@ -100,12 +92,6 @@ trait Loggable {
         caller: Option<&'static Location>,
         f: F,
     ) -> LoggedError;
-}
-
-impl<T, E: Loggable> CxxResultExt<T> for Result<T, E> {
-    fn log_cxx(self) -> LoggedResult<T> {
-        self.map_err(|e| e.do_log(LogLevel::ErrorCxx, None))
-    }
 }
 
 impl<T, E: Loggable> ResultExt<T> for Result<T, E> {

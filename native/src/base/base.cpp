@@ -291,7 +291,7 @@ extern "C" int magisk_log_print(int prio, const char *tag, const char *fmt, ...)
         level = LogLevel::Warn;
         break;
     case ANDROID_LOG_ERROR:
-        level = LogLevel::ErrorCxx;
+        level = LogLevel::Error;
         break;
     default:
         return 0;
@@ -328,11 +328,11 @@ void LOGD(const char *fmt, ...) {}
 #endif
 void LOGI(const char *fmt, ...) { LOG_BODY(Info) }
 void LOGW(const char *fmt, ...) { LOG_BODY(Warn) }
-void LOGE(const char *fmt, ...) { LOG_BODY(ErrorCxx) }
+void LOGE(const char *fmt, ...) { LOG_BODY(Error) }
 
 // Export raw symbol to fortify compat
 extern "C" void __vloge(const char* fmt, va_list ap) {
-    fmt_and_log_with_rs(LogLevel::ErrorCxx, fmt, ap);
+    fmt_and_log_with_rs(LogLevel::Error, fmt, ap);
 }
 
 string full_read(int fd) {

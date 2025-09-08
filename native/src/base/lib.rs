@@ -31,7 +31,6 @@ pub mod ffi {
     #[repr(i32)]
     #[cxx_name = "LogLevel"]
     pub(crate) enum LogLevelCxx {
-        ErrorCxx,
         Error,
         Warn,
         Info,

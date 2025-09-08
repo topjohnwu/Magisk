@@ -13,7 +13,7 @@ use crate::ffi::{FnBoolStr, FnBoolStrStr};
 use crate::files::map_file_at;
 pub(crate) use crate::xwrap::*;
 use crate::{
-    BufReadExt, CxxResultExt, Directory, OsResultStatic, Utf8CStr, clone_attr, cstr, fclone_attr,
+    BufReadExt, Directory, OsResultStatic, ResultExt, Utf8CStr, clone_attr, cstr, fclone_attr,
     map_fd, map_file, slice_from_ptr,
 };
 
@@ -24,7 +24,7 @@ unsafe extern "C" fn canonical_path(path: *const c_char, buf: *mut u8, bufsz: us
             Ok(path) => {
                 let mut buf = cstr::buf::wrap_ptr(buf, bufsz);
                 path.realpath(&mut buf)
-                    .log_cxx()
+                    .log()
                     .map_or(-1_isize, |_| buf.len() as isize)
             }
             Err(_) => -1,
@@ -61,13 +61,13 @@ unsafe extern "C" fn frm_rf(fd: OwnedFd) -> bool {
 }
 
 pub(crate) fn map_file_for_cxx(path: &Utf8CStr, rw: bool) -> &'static mut [u8] {
-    map_file(path, rw).log_cxx().unwrap_or(&mut [])
+    map_file(path, rw).log().unwrap_or(&mut [])
 }
 
 pub(crate) fn map_file_at_for_cxx(fd: RawFd, path: &Utf8CStr, rw: bool) -> &'static mut [u8] {
     unsafe {
         map_file_at(BorrowedFd::borrow_raw(fd), path, rw)
-            .log_cxx()
+            .log()
             .unwrap_or(&mut [])
     }
 }
@@ -75,7 +75,7 @@ pub(crate) fn map_file_at_for_cxx(fd: RawFd, path: &Utf8CStr, rw: bool) -> &'sta
 pub(crate) fn map_fd_for_cxx(fd: RawFd, sz: usize, rw: bool) -> &'static mut [u8] {
     unsafe {
         map_fd(BorrowedFd::borrow_raw(fd), sz, rw)
-            .log_cxx()
+            .log()
             .unwrap_or(&mut [])
     }
 }
@@ -113,7 +113,7 @@ unsafe extern "C" fn cp_afc_for_cxx(src: *const c_char, dest: *const c_char) -> 
         if let Ok(src) = Utf8CStr::from_ptr(src)
             && let Ok(dest) = Utf8CStr::from_ptr(dest)
         {
-            return src.copy_to(dest).log_cxx().is_ok();
+            return src.copy_to(dest).log().is_ok();
         }
         false
     }
@@ -125,7 +125,7 @@ unsafe extern "C" fn mv_path_for_cxx(src: *const c_char, dest: *const c_char) ->
         if let Ok(src) = Utf8CStr::from_ptr(src)
             && let Ok(dest) = Utf8CStr::from_ptr(dest)
         {
-            return src.move_to(dest).log_cxx().is_ok();
+            return src.move_to(dest).log().is_ok();
         }
         false
     }
@@ -137,7 +137,7 @@ unsafe extern "C" fn link_path_for_cxx(src: *const c_char, dest: *const c_char) 
         if let Ok(src) = Utf8CStr::from_ptr(src)
             && let Ok(dest) = Utf8CStr::from_ptr(dest)
         {
-            return src.link_to(dest).log_cxx().is_ok();
+            return src.link_to(dest).log().is_ok();
         }
         false
     }
@@ -149,7 +149,7 @@ unsafe extern "C" fn clone_attr_for_cxx(src: *const c_char, dest: *const c_char)
         if let Ok(src) = Utf8CStr::from_ptr(src)
             && let Ok(dest) = Utf8CStr::from_ptr(dest)
         {
-            return clone_attr(src, dest).log_cxx().is_ok();
+            return clone_attr(src, dest).log().is_ok();
         }
         false
     }
@@ -157,7 +157,7 @@ unsafe extern "C" fn clone_attr_for_cxx(src: *const c_char, dest: *const c_char)
 
 #[unsafe(export_name = "fclone_attr")]
 unsafe extern "C" fn fclone_attr_for_cxx(a: RawFd, b: RawFd) -> bool {
-    fclone_attr(a, b).log_cxx().is_ok()
+    fclone_attr(a, b).log().is_ok()
 }
 
 #[unsafe(export_name = "cxx$utf8str$new")]
