@@ -201,9 +201,10 @@ impl SuAppContext<'_> {
                 events: libc::POLLIN,
                 revents: 0,
             };
-            if unsafe { libc::poll(&mut pfd, 1, 70 * 1000).as_os_result("poll", None, None)? } == 0
+            if unsafe { libc::poll(&mut pfd, 1, 70 * 1000).into_os_result("poll", None, None)? }
+                == 0
             {
-                Err(OsError::with_os_error(libc::ETIMEDOUT, "poll", None, None))?;
+                Err(OsError::new(libc::ETIMEDOUT, "poll", None, None))?;
             }
 
             fd

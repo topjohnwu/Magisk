@@ -64,7 +64,7 @@ fn file_set_prop(name: &Utf8CStr, value: Option<&Utf8CStr>) -> LoggedResult<()> 
         {
             let mut f = unsafe {
                 mkstemp(tmp.as_mut_ptr())
-                    .as_os_result("mkstemp", None, None)
+                    .into_os_result("mkstemp", None, None)
                     .map(|fd| File::from_raw_fd(fd))?
             };
             f.write_all(value.as_bytes())?;
@@ -96,7 +96,7 @@ fn proto_write_props(props: &PersistentProperties) -> LoggedResult<()> {
     {
         let f = unsafe {
             mkstemp(tmp.as_mut_ptr())
-                .as_os_result("mkstemp", None, None)
+                .into_os_result("mkstemp", None, None)
                 .map(|fd| File::from_raw_fd(fd))?
         };
         debug!("resetprop: encode with protobuf [{}]", tmp);

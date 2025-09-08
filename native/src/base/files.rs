@@ -141,7 +141,7 @@ impl FileOrStd {
 
 fn open_fd(path: &Utf8CStr, flags: i32, mode: mode_t) -> OsResult<'_, OwnedFd> {
     unsafe {
-        let fd = libc::open(path.as_ptr(), flags, mode as c_uint).as_os_result(
+        let fd = libc::open(path.as_ptr(), flags, mode as c_uint).into_os_result(
             "open",
             Some(path),
             None,
@@ -267,7 +267,7 @@ impl Utf8CStr {
         buf.clear();
         unsafe {
             let r = libc::readlink(self.as_ptr(), buf.as_mut_ptr(), buf.capacity() - 1)
-                .as_os_result("readlink", Some(self), None)? as isize;
+                .into_os_result("readlink", Some(self), None)? as isize;
             *(buf.as_mut_ptr().offset(r) as *mut u8) = b'\0';
             buf.set_len(r as usize);
         }
@@ -763,7 +763,7 @@ pub(crate) fn map_file_at<'a>(
     let flag = if rw { O_RDWR } else { O_RDONLY };
     let fd = unsafe {
         OwnedFd::from_raw_fd(
-            libc::openat(dirfd.as_raw_fd(), path.as_ptr(), flag | O_CLOEXEC).as_os_result(
+            libc::openat(dirfd.as_raw_fd(), path.as_ptr(), flag | O_CLOEXEC).into_os_result(
                 "openat",
                 Some(path),
                 None,

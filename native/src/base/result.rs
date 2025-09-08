@@ -228,24 +228,20 @@ fn do_log_msg<F: FnOnce(Formatter) -> fmt::Result>(
 // Check libc return value and map to Result
 pub trait LibcReturn
 where
-    Self: Copy,
+    Self: Sized,
 {
     type Value;
 
-    fn is_error(&self) -> bool;
-    fn map_val(self) -> Self::Value;
+    fn into_result(self) -> Result<Self::Value, i32>;
 
-    fn as_os_result<'a>(
+    fn into_os_result<'a>(
         self,
         name: &'static str,
         arg1: Option<&'a str>,
         arg2: Option<&'a str>,
     ) -> OsResult<'a, Self::Value> {
-        if self.is_error() {
-            Err(OsError::last_os_error(name, arg1, arg2))
-        } else {
-            Ok(self.map_val())
-        }
+        self.into_result()
+            .map_err(|e| OsError::new(e, name, arg1, arg2))
     }
 
     fn check_os_err<'a>(
@@ -254,19 +250,15 @@ where
         arg1: Option<&'a str>,
         arg2: Option<&'a str>,
     ) -> OsResult<'a, ()> {
-        if self.is_error() {
-            Err(OsError::last_os_error(name, arg1, arg2))
-        } else {
-            Ok(())
-        }
+        self.into_result()
+            .map(|_| ())
+            .map_err(|e| OsError::new(e, name, arg1, arg2))
     }
 
     fn check_io_err(self) -> io::Result<()> {
-        if self.is_error() {
-            Err(io::Error::last_os_error())
-        } else {
-            Ok(())
-        }
+        self.into_result()
+            .map(|_| ())
+            .map_err(io::Error::from_raw_os_error)
     }
 }
 
@@ -276,13 +268,12 @@ macro_rules! impl_libc_return {
             type Value = Self;
 
             #[inline(always)]
-            fn is_error(&self) -> bool {
-                *self < 0
-            }
-
-            #[inline(always)]
-            fn map_val(self) -> Self::Value {
-                self
+            fn into_result(self) -> Result<Self::Value, i32> {
+                if self < 0 {
+                    Err(*errno())
+                } else {
+                    Ok(self)
+                }
             }
         }
     )*)
@@ -294,14 +285,8 @@ impl<T> LibcReturn for *mut T {
     type Value = NonNull<T>;
 
     #[inline(always)]
-    fn is_error(&self) -> bool {
-        self.is_null()
-    }
-
-    #[inline(always)]
-    fn map_val(self) -> NonNull<T> {
-        // SAFETY: pointer is null checked by is_error
-        unsafe { NonNull::new_unchecked(self.cast()) }
+    fn into_result(self) -> Result<Self::Value, i32> {
+        NonNull::new(self).ok_or_else(|| *errno())
     }
 }
 
@@ -345,7 +330,7 @@ pub struct OsError<'a> {
 }
 
 impl OsError<'_> {
-    pub fn with_os_error<'a>(
+    pub fn new<'a>(
         code: i32,
         name: &'static str,
         arg1: Option<&'a str>,
@@ -364,16 +349,16 @@ impl OsError<'_> {
         arg1: Option<&'a str>,
         arg2: Option<&'a str>,
     ) -> OsError<'a> {
-        Self::with_os_error(*errno(), name, arg1, arg2)
+        Self::new(*errno(), name, arg1, arg2)
     }
 
     pub fn set_args<'a>(self, arg1: Option<&'a str>, arg2: Option<&'a str>) -> OsError<'a> {
-        Self::with_os_error(self.code, self.name, arg1, arg2)
+        Self::new(self.code, self.name, arg1, arg2)
     }
 
     pub fn into_owned(self) -> OsError<'static> {
         OsError {
-            code: *errno(),
+            code: self.code,
             name: self.name,
             arg1: self.arg1.into_owned(),
             arg2: self.arg2.into_owned(),

@@ -84,7 +84,7 @@ fn resize_pty(outfd: i32) {
 
 fn splice(fd_in: RawFd, fd_out: RawFd, len: usize, flags: u32) -> OsResult<'static, ssize_t> {
     unsafe { libc::splice(fd_in, null_mut(), fd_out, null_mut(), len, flags) }
-        .as_os_result("splice", None, None)
+        .into_os_result("splice", None, None)
 }
 
 fn pump_via_copy(infd: RawFd, outfd: RawFd) -> LoggedResult<()> {

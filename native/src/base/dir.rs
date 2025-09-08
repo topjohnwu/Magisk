@@ -74,7 +74,7 @@ impl DirEntry<'_> {
 
     pub fn open_as_dir(&self) -> OsResult<'_, Directory> {
         if !self.is_dir() {
-            return Err(OsError::with_os_error(
+            return Err(OsError::new(
                 libc::ENOTDIR,
                 "fdopendir",
                 Some(self.name()),
@@ -86,7 +86,7 @@ impl DirEntry<'_> {
 
     pub fn open_as_file(&self, flags: i32) -> OsResult<'_, File> {
         if self.is_dir() {
-            return Err(OsError::with_os_error(
+            return Err(OsError::new(
                 libc::EISDIR,
                 "open_as_file",
                 Some(self.name()),
@@ -151,7 +151,7 @@ impl Directory {
     fn openat<'a>(&self, name: &'a Utf8CStr, flags: i32, mode: u32) -> OsResult<'a, OwnedFd> {
         unsafe {
             libc::openat(self.as_raw_fd(), name.as_ptr(), flags | O_CLOEXEC, mode)
-                .as_os_result("openat", Some(name), None)
+                .into_os_result("openat", Some(name), None)
                 .map(|fd| OwnedFd::from_raw_fd(fd))
         }
     }
@@ -166,7 +166,7 @@ impl Directory {
 impl Directory {
     pub fn open(path: &Utf8CStr) -> OsResult<'_, Directory> {
         let dirp = unsafe { libc::opendir(path.as_ptr()) };
-        let dirp = dirp.as_os_result("opendir", Some(path), None)?;
+        let dirp = dirp.into_os_result("opendir", Some(path), None)?;
         Ok(Directory { inner: dirp })
     }
 
@@ -233,7 +233,7 @@ impl Directory {
                 buf.as_mut_ptr().cast(),
                 buf.capacity(),
             )
-            .as_os_result("readlinkat", Some(name), None)? as usize;
+            .into_os_result("readlinkat", Some(name), None)? as usize;
             buf.set_len(r);
         }
         Ok(())
@@ -469,7 +469,7 @@ impl TryFrom<OwnedFd> for Directory {
 
     fn try_from(fd: OwnedFd) -> OsResult<'static, Self> {
         let dirp = unsafe { libc::fdopendir(fd.into_raw_fd()) };
-        let dirp = dirp.as_os_result("fdopendir", None, None)?;
+        let dirp = dirp.into_os_result("fdopendir", None, None)?;
         Ok(Directory { inner: dirp })
     }
 }
