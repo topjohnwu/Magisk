@@ -4,7 +4,6 @@ use std::fmt::Display;
 use std::panic::Location;
 use std::ptr::NonNull;
 use std::{fmt, io};
-use thiserror::Error;
 
 // Error handling throughout the Rust codebase in Magisk:
 //
@@ -277,42 +276,11 @@ impl<T> LibcReturn for *mut T {
 }
 
 #[derive(Debug)]
-enum OwnableStr<'a> {
-    None,
-    Borrowed(&'a str),
-    Owned(Box<str>),
-}
-
-impl OwnableStr<'_> {
-    fn into_owned(self) -> OwnableStr<'static> {
-        match self {
-            OwnableStr::None => OwnableStr::None,
-            OwnableStr::Borrowed(s) => OwnableStr::Owned(Box::from(s)),
-            OwnableStr::Owned(s) => OwnableStr::Owned(s),
-        }
-    }
-
-    fn ok(&self) -> Option<&str> {
-        match self {
-            OwnableStr::None => None,
-            OwnableStr::Borrowed(s) => Some(*s),
-            OwnableStr::Owned(s) => Some(s),
-        }
-    }
-}
-
-impl<'a> From<Option<&'a str>> for OwnableStr<'a> {
-    fn from(value: Option<&'a str>) -> Self {
-        value.map(OwnableStr::Borrowed).unwrap_or(OwnableStr::None)
-    }
-}
-
-#[derive(Debug)]
 pub struct OsError<'a> {
     code: i32,
     name: &'static str,
-    arg1: OwnableStr<'a>,
-    arg2: OwnableStr<'a>,
+    arg1: Option<&'a str>,
+    arg2: Option<&'a str>,
 }
 
 impl OsError<'_> {
@@ -325,8 +293,8 @@ impl OsError<'_> {
         OsError {
             code,
             name,
-            arg1: OwnableStr::from(arg1),
-            arg2: OwnableStr::from(arg2),
+            arg1,
+            arg2,
         }
     }
 
@@ -342,15 +310,6 @@ impl OsError<'_> {
         Self::new(self.code, self.name, arg1, arg2)
     }
 
-    pub fn into_owned(self) -> OsError<'static> {
-        OsError {
-            code: self.code,
-            name: self.name,
-            arg1: self.arg1.into_owned(),
-            arg2: self.arg2.into_owned(),
-        }
-    }
-
     fn as_io_error(&self) -> io::Error {
         io::Error::from_raw_os_error(self.code)
     }
@@ -362,7 +321,7 @@ impl Display for OsError<'_> {
         if self.name.is_empty() {
             write!(f, "{error:#}")
         } else {
-            match (self.arg1.ok(), self.arg2.ok()) {
+            match (self.arg1, self.arg2) {
                 (Some(arg1), Some(arg2)) => {
                     write!(f, "{} '{}' '{}': {:#}", self.name, arg1, arg2, error)
                 }
@@ -380,20 +339,3 @@ impl Display for OsError<'_> {
 impl std::error::Error for OsError<'_> {}
 
 pub type OsResult<'a, T> = Result<T, OsError<'a>>;
-
-#[derive(Debug, Error)]
-pub enum OsErrorStatic {
-    #[error(transparent)]
-    Os(OsError<'static>),
-    #[error(transparent)]
-    Io(#[from] io::Error),
-}
-
-// Convert non-static OsError to static
-impl<'a> From<OsError<'a>> for OsErrorStatic {
-    fn from(value: OsError<'a>) -> Self {
-        OsErrorStatic::Os(value.into_owned())
-    }
-}
-
-pub type OsResultStatic<T> = Result<T, OsErrorStatic>;

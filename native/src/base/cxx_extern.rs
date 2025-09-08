@@ -13,7 +13,7 @@ use crate::ffi::{FnBoolStr, FnBoolStrStr};
 use crate::files::map_file_at;
 pub(crate) use crate::xwrap::*;
 use crate::{
-    BufReadExt, Directory, OsResultStatic, ResultExt, Utf8CStr, clone_attr, cstr, fclone_attr,
+    BufReadExt, Directory, LoggedResult, ResultExt, Utf8CStr, clone_attr, cstr, fclone_attr,
     map_fd, map_file, slice_from_ptr,
 };
 
@@ -54,7 +54,7 @@ unsafe extern "C" fn rm_rf_for_cxx(path: *const c_char) -> bool {
 
 #[unsafe(no_mangle)]
 unsafe extern "C" fn frm_rf(fd: OwnedFd) -> bool {
-    fn inner(fd: OwnedFd) -> OsResultStatic<()> {
+    fn inner(fd: OwnedFd) -> LoggedResult<()> {
         Directory::try_from(fd)?.remove_all()
     }
     inner(fd).is_ok()
@@ -113,7 +113,7 @@ unsafe extern "C" fn cp_afc_for_cxx(src: *const c_char, dest: *const c_char) -> 
         if let Ok(src) = Utf8CStr::from_ptr(src)
             && let Ok(dest) = Utf8CStr::from_ptr(dest)
         {
-            return src.copy_to(dest).log().is_ok();
+            return src.copy_to(dest).is_ok();
         }
         false
     }
@@ -125,7 +125,7 @@ unsafe extern "C" fn mv_path_for_cxx(src: *const c_char, dest: *const c_char) ->
         if let Ok(src) = Utf8CStr::from_ptr(src)
             && let Ok(dest) = Utf8CStr::from_ptr(dest)
         {
-            return src.move_to(dest).log().is_ok();
+            return src.move_to(dest).is_ok();
         }
         false
     }
@@ -137,7 +137,7 @@ unsafe extern "C" fn link_path_for_cxx(src: *const c_char, dest: *const c_char) 
         if let Ok(src) = Utf8CStr::from_ptr(src)
             && let Ok(dest) = Utf8CStr::from_ptr(dest)
         {
-            return src.link_to(dest).log().is_ok();
+            return src.link_to(dest).is_ok();
         }
         false
     }

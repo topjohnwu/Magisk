@@ -1,7 +1,7 @@
 use crate::cxx_extern::readlinkat;
 use crate::{
-    FsPathBuilder, LibcReturn, OsError, OsResult, OsResultStatic, Utf8CStr, Utf8CStrBuf, cstr,
-    errno, fd_path, fd_set_attr,
+    FsPathBuilder, LibcReturn, LoggedResult, OsError, OsResult, Utf8CStr, Utf8CStrBuf, cstr, errno,
+    fd_path, fd_set_attr,
 };
 use libc::{EEXIST, O_CLOEXEC, O_CREAT, O_RDONLY, O_TRUNC, O_WRONLY, dirent, mode_t};
 use std::fs::File;
@@ -163,6 +163,7 @@ impl Directory {
     }
 }
 
+// Low-level methods, we should track the caller when error occurs, so return OsResult.
 impl Directory {
     pub fn open(path: &Utf8CStr) -> OsResult<'_, Directory> {
         let dirp = unsafe { libc::opendir(path.as_ptr()) };
@@ -294,22 +295,26 @@ impl Directory {
     pub fn resolve_path(&self, buf: &mut dyn Utf8CStrBuf) -> OsResult<'static, ()> {
         fd_path(self.as_raw_fd(), buf)
     }
+}
 
-    pub fn post_order_walk<F: FnMut(&DirEntry) -> OsResultStatic<WalkResult>>(
+// High-level helper methods, composed of multiple operations.
+// We should treat these as application logic and log ASAP, so return LoggedResult.
+impl Directory {
+    pub fn post_order_walk<F: FnMut(&DirEntry) -> LoggedResult<WalkResult>>(
         &mut self,
         mut f: F,
-    ) -> OsResultStatic<WalkResult> {
+    ) -> LoggedResult<WalkResult> {
         self.post_order_walk_impl(&mut f)
     }
 
-    pub fn pre_order_walk<F: FnMut(&DirEntry) -> OsResultStatic<WalkResult>>(
+    pub fn pre_order_walk<F: FnMut(&DirEntry) -> LoggedResult<WalkResult>>(
         &mut self,
         mut f: F,
-    ) -> OsResultStatic<WalkResult> {
+    ) -> LoggedResult<WalkResult> {
         self.pre_order_walk_impl(&mut f)
     }
 
-    pub fn remove_all(mut self) -> OsResultStatic<()> {
+    pub fn remove_all(mut self) -> LoggedResult<()> {
         self.post_order_walk(|e| {
             e.unlink()?;
             Ok(WalkResult::Continue)
@@ -317,12 +322,12 @@ impl Directory {
         Ok(())
     }
 
-    pub fn copy_into(&mut self, dir: &Directory) -> OsResultStatic<()> {
+    pub fn copy_into(&mut self, dir: &Directory) -> LoggedResult<()> {
         let mut buf = cstr::buf::default();
         self.copy_into_impl(dir, &mut buf)
     }
 
-    pub fn move_into(&mut self, dir: &Directory) -> OsResultStatic<()> {
+    pub fn move_into(&mut self, dir: &Directory) -> LoggedResult<()> {
         let dir_fd = self.as_raw_fd();
         while let Some(ref e) = self.read()? {
             if e.is_dir() && dir.contains_path(e.name()) {
@@ -346,17 +351,17 @@ impl Directory {
         Ok(())
     }
 
-    pub fn link_into(&mut self, dir: &Directory) -> OsResultStatic<()> {
+    pub fn link_into(&mut self, dir: &Directory) -> LoggedResult<()> {
         let mut buf = cstr::buf::default();
         self.link_into_impl(dir, &mut buf)
     }
 }
 
 impl Directory {
-    fn post_order_walk_impl<F: FnMut(&DirEntry) -> OsResultStatic<WalkResult>>(
+    fn post_order_walk_impl<F: FnMut(&DirEntry) -> LoggedResult<WalkResult>>(
         &mut self,
         f: &mut F,
-    ) -> OsResultStatic<WalkResult> {
+    ) -> LoggedResult<WalkResult> {
         use WalkResult::*;
         loop {
             match self.read()? {
@@ -378,10 +383,10 @@ impl Directory {
         }
     }
 
-    fn pre_order_walk_impl<F: FnMut(&DirEntry) -> OsResultStatic<WalkResult>>(
+    fn pre_order_walk_impl<F: FnMut(&DirEntry) -> LoggedResult<WalkResult>>(
         &mut self,
         f: &mut F,
-    ) -> OsResultStatic<WalkResult> {
+    ) -> LoggedResult<WalkResult> {
         use WalkResult::*;
         loop {
             match self.read()? {
@@ -406,7 +411,7 @@ impl Directory {
         &mut self,
         dest_dir: &Directory,
         buf: &mut dyn Utf8CStrBuf,
-    ) -> OsResultStatic<()> {
+    ) -> LoggedResult<()> {
         while let Some(ref e) = self.read()? {
             e.resolve_path(buf)?;
             let attr = buf.get_attr()?;
@@ -436,7 +441,7 @@ impl Directory {
         &mut self,
         dest_dir: &Directory,
         buf: &mut dyn Utf8CStrBuf,
-    ) -> OsResultStatic<()> {
+    ) -> LoggedResult<()> {
         let dir_fd = self.as_raw_fd();
         while let Some(ref e) = self.read()? {
             if e.is_dir() {

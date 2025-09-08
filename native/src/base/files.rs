@@ -1,5 +1,5 @@
 use crate::{
-    Directory, FsPathFollow, LibcReturn, OsError, OsResult, OsResultStatic, Utf8CStr, Utf8CStrBuf,
+    Directory, FsPathFollow, LibcReturn, LoggedResult, OsError, OsResult, Utf8CStr, Utf8CStrBuf,
     cstr, errno, error,
 };
 use bytemuck::{Pod, bytes_of, bytes_of_mut};
@@ -219,6 +219,7 @@ impl FileAttr {
 
 const XATTR_NAME_SELINUX: &CStr = c"security.selinux";
 
+// Low-level methods, we should track the caller when error occurs, so return OsResult.
 impl Utf8CStr {
     pub fn follow_link(&self) -> &FsPathFollow {
         unsafe { mem::transmute(self) }
@@ -253,15 +254,6 @@ impl Utf8CStr {
         unsafe { libc::remove(self.as_ptr()).check_os_err("remove", Some(self), None) }
     }
 
-    pub fn remove_all(&self) -> OsResultStatic<()> {
-        let attr = self.get_attr()?;
-        if attr.is_dir() {
-            let dir = Directory::try_from(open_fd(self, O_RDONLY | O_CLOEXEC, 0)?)?;
-            dir.remove_all()?;
-        }
-        Ok(self.remove()?)
-    }
-
     #[allow(clippy::unnecessary_cast)]
     pub fn read_link(&self, buf: &mut dyn Utf8CStrBuf) -> OsResult<'_, ()> {
         buf.clear();
@@ -284,35 +276,6 @@ impl Utf8CStr {
                 }
             }
         }
-        Ok(())
-    }
-
-    pub fn mkdirs(&self, mode: mode_t) -> OsResultStatic<()> {
-        if self.is_empty() {
-            return Ok(());
-        }
-
-        let mut path = cstr::buf::default();
-        let mut components = self.split('/').filter(|s| !s.is_empty());
-
-        if self.starts_with('/') {
-            path.append_path("/");
-        }
-
-        loop {
-            let Some(s) = components.next() else {
-                break;
-            };
-            path.append_path(s);
-
-            unsafe {
-                if libc::mkdir(path.as_ptr(), mode) < 0 && *errno() != EEXIST {
-                    return Err(OsError::last_os_error("mkdir", Some(&path), None))?;
-                }
-            }
-        }
-
-        *errno() = 0;
         Ok(())
     }
 
@@ -408,7 +371,79 @@ impl Utf8CStr {
         }
     }
 
-    pub fn copy_to(&self, path: &Utf8CStr) -> OsResultStatic<()> {
+    pub fn parent_dir(&self) -> Option<&str> {
+        Path::new(self.as_str())
+            .parent()
+            .map(Path::as_os_str)
+            // SAFETY: all substring of self is valid UTF-8
+            .map(|s| unsafe { std::str::from_utf8_unchecked(s.as_bytes()) })
+    }
+
+    pub fn file_name(&self) -> Option<&str> {
+        Path::new(self.as_str())
+            .file_name()
+            // SAFETY: all substring of self is valid UTF-8
+            .map(|s| unsafe { std::str::from_utf8_unchecked(s.as_bytes()) })
+    }
+
+    // ln -s target self
+    pub fn create_symlink_to<'a>(&'a self, target: &'a Utf8CStr) -> OsResult<'a, ()> {
+        unsafe {
+            libc::symlink(target.as_ptr(), self.as_ptr()).check_os_err(
+                "symlink",
+                Some(target),
+                Some(self),
+            )
+        }
+    }
+
+    pub fn mkfifo(&self, mode: mode_t) -> OsResult<'_, ()> {
+        unsafe { libc::mkfifo(self.as_ptr(), mode).check_os_err("mkfifo", Some(self), None) }
+    }
+}
+
+// High-level helper methods, composed of multiple operations.
+// We should treat these as application logic and log ASAP, so return LoggedResult.
+impl Utf8CStr {
+    pub fn remove_all(&self) -> LoggedResult<()> {
+        let attr = self.get_attr()?;
+        if attr.is_dir() {
+            let dir = Directory::try_from(open_fd(self, O_RDONLY | O_CLOEXEC, 0)?)?;
+            dir.remove_all()?;
+        }
+        Ok(self.remove()?)
+    }
+
+    pub fn mkdirs(&self, mode: mode_t) -> LoggedResult<()> {
+        if self.is_empty() {
+            return Ok(());
+        }
+
+        let mut path = cstr::buf::default();
+        let mut components = self.split('/').filter(|s| !s.is_empty());
+
+        if self.starts_with('/') {
+            path.append_path("/");
+        }
+
+        loop {
+            let Some(s) = components.next() else {
+                break;
+            };
+            path.append_path(s);
+
+            unsafe {
+                if libc::mkdir(path.as_ptr(), mode) < 0 && *errno() != EEXIST {
+                    return Err(OsError::last_os_error("mkdir", Some(&path), None))?;
+                }
+            }
+        }
+
+        *errno() = 0;
+        Ok(())
+    }
+
+    pub fn copy_to(&self, path: &Utf8CStr) -> LoggedResult<()> {
         let attr = self.get_attr()?;
         if attr.is_dir() {
             path.mkdir(0o777)?;
@@ -438,7 +473,7 @@ impl Utf8CStr {
         Ok(())
     }
 
-    pub fn move_to(&self, path: &Utf8CStr) -> OsResultStatic<()> {
+    pub fn move_to(&self, path: &Utf8CStr) -> LoggedResult<()> {
         if path.exists() {
             let attr = path.get_attr()?;
             if attr.is_dir() {
@@ -453,23 +488,8 @@ impl Utf8CStr {
         Ok(())
     }
 
-    pub fn parent_dir(&self) -> Option<&str> {
-        Path::new(self.as_str())
-            .parent()
-            .map(Path::as_os_str)
-            // SAFETY: all substring of self is valid UTF-8
-            .map(|s| unsafe { std::str::from_utf8_unchecked(s.as_bytes()) })
-    }
-
-    pub fn file_name(&self) -> Option<&str> {
-        Path::new(self.as_str())
-            .file_name()
-            // SAFETY: all substring of self is valid UTF-8
-            .map(|s| unsafe { std::str::from_utf8_unchecked(s.as_bytes()) })
-    }
-
     // ln self path
-    pub fn link_to(&self, path: &Utf8CStr) -> OsResultStatic<()> {
+    pub fn link_to(&self, path: &Utf8CStr) -> LoggedResult<()> {
         let attr = self.get_attr()?;
         if attr.is_dir() {
             path.mkdir(0o777)?;
@@ -487,21 +507,6 @@ impl Utf8CStr {
             }
             Ok(())
         }
-    }
-
-    // ln -s target self
-    pub fn create_symlink_to<'a>(&'a self, target: &'a Utf8CStr) -> OsResult<'a, ()> {
-        unsafe {
-            libc::symlink(target.as_ptr(), self.as_ptr()).check_os_err(
-                "symlink",
-                Some(target),
-                Some(self),
-            )
-        }
-    }
-
-    pub fn mkfifo(&self, mode: mode_t) -> OsResult<'_, ()> {
-        unsafe { libc::mkfifo(self.as_ptr(), mode).check_os_err("mkfifo", Some(self), None) }
     }
 }
 

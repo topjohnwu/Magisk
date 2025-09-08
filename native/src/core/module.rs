@@ -4,7 +4,7 @@ use crate::ffi::{ModuleInfo, exec_module_scripts, exec_script, get_magisk_tmp};
 use crate::mount::setup_module_mount;
 use crate::resetprop::load_prop_file;
 use base::{
-    DirEntry, Directory, FsPathBuilder, LibcReturn, LoggedResult, OsResultStatic, ResultExt,
+    DirEntry, Directory, FsPathBuilder, LibcReturn, LoggedResult, OsResult, ResultExt,
     SilentLogExt, Utf8CStr, Utf8CStrBuf, Utf8CString, WalkResult, clone_attr, cstr, debug, error,
     info, libc, raw_cstr, warn,
 };
@@ -42,7 +42,12 @@ fn bind_mount(reason: &str, src: &Utf8CStr, dest: &Utf8CStr, rec: bool) {
     dest.remount_mount_point_flags(MS_RDONLY).log_ok();
 }
 
-fn mount_dummy(reason: &str, src: &Utf8CStr, dest: &Utf8CStr, is_dir: bool) -> OsResultStatic<()> {
+fn mount_dummy<'a>(
+    reason: &str,
+    src: &Utf8CStr,
+    dest: &'a Utf8CStr,
+    is_dir: bool,
+) -> OsResult<'a, ()> {
     if is_dir {
         dest.mkdir(0o000)?;
     } else {
