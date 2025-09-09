@@ -21,7 +21,7 @@ use std::fs::File;
 use std::mem::ManuallyDrop;
 use std::ops::DerefMut;
 use std::os::fd::FromRawFd;
-use su::{get_pty_num, pump_tty, restore_stdin};
+use su::{get_pty_num, pump_tty};
 use zygisk::zygisk_should_load_module;
 
 #[path = "../include/consts.rs"]
@@ -181,9 +181,8 @@ pub mod ffi {
         fn recv_fd(socket: i32) -> i32;
         fn recv_fds(socket: i32) -> Vec<i32>;
         fn write_to_fd(self: &SuRequest, fd: i32);
-        fn pump_tty(infd: i32, outfd: i32);
+        fn pump_tty(ptmx: i32, pump_stdin: bool);
         fn get_pty_num(fd: i32) -> i32;
-        fn restore_stdin() -> bool;
         fn restorecon();
         fn lgetfilecon(path: Utf8CStrRef, con: &mut [u8]) -> bool;
         fn setfilecon(path: Utf8CStrRef, con: Utf8CStrRef) -> bool;

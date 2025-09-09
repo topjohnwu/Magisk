@@ -63,14 +63,8 @@ int quit_signals[] = { SIGALRM, SIGABRT, SIGHUP, SIGPIPE, SIGQUIT, SIGTERM, SIGI
 }
 
 static void sighandler(int sig) {
-    restore_stdin();
-
-    // Assume we'll only be called before death
-    // See note before sigaction() in set_stdin_raw()
-    //
-    // Now, close all standard I/O to cause the pumps
-    // to exit so we can continue and retrieve the exit
-    // code
+    // Close all standard I/O to cause the pumps to exit
+    // so we can continue and retrieve the exit code.
     close(STDIN_FILENO);
     close(STDOUT_FILENO);
     close(STDERR_FILENO);
@@ -243,9 +237,9 @@ int su_client_main(int argc, char *argv[]) {
         write_int(fd, 1);
         int ptmx = recv_fd(fd);
         setup_sighandlers(sighandler);
-        // if stdin is not a tty, if we pump to ptmx, our process may intercept the input to ptmx and
+        // If stdin is not a tty, and if we pump to ptmx, our process may intercept the input to ptmx and
         // output to stdout, which cause the target process lost input.
-        pump_tty(ptmx, (atty & ATTY_IN) ? ptmx : -1);
+        pump_tty(ptmx, atty & ATTY_IN);
     } else {
         write_int(fd, 0);
     }
