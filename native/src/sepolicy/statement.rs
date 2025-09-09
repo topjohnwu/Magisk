@@ -4,8 +4,7 @@ use std::{iter::Peekable, vec::IntoIter};
 
 use crate::SePolicy;
 use crate::ffi::Xperm;
-use base::libc::{O_CLOEXEC, O_RDONLY};
-use base::{BufReadExt, LoggedResult, Utf8CStr, error, warn};
+use base::{BufReadExt, LoggedResult, Utf8CStr, error, nix::fcntl::OFlag, warn};
 
 pub enum Token<'a> {
     AL,
@@ -279,7 +278,7 @@ impl SePolicy {
 
     pub fn load_rule_file(&mut self, filename: &Utf8CStr) {
         let result: LoggedResult<()> = try {
-            let file = filename.open(O_RDONLY | O_CLOEXEC)?;
+            let file = filename.open(OFlag::O_RDONLY | OFlag::O_CLOEXEC)?;
             let mut reader = BufReader::new(file);
             self.load_rules_from_reader(&mut reader);
         };

@@ -1,7 +1,7 @@
 use crate::ffi::{FileFormat, check_fmt};
-use base::libc::{O_RDONLY, O_TRUNC, O_WRONLY};
 use base::{
     Chunker, FileOrStd, LoggedResult, ReadExt, ResultExt, Utf8CStr, Utf8CString, WriteExt, log_err,
+    nix::fcntl::OFlag,
 };
 use bzip2::{Compression as BzCompression, read::BzDecoder, write::BzEncoder};
 use flate2::{Compression as GzCompression, read::MultiGzDecoder, write::GzEncoder};
@@ -293,7 +293,7 @@ pub(crate) fn decompress_cmd(infile: &Utf8CStr, outfile: Option<&Utf8CStr>) -> L
     let input = if in_std {
         FileOrStd::StdIn
     } else {
-        FileOrStd::File(infile.open(O_RDONLY)?)
+        FileOrStd::File(infile.open(OFlag::O_RDONLY)?)
     };
 
     // First read some bytes for format detection
@@ -316,7 +316,7 @@ pub(crate) fn decompress_cmd(infile: &Utf8CStr, outfile: Option<&Utf8CStr>) -> L
         if outfile == "-" {
             FileOrStd::StdOut
         } else {
-            FileOrStd::File(outfile.create(O_WRONLY | O_TRUNC, 0o644)?)
+            FileOrStd::File(outfile.create(OFlag::O_WRONLY | OFlag::O_TRUNC, 0o644)?)
         }
     } else if in_std {
         FileOrStd::StdOut
@@ -332,7 +332,7 @@ pub(crate) fn decompress_cmd(infile: &Utf8CStr, outfile: Option<&Utf8CStr>) -> L
 
         rm_in = true;
         eprintln!("Decompressing to [{outfile}]");
-        FileOrStd::File(outfile.create(O_WRONLY | O_TRUNC, 0o644)?)
+        FileOrStd::File(outfile.create(OFlag::O_WRONLY | OFlag::O_TRUNC, 0o644)?)
     };
 
     let mut decoder = get_decoder(format, Cursor::new(buf).chain(input.as_file()));
@@ -356,14 +356,14 @@ pub(crate) fn compress_cmd(
     let input = if in_std {
         FileOrStd::StdIn
     } else {
-        FileOrStd::File(infile.open(O_RDONLY)?)
+        FileOrStd::File(infile.open(OFlag::O_RDONLY)?)
     };
 
     let output = if let Some(outfile) = outfile {
         if outfile == "-" {
             FileOrStd::StdOut
         } else {
-            FileOrStd::File(outfile.create(O_WRONLY | O_TRUNC, 0o644)?)
+            FileOrStd::File(outfile.create(OFlag::O_WRONLY | OFlag::O_TRUNC, 0o644)?)
         }
     } else if in_std {
         FileOrStd::StdOut
@@ -374,7 +374,7 @@ pub(crate) fn compress_cmd(
         outfile.write_str(method.ext()).ok();
         eprintln!("Compressing to [{outfile}]");
         rm_in = true;
-        let outfile = outfile.create(O_WRONLY | O_TRUNC, 0o644)?;
+        let outfile = outfile.create(OFlag::O_WRONLY | OFlag::O_TRUNC, 0o644)?;
         FileOrStd::File(outfile)
     };
 

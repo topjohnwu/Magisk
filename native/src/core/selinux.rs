@@ -1,7 +1,7 @@
 use crate::consts::{DATABIN, LOG_PIPE, MAGISK_LOG_CON, MAGISKDB, MODULEROOT, SECURE_DIR};
 use crate::ffi::get_magisk_tmp;
-use base::libc::{O_CLOEXEC, O_WRONLY};
 use base::{Directory, FsPathBuilder, LoggedResult, ResultExt, Utf8CStr, Utf8CStrBuf, cstr, libc};
+use nix::fcntl::OFlag;
 use std::io::Write;
 
 const UNLABEL_CON: &Utf8CStr = cstr!("u:object_r:unlabeled:s0");
@@ -53,7 +53,7 @@ fn restore_syscon(path: &mut dyn Utf8CStrBuf) -> LoggedResult<()> {
 
 pub(crate) fn restorecon() {
     if let Ok(mut file) = cstr!("/sys/fs/selinux/context")
-        .open(O_WRONLY | O_CLOEXEC)
+        .open(OFlag::O_WRONLY | OFlag::O_CLOEXEC)
         .log()
         && file.write_all(ADB_CON.as_bytes_with_nul()).is_ok()
     {

@@ -23,3 +23,4 @@ bytemuck = { workspace = true }
 num-traits = { workspace = true }
 num-derive = { workspace = true }
 const_format = { workspace = true }
+nix = { workspace = true, features = ["fs"] }

@@ -14,20 +14,19 @@ use bytemuck::{Pod, Zeroable, from_bytes};
 use num_traits::cast::AsPrimitive;
 use size::{Base, Size, Style};
 
-use base::libc::{
-    O_CLOEXEC, O_CREAT, O_RDONLY, O_TRUNC, O_WRONLY, S_IFBLK, S_IFCHR, S_IFDIR, S_IFLNK, S_IFMT,
-    S_IFREG, S_IRGRP, S_IROTH, S_IRUSR, S_IWGRP, S_IWOTH, S_IWUSR, S_IXGRP, S_IXOTH, S_IXUSR,
-    dev_t, gid_t, major, makedev, minor, mknod, mode_t, uid_t,
-};
-use base::{
-    BytesExt, EarlyExitExt, LoggedResult, MappedFile, OptionExt, ResultExt, Utf8CStr, Utf8CStrBuf,
-    WriteExt, cstr, log_err,
-};
-
 use crate::check_env;
 use crate::compress::{get_decoder, get_encoder};
 use crate::ffi::FileFormat;
 use crate::patch::{patch_encryption, patch_verity};
+use base::libc::{
+    S_IFBLK, S_IFCHR, S_IFDIR, S_IFLNK, S_IFMT, S_IFREG, S_IRGRP, S_IROTH, S_IRUSR, S_IWGRP,
+    S_IWOTH, S_IWUSR, S_IXGRP, S_IXOTH, S_IXUSR, dev_t, gid_t, major, makedev, minor, mknod,
+    mode_t, uid_t,
+};
+use base::{
+    BytesExt, EarlyExitExt, LoggedResult, MappedFile, OptionExt, ResultExt, Utf8CStr, Utf8CStrBuf,
+    WriteExt, cstr, log_err, nix::fcntl::OFlag,
+};
 
 #[derive(FromArgs)]
 struct CpioCommand {
@@ -349,7 +348,10 @@ impl Cpio {
         match entry.mode & S_IFMT {
             S_IFDIR => out.mkdir(mode)?,
             S_IFREG => {
-                let mut file = out.create(O_CREAT | O_TRUNC | O_WRONLY | O_CLOEXEC, mode)?;
+                let mut file = out.create(
+                    OFlag::O_CREAT | OFlag::O_TRUNC | OFlag::O_WRONLY | OFlag::O_CLOEXEC,
+                    mode,
+                )?;
                 file.write_all(&entry.data)?;
             }
             S_IFLNK => {
@@ -402,7 +404,8 @@ impl Cpio {
         let mode = if attr.is_file() || attr.is_symlink() {
             rdevmajor = 0;
             rdevminor = 0;
-            file.open(O_RDONLY | O_CLOEXEC)?.read_to_end(&mut content)?;
+            file.open(OFlag::O_RDONLY | OFlag::O_CLOEXEC)?
+                .read_to_end(&mut content)?;
             mode | S_IFREG
         } else {
             rdevmajor = major(attr.st.st_rdev.as_()).as_();

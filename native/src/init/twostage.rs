@@ -1,8 +1,6 @@
 use crate::ffi::MagiskInit;
-use base::{
-    LoggedResult, MappedFile, MutBytesExt, ResultExt, cstr, debug, error,
-    libc::{O_CLOEXEC, O_CREAT, O_RDONLY, O_WRONLY},
-};
+use base::nix::fcntl::OFlag;
+use base::{LoggedResult, MappedFile, MutBytesExt, ResultExt, cstr, debug, error};
 use std::io::Write;
 
 pub(crate) fn hexpatch_init_for_second_stage(writable: bool) {
@@ -32,7 +30,7 @@ pub(crate) fn hexpatch_init_for_second_stage(writable: bool) {
         let dest = cstr!("/data/init");
         let _: LoggedResult<()> = try {
             {
-                let mut fd = dest.create(O_CREAT | O_WRONLY, 0)?;
+                let mut fd = dest.create(OFlag::O_CREAT | OFlag::O_WRONLY, 0)?;
                 fd.write_all(init.as_ref())?;
             }
             let attr = src.follow_link().get_attr()?;
@@ -77,7 +75,7 @@ impl MagiskInit {
                 .log_ok();
             debug!("Symlink /first_stage_ramdisk/storage/self/primary -> /system/system/bin/init");
             cstr!("/first_stage_ramdisk/sdcard")
-                .create(O_RDONLY | O_CREAT | O_CLOEXEC, 0)
+                .create(OFlag::O_RDONLY | OFlag::O_CREAT | OFlag::O_CLOEXEC, 0)
                 .log_ok();
         } else {
             cstr!("/storage/self").mkdirs(0o755).log_ok();

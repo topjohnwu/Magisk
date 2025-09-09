@@ -1,5 +1,6 @@
 use cxx::{ExternType, type_id};
 use libc::c_char;
+use nix::NixPath;
 use std::borrow::Borrow;
 use std::cmp::{Ordering, min};
 use std::ffi::{CStr, FromBytesWithNulError, OsStr};
@@ -364,6 +365,26 @@ impl ToOwned for Utf8CStr {
 impl AsRef<Utf8CStr> for Utf8CStr {
     fn as_ref(&self) -> &Utf8CStr {
         self
+    }
+}
+
+impl NixPath for Utf8CStr {
+    #[inline(always)]
+    fn is_empty(&self) -> bool {
+        self.as_str().is_empty()
+    }
+
+    #[inline(always)]
+    fn len(&self) -> usize {
+        self.as_str().len()
+    }
+
+    #[inline(always)]
+    fn with_nix_path<T, F>(&self, f: F) -> nix::Result<T>
+    where
+        F: FnOnce(&CStr) -> T,
+    {
+        Ok(f(self.as_cstr()))
     }
 }
 

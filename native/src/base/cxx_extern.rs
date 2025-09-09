@@ -6,9 +6,6 @@ use std::mem::ManuallyDrop;
 use std::ops::DerefMut;
 use std::os::fd::{BorrowedFd, FromRawFd, OwnedFd, RawFd};
 
-use cfg_if::cfg_if;
-use libc::{O_RDONLY, c_char, mode_t};
-
 use crate::ffi::{FnBoolStr, FnBoolStrStr};
 use crate::files::map_file_at;
 pub(crate) use crate::xwrap::*;
@@ -16,6 +13,9 @@ use crate::{
     BufReadExt, Directory, LoggedResult, ResultExt, Utf8CStr, clone_attr, cstr, fclone_attr,
     map_fd, map_file, slice_from_ptr,
 };
+use cfg_if::cfg_if;
+use libc::{c_char, mode_t};
+use nix::fcntl::OFlag;
 
 #[unsafe(no_mangle)]
 unsafe extern "C" fn canonical_path(path: *const c_char, buf: *mut u8, bufsz: usize) -> isize {
@@ -178,7 +178,7 @@ unsafe extern "C" fn str_len(this: &&Utf8CStr) -> usize {
 }
 
 pub(crate) fn parse_prop_file_rs(name: &Utf8CStr, f: &FnBoolStrStr) {
-    if let Ok(file) = name.open(O_RDONLY) {
+    if let Ok(file) = name.open(OFlag::O_RDONLY) {
         BufReader::new(file).for_each_prop(|key, value| f.call(key, value))
     }
 }

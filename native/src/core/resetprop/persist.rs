@@ -1,3 +1,5 @@
+use nix::fcntl::OFlag;
+use quick_protobuf::{BytesReader, MessageRead, MessageWrite, Writer};
 use std::io::Read;
 use std::{
     fs::File,
@@ -5,14 +7,11 @@ use std::{
     os::fd::FromRawFd,
 };
 
-use quick_protobuf::{BytesReader, MessageRead, MessageWrite, Writer};
-
 use crate::resetprop::PropReader;
 use crate::resetprop::proto::persistent_properties::{
     PersistentProperties, mod_PersistentProperties::PersistentPropertyRecord,
 };
 use base::const_format::concatcp;
-use base::libc::{O_CLOEXEC, O_RDONLY};
 use base::{
     Directory, FsPathBuilder, LibcReturn, LoggedResult, MappedFile, SilentLogExt, Utf8CStr,
     Utf8CStrBuf, WalkResult, clone_attr, cstr, debug, libc::mkstemp, log_err,
@@ -46,7 +45,7 @@ fn file_get_prop(name: &Utf8CStr) -> LoggedResult<String> {
     let path = cstr::buf::default()
         .join_path(PERSIST_PROP_DIR)
         .join_path(name);
-    let mut file = path.open(O_RDONLY | O_CLOEXEC).silent()?;
+    let mut file = path.open(OFlag::O_RDONLY | OFlag::O_CLOEXEC).silent()?;
     debug!("resetprop: read prop from [{}]", path);
     let mut s = String::new();
     file.read_to_string(&mut s)?;

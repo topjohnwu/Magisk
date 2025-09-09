@@ -3,11 +3,12 @@ use crate::daemon::{MagiskD, to_user_id};
 use crate::ffi::{ZygiskRequest, ZygiskStateFlags, get_magisk_tmp, update_deny_flags};
 use crate::resetprop::{get_prop, set_prop};
 use crate::socket::{IpcRead, UnixSocketExt};
-use base::libc::{O_CLOEXEC, O_CREAT, O_RDONLY, STDOUT_FILENO};
+use base::libc::STDOUT_FILENO;
 use base::{
     Directory, FsPathBuilder, LoggedResult, ResultExt, Utf8CStr, WriteExt, cstr, fork_dont_care,
     libc, log_err, raw_cstr, warn,
 };
+use nix::fcntl::OFlag;
 use std::fmt::Write;
 use std::os::fd::{AsRawFd, OwnedFd, RawFd};
 use std::os::unix::net::UnixStream;
@@ -228,7 +229,7 @@ impl MagiskD {
                     .join_path("zygisk");
                 // Create the unloaded marker file
                 if let Ok(dir) = Directory::open(&path) {
-                    dir.open_as_file_at(cstr!("unloaded"), O_CREAT | O_RDONLY, 0o644)
+                    dir.open_as_file_at(cstr!("unloaded"), OFlag::O_CREAT | OFlag::O_RDONLY, 0o644)
                         .log()
                         .ok();
                 }
@@ -244,7 +245,7 @@ impl MagiskD {
         let dir = cstr::buf::default()
             .join_path(MODULEROOT)
             .join_path(&module.name);
-        let fd = dir.open(O_RDONLY | O_CLOEXEC)?;
+        let fd = dir.open(OFlag::O_RDONLY | OFlag::O_CLOEXEC)?;
         client.send_fds(&[fd.as_raw_fd()])?;
         Ok(())
     }

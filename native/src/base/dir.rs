@@ -3,16 +3,16 @@ use crate::{
     FsPathBuilder, LibcReturn, LoggedResult, OsError, OsResult, Utf8CStr, Utf8CStrBuf, cstr, errno,
     fd_path, fd_set_attr,
 };
-use libc::{EEXIST, O_CLOEXEC, O_CREAT, O_RDONLY, O_TRUNC, O_WRONLY, dirent, mode_t};
+use libc::{dirent, mode_t};
+use nix::{errno::Errno, fcntl::AtFlags, fcntl::OFlag, sys::stat::Mode, unistd::UnlinkatFlags};
 use std::fs::File;
-use std::marker::PhantomData;
-use std::ops::{Deref, DerefMut};
-use std::os::fd::{AsFd, AsRawFd, BorrowedFd, FromRawFd, IntoRawFd, OwnedFd, RawFd};
+use std::ops::Deref;
+use std::os::fd::{AsFd, AsRawFd, BorrowedFd, IntoRawFd, OwnedFd, RawFd};
 use std::ptr::NonNull;
-use std::{mem, slice};
+use std::slice;
 
 pub struct DirEntry<'a> {
-    dir: BorrowedDirectory<'a>,
+    dir: &'a Directory,
     entry: NonNull<dirent>,
     d_name_len: usize,
 }
@@ -23,6 +23,7 @@ impl DirEntry<'_> {
     }
 
     pub fn name(&self) -> &Utf8CStr {
+        // SAFETY: Utf8CStr is already validated in Directory::read
         unsafe {
             Utf8CStr::from_bytes_unchecked(slice::from_raw_parts(
                 self.d_name.as_ptr().cast(),
@@ -64,7 +65,11 @@ impl DirEntry<'_> {
     }
 
     pub fn unlink(&self) -> OsResult<'_, ()> {
-        let flag = if self.is_dir() { libc::AT_REMOVEDIR } else { 0 };
+        let flag = if self.is_dir() {
+            UnlinkatFlags::RemoveDir
+        } else {
+            UnlinkatFlags::NoRemoveDir
+        };
         self.dir.unlink_at(self.name(), flag)
     }
 
@@ -75,7 +80,7 @@ impl DirEntry<'_> {
     pub fn open_as_dir(&self) -> OsResult<'_, Directory> {
         if !self.is_dir() {
             return Err(OsError::new(
-                libc::ENOTDIR,
+                Errno::ENOTDIR,
                 "fdopendir",
                 Some(self.name()),
                 None,
@@ -84,16 +89,24 @@ impl DirEntry<'_> {
         self.dir.open_as_dir_at(self.name())
     }
 
-    pub fn open_as_file(&self, flags: i32) -> OsResult<'_, File> {
+    pub fn open_as_file(&self, flags: OFlag) -> OsResult<'_, File> {
         if self.is_dir() {
             return Err(OsError::new(
-                libc::EISDIR,
+                Errno::EISDIR,
                 "open_as_file",
                 Some(self.name()),
                 None,
             ));
         }
         self.dir.open_as_file_at(self.name(), flags, 0)
+    }
+
+    pub fn rename_to<'a, 'entry: 'a>(
+        &'entry self,
+        new_dir: impl AsFd,
+        path: &'a Utf8CStr,
+    ) -> OsResult<'a, ()> {
+        self.dir.rename_at(self.name(), new_dir, path)
     }
 }
 
@@ -110,30 +123,6 @@ pub struct Directory {
     inner: NonNull<libc::DIR>,
 }
 
-#[repr(transparent)]
-pub struct BorrowedDirectory<'a> {
-    inner: NonNull<libc::DIR>,
-    phantom: PhantomData<&'a Directory>,
-}
-
-impl Deref for BorrowedDirectory<'_> {
-    type Target = Directory;
-
-    fn deref(&self) -> &Directory {
-        // SAFETY: layout of NonNull<libc::DIR> is the same as Directory
-        // SAFETY: the lifetime of the raw pointer is tracked in the PhantomData
-        unsafe { mem::transmute(&self.inner) }
-    }
-}
-
-impl DerefMut for BorrowedDirectory<'_> {
-    fn deref_mut(&mut self) -> &mut Directory {
-        // SAFETY: layout of NonNull<libc::DIR> is the same as Directory
-        // SAFETY: the lifetime of the raw pointer is tracked in the PhantomData
-        unsafe { mem::transmute(&mut self.inner) }
-    }
-}
-
 pub enum WalkResult {
     Continue,
     Abort,
@@ -141,19 +130,14 @@ pub enum WalkResult {
 }
 
 impl Directory {
-    fn borrow(&self) -> BorrowedDirectory<'_> {
-        BorrowedDirectory {
-            inner: self.inner,
-            phantom: PhantomData,
-        }
-    }
-
-    fn openat<'a>(&self, name: &'a Utf8CStr, flags: i32, mode: u32) -> OsResult<'a, OwnedFd> {
-        unsafe {
-            libc::openat(self.as_raw_fd(), name.as_ptr(), flags | O_CLOEXEC, mode)
-                .into_os_result("openat", Some(name), None)
-                .map(|fd| OwnedFd::from_raw_fd(fd))
-        }
+    fn open_at<'a>(&self, name: &'a Utf8CStr, flags: OFlag, mode: mode_t) -> OsResult<'a, OwnedFd> {
+        nix::fcntl::openat(
+            self,
+            name,
+            flags | OFlag::O_CLOEXEC,
+            Mode::from_bits_truncate(mode),
+        )
+        .into_os_result("openat", Some(name), None)
     }
 
     fn path_at(&self, name: &Utf8CStr, buf: &mut dyn Utf8CStrBuf) -> OsResult<'static, ()> {
@@ -193,7 +177,7 @@ impl Directory {
                 self.read()
             } else {
                 let e = DirEntry {
-                    dir: self.borrow(),
+                    dir: self,
                     entry: NonNull::from(entry),
                     d_name_len: name.as_bytes_with_nul().len(),
                 };
@@ -207,17 +191,17 @@ impl Directory {
     }
 
     pub fn open_as_dir_at<'a>(&self, name: &'a Utf8CStr) -> OsResult<'a, Directory> {
-        let fd = self.openat(name, O_RDONLY, 0)?;
+        let fd = self.open_at(name, OFlag::O_RDONLY, 0)?;
         Directory::try_from(fd).map_err(|e| e.set_args(Some(name), None))
     }
 
     pub fn open_as_file_at<'a>(
         &self,
         name: &'a Utf8CStr,
-        flags: i32,
-        mode: u32,
+        flags: OFlag,
+        mode: mode_t,
     ) -> OsResult<'a, File> {
-        let fd = self.openat(name, flags, mode)?;
+        let fd = self.open_at(name, flags, mode)?;
         Ok(File::from(fd))
     }
 
@@ -241,14 +225,10 @@ impl Directory {
     }
 
     pub fn mkdir_at<'a>(&self, name: &'a Utf8CStr, mode: mode_t) -> OsResult<'a, ()> {
-        unsafe {
-            if libc::mkdirat(self.as_raw_fd(), name.as_ptr(), mode as mode_t) < 0
-                && *errno() != EEXIST
-            {
-                return Err(OsError::last_os_error("mkdirat", Some(name), None));
-            }
+        match nix::sys::stat::mkdirat(self, name, Mode::from_bits_truncate(mode)) {
+            Ok(_) | Err(Errno::EEXIST) => Ok(()),
+            Err(e) => Err(OsError::new(e, "mkdirat", Some(name), None)),
         }
-        Ok(())
     }
 
     // ln -s target self/name
@@ -257,43 +237,35 @@ impl Directory {
         name: &'a Utf8CStr,
         target: &'a Utf8CStr,
     ) -> OsResult<'a, ()> {
-        unsafe {
-            libc::symlinkat(target.as_ptr(), self.as_raw_fd(), name.as_ptr()).check_os_err(
-                "symlinkat",
-                Some(target),
-                Some(name),
-            )
-        }
+        nix::unistd::symlinkat(target, self, name).check_os_err(
+            "symlinkat",
+            Some(target),
+            Some(name),
+        )
     }
 
-    pub fn unlink_at<'a>(&self, name: &'a Utf8CStr, flag: i32) -> OsResult<'a, ()> {
-        unsafe {
-            libc::unlinkat(self.as_raw_fd(), name.as_ptr(), flag).check_os_err(
-                "unlinkat",
-                Some(name),
-                None,
-            )?;
-        }
-        Ok(())
+    pub fn unlink_at<'a>(&self, name: &'a Utf8CStr, flag: UnlinkatFlags) -> OsResult<'a, ()> {
+        nix::unistd::unlinkat(self, name, flag).check_os_err("unlinkat", Some(name), None)
     }
 
     pub fn contains_path(&self, path: &Utf8CStr) -> bool {
         // WARNING: Using faccessat is incorrect, because the raw linux kernel syscall
         // does not support the flag AT_SYMLINK_NOFOLLOW until 5.8 with faccessat2.
         // Use fstatat to check the existence of a file instead.
-        unsafe {
-            let mut st: libc::stat = mem::zeroed();
-            libc::fstatat(
-                self.as_raw_fd(),
-                path.as_ptr(),
-                &mut st,
-                libc::AT_SYMLINK_NOFOLLOW,
-            ) == 0
-        }
+        nix::sys::stat::fstatat(self, path, AtFlags::AT_SYMLINK_NOFOLLOW).is_ok()
     }
 
     pub fn resolve_path(&self, buf: &mut dyn Utf8CStrBuf) -> OsResult<'static, ()> {
         fd_path(self.as_raw_fd(), buf)
+    }
+
+    pub fn rename_at<'a>(
+        &self,
+        old: &'a Utf8CStr,
+        new_dir: impl AsFd,
+        new: &'a Utf8CStr,
+    ) -> OsResult<'a, ()> {
+        nix::fcntl::renameat(self, old, new_dir, new).check_os_err("renameat", Some(old), Some(new))
     }
 }
 
@@ -328,7 +300,6 @@ impl Directory {
     }
 
     pub fn move_into(&mut self, dir: &Directory) -> LoggedResult<()> {
-        let dir_fd = self.as_raw_fd();
         while let Some(ref e) = self.read()? {
             if e.is_dir() && dir.contains_path(e.name()) {
                 // Destination folder exists, needs recursive move
@@ -337,16 +308,7 @@ impl Directory {
                 src.move_into(&dest)?;
                 return Ok(e.unlink()?);
             }
-
-            unsafe {
-                libc::renameat(
-                    dir_fd,
-                    e.d_name.as_ptr(),
-                    dir.as_raw_fd(),
-                    e.d_name.as_ptr(),
-                )
-                .check_os_err("renameat", Some(e.name()), None)?;
-            }
+            e.rename_to(dir, e.name())?;
         }
         Ok(())
     }
@@ -422,9 +384,12 @@ impl Directory {
                 src.copy_into_impl(&dest, buf)?;
                 fd_set_attr(dest.as_raw_fd(), &attr)?;
             } else if e.is_file() {
-                let mut src = e.open_as_file(O_RDONLY)?;
-                let mut dest =
-                    dest_dir.open_as_file_at(e.name(), O_WRONLY | O_CREAT | O_TRUNC, 0o777)?;
+                let mut src = e.open_as_file(OFlag::O_RDONLY)?;
+                let mut dest = dest_dir.open_as_file_at(
+                    e.name(),
+                    OFlag::O_WRONLY | OFlag::O_CREAT | OFlag::O_TRUNC,
+                    0o777,
+                )?;
                 std::io::copy(&mut src, &mut dest)?;
                 fd_set_attr(dest.as_raw_fd(), &attr)?;
             } else if e.is_symlink() {
@@ -442,7 +407,6 @@ impl Directory {
         dest_dir: &Directory,
         buf: &mut dyn Utf8CStrBuf,
     ) -> LoggedResult<()> {
-        let dir_fd = self.as_raw_fd();
         while let Some(ref e) = self.read()? {
             if e.is_dir() {
                 dest_dir.mkdir_at(e.name(), 0o777)?;
@@ -453,16 +417,8 @@ impl Directory {
                 src.link_into_impl(&dest, buf)?;
                 fd_set_attr(dest.as_raw_fd(), &attr)?;
             } else {
-                unsafe {
-                    libc::linkat(
-                        dir_fd,
-                        e.d_name.as_ptr(),
-                        dest_dir.as_raw_fd(),
-                        e.d_name.as_ptr(),
-                        0,
-                    )
+                nix::unistd::linkat(e.dir, e.name(), dest_dir, e.name(), AtFlags::empty())
                     .check_os_err("linkat", Some(e.name()), None)?;
-                }
             }
         }
         Ok(())

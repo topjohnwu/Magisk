@@ -1,6 +1,7 @@
 use crate::consts::{PREINITMIRR, SELINUXMOCK};
 use crate::ffi::{MagiskInit, preload_ack, preload_lib, preload_policy, split_plat_cil};
 use base::const_format::concatcp;
+use base::nix::fcntl::OFlag;
 use base::{
     BytesExt, LibcReturn, LoggedResult, MappedFile, ResultExt, Utf8CStr, cstr, debug, error, info,
     libc, raw_cstr,
@@ -54,7 +55,7 @@ fn mock_fifo(target: &Utf8CStr, mock: &Utf8CStr) -> LoggedResult<()> {
 
 fn mock_file(target: &Utf8CStr, mock: &Utf8CStr) -> LoggedResult<()> {
     debug!("Hijack [{}]", target);
-    drop(mock.create(libc::O_RDONLY, 0o666)?);
+    drop(mock.create(OFlag::O_RDONLY, 0o666)?);
     mock.bind_mount_to(target, false).log()
 }
 
@@ -93,7 +94,9 @@ impl MagiskInit {
         let rule_file = cstr!(concatcp!("/data/", PREINITMIRR, "/sepolicy.rule"));
         if rule_file.exists() {
             debug!("Loading custom sepolicy patch: [{}]", rule_file);
-            rule_file.open(libc::O_RDONLY)?.read_to_string(&mut rules)?;
+            rule_file
+                .open(OFlag::O_RDONLY)?
+                .read_to_string(&mut rules)?;
         }
 
         // Step 0: determine strategy
@@ -153,7 +156,7 @@ impl MagiskInit {
                             0,
                             ptr::null(),
                         )
-                        .check_io_err()?;
+                        .check_err()?;
                     }
                 }
 
@@ -165,7 +168,7 @@ impl MagiskInit {
 
                 if !policy_ver.exists() {
                     // The file does not exist, create one
-                    drop(policy_ver.create(libc::O_RDONLY, 0o666)?);
+                    drop(policy_ver.create(OFlag::O_RDONLY, 0o666)?);
                 }
 
                 // The only purpose of this is to block init's control flow after it mounts
@@ -204,7 +207,7 @@ impl MagiskInit {
             mock_fifo(SELINUX_REQPROT, MOCK_REQPROT)?;
 
             // This will unblock init at selinux_android_load_policy() -> set_policy_index().
-            drop(MOCK_VERSION.open(libc::O_WRONLY)?);
+            drop(MOCK_VERSION.open(OFlag::O_WRONLY)?);
 
             policy_ver.unmount()?;
 
@@ -218,7 +221,7 @@ impl MagiskInit {
         match strat {
             SePatchStrategy::LdPreload => {
                 // This open will block until preload.so finish writing the sepolicy
-                let mut ack_fd = preload_ack().open(libc::O_WRONLY)?;
+                let mut ack_fd = preload_ack().open(OFlag::O_WRONLY)?;
 
                 let mut sepol = SePolicy::from_file(preload_policy());
 
@@ -237,14 +240,14 @@ impl MagiskInit {
             }
             SePatchStrategy::SelinuxFs => {
                 // This open will block until init calls security_getenforce().
-                let mut mock_enforce = MOCK_ENFORCE.open(libc::O_WRONLY)?;
+                let mut mock_enforce = MOCK_ENFORCE.open(OFlag::O_WRONLY)?;
 
                 self.cleanup_and_load(&rules);
 
                 // security_getenforce was called, read from real and redirect to mock
                 let mut data = vec![];
                 SELINUX_ENFORCE
-                    .open(libc::O_RDONLY)?
+                    .open(OFlag::O_RDONLY)?
                     .read_to_end(&mut data)?;
                 mock_enforce.write_all(&data)?;
             }
@@ -266,10 +269,10 @@ impl MagiskInit {
                 // init is blocked on checkreqprot, write to the real node first, then
                 // unblock init by opening the mock FIFO.
                 SELINUX_REQPROT
-                    .open(libc::O_WRONLY)?
+                    .open(OFlag::O_WRONLY)?
                     .write_all("0".as_bytes())?;
                 let mut v = vec![];
-                MOCK_REQPROT.open(libc::O_RDONLY)?.read_to_end(&mut v)?;
+                MOCK_REQPROT.open(OFlag::O_RDONLY)?.read_to_end(&mut v)?;
             }
         }
 

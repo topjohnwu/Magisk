@@ -8,7 +8,7 @@ use crate::sign::{sha1_hash, sign_boot_image};
 use argh::{CommandInfo, EarlyExit, FromArgs, SubCommand};
 use base::{
     CmdArgs, EarlyExitExt, LoggedResult, MappedFile, PositionalArgParser, ResultExt, Utf8CStr,
-    Utf8CString, WriteExt, cmdline_logging, cstr, libc, libc::umask, log_err,
+    Utf8CString, WriteExt, cmdline_logging, cstr, libc::umask, log_err, nix::fcntl::OFlag,
 };
 use std::ffi::c_char;
 use std::io::{Seek, SeekFrom, Write};
@@ -333,7 +333,7 @@ fn sign_cmd(
     let sig = sign_boot_image(img.payload(), name, cert, key)?;
     let tail_off = img.tail_off();
     drop(img);
-    let mut fd = image.open(libc::O_WRONLY | libc::O_CLOEXEC)?;
+    let mut fd = image.open(OFlag::O_WRONLY | OFlag::O_CLOEXEC)?;
     fd.seek(SeekFrom::Start(tail_off))?;
     fd.write_all(&sig)?;
     let current = fd.stream_position()?;

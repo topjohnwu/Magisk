@@ -18,11 +18,11 @@ use crate::socket::IpcWrite;
 use crate::su::SuInfo;
 use crate::zygisk::ZygiskState;
 use base::const_format::concatcp;
-use base::libc::{O_APPEND, O_CLOEXEC, O_RDONLY, O_WRONLY};
 use base::{
     AtomicArc, BufReadExt, FsPathBuilder, ReadExt, ResultExt, Utf8CStr, Utf8CStrBuf, WriteExt,
     cstr, error, info, libc,
 };
+use nix::fcntl::OFlag;
 use std::fmt::Write as FmtWrite;
 use std::fs::File;
 use std::io::{BufReader, Write};
@@ -304,7 +304,9 @@ pub fn daemon_entry() {
     unsafe { libc::setsid() };
 
     // Make sure the current context is magisk
-    if let Ok(mut current) = cstr!("/proc/self/attr/current").open(O_WRONLY | O_CLOEXEC) {
+    if let Ok(mut current) =
+        cstr!("/proc/self/attr/current").open(OFlag::O_WRONLY | OFlag::O_CLOEXEC)
+    {
         let con = cstr!(MAGISK_PROC_CON);
         current.write_all(con.as_bytes_with_nul()).log_ok();
     }
@@ -323,7 +325,7 @@ pub fn daemon_entry() {
         .join_path(magisk_tmp)
         .join_path(MAIN_CONFIG);
     let mut is_recovery = false;
-    if let Ok(main_config) = tmp_path.open(O_RDONLY | O_CLOEXEC) {
+    if let Ok(main_config) = tmp_path.open(OFlag::O_RDONLY | OFlag::O_CLOEXEC) {
         BufReader::new(main_config).for_each_prop(|key, val| {
             if key == "RECOVERYMODE" {
                 is_recovery = val == "true";
@@ -335,7 +337,7 @@ pub fn daemon_entry() {
     tmp_path.truncate(magisk_tmp.len());
 
     let mut sdk_int = -1;
-    if let Ok(build_prop) = cstr!("/system/build.prop").open(O_RDONLY | O_CLOEXEC) {
+    if let Ok(build_prop) = cstr!("/system/build.prop").open(OFlag::O_RDONLY | OFlag::O_CLOEXEC) {
         BufReader::new(build_prop).for_each_prop(|key, val| {
             if key == "ro.build.version.sdk" {
                 sdk_int = val.parse::<i32>().unwrap_or(-1);
@@ -370,7 +372,7 @@ pub fn daemon_entry() {
 
     // Cleanup pre-init mounts
     tmp_path.append_path(ROOTMNT);
-    if let Ok(mount_list) = tmp_path.open(O_RDONLY | O_CLOEXEC) {
+    if let Ok(mount_list) = tmp_path.open(OFlag::O_RDONLY | OFlag::O_CLOEXEC) {
         BufReader::new(mount_list).for_each_line(|line| {
             line.truncate(line.trim_end().len());
             let item = Utf8CStr::from_string(line);
@@ -407,7 +409,7 @@ fn switch_cgroup(cgroup: &str, pid: i32) {
     if !buf.exists() {
         return;
     }
-    if let Ok(mut file) = buf.open(O_WRONLY | O_APPEND | O_CLOEXEC) {
+    if let Ok(mut file) = buf.open(OFlag::O_WRONLY | OFlag::O_APPEND | OFlag::O_CLOEXEC) {
         buf.clear();
         buf.write_fmt(format_args!("{pid}")).ok();
         file.write_all(buf.as_bytes()).log_ok();
@@ -415,7 +417,7 @@ fn switch_cgroup(cgroup: &str, pid: i32) {
 }
 
 fn check_data() -> bool {
-    if let Ok(file) = cstr!("/proc/mounts").open(O_RDONLY | O_CLOEXEC) {
+    if let Ok(file) = cstr!("/proc/mounts").open(OFlag::O_RDONLY | OFlag::O_CLOEXEC) {
         let mut mnt = false;
         BufReader::new(file).for_each_line(|line| {
             if line.contains(" /data ") && !line.contains("tmpfs") {

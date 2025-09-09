@@ -1,9 +1,7 @@
 // Functions in this file are only for exporting to C++, DO NOT USE IN RUST
 
 use crate::cxx_extern::readlinkat;
-use crate::{
-    BorrowedDirectory, LibcReturn, ResultExt, Utf8CStr, cstr, slice_from_ptr, slice_from_ptr_mut,
-};
+use crate::{Directory, LibcReturn, ResultExt, Utf8CStr, cstr, slice_from_ptr, slice_from_ptr_mut};
 use libc::{c_char, c_uint, c_ulong, c_void, dev_t, mode_t, off_t, sockaddr, socklen_t};
 use std::ffi::CStr;
 use std::fs::File;
@@ -185,7 +183,7 @@ extern "C" fn xfdopendir(fd: RawFd) -> *mut libc::DIR {
 }
 
 #[unsafe(no_mangle)]
-unsafe extern "C" fn xreaddir(mut dir: BorrowedDirectory) -> *mut libc::dirent {
+unsafe extern "C" fn xreaddir(mut dir: ManuallyDrop<Directory>) -> *mut libc::dirent {
     dir.read()
         .log()
         .ok()

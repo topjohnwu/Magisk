@@ -2,6 +2,7 @@
 
 pub use const_format;
 pub use libc;
+pub use nix;
 use num_traits::FromPrimitive;
 
 pub use cstr::{

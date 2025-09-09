@@ -44,7 +44,7 @@ pub(crate) fn switch_root(path: &Utf8CStr) {
             mounts.insert(info.target);
         }
         unsafe {
-            chdir(path.as_ptr()).check_io_err()?;
+            chdir(path.as_ptr()).check_err()?;
             path.move_mount_to(cstr!("/"))?;
             chroot(raw_cstr!("."));
         }
@@ -88,7 +88,7 @@ impl MagiskInit {
                 raw_cstr!("mode=755").cast(),
             )
         }
-        .check_io_err()
+        .check_err()
         .log_ok();
 
         cstr!("/init").copy_to(cstr!("/data/magiskinit")).log_ok();
@@ -107,7 +107,7 @@ impl MagiskInit {
         }
         unsafe {
             execve(raw_cstr!("/init"), self.argv.cast(), environ.cast())
-                .check_io_err()
+                .check_err()
                 .log_ok();
             exit(1);
         }

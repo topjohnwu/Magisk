@@ -200,9 +200,8 @@ pub fn find_preinit_device() -> String {
                     libc::S_IFBLK | 0o600,
                     info.device as dev_t,
                 )
-                .check_io_err()
-                .log()
-                .ok();
+                .check_os_err("mknod", Some(dev_path), None)
+                .log_ok();
             }
         }
     }

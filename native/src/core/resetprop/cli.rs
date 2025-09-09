@@ -6,8 +6,9 @@ use argh::{EarlyExit, FromArgs, MissingRequirements};
 use base::libc::PROP_VALUE_MAX;
 use base::{
     BufReadExt, CmdArgs, EarlyExitExt, LogLevel, LoggedResult, ResultExt, Utf8CStr, Utf8CStrBuf,
-    Utf8CString, cstr, debug, libc, log_err, set_log_level_state,
+    Utf8CString, cstr, debug, log_err, set_log_level_state,
 };
+use nix::fcntl::OFlag;
 use std::collections::BTreeMap;
 use std::ffi::c_char;
 use std::io::BufReader;
@@ -211,7 +212,7 @@ impl ResetProp {
     }
 
     fn load_file(&self, file: &Utf8CStr) -> LoggedResult<()> {
-        let fd = file.open(libc::O_RDONLY | libc::O_CLOEXEC)?;
+        let fd = file.open(OFlag::O_RDONLY | OFlag::O_CLOEXEC)?;
         let mut key = cstr::buf::dynamic(128);
         let mut val = cstr::buf::dynamic(128);
         BufReader::new(fd).for_each_prop(|k, v| {

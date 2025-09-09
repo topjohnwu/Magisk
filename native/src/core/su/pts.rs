@@ -1,21 +1,20 @@
-use base::libc::ssize_t;
-use base::{
-    LibcReturn, LoggedResult, OsResult, PipeFd, ReadExt, ResultExt, error, libc, log_err,
-    make_pipe, warn,
-};
-use bytemuck::{Pod, Zeroable};
+use base::{FileOrStd, LibcReturn, LoggedResult, OsResult, libc, warn};
 use libc::{
-    O_CLOEXEC, POLLIN, SFD_CLOEXEC, SIG_BLOCK, SIGWINCH, STDIN_FILENO, STDOUT_FILENO, TCSADRAIN,
-    TCSAFLUSH, TIOCGWINSZ, TIOCSWINSZ, cfmakeraw, close, poll, pollfd, raise, sigaddset,
-    sigemptyset, signalfd, signalfd_siginfo, sigprocmask, sigset_t, tcgetattr, tcsetattr, termios,
-    winsize,
+    STDIN_FILENO, STDOUT_FILENO, TCSADRAIN, TCSAFLUSH, TIOCGWINSZ, TIOCSWINSZ, c_int, cfmakeraw,
+    ssize_t, tcgetattr, tcsetattr, termios, winsize,
+};
+use nix::{
+    fcntl::OFlag,
+    poll::{PollFd, PollFlags, PollTimeout},
+    sys::signal::{SigSet, Signal},
+    sys::signalfd::{SfdFlags, SignalFd},
 };
 use std::fs::File;
 use std::io::{Read, Write};
 use std::mem::{ManuallyDrop, MaybeUninit};
-use std::os::fd::{AsRawFd, FromRawFd, RawFd};
+use std::os::fd::{AsFd, AsRawFd, FromRawFd, OwnedFd, RawFd};
+use std::ptr::null_mut;
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::{ffi::c_int, ptr::null_mut};
 
 static mut OLD_STDIN: Option<termios> = None;
 static SHOULD_USE_SPLICE: AtomicBool = AtomicBool::new(true);
@@ -97,13 +96,13 @@ fn pump_via_copy(infd: RawFd, outfd: RawFd) -> LoggedResult<()> {
     Ok(())
 }
 
-fn pump_via_splice(infd: RawFd, outfd: RawFd, pipe: &PipeFd) -> LoggedResult<()> {
+fn pump_via_splice(infd: RawFd, outfd: RawFd, pipe: &(OwnedFd, OwnedFd)) -> LoggedResult<()> {
     if !SHOULD_USE_SPLICE.load(Ordering::Acquire) {
         return pump_via_copy(infd, outfd);
     }
 
     // The pipe capacity is by default 16 pages, let's just use 65536
-    let Ok(len) = splice(infd, pipe.write.as_raw_fd(), 65536_usize, 0) else {
+    let Ok(len) = splice(infd, pipe.1.as_raw_fd(), 65536_usize, 0) else {
         // If splice failed, stop using splice and fallback to userspace copy
         SHOULD_USE_SPLICE.store(false, Ordering::Release);
         return pump_via_copy(infd, outfd);
@@ -111,85 +110,70 @@ fn pump_via_splice(infd: RawFd, outfd: RawFd, pipe: &PipeFd) -> LoggedResult<()>
     if len == 0 {
         return Ok(());
     }
-    splice(pipe.read.as_raw_fd(), outfd, len as usize, 0)?;
+    splice(pipe.0.as_raw_fd(), outfd, len as usize, 0)?;
     Ok(())
 }
 
-#[derive(Copy, Clone)]
-#[repr(transparent)]
-struct SignalFdInfo(signalfd_siginfo);
-unsafe impl Zeroable for SignalFdInfo {}
-unsafe impl Pod for SignalFdInfo {}
+fn pump_tty_impl(infd: OwnedFd, raw_out: RawFd) -> LoggedResult<()> {
+    let mut set = SigSet::empty();
+    set.add(Signal::SIGWINCH);
+    set.thread_block()
+        .check_os_err("pthread_sigmask", None, None)?;
+    let signal_fd =
+        SignalFd::with_flags(&set, SfdFlags::SFD_CLOEXEC).into_os_result("signalfd", None, None)?;
 
-pub fn pump_tty(infd: i32, outfd: i32) {
-    set_stdin_raw();
+    let raw_in = infd.as_raw_fd();
+    let raw_sig = signal_fd.as_raw_fd();
 
-    let signal_fd = unsafe {
-        let mut mask: sigset_t = std::mem::zeroed();
-        sigemptyset(&mut mask);
-        sigaddset(&mut mask, SIGWINCH);
-        sigprocmask(SIG_BLOCK, &mask, null_mut())
-            .check_os_err("sigprocmask", None, None)
-            .log_ok();
-        signalfd(-1, &mask, SFD_CLOEXEC)
-    };
+    let mut poll_fds = Vec::with_capacity(3);
+    poll_fds.push(PollFd::new(infd.as_fd(), PollFlags::POLLIN));
+    poll_fds.push(PollFd::new(signal_fd.as_fd(), PollFlags::POLLIN));
+    if raw_out >= 0 {
+        poll_fds.push(PollFd::new(
+            FileOrStd::StdIn.as_file().as_fd(),
+            PollFlags::POLLIN,
+        ));
+    }
 
-    resize_pty(outfd);
+    // Any flag in this list indicates stop polling
+    let stop_flags = PollFlags::POLLERR | PollFlags::POLLHUP | PollFlags::POLLNVAL;
 
-    let mut pfds = [
-        pollfd {
-            fd: if outfd > 0 { STDIN_FILENO } else { -1 },
-            events: POLLIN,
-            revents: 0,
-        },
-        pollfd {
-            fd: infd,
-            events: POLLIN,
-            revents: 0,
-        },
-        pollfd {
-            fd: signal_fd,
-            events: POLLIN,
-            revents: 0,
-        },
-    ];
-
-    let Ok(pipe_fd) = make_pipe(O_CLOEXEC).log() else {
-        return;
-    };
+    // Open a pipe to bypass userspace copy with splice
+    let pipe_fd = nix::unistd::pipe2(OFlag::O_CLOEXEC).into_os_result("pipe2", None, None)?;
 
     'poll: loop {
-        let ready = unsafe { poll(pfds.as_mut_ptr(), pfds.len() as _, -1) };
-
-        if ready < 0 {
-            error!("poll error");
-            break;
-        }
-
-        for pfd in &pfds {
-            if pfd.revents & POLLIN != 0 {
-                let res = if pfd.fd == STDIN_FILENO {
-                    pump_via_splice(STDIN_FILENO, outfd, &pipe_fd)
-                } else if pfd.fd == infd {
-                    pump_via_splice(infd, STDOUT_FILENO, &pipe_fd)
-                } else if pfd.fd == signal_fd {
-                    resize_pty(outfd);
-                    let mut info = SignalFdInfo::zeroed();
-                    let mut fd = ManuallyDrop::new(unsafe { File::from_raw_fd(signal_fd) });
-                    fd.read_pod(&mut info).log()
-                } else {
-                    log_err!()
-                };
-                if res.is_err() {
-                    break 'poll;
+        // Wait for event
+        nix::poll::poll(&mut poll_fds, PollTimeout::NONE).check_os_err("poll", None, None)?;
+        for pfd in &poll_fds {
+            if pfd.all().unwrap_or(false) {
+                let raw_fd = pfd.as_fd().as_raw_fd();
+                if raw_fd == STDIN_FILENO {
+                    pump_via_splice(STDIN_FILENO, raw_out, &pipe_fd)?;
+                } else if raw_fd == raw_in {
+                    pump_via_splice(raw_in, STDOUT_FILENO, &pipe_fd)?;
+                } else if raw_fd == raw_sig {
+                    resize_pty(raw_out);
+                    signal_fd.read_signal()?;
                 }
-            } else if pfd.revents != 0 && pfd.fd == infd {
-                unsafe { close(pfd.fd) };
+            } else if pfd
+                .revents()
+                .unwrap_or(PollFlags::POLLHUP)
+                .intersects(stop_flags)
+            {
+                // If revents is None or contains any err_flags, stop polling
                 break 'poll;
             }
         }
     }
+    Ok(())
+}
+
+pub fn pump_tty(infd: i32, outfd: i32) {
+    set_stdin_raw();
+
+    let infd = unsafe { OwnedFd::from_raw_fd(infd) };
+    pump_tty_impl(infd, outfd).ok();
 
     restore_stdin();
-    unsafe { raise(SIGWINCH) };
+    nix::sys::signal::raise(Signal::SIGWINCH).ok();
 }

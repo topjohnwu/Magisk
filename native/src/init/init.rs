@@ -130,7 +130,7 @@ impl MagiskInit {
                     null(),
                 )
             }
-            .check_io_err()?;
+            .check_err()?;
             self.mount_list.push("/proc".to_string());
         }
         if !cstr!("/sys/block").exists() {
@@ -144,7 +144,7 @@ impl MagiskInit {
                     null(),
                 )
             }
-            .check_io_err()?;
+            .check_err()?;
             self.mount_list.push("/sys".to_string());
         }
 

@@ -4,13 +4,14 @@ use crate::ffi::{ModuleInfo, exec_module_scripts, exec_script, get_magisk_tmp};
 use crate::mount::setup_module_mount;
 use crate::resetprop::load_prop_file;
 use base::{
-    DirEntry, Directory, FsPathBuilder, LibcReturn, LoggedResult, OsResult, ResultExt,
-    SilentLogExt, Utf8CStr, Utf8CStrBuf, Utf8CString, WalkResult, clone_attr, cstr, debug, error,
-    info, libc, raw_cstr, warn,
+    DirEntry, Directory, FsPathBuilder, LoggedResult, OsResult, ResultExt, SilentLogExt, Utf8CStr,
+    Utf8CStrBuf, Utf8CString, WalkResult, clone_attr, cstr, debug, error, info, libc, raw_cstr,
+    warn,
 };
-use libc::{AT_REMOVEDIR, MS_RDONLY, O_CLOEXEC, O_CREAT, O_RDONLY};
+use libc::MS_RDONLY;
+use nix::{fcntl::OFlag, unistd::UnlinkatFlags};
 use std::collections::BTreeMap;
-use std::os::fd::{AsRawFd, IntoRawFd};
+use std::os::fd::IntoRawFd;
 use std::path::{Component, Path};
 use std::ptr;
 use std::sync::atomic::Ordering;
@@ -51,7 +52,7 @@ fn mount_dummy<'a>(
     if is_dir {
         dest.mkdir(0o000)?;
     } else {
-        dest.create(O_CREAT | O_RDONLY | O_CLOEXEC, 0o000)?;
+        dest.create(OFlag::O_CREAT | OFlag::O_RDONLY | OFlag::O_CLOEXEC, 0o000)?;
     }
     bind_mount(reason, src, dest, false);
     Ok(())
@@ -563,7 +564,6 @@ fn inject_zygisk_bins(name: &str, system: &mut FsNode) {
 
 fn upgrade_modules() -> LoggedResult<()> {
     let mut upgrade = Directory::open(cstr!(MODULEUPGRADE)).silent()?;
-    let ufd = upgrade.as_raw_fd();
     let root = Directory::open(cstr!(MODULEROOT))?;
     while let Some(e) = upgrade.read()? {
         if !e.is_dir() {
@@ -577,23 +577,19 @@ fn upgrade_modules() -> LoggedResult<()> {
             // If the old module is disabled, we need to also disable the new one
             disable = module.contains_path(cstr!("disable"));
             module.remove_all()?;
-            root.unlink_at(module_name, AT_REMOVEDIR)?;
+            root.unlink_at(module_name, UnlinkatFlags::RemoveDir)?;
         }
         info!("Upgrade / New module: {module_name}");
-        unsafe {
-            libc::renameat(
-                ufd,
-                module_name.as_ptr(),
-                root.as_raw_fd(),
-                module_name.as_ptr(),
-            )
-            .check_os_err("renameat", Some(module_name), None)?;
-        }
+        e.rename_to(&root, module_name)?;
         if disable {
             let path = cstr::buf::default()
                 .join_path(module_name)
                 .join_path("disable");
-            let _ = root.open_as_file_at(&path, O_RDONLY | O_CREAT | O_CLOEXEC, 0)?;
+            let _ = root.open_as_file_at(
+                &path,
+                OFlag::O_RDONLY | OFlag::O_CREAT | OFlag::O_CLOEXEC,
+                0,
+            )?;
         }
     }
     upgrade.remove_all()?;
@@ -614,7 +610,11 @@ fn for_each_module(mut func: impl FnMut(&DirEntry) -> LoggedResult<()>) -> Logge
 pub fn disable_modules() {
     for_each_module(|e| {
         let dir = e.open_as_dir()?;
-        dir.open_as_file_at(cstr!("disable"), O_RDONLY | O_CREAT | O_CLOEXEC, 0)?;
+        dir.open_as_file_at(
+            cstr!("disable"),
+            OFlag::O_RDONLY | OFlag::O_CREAT | OFlag::O_CLOEXEC,
+            0,
+        )?;
         Ok(())
     })
     .log_ok();
@@ -656,7 +656,8 @@ fn collect_modules(zygisk_enabled: bool, open_zygisk: bool) -> Vec<ModuleInfo> {
             e.unlink()?;
             return Ok(());
         }
-        dir.unlink_at(cstr!("update"), 0).ok();
+        dir.unlink_at(cstr!("update"), UnlinkatFlags::NoRemoveDir)
+            .ok();
         if dir.contains_path(cstr!("disable")) {
             return Ok(());
         }
@@ -673,7 +674,7 @@ fn collect_modules(zygisk_enabled: bool, open_zygisk: bool) -> Vec<ModuleInfo> {
             }
 
             fn open_fd_safe(dir: &Directory, name: &Utf8CStr) -> i32 {
-                dir.open_as_file_at(name, O_RDONLY | O_CLOEXEC, 0)
+                dir.open_as_file_at(name, OFlag::O_RDONLY | OFlag::O_CLOEXEC, 0)
                     .log()
                     .map(IntoRawFd::into_raw_fd)
                     .unwrap_or(-1)
@@ -702,7 +703,8 @@ fn collect_modules(zygisk_enabled: bool, open_zygisk: bool) -> Vec<ModuleInfo> {
                 {
                     z64 = open_fd_safe(&dir, cstr!("zygisk/riscv64.so"));
                 }
-                dir.unlink_at(cstr!("zygisk/unloaded"), 0).ok();
+                dir.unlink_at(cstr!("zygisk/unloaded"), UnlinkatFlags::NoRemoveDir)
+                    .ok();
             }
         } else {
             // Ignore zygisk modules when zygisk is not enabled

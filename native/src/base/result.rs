@@ -1,9 +1,10 @@
 use crate::logging::Formatter;
-use crate::{LogLevel, errno, log_with_args, log_with_formatter};
+use crate::{LogLevel, log_with_args, log_with_formatter};
+use nix::errno::Errno;
+use std::fmt;
 use std::fmt::Display;
 use std::panic::Location;
 use std::ptr::NonNull;
-use std::{fmt, io};
 
 // Error handling throughout the Rust codebase in Magisk:
 //
@@ -217,7 +218,7 @@ where
 {
     type Value;
 
-    fn into_result(self) -> Result<Self::Value, i32>;
+    fn check_err(self) -> nix::Result<Self::Value>;
 
     fn into_os_result<'a>(
         self,
@@ -225,7 +226,7 @@ where
         arg1: Option<&'a str>,
         arg2: Option<&'a str>,
     ) -> OsResult<'a, Self::Value> {
-        self.into_result()
+        self.check_err()
             .map_err(|e| OsError::new(e, name, arg1, arg2))
     }
 
@@ -235,15 +236,9 @@ where
         arg1: Option<&'a str>,
         arg2: Option<&'a str>,
     ) -> OsResult<'a, ()> {
-        self.into_result()
+        self.check_err()
             .map(|_| ())
             .map_err(|e| OsError::new(e, name, arg1, arg2))
-    }
-
-    fn check_io_err(self) -> io::Result<()> {
-        self.into_result()
-            .map(|_| ())
-            .map_err(io::Error::from_raw_os_error)
     }
 }
 
@@ -253,9 +248,9 @@ macro_rules! impl_libc_return {
             type Value = Self;
 
             #[inline(always)]
-            fn into_result(self) -> Result<Self::Value, i32> {
+            fn check_err(self) -> nix::Result<Self::Value> {
                 if self < 0 {
-                    Err(*errno())
+                    Err(Errno::last())
                 } else {
                     Ok(self)
                 }
@@ -270,14 +265,23 @@ impl<T> LibcReturn for *mut T {
     type Value = NonNull<T>;
 
     #[inline(always)]
-    fn into_result(self) -> Result<Self::Value, i32> {
-        NonNull::new(self).ok_or_else(|| *errno())
+    fn check_err(self) -> nix::Result<Self::Value> {
+        NonNull::new(self).ok_or_else(Errno::last)
+    }
+}
+
+impl<T> LibcReturn for nix::Result<T> {
+    type Value = T;
+
+    #[inline(always)]
+    fn check_err(self) -> Self {
+        self
     }
 }
 
 #[derive(Debug)]
 pub struct OsError<'a> {
-    code: i32,
+    errno: Errno,
     name: &'static str,
     arg1: Option<&'a str>,
     arg2: Option<&'a str>,
@@ -285,13 +289,13 @@ pub struct OsError<'a> {
 
 impl OsError<'_> {
     pub fn new<'a>(
-        code: i32,
+        errno: Errno,
         name: &'static str,
         arg1: Option<&'a str>,
         arg2: Option<&'a str>,
     ) -> OsError<'a> {
         OsError {
-            code,
+            errno,
             name,
             arg1,
             arg2,
@@ -303,33 +307,28 @@ impl OsError<'_> {
         arg1: Option<&'a str>,
         arg2: Option<&'a str>,
     ) -> OsError<'a> {
-        Self::new(*errno(), name, arg1, arg2)
+        Self::new(Errno::last(), name, arg1, arg2)
     }
 
     pub fn set_args<'a>(self, arg1: Option<&'a str>, arg2: Option<&'a str>) -> OsError<'a> {
-        Self::new(self.code, self.name, arg1, arg2)
-    }
-
-    fn as_io_error(&self) -> io::Error {
-        io::Error::from_raw_os_error(self.code)
+        Self::new(self.errno, self.name, arg1, arg2)
     }
 }
 
 impl Display for OsError<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let error = self.as_io_error();
         if self.name.is_empty() {
-            write!(f, "{error:#}")
+            write!(f, "{}", self.errno)
         } else {
             match (self.arg1, self.arg2) {
                 (Some(arg1), Some(arg2)) => {
-                    write!(f, "{} '{}' '{}': {:#}", self.name, arg1, arg2, error)
+                    write!(f, "{} '{arg1}' '{arg2}': {}", self.name, self.errno)
                 }
                 (Some(arg1), None) => {
-                    write!(f, "{} '{}': {:#}", self.name, arg1, error)
+                    write!(f, "{} '{arg1}': {}", self.name, self.errno)
                 }
                 _ => {
-                    write!(f, "{}: {:#}", self.name, error)
+                    write!(f, "{}: {}", self.name, self.errno)
                 }
             }
         }

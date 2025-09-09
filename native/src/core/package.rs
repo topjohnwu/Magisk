@@ -2,12 +2,12 @@ use crate::consts::{APP_PACKAGE_NAME, MAGISK_VER_CODE};
 use crate::daemon::{AID_APP_END, AID_APP_START, AID_USER_OFFSET, MagiskD, to_app_id};
 use crate::ffi::{DbEntryKey, get_magisk_tmp, install_apk, uninstall_pkg};
 use base::WalkResult::{Abort, Continue, Skip};
-use base::libc::{O_CLOEXEC, O_CREAT, O_RDONLY, O_TRUNC, O_WRONLY};
 use base::{
     BufReadExt, Directory, FsPathBuilder, LoggedResult, ReadExt, ResultExt, Utf8CStrBuf,
     Utf8CString, cstr, error, fd_get_attr, warn,
 };
 use bit_set::BitSet;
+use nix::fcntl::OFlag;
 use std::collections::BTreeMap;
 use std::fs::File;
 use std::io;
@@ -238,7 +238,7 @@ impl ManagerInfo {
             .join_path("dyn")
             .join_path("current.apk");
         let uid: i32;
-        let cert = match apk.open(O_RDONLY | O_CLOEXEC) {
+        let cert = match apk.open(OFlag::O_RDONLY | OFlag::O_CLOEXEC) {
             Ok(mut fd) => {
                 uid = fd_get_attr(fd.as_raw_fd())
                     .map(|attr| attr.st.st_uid as i32)
@@ -270,7 +270,7 @@ impl ManagerInfo {
             return Status::NotInstalled;
         };
 
-        let cert = match apk.open(O_RDONLY | O_CLOEXEC) {
+        let cert = match apk.open(OFlag::O_RDONLY | OFlag::O_CLOEXEC) {
             Ok(mut fd) => read_certificate(&mut fd, -1),
             Err(_) => return Status::NotInstalled,
         };
@@ -293,7 +293,7 @@ impl ManagerInfo {
             return Status::NotInstalled;
         };
 
-        let cert = match apk.open(O_RDONLY | O_CLOEXEC) {
+        let cert = match apk.open(OFlag::O_RDONLY | OFlag::O_CLOEXEC) {
             Ok(mut fd) => read_certificate(&mut fd, MAGISK_VER_CODE),
             Err(_) => return Status::NotInstalled,
         };
@@ -317,8 +317,10 @@ impl ManagerInfo {
             let tmp_apk = cstr!("/data/stub.apk");
             let result: LoggedResult<()> = try {
                 {
-                    let mut tmp_apk_file =
-                        tmp_apk.create(O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0o600)?;
+                    let mut tmp_apk_file = tmp_apk.create(
+                        OFlag::O_WRONLY | OFlag::O_CREAT | OFlag::O_TRUNC | OFlag::O_CLOEXEC,
+                        0o600,
+                    )?;
                     io::copy(stub_fd, &mut tmp_apk_file)?;
                 }
                 // Seek the fd back to start
@@ -445,7 +447,7 @@ impl MagiskD {
             .join_path(get_magisk_tmp())
             .join_path("stub.apk");
 
-        if let Ok(mut fd) = apk.open(O_RDONLY | O_CLOEXEC) {
+        if let Ok(mut fd) = apk.open(OFlag::O_RDONLY | OFlag::O_CLOEXEC) {
             info.trusted_cert = read_certificate(&mut fd, MAGISK_VER_CODE);
             // Seek the fd back to start
             fd.seek(SeekFrom::Start(0)).log_ok();
