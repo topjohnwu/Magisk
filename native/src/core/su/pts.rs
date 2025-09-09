@@ -1,7 +1,7 @@
 use base::{FileOrStd, LibcReturn, LoggedResult, OsResult, ResultExt, libc, warn};
-use libc::{STDIN_FILENO, STDOUT_FILENO, TIOCGWINSZ, TIOCSWINSZ, c_int, ssize_t, winsize};
+use libc::{STDIN_FILENO, TIOCGWINSZ, TIOCSWINSZ, c_int, winsize};
 use nix::{
-    fcntl::OFlag,
+    fcntl::{OFlag, SpliceFFlags},
     poll::{PollFd, PollFlags, PollTimeout, poll},
     sys::signal::{SigSet, Signal, raise},
     sys::signalfd::{SfdFlags, SignalFd},
@@ -10,9 +10,8 @@ use nix::{
 };
 use std::fs::File;
 use std::io::{Read, Write};
-use std::mem::{ManuallyDrop, MaybeUninit};
+use std::mem::MaybeUninit;
 use std::os::fd::{AsFd, AsRawFd, FromRawFd, OwnedFd, RawFd};
-use std::ptr::null_mut;
 use std::sync::atomic::{AtomicBool, Ordering};
 
 static SHOULD_USE_SPLICE: AtomicBool = AtomicBool::new(true);
@@ -38,36 +37,34 @@ fn sync_winsize(ptmx: i32) {
     }
 }
 
-fn splice(fd_in: RawFd, fd_out: RawFd, len: usize, flags: u32) -> OsResult<'static, ssize_t> {
-    unsafe { libc::splice(fd_in, null_mut(), fd_out, null_mut(), len, flags) }
+fn splice(fd_in: impl AsFd, fd_out: impl AsFd, len: usize) -> OsResult<'static, usize> {
+    nix::fcntl::splice(fd_in, None, fd_out, None, len, SpliceFFlags::empty())
         .into_os_result("splice", None, None)
 }
 
-fn pump_via_copy(infd: RawFd, outfd: RawFd) -> LoggedResult<()> {
+fn pump_via_copy(mut fd_in: &File, mut fd_out: &File) -> LoggedResult<()> {
     let mut buf = MaybeUninit::<[u8; 4096]>::uninit();
     let buf = unsafe { buf.assume_init_mut() };
-    let mut infd = ManuallyDrop::new(unsafe { File::from_raw_fd(infd) });
-    let mut outfd = ManuallyDrop::new(unsafe { File::from_raw_fd(outfd) });
-    let len = infd.read(buf)?;
-    outfd.write_all(&buf[..len])?;
+    let len = fd_in.read(buf)?;
+    fd_out.write_all(&buf[..len])?;
     Ok(())
 }
 
-fn pump_via_splice(infd: RawFd, outfd: RawFd, pipe: &(OwnedFd, OwnedFd)) -> LoggedResult<()> {
+fn pump_via_splice(fd_in: &File, fd_out: &File, pipe: &(OwnedFd, OwnedFd)) -> LoggedResult<()> {
     if !SHOULD_USE_SPLICE.load(Ordering::Acquire) {
-        return pump_via_copy(infd, outfd);
+        return pump_via_copy(fd_in, fd_out);
     }
 
     // The pipe capacity is by default 16 pages, let's just use 65536
-    let Ok(len) = splice(infd, pipe.1.as_raw_fd(), 65536_usize, 0) else {
+    let Ok(len) = splice(fd_in, &pipe.1, 65536) else {
         // If splice failed, stop using splice and fallback to userspace copy
         SHOULD_USE_SPLICE.store(false, Ordering::Release);
-        return pump_via_copy(infd, outfd);
+        return pump_via_copy(fd_in, fd_out);
     };
     if len == 0 {
         return Ok(());
     }
-    splice(pipe.0.as_raw_fd(), outfd, len as usize, 0)?;
+    splice(&pipe.0, fd_out, len)?;
     Ok(())
 }
 
@@ -96,7 +93,7 @@ fn restore_stdin(term: Termios) -> LoggedResult<()> {
         .log_with_msg(|w| w.write_str("Failed to restore terminal attributes"))
 }
 
-fn pump_tty_impl(ptmx: OwnedFd, pump_stdin: bool) -> LoggedResult<()> {
+fn pump_tty_impl(ptmx: File, pump_stdin: bool) -> LoggedResult<()> {
     let mut signal_fd: Option<SignalFd> = None;
 
     let raw_ptmx = ptmx.as_raw_fd();
@@ -139,9 +136,9 @@ fn pump_tty_impl(ptmx: OwnedFd, pump_stdin: bool) -> LoggedResult<()> {
             if pfd.all().unwrap_or(false) {
                 let raw_fd = pfd.as_fd().as_raw_fd();
                 if raw_fd == STDIN_FILENO {
-                    pump_via_splice(STDIN_FILENO, raw_ptmx, &pipe_fd)?;
+                    pump_via_splice(FileOrStd::StdIn.as_file(), &ptmx, &pipe_fd)?;
                 } else if raw_fd == raw_ptmx {
-                    pump_via_splice(raw_ptmx, STDOUT_FILENO, &pipe_fd)?;
+                    pump_via_splice(&ptmx, FileOrStd::StdIn.as_file(), &pipe_fd)?;
                 } else if raw_fd == raw_sig {
                     sync_winsize(raw_ptmx);
                     signal_fd.as_ref().unwrap().read_signal()?;
@@ -167,7 +164,7 @@ pub fn pump_tty(ptmx: RawFd, pump_stdin: bool) {
         None
     };
 
-    let ptmx = unsafe { OwnedFd::from_raw_fd(ptmx) };
+    let ptmx = unsafe { File::from_raw_fd(ptmx) };
     pump_tty_impl(ptmx, pump_stdin).ok();
 
     if let Some(term) = old_term {
