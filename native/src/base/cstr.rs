@@ -336,6 +336,11 @@ impl Utf8CStr {
     }
 
     #[inline(always)]
+    pub fn as_utf8_cstr(&self) -> &Utf8CStr {
+        self
+    }
+
+    #[inline(always)]
     pub fn as_str(&self) -> &str {
         // SAFETY: Already UTF-8 validated during construction
         // SAFETY: The length of the slice is at least 1 due to null termination check

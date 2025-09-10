@@ -1,19 +1,17 @@
-use std::{
-    cmp::Ordering::{Greater, Less},
-    path::{Path, PathBuf},
-};
-
-use num_traits::AsPrimitive;
-
-use base::libc::{c_uint, dev_t};
+use crate::consts::{MODULEMNT, MODULEROOT, PREINITDEV, PREINITMIRR, WORKERDIR};
+use crate::ffi::{get_magisk_tmp, resolve_preinit_dir, switch_mnt_ns};
+use crate::resetprop::get_prop;
 use base::{
     FsPathBuilder, LibcReturn, LoggedResult, MountInfo, ResultExt, Utf8CStr, Utf8CStrBuf, cstr,
     debug, info, libc, parse_mount_info, warn,
 };
-
-use crate::consts::{MODULEMNT, MODULEROOT, PREINITDEV, PREINITMIRR, WORKERDIR};
-use crate::ffi::{get_magisk_tmp, resolve_preinit_dir, switch_mnt_ns};
-use crate::resetprop::get_prop;
+use libc::{c_uint, dev_t};
+use nix::{
+    mount::MsFlags,
+    sys::stat::{Mode, SFlag, mknod},
+};
+use num_traits::AsPrimitive;
+use std::{cmp::Ordering::Greater, cmp::Ordering::Less, path::Path, path::PathBuf};
 
 pub fn setup_preinit_dir() {
     let magisk_tmp = get_magisk_tmp();
@@ -69,7 +67,7 @@ pub fn setup_module_mount() {
     let _: LoggedResult<()> = try {
         module_mnt.mkdir(0o755)?;
         cstr!(MODULEROOT).bind_mount_to(&module_mnt, false)?;
-        module_mnt.remount_mount_point_flags(libc::MS_RDONLY)?;
+        module_mnt.remount_mount_point_flags(MsFlags::MS_RDONLY)?;
     };
 }
 
@@ -194,15 +192,14 @@ pub fn find_preinit_device() -> String {
         if std::env::var_os("MAKEDEV").is_some() {
             buf.clear();
             let dev_path = buf.append_path(&tmp).append_path(PREINITDEV);
-            unsafe {
-                libc::mknod(
-                    dev_path.as_ptr(),
-                    libc::S_IFBLK | 0o600,
-                    info.device as dev_t,
-                )
-                .check_os_err("mknod", Some(dev_path), None)
-                .log_ok();
-            }
+            mknod(
+                dev_path.as_utf8_cstr(),
+                SFlag::S_IFBLK,
+                Mode::from_bits_truncate(0o600),
+                info.device as dev_t,
+            )
+            .check_os_err("mknod", Some(dev_path), None)
+            .log_ok();
         }
     }
     Path::new(&info.source)
@@ -248,10 +245,8 @@ pub fn revert_unmount(pid: i32) {
 
     for mut target in targets {
         let target = Utf8CStr::from_string(&mut target);
-        unsafe {
-            if libc::umount2(target.as_ptr(), libc::MNT_DETACH) == 0 {
-                debug!("denylist: Unmounted ({})", target);
-            }
+        if target.unmount().is_ok() {
+            debug!("denylist: Unmounted ({})", target);
         }
     }
 }

@@ -26,4 +26,4 @@ bytemuck = { workspace = true, features = ["derive"] }
 thiserror = { workspace = true }
 bit-set = { workspace = true }
 argh = { workspace = true }
-nix = { workspace = true, features = ["fs", "poll", "signal", "term", "zerocopy"] }
+nix = { workspace = true, features = ["fs", "mount", "poll", "signal", "term", "zerocopy"] }

@@ -8,8 +8,7 @@ use base::{
     Utf8CStrBuf, Utf8CString, WalkResult, clone_attr, cstr, debug, error, info, libc, raw_cstr,
     warn,
 };
-use libc::MS_RDONLY;
-use nix::{fcntl::OFlag, unistd::UnlinkatFlags};
+use nix::{fcntl::OFlag, mount::MsFlags, unistd::UnlinkatFlags};
 use std::collections::BTreeMap;
 use std::os::fd::IntoRawFd;
 use std::path::{Component, Path};
@@ -40,7 +39,7 @@ fn bind_mount(reason: &str, src: &Utf8CStr, dest: &Utf8CStr, rec: bool) {
     // Ignore any kind of error here. If a single bind mount fails due to selinux permissions or
     // kernel limitations, don't let it break module mount entirely.
     src.bind_mount_to(dest, rec).log_ok();
-    dest.remount_mount_point_flags(MS_RDONLY).log_ok();
+    dest.remount_mount_point_flags(MsFlags::MS_RDONLY).log_ok();
 }
 
 fn mount_dummy<'a>(

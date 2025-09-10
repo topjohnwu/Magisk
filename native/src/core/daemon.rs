@@ -23,6 +23,7 @@ use base::{
     cstr, error, info, libc,
 };
 use nix::fcntl::OFlag;
+use nix::mount::MsFlags;
 use std::fmt::Write as FmtWrite;
 use std::fs::File;
 use std::io::{BufReader, Write};
@@ -384,7 +385,7 @@ pub fn daemon_entry() {
 
     // Remount rootfs as read-only if requested
     if std::env::var_os("REMOUNT_ROOT").is_some() {
-        cstr!("/").remount_mount_flags(libc::MS_RDONLY).log_ok();
+        cstr!("/").remount_mount_flags(MsFlags::MS_RDONLY).log_ok();
         unsafe { std::env::remove_var("REMOUNT_ROOT") };
     }
 

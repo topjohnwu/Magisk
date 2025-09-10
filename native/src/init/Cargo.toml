@@ -14,3 +14,4 @@ cxx-gen = { workspace = true }
 base = { path = "../base" }
 magiskpolicy = { path = "../sepolicy", default-features = false }
 cxx = { workspace = true }
+num-traits = { workspace = true }
