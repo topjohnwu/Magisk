@@ -407,7 +407,16 @@ impl Utf8CStr {
 // We should treat these as application logic and log ASAP, so return LoggedResult.
 impl Utf8CStr {
     pub fn remove_all(&self) -> LoggedResult<()> {
-        let attr = self.get_attr()?;
+        let attr = match self.get_attr() {
+            Ok(attr) => attr,
+            Err(e) => {
+                return match e.errno {
+                    // Allow calling remove_all on non-existence file
+                    Errno::ENOENT => Ok(()),
+                    _ => Err(e)?,
+                };
+            }
+        };
         if attr.is_dir() {
             let dir = Directory::open(self)?;
             dir.remove_all()?;

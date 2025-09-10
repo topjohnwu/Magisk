@@ -281,7 +281,7 @@ impl<T> LibcReturn for nix::Result<T> {
 
 #[derive(Debug)]
 pub struct OsError<'a> {
-    errno: Errno,
+    pub errno: Errno,
     name: &'static str,
     arg1: Option<&'a str>,
     arg2: Option<&'a str>,
