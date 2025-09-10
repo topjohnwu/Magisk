@@ -111,7 +111,7 @@ pub fn cmdline_logging() {
 
     let logger = Logger {
         write: cmdline_write,
-        flags: LogFlag::ExitOnError,
+        flags: 0,
     };
     unsafe {
         LOGGER = logger;
