@@ -54,6 +54,7 @@ name = "base"
 version = "0.0.0"
 dependencies = [
  "argh",
+ "bitflags",
  "bytemuck",
  "cfg-if",
  "const_format",

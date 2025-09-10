@@ -28,11 +28,12 @@ argh = { version = "0.1.13", default-features = false }
 pb-rs = { version = "0.10.0", default-features = false }
 quick-protobuf = "0.8.1"
 flate2 = { version = "1.1.2", default-features = false }
-bzip2 = { version = "0.6.0" }
+bzip2 = "0.6.0"
 zopfli = "0.8.2"
 lz4 = "1.28.1"
 lzma-rust2 = { version = "0.13.0", default-features = false, features = ["xz", "std", "encoder", "optimization"] }
 nix = "0.30.1"
+bitflags = "2.9.4"
 
 # Rust crypto crates are tied together
 sha1 = "0.11.0-rc.2"

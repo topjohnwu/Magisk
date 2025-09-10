@@ -8,7 +8,6 @@ path = "lib.rs"
 
 [features]
 selinux = []
-dyn_selinux = []
 
 [build-dependencies]
 cxx-gen = { workspace = true }
@@ -24,3 +23,4 @@ num-traits = { workspace = true }
 num-derive = { workspace = true }
 const_format = { workspace = true }
 nix = { workspace = true, features = ["fs", "mount"] }
+bitflags = { workspace = true }

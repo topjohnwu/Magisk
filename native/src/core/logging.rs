@@ -1,20 +1,19 @@
 use crate::consts::{LOG_PIPE, LOGFILE};
 use crate::ffi::get_magisk_tmp;
 use crate::logging::LogFile::{Actual, Buffer};
-use base::libc::{
-    O_CLOEXEC, O_RDWR, O_WRONLY, PIPE_BUF, SIG_BLOCK, SIG_SETMASK, SIGPIPE, getpid, gettid,
-    localtime_r, pthread_sigmask, sigaddset, sigset_t, sigtimedwait, time_t, timespec, tm,
-};
 use base::{
-    FsPathBuilder, LOGGER, LogLevel, Logger, ReadExt, Utf8CStr, Utf8CStrBuf, WriteExt,
-    const_format::concatcp, cstr, libc, raw_cstr,
+    FsPathBuilder, LogLevel, ReadExt, Utf8CStr, Utf8CStrBuf, WriteExt, const_format::concatcp,
+    cstr, libc, raw_cstr, update_logger,
 };
 use bytemuck::{Pod, Zeroable, bytes_of, write_zeroes};
+use libc::{
+    O_CLOEXEC, O_RDWR, O_WRONLY, PIPE_BUF, SIG_BLOCK, SIG_SETMASK, SIGPIPE, c_char, c_void, getpid,
+    gettid, localtime_r, pthread_sigmask, sigaddset, sigset_t, sigtimedwait, time_t, timespec, tm,
+};
 use num_derive::{FromPrimitive, ToPrimitive};
 use num_traits::FromPrimitive;
 use std::cmp::min;
-use std::ffi::{c_char, c_void};
-use std::fmt::Write as FmtWrite;
+use std::fmt::Write as _;
 use std::fs::File;
 use std::io::{IoSlice, Read, Write};
 use std::mem::ManuallyDrop;
@@ -64,13 +63,7 @@ fn android_log_write(level: LogLevel, msg: &Utf8CStr) {
 }
 
 pub fn android_logging() {
-    let logger = Logger {
-        write: android_log_write,
-        flags: 0,
-    };
-    unsafe {
-        LOGGER = logger;
-    }
+    update_logger(|logger| logger.write = android_log_write);
 }
 
 pub fn magisk_logging() {
@@ -78,14 +71,7 @@ pub fn magisk_logging() {
         android_log_write(level, msg);
         magisk_log_to_pipe(level_to_prio(level), msg);
     }
-
-    let logger = Logger {
-        write: magisk_log_write,
-        flags: 0,
-    };
-    unsafe {
-        LOGGER = logger;
-    }
+    update_logger(|logger| logger.write = magisk_log_write);
 }
 
 pub fn zygisk_logging() {
@@ -93,14 +79,7 @@ pub fn zygisk_logging() {
         android_log_write(level, msg);
         zygisk_log_to_pipe(level_to_prio(level), msg);
     }
-
-    let logger = Logger {
-        write: zygisk_log_write,
-        flags: 0,
-    };
-    unsafe {
-        LOGGER = logger;
-    }
+    update_logger(|logger| logger.write = zygisk_log_write);
 }
 
 #[derive(Copy, Clone, Pod, Zeroable)]

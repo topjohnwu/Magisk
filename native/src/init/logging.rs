@@ -1,18 +1,13 @@
 use base::nix::fcntl::OFlag;
-use base::{
-    LOGGER, LogLevel, Logger, SilentLogExt, Utf8CStr, cstr,
-    libc::{
-        O_CLOEXEC, S_IFCHR, STDERR_FILENO, STDIN_FILENO, STDOUT_FILENO, SYS_dup3, makedev, mknod,
-        syscall,
-    },
-    raw_cstr,
+use base::{LogLevel, SilentLogExt, Utf8CStr, cstr, libc, raw_cstr, update_logger};
+use libc::{
+    O_CLOEXEC, S_IFCHR, STDERR_FILENO, STDIN_FILENO, STDOUT_FILENO, SYS_dup3, makedev, mknod,
+    syscall,
 };
+use std::fs::File;
+use std::io::{IoSlice, Write};
 use std::mem::ManuallyDrop;
-use std::{
-    fs::File,
-    io::{IoSlice, Write},
-    os::fd::{FromRawFd, IntoRawFd, RawFd},
-};
+use std::os::fd::{FromRawFd, IntoRawFd, RawFd};
 
 // SAFETY: magiskinit is single threaded
 static mut KMSG: RawFd = -1;
@@ -67,11 +62,5 @@ pub fn setup_klog() {
         }
     }
 
-    let logger = Logger {
-        write: kmsg_log_write,
-        flags: 0,
-    };
-    unsafe {
-        LOGGER = logger;
-    }
+    update_logger(|logger| logger.write = kmsg_log_write);
 }

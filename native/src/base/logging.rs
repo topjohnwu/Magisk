@@ -1,21 +1,21 @@
+use crate::ffi::LogLevelCxx;
+use crate::{Utf8CStr, cstr};
+use bitflags::bitflags;
+use num_derive::{FromPrimitive, ToPrimitive};
+use num_traits::FromPrimitive;
 use std::fmt;
 use std::io::{Write, stderr, stdout};
 use std::process::exit;
 
-use num_derive::{FromPrimitive, ToPrimitive};
-use num_traits::FromPrimitive;
-
-use crate::ffi::LogLevelCxx;
-use crate::{Utf8CStr, cstr};
-
-// Ugly hack to avoid using enum
-#[allow(non_snake_case, non_upper_case_globals)]
-mod LogFlag {
-    pub const DisableError: u32 = 1 << 0;
-    pub const DisableWarn: u32 = 1 << 1;
-    pub const DisableInfo: u32 = 1 << 2;
-    pub const DisableDebug: u32 = 1 << 3;
-    pub const ExitOnError: u32 = 1 << 4;
+bitflags! {
+    #[derive(Copy, Clone)]
+    struct LogFlag : u32 {
+        const DISABLE_ERROR = 1 << 0;
+        const DISABLE_WARN = 1 << 1;
+        const DISABLE_INFO = 1 << 2;
+        const DISABLE_DEBUG = 1 << 3;
+        const EXIT_ON_ERROR = 1 << 4;
+    }
 }
 
 #[derive(Copy, Clone, FromPrimitive, ToPrimitive)]
@@ -31,7 +31,7 @@ pub enum LogLevel {
 // logger changes will only happen on the main thread.
 pub static mut LOGGER: Logger = Logger {
     write: |_, _| {},
-    flags: 0,
+    flags: LogFlag::empty(),
 };
 
 type LogWriter = fn(level: LogLevel, msg: &Utf8CStr);
@@ -40,48 +40,43 @@ pub(crate) type Formatter<'a> = &'a mut dyn fmt::Write;
 #[derive(Copy, Clone)]
 pub struct Logger {
     pub write: LogWriter,
-    pub flags: u32,
+    flags: LogFlag,
 }
 
-pub fn exit_on_error(b: bool) {
+pub fn update_logger(f: impl FnOnce(&mut Logger)) {
+    let mut logger = unsafe { LOGGER };
+    f(&mut logger);
     unsafe {
-        if b {
-            LOGGER.flags |= LogFlag::ExitOnError;
-        } else {
-            LOGGER.flags &= !LogFlag::ExitOnError;
-        }
+        LOGGER = logger;
     }
 }
 
+pub fn exit_on_error(b: bool) {
+    update_logger(|logger| logger.flags.set(LogFlag::EXIT_ON_ERROR, b));
+}
+
 impl LogLevel {
-    fn as_disable_flag(&self) -> u32 {
+    fn as_disable_flag(&self) -> LogFlag {
         match *self {
-            LogLevel::Error => LogFlag::DisableError,
-            LogLevel::Warn => LogFlag::DisableWarn,
-            LogLevel::Info => LogFlag::DisableInfo,
-            LogLevel::Debug => LogFlag::DisableDebug,
+            LogLevel::Error => LogFlag::DISABLE_ERROR,
+            LogLevel::Warn => LogFlag::DISABLE_WARN,
+            LogLevel::Info => LogFlag::DISABLE_INFO,
+            LogLevel::Debug => LogFlag::DISABLE_DEBUG,
         }
     }
 }
 
 pub fn set_log_level_state(level: LogLevel, enabled: bool) {
-    let flag = level.as_disable_flag();
-    unsafe {
-        if enabled {
-            LOGGER.flags &= !flag
-        } else {
-            LOGGER.flags |= flag
-        }
-    }
+    update_logger(|logger| logger.flags.set(level.as_disable_flag(), enabled));
 }
 
 fn log_with_writer<F: FnOnce(LogWriter)>(level: LogLevel, f: F) {
     let logger = unsafe { LOGGER };
-    if (logger.flags & level.as_disable_flag()) != 0 {
+    if logger.flags.contains(level.as_disable_flag()) {
         return;
     }
     f(logger.write);
-    if (logger.flags & LogFlag::ExitOnError) != 0 {
+    if logger.flags.contains(LogFlag::EXIT_ON_ERROR) {
         exit(-1);
     }
 }
@@ -108,14 +103,7 @@ pub fn cmdline_logging() {
             stderr().write_all(msg.as_bytes()).ok();
         }
     }
-
-    let logger = Logger {
-        write: cmdline_write,
-        flags: 0,
-    };
-    unsafe {
-        LOGGER = logger;
-    }
+    update_logger(|logger| logger.write = cmdline_write);
 }
 
 #[macro_export]
