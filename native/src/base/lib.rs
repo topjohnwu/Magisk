@@ -10,7 +10,7 @@ pub use cstr::{
 };
 use cxx_extern::*;
 pub use dir::*;
-pub use ffi::fork_dont_care;
+pub use ffi::{Utf8CStrRef, fork_dont_care};
 pub use files::*;
 pub use logging::*;
 pub use misc::*;
@@ -27,7 +27,7 @@ mod result;
 mod xwrap;
 
 #[cxx::bridge]
-pub mod ffi {
+mod ffi {
     #[derive(Copy, Clone)]
     #[repr(i32)]
     #[cxx_name = "LogLevel"]

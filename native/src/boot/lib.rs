@@ -52,7 +52,7 @@ pub mod ffi {
         include!("magiskboot.hpp");
 
         #[cxx_name = "Utf8CStr"]
-        type Utf8CStrRef<'a> = base::ffi::Utf8CStrRef<'a>;
+        type Utf8CStrRef<'a> = base::Utf8CStrRef<'a>;
 
         fn cleanup();
         fn unpack(image: Utf8CStrRef, skip_decomp: bool, hdr: bool) -> i32;

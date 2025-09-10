@@ -127,7 +127,7 @@ pub mod ffi {
 
     unsafe extern "C++" {
         #[cxx_name = "Utf8CStr"]
-        type Utf8CStrRef<'a> = base::ffi::Utf8CStrRef<'a>;
+        type Utf8CStrRef<'a> = base::Utf8CStrRef<'a>;
         #[cxx_name = "ucred"]
         type UCred = crate::UCred;
 

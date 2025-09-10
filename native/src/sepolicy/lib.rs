@@ -31,7 +31,7 @@ pub mod ffi {
         include!("../base/include/base.hpp");
 
         #[cxx_name = "Utf8CStr"]
-        type Utf8CStrRef<'a> = base::ffi::Utf8CStrRef<'a>;
+        type Utf8CStrRef<'a> = base::Utf8CStrRef<'a>;
 
         type sepol_impl;
 
