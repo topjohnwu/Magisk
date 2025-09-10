@@ -212,15 +212,15 @@ impl Directory {
     ) -> OsResult<'a, ()> {
         buf.clear();
         unsafe {
-            let r = readlinkat(
+            readlinkat(
                 self.as_raw_fd(),
                 name.as_ptr(),
                 buf.as_mut_ptr().cast(),
                 buf.capacity(),
             )
-            .into_os_result("readlinkat", Some(name), None)? as usize;
-            buf.set_len(r);
+            .check_os_err("readlinkat", Some(name), None)?;
         }
+        buf.rebuild().ok();
         Ok(())
     }
 

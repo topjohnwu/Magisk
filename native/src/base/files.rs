@@ -257,8 +257,8 @@ impl Utf8CStr {
             let r = libc::readlink(self.as_ptr(), buf.as_mut_ptr(), buf.capacity() - 1)
                 .into_os_result("readlink", Some(self), None)? as isize;
             *(buf.as_mut_ptr().offset(r) as *mut u8) = b'\0';
-            buf.set_len(r as usize);
         }
+        buf.rebuild().ok();
         Ok(())
     }
 
@@ -336,23 +336,25 @@ impl Utf8CStr {
     }
 
     pub fn get_secontext(&self, con: &mut dyn Utf8CStrBuf) -> OsResult<'_, ()> {
-        unsafe {
-            let sz = libc::lgetxattr(
+        con.clear();
+        let result = unsafe {
+            libc::lgetxattr(
                 self.as_ptr(),
                 XATTR_NAME_SELINUX.as_ptr(),
                 con.as_mut_ptr().cast(),
                 con.capacity(),
-            );
-            if sz < 1 {
-                con.clear();
-                if *errno() != libc::ENODATA {
-                    return Err(OsError::last_os_error("lgetxattr", Some(self), None));
-                }
-            } else {
-                con.set_len((sz - 1) as usize);
+            )
+            .check_err()
+        };
+
+        match result {
+            Ok(_) => {
+                con.rebuild().ok();
+                Ok(())
             }
+            Err(Errno::ENODATA) => Ok(()),
+            Err(e) => Err(OsError::new(e, "lgetxattr", Some(self), None)),
         }
-        Ok(())
     }
 
     pub fn set_secontext<'a>(&'a self, con: &'a Utf8CStr) -> OsResult<'a, ()> {
@@ -549,23 +551,25 @@ impl FsPathFollow {
     }
 
     pub fn get_secontext(&self, con: &mut dyn Utf8CStrBuf) -> OsResult<'_, ()> {
-        unsafe {
-            let sz = libc::getxattr(
+        con.clear();
+        let result = unsafe {
+            libc::getxattr(
                 self.as_ptr(),
                 XATTR_NAME_SELINUX.as_ptr(),
                 con.as_mut_ptr().cast(),
                 con.capacity(),
-            );
-            if sz < 1 {
-                con.clear();
-                if *errno() != libc::ENODATA {
-                    return Err(OsError::last_os_error("getxattr", Some(self), None));
-                }
-            } else {
-                con.set_len((sz - 1) as usize);
+            )
+            .check_err()
+        };
+
+        match result {
+            Ok(_) => {
+                con.rebuild().ok();
+                Ok(())
             }
+            Err(Errno::ENODATA) => Ok(()),
+            Err(e) => Err(OsError::new(e, "getxattr", Some(self), None)),
         }
-        Ok(())
     }
 
     pub fn set_secontext<'a>(&'a self, con: &'a Utf8CStr) -> OsResult<'a, ()> {
@@ -660,22 +664,25 @@ pub fn fd_set_attr(fd: RawFd, attr: &FileAttr) -> OsResult<'_, ()> {
 }
 
 pub fn fd_get_secontext(fd: RawFd, con: &mut dyn Utf8CStrBuf) -> OsResult<'static, ()> {
-    unsafe {
-        let sz = libc::fgetxattr(
+    con.clear();
+    let result = unsafe {
+        libc::fgetxattr(
             fd,
             XATTR_NAME_SELINUX.as_ptr(),
             con.as_mut_ptr().cast(),
             con.capacity(),
-        );
-        if sz < 1 {
-            if *errno() != libc::ENODATA {
-                return Err(OsError::last_os_error("fgetxattr", None, None));
-            }
-        } else {
-            con.set_len((sz - 1) as usize);
+        )
+        .check_err()
+    };
+
+    match result {
+        Ok(_) => {
+            con.rebuild().ok();
+            Ok(())
         }
+        Err(Errno::ENODATA) => Ok(()),
+        Err(e) => Err(OsError::new(e, "fgetxattr", None, None)),
     }
-    Ok(())
 }
 
 pub fn fd_set_secontext(fd: RawFd, con: &Utf8CStr) -> OsResult<'_, ()> {

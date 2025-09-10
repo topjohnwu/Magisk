@@ -313,21 +313,26 @@ extern "C" fn logfile_writer(arg: *mut c_void) -> *mut c_void {
             // the crate cannot fetch the proper local timezone without pulling in a bunch of
             // timezone handling code. To reduce binary size, fallback to use localtime_r in libc.
             unsafe {
-                let secs: time_t = now.as_secs() as time_t;
+                let secs = now.as_secs() as time_t;
                 let mut tm: tm = std::mem::zeroed();
                 if localtime_r(&secs, &mut tm).is_null() {
                     continue;
                 }
-                let len = strftime(aux.as_mut_ptr(), aux.capacity(), raw_cstr!("%m-%d %T"), &tm);
-                aux.set_len(len);
-                aux.write_fmt(format_args!(
+                strftime(aux.as_mut_ptr(), aux.capacity(), raw_cstr!("%m-%d %T"), &tm);
+            }
+
+            if aux.rebuild().is_ok() {
+                write!(
+                    aux,
                     ".{:03} {:5} {:5} {} : ",
                     now.subsec_millis(),
                     meta.pid,
                     meta.tid,
                     prio
-                ))
+                )
                 .ok();
+            } else {
+                continue;
             }
 
             let io1 = IoSlice::new(aux.as_bytes());
