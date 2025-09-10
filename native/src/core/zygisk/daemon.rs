@@ -136,7 +136,7 @@ impl ZygiskState {
         self.lib_name = if orig.is_empty() || orig == "0" {
             ZYGISKLDR.to_string()
         } else {
-            orig + ZYGISKLDR
+            ZYGISKLDR.to_string() + &orig
         };
         set_prop(NBPROP, Utf8CStr::from_string(&mut self.lib_name));
         // Whether Huawei's Maple compiler is enabled.
