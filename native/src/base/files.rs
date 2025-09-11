@@ -4,12 +4,12 @@ use crate::{
 };
 use bytemuck::{Pod, bytes_of, bytes_of_mut};
 use libc::{c_uint, makedev, mode_t};
-use mem::MaybeUninit;
 use nix::{
     errno::Errno,
     fcntl::{AT_FDCWD, OFlag},
     sys::stat::{FchmodatFlags, Mode},
     unistd::AccessFlags,
+    unistd::{Gid, Uid},
 };
 use num_traits::AsPrimitive;
 use std::cmp::min;
@@ -17,6 +17,7 @@ use std::ffi::CStr;
 use std::fmt::Display;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Read, Seek, SeekFrom, Write};
+use std::mem::MaybeUninit;
 use std::ops::Deref;
 use std::os::fd::{AsFd, BorrowedFd};
 use std::os::unix::ffi::OsStrExt;
@@ -544,13 +545,12 @@ impl FsPathFollow {
         )
         .check_os_err("chmod", Some(self), None)?;
 
-        unsafe {
-            libc::chown(self.as_ptr(), attr.st.st_uid, attr.st.st_gid).check_os_err(
-                "chown",
-                Some(self),
-                None,
-            )?;
-        }
+        nix::unistd::chown(
+            self.deref(),
+            Some(Uid::from(attr.st.st_uid)),
+            Some(Gid::from(attr.st.st_gid)),
+        )
+        .check_os_err("chown", Some(self), None)?;
 
         #[cfg(feature = "selinux")]
         if !attr.con.is_empty() {
