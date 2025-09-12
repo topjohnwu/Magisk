@@ -96,46 +96,101 @@ impl Drop for PathTracker<'_> {
     }
 }
 
-struct FilePaths<'a> {
+// The comments for this struct assume real = "/system/bin"
+struct ModulePaths<'a> {
     real: PathTracker<'a>,
-    worker: PathTracker<'a>,
+    module: PathTracker<'a>,
     module_mnt: PathTracker<'a>,
-    module_root: PathTracker<'a>,
 }
 
-impl FilePaths<'_> {
-    fn append(&mut self, name: &str) -> FilePaths<'_> {
-        FilePaths {
-            real: self.real.append(name),
-            worker: self.worker.append(name),
-            module_mnt: self.module_mnt.append(name),
-            module_root: self.module_root.append(name),
+impl ModulePaths<'_> {
+    fn new<'a>(
+        real: &'a mut dyn Utf8CStrBuf,
+        module: &'a mut dyn Utf8CStrBuf,
+        module_mnt: &'a mut dyn Utf8CStrBuf,
+    ) -> ModulePaths<'a> {
+        real.append_path("/");
+        module.append_path(MODULEROOT);
+        module_mnt
+            .append_path(get_magisk_tmp())
+            .append_path(MODULEMNT);
+        ModulePaths {
+            real: PathTracker::from(real),
+            module: PathTracker::from(module),
+            module_mnt: PathTracker::from(module_mnt),
         }
     }
 
-    fn reborrow(&mut self) -> FilePaths<'_> {
-        FilePaths {
+    fn set_module(&mut self, module: &str) -> ModulePaths<'_> {
+        ModulePaths {
             real: self.real.reborrow(),
-            worker: self.worker.reborrow(),
-            module_mnt: self.module_mnt.reborrow(),
-            module_root: self.module_root.reborrow(),
+            module: self.module.append(module),
+            module_mnt: self.module_mnt.append(module),
         }
     }
 
+    fn append(&mut self, name: &str) -> ModulePaths<'_> {
+        ModulePaths {
+            real: self.real.append(name),
+            module: self.module.append(name),
+            module_mnt: self.module_mnt.append(name),
+        }
+    }
+
+    // Returns "/system/bin"
     fn real(&self) -> &Utf8CStr {
         self.real.path
     }
 
-    fn worker(&self) -> &Utf8CStr {
-        self.worker.path
+    // Returns "$MAGISK_TMP/.magisk/modules/{module}/system/bin"
+    fn module(&self) -> &Utf8CStr {
+        self.module.path
     }
 
+    // Returns "/data/adb/modules/{module}/system/bin"
     fn module_mnt(&self) -> &Utf8CStr {
         self.module_mnt.path
     }
+}
 
-    fn module(&self) -> &Utf8CStr {
-        self.module_root.path
+// The comments for this struct assume real = "/system/bin"
+struct MountPaths<'a> {
+    real: PathTracker<'a>,
+    worker: PathTracker<'a>,
+}
+
+impl MountPaths<'_> {
+    fn new<'a>(real: &'a mut dyn Utf8CStrBuf, worker: &'a mut dyn Utf8CStrBuf) -> MountPaths<'a> {
+        real.append_path("/");
+        worker.append_path(get_magisk_tmp()).append_path(WORKERDIR);
+        MountPaths {
+            real: PathTracker::from(real),
+            worker: PathTracker::from(worker),
+        }
+    }
+
+    fn append(&mut self, name: &str) -> MountPaths<'_> {
+        MountPaths {
+            real: self.real.append(name),
+            worker: self.worker.append(name),
+        }
+    }
+
+    fn reborrow(&mut self) -> MountPaths<'_> {
+        MountPaths {
+            real: self.real.reborrow(),
+            worker: self.worker.reborrow(),
+        }
+    }
+
+    // Returns "/system/bin"
+    fn real(&self) -> &Utf8CStr {
+        self.real.path
+    }
+
+    // Returns "$MAGISK_TMP/.magisk/worker/system/bin"
+    fn worker(&self) -> &Utf8CStr {
+        self.worker.path
     }
 }
 
@@ -154,7 +209,7 @@ impl FsNode {
         }
     }
 
-    fn collect(&mut self, mut paths: FilePaths) -> LoggedResult<()> {
+    fn collect(&mut self, mut paths: ModulePaths) -> LoggedResult<()> {
         let FsNode::Directory { children } = self else {
             return Ok(());
         };
@@ -169,6 +224,7 @@ impl FsNode {
                     .or_insert_with(FsNode::new_dir);
                 node.collect(entry_paths)?;
             } else if entry.is_symlink() {
+                // Read the link and store its target
                 let mut link = cstr::buf::default();
                 path.read_link(&mut link)?;
                 children
@@ -225,7 +281,7 @@ impl FsNode {
         }
     }
 
-    fn commit(&mut self, mut path: FilePaths, is_root_dir: bool) -> LoggedResult<()> {
+    fn commit(&mut self, mut path: MountPaths, is_root_dir: bool) -> LoggedResult<()> {
         match self {
             FsNode::Directory { children } => {
                 let mut is_tmpfs = false;
@@ -277,7 +333,7 @@ impl FsNode {
         Ok(())
     }
 
-    fn commit_tmpfs(&mut self, mut path: FilePaths) -> LoggedResult<()> {
+    fn commit_tmpfs(&mut self, mut path: MountPaths) -> LoggedResult<()> {
         match self {
             FsNode::Directory { children } => {
                 path.worker().mkdirs(0o000)?;
@@ -779,26 +835,12 @@ impl MagiskD {
     fn apply_modules(&self, module_list: &[ModuleInfo]) {
         let mut system = FsNode::new_dir();
 
-        // Build all the base "prefix" paths
-        let mut root = cstr::buf::default().join_path("/");
+        // Create buffers for paths
+        let mut buf1 = cstr::buf::dynamic(256);
+        let mut buf2 = cstr::buf::dynamic(256);
+        let mut buf3 = cstr::buf::dynamic(256);
 
-        let mut module_dir = cstr::buf::default().join_path(MODULEROOT);
-
-        let mut module_mnt = cstr::buf::default()
-            .join_path(get_magisk_tmp())
-            .join_path(MODULEMNT);
-
-        let mut worker = cstr::buf::default()
-            .join_path(get_magisk_tmp())
-            .join_path(WORKERDIR);
-
-        // Create a collection of all relevant paths
-        let mut root_paths = FilePaths {
-            real: PathTracker::from(&mut root),
-            worker: PathTracker::from(&mut worker),
-            module_mnt: PathTracker::from(&mut module_mnt),
-            module_root: PathTracker::from(&mut module_dir),
-        };
+        let mut paths = ModulePaths::new(&mut buf1, &mut buf2, &mut buf3);
 
         // Step 1: Create virtual filesystem tree
         //
@@ -806,28 +848,27 @@ impl MagiskD {
         // record the union of all module filesystem trees under each of their /system directory.
 
         for info in module_list {
-            let mut module_paths = root_paths.append(&info.name);
-            {
-                // Read props
-                let prop = module_paths.append("system.prop");
-                if prop.module().exists() {
-                    load_prop_file(prop.module());
-                }
+            let mut paths = paths.set_module(&info.name);
+
+            // Read props
+            let prop = paths.append("system.prop");
+            if prop.module().exists() {
+                load_prop_file(prop.module());
             }
-            {
-                // Check whether skip mounting
-                let skip = module_paths.append("skip_mount");
-                if skip.module().exists() {
-                    continue;
-                }
+            drop(prop);
+
+            // Check whether skip mounting
+            let skip = paths.append("skip_mount");
+            if skip.module().exists() {
+                continue;
             }
-            {
-                // Double check whether the system folder exists
-                let sys = module_paths.append("system");
-                if sys.module().exists() {
-                    info!("{}: loading module files", &info.name);
-                    system.collect(sys).log_ok();
-                }
+            drop(skip);
+
+            // Double check whether the system folder exists
+            let sys = paths.append("system");
+            if sys.module().exists() {
+                info!("{}: loading module files", &info.name);
+                system.collect(sys).log_ok();
             }
         }
 
@@ -874,6 +915,9 @@ impl MagiskD {
         }
         roots.insert("system", system);
 
+        drop(paths);
+        let mut paths = MountPaths::new(&mut buf1, &mut buf2);
+
         for (dir, mut root) in roots {
             // Step 4: Convert virtual filesystem tree into concrete operations
             //
@@ -882,8 +926,8 @@ impl MagiskD {
             // The "core" of the logic is to decide which directories need to be rebuilt in the
             // tmpfs worker directory, and real sub-nodes need to be mirrored inside it.
 
-            let path = root_paths.append(dir);
-            root.commit(path, true).log_ok();
+            let paths = paths.append(dir);
+            root.commit(paths, true).log_ok();
         }
     }
 }
