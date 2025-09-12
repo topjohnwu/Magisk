@@ -344,21 +344,18 @@ impl FsNode {
                     clone_attr(&parent, path.worker())?;
                 }
 
-                // Check whether a file name '.replace' exist
+                // Check whether a file named '.replace' exists
                 if let Some(FsNode::File { src }) = children.remove(".replace")
-                    && let Some(base_dir) = src.parent_dir()
+                    && let Some(replace_dir) = src.parent_dir()
                 {
                     for (name, node) in children {
                         let path = path.append(name);
                         match node {
-                            FsNode::Directory { .. } | FsNode::File { .. } => {
-                                let src = Utf8CString::from(base_dir).join_path(name);
-                                mount_dummy(
-                                    "mount",
-                                    &src,
-                                    path.worker(),
-                                    matches!(node, FsNode::Directory { .. }),
-                                )?;
+                            FsNode::Directory { .. } => {
+                                // For replace, we don't need to traverse any deeper for mirroring.
+                                // We can simply just bind mount the module dir to worker dir.
+                                let src = Utf8CString::from(replace_dir).join_path(name);
+                                mount_dummy("mount", &src, path.worker(), true)?;
                             }
                             _ => node.commit_tmpfs(path)?,
                         }
@@ -368,7 +365,7 @@ impl FsNode {
                     return Ok(());
                 }
 
-                // Traverse the real directory and mount mirrors
+                // Traverse the real directory and mount mirror files
                 if let Ok(mut dir) = Directory::open(path.real()) {
                     while let Ok(Some(entry)) = dir.read() {
                         if children.contains_key(entry.name().as_str()) {
@@ -378,18 +375,22 @@ impl FsNode {
 
                         let path = path.append(entry.name());
 
-                        if entry.is_symlink() {
-                            // Add the symlink into children and handle it later
+                        if entry.is_dir() {
+                            // At the first glance, it looks like we can directly mount the
+                            // real dir to worker dir as mirror. However, this should NOT be done,
+                            // because init will track these mounts with dev.mnt, causing issues.
+                            // We unfortunately have to traverse recursively for mirroring.
+                            FsNode::new_dir().commit_tmpfs(path)?;
+                        } else if entry.is_symlink() {
                             let mut link = cstr::buf::default();
                             entry.read_link(&mut link).log_ok();
-                            children.insert(
-                                entry.name().to_string(),
-                                FsNode::Symlink {
-                                    target: link.to_owned(),
-                                },
-                            );
+                            FsNode::Symlink {
+                                target: link.to_owned(),
+                            }
+                            .commit_tmpfs(path)?;
                         } else {
-                            mount_dummy("mirror", path.real(), path.worker(), entry.is_dir())?;
+                            // Mount the mirror file
+                            mount_dummy("mirror", path.real(), path.worker(), false)?;
                         }
                     }
                 }
