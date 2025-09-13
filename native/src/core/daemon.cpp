@@ -243,25 +243,8 @@ static void handle_request(pollfd *pfd) {
 }
 
 static void daemon_entry() {
-    android_logging();
-
-    // Block all signals
-    sigset_t block_set;
-    sigfillset(&block_set);
-    pthread_sigmask(SIG_SETMASK, &block_set, nullptr);
-
     // Change process name
     set_nice_name("magiskd");
-
-    int fd = xopen("/dev/null", O_WRONLY);
-    xdup2(fd, STDOUT_FILENO);
-    xdup2(fd, STDERR_FILENO);
-    if (fd > STDERR_FILENO)
-        close(fd);
-    fd = xopen("/dev/zero", O_RDONLY);
-    xdup2(fd, STDIN_FILENO);
-    if (fd > STDERR_FILENO)
-        close(fd);
 
     rust::daemon_entry();
     SDK_INT = MagiskD::Get().sdk_int();
@@ -269,7 +252,7 @@ static void daemon_entry() {
     // Get self stat
     xstat("/proc/self/exe", &self_st);
 
-    fd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
+    int fd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
     sockaddr_un addr = {.sun_family = AF_LOCAL};
     ssprintf(addr.sun_path, sizeof(addr.sun_path), "%s/" MAIN_SOCKET, get_magisk_tmp());
     unlink(addr.sun_path);

@@ -8,7 +8,7 @@ use crate::ffi::{
     DbEntryKey, ModuleInfo, RequestCode, check_key_combo, denylist_handler, exec_common_scripts,
     exec_module_scripts, get_magisk_tmp, initialize_denylist, scan_deny_apps, setup_magisk_env,
 };
-use crate::logging::{magisk_logging, setup_logfile, start_log_daemon};
+use crate::logging::{android_logging, magisk_logging, setup_logfile, start_log_daemon};
 use crate::module::{disable_modules, remove_modules};
 use crate::mount::{clean_mounts, setup_preinit_dir};
 use crate::package::ManagerInfo;
@@ -22,12 +22,16 @@ use base::{
     AtomicArc, BufReadExt, FsPathBuilder, ReadExt, ResultExt, Utf8CStr, Utf8CStrBuf, WriteExt,
     cstr, error, info, libc,
 };
-use nix::fcntl::OFlag;
-use nix::mount::MsFlags;
+use nix::{
+    fcntl::OFlag,
+    mount::MsFlags,
+    sys::signal::SigSet,
+    unistd::{dup2_stderr, dup2_stdin, dup2_stdout, setsid},
+};
 use std::fmt::Write as FmtWrite;
 use std::fs::File;
 use std::io::{BufReader, Write};
-use std::os::fd::{FromRawFd, IntoRawFd, OwnedFd};
+use std::os::fd::{AsFd, FromRawFd, IntoRawFd, OwnedFd};
 use std::process::{Command, exit};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Mutex, OnceLock};
@@ -302,7 +306,21 @@ impl MagiskD {
 }
 
 pub fn daemon_entry() {
-    unsafe { libc::setsid() };
+    android_logging();
+
+    // Block all signals
+    SigSet::all().thread_set_mask().log_ok();
+
+    // Swap out the original stdio
+    if let Ok(null) = cstr!("/dev/null").open(OFlag::O_WRONLY).log() {
+        dup2_stdout(null.as_fd()).log_ok();
+        dup2_stderr(null.as_fd()).log_ok();
+    }
+    if let Ok(zero) = cstr!("/dev/zero").open(OFlag::O_RDONLY).log() {
+        dup2_stdin(zero).log_ok();
+    }
+
+    setsid().log_ok();
 
     // Make sure the current context is magisk
     if let Ok(mut current) =
