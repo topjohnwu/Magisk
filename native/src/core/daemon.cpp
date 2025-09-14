@@ -9,138 +9,12 @@
 #include <consts.hpp>
 #include <base.hpp>
 #include <core.hpp>
-#include <flags.h>
 
 using namespace std;
 
 int SDK_INT = -1;
 
 static struct stat self_st;
-
-static map<int, poll_callback> *poll_map;
-static vector<pollfd> *poll_fds;
-static int poll_ctrl;
-
-enum {
-    POLL_CTRL_NEW,
-    POLL_CTRL_RM,
-};
-
-void register_poll(const pollfd *pfd, poll_callback callback) {
-    if (gettid() == getpid()) {
-        // On main thread, directly modify
-        poll_map->try_emplace(pfd->fd, callback);
-        poll_fds->emplace_back(*pfd);
-    } else {
-        // Send it to poll_ctrl
-        write_int(poll_ctrl, POLL_CTRL_NEW);
-        xwrite(poll_ctrl, pfd, sizeof(*pfd));
-        xwrite(poll_ctrl, &callback, sizeof(callback));
-    }
-}
-
-void unregister_poll(int fd, bool auto_close) {
-    if (fd < 0)
-        return;
-
-    if (gettid() == getpid()) {
-        // On main thread, directly modify
-        poll_map->erase(fd);
-        for (auto &poll_fd : *poll_fds) {
-            if (poll_fd.fd == fd) {
-                if (auto_close) {
-                    close(poll_fd.fd);
-                }
-                // Cannot modify while iterating, invalidate it instead
-                // It will be removed in the next poll loop
-                poll_fd.fd = -1;
-                break;
-            }
-        }
-    } else {
-        // Send it to poll_ctrl
-        write_int(poll_ctrl, POLL_CTRL_RM);
-        write_int(poll_ctrl, fd);
-        write_int(poll_ctrl, auto_close);
-    }
-}
-
-void clear_poll() {
-    if (poll_fds) {
-        for (auto &poll_fd : *poll_fds) {
-            close(poll_fd.fd);
-        }
-    }
-    delete poll_fds;
-    delete poll_map;
-    poll_fds = nullptr;
-    poll_map = nullptr;
-}
-
-static void poll_ctrl_handler(pollfd *pfd) {
-    int code = read_int(pfd->fd);
-    switch (code) {
-    case POLL_CTRL_NEW: {
-        pollfd new_fd{};
-        poll_callback cb;
-        xxread(pfd->fd, &new_fd, sizeof(new_fd));
-        xxread(pfd->fd, &cb, sizeof(cb));
-        register_poll(&new_fd, cb);
-        break;
-    }
-    case POLL_CTRL_RM: {
-        int fd = read_int(pfd->fd);
-        bool auto_close = read_int(pfd->fd);
-        unregister_poll(fd, auto_close);
-        break;
-    }
-    default:
-        __builtin_unreachable();
-    }
-}
-
-[[noreturn]] static void poll_loop() {
-    // Register poll_ctrl
-    auto pipefd = array<int, 2>{-1, -1};
-    xpipe2(pipefd, O_CLOEXEC);
-    poll_ctrl = pipefd[1];
-    pollfd poll_ctrl_pfd = { pipefd[0], POLLIN, 0 };
-    register_poll(&poll_ctrl_pfd, poll_ctrl_handler);
-
-    for (;;) {
-        if (poll(poll_fds->data(), poll_fds->size(), -1) <= 0)
-            continue;
-
-        // MUST iterate with index because any poll_callback could add new elements to poll_fds
-        for (int i = 0; i < poll_fds->size();) {
-            auto &pfd = (*poll_fds)[i];
-            if (pfd.revents) {
-                if (pfd.revents & POLLERR || pfd.revents & POLLNVAL) {
-                    poll_map->erase(pfd.fd);
-                    poll_fds->erase(poll_fds->begin() + i);
-                    continue;
-                }
-                if (auto it = poll_map->find(pfd.fd); it != poll_map->end()) {
-                    it->second(&pfd);
-                }
-            }
-            ++i;
-        }
-    }
-}
-
-bool get_client_cred(int fd, sock_cred *cred) {
-    socklen_t len = sizeof(ucred);
-    if (getsockopt(fd, SOL_SOCKET, SO_PEERCRED, cred, &len) != 0)
-        return false;
-    char buf[4096];
-    len = sizeof(buf);
-    if (getsockopt(fd, SOL_SOCKET, SO_PEERSEC, buf, &len) != 0)
-        len = 0;
-    buf[len] = '\0';
-    cred->context = buf;
-    return true;
-}
 
 bool read_string(int fd, std::string &str) {
     str.clear();
@@ -169,18 +43,22 @@ static bool is_client(pid_t pid) {
     return !(stat(path, &st) || st.st_dev != self_st.st_dev || st.st_ino != self_st.st_ino);
 }
 
-static void handle_request(pollfd *pfd) {
-    owned_fd client = xaccept4(pfd->fd, nullptr, nullptr, SOCK_CLOEXEC);
-
+static void handle_request(owned_fd client) {
     // Verify client credentials
-    sock_cred cred;
+    ucred cred{};
 
-    if (!get_client_cred(client, &cred)) {
-        // Client died
+    socklen_t len = sizeof(cred);
+    // Client died
+    if (getsockopt(client, SOL_SOCKET, SO_PEERCRED, &cred, &len) != 0)
         return;
-    }
+    char context[256];
+    len = sizeof(context);
+    if (getsockopt(client, SOL_SOCKET, SO_PEERSEC, context, &len) != 0)
+        len = 0;
+    context[len] = '\0';
+
     bool is_root = cred.uid == AID_ROOT;
-    bool is_zygote = cred.context == "u:r:zygote:s0";
+    bool is_zygote = context == "u:r:zygote:s0"sv;
 
     if (!is_root && !is_zygote && !is_client(cred.pid)) {
         // Unsupported client state
@@ -242,7 +120,7 @@ static void handle_request(pollfd *pfd) {
     }
 }
 
-static void daemon_entry() {
+[[noreturn]] static void daemon_entry() {
     // Change process name
     set_nice_name("magiskd");
 
@@ -252,26 +130,21 @@ static void daemon_entry() {
     // Get self stat
     xstat("/proc/self/exe", &self_st);
 
-    int fd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
+    int sockfd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
     sockaddr_un addr = {.sun_family = AF_LOCAL};
     ssprintf(addr.sun_path, sizeof(addr.sun_path), "%s/" MAIN_SOCKET, get_magisk_tmp());
     unlink(addr.sun_path);
-    if (xbind(fd, (sockaddr *) &addr, sizeof(addr)))
+    if (xbind(sockfd, (sockaddr *) &addr, sizeof(addr)))
         exit(1);
     chmod(addr.sun_path, 0666);
     setfilecon(addr.sun_path, MAGISK_FILE_CON);
-    xlisten(fd, 10);
-
-    default_new(poll_map);
-    default_new(poll_fds);
-
-    // Register handler for main socket
-    pollfd main_socket_pfd = { fd, POLLIN, 0 };
-    register_poll(&main_socket_pfd, handle_request);
+    xlisten(sockfd, 10);
 
     // Loop forever to listen for requests
-    init_thread_pool();
-    poll_loop();
+    for (;;) {
+        int client = xaccept4(sockfd, nullptr, nullptr, SOCK_CLOEXEC);
+        handle_request(client);
+    }
 }
 
 const char *get_magisk_tmp() {

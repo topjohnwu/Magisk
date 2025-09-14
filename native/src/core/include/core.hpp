@@ -40,11 +40,6 @@ void unlock_blocks();
 bool setup_magisk_env();
 bool check_key_combo();
 
-// Sockets
-struct sock_cred : public ucred {
-    std::string context;
-};
-
 template<typename T> requires(std::is_trivially_copyable_v<T>)
 T read_any(int fd) {
     T val;
@@ -59,7 +54,6 @@ void write_any(int fd, T val) {
     xwrite(fd, &val, sizeof(val));
 }
 
-bool get_client_cred(int fd, sock_cred *cred);
 static inline int read_int(int fd) { return read_any<int>(fd); }
 static inline void write_int(int fd, int val) { write_any(fd, val); }
 std::string read_string(int fd);
@@ -78,12 +72,6 @@ bool read_vector(int fd, std::vector<T> &vec) {
     vec.resize(size);
     return xread(fd, vec.data(), size * sizeof(T)) == size * sizeof(T);
 }
-
-// Poll control
-using poll_callback = void(*)(pollfd*);
-void register_poll(const pollfd *pfd, poll_callback callback);
-void unregister_poll(int fd, bool auto_close);
-void clear_poll();
 
 // Thread pool
 void init_thread_pool();

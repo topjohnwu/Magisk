@@ -28,7 +28,6 @@ static void operator+=(timespec &a, const timespec &b) {
 }
 
 static void reset_pool() {
-    clear_poll();
     pthread_mutex_unlock(&lock);
     pthread_mutex_destroy(&lock);
     pthread_mutex_init(&lock, nullptr);
