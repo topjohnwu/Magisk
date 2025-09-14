@@ -20,12 +20,11 @@
     <string name="hide">Сакриј</string>
     <string name="home_package">Пакет</string>
     <string name="home_app_title">Апл.</string>
-
     <string name="home_notice_content">Преузмите Magisk САМО са званичне GitHub странице. Фајлови из непознатих извора могу бити малициозни!</string>
     <string name="home_support_title">Подржите нас</string>
     <string name="home_follow_title">Запратите нас</string>
     <string name="home_item_source">Извор</string>
-    <string name="home_support_content">Magisk јесте и увек ће бити бесплатан и open source. Можете показати да вам је стало својом донацијом.</string>
+    <string name="home_support_content">Magisk јесте и увек ће бити бесплатан и open source. Међутим, можете показати да вам је стало својом донацијом.</string>
     <string name="home_installed_version">Инсталирано</string>
     <string name="home_latest_version">Најновије</string>
     <string name="invalid_update_channel">Невалидан канал ажурирања</string>
@@ -52,9 +51,10 @@
 
     <!--Superuser-->
     <string name="su_request_title">Супер-кориснички захтев</string>
-    <string name="touch_filtered_warning">Magisk не може да верификује ваш одговор, јер апликација прикрива супер-кориснички захтев</string>
+    <string name="touch_filtered_warning">Magisk не може да верификује ваш одговор, јер апликација прикрива супер-кориснички захтев.</string>
     <string name="deny">Забрани</string>
     <string name="prompt">Захтев</string>
+    <string name="restrict">Ограничи</string>
     <string name="grant">Дозволи</string>
     <string name="su_warning">Пружа потпун приступ вашем уређају.\nЗабраните ако нисте сигурни!</string>
     <string name="forever">Заувек</string>
@@ -75,24 +75,21 @@
     <string name="su_revoke_msg">Потврди да опозовеш права на супер-корисника од %1$s?</string>
     <string name="toast">Toast</string>
     <string name="none">Ништа</string>
-
     <string name="superuser_toggle_notification">Нотификације</string>
     <string name="superuser_toggle_revoke">Опозови</string>
     <string name="superuser_policy_none">Ниједна апликација није тражила пермисије за супер-корисника још увек.</string>
 
     <!--Logs-->
-    <string name="log_data_none">Немате логова, покушајте користити коренске апликације више</string>
-    <string name="log_data_magisk_none">Magisk логови су празни, то је чудно</string>
+    <string name="log_data_none">Немате логова. Покушајте користити коренске апликације више.</string>
+    <string name="log_data_magisk_none">Magisk логови су празни, то је чудно.</string>
     <string name="menuSaveLog">Сачувај лог</string>
     <string name="menuClearLog">Уклони лог</string>
     <string name="logs_cleared">Лог успешно уклоњен</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Циљани UID: %1$d</string>
-    <string name="target_pid">Mount ns цињани PID: %s</string>
+    <string name="target_pid">Циљани PID: %s</string>
     <string name="selinux_context">SELinux контекст: %s</string>
     <string name="supp_group">Допунска група: %s</string>
-
-    <!--SafetyNet-->
 
     <!--MagiskHide-->
     <string name="show_system_app">Прикажи системске апл.</string>
@@ -140,9 +137,10 @@
     <string name="settings_update_channel_title">Канал ажурирања</string>
     <string name="settings_update_stable">Стабилно</string>
     <string name="settings_update_beta">Бета</string>
+    <string name="settings_update_debug">Debug</string>
     <string name="settings_update_custom">Прилагођено</string>
     <string name="settings_update_custom_msg">Унеси прилагођени URL канала</string>
-    <string name="settings_zygisk_summary">Покрени делове Magisk-а у zygote daemon-у</string>
+    <string name="settings_zygisk_summary">Покрени делове Magisk-а у Zygote daemon-у</string>
     <string name="settings_denylist_title">Спроведи листу забрана</string>
     <string name="settings_denylist_summary">Процеси на листи забрана ће повратити све Magisk измене</string>
     <string name="settings_denylist_config_title">Конфигуриши листу забрана</string>
@@ -174,13 +172,14 @@
     <string name="settings_su_auth_title">Аутентификација корисника</string>
     <string name="settings_su_auth_summary">Тражи аутентификацију корисника током захтева супер-корисника</string>
     <string name="settings_su_auth_insecure">Ниједан метод аутентификације није подешен на уређају</string>
+    <string name="settings_su_restrict_title">Ограничи коренске способности</string>
+    <string name="settings_su_restrict_summary">Подразумевано ограничава апл. супер-корисника. Упозорење: ово ће већину апликација скршити. Не омогућавај, осим ако знаш шта радиш.</string>
     <string name="settings_customization">Прилагођавање</string>
     <string name="setting_add_shortcut_summary">Додај лепу пречицу на почетни екран у случају да се име и иконица не препознају лако након скривања апликације</string>
     <string name="settings_doh_title">DNS преко HTTPS-а</string>
     <string name="settings_doh_description">Заобилазно решење DNS тровања у неким нацијама</string>
     <string name="settings_random_name_title">Насумично име на излазу</string>
     <string name="settings_random_name_description">Насумично име излазног фајла слика и tar фајлова ради спречавања детекције</string>
-
     <string name="multiuser_mode">Вишекориснички режим</string>
     <string name="settings_owner_only">Само власник уређаја</string>
     <string name="settings_owner_manage">Одређено од стране власника</string>
@@ -188,7 +187,6 @@
     <string name="owner_only_summary">Само власник има приступ корену</string>
     <string name="owner_manage_summary">Само власник може да приступа корену и да прима захтеве за њега</string>
     <string name="user_independent_summary">Сваки корисник има своја правила корена</string>
-
     <string name="mount_namespace_mode">Mount режим namespace-а</string>
     <string name="settings_ns_global">Глобални namespace</string>
     <string name="settings_ns_requester">Наслеђени namespace</string>
@@ -233,7 +231,7 @@
     <string name="env_full_fix_msg">Ваш уређај захтева поновно флешовање да би Magisk радио како треба. Реинсталирајте Magisk кроз апликацију, режим опоравка не може добити тачне информације о уређају.</string>
     <string name="setup_msg">Покретање подешавања окружења…</string>
     <string name="unsupport_magisk_title">Неподржана верзија Magisk-а</string>
-    <string name="unsupport_magisk_msg">Ова верзија апликације не подржава Magisk верзије мање од %1$s.\n\nАпликација ће се понашати као да Magisk није инсталиран, молимо ажурирајте Magisk што пре.</string>
+    <string name="unsupport_magisk_msg">Ова верзија апликације не подржава Magisk верзије мање од %1$s.\n\nАпликација ће се понашати као да Magisk није инсталиран. Молимо ажурирајте Magisk што пре.</string>
     <string name="unsupport_general_title">Ненормално стање</string>
     <string name="unsupport_system_app_msg">Покретање апликације као системске није подржано. Молимо поставите апликацију да буде корисничка.</string>
     <string name="unsupport_other_su_msg">Детектован \"su\" binary који није Magisk-ов. Молимо уклоните конкурентно коренско решење и/или реинсталирајте Magisk.</string>
@@ -242,7 +240,7 @@
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Дозволите пермисију за складиште да бисте омогућили ову функционалност</string>
     <string name="post_notifications_denied">Дозволите пермисију за нотификације да бисте омогућили ову функционалност</string>
-    <string name="install_unknown_denied">Дозволите "инсталирање непознатих апликација" да бисте омогућили ову функционалност</string>
+    <string name="install_unknown_denied">Дозволите \"инсталирање непознатих апликација\" да бисте омогућили ову функционалност</string>
     <string name="add_shortcut_title">Додај пречицу на почетни екран</string>
     <string name="add_shortcut_msg">Након скривања апликације, њено име и иконицу ћете тешко препознати. Желите ли додати лепу пречицу на почетни екран?</string>
     <string name="app_not_found">Није пронађена апликација за ову акцију</string>
