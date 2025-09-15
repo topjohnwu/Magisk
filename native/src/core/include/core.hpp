@@ -19,6 +19,10 @@
 #define SDK_INT      (MagiskD::Get().sdk_int())
 #define APP_DATA_DIR (SDK_INT >= 24 ? "/data/user_de" : "/data/user")
 
+inline int connect_daemon(RequestCode req) {
+    return connect_daemon(req, false);
+}
+
 // Multi-call entrypoints
 int magisk_main(int argc, char *argv[]);
 int su_client_main(int argc, char *argv[]);
@@ -26,12 +30,10 @@ int zygisk_main(int argc, char *argv[]);
 
 struct ModuleInfo;
 
-// Daemon
-int connect_daemon(RequestCode req, bool create = false);
+// Utils
 const char *get_magisk_tmp();
 void unlock_blocks();
 bool check_key_combo();
-
 template<typename T> requires(std::is_trivially_copyable_v<T>)
 T read_any(int fd) {
     T val;
@@ -39,25 +41,21 @@ T read_any(int fd) {
         return -1;
     return val;
 }
-
 template<typename T> requires(std::is_trivially_copyable_v<T>)
 void write_any(int fd, T val) {
     if (fd < 0) return;
     xwrite(fd, &val, sizeof(val));
 }
-
-static inline int read_int(int fd) { return read_any<int>(fd); }
-static inline void write_int(int fd, int val) { write_any(fd, val); }
+inline int read_int(int fd) { return read_any<int>(fd); }
+inline void write_int(int fd, int val) { write_any(fd, val); }
 std::string read_string(int fd);
 bool read_string(int fd, std::string &str);
 void write_string(int fd, std::string_view str);
-
 template<typename T> requires(std::is_trivially_copyable_v<T>)
 void write_vector(int fd, const std::vector<T> &vec) {
     write_int(fd, vec.size());
     xwrite(fd, vec.data(), vec.size() * sizeof(T));
 }
-
 template<typename T> requires(std::is_trivially_copyable_v<T>)
 bool read_vector(int fd, std::vector<T> &vec) {
     int size = read_int(fd);
@@ -88,8 +86,8 @@ void update_deny_flags(int uid, rust::Str process, uint32_t &flags);
 void exec_root_shell(int client, int pid, SuRequest &req, MntNsMode mode);
 
 // Rust bindings
-static inline Utf8CStr get_magisk_tmp_rs() { return get_magisk_tmp(); }
-static inline rust::String resolve_preinit_dir_rs(Utf8CStr base_dir) {
+inline Utf8CStr get_magisk_tmp_rs() { return get_magisk_tmp(); }
+inline rust::String resolve_preinit_dir_rs(Utf8CStr base_dir) {
     return resolve_preinit_dir(base_dir.c_str());
 }
-static inline void exec_script_rs(Utf8CStr script) { exec_script(script.c_str()); }
+inline void exec_script_rs(Utf8CStr script) { exec_script(script.c_str()); }
