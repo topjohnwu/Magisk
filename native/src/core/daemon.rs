@@ -1,19 +1,19 @@
 use crate::UCred;
 use crate::consts::{
-    MAGISK_FULL_VER, MAGISK_PROC_CON, MAGISK_VER_CODE, MAGISK_VERSION, MAIN_CONFIG, ROOTMNT,
-    ROOTOVL, SECURE_DIR,
+    APP_PACKAGE_NAME, BBPATH, DATABIN, MAGISK_FULL_VER, MAGISK_PROC_CON, MAGISK_VER_CODE,
+    MAGISK_VERSION, MAIN_CONFIG, MODULEROOT, ROOTMNT, ROOTOVL, SECURE_DIR,
 };
 use crate::db::Sqlite3;
 use crate::ffi::{
     DbEntryKey, ModuleInfo, RequestCode, check_key_combo, denylist_handler, exec_common_scripts,
-    exec_module_scripts, get_magisk_tmp, initialize_denylist, scan_deny_apps, setup_magisk_env,
+    exec_module_scripts, get_magisk_tmp, initialize_denylist, scan_deny_apps,
 };
 use crate::logging::{android_logging, magisk_logging, setup_logfile, start_log_daemon};
 use crate::module::{disable_modules, remove_modules};
 use crate::mount::{clean_mounts, setup_preinit_dir};
 use crate::package::ManagerInfo;
 use crate::resetprop::{get_prop, set_prop};
-use crate::selinux::restore_tmpcon;
+use crate::selinux::{restore_tmpcon, restorecon};
 use crate::socket::IpcWrite;
 use crate::su::SuInfo;
 use crate::zygisk::ZygiskState;
@@ -32,7 +32,7 @@ use std::fmt::Write as FmtWrite;
 use std::fs::File;
 use std::io::{BufReader, Write};
 use std::os::fd::{AsFd, FromRawFd, IntoRawFd, OwnedFd};
-use std::process::{Command, exit};
+use std::process::{Command, Stdio, exit};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Mutex, OnceLock};
 
@@ -106,6 +106,83 @@ impl MagiskD {
         }
     }
 
+    fn setup_magisk_env(&self) -> bool {
+        info!("* Initializing Magisk environment");
+
+        let mut buf = cstr::buf::default();
+
+        let app_bin_dir = buf
+            .append_path(self.app_data_dir())
+            .append_path("0")
+            .append_path(APP_PACKAGE_NAME)
+            .append_path("install");
+
+        // Alternative binaries paths
+        let alt_bin_dirs = &[
+            cstr!("/cache/data_adb/magisk"),
+            cstr!("/data/magisk"),
+            app_bin_dir,
+        ];
+        for dir in alt_bin_dirs {
+            if dir.exists() {
+                cstr!(DATABIN).remove_all().ok();
+                dir.copy_to(cstr!(DATABIN)).ok();
+                dir.remove_all().ok();
+            }
+        }
+        cstr!("/cache/data_adb").remove_all().ok();
+
+        // Directories in /data/adb
+        cstr!(SECURE_DIR).follow_link().chmod(0o700).log_ok();
+        cstr!(DATABIN).mkdir(0o755).log_ok();
+        cstr!(MODULEROOT).mkdir(0o755).log_ok();
+        cstr!(concatcp!(SECURE_DIR, "/post-fs-data.d"))
+            .mkdir(0o755)
+            .log_ok();
+        cstr!(concatcp!(SECURE_DIR, "/service.d"))
+            .mkdir(0o755)
+            .log_ok();
+        restorecon();
+
+        let busybox = cstr!(concatcp!(DATABIN, "/busybox"));
+        if !busybox.exists() {
+            return false;
+        }
+
+        let tmp_bb = buf.append_path(get_magisk_tmp()).append_path(BBPATH);
+        tmp_bb.mkdirs(0o755).ok();
+        tmp_bb.append_path("busybox");
+        tmp_bb.follow_link().chmod(0o755).log_ok();
+        busybox.copy_to(tmp_bb).ok();
+
+        // Install busybox applets
+        Command::new(&tmp_bb)
+            .arg("--install")
+            .arg("-s")
+            .arg(tmp_bb.parent_dir().unwrap())
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .status()
+            .log_ok();
+
+        // magisk32 and magiskpolicy are not installed into ramdisk and has to be copied
+        // from data to magisk tmp
+        let magisk32 = cstr!(concatcp!(DATABIN, "/magisk32"));
+        if magisk32.exists() {
+            let tmp = buf.append_path(get_magisk_tmp()).append_path("magisk32");
+            magisk32.copy_to(tmp).log_ok();
+        }
+        let magiskpolicy = cstr!(concatcp!(DATABIN, "/magiskpolicy"));
+        if magiskpolicy.exists() {
+            let tmp = buf
+                .append_path(get_magisk_tmp())
+                .append_path("magiskpolicy");
+            magiskpolicy.copy_to(tmp).log_ok();
+        }
+
+        true
+    }
+
     fn post_fs_data(&self) -> bool {
         setup_logfile();
         info!("** post-fs-data mode running");
@@ -125,7 +202,7 @@ impl MagiskD {
 
         self.prune_su_access();
 
-        if !setup_magisk_env() {
+        if !self.setup_magisk_env() {
             error!("* Magisk environment incomplete, abort");
             return true;
         }

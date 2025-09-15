@@ -137,7 +137,6 @@ pub mod ffi {
         fn get_magisk_tmp() -> Utf8CStrRef<'static>;
         #[cxx_name = "resolve_preinit_dir_rs"]
         fn resolve_preinit_dir(base_dir: Utf8CStrRef) -> String;
-        fn setup_magisk_env() -> bool;
         fn check_key_combo() -> bool;
         #[cxx_name = "exec_script_rs"]
         fn exec_script(script: Utf8CStrRef);

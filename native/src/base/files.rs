@@ -18,7 +18,6 @@ use std::fmt::Display;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Read, Seek, SeekFrom, Write};
 use std::mem::MaybeUninit;
-use std::ops::Deref;
 use std::os::fd::{AsFd, BorrowedFd};
 use std::os::unix::ffi::OsStrExt;
 use std::os::unix::io::{AsRawFd, OwnedFd, RawFd};
@@ -307,17 +306,12 @@ impl Utf8CStr {
 
     pub fn set_attr<'a>(&'a self, attr: &'a FileAttr) -> OsResult<'a, ()> {
         if !attr.is_symlink()
-            && let Err(e) = nix::sys::stat::fchmodat(
-                AT_FDCWD,
-                self,
-                Mode::from_bits_truncate((attr.st.st_mode & 0o777).as_()),
-                FchmodatFlags::FollowSymlink,
-            )
+            && let Err(e) = self.follow_link().chmod((attr.st.st_mode & 0o777).as_())
         {
             // Double check if self is symlink before reporting error
             let self_attr = self.get_attr()?;
             if !self_attr.is_symlink() {
-                return Err(OsError::new(e, "chmod", Some(self), None));
+                return Err(e);
             }
         }
 
@@ -521,13 +515,27 @@ impl Utf8CStr {
 
 impl FsPathFollow {
     pub fn exists(&self) -> bool {
-        nix::unistd::access(self.deref(), AccessFlags::F_OK).is_ok()
+        nix::unistd::access(self.as_utf8_cstr(), AccessFlags::F_OK).is_ok()
+    }
+
+    pub fn chmod(&self, mode: mode_t) -> OsResult<'_, ()> {
+        nix::sys::stat::fchmodat(
+            AT_FDCWD,
+            self.as_utf8_cstr(),
+            Mode::from_bits_truncate(mode),
+            FchmodatFlags::FollowSymlink,
+        )
+        .check_os_err("chmod", Some(self), None)
     }
 
     pub fn get_attr(&self) -> OsResult<'_, FileAttr> {
         #[allow(unused_mut)]
         let mut attr = FileAttr {
-            st: nix::sys::stat::stat(self.deref()).into_os_result("lstat", Some(self), None)?,
+            st: nix::sys::stat::stat(self.as_utf8_cstr()).into_os_result(
+                "lstat",
+                Some(self),
+                None,
+            )?,
             #[cfg(feature = "selinux")]
             con: cstr::buf::new(),
         };
@@ -537,16 +545,10 @@ impl FsPathFollow {
     }
 
     pub fn set_attr<'a>(&'a self, attr: &'a FileAttr) -> OsResult<'a, ()> {
-        nix::sys::stat::fchmodat(
-            AT_FDCWD,
-            self.deref(),
-            Mode::from_bits_truncate((attr.st.st_mode & 0o777).as_()),
-            FchmodatFlags::FollowSymlink,
-        )
-        .check_os_err("chmod", Some(self), None)?;
+        self.chmod((attr.st.st_mode & 0o777).as_())?;
 
         nix::unistd::chown(
-            self.deref(),
+            self.as_utf8_cstr(),
             Some(Uid::from(attr.st.st_uid)),
             Some(Gid::from(attr.st.st_gid)),
         )
