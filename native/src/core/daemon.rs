@@ -1,19 +1,16 @@
 use crate::consts::{
-    APP_PACKAGE_NAME, BBPATH, DATABIN, MAGISK_FILE_CON, MAGISK_FULL_VER, MAGISK_PROC_CON,
-    MAGISK_VER_CODE, MAGISK_VERSION, MAIN_CONFIG, MAIN_SOCKET, MODULEROOT, ROOTMNT, ROOTOVL,
-    SECURE_DIR,
+    MAGISK_FILE_CON, MAGISK_FULL_VER, MAGISK_PROC_CON, MAGISK_VER_CODE, MAGISK_VERSION,
+    MAIN_CONFIG, MAIN_SOCKET, ROOTMNT, ROOTOVL,
 };
 use crate::db::Sqlite3;
 use crate::ffi::{
-    DbEntryKey, ModuleInfo, RequestCode, RespondCode, check_key_combo, denylist_handler,
-    exec_common_scripts, exec_module_scripts, get_magisk_tmp, initialize_denylist, scan_deny_apps,
+    ModuleInfo, RequestCode, RespondCode, denylist_handler, get_magisk_tmp, scan_deny_apps,
 };
 use crate::logging::{android_logging, magisk_logging, setup_logfile, start_log_daemon};
-use crate::module::{disable_modules, remove_modules};
-use crate::mount::{clean_mounts, setup_preinit_dir};
+use crate::module::remove_modules;
 use crate::package::ManagerInfo;
 use crate::resetprop::{get_prop, set_prop};
-use crate::selinux::{restore_tmpcon, restorecon};
+use crate::selinux::restore_tmpcon;
 use crate::socket::IpcWrite;
 use crate::su::SuInfo;
 use crate::thread::ThreadPool;
@@ -21,7 +18,7 @@ use crate::zygisk::ZygiskState;
 use base::const_format::concatcp;
 use base::{
     AtomicArc, BufReadExt, FileAttr, FsPathBuilder, ReadExt, ResultExt, Utf8CStr, Utf8CStrBuf,
-    WriteExt, cstr, error, info, libc,
+    WriteExt, cstr, info, libc,
 };
 use nix::{
     fcntl::OFlag,
@@ -34,15 +31,15 @@ use std::fmt::Write as _;
 use std::io::{BufReader, Write};
 use std::os::fd::{AsFd, AsRawFd, IntoRawFd};
 use std::os::unix::net::{UCred, UnixListener, UnixStream};
-use std::process::{Command, Stdio, exit};
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::process::{Command, exit};
+use std::sync::atomic::AtomicBool;
 use std::sync::{Mutex, OnceLock};
 
 // Global magiskd singleton
 pub static MAGISKD: OnceLock<MagiskD> = OnceLock::new();
 
 #[repr(u32)]
-enum BootState {
+pub enum BootState {
     PostFsDataDone = (1 << 0),
     LateStartDone = (1 << 1),
     BootComplete = (1 << 2),
@@ -51,14 +48,14 @@ enum BootState {
 
 #[derive(Default)]
 #[repr(transparent)]
-struct BootStateFlags(u32);
+pub struct BootStateFlags(u32);
 
 impl BootStateFlags {
-    fn contains(&self, stage: BootState) -> bool {
+    pub fn contains(&self, stage: BootState) -> bool {
         (self.0 & stage as u32) != 0
     }
 
-    fn set(&mut self, stage: BootState) {
+    pub fn set(&mut self, stage: BootState) {
         self.0 |= stage as u32;
     }
 }
@@ -81,12 +78,12 @@ pub const fn to_user_id(uid: i32) -> i32 {
 pub struct MagiskD {
     pub sql_connection: Mutex<Option<Sqlite3>>,
     pub manager_info: Mutex<ManagerInfo>,
-    boot_stage_lock: Mutex<BootStateFlags>,
+    pub boot_stage_lock: Mutex<BootStateFlags>,
     pub module_list: OnceLock<Vec<ModuleInfo>>,
     pub zygisk_enabled: AtomicBool,
     pub zygisk: Mutex<ZygiskState>,
     pub cached_su_info: AtomicArc<SuInfo>,
-    sdk_int: i32,
+    pub sdk_int: i32,
     pub is_emulator: bool,
     is_recovery: bool,
     exe_attr: FileAttr,
@@ -106,197 +103,6 @@ impl MagiskD {
             cstr!("/data/user_de")
         } else {
             cstr!("/data/user")
-        }
-    }
-
-    fn setup_magisk_env(&self) -> bool {
-        info!("* Initializing Magisk environment");
-
-        let mut buf = cstr::buf::default();
-
-        let app_bin_dir = buf
-            .append_path(self.app_data_dir())
-            .append_path("0")
-            .append_path(APP_PACKAGE_NAME)
-            .append_path("install");
-
-        // Alternative binaries paths
-        let alt_bin_dirs = &[
-            cstr!("/cache/data_adb/magisk"),
-            cstr!("/data/magisk"),
-            app_bin_dir,
-        ];
-        for dir in alt_bin_dirs {
-            if dir.exists() {
-                cstr!(DATABIN).remove_all().ok();
-                dir.copy_to(cstr!(DATABIN)).ok();
-                dir.remove_all().ok();
-            }
-        }
-        cstr!("/cache/data_adb").remove_all().ok();
-
-        // Directories in /data/adb
-        cstr!(SECURE_DIR).follow_link().chmod(0o700).log_ok();
-        cstr!(DATABIN).mkdir(0o755).log_ok();
-        cstr!(MODULEROOT).mkdir(0o755).log_ok();
-        cstr!(concatcp!(SECURE_DIR, "/post-fs-data.d"))
-            .mkdir(0o755)
-            .log_ok();
-        cstr!(concatcp!(SECURE_DIR, "/service.d"))
-            .mkdir(0o755)
-            .log_ok();
-        restorecon();
-
-        let busybox = cstr!(concatcp!(DATABIN, "/busybox"));
-        if !busybox.exists() {
-            return false;
-        }
-
-        let tmp_bb = buf.append_path(get_magisk_tmp()).append_path(BBPATH);
-        tmp_bb.mkdirs(0o755).ok();
-        tmp_bb.append_path("busybox");
-        tmp_bb.follow_link().chmod(0o755).log_ok();
-        busybox.copy_to(tmp_bb).ok();
-
-        // Install busybox applets
-        Command::new(&tmp_bb)
-            .arg("--install")
-            .arg("-s")
-            .arg(tmp_bb.parent_dir().unwrap())
-            .stdout(Stdio::null())
-            .stderr(Stdio::null())
-            .status()
-            .log_ok();
-
-        // magisk32 and magiskpolicy are not installed into ramdisk and has to be copied
-        // from data to magisk tmp
-        let magisk32 = cstr!(concatcp!(DATABIN, "/magisk32"));
-        if magisk32.exists() {
-            let tmp = buf.append_path(get_magisk_tmp()).append_path("magisk32");
-            magisk32.copy_to(tmp).log_ok();
-        }
-        let magiskpolicy = cstr!(concatcp!(DATABIN, "/magiskpolicy"));
-        if magiskpolicy.exists() {
-            let tmp = buf
-                .append_path(get_magisk_tmp())
-                .append_path("magiskpolicy");
-            magiskpolicy.copy_to(tmp).log_ok();
-        }
-
-        true
-    }
-
-    fn post_fs_data(&self) -> bool {
-        setup_logfile();
-        info!("** post-fs-data mode running");
-
-        self.preserve_stub_apk();
-
-        // Check secure dir
-        let secure_dir = cstr!(SECURE_DIR);
-        if !secure_dir.exists() {
-            if self.sdk_int < 24 {
-                secure_dir.mkdir(0o700).log_ok();
-            } else {
-                error!("* {} is not present, abort", SECURE_DIR);
-                return true;
-            }
-        }
-
-        self.prune_su_access();
-
-        if !self.setup_magisk_env() {
-            error!("* Magisk environment incomplete, abort");
-            return true;
-        }
-
-        // Check safe mode
-        let boot_cnt = self.get_db_setting(DbEntryKey::BootloopCount);
-        self.set_db_setting(DbEntryKey::BootloopCount, boot_cnt + 1)
-            .log()
-            .ok();
-        let safe_mode = boot_cnt >= 2
-            || get_prop(cstr!("persist.sys.safemode")) == "1"
-            || get_prop(cstr!("ro.sys.safemode")) == "1"
-            || check_key_combo();
-
-        if safe_mode {
-            info!("* Safe mode triggered");
-            // Disable all modules and zygisk so next boot will be clean
-            disable_modules();
-            self.set_db_setting(DbEntryKey::ZygiskConfig, 0).log_ok();
-            return true;
-        }
-
-        exec_common_scripts(cstr!("post-fs-data"));
-        self.zygisk_enabled.store(
-            self.get_db_setting(DbEntryKey::ZygiskConfig) != 0,
-            Ordering::Release,
-        );
-        initialize_denylist();
-        self.handle_modules();
-        clean_mounts();
-
-        false
-    }
-
-    fn late_start(&self) {
-        setup_logfile();
-        info!("** late_start service mode running");
-
-        exec_common_scripts(cstr!("service"));
-        if let Some(module_list) = self.module_list.get() {
-            exec_module_scripts(cstr!("service"), module_list);
-        }
-    }
-
-    fn boot_complete(&self) {
-        setup_logfile();
-        info!("** boot-complete triggered");
-
-        // Reset the bootloop counter once we have boot-complete
-        self.set_db_setting(DbEntryKey::BootloopCount, 0).log_ok();
-
-        // At this point it's safe to create the folder
-        let secure_dir = cstr!(SECURE_DIR);
-        if !secure_dir.exists() {
-            secure_dir.mkdir(0o700).log_ok();
-        }
-
-        setup_preinit_dir();
-        self.ensure_manager();
-        self.zygisk.lock().unwrap().reset(true);
-    }
-
-    fn boot_stage_handler(&self, client: UnixStream, code: RequestCode) {
-        // Make sure boot stage execution is always serialized
-        let mut state = self.boot_stage_lock.lock().unwrap();
-
-        match code {
-            RequestCode::POST_FS_DATA => {
-                if check_data() && !state.contains(BootState::PostFsDataDone) {
-                    if self.post_fs_data() {
-                        state.set(BootState::SafeMode);
-                    }
-                    state.set(BootState::PostFsDataDone);
-                }
-            }
-            RequestCode::LATE_START => {
-                drop(client);
-                if state.contains(BootState::PostFsDataDone) && !state.contains(BootState::SafeMode)
-                {
-                    self.late_start();
-                    state.set(BootState::LateStartDone);
-                }
-            }
-            RequestCode::BOOT_COMPLETE => {
-                drop(client);
-                if state.contains(BootState::PostFsDataDone) {
-                    state.set(BootState::BootComplete);
-                    self.boot_complete()
-                }
-            }
-            _ => {}
         }
     }
 
@@ -632,34 +438,4 @@ fn switch_cgroup(cgroup: &str, pid: i32) {
         write!(buf, "{pid}").ok();
         file.write_all(buf.as_bytes()).log_ok();
     }
-}
-
-fn check_data() -> bool {
-    if let Ok(file) = cstr!("/proc/mounts").open(OFlag::O_RDONLY | OFlag::O_CLOEXEC) {
-        let mut mnt = false;
-        BufReader::new(file).for_each_line(|line| {
-            if line.contains(" /data ") && !line.contains("tmpfs") {
-                mnt = true;
-                return false;
-            }
-            true
-        });
-        if !mnt {
-            return false;
-        }
-        let crypto = get_prop(cstr!("ro.crypto.state"));
-        return if !crypto.is_empty() {
-            if crypto != "encrypted" {
-                // Unencrypted, we can directly access data
-                true
-            } else {
-                // Encrypted, check whether vold is started
-                !get_prop(cstr!("init.svc.vold")).is_empty()
-            }
-        } else {
-            // ro.crypto.state is not set, assume it's unencrypted
-            true
-        };
-    }
-    false
 }
