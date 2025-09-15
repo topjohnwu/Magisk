@@ -214,53 +214,6 @@ int connect_daemon(int req, bool create) {
     return fd;
 }
 
-bool setup_magisk_env() {
-    char buf[4096];
-
-    LOGI("* Initializing Magisk environment\n");
-
-    ssprintf(buf, sizeof(buf), "%s/0/%s/install", APP_DATA_DIR, JAVA_PACKAGE_NAME);
-    // Alternative binaries paths
-    const char *alt_bin[] = { "/cache/data_adb/magisk", "/data/magisk", buf };
-    for (auto alt : alt_bin) {
-        if (access(alt, F_OK) == 0) {
-            rm_rf(DATABIN);
-            cp_afc(alt, DATABIN);
-            rm_rf(alt);
-        }
-    }
-    rm_rf("/cache/data_adb");
-
-    // Directories in /data/adb
-    chmod(SECURE_DIR, 0700);
-    xmkdir(DATABIN, 0755);
-    xmkdir(MODULEROOT, 0755);
-    xmkdir(SECURE_DIR "/post-fs-data.d", 0755);
-    xmkdir(SECURE_DIR "/service.d", 0755);
-    restorecon();
-
-    if (access(DATABIN "/busybox", X_OK))
-        return false;
-
-    ssprintf(buf, sizeof(buf), "%s/" BBPATH "/busybox", get_magisk_tmp());
-    mkdir(dirname(buf), 0755);
-    cp_afc(DATABIN "/busybox", buf);
-    exec_command_async(buf, "--install", "-s", dirname(buf));
-
-    // magisk32 and magiskpolicy are not installed into ramdisk and has to be copied
-    // from data to magisk tmp
-    if (access(DATABIN "/magisk32", X_OK) == 0) {
-        ssprintf(buf, sizeof(buf), "%s/magisk32", get_magisk_tmp());
-        cp_afc(DATABIN "/magisk32", buf);
-    }
-    if (access(DATABIN "/magiskpolicy", X_OK) == 0) {
-        ssprintf(buf, sizeof(buf), "%s/magiskpolicy", get_magisk_tmp());
-        cp_afc(DATABIN "/magiskpolicy", buf);
-    }
-
-    return true;
-}
-
 void unlock_blocks() {
     int fd, dev, OFF = 0;
 

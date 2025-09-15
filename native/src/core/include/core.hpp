@@ -37,7 +37,6 @@ struct ModuleInfo;
 int connect_daemon(int req, bool create = false);
 const char *get_magisk_tmp();
 void unlock_blocks();
-bool setup_magisk_env();
 bool check_key_combo();
 
 template<typename T> requires(std::is_trivially_copyable_v<T>)
