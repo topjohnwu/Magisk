@@ -12,10 +12,6 @@
 
 using namespace std;
 
-int SDK_INT = -1;
-
-static struct stat self_st;
-
 bool read_string(int fd, std::string &str) {
     str.clear();
     int len = read_int(fd);
@@ -33,118 +29,6 @@ void write_string(int fd, string_view str) {
     if (fd < 0) return;
     write_int(fd, str.size());
     xwrite(fd, str.data(), str.size());
-}
-
-static bool is_client(pid_t pid) {
-    // Verify caller is the same as server
-    char path[32];
-    sprintf(path, "/proc/%d/exe", pid);
-    struct stat st{};
-    return !(stat(path, &st) || st.st_dev != self_st.st_dev || st.st_ino != self_st.st_ino);
-}
-
-static void handle_request(owned_fd client) {
-    // Verify client credentials
-    ucred cred{};
-
-    socklen_t len = sizeof(cred);
-    // Client died
-    if (getsockopt(client, SOL_SOCKET, SO_PEERCRED, &cred, &len) != 0)
-        return;
-    char context[256];
-    len = sizeof(context);
-    if (getsockopt(client, SOL_SOCKET, SO_PEERSEC, context, &len) != 0)
-        len = 0;
-    context[len] = '\0';
-
-    bool is_root = cred.uid == AID_ROOT;
-    bool is_zygote = context == "u:r:zygote:s0"sv;
-
-    if (!is_root && !is_zygote && !is_client(cred.pid)) {
-        // Unsupported client state
-        write_int(client, +RespondCode::ACCESS_DENIED);
-        return;
-    }
-
-    int code = read_int(client);
-    if (code < 0 || code >= +RequestCode::END ||
-        code == +RequestCode::_SYNC_BARRIER_ ||
-        code == +RequestCode::_STAGE_BARRIER_) {
-        // Unknown request code
-        return;
-    }
-
-    // Check client permissions
-    switch (code) {
-    case +RequestCode::POST_FS_DATA:
-    case +RequestCode::LATE_START:
-    case +RequestCode::BOOT_COMPLETE:
-    case +RequestCode::ZYGOTE_RESTART:
-    case +RequestCode::SQLITE_CMD:
-    case +RequestCode::DENYLIST:
-    case +RequestCode::STOP_DAEMON:
-        if (!is_root) {
-            write_int(client, +RespondCode::ROOT_REQUIRED);
-            return;
-        }
-        break;
-    case +RequestCode::REMOVE_MODULES:
-        if (!is_root && cred.uid != AID_SHELL) {
-            write_int(client, +RespondCode::ACCESS_DENIED);
-            return;
-        }
-        break;
-    case +RequestCode::ZYGISK:
-        if (!is_zygote) {
-            // Invalid client context
-            write_int(client, +RespondCode::ACCESS_DENIED);
-            return;
-        }
-        break;
-    default:
-        break;
-    }
-
-    write_int(client, +RespondCode::OK);
-
-    if (code < +RequestCode::_SYNC_BARRIER_) {
-        MagiskD::Get().handle_request_sync(client.release(), code);
-    } else if (code < +RequestCode::_STAGE_BARRIER_) {
-        exec_task([=, fd = client.release()] {
-            MagiskD::Get().handle_request_async(fd, code, cred);
-        });
-    } else {
-        exec_task([=, fd = client.release()] {
-            MagiskD::Get().boot_stage_handler(fd, code);
-        });
-    }
-}
-
-[[noreturn]] static void daemon_entry() {
-    // Change process name
-    set_nice_name("magiskd");
-
-    rust::daemon_entry();
-    SDK_INT = MagiskD::Get().sdk_int();
-
-    // Get self stat
-    xstat("/proc/self/exe", &self_st);
-
-    int sockfd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
-    sockaddr_un addr = {.sun_family = AF_LOCAL};
-    ssprintf(addr.sun_path, sizeof(addr.sun_path), "%s/" MAIN_SOCKET, get_magisk_tmp());
-    unlink(addr.sun_path);
-    if (xbind(sockfd, (sockaddr *) &addr, sizeof(addr)))
-        exit(1);
-    chmod(addr.sun_path, 0666);
-    setfilecon(addr.sun_path, MAGISK_FILE_CON);
-    xlisten(sockfd, 10);
-
-    // Loop forever to listen for requests
-    for (;;) {
-        int client = xaccept4(sockfd, nullptr, nullptr, SOCK_CLOEXEC);
-        handle_request(client);
-    }
 }
 
 const char *get_magisk_tmp() {
@@ -166,9 +50,9 @@ int connect_daemon(int req, bool create) {
     sockaddr_un addr = {.sun_family = AF_LOCAL};
     const char *tmp = get_magisk_tmp();
     ssprintf(addr.sun_path, sizeof(addr.sun_path), "%s/" MAIN_SOCKET, tmp);
-    if (connect(fd, (sockaddr *) &addr, sizeof(addr))) {
+    if (connect(fd, reinterpret_cast<sockaddr *>(&addr), sizeof(addr))) {
         if (!create || getuid() != AID_ROOT) {
-            LOGE("No daemon is currently running!\n");
+            PLOGE("Cannot connect daemon at %s,", addr.sun_path);
             close(fd);
             return -1;
         }
@@ -183,10 +67,11 @@ int connect_daemon(int req, bool create) {
 
         if (fork_dont_care() == 0) {
             close(fd);
+            set_nice_name("magiskd");
             daemon_entry();
         }
 
-        while (connect(fd, (sockaddr *) &addr, sizeof(addr)))
+        while (connect(fd, reinterpret_cast<sockaddr *>(&addr), sizeof(addr)))
             usleep(10000);
     }
     write_int(fd, req);

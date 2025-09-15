@@ -4,12 +4,11 @@
 #![feature(unix_socket_ancillary_data)]
 #![feature(unix_socket_peek)]
 #![feature(default_field_values)]
+#![feature(peer_credentials_unix_socket)]
 #![allow(clippy::missing_safety_doc)]
 
 use crate::ffi::SuRequest;
 use crate::socket::Encodable;
-use base::libc;
-use cxx::{ExternType, type_id};
 use daemon::{MagiskD, daemon_entry};
 use derive::Decodable;
 use logging::{android_logging, zygisk_close_logd, zygisk_get_logd, zygisk_logging};
@@ -36,6 +35,7 @@ mod resetprop;
 mod selinux;
 mod socket;
 mod su;
+mod thread;
 mod zygisk;
 
 #[allow(clippy::needless_lifetimes)]
@@ -63,6 +63,15 @@ pub mod ffi {
         LATE_START,
         BOOT_COMPLETE,
 
+        END,
+    }
+
+    #[repr(i32)]
+    enum RespondCode {
+        ERROR = -1,
+        OK = 0,
+        ROOT_REQUIRED,
+        ACCESS_DENIED,
         END,
     }
 
@@ -128,8 +137,6 @@ pub mod ffi {
     unsafe extern "C++" {
         #[cxx_name = "Utf8CStr"]
         type Utf8CStrRef<'a> = base::Utf8CStrRef<'a>;
-        #[cxx_name = "ucred"]
-        type UCred = crate::UCred;
 
         include!("include/core.hpp");
 
@@ -190,7 +197,6 @@ pub mod ffi {
         fn get_prop(name: Utf8CStrRef) -> String;
         unsafe fn resetprop_main(argc: i32, argv: *mut *mut c_char) -> i32;
 
-        #[namespace = "rust"]
         fn daemon_entry();
     }
 
@@ -206,9 +212,6 @@ pub mod ffi {
         type MagiskD;
         fn sdk_int(&self) -> i32;
         fn zygisk_enabled(&self) -> bool;
-        fn boot_stage_handler(&self, client: i32, code: i32);
-        fn handle_request_sync(&self, client: i32, code: i32);
-        fn handle_request_async(&self, client: i32, code: i32, cred: &UCred);
         fn get_db_setting(&self, key: DbEntryKey) -> i32;
         #[cxx_name = "set_db_setting"]
         fn set_db_setting_for_cxx(&self, key: DbEntryKey, value: i32) -> bool;
@@ -217,14 +220,6 @@ pub mod ffi {
         #[cxx_name = "Get"]
         fn get() -> &'static MagiskD;
     }
-}
-
-#[repr(transparent)]
-pub struct UCred(pub libc::ucred);
-
-unsafe impl ExternType for UCred {
-    type Id = type_id!("ucred");
-    type Kind = cxx::kind::Trivial;
 }
 
 impl SuRequest {
