@@ -644,6 +644,7 @@ dependencies = [
  "argh",
  "base",
  "bit-set",
+ "bitflags",
  "bytemuck",
  "cxx",
  "cxx-gen",

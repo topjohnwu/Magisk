@@ -1,3 +1,4 @@
+use crate::bootstages::BootState;
 use crate::consts::{
     MAGISK_FILE_CON, MAGISK_FULL_VER, MAGISK_PROC_CON, MAGISK_VER_CODE, MAGISK_VERSION,
     MAIN_CONFIG, MAIN_SOCKET, ROOTMNT, ROOTOVL,
@@ -38,28 +39,6 @@ use std::sync::{Mutex, OnceLock};
 // Global magiskd singleton
 pub static MAGISKD: OnceLock<MagiskD> = OnceLock::new();
 
-#[repr(u32)]
-pub enum BootState {
-    PostFsDataDone = (1 << 0),
-    LateStartDone = (1 << 1),
-    BootComplete = (1 << 2),
-    SafeMode = (1 << 3),
-}
-
-#[derive(Default)]
-#[repr(transparent)]
-pub struct BootStateFlags(u32);
-
-impl BootStateFlags {
-    pub fn contains(&self, stage: BootState) -> bool {
-        (self.0 & stage as u32) != 0
-    }
-
-    pub fn set(&mut self, stage: BootState) {
-        self.0 |= stage as u32;
-    }
-}
-
 pub const AID_ROOT: i32 = 0;
 pub const AID_SHELL: i32 = 2000;
 pub const AID_APP_START: i32 = 10000;
@@ -78,7 +57,7 @@ pub const fn to_user_id(uid: i32) -> i32 {
 pub struct MagiskD {
     pub sql_connection: Mutex<Option<Sqlite3>>,
     pub manager_info: Mutex<ManagerInfo>,
-    pub boot_stage_lock: Mutex<BootStateFlags>,
+    pub boot_stage_lock: Mutex<BootState>,
     pub module_list: OnceLock<Vec<ModuleInfo>>,
     pub zygisk_enabled: AtomicBool,
     pub zygisk: Mutex<ZygiskState>,

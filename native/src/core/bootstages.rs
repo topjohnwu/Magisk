@@ -1,5 +1,5 @@
 use crate::consts::{APP_PACKAGE_NAME, BBPATH, DATABIN, MODULEROOT, SECURE_DIR};
-use crate::daemon::{BootState, MagiskD};
+use crate::daemon::MagiskD;
 use crate::ffi::{
     DbEntryKey, RequestCode, check_key_combo, exec_common_scripts, exec_module_scripts,
     get_magisk_tmp, initialize_denylist,
@@ -11,11 +11,22 @@ use crate::resetprop::get_prop;
 use crate::selinux::restorecon;
 use base::const_format::concatcp;
 use base::{BufReadExt, FsPathBuilder, ResultExt, cstr, error, info};
+use bitflags::bitflags;
 use nix::fcntl::OFlag;
 use std::io::BufReader;
 use std::os::unix::net::UnixStream;
 use std::process::{Command, Stdio};
 use std::sync::atomic::Ordering;
+
+bitflags! {
+    #[derive(Default)]
+    pub struct BootState : u32 {
+        const PostFsDataDone = 1 << 0;
+        const LateStartDone = 1 << 1;
+        const BootComplete = 1 << 2;
+        const SafeMode = 1 << 3;
+    }
+}
 
 impl MagiskD {
     fn setup_magisk_env(&self) -> bool {
@@ -185,9 +196,9 @@ impl MagiskD {
             RequestCode::POST_FS_DATA => {
                 if check_data() && !state.contains(BootState::PostFsDataDone) {
                     if self.post_fs_data() {
-                        state.set(BootState::SafeMode);
+                        state.insert(BootState::SafeMode);
                     }
-                    state.set(BootState::PostFsDataDone);
+                    state.insert(BootState::PostFsDataDone);
                 }
             }
             RequestCode::LATE_START => {
@@ -195,13 +206,13 @@ impl MagiskD {
                 if state.contains(BootState::PostFsDataDone) && !state.contains(BootState::SafeMode)
                 {
                     self.late_start();
-                    state.set(BootState::LateStartDone);
+                    state.insert(BootState::LateStartDone);
                 }
             }
             RequestCode::BOOT_COMPLETE => {
                 drop(client);
                 if state.contains(BootState::PostFsDataDone) {
-                    state.set(BootState::BootComplete);
+                    state.insert(BootState::BootComplete);
                     self.boot_complete()
                 }
             }

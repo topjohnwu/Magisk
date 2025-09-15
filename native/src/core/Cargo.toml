@@ -27,3 +27,4 @@ thiserror = { workspace = true }
 bit-set = { workspace = true }
 argh = { workspace = true }
 nix = { workspace = true, features = ["fs", "mount", "poll", "signal", "term", "user", "zerocopy"] }
+bitflags = { workspace = true }
