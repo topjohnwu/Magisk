@@ -25,13 +25,6 @@
 void hook_entry();
 void hookJniNativeMethods(JNIEnv *env, const char *clz, JNINativeMethod *methods, int numMethods);
 
-inline int zygisk_request(int req) {
-    int fd = connect_daemon(+RequestCode::ZYGISK);
-    if (fd < 0) return fd;
-    write_int(fd, req);
-    return fd;
-}
-
 // The reference of the following structs
 // https://cs.android.com/android/platform/superproject/main/+/main:art/libnativebridge/include/nativebridge/native_bridge.h
 

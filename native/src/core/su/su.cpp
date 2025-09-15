@@ -206,7 +206,7 @@ int su_client_main(int argc, char *argv[]) {
     }
 
     // Connect to client
-    owned_fd fd = connect_daemon(+RequestCode::SUPERUSER);
+    owned_fd fd = connect_daemon(RequestCode::SUPERUSER);
 
     // Send request
     req.write_to_fd(fd);

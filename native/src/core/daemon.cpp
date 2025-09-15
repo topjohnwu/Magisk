@@ -45,7 +45,7 @@ const char *get_magisk_tmp() {
     return path;
 }
 
-int connect_daemon(int req, bool create) {
+int connect_daemon(RequestCode req, bool create) {
     int fd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
     sockaddr_un addr = {.sun_family = AF_LOCAL};
     const char *tmp = get_magisk_tmp();
@@ -74,7 +74,7 @@ int connect_daemon(int req, bool create) {
         while (connect(fd, reinterpret_cast<sockaddr *>(&addr), sizeof(addr)))
             usleep(10000);
     }
-    write_int(fd, req);
+    write_int(fd, +req);
     int res = read_int(fd);
     if (res < +RespondCode::ERROR || res >= +RespondCode::END)
         res = +RespondCode::ERROR;

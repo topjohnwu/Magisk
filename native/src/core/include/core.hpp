@@ -27,7 +27,7 @@ int zygisk_main(int argc, char *argv[]);
 struct ModuleInfo;
 
 // Daemon
-int connect_daemon(int req, bool create = false);
+int connect_daemon(RequestCode req, bool create = false);
 const char *get_magisk_tmp();
 void unlock_blocks();
 bool check_key_combo();

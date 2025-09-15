@@ -11,6 +11,13 @@
 
 using namespace std;
 
+static int zygisk_request(int req) {
+    int fd = connect_daemon(RequestCode::ZYGISK);
+    if (fd < 0) return fd;
+    write_int(fd, req);
+    return fd;
+}
+
 ZygiskModule::ZygiskModule(int id, void *handle, void *entry)
     : id(id), handle(handle), entry{entry}, api{}, mod{nullptr} {
     // Make sure all pointers are null
