@@ -17,9 +17,9 @@ LOCAL_STATIC_LIBRARIES := \
 LOCAL_SRC_FILES := \
     core/applets.cpp \
     core/magisk.cpp \
-    core/daemon.cpp \
     core/scripting.cpp \
     core/sqlite.cpp \
+    core/utils.cpp \
     core/core-rs.cpp \
     core/resetprop/sys.cpp \
     core/su/su.cpp \

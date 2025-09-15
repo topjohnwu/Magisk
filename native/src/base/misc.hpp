@@ -18,6 +18,8 @@ clazz(const clazz&) = delete;  \
 clazz(clazz &&o) { swap(o); }  \
 clazz& operator=(clazz &&o) { swap(o); return *this; }
 
+struct Utf8CStr;
+
 class mutex_guard {
     DISALLOW_COPY_AND_MOVE(mutex_guard)
 public:
@@ -146,7 +148,7 @@ static inline std::string rtrim(std::string &&s) {
 int fork_dont_care();
 int fork_no_orphan();
 void init_argv0(int argc, char **argv);
-void set_nice_name(const char *name);
+void set_nice_name(Utf8CStr name);
 int switch_mnt_ns(int pid);
 std::string &replace_all(std::string &str, std::string_view from, std::string_view to);
 std::vector<std::string> split(std::string_view s, std::string_view delims);

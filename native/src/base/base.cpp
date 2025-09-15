@@ -158,10 +158,10 @@ void init_argv0(int argc, char **argv) {
     name_len = (argv[argc - 1] - argv[0]) + strlen(argv[argc - 1]) + 1;
 }
 
-void set_nice_name(const char *name) {
+void set_nice_name(Utf8CStr name) {
     memset(argv0, 0, name_len);
-    strscpy(argv0, name, name_len);
-    prctl(PR_SET_NAME, name);
+    strscpy(argv0, name.c_str(), name_len);
+    prctl(PR_SET_NAME, name.c_str());
 }
 
 template<typename T, int base>

@@ -9,7 +9,7 @@
 
 use crate::ffi::SuRequest;
 use crate::socket::Encodable;
-use daemon::{MagiskD, daemon_entry};
+use daemon::{MagiskD, connect_daemon};
 use derive::Decodable;
 use logging::{android_logging, zygisk_close_logd, zygisk_get_logd, zygisk_logging};
 use mount::{find_preinit_device, revert_unmount};
@@ -198,7 +198,7 @@ pub mod ffi {
         fn get_prop(name: Utf8CStrRef) -> String;
         unsafe fn resetprop_main(argc: i32, argv: *mut *mut c_char) -> i32;
 
-        fn daemon_entry();
+        fn connect_daemon(code: RequestCode, create: bool) -> i32;
     }
 
     // Default constructors

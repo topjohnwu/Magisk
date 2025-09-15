@@ -19,8 +19,9 @@ use crate::zygisk::ZygiskState;
 use base::const_format::concatcp;
 use base::{
     AtomicArc, BufReadExt, FileAttr, FsPathBuilder, ReadExt, ResultExt, Utf8CStr, Utf8CStrBuf,
-    WriteExt, cstr, info, libc,
+    WriteExt, cstr, error, fork_dont_care, info, libc, set_nice_name,
 };
+use nix::unistd::getuid;
 use nix::{
     fcntl::OFlag,
     mount::MsFlags,
@@ -30,11 +31,12 @@ use nix::{
 use num_traits::AsPrimitive;
 use std::fmt::Write as _;
 use std::io::{BufReader, Write};
-use std::os::fd::{AsFd, AsRawFd, IntoRawFd};
+use std::os::fd::{AsFd, AsRawFd, IntoRawFd, RawFd};
 use std::os::unix::net::{UCred, UnixListener, UnixStream};
 use std::process::{Command, exit};
 use std::sync::atomic::AtomicBool;
 use std::sync::{Mutex, OnceLock};
+use std::time::Duration;
 
 // Global magiskd singleton
 pub static MAGISKD: OnceLock<MagiskD> = OnceLock::new();
@@ -150,7 +152,7 @@ impl MagiskD {
         }
     }
 
-    pub fn reboot(&self) {
+    fn reboot(&self) {
         if self.is_recovery {
             Command::new("/system/bin/reboot").arg("recovery").status()
         } else {
@@ -260,7 +262,22 @@ impl MagiskD {
     }
 }
 
-pub fn daemon_entry() {
+fn switch_cgroup(cgroup: &str, pid: i32) {
+    let mut buf = cstr::buf::new::<64>()
+        .join_path(cgroup)
+        .join_path("cgroup.procs");
+    if !buf.exists() {
+        return;
+    }
+    if let Ok(mut file) = buf.open(OFlag::O_WRONLY | OFlag::O_APPEND | OFlag::O_CLOEXEC) {
+        buf.clear();
+        write!(buf, "{pid}").ok();
+        file.write_all(buf.as_bytes()).log_ok();
+    }
+}
+
+fn daemon_entry() {
+    set_nice_name(cstr!("magiskd"));
     android_logging();
 
     // Block all signals
@@ -405,16 +422,63 @@ pub fn daemon_entry() {
     }
 }
 
-fn switch_cgroup(cgroup: &str, pid: i32) {
-    let mut buf = cstr::buf::new::<64>()
-        .join_path(cgroup)
-        .join_path("cgroup.procs");
-    if !buf.exists() {
-        return;
+pub fn connect_daemon(code: RequestCode, create: bool) -> RawFd {
+    let sock_path = cstr::buf::new::<64>()
+        .join_path(get_magisk_tmp())
+        .join_path(MAIN_SOCKET);
+
+    fn send_request(code: RequestCode, mut socket: UnixStream) -> RawFd {
+        socket.write_pod(&code.repr).log_ok();
+        let mut res = -1;
+        socket.read_pod(&mut res).log_ok();
+        let res = RespondCode { repr: res };
+        match res {
+            RespondCode::OK => socket.into_raw_fd(),
+            RespondCode::ROOT_REQUIRED => {
+                error!("Root is required for this operation");
+                -1
+            }
+            RespondCode::ACCESS_DENIED => {
+                error!("Accessed denied");
+                -1
+            }
+            _ => {
+                error!("Daemon error");
+                -1
+            }
+        }
     }
-    if let Ok(mut file) = buf.open(OFlag::O_WRONLY | OFlag::O_APPEND | OFlag::O_CLOEXEC) {
-        buf.clear();
-        write!(buf, "{pid}").ok();
-        file.write_all(buf.as_bytes()).log_ok();
+
+    match UnixStream::connect(&sock_path) {
+        Ok(socket) => send_request(code, socket),
+        Err(e) => {
+            if !create || !getuid().is_root() {
+                error!("Cannot connect to daemon: {e}");
+                return -1;
+            }
+
+            let mut buf = cstr::buf::new::<64>();
+            if cstr!("/proc/self/exe").read_link(&mut buf).is_err()
+                || !buf.starts_with(get_magisk_tmp().as_str())
+            {
+                error!("Start daemon on magisk tmpfs");
+                return -1;
+            }
+
+            // Fork a process and run the daemon
+            if fork_dont_care() == 0 {
+                daemon_entry();
+                exit(0);
+            }
+
+            // In the client, we keep retry and connect to the socket
+            loop {
+                if let Ok(socket) = UnixStream::connect(&sock_path) {
+                    return send_request(code, socket);
+                } else {
+                    std::thread::sleep(Duration::from_millis(100));
+                }
+            }
+        }
     }
 }
