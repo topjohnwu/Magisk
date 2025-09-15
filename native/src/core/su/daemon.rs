@@ -1,13 +1,12 @@
 use super::connect::SuAppContext;
 use super::db::RootSettings;
-use crate::UCred;
 use crate::daemon::{AID_ROOT, AID_SHELL, MagiskD, to_app_id, to_user_id};
 use crate::db::{DbSettings, MultiuserMode, RootAccess};
 use crate::ffi::{SuPolicy, SuRequest, exec_root_shell};
 use crate::socket::IpcRead;
 use base::{LoggedResult, ResultExt, WriteExt, debug, error, exit_on_error, libc, warn};
-use std::os::fd::{IntoRawFd, OwnedFd};
-use std::os::unix::net::UnixStream;
+use std::os::fd::IntoRawFd;
+use std::os::unix::net::{UCred, UnixStream};
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
@@ -114,16 +113,13 @@ impl AccessInfo {
 }
 
 impl MagiskD {
-    pub fn su_daemon_handler(&self, client: OwnedFd, cred: &UCred) {
-        let cred = cred.0;
+    pub fn su_daemon_handler(&self, mut client: UnixStream, cred: UCred) {
         debug!(
             "su: request from uid=[{}], pid=[{}], client=[{}]",
             cred.uid,
-            cred.pid,
+            cred.pid.unwrap_or(-1),
             client.as_raw_fd()
         );
-
-        let mut client = UnixStream::from(client);
 
         let mut req = match client.read_decodable::<SuRequest>().log() {
             Ok(req) => req,
@@ -174,7 +170,12 @@ impl MagiskD {
             // ack
             client.write_pod(&0).ok();
 
-            exec_root_shell(client.into_raw_fd(), cred.pid, &mut req, info.cfg.mnt_ns);
+            exec_root_shell(
+                client.into_raw_fd(),
+                cred.pid.unwrap_or(-1),
+                &mut req,
+                info.cfg.mnt_ns,
+            );
             return;
         }
         if child < 0 {

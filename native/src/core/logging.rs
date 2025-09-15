@@ -3,10 +3,10 @@ use crate::ffi::get_magisk_tmp;
 use crate::logging::LogFile::{Actual, Buffer};
 use base::{
     FsPathBuilder, LogLevel, LoggedResult, ReadExt, Utf8CStr, Utf8CStrBuf, WriteExt,
-    const_format::concatcp, cstr, libc, raw_cstr, update_logger,
+    const_format::concatcp, cstr, libc, new_daemon_thread, raw_cstr, update_logger,
 };
 use bytemuck::{Pod, Zeroable, bytes_of, write_zeroes};
-use libc::{PIPE_BUF, c_char, c_void, localtime_r, sigtimedwait, time_t, timespec, tm};
+use libc::{PIPE_BUF, c_char, localtime_r, sigtimedwait, time_t, timespec, tm};
 use nix::{
     fcntl::OFlag,
     sys::signal::{SigSet, SigmaskHow, Signal},
@@ -41,12 +41,9 @@ enum ALogPriority {
     ANDROID_LOG_SILENT,
 }
 
-type ThreadEntry = extern "C" fn(*mut c_void) -> *mut c_void;
-
 unsafe extern "C" {
     fn __android_log_write(prio: i32, tag: *const c_char, msg: *const c_char);
     fn strftime(buf: *mut c_char, len: usize, fmt: *const c_char, tm: *const tm) -> usize;
-    fn new_daemon_thread(entry: ThreadEntry, arg: *mut c_void);
 }
 
 fn level_to_prio(level: LogLevel) -> i32 {
@@ -226,92 +223,83 @@ impl LogFile {
     }
 }
 
-extern "C" fn logfile_writer(arg: *mut c_void) -> *mut c_void {
-    fn writer_loop(pipefd: RawFd) -> io::Result<()> {
-        let mut pipe = unsafe { File::from_raw_fd(pipefd) };
-        let mut logfile: LogFile = Buffer(Vec::new());
+fn logfile_write_loop(mut pipe: File) -> io::Result<()> {
+    let mut logfile: LogFile = Buffer(Vec::new());
 
-        let mut meta = LogMeta::zeroed();
-        let mut msg_buf = [0u8; MAX_MSG_LEN];
-        let mut aux = cstr::buf::new::<64>();
+    let mut meta = LogMeta::zeroed();
+    let mut msg_buf = [0u8; MAX_MSG_LEN];
+    let mut aux = cstr::buf::new::<64>();
 
-        loop {
-            // Read request
-            write_zeroes(&mut meta);
-            pipe.read_pod(&mut meta)?;
+    loop {
+        // Read request
+        write_zeroes(&mut meta);
+        pipe.read_pod(&mut meta)?;
 
-            if meta.prio < 0 {
-                if let Buffer(ref mut buf) = logfile {
-                    fs::rename(LOGFILE, concatcp!(LOGFILE, ".bak")).ok();
-                    let mut out = File::create(LOGFILE)?;
-                    out.write_all(buf.as_slice())?;
-                    logfile = Actual(out);
-                }
-                continue;
+        if meta.prio < 0 {
+            if let Buffer(ref mut buf) = logfile {
+                fs::rename(LOGFILE, concatcp!(LOGFILE, ".bak")).ok();
+                let mut out = File::create(LOGFILE)?;
+                out.write_all(buf.as_slice())?;
+                logfile = Actual(out);
             }
-
-            if meta.len < 0 || meta.len > MAX_MSG_LEN as i32 {
-                continue;
-            }
-
-            // Read the rest of the message
-            let msg = &mut msg_buf[..(meta.len as usize)];
-            pipe.read_exact(msg)?;
-
-            // Start building the log string
-            aux.clear();
-            let prio =
-                ALogPriority::from_i32(meta.prio).unwrap_or(ALogPriority::ANDROID_LOG_UNKNOWN);
-            let prio = match prio {
-                ALogPriority::ANDROID_LOG_VERBOSE => 'V',
-                ALogPriority::ANDROID_LOG_DEBUG => 'D',
-                ALogPriority::ANDROID_LOG_INFO => 'I',
-                ALogPriority::ANDROID_LOG_WARN => 'W',
-                ALogPriority::ANDROID_LOG_ERROR => 'E',
-                // Unsupported values, skip
-                _ => continue,
-            };
-
-            let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
-
-            // Note: the obvious better implementation is to use the rust chrono crate, however
-            // the crate cannot fetch the proper local timezone without pulling in a bunch of
-            // timezone handling code. To reduce binary size, fallback to use localtime_r in libc.
-            unsafe {
-                let secs = now.as_secs() as time_t;
-                let mut tm: tm = std::mem::zeroed();
-                if localtime_r(&secs, &mut tm).is_null() {
-                    continue;
-                }
-                strftime(aux.as_mut_ptr(), aux.capacity(), raw_cstr!("%m-%d %T"), &tm);
-            }
-
-            if aux.rebuild().is_ok() {
-                write!(
-                    aux,
-                    ".{:03} {:5} {:5} {} : ",
-                    now.subsec_millis(),
-                    meta.pid,
-                    meta.tid,
-                    prio
-                )
-                .ok();
-            } else {
-                continue;
-            }
-
-            let io1 = IoSlice::new(aux.as_bytes());
-            let io2 = IoSlice::new(msg);
-            // We don't need to care the written len because we are writing less than PIPE_BUF
-            // It's guaranteed to always write the whole thing atomically
-            let _ = logfile.as_write().write_vectored(&[io1, io2])?;
+            continue;
         }
-    }
 
-    writer_loop(arg as RawFd).ok();
-    // If any error occurs, shut down the logd pipe
-    *MAGISK_LOGD_FD.lock().unwrap() = None;
-    null_mut()
+        if meta.len < 0 || meta.len > MAX_MSG_LEN as i32 {
+            continue;
+        }
+
+        // Read the rest of the message
+        let msg = &mut msg_buf[..(meta.len as usize)];
+        pipe.read_exact(msg)?;
+
+        // Start building the log string
+        aux.clear();
+        let prio = ALogPriority::from_i32(meta.prio).unwrap_or(ALogPriority::ANDROID_LOG_UNKNOWN);
+        let prio = match prio {
+            ALogPriority::ANDROID_LOG_VERBOSE => 'V',
+            ALogPriority::ANDROID_LOG_DEBUG => 'D',
+            ALogPriority::ANDROID_LOG_INFO => 'I',
+            ALogPriority::ANDROID_LOG_WARN => 'W',
+            ALogPriority::ANDROID_LOG_ERROR => 'E',
+            // Unsupported values, skip
+            _ => continue,
+        };
+
+        let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
+
+        // Note: the obvious better implementation is to use the rust chrono crate, however
+        // the crate cannot fetch the proper local timezone without pulling in a bunch of
+        // timezone handling code. To reduce binary size, fallback to use localtime_r in libc.
+        unsafe {
+            let secs = now.as_secs() as time_t;
+            let mut tm: tm = std::mem::zeroed();
+            if localtime_r(&secs, &mut tm).is_null() {
+                continue;
+            }
+            strftime(aux.as_mut_ptr(), aux.capacity(), raw_cstr!("%m-%d %T"), &tm);
+        }
+
+        if aux.rebuild().is_ok() {
+            write!(
+                aux,
+                ".{:03} {:5} {:5} {} : ",
+                now.subsec_millis(),
+                meta.pid,
+                meta.tid,
+                prio
+            )
+            .ok();
+        } else {
+            continue;
+        }
+
+        let io1 = IoSlice::new(aux.as_bytes());
+        let io2 = IoSlice::new(msg);
+        // We don't need to care the written len because we are writing less than PIPE_BUF
+        // It's guaranteed to always write the whole thing atomically
+        let _ = logfile.as_write().write_vectored(&[io1, io2])?;
+    }
 }
 
 pub fn setup_logfile() {
@@ -331,6 +319,14 @@ pub fn start_log_daemon() {
         .join_path(get_magisk_tmp())
         .join_path(LOG_PIPE);
 
+    extern "C" fn logfile_writer_thread(arg: usize) -> usize {
+        let file = unsafe { File::from_raw_fd(arg as RawFd) };
+        logfile_write_loop(file).ok();
+        // If any error occurs, shut down the logd pipe
+        *MAGISK_LOGD_FD.lock().unwrap() = None;
+        0
+    }
+
     let _: LoggedResult<()> = try {
         path.mkfifo(0o666)?;
         chown(path.as_utf8_cstr(), Some(Uid::from(0)), Some(Gid::from(0)))?;
@@ -338,7 +334,7 @@ pub fn start_log_daemon() {
         let write = path.open(OFlag::O_WRONLY | OFlag::O_CLOEXEC)?;
         *MAGISK_LOGD_FD.lock().unwrap() = Some(Arc::new(write));
         unsafe {
-            new_daemon_thread(logfile_writer, read.into_raw_fd() as *mut c_void);
+            new_daemon_thread(logfile_writer_thread, read.into_raw_fd() as usize);
         }
     };
 }

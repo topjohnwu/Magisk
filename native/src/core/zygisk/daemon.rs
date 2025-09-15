@@ -10,7 +10,7 @@ use base::{
 };
 use nix::fcntl::OFlag;
 use std::fmt::Write;
-use std::os::fd::{AsRawFd, OwnedFd, RawFd};
+use std::os::fd::{AsRawFd, RawFd};
 use std::os::unix::net::UnixStream;
 use std::ptr;
 use std::sync::atomic::Ordering;
@@ -158,8 +158,7 @@ impl ZygiskState {
 }
 
 impl MagiskD {
-    pub fn zygisk_handler(&self, client: OwnedFd) {
-        let mut client = UnixStream::from(client);
+    pub fn zygisk_handler(&self, mut client: UnixStream) {
         let _: LoggedResult<()> = try {
             let code = ZygiskRequest {
                 repr: client.read_decodable()?,

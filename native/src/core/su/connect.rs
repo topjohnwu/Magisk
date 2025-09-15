@@ -7,7 +7,6 @@ use crate::socket::IpcRead;
 use ExtraVal::{Bool, Int, IntList, Str};
 use base::{
     BytesExt, FileAttr, LibcReturn, LoggedResult, ResultExt, Utf8CStrBuf, cstr, fork_dont_care,
-    libc,
 };
 use nix::{
     fcntl::OFlag,
@@ -15,6 +14,7 @@ use nix::{
 };
 use num_traits::AsPrimitive;
 use std::os::fd::AsFd;
+use std::os::unix::net::UCred;
 use std::{fmt::Write, fs::File, process::Command, process::exit};
 
 struct Extra<'a> {
@@ -87,7 +87,7 @@ impl Extra<'_> {
 }
 
 pub(super) struct SuAppContext<'a> {
-    pub(super) cred: libc::ucred,
+    pub(super) cred: UCred,
     pub(super) request: &'a SuRequest,
     pub(super) info: &'a SuInfo,
     pub(super) settings: &'a mut RootSettings,
@@ -167,7 +167,7 @@ impl SuAppContext<'_> {
             "{}/{}/su_request_{}",
             get_magisk_tmp(),
             INTERNAL_DIR,
-            self.cred.pid
+            self.cred.pid.unwrap_or(-1)
         ))
         .ok();
 
@@ -192,7 +192,7 @@ impl SuAppContext<'_> {
                 },
                 Extra {
                     key: "pid",
-                    value: Int(self.cred.pid),
+                    value: Int(self.cred.pid.unwrap_or(-1)),
                 },
             ];
             self.exec_cmd("request", &extras, false);
@@ -230,7 +230,7 @@ impl SuAppContext<'_> {
             },
             Extra {
                 key: "pid",
-                value: Int(self.cred.pid.as_()),
+                value: Int(self.cred.pid.unwrap_or(-1).as_()),
             },
             Extra {
                 key: "policy",
@@ -257,7 +257,7 @@ impl SuAppContext<'_> {
             },
             Extra {
                 key: "pid",
-                value: Int(self.cred.pid.as_()),
+                value: Int(self.cred.pid.unwrap_or(-1).as_()),
             },
             Extra {
                 key: "policy",

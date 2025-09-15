@@ -1,7 +1,6 @@
 #pragma once
 
 #include <sys/socket.h>
-#include <poll.h>
 #include <string>
 #include <atomic>
 #include <functional>
@@ -17,19 +16,13 @@
 #define to_app_id(uid)  (uid % AID_USER_OFFSET)
 #define to_user_id(uid) (uid / AID_USER_OFFSET)
 
+#define SDK_INT      (MagiskD::Get().sdk_int())
+#define APP_DATA_DIR (SDK_INT >= 24 ? "/data/user_de" : "/data/user")
+
 // Multi-call entrypoints
 int magisk_main(int argc, char *argv[]);
 int su_client_main(int argc, char *argv[]);
 int zygisk_main(int argc, char *argv[]);
-
-// Return codes for daemon
-enum class RespondCode : int {
-    ERROR = -1,
-    OK = 0,
-    ROOT_REQUIRED,
-    ACCESS_DENIED,
-    END
-};
 
 struct ModuleInfo;
 
@@ -72,13 +65,6 @@ bool read_vector(int fd, std::vector<T> &vec) {
     return xread(fd, vec.data(), size * sizeof(T)) == size * sizeof(T);
 }
 
-// Thread pool
-void init_thread_pool();
-void exec_task(std::function<void()> &&task);
-
-// Daemon handlers
-void denylist_handler(int client);
-
 // Scripting
 void install_apk(Utf8CStr apk);
 void uninstall_pkg(Utf8CStr pkg);
@@ -91,6 +77,7 @@ void clear_pkg(const char *pkg, int user_id);
 // Denylist
 extern std::atomic<bool> denylist_enforced;
 int denylist_cli(int argc, char **argv);
+void denylist_handler(int client);
 void initialize_denylist();
 void scan_deny_apps();
 bool is_deny_target(int uid, std::string_view process);
@@ -105,4 +92,4 @@ static inline Utf8CStr get_magisk_tmp_rs() { return get_magisk_tmp(); }
 static inline rust::String resolve_preinit_dir_rs(Utf8CStr base_dir) {
     return resolve_preinit_dir(base_dir.c_str());
 }
-static inline void exec_script_rs(Utf8CStr script) { exec_script(script.data()); }
+static inline void exec_script_rs(Utf8CStr script) { exec_script(script.c_str()); }

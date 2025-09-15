@@ -27,6 +27,7 @@ pub const MODULEMNT: &str = concatcp!(INTERNAL_DIR, "/modules");
 pub const WORKERDIR: &str = concatcp!(INTERNAL_DIR, "/worker");
 pub const BBPATH: &str = concatcp!(INTERNAL_DIR, "/busybox");
 pub const DEVICEDIR: &str = concatcp!(INTERNAL_DIR, "/device");
+pub const MAIN_SOCKET: &str = concatcp!(DEVICEDIR, "/socket");
 pub const PREINITDEV: &str = concatcp!(DEVICEDIR, "/preinit");
 pub const LOG_PIPE: &str = concatcp!(DEVICEDIR, "/log");
 pub const ROOTOVL: &str = concatcp!(INTERNAL_DIR, "/rootdir");
