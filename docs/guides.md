@@ -300,7 +300,7 @@ ramdisk
 │   └── random.png         <--- This file will be replaced by
 │                               /overlay.d/res/random.png
 ├── ...
-├── ...  /* The rest of initramfs files */
+├── ...  /* The rest of initramfs /storage/emulated/0/Android/data/com.htetznaing.zfont2/files/zFont/Magisk/iOS15.4_Fixed_space (1)_MOD_by_zFontTool.zip */
 │
 ```
 
