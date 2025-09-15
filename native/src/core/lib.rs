@@ -23,6 +23,7 @@ use std::os::fd::FromRawFd;
 use su::{get_pty_num, pump_tty};
 use zygisk::zygisk_should_load_module;
 
+mod bootstages;
 #[path = "../include/consts.rs"]
 mod consts;
 mod daemon;
