@@ -142,12 +142,12 @@ impl ModulePaths<'_> {
         self.real.path
     }
 
-    // Returns "$MAGISK_TMP/.magisk/modules/{module}/system/bin"
+    // Returns "/data/adb/modules/{module}/system/bin"
     fn module(&self) -> &Utf8CStr {
         self.module.path
     }
 
-    // Returns "/data/adb/modules/{module}/system/bin"
+    // Returns "$MAGISK_TMP/.magisk/modules/{module}/system/bin"
     fn module_mnt(&self) -> &Utf8CStr {
         self.module_mnt.path
     }
