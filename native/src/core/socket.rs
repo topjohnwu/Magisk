@@ -7,8 +7,6 @@ use std::os::fd::{FromRawFd, IntoRawFd, OwnedFd, RawFd};
 use std::os::unix::net::{AncillaryData, SocketAncillary, UnixStream};
 
 pub trait Encodable {
-    #[allow(dead_code)]
-    fn encoded_len(&self) -> usize;
     fn encode(&self, w: &mut impl Write) -> io::Result<()>;
 }
 
@@ -19,11 +17,6 @@ pub trait Decodable: Sized + Encodable {
 macro_rules! impl_pod_encodable {
     ($($t:ty)*) => ($(
         impl Encodable for $t {
-            #[inline(always)]
-            fn encoded_len(&self) -> usize {
-                size_of::<Self>()
-            }
-
             #[inline(always)]
             fn encode(&self, w: &mut impl Write) -> io::Result<()> {
                 w.write_pod(self)
@@ -44,11 +37,6 @@ impl_pod_encodable! { u8 u32 i32 usize }
 
 impl Encodable for bool {
     #[inline(always)]
-    fn encoded_len(&self) -> usize {
-        size_of::<u8>()
-    }
-
-    #[inline(always)]
     fn encode(&self, w: &mut impl Write) -> io::Result<()> {
         match *self {
             true => 1u8.encode(w),
@@ -64,11 +52,24 @@ impl Decodable for bool {
     }
 }
 
-impl<T: Decodable> Encodable for Vec<T> {
-    fn encoded_len(&self) -> usize {
-        size_of::<i32>() + size_of::<T>() * self.len()
-    }
+// impl<E: Encodable, T: AsRef<E>> Encodable for T
+macro_rules! impl_encodable_as_ref {
+    ($( ($t:ty, $e:ty, $($g:tt)*) )*) => ($(
+        impl<$($g)*> Encodable for $t {
+            #[inline(always)]
+            fn encode(&self, w: &mut impl Write) -> io::Result<()> {
+                AsRef::<$e>::as_ref(self).encode(w)
+            }
+        }
+    )*)
+}
 
+impl_encodable_as_ref! {
+    (String, str,)
+    (Vec<T>, [T], T: Encodable)
+}
+
+impl<T: Encodable> Encodable for [T] {
     fn encode(&self, w: &mut impl Write) -> io::Result<()> {
         (self.len() as i32).encode(w)?;
         self.iter().try_for_each(|e| e.encode(w))
@@ -87,23 +88,9 @@ impl<T: Decodable> Decodable for Vec<T> {
 }
 
 impl Encodable for str {
-    fn encoded_len(&self) -> usize {
-        size_of::<i32>() + self.len()
-    }
-
     fn encode(&self, w: &mut impl Write) -> io::Result<()> {
         (self.len() as i32).encode(w)?;
         w.write_all(self.as_bytes())
-    }
-}
-
-impl Encodable for String {
-    fn encoded_len(&self) -> usize {
-        self.as_str().encoded_len()
-    }
-
-    fn encode(&self, w: &mut impl Write) -> io::Result<()> {
-        self.as_str().encode(w)
     }
 }
 

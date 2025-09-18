@@ -20,16 +20,12 @@ pub(crate) fn derive_decodable(input: proc_macro::TokenStream) -> proc_macro::To
 
     let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
 
-    let sum = gen_size_sum(&input.data);
     let encode = gen_encode(&input.data);
     let decode = gen_decode(&input.data);
 
     let expanded = quote! {
         // The generated impl.
         impl #impl_generics crate::socket::Encodable for #name #ty_generics #where_clause {
-            fn encoded_len(&self) -> usize {
-                #sum
-            }
             fn encode(&self, w: &mut impl std::io::Write) -> std::io::Result<()> {
                 #encode
                 Ok(())
@@ -43,32 +39,6 @@ pub(crate) fn derive_decodable(input: proc_macro::TokenStream) -> proc_macro::To
         }
     };
     proc_macro::TokenStream::from(expanded)
-}
-
-// Generate an expression to sum up the size of each field.
-fn gen_size_sum(data: &Data) -> TokenStream {
-    match *data {
-        Data::Struct(ref data) => {
-            match data.fields {
-                Fields::Named(ref fields) => {
-                    // Expands to an expression like
-                    //
-                    //     0 + self.x.encoded_len() + self.y.encoded_len() + self.z.encoded_len()
-                    let recurse = fields.named.iter().map(|f| {
-                        let name = &f.ident;
-                        quote_spanned! { f.span() =>
-                            crate::socket::Encodable::encoded_len(&self.#name)
-                        }
-                    });
-                    quote! {
-                        0 #(+ #recurse)*
-                    }
-                }
-                _ => unimplemented!(),
-            }
-        }
-        Data::Enum(_) | Data::Union(_) => unimplemented!(),
-    }
 }
 
 // Generate an expression to encode each field.
