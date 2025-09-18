@@ -24,7 +24,6 @@ inline int connect_daemon(RequestCode req) {
 }
 
 // Multi-call entrypoints
-int magisk_main(int argc, char *argv[]);
 int su_client_main(int argc, char *argv[]);
 int zygisk_main(int argc, char *argv[]);
 
@@ -68,13 +67,13 @@ void install_apk(Utf8CStr apk);
 void uninstall_pkg(Utf8CStr pkg);
 void exec_common_scripts(Utf8CStr stage);
 void exec_module_scripts(Utf8CStr stage, const rust::Vec<ModuleInfo> &module_list);
-void exec_script(const char *script);
+void exec_script(Utf8CStr script);
 void clear_pkg(const char *pkg, int user_id);
-[[noreturn]] void install_module(const char *file);
+[[noreturn]] void install_module(Utf8CStr file);
 
 // Denylist
 extern std::atomic<bool> denylist_enforced;
-int denylist_cli(int argc, char **argv);
+int denylist_cli(rust::Vec<rust::String> &args);
 void denylist_handler(int client);
 void initialize_denylist();
 void scan_deny_apps();
@@ -90,4 +89,3 @@ inline Utf8CStr get_magisk_tmp_rs() { return get_magisk_tmp(); }
 inline rust::String resolve_preinit_dir_rs(Utf8CStr base_dir) {
     return resolve_preinit_dir(base_dir.c_str());
 }
-inline void exec_script_rs(Utf8CStr script) { exec_script(script.c_str()); }

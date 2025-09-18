@@ -29,12 +29,12 @@ static void set_script_env() {
         setenv("ZYGISK_ENABLED", "1", 1);
 };
 
-void exec_script(const char *script) {
+void exec_script(Utf8CStr script) {
     exec_t exec {
         .pre_exec = set_script_env,
         .fork = fork_no_orphan
     };
-    exec_command_sync(exec, BBEXEC_CMD, script);
+    exec_command_sync(exec, BBEXEC_CMD, script.c_str());
 }
 
 static timespec pfs_timeout;
@@ -205,17 +205,17 @@ install_module
 exit 0
 )EOF";
 
-void install_module(const char *file) {
+void install_module(Utf8CStr file) {
     if (getuid() != 0)
         abort(stderr, "Run this command with root");
     if (access(DATABIN, F_OK) ||
         access(bbpath(), X_OK) ||
         access(DATABIN "/util_functions.sh", F_OK))
         abort(stderr, "Incomplete Magisk install");
-    if (access(file, F_OK))
-        abort(stderr, "'%s' does not exist", file);
+    if (access(file.c_str(), F_OK))
+        abort(stderr, "'%s' does not exist", file.c_str());
 
-    char *zip = realpath(file, nullptr);
+    char *zip = realpath(file.c_str(), nullptr);
     setenv("OUTFD", "1", 1);
     setenv("ZIPFILE", zip, 1);
     setenv("ASH_STANDALONE", "1", 1);

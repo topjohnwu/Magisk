@@ -62,28 +62,35 @@ void denylist_handler(int client) {
     close(client);
 }
 
-int denylist_cli(int argc, char **argv) {
-    if (argc < 2)
+int denylist_cli(rust::Vec<rust::String> &args) {
+    if (args.empty())
         usage();
 
+    // Convert rust strings into c strings
+    size_t argc = args.size();
+    std::vector<const char *> argv;
+    ranges::transform(args, std::back_inserter(argv), [](rust::String &arg) { return arg.c_str(); });
+    // End with nullptr
+    argv.push_back(nullptr);
+
     int req;
-    if (argv[1] == "enable"sv)
+    if (argv[0] == "enable"sv)
         req = DenyRequest::ENFORCE;
-    else if (argv[1] == "disable"sv)
+    else if (argv[0] == "disable"sv)
         req = DenyRequest::DISABLE;
-    else if (argv[1] == "add"sv)
+    else if (argv[0] == "add"sv)
         req = DenyRequest::ADD;
-    else if (argv[1] == "rm"sv)
+    else if (argv[0] == "rm"sv)
         req = DenyRequest::REMOVE;
-    else if (argv[1] == "ls"sv)
+    else if (argv[0] == "ls"sv)
         req = DenyRequest::LIST;
-    else if (argv[1] == "status"sv)
+    else if (argv[0] == "status"sv)
         req = DenyRequest::STATUS;
-    else if (argv[1] == "exec"sv && argc > 2) {
+    else if (argv[0] == "exec"sv && argc > 1) {
         xunshare(CLONE_NEWNS);
         xmount(nullptr, "/", nullptr, MS_PRIVATE | MS_REC, nullptr);
         revert_unmount();
-        execvp(argv[2], argv + 2);
+        execvp(argv[1], (char **) argv.data() + 1);
         exit(1);
     } else {
         usage();
@@ -93,8 +100,8 @@ int denylist_cli(int argc, char **argv) {
     int fd = connect_daemon(RequestCode::DENYLIST);
     write_int(fd, req);
     if (req == DenyRequest::ADD || req == DenyRequest::REMOVE) {
-        write_string(fd, argv[2]);
-        write_string(fd, argv[3] ? argv[3] : "");
+        write_string(fd, argv[1]);
+        write_string(fd, argv[2] ? argv[2] : "");
     }
 
     // Get response

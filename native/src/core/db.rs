@@ -9,9 +9,8 @@ use base::{LoggedResult, ResultExt, Utf8CStr};
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 use std::ffi::c_void;
-use std::fs::File;
 use std::io::{BufReader, BufWriter};
-use std::os::fd::OwnedFd;
+use std::os::unix::net::UnixStream;
 use std::pin::Pin;
 use std::ptr;
 use std::ptr::NonNull;
@@ -302,8 +301,7 @@ impl MagiskD {
             .sql_result()
     }
 
-    pub fn db_exec_for_cli(&self, fd: OwnedFd) -> LoggedResult<()> {
-        let mut file = File::from(fd);
+    pub fn db_exec_for_cli(&self, mut file: UnixStream) -> LoggedResult<()> {
         let mut reader = BufReader::new(&mut file);
         let sql: String = reader.read_decodable()?;
         let mut writer = BufWriter::new(&mut file);

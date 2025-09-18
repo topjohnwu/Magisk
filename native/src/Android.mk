@@ -16,7 +16,6 @@ LOCAL_STATIC_LIBRARIES := \
 
 LOCAL_SRC_FILES := \
     core/applets.cpp \
-    core/magisk.cpp \
     core/scripting.cpp \
     core/sqlite.cpp \
     core/utils.cpp \

@@ -9,9 +9,10 @@
 
 use crate::ffi::SuRequest;
 use crate::socket::Encodable;
-use daemon::{MagiskD, connect_daemon};
+use daemon::{MagiskD, connect_daemon_for_cxx};
 use derive::Decodable;
 use logging::{android_logging, zygisk_close_logd, zygisk_get_logd, zygisk_logging};
+use magisk::magisk_main;
 use mount::{find_preinit_device, revert_unmount};
 use resetprop::{get_prop, resetprop_main};
 use selinux::{lgetfilecon, lsetfilecon, restorecon, setfilecon};
@@ -29,6 +30,7 @@ mod consts;
 mod daemon;
 mod db;
 mod logging;
+mod magisk;
 mod module;
 mod mount;
 mod package;
@@ -146,18 +148,22 @@ pub mod ffi {
         #[cxx_name = "resolve_preinit_dir_rs"]
         fn resolve_preinit_dir(base_dir: Utf8CStrRef) -> String;
         fn check_key_combo() -> bool;
-        #[cxx_name = "exec_script_rs"]
-        fn exec_script(script: Utf8CStrRef);
-        fn exec_common_scripts(stage: Utf8CStrRef);
-        fn exec_module_scripts(state: Utf8CStrRef, modules: &Vec<ModuleInfo>);
-        fn install_apk(apk: Utf8CStrRef);
-        fn uninstall_pkg(apk: Utf8CStrRef);
+        fn unlock_blocks();
         fn update_deny_flags(uid: i32, process: &str, flags: &mut u32);
         fn initialize_denylist();
         fn switch_mnt_ns(pid: i32) -> i32;
         fn exec_root_shell(client: i32, pid: i32, req: &mut SuRequest, mode: MntNsMode);
 
+        // Scripting
+        fn exec_script(script: Utf8CStrRef);
+        fn exec_common_scripts(stage: Utf8CStrRef);
+        fn exec_module_scripts(state: Utf8CStrRef, modules: &Vec<ModuleInfo>);
+        fn install_apk(apk: Utf8CStrRef);
+        fn uninstall_pkg(apk: Utf8CStrRef);
+        fn install_module(zip: Utf8CStrRef);
+
         // Denylist
+        fn denylist_cli(args: &mut Vec<String>) -> i32;
         fn denylist_handler(client: i32);
         fn scan_deny_apps();
 
@@ -198,7 +204,9 @@ pub mod ffi {
         fn get_prop(name: Utf8CStrRef) -> String;
         unsafe fn resetprop_main(argc: i32, argv: *mut *mut c_char) -> i32;
 
-        fn connect_daemon(code: RequestCode, create: bool) -> i32;
+        #[cxx_name = "connect_daemon"]
+        fn connect_daemon_for_cxx(code: RequestCode, create: bool) -> i32;
+        unsafe fn magisk_main(argc: i32, argv: *mut *mut c_char) -> i32;
     }
 
     // Default constructors
