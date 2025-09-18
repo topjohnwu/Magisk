@@ -12,21 +12,20 @@ use crate::module::remove_modules;
 use crate::package::ManagerInfo;
 use crate::resetprop::{get_prop, set_prop};
 use crate::selinux::restore_tmpcon;
-use crate::socket::IpcWrite;
+use crate::socket::{IpcRead, IpcWrite};
 use crate::su::SuInfo;
 use crate::thread::ThreadPool;
 use crate::zygisk::ZygiskState;
 use base::const_format::concatcp;
 use base::{
-    AtomicArc, BufReadExt, FileAttr, FsPathBuilder, ReadExt, ResultExt, Utf8CStr, Utf8CStrBuf,
-    WriteExt, cstr, error, fork_dont_care, info, libc, set_nice_name,
+    AtomicArc, BufReadExt, FileAttr, FsPathBuilder, LoggedResult, ReadExt, ResultExt, Utf8CStr,
+    Utf8CStrBuf, WriteExt, cstr, fork_dont_care, info, libc, log_err, set_nice_name,
 };
-use nix::unistd::getuid;
 use nix::{
     fcntl::OFlag,
     mount::MsFlags,
     sys::signal::SigSet,
-    unistd::{dup2_stderr, dup2_stdin, dup2_stdout, getpid, setsid},
+    unistd::{dup2_stderr, dup2_stdin, dup2_stdout, getpid, getuid, setsid},
 };
 use num_traits::AsPrimitive;
 use std::fmt::Write as _;
@@ -134,14 +133,13 @@ impl MagiskD {
                 self.zygisk.lock().unwrap().reset(false);
             }
             RequestCode::SQLITE_CMD => {
-                self.db_exec_for_cli(client.into()).ok();
+                self.db_exec_for_cli(client).ok();
             }
             RequestCode::REMOVE_MODULES => {
-                let mut do_reboot: i32 = 0;
-                client.read_pod(&mut do_reboot).log_ok();
+                let do_reboot: bool = client.read_decodable().log().unwrap_or_default();
                 remove_modules();
                 client.write_pod(&0).log_ok();
-                if do_reboot != 0 {
+                if do_reboot {
                     self.reboot();
                 }
             }
@@ -422,29 +420,26 @@ fn daemon_entry() {
     }
 }
 
-pub fn connect_daemon(code: RequestCode, create: bool) -> RawFd {
+pub fn connect_daemon(code: RequestCode, create: bool) -> LoggedResult<UnixStream> {
     let sock_path = cstr::buf::new::<64>()
         .join_path(get_magisk_tmp())
         .join_path(MAIN_SOCKET);
 
-    fn send_request(code: RequestCode, mut socket: UnixStream) -> RawFd {
+    fn send_request(code: RequestCode, mut socket: UnixStream) -> LoggedResult<UnixStream> {
         socket.write_pod(&code.repr).log_ok();
         let mut res = -1;
         socket.read_pod(&mut res).log_ok();
         let res = RespondCode { repr: res };
         match res {
-            RespondCode::OK => socket.into_raw_fd(),
+            RespondCode::OK => Ok(socket),
             RespondCode::ROOT_REQUIRED => {
-                error!("Root is required for this operation");
-                -1
+                log_err!("Root is required for this operation")
             }
             RespondCode::ACCESS_DENIED => {
-                error!("Accessed denied");
-                -1
+                log_err!("Accessed denied")
             }
             _ => {
-                error!("Daemon error");
-                -1
+                log_err!("Daemon error")
             }
         }
     }
@@ -453,16 +448,14 @@ pub fn connect_daemon(code: RequestCode, create: bool) -> RawFd {
         Ok(socket) => send_request(code, socket),
         Err(e) => {
             if !create || !getuid().is_root() {
-                error!("Cannot connect to daemon: {e}");
-                return -1;
+                return log_err!("Cannot connect to daemon: {e}");
             }
 
             let mut buf = cstr::buf::new::<64>();
             if cstr!("/proc/self/exe").read_link(&mut buf).is_err()
                 || !buf.starts_with(get_magisk_tmp().as_str())
             {
-                error!("Start daemon on magisk tmpfs");
-                return -1;
+                return log_err!("Start daemon on magisk tmpfs");
             }
 
             // Fork a process and run the daemon
@@ -481,4 +474,10 @@ pub fn connect_daemon(code: RequestCode, create: bool) -> RawFd {
             }
         }
     }
+}
+
+pub fn connect_daemon_for_cxx(code: RequestCode, create: bool) -> RawFd {
+    connect_daemon(code, create)
+        .map(IntoRawFd::into_raw_fd)
+        .unwrap_or(-1)
 }
