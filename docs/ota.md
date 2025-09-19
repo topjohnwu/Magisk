@@ -17,7 +17,7 @@ Magisk does not modify most read-only partitions, which means applying official 
 It is possible to have the OTA installed to the inactive slot and have the Magisk app install Magisk onto the updated partitions. The out-of-the-box OTA installation works seamlessly and Magisk can be preserved after the installation.
 
 - After restoring stock images, apply OTAs as you normally would (Settings → System → System Update).
-- Wait for the installation to be fully done (both step 1: "installing update", and step 2: "optimizing your device", of the OTA), **do not press the "Restart now" or "Reboot" button!** Instead, go to (Magisk app → Install → Install to Inactive Slot) to install Magisk to the updated slot.
+- Wait for the installation to be fully done (both step 1: "installing update", and step 2: "optimizing your device", of the OTA), **do not press the "Restart now", "Reboot" or "Install now" (on OnePlus devices) button!** Instead, go to (Magisk app → Install → Install to Inactive Slot) to install Magisk to the updated slot.
 
 <p align="center"><img src="images/ota_done.png" width="250"/> <img src="images/install_inactive_slot.png" width="250"/></p>
 
