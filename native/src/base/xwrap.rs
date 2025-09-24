@@ -2,7 +2,7 @@
 
 use crate::cxx_extern::readlinkat;
 use crate::{Directory, LibcReturn, ResultExt, Utf8CStr, cstr, slice_from_ptr, slice_from_ptr_mut};
-use libc::{c_char, c_uint, c_ulong, c_void, dev_t, mode_t, off_t, sockaddr, socklen_t};
+use libc::{c_char, c_uint, c_ulong, c_void, dev_t, mode_t, off_t};
 use std::ffi::CStr;
 use std::fs::File;
 use std::io::{Read, Write};
@@ -196,51 +196,6 @@ extern "C" fn xsetsid() -> i32 {
     unsafe {
         libc::setsid()
             .into_os_result("setsid", None, None)
-            .log()
-            .unwrap_or(-1)
-    }
-}
-
-#[unsafe(no_mangle)]
-extern "C" fn xsocket(domain: i32, ty: i32, protocol: i32) -> RawFd {
-    unsafe {
-        libc::socket(domain, ty, protocol)
-            .into_os_result("socket", None, None)
-            .log()
-            .unwrap_or(-1)
-    }
-}
-
-#[unsafe(no_mangle)]
-unsafe extern "C" fn xbind(socket: i32, address: *const sockaddr, len: socklen_t) -> i32 {
-    unsafe {
-        libc::bind(socket, address, len)
-            .into_os_result("bind", None, None)
-            .log()
-            .unwrap_or(-1)
-    }
-}
-
-#[unsafe(no_mangle)]
-extern "C" fn xlisten(socket: i32, backlog: i32) -> i32 {
-    unsafe {
-        libc::listen(socket, backlog)
-            .into_os_result("listen", None, None)
-            .log()
-            .unwrap_or(-1)
-    }
-}
-
-#[unsafe(no_mangle)]
-unsafe extern "C" fn xaccept4(
-    sockfd: RawFd,
-    addr: *mut sockaddr,
-    len: *mut socklen_t,
-    flg: i32,
-) -> RawFd {
-    unsafe {
-        libc::accept4(sockfd, addr, len, flg)
-            .into_os_result("accept4", None, None)
             .log()
             .unwrap_or(-1)
     }

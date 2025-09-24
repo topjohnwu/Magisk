@@ -104,7 +104,3 @@ pub(crate) fn lgetfilecon(path: &Utf8CStr, con: &mut [u8]) -> bool {
 pub(crate) fn setfilecon(path: &Utf8CStr, con: &Utf8CStr) -> bool {
     path.follow_link().set_secontext(con).is_ok()
 }
-
-pub(crate) fn lsetfilecon(path: &Utf8CStr, con: &Utf8CStr) -> bool {
-    path.set_secontext(con).is_ok()
-}

@@ -13,9 +13,9 @@ use daemon::{MagiskD, connect_daemon_for_cxx};
 use derive::Decodable;
 use logging::{android_logging, zygisk_close_logd, zygisk_get_logd, zygisk_logging};
 use magisk::magisk_main;
-use mount::{find_preinit_device, revert_unmount};
+use mount::revert_unmount;
 use resetprop::{get_prop, resetprop_main};
-use selinux::{lgetfilecon, lsetfilecon, restorecon, setfilecon};
+use selinux::{lgetfilecon, setfilecon};
 use socket::{recv_fd, recv_fds, send_fd};
 use std::fs::File;
 use std::mem::ManuallyDrop;
@@ -187,7 +187,6 @@ pub mod ffi {
         fn zygisk_logging();
         fn zygisk_close_logd();
         fn zygisk_get_logd() -> i32;
-        fn find_preinit_device() -> String;
         fn revert_unmount(pid: i32);
         fn zygisk_should_load_module(flags: u32) -> bool;
         fn send_fd(socket: i32, fd: i32) -> bool;
@@ -196,10 +195,8 @@ pub mod ffi {
         fn write_to_fd(self: &SuRequest, fd: i32);
         fn pump_tty(ptmx: i32, pump_stdin: bool);
         fn get_pty_num(fd: i32) -> i32;
-        fn restorecon();
         fn lgetfilecon(path: Utf8CStrRef, con: &mut [u8]) -> bool;
         fn setfilecon(path: Utf8CStrRef, con: Utf8CStrRef) -> bool;
-        fn lsetfilecon(path: Utf8CStrRef, con: Utf8CStrRef) -> bool;
 
         fn get_prop(name: Utf8CStrRef) -> String;
         unsafe fn resetprop_main(argc: i32, argv: *mut *mut c_char) -> i32;
