@@ -82,10 +82,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: [23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, "36.0-CANARY"]
+        version: [23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, "CANARY"]
         type: [""]
         include:
-          - version: "36.0-CANARY"
+          - version: "CANARY"
             type: "google_apis_ps16k"
 
     steps:
