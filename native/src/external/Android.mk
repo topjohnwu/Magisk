@@ -81,6 +81,7 @@ LOCAL_SRC_FILES := \
     selinux/libsepol/cil/src/cil_binary.c \
     selinux/libsepol/cil/src/cil_build_ast.c \
     selinux/libsepol/cil/src/cil_copy_ast.c \
+    selinux/libsepol/cil/src/cil_deny.c \
     selinux/libsepol/cil/src/cil_find.c \
     selinux/libsepol/cil/src/cil_fqn.c \
     selinux/libsepol/cil/src/cil_lexer.c \
