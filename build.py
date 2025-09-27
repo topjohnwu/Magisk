@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import argparse
-import copy
 import glob
 import multiprocessing
 import os
@@ -38,8 +37,13 @@ def vprint(str):
         print(str)
 
 
-# Environment checks and detection
-is_windows = os.name == "nt"
+# OS detection
+os_name = platform.system().lower()
+is_windows = False
+if os_name != "linux" and os_name != "darwin":
+    # It's possible we're using MSYS/Cygwin/MinGW, treat them all as Windows
+    is_windows = True
+    os_name = "windows"
 EXE_EXT = ".exe" if is_windows else ""
 
 no_color = False
@@ -56,7 +60,6 @@ if not sys.version_info >= (3, 8):
     error("Requires Python 3.8+")
 
 cpu_count = multiprocessing.cpu_count()
-os_name = platform.system().lower()
 
 # Common constants
 support_abis = {
@@ -66,16 +69,24 @@ support_abis = {
     "x86_64": "x86_64-linux-android",
     "riscv64": "riscv64-linux-android",
 }
-default_archs = {"armeabi-v7a", "x86", "arm64-v8a", "x86_64"}
-default_targets = {"magisk", "magiskinit", "magiskboot", "magiskpolicy"}
-support_targets = default_targets | {"resetprop"}
-rust_targets = {"magisk", "magiskinit", "magiskboot", "magiskpolicy"}
+abi_alias = {
+    "arm": "armeabi-v7a",
+    "arm32": "armeabi-v7a",
+    "arm64": "arm64-v8a",
+    "x64": "x86_64",
+}
+default_abis = support_abis.keys() - {"riscv64"}
+support_targets = {"magisk", "magiskinit", "magiskboot", "magiskpolicy", "resetprop"}
+default_targets = support_targets - {"resetprop"}
+rust_targets = default_targets.copy()
+clean_targets = {"native", "cpp", "rust", "app"}
 ondk_version = "r29.2"
 
 # Global vars
 config = {}
-args = {}
-build_abis = {}
+args: argparse.Namespace
+build_abis: dict[str, str]
+force_out = False
 
 ###################
 # Helper functions
@@ -125,7 +136,7 @@ def rm_rf(path: Path):
 
 
 def execv(cmds: list, env=None):
-    out = None if args.force_out or args.verbose > 0 else subprocess.DEVNULL
+    out = None if force_out or args.verbose > 0 else subprocess.DEVNULL
     # Use shell on Windows to support PATHEXT
     return subprocess.run(cmds, stdout=out, env=env, shell=is_windows)
 
@@ -170,7 +181,7 @@ def collect_ndk_build():
             mv(source, target)
 
 
-def run_ndk_build(cmds: list):
+def run_ndk_build(cmds: list[str]):
     os.chdir("native")
     cmds.append("NDK_PROJECT_PATH=.")
     cmds.append("NDK_APPLICATION_MK=src/Application.mk")
@@ -186,7 +197,7 @@ def run_ndk_build(cmds: list):
     os.chdir("..")
 
 
-def build_cpp_src(targets: set):
+def build_cpp_src(targets: set[str]):
     cmds = []
     clean = False
 
@@ -225,15 +236,22 @@ def build_cpp_src(targets: set):
         clean_elf()
 
 
-def run_cargo(cmds):
+def run_cargo(cmds: list[str]):
     ensure_paths()
     env = os.environ.copy()
-    env["RUSTUP_TOOLCHAIN"] = str(rust_sysroot)
+    env["PATH"] = f"{rust_sysroot / "bin"}{os.pathsep}{env["PATH"]}"
     env["CARGO_BUILD_RUSTFLAGS"] = f"-Z threads={min(8, cpu_count)}"
+    # Cargo calls executables in $RUSTROOT/lib/rustlib/$TRIPLE/bin, we need
+    # to make sure the runtime linker also search $RUSTROOT/lib for libraries.
+    # This is only required on Unix, as Windows search dlls from PATH.
+    if os_name == "darwin":
+        env["DYLD_FALLBACK_LIBRARY_PATH"] = str(rust_sysroot / "lib")
+    elif os_name == "linux":
+        env["LD_LIBRARY_PATH"] = str(rust_sysroot / "lib")
     return execv(["cargo", *cmds], env)
 
 
-def build_rust_src(targets: set):
+def build_rust_src(targets: set[str]):
     targets = targets.copy()
     if "resetprop" in targets:
         targets.add("magisk")
@@ -432,8 +450,7 @@ def build_stub():
 
 
 def build_test():
-    global args
-    args_bak = copy.copy(args)
+    old_release = args.release
     # Test APK has to be built as release to prevent classname clash
     args.release = True
     try:
@@ -443,7 +460,7 @@ def build_test():
         mv(source, target)
         header(f"Output: {target}")
     finally:
-        args = args_bak
+        args.release = old_release
 
 
 ################
@@ -453,14 +470,13 @@ def build_test():
 
 def cleanup():
     ensure_paths()
-    support_targets = {"native", "cpp", "rust", "app"}
     if args.targets:
-        targets = set(args.targets) & support_targets
+        targets: set[str] = set(args.targets) & clean_targets
         if "native" in targets:
             targets.add("cpp")
             targets.add("rust")
     else:
-        targets = support_targets
+        targets = clean_targets
 
     if "cpp" in targets:
         header("* Cleaning C++")
@@ -469,11 +485,11 @@ def cleanup():
 
     if "rust" in targets:
         header("* Cleaning Rust")
-        rm_rf(Path("native", "src", "target"))
+        rm_rf(Path("native", "out", "rust"))
         rm(Path("native", "src", "boot", "proto", "mod.rs"))
         rm(Path("native", "src", "boot", "proto", "update_metadata.rs"))
         for rs_gen in glob.glob("native/**/*-rs.*pp", recursive=True):
-            rm(rs_gen)
+            rm(Path(rs_gen))
 
     if "native" in targets:
         header("* Cleaning native")
@@ -500,7 +516,7 @@ def build_all():
 
 def gen_ide():
     ensure_paths()
-    set_archs({args.abi})
+    set_build_abis({args.abi})
 
     # Dump flags for both C++ and Rust code
     dump_flag_header()
@@ -528,22 +544,31 @@ def gen_ide():
 
 def clippy_cli():
     ensure_toolchain()
-    args.force_out = True
+    global force_out
+    force_out = True
     if args.abi:
-        set_archs({args.abi})
+        set_build_abis(set(args.abi))
     else:
-        set_archs(default_archs)
+        set_build_abis(default_abis)
+
+    if not args.release and not args.debug:
+        # If none is specified, run both
+        args.release = True
+        args.debug = True
 
     os.chdir(Path("native", "src"))
     cmds = ["clippy", "--no-deps", "--target"]
     for triple in build_abis.values():
-        run_cargo(cmds + [triple])
-        run_cargo(cmds + [triple, "--release"])
+        if args.debug:
+            run_cargo(cmds + [triple])
+        if args.release:
+            run_cargo(cmds + [triple, "--release"])
     os.chdir(Path("..", ".."))
 
 
 def cargo_cli():
-    args.force_out = True
+    global force_out
+    force_out = True
     if len(args.commands) >= 1 and args.commands[0] == "--":
         args.commands = args.commands[1:]
     os.chdir(Path("native", "src"))
@@ -603,7 +628,7 @@ def setup_rustup():
 ##################
 
 
-def push_files(script):
+def push_files(script: Path):
     if args.build:
         build_all()
     ensure_adb()
@@ -680,8 +705,8 @@ def patch_avd_file():
 
 
 def ensure_paths():
-    global sdk_path, ndk_root, ndk_path, ndk_build, rust_sysroot
-    global llvm_bin, gradlew, adb_path, native_gen_path
+    global sdk_path, ndk_root, ndk_path, rust_sysroot
+    global ndk_build, gradlew, adb_path
 
     # Skip if already initialized
     if "sdk_path" in globals():
@@ -699,9 +724,6 @@ def ensure_paths():
     ndk_path = ndk_root / "magisk"
     ndk_build = ndk_path / "ndk-build"
     rust_sysroot = ndk_path / "toolchains" / "rust"
-    llvm_bin = (
-        ndk_path / "toolchains" / "llvm" / "prebuilt" / f"{os_name}-x86_64" / "bin"
-    )
     adb_path = sdk_path / "platform-tools" / "adb"
     gradlew = Path.cwd() / "app" / "gradlew"
 
@@ -710,14 +732,13 @@ def ensure_paths():
 def ensure_adb():
     global adb_path
     if "adb_path" not in globals():
-        adb_path = shutil.which("adb")
-        if not adb_path:
-            error("Command 'adb' cannot be found in PATH")
+        if adb := shutil.which("adb"):
+            adb_path = Path(adb)
         else:
-            adb_path = Path(adb_path)
+            error("Command 'adb' cannot be found in PATH")
 
 
-def parse_props(file):
+def parse_props(file: Path) -> dict[str, str]:
     props = {}
     with open(file, "r") as f:
         for line in [l.strip(" \t\r\n") for l in f]:
@@ -734,10 +755,14 @@ def parse_props(file):
     return props
 
 
-def set_archs(archs: set):
-    triples = map(support_abis.get, archs)
+def set_build_abis(abis: set[str]):
     global build_abis
-    build_abis = dict(zip(archs, triples))
+    # Try to convert several aliases to real ABI
+    abis = {abi_alias.get(k, k) for k in abis}
+    # Check any unknown ABIs
+    for k in abis - support_abis.keys():
+        error(f"Unknown ABI: {k}")
+    build_abis = {k: support_abis[k] for k in abis if k in support_abis}
 
 
 def load_config():
@@ -747,8 +772,6 @@ def load_config():
     config["version"] = commit_hash
     config["versionCode"] = 1000000
     config["outdir"] = "out"
-
-    args.config = Path(args.config)
 
     # Load prop files
     if args.config.exists():
@@ -769,12 +792,11 @@ def load_config():
     config["outdir"].mkdir(mode=0o755, parents=True, exist_ok=True)
 
     if "abiList" in config:
-        abiList = re.split("\\s*,\\s*", config["abiList"])
-        archs = set(abiList) & support_abis.keys()
+        abis = set(re.split("\\s*,\\s*", config["abiList"]))
     else:
-        archs = default_archs
+        abis = default_abis
 
-    set_archs(archs)
+    set_build_abis(abis)
 
 
 def parse_args():
@@ -839,7 +861,15 @@ def parse_args():
     cargo_parser.add_argument("commands", nargs=argparse.REMAINDER)
 
     clippy_parser = subparsers.add_parser("clippy", help="run clippy on Rust sources")
-    clippy_parser.add_argument("--abi", help="target ABI to generate")
+    clippy_parser.add_argument(
+        "--abi", action="append", help="target ABI(s) to run clippy"
+    )
+    clippy_parser.add_argument(
+        "-r", "--release", action="store_true", help="run clippy as release"
+    )
+    clippy_parser.add_argument(
+        "-d", "--debug", action="store_true", help="run clippy as debug"
+    )
 
     rustup_parser = subparsers.add_parser("rustup", help="setup rustup wrapper")
     rustup_parser.add_argument(
@@ -874,8 +904,8 @@ def parse_args():
 def main():
     global args
     args = parse_args()
+    args.config = Path(args.config)
     load_config()
-    vars(args)["force_out"] = False
     args.func()
 
 
