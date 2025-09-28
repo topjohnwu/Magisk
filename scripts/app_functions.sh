@@ -214,6 +214,7 @@ get_flags() {
     PATCHVBMETAFLAG=true
   fi
   [ -z $RECOVERYMODE ] && RECOVERYMODE=false
+  [ -z $VENDORBOOT ] && VENDORBOOT=false
 }
 
 run_migrations() { return; }
@@ -243,6 +244,7 @@ app_init() {
   printvar RECOVERYMODE
   printvar KEEPVERITY
   printvar KEEPFORCEENCRYPT
+  printvar VENDORBOOT
 }
 
 export BOOTMODE=true

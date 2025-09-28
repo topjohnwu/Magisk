@@ -437,7 +437,7 @@ private:
 #define __impl_cls(name, hdr)           \
 protected: name() = default;            \
 public:                                 \
-name(const void *ptr) {                 \
+explicit name(const void *ptr) {        \
     raw = malloc(sizeof(hdr));          \
     memcpy(raw, ptr, sizeof(hdr));      \
 }                                       \
@@ -651,10 +651,10 @@ struct boot_img {
     // +---------------+
     // | z_info.tail   | z_info.tail.sz()
     // +---------------+
-    const zimage_hdr *z_hdr = nullptr;
     struct {
-        uint32_t hdr_sz;
-        byte_view tail;
+        const zimage_hdr *hdr = nullptr;
+        uint32_t hdr_sz = 0;
+        byte_view tail{};
     } z_info;
 
     // AVB structs
@@ -675,14 +675,12 @@ struct boot_img {
     // dtb embedded in kernel
     byte_view kernel_dtb;
 
-    // Blocks defined in header but we do not care
-    byte_view ignore;
-
-    boot_img(const char *);
+    explicit boot_img(const char *);
     ~boot_img();
 
     bool parse_image(const uint8_t *addr, FileFormat type);
     std::pair<const uint8_t *, dyn_img_hdr *> create_hdr(const uint8_t *addr, FileFormat type);
+    std::span<const vendor_ramdisk_table_entry_v4> vendor_ramdisk_tbl() const;
 
     // Rust FFI
     static std::unique_ptr<boot_img> create(Utf8CStr name) { return std::make_unique<boot_img>(name.c_str()); }

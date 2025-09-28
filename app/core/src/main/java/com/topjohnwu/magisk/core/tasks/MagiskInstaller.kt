@@ -81,10 +81,12 @@ abstract class MagiskInstallImpl protected constructor(
     }
 
     private fun findImage(slot: String): Boolean {
-        val bootPath = (
-            "(RECOVERYMODE=${Config.recovery} " +
-            "SLOT=$slot find_boot_image; " +
-            "echo \$BOOTIMAGE)").fsh()
+        val cmd =
+            "RECOVERYMODE=${Config.recovery} " +
+            "VENDORBOOT=${Info.isVendorBoot} " +
+            "SLOT=$slot " +
+            "find_boot_image; echo \$BOOTIMAGE"
+        val bootPath = ("($cmd)").fsh()
         if (bootPath.isEmpty()) {
             console.add("! Unable to detect target image")
             return false

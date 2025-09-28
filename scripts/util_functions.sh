@@ -325,7 +325,7 @@ mount_partitions() {
 
 # After calling this method, the following variables will be set:
 # ISENCRYPTED, PATCHVBMETAFLAG,
-# KEEPVERITY, KEEPFORCEENCRYPT, RECOVERYMODE
+# KEEPVERITY, KEEPFORCEENCRYPT, RECOVERYMODE, VENDORBOOT
 get_flags() {
   if grep ' /data ' /proc/mounts | grep -q 'dm-'; then
     ISENCRYPTED=true
@@ -348,6 +348,7 @@ get_flags() {
   getvar KEEPVERITY
   getvar KEEPFORCEENCRYPT
   getvar RECOVERYMODE
+  getvar VENDORBOOT
   if [ -z $KEEPVERITY ]; then
     if $SYSTEM_AS_ROOT; then
       KEEPVERITY=true
@@ -365,13 +366,23 @@ get_flags() {
     fi
   fi
   [ -z $RECOVERYMODE ] && RECOVERYMODE=false
+  [ -z $VENDORBOOT ] && VENDORBOOT=false
 }
 
+# Returns whether the device is GKI 13+
+is_gt_gki_13() {
+  [ "$(uname -r | cut -d. -f1)" -ge 5 ] && uname -r | grep -Evq "android12-|^5\.4"
+}
+
+# Require RECOVERYMODE, VENDORBOOT, SLOT to be set.
+# After calling this method, BOOTIMAGE will be set.
 find_boot_image() {
   BOOTIMAGE=
-  if $RECOVERYMODE; then
+  if $VENDORBOOT; then
+    BOOTIMAGE="/dev/block/by-name/vendor_boot$SLOT"
+  elif $RECOVERYMODE; then
     BOOTIMAGE=$(find_block "recovery$SLOT" "sos")
-  elif [ -e "/dev/block/by-name/init_boot$SLOT" ] && [ "$(uname -r | cut -d. -f1)" -ge 5 ] && uname -r | grep -Evq "android12-|^5\.4"; then
+  elif [ -e "/dev/block/by-name/init_boot$SLOT" ] && is_gt_gki_13; then
     # init_boot is only used with GKI 13+. It is possible that some devices with init_boot
     # partition still uses Android 12 GKI or previous kernels, so we need to explicitly detect that scenario.
     BOOTIMAGE="/dev/block/by-name/init_boot$SLOT"

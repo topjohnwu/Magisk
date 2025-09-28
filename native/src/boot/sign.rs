@@ -25,7 +25,7 @@ use x509_cert::der::Any;
 use x509_cert::der::asn1::{OctetString, PrintableString};
 use x509_cert::spki::AlgorithmIdentifier;
 
-use base::{LoggedResult, MappedFile, ResultExt, Utf8CStr, cstr, log_err};
+use base::{LoggedResult, MappedFile, ResultExt, SilentLogExt, Utf8CStr, cstr, log_err};
 
 use crate::ffi::BootImage;
 
@@ -273,7 +273,7 @@ impl BootImage {
 
         // Don't use BootSignature::from_der because tail might have trailing zeros
         let mut reader = SliceReader::new(tail)?;
-        let mut sig = BootSignature::decode(&mut reader)?;
+        let mut sig = BootSignature::decode(&mut reader).silent()?;
         if let Some(s) = cert {
             let pem = MappedFile::open(s)?;
             sig.certificate = Certificate::from_pem(pem)?;

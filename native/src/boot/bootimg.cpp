@@ -15,6 +15,11 @@ using namespace std;
 #define SHA256_DIGEST_SIZE 32
 #define SHA_DIGEST_SIZE 20
 
+#define RETURN_OK       0
+#define RETURN_ERROR    1
+#define RETURN_CHROMEOS 2
+#define RETURN_VENDOR   3
+
 static void decompress(FileFormat type, int fd, const void *in, size_t size) {
     decompress_bytes(type, byte_view { in, size }, fd);
 }
@@ -217,7 +222,7 @@ map(image), k_fmt(FileFormat::UNKNOWN), r_fmt(FileFormat::UNKNOWN), e_fmt(FileFo
             break;
         }
     }
-    exit(1);
+    exit(RETURN_ERROR);
 }
 
 boot_img::~boot_img() {
@@ -263,7 +268,6 @@ struct [[gnu::packed]] fdt_header {
     /* version 17 fields below */
     fdt32_t size_dt_struct;		 /* size of the structure block */
 };
-
 
 static int find_dtb_offset(const uint8_t *buf, unsigned sz) {
     const uint8_t * const end = buf + sz;
@@ -403,6 +407,23 @@ static const char *vendor_ramdisk_type(int type) {
     }
 }
 
+std::span<const vendor_ramdisk_table_entry_v4> boot_img::vendor_ramdisk_tbl() const {
+    if (hdr->vendor_ramdisk_table_size() == 0) {
+        return {};
+    }
+
+    // v4 vendor boot contains multiple ramdisks
+    using table_entry = const vendor_ramdisk_table_entry_v4;
+    if (hdr->vendor_ramdisk_table_entry_size() != sizeof(table_entry)) {
+        fprintf(stderr,
+                "! Invalid vendor image: vendor_ramdisk_table_entry_size != %zu\n",
+                sizeof(table_entry));
+        exit(RETURN_ERROR);
+    }
+    return span(reinterpret_cast<table_entry *>(vendor_ramdisk_table), hdr->vendor_ramdisk_table_entry_num());
+}
+
+
 #define assert_off() \
 if ((base_addr + off) > (map.data() + map_end)) { \
     fprintf(stderr, "Corrupted boot image!\n");   \
@@ -421,6 +442,7 @@ bool boot_img::parse_image(const uint8_t *p, FileFormat type) {
         fprintf(stderr, "Invalid boot image header!\n");
         return false;
     }
+    this->hdr = hdr;
 
     if (const char *id = hdr->id()) {
         for (int i = SHA_DIGEST_SIZE + 4; i < SHA256_DIGEST_SIZE; ++i) {
@@ -468,9 +490,9 @@ bool boot_img::parse_image(const uint8_t *p, FileFormat type) {
             k_fmt = check_fmt_lg(kernel, hdr->kernel_size());
         }
         if (k_fmt == FileFormat::ZIMAGE) {
-            z_hdr = reinterpret_cast<const zimage_hdr *>(kernel);
+            z_info.hdr = reinterpret_cast<const zimage_hdr *>(kernel);
 
-            const uint8_t* found_pos = 0;
+            const uint8_t* found_pos = nullptr;
 
             for (const uint8_t* search_pos = kernel + 0x28; search_pos < kernel + hdr->kernel_size(); search_pos++) {
                 //                                  ^^^^^^ +0x28 to search after zimage header and magic
@@ -480,12 +502,12 @@ bool boot_img::parse_image(const uint8_t *p, FileFormat type) {
                 }
             }
 
-            if (found_pos != 0) {
+            if (found_pos != nullptr) {
                 fprintf(stderr, "ZIMAGE_KERNEL\n");
-                z_info.hdr_sz = (const uint8_t *) found_pos - kernel;
+                z_info.hdr_sz = found_pos - kernel;
 
                 // Find end of piggy
-                uint32_t zImage_size = z_hdr->end - z_hdr->start;
+                uint32_t zImage_size = z_info.hdr->end - z_info.hdr->start;
                 uint32_t piggy_end = zImage_size;
                 uint32_t offsets[16];
                 memcpy(offsets, kernel + zImage_size - sizeof(offsets), sizeof(offsets));
@@ -513,19 +535,7 @@ bool boot_img::parse_image(const uint8_t *p, FileFormat type) {
     }
     if (auto size = hdr->ramdisk_size()) {
         if (hdr->vendor_ramdisk_table_size()) {
-            // v4 vendor boot contains multiple ramdisks
-            using table_entry = const vendor_ramdisk_table_entry_v4;
-            if (hdr->vendor_ramdisk_table_entry_size() != sizeof(table_entry)) {
-                fprintf(stderr,
-                        "! Invalid vendor image: vendor_ramdisk_table_entry_size != %zu\n",
-                        sizeof(table_entry));
-                exit(1);
-            }
-
-            span<table_entry> table(
-                    reinterpret_cast<table_entry *>(vendor_ramdisk_table),
-                    hdr->vendor_ramdisk_table_entry_num());
-            for (auto &it : table) {
+            for (auto &it : vendor_ramdisk_tbl()) {
                 FileFormat fmt = check_fmt_lg(ramdisk + it.ramdisk_offset, it.ramdisk_size);
                 fprintf(stderr,
                         "%-*s name=[%s] type=[%s] size=[%u] fmt=[%s]\n", PADDING, "VND_RAMDISK",
@@ -579,7 +589,6 @@ bool boot_img::parse_image(const uint8_t *p, FileFormat type) {
         }
     }
 
-    this->hdr = hdr;
     return true;
 }
 
@@ -680,7 +689,9 @@ int unpack(Utf8CStr image, bool skip_decomp, bool hdr) {
     // Dump bootconfig
     dump(boot.bootconfig, boot.hdr->bootconfig_size(), BOOTCONFIG_FILE);
 
-    return boot.flags[CHROMEOS_FLAG] ? 2 : 0;
+    if (boot.flags[CHROMEOS_FLAG]) return RETURN_CHROMEOS;
+    if (boot.hdr->is_vendor()) return RETURN_VENDOR;
+    return RETURN_OK;
 }
 
 #define file_align_with(page_size) \
@@ -744,7 +755,7 @@ void repack(Utf8CStr src_img, Utf8CStr out_img, bool skip_comp) {
     }
     if (boot.flags[ZIMAGE_KERNEL]) {
         // Copy zImage headers
-        xwrite(fd, boot.z_hdr, boot.z_info.hdr_sz);
+        xwrite(fd, boot.z_info.hdr, boot.z_info.hdr_sz);
     }
     if (access(KERNEL_FILE, R_OK) == 0) {
         mmap_data m(KERNEL_FILE);
@@ -794,15 +805,11 @@ void repack(Utf8CStr src_img, Utf8CStr out_img, bool skip_comp) {
         xwrite(fd, boot.r_hdr, sizeof(mtk_hdr));
     }
 
-    using table_entry = vendor_ramdisk_table_entry_v4;
-    vector<table_entry> ramdisk_table;
+    vector<vendor_ramdisk_table_entry_v4> ramdisk_table;
 
     if (boot.hdr->vendor_ramdisk_table_size()) {
         // Create a copy so we can modify it
-        auto entry_start = reinterpret_cast<const table_entry *>(boot.vendor_ramdisk_table);
-        ramdisk_table.insert(
-                ramdisk_table.begin(),
-                entry_start, entry_start + boot.hdr->vendor_ramdisk_table_entry_num());
+        ramdisk_table.assign_range(boot.vendor_ramdisk_tbl());
 
         owned_fd dirfd = xopen(VND_RAMDISK_DIR, O_RDONLY | O_CLOEXEC);
         uint32_t ramdisk_offset = 0;
@@ -885,7 +892,7 @@ void repack(Utf8CStr src_img, Utf8CStr out_img, bool skip_comp) {
 
     // vendor ramdisk table
     if (!ramdisk_table.empty()) {
-        xwrite(fd, ramdisk_table.data(), sizeof(table_entry) * ramdisk_table.size());
+        xwrite(fd, ramdisk_table.data(), sizeof(*ramdisk_table.data()) * ramdisk_table.size());
         file_align();
     }
 
