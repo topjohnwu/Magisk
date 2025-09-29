@@ -1,17 +1,20 @@
 package com.topjohnwu.magisk.core.utils;
 
+import org.apache.commons.io.input.BoundedInputStream;
+
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ClosedChannelException;
+import java.nio.channels.FileChannel;
 import java.nio.channels.NonWritableChannelException;
 import java.nio.channels.SeekableByteChannel;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okio.BufferedSource;
 
-public class HttpFileChannel implements SeekableByteChannel {
+public class DataSourceChannel implements SeekableByteChannel {
     private static final int RANDOM_READ_CACHE_SIZE = 16 * 1024;
     private static final int SEQ_READ_CACHE_SIZE = 1024 * 1024;
     private static final int SEQ_READ_THRESHOLD = 1024;
@@ -19,6 +22,7 @@ public class HttpFileChannel implements SeekableByteChannel {
 
     private final OkHttpClient client;
     private final String url;
+    private final FileChannel fileChannel;
     private final long startOffset;
     private final long size;
 
@@ -28,15 +32,21 @@ public class HttpFileChannel implements SeekableByteChannel {
     private byte[] cache = null;
     private long cacheStart = -1;
 
-    public HttpFileChannel(OkHttpClient client, String url, long startOffset, long size) {
+    private DataSourceChannel(OkHttpClient client, String url, FileChannel fileChannel,
+                              long startOffset, long size) {
         this.client = client;
         this.url = url;
+        this.fileChannel = fileChannel;
         this.startOffset = startOffset;
         this.size = size;
     }
 
-    public HttpFileChannel(OkHttpClient client, String url) throws IOException {
-        this(client, url, 0, fetchTotalSize(client, url));
+    public DataSourceChannel(FileChannel fileChannel) throws IOException {
+        this(null, null, fileChannel, 0, fileChannel.size());
+    }
+
+    public DataSourceChannel(OkHttpClient client, String url) throws IOException {
+        this(client, url, null, 0, fetchTotalSize(client, url));
     }
 
     private static long fetchTotalSize(OkHttpClient client, String url) throws IOException {
@@ -57,14 +67,14 @@ public class HttpFileChannel implements SeekableByteChannel {
         }
     }
 
-    public HttpFileChannel slice(long offset, long sliceSize) {
+    public DataSourceChannel slice(long offset, long sliceSize) {
         if (offset == 0 && sliceSize == size) {
             return this;
         }
         if (offset < 0 || sliceSize <= 0 || offset + sliceSize >= size) {
             throw new IllegalArgumentException("Invalid slice parameters");
         }
-        return new HttpFileChannel(client, url, startOffset + offset, sliceSize);
+        return new DataSourceChannel(client, url, fileChannel, startOffset + offset, sliceSize);
     }
 
     @Override
@@ -170,8 +180,7 @@ public class HttpFileChannel implements SeekableByteChannel {
     }
 
     private int readDirectly(ByteBuffer dst, long position) throws IOException {
-        try (var source = streamRead(position, dst.remaining());
-             var channel = Channels.newChannel(source.inputStream())) {
+        try (var channel = Channels.newChannel(streamRead(position, dst.remaining()))) {
             int totalBytesRead = 0;
             while (true) {
                 int bytesRead = channel.read(dst);
@@ -185,12 +194,23 @@ public class HttpFileChannel implements SeekableByteChannel {
         }
     }
 
-    public BufferedSource streamRead(long position, long length) throws IOException {
+    public InputStream streamRead(long position, long length) throws IOException {
         long endPosition = Math.min(position + length, size) + startOffset;
+        var startPosition = startOffset + position;
+        var readLength = endPosition - startPosition;
+
+        if (fileChannel != null) {
+            fileChannel.position(startPosition);
+            return BoundedInputStream.builder()
+                    .setInputStream(Channels.newInputStream(fileChannel))
+                    .setMaxCount(readLength)
+                    .setPropagateClose(false)
+                    .get();
+        }
 
         var request = new Request.Builder()
                 .url(url)
-                .header("Range", "bytes=" + (startOffset + position) + "-" + (endPosition - 1))
+                .header("Range", "bytes=" + startPosition + "-" + (endPosition - 1))
                 .build();
 
         var response = client.newCall(request).execute();
@@ -198,7 +218,7 @@ public class HttpFileChannel implements SeekableByteChannel {
             response.close();
             throw new IOException("Unexpected response code " + response.code());
         }
-        return response.body().source();
+        return response.body().byteStream();
     }
 
     @Override
@@ -207,7 +227,7 @@ public class HttpFileChannel implements SeekableByteChannel {
     }
 
     @Override
-    public SeekableByteChannel position(long newPosition) throws IOException {
+    public DataSourceChannel position(long newPosition) throws IOException {
         if (!open) throw new ClosedChannelException();
         if (newPosition < 0) {
             throw new IllegalArgumentException("Position out of bounds: " + newPosition);
@@ -227,9 +247,12 @@ public class HttpFileChannel implements SeekableByteChannel {
     }
 
     @Override
-    public void close() {
+    public void close() throws IOException {
         open = false;
         cache = null;
+        if (fileChannel != null) {
+            fileChannel.close();
+        }
     }
 
     @Override
@@ -238,7 +261,7 @@ public class HttpFileChannel implements SeekableByteChannel {
     }
 
     @Override
-    public SeekableByteChannel truncate(long size) {
+    public DataSourceChannel truncate(long size) {
         throw new NonWritableChannelException();
     }
 }
