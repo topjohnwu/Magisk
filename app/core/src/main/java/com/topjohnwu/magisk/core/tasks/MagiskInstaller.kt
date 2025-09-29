@@ -540,7 +540,7 @@ abstract class MagiskInstallImpl protected constructor(
         // Download image from url
         try {
             srcBoot = installDir.getChildFile("boot.img")
-            //todo
+            ExtractImage(url, console, logs).start(srcBoot)
         } catch (e: IOException) {
             console.add("! Error: " + e.message)
             Timber.e(e)
