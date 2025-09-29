@@ -1,11 +1,13 @@
 package com.topjohnwu.magisk.core.tasks
 
 import android.net.Uri
+import android.os.FileUtils
 import android.os.Process
 import android.system.ErrnoException
 import android.system.Os
 import android.system.OsConstants
 import android.system.OsConstants.O_WRONLY
+import androidx.annotation.RequiresApi
 import androidx.annotation.WorkerThread
 import androidx.core.os.postDelayed
 import com.topjohnwu.magisk.StubApk
@@ -21,6 +23,7 @@ import com.topjohnwu.magisk.core.ktx.writeTo
 import com.topjohnwu.magisk.core.utils.DummyList
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.inputStream
+import com.topjohnwu.magisk.core.utils.MediaStoreUtils.openFd
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.core.utils.RootUtils
 import com.topjohnwu.superuser.Shell
@@ -39,6 +42,8 @@ import org.apache.commons.compress.archivers.zip.ZipFile
 import org.apache.commons.compress.compressors.lz4.FramedLZ4CompressorInputStream
 import timber.log.Timber
 import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.io.FilterInputStream
 import java.io.IOException
 import java.io.InputStream
@@ -530,6 +535,53 @@ abstract class MagiskInstallImpl protected constructor(
         return true
     }
 
+    @RequiresApi(29)
+    private fun processUrl(url: String): Boolean {
+        // Download image from url
+        try {
+            srcBoot = installDir.getChildFile("boot.img")
+            //todo
+        } catch (e: IOException) {
+            console.add("! Error: " + e.message)
+            Timber.e(e)
+            return false
+        }
+
+        // Patch file
+        if (!patchBoot()) {
+            return false
+        }
+
+        // Output file
+        val outFile = MediaStoreUtils.getFile("$destName.img")
+        try {
+            val newBoot = installDir.getChildFile("new-boot.img")
+            outFile.uri.openFd().use { out ->
+                FileInputStream(newBoot).use { input ->
+                    FileUtils.copy(input, FileOutputStream(out.fileDescriptor))
+                }
+            }
+            newBoot.delete()
+
+            console.add("")
+            console.add("****************************")
+            console.add(" Output file is written to ")
+            console.add(" $outFile ")
+            console.add("****************************")
+        } catch (e: IOException) {
+            console.add("! Failed to output to $outFile")
+            outFile.delete()
+            Timber.e(e)
+            return false
+        }
+
+        // Fix up binaries
+        srcBoot.delete()
+        "cp_readlink $installDir".sh()
+
+        return true
+    }
+
     private fun patchBoot(): Boolean {
         val newBoot = installDir.getChildFile("new-boot.img")
         if (!useRootDir) {
@@ -580,6 +632,9 @@ abstract class MagiskInstallImpl protected constructor(
     private fun Array<String>.fsh() = ShellUtils.fastCmd(shell, *this)
 
     protected suspend fun patchFile(file: Uri) = extractFiles() && processFile(file)
+
+    @RequiresApi(29)
+    protected suspend fun patchFile(url: String) = extractFiles() && processUrl(url)
 
     protected suspend fun direct() = findImage() && extractFiles() && patchBoot() && flashBoot()
 
@@ -646,6 +701,15 @@ class MagiskInstaller {
         logs: MutableList<String>
     ) : ConsoleInstaller(console, logs) {
         override suspend fun operations() = patchFile(uri)
+    }
+
+    @RequiresApi(29)
+    class Download(
+        private val url: String,
+        console: MutableList<String>,
+        logs: MutableList<String>
+    ) : ConsoleInstaller(console, logs) {
+        override suspend fun operations() = patchFile(url)
     }
 
     class SecondSlot(
