@@ -1,28 +1,24 @@
 package com.topjohnwu.magisk.core.tasks
 
-import com.topjohnwu.magisk.core.di.ServiceLocator
-import com.topjohnwu.magisk.core.utils.HttpFileChannel
-import okio.buffer
-import okio.inflate
-import okio.sink
+import com.topjohnwu.magisk.core.utils.DataSourceChannel
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
 import org.apache.commons.compress.archivers.zip.ZipFile
 import org.apache.commons.compress.archivers.zip.ZipMethod
 import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
 import java.nio.channels.FileChannel
 import java.nio.file.StandardOpenOption
+import java.util.zip.Inflater
+import java.util.zip.InflaterInputStream
 
 class ExtractImage(
-    private val url: String,
+    private val outFile: File,
     private val console: MutableList<String>,
     private val logs: MutableList<String>,
 ) {
     @Throws(IOException::class)
-    fun start(outFile: File) {
-        logs.add("Downloading from: $url")
-
-        val channel = HttpFileChannel(ServiceLocator.okhttp, url)
+    fun consume(channel: DataSourceChannel) {
         ZipFile.builder()
             .setSeekableByteChannel(channel)
             .setIgnoreLocalFileHeader(true)
@@ -55,7 +51,7 @@ class ExtractImage(
     @Throws(IOException::class)
     private fun extractFromOTAPackage(
         payload: ZipArchiveEntry,
-        channel: HttpFileChannel,
+        channel: DataSourceChannel,
         outFile: File,
     ) {
         if (payload.method != ZipMethod.STORED.code) {
@@ -68,7 +64,11 @@ class ExtractImage(
     }
 
     @Throws(IOException::class)
-    private fun extractFromFactoryImage(zipFile: ZipFile, channel: HttpFileChannel, outFile: File) {
+    private fun extractFromFactoryImage(
+        zipFile: ZipFile,
+        channel: DataSourceChannel,
+        outFile: File
+    ) {
         console.add("- Processing as factory image package")
 
         findBootImageZipEntry(zipFile)?.let { entry ->
@@ -88,14 +88,17 @@ class ExtractImage(
     }
 
     private fun findBootImageZipEntry(zipFile: ZipFile): ZipArchiveEntry? {
-        return zipFile.entries.asSequence().find { it.name == "init_boot.img" }
-            ?: zipFile.entries.asSequence().find { it.name == "boot.img" }
+        return zipFile.entries.asSequence().find {
+            it.name.substringAfterLast('/') == "init_boot.img"
+        } ?: zipFile.entries.asSequence().find {
+            it.name.substringAfterLast('/') == "boot.img"
+        }
     }
 
     @Throws(IOException::class)
     private fun extractFromInnerImageZip(
         entry: ZipArchiveEntry,
-        channel: HttpFileChannel,
+        channel: DataSourceChannel,
         outFile: File
     ) {
         logs.add("Found inner image ZIP: ${entry.name}")
@@ -120,7 +123,7 @@ class ExtractImage(
     private fun extractImageFile(
         zipFile: ZipFile,
         entry: ZipArchiveEntry,
-        channel: HttpFileChannel,
+        channel: DataSourceChannel,
         outFile: File,
     ) {
         console.add("- Found boot image entry: ${entry.name} (${entry.size} bytes)")
@@ -143,9 +146,13 @@ class ExtractImage(
             }
 
             ZipMethod.DEFLATED.code -> {
-                channel.streamRead(entry.dataOffset, entry.size).inflate().use { source ->
-                    outFile.sink().buffer().use { sink ->
-                        sink.writeAll(source)
+                InflaterInputStream(
+                    channel.streamRead(entry.dataOffset, entry.size),
+                    Inflater(true),
+                    16 * 1024
+                ).use { input ->
+                    FileOutputStream(outFile).use { out ->
+                        input.copyTo(out)
                     }
                 }
             }
