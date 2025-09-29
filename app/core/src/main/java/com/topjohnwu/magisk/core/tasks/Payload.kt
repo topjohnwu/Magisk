@@ -3,7 +3,7 @@ package com.topjohnwu.magisk.core.tasks
 import chromeos_update_engine.UpdateMetadata.DeltaArchiveManifest
 import chromeos_update_engine.UpdateMetadata.InstallOperation
 import chromeos_update_engine.UpdateMetadata.PartitionUpdate
-import com.topjohnwu.magisk.core.utils.HttpFileChannel
+import com.topjohnwu.magisk.core.utils.DataSourceChannel
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream
 import org.apache.commons.compress.compressors.xz.XZCompressorInputStream
 import java.io.File
@@ -14,7 +14,7 @@ import java.nio.channels.FileChannel
 import java.nio.file.StandardOpenOption
 import java.security.MessageDigest
 
-class Payload(private val channel: HttpFileChannel) {
+class Payload(private val channel: DataSourceChannel) {
     private val manifest: DeltaArchiveManifest
     private var dataBase = 0L
 
