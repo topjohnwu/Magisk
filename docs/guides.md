@@ -96,7 +96,8 @@ updateJson=<url> (optional)
 - `versionCode` has to be an **integer**. This is used to compare versions
 - `updateJson` should point to a URL that downloads a JSON to provide info so the Magisk app can update the module.
 - Others that weren't mentioned above can be any **single line** string.
-- Make sure to use the `UNIX (LF)` line break type and not the `Windows (CR+LF)` or `Macintosh (CR)`.
+- Make sure to use the `UNIX (LF)` line break type and not the `Windows (CR+LF)` or
+- `Macintosh (CR)`.
 
 Update JSON format:
 
