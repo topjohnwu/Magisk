@@ -1,5 +1,12 @@
 # Magisk Changelog
 
+### v30.3 (2025.9.29)
+
+- [General] Support installing Magisk into vendor_boot partition
+- [MagiskPolicy] Support new sepolicy binary format introduced in Android 16 QPR2
+- [Core] Migrate much more code into Rust
+- [MagiskSU] Fallback to older implementation when the kernel doesn't support zero userspace copy APIs
+
 ### v30.2 (2025.8.6)
 
 - [Core] Fix an edge case breaking modules when overlayfs is involved
