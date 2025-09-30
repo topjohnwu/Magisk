@@ -41,7 +41,9 @@ class NetworkService(
         info
     }
 
-    suspend fun fetchUpdate(version: Int) = findRelease { it.versionCode == version }.asInfo()
+    suspend fun fetchUpdate(version: Int) = safe {
+        findRelease { it.versionCode == version }.asInfo()
+    }
 
     // Keep going through all release pages until we find a match
     private suspend inline fun findRelease(predicate: (Release) -> Boolean): Release? {

@@ -73,7 +73,8 @@ class InstallViewModel(svc: NetworkService, markwon: Markwon) : BaseViewModel() 
                 val noteText = when {
                     noteFile.exists() -> noteFile.readText()
                     else -> {
-                        val note = svc.fetchUpdate(APP_VERSION_CODE).note
+                        val note = svc.fetchUpdate(APP_VERSION_CODE)?.note.orEmpty()
+                        if (note.isEmpty()) return@launch
                         noteFile.writeText(note)
                         note
                     }
