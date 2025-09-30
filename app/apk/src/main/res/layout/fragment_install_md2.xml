@@ -194,7 +194,6 @@
                             android:id="@+id/method_download"
                             style="@style/WidgetFoundation.RadioButton"
                             android:layout_width="match_parent"
-                            gone="@{android.os.Build.VERSION.SDK_INT &lt; 29}"
                             android:layout_height="wrap_content"
                             android:text="@string/download_patch_file" />
 
