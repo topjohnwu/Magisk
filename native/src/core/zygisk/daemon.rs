@@ -110,6 +110,9 @@ impl ZygiskState {
     }
 
     pub fn reset(&mut self, mut restore: bool) {
+        if !zygisk_enabled.load(Ordering::Acquire) {
+            return;
+        }
         if restore {
             self.start_count = 1;
         } else {
