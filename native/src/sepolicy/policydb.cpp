@@ -7,6 +7,7 @@
 #include <cil/cil.h>
 
 #include <base.hpp>
+#include <flags.h>
 
 using namespace std;
 
