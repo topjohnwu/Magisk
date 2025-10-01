@@ -10,8 +10,8 @@ use nix::{
 };
 use std::fs::File;
 use std::io::{Read, Write};
-use std::mem::MaybeUninit;
-use std::os::fd::{AsFd, AsRawFd, FromRawFd, OwnedFd, RawFd};
+use std::mem::{ManuallyDrop, MaybeUninit};
+use std::os::fd::{AsFd, AsRawFd, FromRawFd, IntoRawFd, OwnedFd, RawFd};
 use std::sync::atomic::{AtomicBool, Ordering};
 
 static SHOULD_USE_SPLICE: AtomicBool = AtomicBool::new(true);
@@ -51,20 +51,27 @@ fn pump_via_copy(mut fd_in: &File, mut fd_out: &File) -> LoggedResult<()> {
 }
 
 fn pump_via_splice(fd_in: &File, fd_out: &File, pipe: &(OwnedFd, OwnedFd)) -> LoggedResult<()> {
-    if !SHOULD_USE_SPLICE.load(Ordering::Acquire) {
+    if !SHOULD_USE_SPLICE.load(Ordering::Relaxed) {
         return pump_via_copy(fd_in, fd_out);
     }
 
     // The pipe capacity is by default 16 pages, let's just use 65536
     let Ok(len) = splice(fd_in, &pipe.1, 65536) else {
         // If splice failed, stop using splice and fallback to userspace copy
-        SHOULD_USE_SPLICE.store(false, Ordering::Release);
+        SHOULD_USE_SPLICE.store(false, Ordering::Relaxed);
         return pump_via_copy(fd_in, fd_out);
     };
     if len == 0 {
         return Ok(());
     }
-    splice(&pipe.0, fd_out, len)?;
+    // splice can fail here again due to O_APPEND
+    let Ok(_) = splice(&pipe.0, fd_out, len) else {
+        SHOULD_USE_SPLICE.store(false, Ordering::Relaxed);
+        return pump_via_copy(
+            &ManuallyDrop::new(unsafe { File::from_raw_fd(pipe.0.into_raw_fd()) }),
+            fd_out,
+        );
+    };
     Ok(())
 }
 
