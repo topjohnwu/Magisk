@@ -10,6 +10,7 @@
 #include <string>
 
 #include <base.hpp>
+#include <flags.h>
 
 using namespace std;
 

@@ -76,7 +76,7 @@ fn log_with_writer<F: FnOnce(LogWriter)>(level: LogLevel, f: F) {
         return;
     }
     f(logger.write);
-    if logger.flags.contains(LogFlag::EXIT_ON_ERROR) {
+    if matches!(level, LogLevel::Error) && logger.flags.contains(LogFlag::EXIT_ON_ERROR) {
         exit(-1);
     }
 }
