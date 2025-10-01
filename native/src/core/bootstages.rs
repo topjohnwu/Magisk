@@ -16,7 +16,7 @@ use nix::fcntl::OFlag;
 use std::io::BufReader;
 use std::os::unix::net::UnixStream;
 use std::process::{Command, Stdio};
-use std::sync::atomic::Ordering;
+use std::sync::atomic::{AtomicBool, Ordering};
 
 bitflags! {
     #[derive(Default)]
@@ -185,7 +185,9 @@ impl MagiskD {
 
         setup_preinit_dir();
         self.ensure_manager();
-        self.zygisk.lock().unwrap().reset(true);
+        if self.zygisk_enabled.load(Ordering::Relaxed) {
+            self.zygisk.lock().unwrap().reset(true);
+        }
     }
 
     pub fn boot_stage_handler(&self, client: UnixStream, code: RequestCode) {
