@@ -78,3 +78,4 @@ rustup +nightly component add rust-src clippy
 - To do any development on Magisk itself, switch to an **official debug build and reinstall Magisk** to turn off the signature check.
 - To distribute your own Magisk builds signed with your own keys, set your signing configs in `config.prop`.
 - Check [Google's Documentation](https://developer.android.com/studio/publish/app-signing.html#generate-key) for more details on generating your own key.
+ 
