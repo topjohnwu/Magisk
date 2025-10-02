@@ -86,7 +86,7 @@ resolve_vars() {
   # Determine API level
   local api
   case $ver in
-    +([0-9])) api=$ver ;;
+    +([0-9\.])) api=$ver ;;
     TiramisuPrivacySandbox) api=33 ;;
     UpsideDownCakePrivacySandbox) api=34 ;;
     VanillaIceCream) api=35 ;;
@@ -100,10 +100,10 @@ resolve_vars() {
 
   # Determine default image type
   if [ -z $type ]; then
-    if [ $api -ge $atd_min_api -a $api -le $atd_max_api ]; then
+    if [ $(bc <<< "$api >= $atd_min_api && $api <= $atd_max_api") = 1 ]; then
       # Use the lightweight ATD images if possible
       type='aosp_atd'
-    elif [ $api -gt $atd_max_api ]; then
+    elif [ $(bc <<< "$api > $atd_max_api") = 1 ]; then
       # Preview/beta release, no AOSP version available
       type='google_apis'
     else
@@ -113,7 +113,7 @@ resolve_vars() {
 
   # Old Linux kernels will not boot with memory larger than 3GB
   local memory
-  if [ $api -lt $huge_ram_min_api ]; then
+  if [ $(bc <<< "$api < $huge_ram_min_api") = 1 ]; then
     memory=3072
   else
     memory=8192
@@ -169,8 +169,9 @@ test_emu() {
 }
 
 test_main() {
-  local avd_pkg ramdisk
-  eval $(resolve_vars "emu_args avd_pkg ramdisk" $1 $2)
+  local avd_pkg ramdisk vars
+  vars=$(resolve_vars "emu_args avd_pkg ramdisk" $1 $2)
+  eval $vars
 
   # Specify an explicit port so that tests can run with other emulators running at the same time
   local emu_port=5682
@@ -216,16 +217,18 @@ test_main() {
 }
 
 run_main() {
-  local avd_pkg
-  eval $(resolve_vars "emu_args avd_pkg" $1 $2)
+  local avd_pkg vars
+  vars=$(resolve_vars "emu_args avd_pkg" $1 $2)
+  eval $vars
   setup_emu "$avd_pkg"
   print_title "* Launching $avd_pkg"
   "$emu" @test $emu_args 2>/dev/null
 }
 
 dl_main() {
-  local avd_pkg
-  eval $(resolve_vars "avd_pkg" $1 $2)
+  local avd_pkg vars
+  vars=$(resolve_vars "avd_pkg" $1 $2)
+  eval $vars
   print_title "* Downloading $avd_pkg"
   dl_emu "$avd_pkg"
 }
