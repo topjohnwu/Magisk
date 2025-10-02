@@ -1,5 +1,9 @@
 # Magisk Changelog
 
+### v30.4 (2025.10.2)
+
+- [MagiskSU] Fix several implementation bugs
+
 ### v30.3 (2025.9.29)
 
 - [General] Support installing Magisk into vendor_boot partition
