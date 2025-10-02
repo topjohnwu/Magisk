@@ -161,6 +161,7 @@ impl MagiskD {
         .ok();
     }
 
+    #[cfg(feature = "check-client")]
     fn is_client(&self, pid: i32) -> bool {
         let mut buf = cstr::buf::new::<32>();
         write!(buf, "/proc/{pid}/exe").ok();
@@ -169,6 +170,11 @@ impl MagiskD {
         } else {
             false
         }
+    }
+
+    #[cfg(not(feature = "check-client"))]
+    fn is_client(&self, pid: i32) -> bool {
+        true
     }
 
     fn handle_requests(&'static self, mut client: UnixStream) {

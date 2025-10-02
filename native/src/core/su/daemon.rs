@@ -212,6 +212,7 @@ impl MagiskD {
         info
     }
 
+    #[cfg(feature = "su-check-db")]
     fn build_su_info(&self, uid: i32) -> Arc<SuInfo> {
         let result: LoggedResult<Arc<SuInfo>> = try {
             let cfg = self.get_db_settings()?;
@@ -282,5 +283,10 @@ impl MagiskD {
         };
 
         result.unwrap_or(Arc::new(SuInfo::deny(uid)))
+    }
+
+    #[cfg(not(feature = "su-check-db"))]
+    fn build_su_info(&self, uid: i32) -> Arc<SuInfo> {
+        Arc::new(SuInfo::allow(uid))
     }
 }
