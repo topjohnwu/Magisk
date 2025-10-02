@@ -13,6 +13,7 @@ struct mmap_data : public byte_data {
                   (sizeof(void *) == 4 && BLKGETSIZE64 == 0x80041272));
     ALLOW_MOVE_ONLY(mmap_data)
 
+    mmap_data() = default;
     explicit mmap_data(const char *name, bool rw = false);
     mmap_data(int dirfd, const char *name, bool rw = false);
     mmap_data(int fd, size_t sz, bool rw = false);
