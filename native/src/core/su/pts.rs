@@ -10,8 +10,8 @@ use nix::{
 };
 use std::fs::File;
 use std::io::{Read, Write};
-use std::mem::{ManuallyDrop, MaybeUninit};
-use std::os::fd::{AsFd, AsRawFd, FromRawFd, OwnedFd, RawFd};
+use std::mem::MaybeUninit;
+use std::os::fd::{AsFd, AsRawFd, FromRawFd, RawFd};
 use std::sync::atomic::{AtomicBool, Ordering};
 
 static SHOULD_USE_SPLICE: AtomicBool = AtomicBool::new(true);
@@ -50,7 +50,7 @@ fn pump_via_copy(mut fd_in: &File, mut fd_out: &File) -> LoggedResult<()> {
     Ok(())
 }
 
-fn pump_via_splice(fd_in: &File, fd_out: &File, pipe: &(OwnedFd, OwnedFd)) -> LoggedResult<()> {
+fn pump_via_splice(fd_in: &File, fd_out: &File, pipe: &(File, File)) -> LoggedResult<()> {
     if !SHOULD_USE_SPLICE.load(Ordering::Relaxed) {
         return pump_via_copy(fd_in, fd_out);
     }
@@ -64,10 +64,10 @@ fn pump_via_splice(fd_in: &File, fd_out: &File, pipe: &(OwnedFd, OwnedFd)) -> Lo
     if len == 0 {
         return Ok(());
     }
-    if let Err(_) = splice(&pipe.0, fd_out, len) {
+    if splice(&pipe.0, fd_out, len).is_err() {
         // If splice failed, stop using splice and fallback to userspace copy
         SHOULD_USE_SPLICE.store(false, Ordering::Relaxed);
-        return pump_via_copy(&ManuallyDrop::new(unsafe { File::from_raw_fd(pipe.0.as_raw_fd()) }), fd_out);
+        return pump_via_copy(&pipe.0, fd_out);
     }
     Ok(())
 }
@@ -132,6 +132,7 @@ fn pump_tty_impl(ptmx: File, pump_stdin: bool) -> LoggedResult<()> {
 
     // Open a pipe to bypass userspace copy with splice
     let pipe_fd = pipe2(OFlag::O_CLOEXEC).into_os_result("pipe2", None, None)?;
+    let pipe_fd = (File::from(pipe_fd.0), File::from(pipe_fd.1));
 
     'poll: loop {
         // Wait for event
