@@ -15,7 +15,7 @@ clazz(clazz &&) = delete;
 
 #define ALLOW_MOVE_ONLY(clazz) \
 clazz(const clazz&) = delete;  \
-clazz(clazz &&o) { swap(o); }  \
+clazz(clazz &&o) : clazz() { swap(o); }  \
 clazz& operator=(clazz &&o) { swap(o); return *this; }
 
 struct Utf8CStr;
