@@ -2,7 +2,7 @@ use crate::consts::{LOG_PIPE, LOGFILE};
 use crate::ffi::get_magisk_tmp;
 use crate::logging::LogFile::{Actual, Buffer};
 use base::{
-    FsPathBuilder, LogLevel, LoggedResult, ReadExt, Utf8CStr, Utf8CStrBuf, WriteExt,
+    FsPathBuilder, LogLevel, LoggedResult, ReadExt, ResultExt, Utf8CStr, Utf8CStrBuf, WriteExt,
     const_format::concatcp, cstr, libc, new_daemon_thread, raw_cstr, update_logger,
 };
 use bytemuck::{Pod, Zeroable, bytes_of, write_zeroes};
@@ -328,7 +328,7 @@ pub fn start_log_daemon() {
     }
 
     let _: LoggedResult<()> = try {
-        path.mkfifo(0o666)?;
+        path.mkfifo(0o666).log_ok();
         chown(path.as_utf8_cstr(), Some(Uid::from(0)), Some(Gid::from(0)))?;
         let read = path.open(OFlag::O_RDWR | OFlag::O_CLOEXEC)?;
         let write = path.open(OFlag::O_WRONLY | OFlag::O_CLOEXEC)?;

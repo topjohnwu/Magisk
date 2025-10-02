@@ -234,14 +234,11 @@ int su_client_main(int argc, char *argv[]) {
 
     if (atty) {
         // We need a PTY. Get one.
-        write_int(fd, 1);
         int ptmx = recv_fd(fd);
         setup_sighandlers(sighandler);
         // If stdin is not a tty, and if we pump to ptmx, our process may intercept the input to ptmx and
         // output to stdout, which cause the target process lost input.
         pump_tty(ptmx, atty & ATTY_IN);
-    } else {
-        write_int(fd, 0);
     }
 
     // Get the exit code
@@ -335,9 +332,10 @@ void exec_root_shell(int client, int pid, SuRequest &req, MntNsMode mode) {
     int infd = recv_fd(client);
     int outfd = recv_fd(client);
     int errfd = recv_fd(client);
+    int ptsfd = -1;
 
     // App need a PTY
-    if (read_int(client)) {
+    if (infd < 0 || outfd < 0 || errfd < 0) {
         string pts;
         string ptmx;
         auto magiskpts = get_magisk_tmp() + "/"s SHELLPTS;
@@ -370,24 +368,18 @@ void exec_root_shell(int client, int pid, SuRequest &req, MntNsMode mode) {
         // Opening the TTY has to occur after the
         // fork() and setsid() so that it becomes
         // our controlling TTY and not the daemon's
-        int ptsfd = xopen(pts_slave.data(), O_RDWR);
-
-        if (infd < 0)
-            infd = ptsfd;
-        if (outfd < 0)
-            outfd = ptsfd;
-        if (errfd < 0)
-            errfd = ptsfd;
+        ptsfd = xopen(pts_slave.data(), O_RDWR);
     }
 
     // Swap out stdin, stdout, stderr
-    xdup2(infd, STDIN_FILENO);
-    xdup2(outfd, STDOUT_FILENO);
-    xdup2(errfd, STDERR_FILENO);
+    xdup2(infd < 0 ? ptsfd : infd, STDIN_FILENO);
+    xdup2(outfd < 0 ? ptsfd : outfd, STDOUT_FILENO);
+    xdup2(errfd < 0 ? ptsfd : errfd, STDERR_FILENO);
 
     close(infd);
     close(outfd);
     close(errfd);
+    close(ptsfd);
     close(client);
 
     // Handle namespaces
