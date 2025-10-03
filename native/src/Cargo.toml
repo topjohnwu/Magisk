@@ -55,6 +55,7 @@ lz4-sys = { path = "external/lz4-sys" }
 opt-level = "z"
 lto = "thin"
 panic = "abort"
+debug = "none"
 
 [profile.release]
 opt-level = "z"
