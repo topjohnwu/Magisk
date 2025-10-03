@@ -60,6 +60,7 @@ abstract class AddCommentTask: DefaultTask() {
             it.get(IncrementalPackager.APP_METADATA_ENTRY_PATH)?.delete()
             it.get(IncrementalPackager.VERSION_CONTROL_INFO_ENTRY_PATH)?.delete()
             it.get(JarFile.MANIFEST_NAME)?.delete()
+            it.get("assets/PublicSuffixDatabase.list")?.delete()
         }
 
         outFile
