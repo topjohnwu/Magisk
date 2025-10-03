@@ -258,8 +258,25 @@ pub fn resetprop_main(argc: i32, argv: *mut *mut c_char) -> i32 {
     let cmds = CmdArgs::new(argc, argv.cast());
     let cmds = cmds.as_slice();
 
-    let cli = ResetProp::from_args(&[cmds[0]], &cmds[1..])
-        .and_then(|cli| {
+    let mut options = vec![cmds[0]];
+    let mut positional = Vec::new();
+    let mut found_non_option = false;
+
+    for arg in &cmds[1..] {
+        if !found_non_option && arg.starts_with('-') {
+            options.push(*arg);
+        } else {
+            found_non_option = true;
+            positional.push(*arg);
+        }
+    }
+
+    let cli = ResetProp::from_args(&[options[0]], &options[1..])
+        .and_then(|mut cli| {
+            for arg in positional {
+                cli.args.push(Utf8CString::from(arg));
+            }
+            
             let mut special_mode = 0;
             if cli.wait_mode {
                 if cli.args.is_empty() {
