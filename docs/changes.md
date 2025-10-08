@@ -1,26 +1,26 @@
-# Magisk Changelog
+#Magisk变更日志
 
-### v30.4 (2025.10.2)
+###v30.4 (2025.10.2)
 
-- [MagiskSU] Fix several implementation bugs
+- [马吉斯库]修复几个实现错误
 
-### v30.3 (2025.9.29)
+###v30.3 (2025.9.29)
 
-- [General] Support installing Magisk into vendor_boot partition
-- [MagiskPolicy] Support new sepolicy binary format introduced in Android 16 QPR2
-- [Core] Migrate much more code into Rust
-- [MagiskSU] Fallback to older implementation when the kernel doesn't support zero userspace copy APIs
+- [一般]支持将Magisk安装到vendor_boot分区
+- [magisk策略]支持Android 16 QPR2中引入的新sepolicy二进制格式
+- [核心]将更多的代码移植到Rust中
+- [马吉斯库]当内核不支持零用户空间复制API时，退回到旧的实现
 
-### v30.2 (2025.8.6)
+###v30.2 (2025.8.6)
 
-- [Core] Fix an edge case breaking modules when overlayfs is involved
-- [Core] Fix module `.replace` functionality in certain situations
-- [resetprop] Reduce property modification traces
+- [核心]修复涉及overlayfs时破坏模块的边缘情况
+- [核心]修复模块`。替换`某些情况下的功能
+- [重置prop]减少属性修改痕迹
 
-### v30.1 (2025.7.3)
+###v30.1 (2025.7.3)
 
-- [Core] Fix bug in module mounting implementation
-- [MagiskSU] Add ability to restrict Linux capabilities even if running as root (uid=0)
+- [核心]修复模块安装实现中的错误
+- [马吉斯库]增加了限制Linux功能的能力，即使以root用户身份运行(uid=0)
 
 ### v30.0 (2025.7.1)
 
