@@ -725,7 +725,14 @@ Use the following resources and reference to complete your integration.
 ChatKit emits `CustomEvent` instances from the Web Component. The payload shapes are:
 
 ```ts
-type Events = {{"sessionId":"9f7377a43eee4b29b1210c7fd42922a4","subscriptionId":"","resourceGroup":"","errorCode":"401","resourceName":"","details":"Insufficient privileges to complete the operation."}{"sessionId":"bc8e8456950f44cb826562ce9b379141","subscriptionId":"","resourceGroup":"","errorCode":"401","resourceName":"","details":"You need a Microsoft Entra ID Premium license to use this feature."}5bf81b5634828ef453d5888984071ded07f337a21be28d4d7c6450ac53f7043fglimt-335rsx3f09z98cyzcdh1meduyglft-XVAyGC6x4A-hNjFn4G6_glpat-OJAFxKPITTAsmHCMyNjiom86MQp1OmhhODF0Cw.01.120vc3fsnCRohMKcyPkT4TtbHRGhnEUoQN1bpCrh4zajWXH91pumpDeAgentAIsk-Hjb2lb34Vsh_icGWSQYnBQVdDM_J8A3hDmjgmplsPVT3BlbkFJedv_2GIc10zOj0FhxIUFYJDYOpnHYLzqUy9yAj9LoAsk-proj-Kbo2iJ4iuApyOmVb1F_krm3SXsp-b-_UvoGTBsrehh0xIi0HxW1OseHfZX5KKc_dVPysgqPOhbT3BlbkFJQ3Xbku2dm7EmNEQUOhqLI6IMbZxA5nN7RM6QHFIXRp673_9qrc1sRMFJo-fZToB0sGlkIo_bUAhttps://quantumzeitgeist.substack.com/?r=lup5w&utm_campaign=referrals-subscribe-page-share-screen&utm_medium=webbb_live_XUPeMnjKzRrcltYWzYuZOi0s_WYhttps://github.com/users/michaelbjordanz/succession/invitation# Contributing
+type Events = {
+  sessionId: string; // e.g. "example-session-id"
+  subscriptionId: string; // e.g. "example-subscription-id"
+  resourceGroup: string; // e.g. "example-resource-group"
+  errorCode: string; // e.g. "401"
+  resourceName: string; // e.g. "example-resource-name"
+  details: string; // e.g. "Insufficient privileges to complete the operation."
+}
 
 
 
