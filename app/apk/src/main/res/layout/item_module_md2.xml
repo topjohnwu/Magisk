@@ -27,7 +27,6 @@
             isEnabled="@{!item.removed &amp;&amp; item.enabled &amp;&amp; !item.showNotice}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clickable="@{!item.removed &amp;&amp; item.enabled &amp;&amp; !item.showNotice}"
             android:focusable="@{!item.removed &amp;&amp; item.enabled &amp;&amp; !item.showNotice}"
             android:nextFocusRight="@id/module_indicator"
             app:cardBackgroundColor="@color/color_card_background_color_selector"
