@@ -30,7 +30,6 @@
             android:clickable="@{!item.removed &amp;&amp; item.enabled &amp;&amp; !item.showNotice}"
             android:focusable="@{!item.removed &amp;&amp; item.enabled &amp;&amp; !item.showNotice}"
             android:nextFocusRight="@id/module_indicator"
-            android:onClick="@{() -> item.setEnabled(!item.enabled)}"
             app:cardBackgroundColor="@color/color_card_background_color_selector"
             tools:isEnabled="false"
             tools:layout_gravity="center"
