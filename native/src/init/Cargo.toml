@@ -11,7 +11,7 @@ path = "lib.rs"
 cxx-gen = { workspace = true }
 
 [dependencies]
-base = { path = "../base" }
-magiskpolicy = { path = "../sepolicy", default-features = false }
+base = { workspace = true }
+magiskpolicy = { workspace = true, features = ["no-main"] }
 cxx = { workspace = true }
 num-traits = { workspace = true }

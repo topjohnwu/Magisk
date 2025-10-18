@@ -12,7 +12,7 @@ cxx-gen = { workspace = true }
 pb-rs = { workspace = true }
 
 [dependencies]
-base = { path = "../base" }
+base = { workspace = true }
 cxx = { workspace = true }
 byteorder = { workspace = true }
 size = { workspace = true }
