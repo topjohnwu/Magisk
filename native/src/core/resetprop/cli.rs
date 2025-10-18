@@ -1,7 +1,7 @@
-use super::{
-    PropInfo, PropReader, SYS_PROP,
-    persist::{persist_delete_prop, persist_get_all_props, persist_get_prop, persist_set_prop},
+use super::persist::{
+    persist_delete_prop, persist_get_all_props, persist_get_prop, persist_set_prop,
 };
+use super::{PropInfo, PropReader, SYS_PROP};
 use argh::{EarlyExit, FromArgs, MissingRequirements};
 use base::libc::PROP_VALUE_MAX;
 use base::{

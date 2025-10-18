@@ -4,7 +4,10 @@ use crate::{
     fd_path, fd_set_attr,
 };
 use libc::{dirent, mode_t};
-use nix::{errno::Errno, fcntl::AtFlags, fcntl::OFlag, sys::stat::Mode, unistd::UnlinkatFlags};
+use nix::errno::Errno;
+use nix::fcntl::{AtFlags, OFlag};
+use nix::sys::stat::Mode;
+use nix::unistd::UnlinkatFlags;
 use std::fs::File;
 use std::ops::Deref;
 use std::os::fd::{AsFd, AsRawFd, BorrowedFd, IntoRawFd, OwnedFd, RawFd};

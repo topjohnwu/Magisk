@@ -1,5 +1,6 @@
+use crate::SePolicy;
 use crate::consts::{SEPOL_FILE_TYPE, SEPOL_LOG_TYPE, SEPOL_PROC_DOMAIN};
-use crate::{SePolicy, ffi::Xperm};
+use crate::ffi::Xperm;
 use base::{LogLevel, set_log_level_state};
 
 macro_rules! rules {

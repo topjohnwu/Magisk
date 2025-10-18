@@ -8,7 +8,9 @@ use base::{
     Utf8CStrBuf, Utf8CString, WalkResult, clone_attr, cstr, debug, error, info, libc, raw_cstr,
     warn,
 };
-use nix::{fcntl::OFlag, mount::MsFlags, unistd::UnlinkatFlags};
+use nix::fcntl::OFlag;
+use nix::mount::MsFlags;
+use nix::unistd::UnlinkatFlags;
 use std::collections::BTreeMap;
 use std::os::fd::IntoRawFd;
 use std::path::{Component, Path};

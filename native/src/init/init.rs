@@ -1,19 +1,11 @@
-use crate::ffi::backup_init;
+use crate::ffi::{BootConfig, MagiskInit, backup_init, magisk_proxy_main};
+use crate::logging::setup_klog;
 use crate::mount::is_rootfs;
 use crate::twostage::hexpatch_init_for_second_stage;
-use crate::{
-    ffi::{BootConfig, MagiskInit, magisk_proxy_main},
-    logging::setup_klog,
-};
-use base::{
-    LibcReturn, LoggedResult, ResultExt, cstr, info,
-    libc::{basename, getpid, mount, umask},
-    raw_cstr,
-};
-use std::{
-    ffi::{CStr, c_char},
-    ptr::null,
-};
+use base::libc::{basename, getpid, mount, umask};
+use base::{LibcReturn, LoggedResult, ResultExt, cstr, info, raw_cstr};
+use std::ffi::{CStr, c_char};
+use std::ptr::null;
 
 impl MagiskInit {
     fn new(argv: *mut *mut c_char) -> Self {

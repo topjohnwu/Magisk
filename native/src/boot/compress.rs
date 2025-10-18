@@ -1,13 +1,19 @@
 use crate::ffi::{FileFormat, check_fmt};
+use base::nix::fcntl::OFlag;
 use base::{
     Chunker, FileOrStd, LoggedResult, ReadExt, ResultExt, Utf8CStr, Utf8CString, WriteExt, log_err,
-    nix::fcntl::OFlag,
 };
-use bzip2::{Compression as BzCompression, read::BzDecoder, write::BzEncoder};
-use flate2::{Compression as GzCompression, read::MultiGzDecoder, write::GzEncoder};
+use bzip2::Compression as BzCompression;
+use bzip2::read::BzDecoder;
+use bzip2::write::BzEncoder;
+use flate2::Compression as GzCompression;
+use flate2::read::MultiGzDecoder;
+use flate2::write::GzEncoder;
+use lz4::block::CompressionMode;
+use lz4::liblz4::BlockChecksum;
 use lz4::{
     BlockMode, BlockSize, ContentChecksum, Decoder as LZ4FrameDecoder, Encoder as LZ4FrameEncoder,
-    EncoderBuilder as LZ4FrameEncoderBuilder, block::CompressionMode, liblz4::BlockChecksum,
+    EncoderBuilder as LZ4FrameEncoderBuilder,
 };
 use lzma_rust2::{CheckType, LzmaOptions, LzmaReader, LzmaWriter, XzOptions, XzReader, XzWriter};
 use std::cmp::min;

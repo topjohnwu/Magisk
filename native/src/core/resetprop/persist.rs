@@ -1,20 +1,17 @@
 use nix::fcntl::OFlag;
 use quick_protobuf::{BytesReader, MessageRead, MessageWrite, Writer};
-use std::io::Read;
-use std::{
-    fs::File,
-    io::{BufWriter, Write},
-    os::fd::FromRawFd,
-};
+use std::fs::File;
+use std::io::{BufWriter, Read, Write};
+use std::os::fd::FromRawFd;
 
 use crate::resetprop::PropReader;
-use crate::resetprop::proto::persistent_properties::{
-    PersistentProperties, mod_PersistentProperties::PersistentPropertyRecord,
-};
+use crate::resetprop::proto::persistent_properties::PersistentProperties;
+use crate::resetprop::proto::persistent_properties::mod_PersistentProperties::PersistentPropertyRecord;
 use base::const_format::concatcp;
+use base::libc::mkstemp;
 use base::{
     Directory, FsPathBuilder, LibcReturn, LoggedResult, MappedFile, SilentLogExt, Utf8CStr,
-    Utf8CStrBuf, WalkResult, clone_attr, cstr, debug, libc::mkstemp, log_err,
+    Utf8CStrBuf, WalkResult, clone_attr, cstr, debug, log_err,
 };
 
 const PERSIST_PROP_DIR: &str = "/data/property";

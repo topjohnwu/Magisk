@@ -21,12 +21,10 @@ use base::{
     AtomicArc, BufReadExt, FileAttr, FsPathBuilder, LoggedResult, ReadExt, ResultExt, Utf8CStr,
     Utf8CStrBuf, WriteExt, cstr, fork_dont_care, info, libc, log_err, set_nice_name,
 };
-use nix::{
-    fcntl::OFlag,
-    mount::MsFlags,
-    sys::signal::SigSet,
-    unistd::{dup2_stderr, dup2_stdin, dup2_stdout, getpid, getuid, setsid},
-};
+use nix::fcntl::OFlag;
+use nix::mount::MsFlags;
+use nix::sys::signal::SigSet;
+use nix::unistd::{dup2_stderr, dup2_stdin, dup2_stdout, getpid, getuid, setsid};
 use num_traits::AsPrimitive;
 use std::fmt::Write as _;
 use std::io::{BufReader, Write};

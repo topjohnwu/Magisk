@@ -8,14 +8,14 @@ use ExtraVal::{Bool, Int, IntList, Str};
 use base::{
     BytesExt, FileAttr, LibcReturn, LoggedResult, ResultExt, Utf8CStrBuf, cstr, fork_dont_care,
 };
-use nix::{
-    fcntl::OFlag,
-    poll::{PollFd, PollFlags, PollTimeout},
-};
+use nix::fcntl::OFlag;
+use nix::poll::{PollFd, PollFlags, PollTimeout};
 use num_traits::AsPrimitive;
+use std::fmt::Write;
+use std::fs::File;
 use std::os::fd::AsFd;
 use std::os::unix::net::UCred;
-use std::{fmt::Write, fs::File, process::Command, process::exit};
+use std::process::{Command, exit};
 
 struct Extra<'a> {
     key: &'static str,

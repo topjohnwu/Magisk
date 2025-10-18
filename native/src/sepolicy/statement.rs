@@ -1,10 +1,12 @@
 use std::fmt::{Display, Formatter, Write};
 use std::io::{BufRead, BufReader, Cursor};
-use std::{iter::Peekable, vec::IntoIter};
+use std::iter::Peekable;
+use std::vec::IntoIter;
 
 use crate::SePolicy;
 use crate::ffi::Xperm;
-use base::{BufReadExt, LoggedResult, Utf8CStr, error, nix::fcntl::OFlag, warn};
+use base::nix::fcntl::OFlag;
+use base::{BufReadExt, LoggedResult, Utf8CStr, error, warn};
 
 pub enum Token<'a> {
     AL,
