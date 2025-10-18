@@ -761,3 +761,4 @@ install_module() {
 
 TMPDIR=/dev/tmp
 MAGISKBIN="/data/adb/magisk"
+NVBASE=/data/adb
