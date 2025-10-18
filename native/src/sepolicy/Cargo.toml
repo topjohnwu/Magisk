@@ -16,4 +16,3 @@ no-main = []
 [dependencies]
 base = { workspace = true }
 cxx = { workspace = true }
-argh = { workspace = true }

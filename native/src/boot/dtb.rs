@@ -1,10 +1,8 @@
-use std::cell::UnsafeCell;
-
 use argh::FromArgs;
+use base::{LoggedResult, MappedFile, Utf8CStr, argh};
 use fdt::node::{FdtNode, NodeProperty};
 use fdt::{Fdt, FdtError};
-
-use base::{LoggedResult, MappedFile, Utf8CStr};
+use std::cell::UnsafeCell;
 
 use crate::check_env;
 use crate::patch::patch_verity;

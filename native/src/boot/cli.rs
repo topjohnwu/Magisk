@@ -10,7 +10,7 @@ use base::libc::umask;
 use base::nix::fcntl::OFlag;
 use base::{
     CmdArgs, EarlyExitExt, LoggedResult, MappedFile, PositionalArgParser, ResultExt, Utf8CStr,
-    Utf8CString, WriteExt, cmdline_logging, cstr, log_err,
+    Utf8CString, WriteExt, argh, cmdline_logging, cstr, log_err,
 };
 use std::ffi::c_char;
 use std::io::{Seek, SeekFrom, Write};

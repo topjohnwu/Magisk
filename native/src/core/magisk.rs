@@ -5,7 +5,7 @@ use crate::mount::find_preinit_device;
 use crate::selinux::restorecon;
 use crate::socket::{Decodable, Encodable};
 use argh::FromArgs;
-use base::{CmdArgs, EarlyExitExt, LoggedResult, Utf8CString, clone_attr};
+use base::{CmdArgs, EarlyExitExt, LoggedResult, Utf8CString, argh, clone_attr};
 use nix::poll::{PollFd, PollFlags, PollTimeout};
 use std::ffi::c_char;
 use std::os::fd::AsFd;

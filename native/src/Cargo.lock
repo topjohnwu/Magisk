@@ -15,35 +15,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "862ed96ca487e809f1c8e5a8447f6ee2cf102f846893800b20cebdf541fc6bbd"
 
 [[package]]
-name = "argh"
-version = "0.1.13"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "34ff18325c8a36b82f992e533ece1ec9f9a9db446bd1c14d4f936bac88fcd240"
-dependencies = [
- "argh_derive",
- "argh_shared",
- "rust-fuzzy-search",
-]
-
-[[package]]
-name = "argh_derive"
-version = "0.1.13"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "adb7b2b83a50d329d5d8ccc620f5c7064028828538bdf5646acd60dc1f767803"
-dependencies = [
- "argh_shared",
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
-name = "argh_shared"
-version = "0.1.13"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a464143cc82dedcdc3928737445362466b7674b5db4e2eb8e869846d6d84f4f6"
-
-[[package]]
 name = "autocfg"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -53,13 +24,13 @@ checksum = "c08606f8c3cbf4ce6ec8e28fb0014a2c086708fe954eaa885384a6165172e7e8"
 name = "base"
 version = "0.0.0"
 dependencies = [
- "argh",
  "bitflags",
  "bytemuck",
  "cfg-if",
  "const_format",
  "cxx",
  "cxx-gen",
+ "derive",
  "libc",
  "nix",
  "num-derive",
@@ -648,14 +619,12 @@ dependencies = [
 name = "magisk"
 version = "0.0.0"
 dependencies = [
- "argh",
  "base",
  "bit-set",
  "bitflags",
  "bytemuck",
  "cxx",
  "cxx-gen",
- "derive",
  "nix",
  "num-derive",
  "num-traits",
@@ -668,7 +637,6 @@ dependencies = [
 name = "magiskboot"
 version = "0.0.0"
 dependencies = [
- "argh",
  "base",
  "bytemuck",
  "byteorder",
@@ -710,7 +678,6 @@ dependencies = [
 name = "magiskpolicy"
 version = "0.0.0"
 dependencies = [
- "argh",
  "base",
  "cxx",
  "cxx-gen",
@@ -951,12 +918,6 @@ dependencies = [
  "subtle",
  "zeroize",
 ]
-
-[[package]]
-name = "rust-fuzzy-search"
-version = "0.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a157657054ffe556d8858504af8a672a054a6e0bd9e8ee531059100c0fa11bb2"
 
 [[package]]
 name = "rustversion"
