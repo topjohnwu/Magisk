@@ -8,6 +8,9 @@ version = "0.0.0"
 edition = "2024"
 
 [workspace.dependencies]
+base = { path = "base" }
+derive = { path = "core/derive" }
+magiskpolicy = { path = "sepolicy" }
 cxx = { path = "external/cxx-rs" }
 cxx-gen = { path = "external/cxx-rs/gen/lib" }
 libc = "0.2.176"

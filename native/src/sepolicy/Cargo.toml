@@ -11,10 +11,9 @@ path = "lib.rs"
 cxx-gen = { workspace = true }
 
 [features]
-default = ["main"]
-main = []
+no-main = []
 
 [dependencies]
-base = { path = "../base" }
+base = { workspace = true }
 cxx = { workspace = true }
 argh = { workspace = true }
