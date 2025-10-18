@@ -4,13 +4,10 @@ use crate::{
 };
 use bytemuck::{Pod, bytes_of, bytes_of_mut};
 use libc::{c_uint, makedev, mode_t};
-use nix::{
-    errno::Errno,
-    fcntl::{AT_FDCWD, OFlag},
-    sys::stat::{FchmodatFlags, Mode},
-    unistd::AccessFlags,
-    unistd::{Gid, Uid},
-};
+use nix::errno::Errno;
+use nix::fcntl::{AT_FDCWD, OFlag};
+use nix::sys::stat::{FchmodatFlags, Mode};
+use nix::unistd::{AccessFlags, Gid, Uid};
 use num_traits::AsPrimitive;
 use std::cmp::min;
 use std::ffi::CStr;

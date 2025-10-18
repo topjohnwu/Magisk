@@ -4,17 +4,13 @@ use base::{
     nix, parse_mount_info, raw_cstr,
 };
 use cxx::CxxString;
-use nix::{
-    mount::MsFlags,
-    sys::statfs::{FsType, TMPFS_MAGIC, statfs},
-    unistd::{chdir, chroot},
-};
+use nix::mount::MsFlags;
+use nix::sys::statfs::{FsType, TMPFS_MAGIC, statfs};
+use nix::unistd::{chdir, chroot};
 use num_traits::AsPrimitive;
-use std::{
-    collections::BTreeSet,
-    ops::Bound::{Excluded, Unbounded},
-    pin::Pin,
-};
+use std::collections::BTreeSet;
+use std::ops::Bound::{Excluded, Unbounded};
+use std::pin::Pin;
 
 unsafe extern "C" {
     static environ: *const *mut libc::c_char;

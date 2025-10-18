@@ -6,9 +6,11 @@ use crate::patch::hexpatch;
 use crate::payload::extract_boot_from_payload;
 use crate::sign::{sha1_hash, sign_boot_image};
 use argh::{CommandInfo, EarlyExit, FromArgs, SubCommand};
+use base::libc::umask;
+use base::nix::fcntl::OFlag;
 use base::{
     CmdArgs, EarlyExitExt, LoggedResult, MappedFile, PositionalArgParser, ResultExt, Utf8CStr,
-    Utf8CString, WriteExt, cmdline_logging, cstr, libc::umask, log_err, nix::fcntl::OFlag,
+    Utf8CString, WriteExt, cmdline_logging, cstr, log_err,
 };
 use std::ffi::c_char;
 use std::io::{Seek, SeekFrom, Write};

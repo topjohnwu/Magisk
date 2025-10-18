@@ -1,16 +1,13 @@
 use crate::{Utf8CStr, Utf8CString, cstr, ffi};
 use argh::{EarlyExit, MissingRequirements};
 use libc::c_char;
-use std::{
-    fmt,
-    fmt::Arguments,
-    io::Write,
-    mem::ManuallyDrop,
-    process::exit,
-    slice, str,
-    sync::Arc,
-    sync::atomic::{AtomicPtr, Ordering},
-};
+use std::fmt::Arguments;
+use std::io::Write;
+use std::mem::ManuallyDrop;
+use std::process::exit;
+use std::sync::Arc;
+use std::sync::atomic::{AtomicPtr, Ordering};
+use std::{fmt, slice, str};
 
 pub fn errno() -> &'static mut i32 {
     unsafe { &mut *libc::__errno() }

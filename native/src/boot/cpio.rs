@@ -23,9 +23,10 @@ use base::libc::{
     S_IWOTH, S_IWUSR, S_IXGRP, S_IXOTH, S_IXUSR, dev_t, gid_t, major, makedev, minor, mknod,
     mode_t, uid_t,
 };
+use base::nix::fcntl::OFlag;
 use base::{
     BytesExt, EarlyExitExt, LoggedResult, MappedFile, OptionExt, ResultExt, Utf8CStr, Utf8CStrBuf,
-    WriteExt, cstr, log_err, nix::fcntl::OFlag,
+    WriteExt, cstr, log_err,
 };
 
 #[derive(FromArgs)]

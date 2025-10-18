@@ -1,14 +1,13 @@
 use std::cell::UnsafeCell;
 
 use argh::FromArgs;
-use fdt::{
-    Fdt, FdtError,
-    node::{FdtNode, NodeProperty},
-};
+use fdt::node::{FdtNode, NodeProperty};
+use fdt::{Fdt, FdtError};
 
 use base::{LoggedResult, MappedFile, Utf8CStr};
 
-use crate::{check_env, patch::patch_verity};
+use crate::check_env;
+use crate::patch::patch_verity;
 
 #[derive(FromArgs)]
 #[argh(subcommand)]

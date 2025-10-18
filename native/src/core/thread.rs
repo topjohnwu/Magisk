@@ -1,5 +1,6 @@
 use base::{ResultExt, new_daemon_thread};
-use nix::{sys::signal::SigSet, unistd::getpid, unistd::gettid};
+use nix::sys::signal::SigSet;
+use nix::unistd::{getpid, gettid};
 use std::sync::{Condvar, LazyLock, Mutex, WaitTimeoutResult};
 use std::time::Duration;
 

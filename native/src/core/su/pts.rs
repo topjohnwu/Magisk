@@ -1,13 +1,11 @@
 use base::{FileOrStd, LibcReturn, LoggedResult, OsResult, ResultExt, libc, warn};
 use libc::{STDIN_FILENO, TIOCGWINSZ, TIOCSWINSZ, c_int, winsize};
-use nix::{
-    fcntl::{OFlag, SpliceFFlags},
-    poll::{PollFd, PollFlags, PollTimeout, poll},
-    sys::signal::{SigSet, Signal, raise},
-    sys::signalfd::{SfdFlags, SignalFd},
-    sys::termios::{SetArg, Termios, cfmakeraw, tcgetattr, tcsetattr},
-    unistd::pipe2,
-};
+use nix::fcntl::{OFlag, SpliceFFlags};
+use nix::poll::{PollFd, PollFlags, PollTimeout, poll};
+use nix::sys::signal::{SigSet, Signal, raise};
+use nix::sys::signalfd::{SfdFlags, SignalFd};
+use nix::sys::termios::{SetArg, Termios, cfmakeraw, tcgetattr, tcsetattr};
+use nix::unistd::pipe2;
 use std::fs::File;
 use std::io::{Read, Write};
 use std::mem::MaybeUninit;

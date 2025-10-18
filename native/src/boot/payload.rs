@@ -1,15 +1,13 @@
 use crate::compress::get_decoder;
 use crate::ffi::check_fmt;
-use crate::proto::update_metadata::{DeltaArchiveManifest, mod_InstallOperation::Type};
+use crate::proto::update_metadata::DeltaArchiveManifest;
+use crate::proto::update_metadata::mod_InstallOperation::Type;
 use base::{LoggedError, LoggedResult, ReadSeekExt, ResultExt, WriteExt, error};
 use byteorder::{BigEndian, ReadBytesExt};
 use quick_protobuf::{BytesReader, MessageRead};
-use std::io::Cursor;
-use std::{
-    fs::File,
-    io::{BufReader, Read, Seek, SeekFrom, Write},
-    os::fd::FromRawFd,
-};
+use std::fs::File;
+use std::io::{BufReader, Cursor, Read, Seek, SeekFrom, Write};
+use std::os::fd::FromRawFd;
 
 macro_rules! bad_payload {
     ($msg:literal) => {{

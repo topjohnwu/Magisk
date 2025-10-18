@@ -6,12 +6,11 @@ use base::{
     debug, info, libc, parse_mount_info, warn,
 };
 use libc::{c_uint, dev_t};
-use nix::{
-    mount::MsFlags,
-    sys::stat::{Mode, SFlag, mknod},
-};
+use nix::mount::MsFlags;
+use nix::sys::stat::{Mode, SFlag, mknod};
 use num_traits::AsPrimitive;
-use std::{cmp::Ordering::Greater, cmp::Ordering::Less, path::Path, path::PathBuf};
+use std::cmp::Ordering::{Greater, Less};
+use std::path::{Path, PathBuf};
 
 pub fn setup_preinit_dir() {
     let magisk_tmp = get_magisk_tmp();

@@ -5,13 +5,10 @@ use base::{
     BufReadExt, Directory, FsPathBuilder, LoggedResult, ResultExt, Utf8CStr, Utf8CString,
     clone_attr, cstr, debug,
 };
-use std::io::BufReader;
-use std::{
-    fs::File,
-    io::Write,
-    mem,
-    os::fd::{FromRawFd, RawFd},
-};
+use std::fs::File;
+use std::io::{BufReader, Write};
+use std::mem;
+use std::os::fd::{FromRawFd, RawFd};
 
 pub fn inject_magisk_rc(fd: RawFd, tmp_dir: &Utf8CStr) {
     debug!("Injecting magisk rc");
