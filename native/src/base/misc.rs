@@ -1,5 +1,5 @@
+use super::argh::{EarlyExit, MissingRequirements};
 use crate::{Utf8CStr, Utf8CString, cstr, ffi};
-use argh::{EarlyExit, MissingRequirements};
 use libc::c_char;
 use std::fmt::Arguments;
 use std::io::Write;

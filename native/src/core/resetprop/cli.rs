@@ -6,7 +6,7 @@ use argh::{EarlyExit, FromArgs, MissingRequirements};
 use base::libc::PROP_VALUE_MAX;
 use base::{
     BufReadExt, CmdArgs, EarlyExitExt, LogLevel, LoggedResult, ResultExt, Utf8CStr, Utf8CStrBuf,
-    Utf8CString, cstr, debug, log_err, set_log_level_state,
+    Utf8CString, argh, cstr, debug, log_err, set_log_level_state,
 };
 use nix::fcntl::OFlag;
 use std::collections::BTreeMap;

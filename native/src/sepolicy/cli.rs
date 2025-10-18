@@ -3,7 +3,8 @@ use crate::statement::format_statement_help;
 use argh::FromArgs;
 use base::libc::umask;
 use base::{
-    CmdArgs, EarlyExitExt, FmtAdaptor, LoggedResult, Utf8CString, cmdline_logging, cstr, log_err,
+    CmdArgs, EarlyExitExt, FmtAdaptor, LoggedResult, Utf8CString, argh, cmdline_logging, cstr,
+    log_err,
 };
 use std::ffi::c_char;
 use std::io::stderr;

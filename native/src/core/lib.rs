@@ -9,8 +9,8 @@
 
 use crate::ffi::SuRequest;
 use crate::socket::Encodable;
+use base::derive::Decodable;
 use daemon::{MagiskD, connect_daemon_for_cxx};
-use derive::Decodable;
 use logging::{android_logging, zygisk_close_logd, zygisk_get_logd, zygisk_logging};
 use magisk::magisk_main;
 use mount::revert_unmount;

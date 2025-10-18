@@ -7,6 +7,7 @@ pub use cstr::{
     FsPathFollow, StrErr, Utf8CStr, Utf8CStrBuf, Utf8CStrBufArr, Utf8CStrBufRef, Utf8CString,
 };
 use cxx_extern::*;
+pub use derive;
 pub use dir::*;
 pub use ffi::{Utf8CStrRef, fork_dont_care, set_nice_name};
 pub use files::*;
@@ -14,6 +15,7 @@ pub use logging::*;
 pub use misc::*;
 pub use result::*;
 
+pub mod argh;
 pub mod cstr;
 mod cxx_extern;
 mod dir;

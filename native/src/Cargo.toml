@@ -1,6 +1,6 @@
 [workspace]
 exclude = ["external"]
-members = ["base", "boot", "core", "core/derive", "init", "sepolicy"]
+members = ["base", "base/derive", "boot", "core", "init", "sepolicy"]
 resolver = "2"
 
 [workspace.package]
@@ -9,7 +9,7 @@ edition = "2024"
 
 [workspace.dependencies]
 base = { path = "base" }
-derive = { path = "core/derive" }
+derive = { path = "base/derive" }
 magiskpolicy = { path = "sepolicy" }
 cxx = { path = "external/cxx-rs" }
 cxx-gen = { path = "external/cxx-rs/gen/lib" }
@@ -27,7 +27,6 @@ bit-set = "0.8.0"
 syn = "2.0.106"
 quote = "1.0.40"
 proc-macro2 = "1.0.101"
-argh = { version = "0.1.13", default-features = false }
 pb-rs = { version = "0.10.0", default-features = false }
 quick-protobuf = "0.8.1"
 flate2 = { version = "1.1.2", default-features = false }
