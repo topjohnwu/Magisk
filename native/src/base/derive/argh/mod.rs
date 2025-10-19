@@ -279,7 +279,7 @@ fn impl_from_args_struct(
         .collect();
 
     ensure_unique_names(errors, &fields);
-    ensure_only_last_positional_is_optional(errors, &fields);
+    ensure_only_trailing_positionals_are_optional(errors, &fields);
 
     let impl_span = Span::call_site();
 
@@ -441,17 +441,22 @@ fn get_help_triggers(type_attrs: &TypeAttrs) -> Vec<String> {
         })
 }
 
-/// Ensures that only the last positional arg is non-required.
-fn ensure_only_last_positional_is_optional(errors: &Errors, fields: &[StructField<'_>]) {
+/// Ensures that only trailing positional args are non-required.
+fn ensure_only_trailing_positionals_are_optional(errors: &Errors, fields: &[StructField<'_>]) {
     let mut first_non_required_span = None;
     for field in fields {
         if field.kind == FieldKind::Positional {
-            if let Some(first) = first_non_required_span {
+            if let Some(first) = first_non_required_span
+                && field.optionality.is_required()
+            {
                 errors.err_span(
                     first,
-                    "Only the last positional argument may be `Option`, `Vec`, or defaulted.",
+                    "Only trailing positional arguments may be `Option`, `Vec`, or defaulted.",
                 );
-                errors.err(&field.field, "Later positional argument declared here.");
+                errors.err(
+                    &field.field,
+                    "Later non-optional positional argument declared here.",
+                );
                 return;
             }
             if !field.optionality.is_required() {
