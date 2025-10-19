@@ -525,21 +525,15 @@ pub trait DynamicSubCommand: Sized {
 pub struct EarlyExit {
     /// The output to display to the user of the commandline tool.
     pub output: String,
-    /// Status of argument parsing.
-    ///
-    /// `Ok` if the command was parsed successfully and the early exit is due
-    /// to a flag like `--help` causing early exit with output.
-    ///
-    /// `Err` if the arguments were not successfully parsed.
-    // TODO replace with std::process::ExitCode when stable.
-    pub status: Result<(), ()>,
+    /// If the early exit is caused by help triggers.
+    pub is_help: bool,
 }
 
 impl From<String> for EarlyExit {
     fn from(err_msg: String) -> Self {
         Self {
             output: err_msg,
-            status: Err(()),
+            is_help: false,
         }
     }
 }
@@ -695,7 +689,6 @@ pub fn parse_struct_args(
     mut parse_options: ParseStructOptions<'_>,
     mut parse_positionals: ParseStructPositionals<'_>,
     mut parse_subcommand: Option<ParseStructSubCommand<'_>>,
-    help_func: &dyn Fn() -> String,
 ) -> Result<(), EarlyExit> {
     let mut help = false;
     let mut remaining_args = args;
@@ -738,8 +731,8 @@ pub fn parse_struct_args(
 
     if help {
         Err(EarlyExit {
-            output: help_func(),
-            status: Ok(()),
+            output: String::new(),
+            is_help: true,
         })
     } else {
         Ok(())
@@ -869,7 +862,7 @@ impl ParseStructPositionals<'_> {
         } else {
             Err(EarlyExit {
                 output: unrecognized_arg(arg),
-                status: Err(()),
+                is_help: false,
             })
         }
     }

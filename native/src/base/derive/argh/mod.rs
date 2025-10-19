@@ -374,8 +374,6 @@ fn impl_from_args_struct_from_args<'a>(
 
     let help_triggers = get_help_triggers(type_attrs);
 
-    let help = quote! { String::new() };
-
     let method_impl = quote_spanned! { impl_span =>
         fn from_args(__cmd_name: &[&str], __args: &[&str])
             -> std::result::Result<Self, argh::EarlyExit>
@@ -405,7 +403,6 @@ fn impl_from_args_struct_from_args<'a>(
                     last_is_greedy: #last_positional_is_greedy,
                 },
                 #parse_subcommands,
-                &|| #help,
             )?;
 
             let mut #missing_requirements_ident = argh::MissingRequirements::default();

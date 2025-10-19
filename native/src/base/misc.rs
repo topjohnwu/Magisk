@@ -84,17 +84,16 @@ impl<T> EarlyExitExt<T> for Result<T, EarlyExit> {
     fn on_early_exit<F: FnOnce()>(self, print_help_msg: F) -> T {
         match self {
             Ok(t) => t,
-            Err(EarlyExit { output, status }) => match status {
-                Ok(_) => {
+            Err(EarlyExit { output, is_help }) => {
+                if is_help {
                     print_help_msg();
                     exit(0)
-                }
-                Err(_) => {
+                } else {
                     eprintln!("{output}");
                     print_help_msg();
                     exit(1)
                 }
-            },
+            }
         }
     }
 }
