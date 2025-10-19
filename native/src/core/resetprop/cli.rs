@@ -17,21 +17,21 @@ use std::io::BufReader;
 struct ResetProp {
     #[argh(switch, short = 'v')]
     verbose: bool,
-    #[argh(switch, short = 'w')]
+    #[argh(switch, short = 'w', long = none)]
     wait_mode: bool,
-    #[argh(switch, short = 'p')]
+    #[argh(switch, short = 'p', long = none)]
     persist: bool,
-    #[argh(switch, short = 'P')]
+    #[argh(switch, short = 'P', long = none)]
     persist_only: bool,
-    #[argh(switch, short = 'Z')]
+    #[argh(switch, short = 'Z', long = none)]
     context: bool,
-    #[argh(switch, short = 'n')]
+    #[argh(switch, short = 'n', long = none)]
     skip_svc: bool,
     #[argh(option, short = 'f')]
     file: Option<Utf8CString>,
-    #[argh(option, long = "delete", short = 'd')]
+    #[argh(option, short = 'd', long = "delete")]
     delete_key: Option<Utf8CString>,
-    #[argh(positional)]
+    #[argh(positional, greedy = true)]
     args: Vec<Utf8CString>,
 }
 
@@ -57,7 +57,7 @@ Wait mode arguments (toggled with -w):
 
 General flags:
    -h,--help         show this message
-   -v                print verbose output to stderr
+   -v,--verbose      print verbose output to stderr
    -w                switch to wait mode
 
 Read mode flags:

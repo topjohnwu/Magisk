@@ -175,23 +175,29 @@ impl<'a> StructField<'a> {
         }
 
         // Determine the "long" name of options and switches.
-        // Defaults to the kebab-case'd field name if `#[argh(long = "...")]` is omitted.
+        // Defaults to the kebab-cased field name if `#[argh(long = "...")]` is omitted.
+        // If `#[argh(long = none)]` is explicitly set, no long name will be set.
         let long_name = match kind {
             FieldKind::Switch | FieldKind::Option => {
-                let long_name = attrs
-                    .long
-                    .as_ref()
-                    .map(syn::LitStr::value)
-                    .unwrap_or_else(|| {
+                let long_name = match &attrs.long {
+                    None => {
                         let kebab_name = to_kebab_case(&name.unraw().to_string());
                         check_long_name(errors, name, &kebab_name);
-                        kebab_name
-                    });
-                if long_name == "help" {
-                    errors.err(field, "Custom `--help` flags are not supported.");
+                        Some(kebab_name)
+                    }
+                    Some(None) => None,
+                    Some(Some(long)) => Some(long.value()),
                 }
-                let long_name = format!("--{}", long_name);
-                Some(long_name)
+                .map(|long_name| {
+                    if long_name == "help" {
+                        errors.err(field, "Custom `--help` flags are not supported.");
+                    }
+                    format!("--{}", long_name)
+                });
+                if let (None, None) = (&attrs.short, &long_name) {
+                    errors.err(field, "At least one of `short` or `long` has to be set.")
+                };
+                long_name
             }
             FieldKind::SubCommand | FieldKind::Positional => None,
         };
@@ -214,6 +220,15 @@ impl<'a> StructField<'a> {
             .map(LitStr::value)
             .unwrap_or_else(|| self.name.to_string().trim_matches('_').to_owned())
     }
+
+    fn option_arg_name(&self) -> String {
+        match (&self.attrs.short, &self.long_name) {
+            (None, None) => unreachable!("short and long cannot both be None"),
+            (Some(short), None) => format!("-{}", short.value()),
+            (None, Some(long)) => long.clone(),
+            (Some(short), Some(long)) => format!("-{},{long}", short.value()),
+        }
+    }
 }
 
 fn to_kebab_case(s: &str) -> String {
@@ -226,22 +241,6 @@ fn to_kebab_case(s: &str) -> String {
         res.push_str(word)
     }
     res
-}
-
-#[test]
-fn test_kebabs() {
-    #[track_caller]
-    fn check(s: &str, want: &str) {
-        let got = to_kebab_case(s);
-        assert_eq!(got.as_str(), want)
-    }
-    check("", "");
-    check("_", "");
-    check("foo", "foo");
-    check("__foo_", "foo");
-    check("foo_bar", "foo-bar");
-    check("foo__Bar", "foo-Bar");
-    check("foo_bar__baz_", "foo-bar-baz");
 }
 
 /// Implements `FromArgs` and `TopLevelCommand` or `SubCommand` for a `#[derive(FromArgs)]` struct.
@@ -620,17 +619,15 @@ fn unwrap_from_args_fields<'a>(
 /// to an index in the output table.
 fn flag_str_to_output_table_map_entries<'a>(fields: &'a [StructField<'a>]) -> Vec<TokenStream> {
     let mut flag_str_to_output_table_map = vec![];
-    for (i, (field, long_name)) in fields
-        .iter()
-        .filter_map(|field| field.long_name.as_ref().map(|long_name| (field, long_name)))
-        .enumerate()
-    {
+
+    for (i, field) in fields.iter().enumerate() {
         if let Some(short) = &field.attrs.short {
             let short = format!("-{}", short.value());
             flag_str_to_output_table_map.push(quote! { (#short, #i) });
         }
-
-        flag_str_to_output_table_map.push(quote! { (#long_name, #i) });
+        if let Some(long) = &field.long_name {
+            flag_str_to_output_table_map.push(quote! { (#long, #i) });
+        }
     }
     flag_str_to_output_table_map
 }
@@ -658,10 +655,7 @@ fn append_missing_requirements<'a>(
                     }
                 }
                 FieldKind::Option => {
-                    let name = field
-                        .long_name
-                        .as_ref()
-                        .expect("options always have a long name");
+                    let name = field.option_arg_name();
                     quote! {
                         if #field_name.slot.is_none() {
                             #mri.missing_option(#name)

@@ -18,7 +18,7 @@ pub(crate) enum DtbAction {
 #[derive(FromArgs)]
 #[argh(subcommand, name = "print")]
 pub(crate) struct Print {
-    #[argh(switch, short = 'f')]
+    #[argh(switch, short = 'f', long = none)]
     fstab: bool,
 }
 

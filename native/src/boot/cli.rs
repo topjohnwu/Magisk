@@ -43,9 +43,9 @@ enum Action {
 #[derive(FromArgs)]
 #[argh(subcommand, name = "unpack")]
 struct Unpack {
-    #[argh(switch, short = 'n')]
+    #[argh(switch, short = 'n', long = none)]
     no_decompress: bool,
-    #[argh(switch, short = 'h')]
+    #[argh(switch, short = 'h', long = none)]
     dump_header: bool,
     #[argh(positional)]
     img: Utf8CString,
@@ -54,7 +54,7 @@ struct Unpack {
 #[derive(FromArgs)]
 #[argh(subcommand, name = "repack")]
 struct Repack {
-    #[argh(switch, short = 'n')]
+    #[argh(switch, short = 'n', long = none)]
     no_compress: bool,
     #[argh(positional)]
     img: Utf8CString,
@@ -136,7 +136,7 @@ struct Dtb {
 #[derive(FromArgs)]
 #[argh(subcommand, name = "split")]
 struct Split {
-    #[argh(switch, short = 'n')]
+    #[argh(switch, short = 'n', long = none)]
     no_decompress: bool,
     #[argh(positional)]
     file: Utf8CString,
