@@ -704,7 +704,7 @@ pub fn parse_struct_args(
 
     'parse_args: while let Some(&next_arg) = remaining_args.first() {
         remaining_args = &remaining_args[1..];
-        if (parse_options.help_triggers.contains(&next_arg)) && !options_ended {
+        if (parse_options.help_triggers().contains(&next_arg)) && !options_ended {
             help = true;
             continue;
         }
@@ -761,7 +761,7 @@ pub struct ParseStructOptions<'a> {
     pub help_triggers: &'a [&'a str],
 }
 
-impl ParseStructOptions<'_> {
+impl<'a> ParseStructOptions<'a> {
     /// Parse a commandline option.
     ///
     /// `arg`: the current option argument being parsed (e.g. `--foo`).
@@ -772,7 +772,7 @@ impl ParseStructOptions<'_> {
             .arg_to_slot
             .iter()
             .find_map(|&(name, pos)| if name == arg { Some(pos) } else { None })
-            .ok_or_else(|| unrecognized_argument(arg, self.arg_to_slot, self.help_triggers))?;
+            .ok_or_else(|| unrecognized_argument(arg, self.arg_to_slot, self.help_triggers()))?;
 
         match self.slots[pos] {
             ParseStructOption::Flag(ref mut b) => b.set_flag(arg),
@@ -797,6 +797,14 @@ impl ParseStructOptions<'_> {
         }
 
         Ok(())
+    }
+
+    fn help_triggers(&self) -> &'a [&'a str] {
+        if self.help_triggers.is_empty() {
+            &["-h", "--help"]
+        } else {
+            self.help_triggers
+        }
     }
 }
 
