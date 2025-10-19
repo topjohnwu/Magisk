@@ -16,7 +16,7 @@ pub struct FieldAttrs {
     pub description: Option<Description>,
     pub from_str_fn: Option<syn::ExprPath>,
     pub field_type: Option<FieldType>,
-    pub long: Option<syn::LitStr>,
+    pub long: Option<Option<syn::LitStr>>,
     pub short: Option<syn::LitChar>,
     pub arg_name: Option<syn::LitStr>,
     pub greedy: Option<syn::Path>,
@@ -179,10 +179,20 @@ impl FieldAttrs {
     }
 
     fn parse_attr_long(&mut self, errors: &Errors, m: &syn::MetaNameValue) {
-        parse_attr_single_string(errors, m, "long", &mut self.long);
-        let long = self.long.as_ref().unwrap();
-        let value = long.value();
-        check_long_name(errors, long, &value);
+        if let Some(first) = &self.long {
+            errors.duplicate_attrs("long", first, m);
+        } else if let syn::Expr::Path(syn::ExprPath { path, .. }) = &m.value
+            && let Some(ident) = path.get_ident()
+            && ident.to_string().eq_ignore_ascii_case("none")
+        {
+            self.long = Some(None);
+        } else if let Some(lit_str) = errors.expect_lit_str(&m.value) {
+            self.long = Some(Some(lit_str.clone()));
+        }
+        if let Some(Some(long)) = &self.long {
+            let value = long.value();
+            check_long_name(errors, long, &value);
+        }
     }
 
     fn parse_attr_short(&mut self, errors: &Errors, m: &syn::MetaNameValue) {
