@@ -425,11 +425,12 @@ fn impl_from_args_struct_from_args<'a>(
 
 /// get help triggers vector from type_attrs.help_triggers as a [`Vec<String>`]
 ///
-/// Defaults to vec!["--help", "help"] if type_attrs.help_triggers is None
+/// Defaults to vec!["-h", "--help"] if type_attrs.help_triggers is None
 fn get_help_triggers(type_attrs: &TypeAttrs) -> Vec<String> {
-    type_attrs.help_triggers.as_ref().map_or_else(
-        || vec!["--help".to_owned(), "help".to_owned()],
-        |s| {
+    type_attrs
+        .help_triggers
+        .as_ref()
+        .map_or_else(Vec::new, |s| {
             s.iter()
                 .filter_map(|s| {
                     let trigger = s.value();
@@ -441,8 +442,7 @@ fn get_help_triggers(type_attrs: &TypeAttrs) -> Vec<String> {
                     }
                 })
                 .collect::<Vec<_>>()
-        },
-    )
+        })
 }
 
 /// Ensures that only the last positional arg is non-required.
