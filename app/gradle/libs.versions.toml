@@ -3,11 +3,11 @@ kotlin = "2.2.20"
 android = "8.13.0"
 ksp = "2.2.20-2.0.2"
 rikka = "1.3.0"
-navigation = "2.9.4"
+navigation = "2.9.5"
 libsu = "6.0.0"
-okhttp = "5.1.0"
+okhttp = "5.2.1"
 retrofit = "3.0.0"
-room = "2.8.0"
+room = "2.8.2"
 
 [libraries]
 bcpkix = { module = "org.bouncycastle:bcpkix-jdk18on", version = "1.82" }
