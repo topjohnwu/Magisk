@@ -127,6 +127,13 @@ class FlashFragment : BaseFragment<FragmentFlashMd2Binding>(), MenuProvider {
             additionalData = uri
         )
 
+        // Downloading is understood as downloading file then patch */
+
+        fun download(uri: Uri) = MainDirections.actionFlashFragment(
+            action = Const.Value.DOWNLOAD,
+            additionalData = uri
+        )
+
         /* Uninstalling is understood as removing magisk entirely */
 
         fun uninstall() = MainDirections.actionFlashFragment(

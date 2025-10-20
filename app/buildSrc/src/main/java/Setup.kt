@@ -72,22 +72,17 @@ fun Project.setupCommon() {
                     "/META-INF/*",
                     "/META-INF/androidx/**",
                     "/META-INF/versions/**",
+                    "/META-INF/native-image/**",
                     "/org/bouncycastle/**",
                     "/org/apache/commons/**",
                     "/kotlin/**",
-                    "/kotlinx/**",
-                    "/okhttp3/**",
                     "/*.txt",
-                    "/*.bin",
                     "/*.json",
+                    "**/*.bin",
+                    "**/*.proto",
                 )
             }
         }
-    }
-
-    configurations.all {
-        exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk7")
-        exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk8")
     }
 
     tasks.withType<KotlinCompile> {
