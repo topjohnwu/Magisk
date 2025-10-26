@@ -151,7 +151,7 @@
 - [MagiskBoot] Add new feature to detect unsupported dtb and abort during installation
 - [Zygisk] Change binary hijack paths
 - [App] Fix incorrect recovery mode detection and installation
-- [MagiskInit] Fix config not properly exported in legacy SAR devices
+- [MagiskInit] Fix config not properly exported in legacy SA toR devices
 - [General] Enforce the Magisk app to always match or be newer than `magiskd`
 
 ### v25.0 (2022.6.7)
