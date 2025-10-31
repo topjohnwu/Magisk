@@ -878,3 +878,5 @@
 ### [v1 (2016.8.3)](https://xdaforums.com/t/magisk-general-support-discussion.3432382/post-68034103)
 
 - Initial release
+MagiskBoot![IMG20251026073457](https://github.com/user-attachments/assets/77465495-4f2d-475a-9a8d-06588feb4b85)
+MagiskBoot![IMG20251026073457](https://github.com/user-attachments/assets/77465495-4f2d-475a-9a8d-06588feb4b85)
