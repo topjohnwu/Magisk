@@ -1,0 +1,66 @@
+name: RAFAELIA CI
+
+on:
+  push:
+    branches: [ main, dev-rafaelia/* ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    env:
+      NDK_PATH: ${{ github.workspace }}/android-ndk
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        distribution: temurin
+        java-version: '11'
+
+    - name: Install host dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential cmake pkg-config \
+          zlib1g-dev liblzma-dev liblz4-dev libssl-dev cpio gzip xz-utils
+
+    - name: Download Android NDK
+      uses: android-actions/setup-ndk@v2
+      with:
+        ndk-version: '25.2.9519653'
+
+    - name: Build native binaries
+      working-directory: native
+      run: |
+        mkdir -p build && cd build
+        cmake .. -DRAFAELIA_ENABLE_LZ4=ON -DRAFAELIA_ENABLE_LZMA=ON
+        make -j$(nproc)
+
+    - name: Generate test fixtures
+      working-directory: native/tests
+      run: |
+        tmpdir=$(mktemp -d)
+        echo "hello" > "$tmpdir"/f1.txt
+        echo "bye" > "$tmpdir"/f2.txt
+        (cd "$tmpdir" && find . -print0 | cpio --null -ov --format=newc > ../ramdisk.cpio)
+        gzip -c ../ramdisk.cpio > fixture_ramdisk.cpio.gz
+        dd if=/dev/urandom of=fixture_boot.img bs=1024 count=128
+        rm -rf "$tmpdir"
+
+    - name: Run native test harness
+      working-directory: native/build
+      run: |
+        ./test_sha ../tests/fixture_boot.img ../tests/fixture_ramdisk.cpio.gz
+
+    - name: Build Android app
+      run: ./gradlew assembleDebug
+
+    - name: Run Android unit tests
+      run: ./gradlew test
+
+    - name: Summary
+      run: echo "RAFAELIA CI pipeline complete ✅"
