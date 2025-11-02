@@ -1,3 +1,7 @@
+/* Signature: RAFCODE-Φ-∆RafaelVerboΩ - 2025-08-31T14:25:55Z
+   Manifest: RAFAELIA_MANIFEST.json (see repo root)
+   ψχρΔΣΩ-session: (runtime will inject per-run)
+*/
 /*
  * native/magiskboot/magiskboot.c
  * RAFAELIA NATIVE_HARDEN - integrated hardened magiskboot.c
