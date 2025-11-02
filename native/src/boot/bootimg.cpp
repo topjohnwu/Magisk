@@ -279,9 +279,10 @@ static int find_dtb_offset(const uint8_t *buf, unsigned sz) {
 
         auto fdt_hdr = reinterpret_cast<const fdt_header *>(curr);
 
-        // Check that fdt_header.totalsize does not overflow kernel image size
+        // Check that fdt_header.totalsize does not overflow kernel image size or is empty dtb
+		// https://github.com/torvalds/linux/commit/7b937cc243e5b1df8780a0aa743ce800df6c68d1
         uint32_t totalsize = fdt_hdr->totalsize;
-        if (totalsize > end - curr)
+        if (totalsize > end - curr || totalsize <= 0x48)
             continue;
 
         // Check that fdt_header.off_dt_struct does not overflow kernel image size
