@@ -1,0 +1,53 @@
+name: RAFAELIA CI - symbols & ndk-stack
+
+on:
+  workflow_run:
+    workflows: ["RAFAELIA CI - native & android (full pipeline)"]
+    types: [completed]
+
+jobs:
+  upload-symbols-and-decode:
+    name: Upload symbols & decode tombstones
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'failure' || github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download native-artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: native-artifacts
+          path: native_artifacts || true
+
+      - name: Upload debug symbols (if present)
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-symbols
+          path: native_artifacts || native/build || native/build/**/*.debug || native/build/**/*.sym || native/build
+
+      - name: Download emulator snapshot (if any)
+        uses: actions/download-artifact@v4
+        with:
+          name: emulator-snapshot
+          path: emulator_snapshot || true
+
+      - name: ndk-stack decode (if tombstone present)
+        run: |
+          set -e
+          if [ -d "emulator_snapshot/tombstones" ]; then
+            mkdir -p decoded_tombstones
+            for t in emulator_snapshot/tombstones/*; do
+              echo "Decoding $t"
+              if command -v ndk-stack >/dev/null 2>&1; then
+                ndk-stack -sym native_artifacts -dump "$t" > "decoded_tombstones/$(basename $t).txt" || true
+              else
+                echo "ndk-stack not found; saving tombstone raw" > "decoded_tombstones/$(basename $t).txt"
+                cat "$t" >> "decoded_tombstones/$(basename $t).txt"
+              fi
+            done
+            tar -czf decoded_tombstones.tar.gz decoded_tombstones
+            echo "Decoded tombstones packaged"
+          else
+            echo "No tombstones directory present in snapshot"
+          fi
