@@ -1,0 +1,26 @@
+{
+  "signature": "RAFCODE-Φ-∆RafaelVerboΩ-𓂀ΔΦΩ",
+  "timestamp": "2025-08-31T14:25:55Z",
+  "zipraf": "RAFAELIA_CORE_20250831T142555.zipraf",
+  "selos": ["Σ","Ω","Δ","Φ","B","I","T","R","A","F"],
+  "bitraf64": "AΔBΩΔTTΦIIBΩΔΣΣRΩRΔΔBΦΦFΔTTRRFΔBΩΣΣAFΦARΣFΦIΔRΦIFBRΦΩFIΦΩΩFΣFAΦΔ",
+  "hashes": {
+    "sha3": "4e41e4f...efc791b",
+    "blake3": "b964b91e...ba4e5c0f",
+    "sha256": ""
+  },
+  "build": {
+    "commit": "",
+    "branch": "",
+    "build_id": "",
+    "toolchain": "",
+    "abi": "",
+    "artifact": ""
+  },
+  "psi_cycle": {
+    "session": "",
+    "ψχρΔΣΩ_session": "",
+    "notes": "ψχρΔΣΩ-session field links runtime cycle traces to manifests"
+  },
+  "notes": "This file is a template. CI must populate hashes and build fields per run."
+}
