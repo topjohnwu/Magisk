@@ -1,0 +1,3 @@
+ZIPRAF_OMEGA_FULL DO it ativar
+Signature: RAFCODE-Φ-∆RafaelVerboΩ
+Action: Manual activation file. Read METADATA.md for steps to enable experimental pipelines.
