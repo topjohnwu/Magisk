@@ -1,11 +1,7 @@
+ url=https://github.com/rafaelmeloreisnovo/Magisk_Rafaelia/blob/main/native/tests/test_sha.c
 /*
  * native/tests/test_sha.c
- *
- * Minimal test harness for sha256_file_stream_path and logical ramdisk hashing.
- *
- * Build (host):
- *   gcc -o test_sha test_sha.c ../magiskboot.c -lcrypto -lz -llzma -llz4
- *
+ * Improved harness with argument checks and descriptive output.
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,12 +21,12 @@ int main(int argc, char **argv) {
     if (argc < 2) { fprintf(stderr,"Usage: %s <fixture_boot.img> [ramdisk.gz]\n", argv[0]); return 2; }
     unsigned char digest[32];
     int rc = sha256_file_stream_path(argv[1], digest, NULL, NULL);
-    assert(rc == 0);
+    if (rc != 0) { fprintf(stderr, "sha256_file_stream_path failed\n"); return 3; }
     printf("sha256(%s): ", argv[1]); print_hex(digest,32);
 
     if (argc >= 3) {
         int fd = open(argv[2], O_RDONLY);
-        if (fd < 0) { perror("open ramdisk"); return 3; }
+        if (fd < 0) { perror("open ramdisk"); return 4; }
         const char *fmt = "gzip";
         unsigned char rsha[32];
         int r = compute_logical_ramdisk_sha_from_fd(fd, fmt, rsha, NULL, NULL);
