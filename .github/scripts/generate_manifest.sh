@@ -9,7 +9,14 @@ OUT=${2:-RAFAELIA_MANIFEST.json}
 COMMIT=${GITHUB_SHA:-$(git rev-parse --short HEAD 2>/dev/null || echo "local")}
 BRANCH=${GITHUB_REF_NAME:-$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "local")}
 RUN_ID=${GITHUB_RUN_ID:-local}
-TIMESTAMP=$(date --iso-8601=seconds)
+# Portable date command that works on both GNU and BSD date
+if command -v gdate >/dev/null 2>&1; then
+  TIMESTAMP=$(gdate --iso-8601=seconds)
+elif date --iso-8601=seconds >/dev/null 2>&1; then
+  TIMESTAMP=$(date --iso-8601=seconds)
+else
+  TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%S%z")
+fi
 TOOLCHAIN="$(cc --version 2>/dev/null | head -n1 || echo 'unknown')"
 OS="$(uname -s)-$(uname -m)"
 
