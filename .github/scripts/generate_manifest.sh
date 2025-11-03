@@ -3,7 +3,7 @@
 # Produz RAFAELIA_MANIFEST.json para o build atual com hashes e metadata.
 # Usage: .github/scripts/generate_manifest.sh <artifact-path> <output-manifest-path>
 set -euo pipefail
-
+ 
 ARTIFACT=${1:-}
 OUT=${2:-RAFAELIA_MANIFEST.json}
 COMMIT=${GITHUB_SHA:-$(git rev-parse --short HEAD 2>/dev/null || echo "local")}
