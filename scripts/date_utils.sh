@@ -4,7 +4,7 @@
 # Uses gdate if available, falls back to date and Python3 for parsing/relative ops.
 # Usage: source scripts/date_utils.sh
 
-set -euo pipefail
+set -euo pipefail 
 
 # Determine which date command to use:
 if command -v gdate >/dev/null 2>&1; then
