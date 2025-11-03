@@ -99,7 +99,7 @@ fun main(args: Array<String>) {
             println("manifest_verify: HMAC mismatch: expected=$expectedHmac computed=$computedB64")
             kotlin.system.exitProcess(8)
         }
-    } else {
+    } else  {
         println("manifest_verify: device mode not implemented in this CLI - use app verifier via adb if needed.")
         kotlin.system.exitProcess(9)
     }
