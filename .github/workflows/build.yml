@@ -38,6 +38,18 @@ jobs:
       - name: Stop gradle daemon
         run: ./app/gradlew --stop
 
+      - name: Generate RAFAELIA manifest for release APK
+        run: |
+          if [ -f out/app-release.apk ]; then
+            .github/scripts/generate_manifest.sh out/app-release.apk out/RAFAELIA_MANIFEST_release.json
+          fi
+
+      - name: Generate RAFAELIA manifest for debug APK
+        run: |
+          if [ -f out/app-debug.apk ]; then
+            .github/scripts/generate_manifest.sh out/app-debug.apk out/RAFAELIA_MANIFEST_debug.json
+          fi
+
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
