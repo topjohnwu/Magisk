@@ -4,12 +4,12 @@
 # Uses gdate if available, falls back to date and Python3 for parsing/relative ops.
 # Usage: source scripts/date_utils.sh
 
-set -euo pipefail
+set -euo pipefail 
 
 # Determine which date command to use:
 if command -v gdate >/dev/null 2>&1; then
   DATE_CMD=gdate
-elif command -v date >/dev/null 2>&1; then
+elif command -v date >/dev/null 2>&1; then 
   DATE_CMD=date
 else
   echo "No date command found" >&2
@@ -60,7 +60,7 @@ else:
     ts = int(dt.timestamp())
 print(ts)
 PY
-}
+} 
 
 # from_epoch EPOCH OUTPUT_FORMAT
 from_epoch(){
