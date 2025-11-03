@@ -9,7 +9,7 @@ on:
       - "build.py"
       - ".github/workflows/build.yml"
   pull_request:
-     branches: [master]
+    branches: [master]
   workflow_dispatch:
 
 jobs:
