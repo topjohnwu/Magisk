@@ -306,53 +306,60 @@ impl TypeAttrs {
                 continue;
             }
 
-            let ml = if let Some(ml) = argh_attr_to_meta_list(errors, attr) {
-                ml
+            let ml: Vec<syn::Meta> = if let Some(ml) = argh_attr_to_meta_list(errors, attr) {
+                ml.into_iter().collect()
             } else {
                 continue;
             };
 
-            for meta in ml {
+            for meta in ml.iter() {
                 let name = meta.path();
                 if name.is_ident("description") {
-                    if let Some(m) = errors.expect_meta_name_value(&meta) {
+                    if let Some(m) = errors.expect_meta_name_value(meta) {
                         parse_attr_description(errors, m, &mut this.description);
                     }
                 } else if name.is_ident("error_code") {
-                    if let Some(m) = errors.expect_meta_list(&meta) {
+                    if let Some(m) = errors.expect_meta_list(meta) {
                         this.parse_attr_error_code(errors, m);
                     }
                 } else if name.is_ident("example") {
-                    if let Some(m) = errors.expect_meta_name_value(&meta) {
+                    if let Some(m) = errors.expect_meta_name_value(meta) {
                         this.parse_attr_example(errors, m);
                     }
                 } else if name.is_ident("name") {
-                    if let Some(m) = errors.expect_meta_name_value(&meta) {
+                    if let Some(m) = errors.expect_meta_name_value(meta) {
                         this.parse_attr_name(errors, m);
                     }
                 } else if name.is_ident("note") {
-                    if let Some(m) = errors.expect_meta_name_value(&meta) {
+                    if let Some(m) = errors.expect_meta_name_value(meta) {
                         this.parse_attr_note(errors, m);
                     }
                 } else if name.is_ident("subcommand") {
-                    if let Some(ident) = errors.expect_meta_word(&meta).and_then(|p| p.get_ident())
-                    {
+                    if let Some(ident) = errors.expect_meta_word(meta).and_then(|p| p.get_ident()) {
                         this.parse_attr_subcommand(errors, ident);
                     }
                 } else if name.is_ident("help_triggers") {
-                    if let Some(m) = errors.expect_meta_list(&meta) {
+                    if let Some(m) = errors.expect_meta_list(meta) {
                         Self::parse_help_triggers(m, errors, &mut this);
                     }
                 } else {
                     errors.err(
-                        &meta,
+                        meta,
                         concat!(
                             "Invalid type-level `argh` attribute\n",
                             "Expected one of: `description`, `error_code`, `example`, `name`, ",
-                            "`note`, `subcommand`",
+                            "`note`, `subcommand`, `help_triggers`",
                         ),
                     );
                 }
+            }
+
+            if this.is_subcommand.is_some() && this.help_triggers.is_some() {
+                let help_meta = ml
+                    .iter()
+                    .find(|meta| meta.path().is_ident("help_triggers"))
+                    .unwrap();
+                errors.err(help_meta, "Cannot use `help_triggers` on a subcommand");
             }
         }
 

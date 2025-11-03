@@ -423,22 +423,27 @@ fn impl_from_args_struct_from_args<'a>(
 ///
 /// Defaults to vec!["-h", "--help"] if type_attrs.help_triggers is None
 fn get_help_triggers(type_attrs: &TypeAttrs) -> Vec<String> {
-    type_attrs
-        .help_triggers
-        .as_ref()
-        .map_or_else(Vec::new, |s| {
-            s.iter()
-                .filter_map(|s| {
-                    let trigger = s.value();
-                    let trigger_trimmed = trigger.trim().to_owned();
-                    if trigger_trimmed.is_empty() {
-                        None
-                    } else {
-                        Some(trigger_trimmed)
-                    }
-                })
-                .collect::<Vec<_>>()
-        })
+    if type_attrs.is_subcommand.is_some() {
+        // Subcommands should never have any help triggers
+        Vec::new()
+    } else {
+        type_attrs.help_triggers.as_ref().map_or_else(
+            || vec!["-h".to_string(), "--help".to_string()],
+            |s| {
+                s.iter()
+                    .filter_map(|s| {
+                        let trigger = s.value();
+                        let trigger_trimmed = trigger.trim().to_owned();
+                        if trigger_trimmed.is_empty() {
+                            None
+                        } else {
+                            Some(trigger_trimmed)
+                        }
+                    })
+                    .collect::<Vec<_>>()
+            },
+        )
+    }
 }
 
 /// Ensures that only trailing positional args are non-required.
