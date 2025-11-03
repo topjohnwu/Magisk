@@ -34,7 +34,7 @@ data class ModuleJson(
 @JsonClass(generateAdapter = true)
 data class ReleaseAssets(
     val name: String,
-    @Json(name = "browser_download_url") val url: String,
+    @param:Json(name = "browser_download_url") val url: String,
 )
 
 class DateTimeAdapter {
@@ -51,12 +51,12 @@ class DateTimeAdapter {
 
 @JsonClass(generateAdapter = true)
 data class Release(
-    @Json(name = "tag_name") val tag: String,
+    @param:Json(name = "tag_name") val tag: String,
     val name: String,
     val prerelease: Boolean,
     val assets: List<ReleaseAssets>,
     val body: String,
-    @Json(name = "created_at") val createdTime: Instant,
+    @param:Json(name = "created_at") val createdTime: Instant,
 ) {
     val versionCode: Int get() {
         return if (tag[0] == 'v') {

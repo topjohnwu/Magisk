@@ -19,7 +19,7 @@ abstract class SuLogDatabase : RoomDatabase() {
 
     companion object {
         val MIGRATION_1_2 = object : Migration(1, 2) {
-            override fun migrate(database: SupportSQLiteDatabase) = with(database) {
+            override fun migrate(db: SupportSQLiteDatabase) = with(db) {
                 execSQL("ALTER TABLE logs ADD COLUMN target INTEGER NOT NULL DEFAULT -1")
                 execSQL("ALTER TABLE logs ADD COLUMN context TEXT NOT NULL DEFAULT ''")
                 execSQL("ALTER TABLE logs ADD COLUMN gids TEXT NOT NULL DEFAULT ''")
