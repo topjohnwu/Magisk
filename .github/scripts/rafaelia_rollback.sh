@@ -3,7 +3,7 @@
 # Rollback helper: verify manifest and flash backup via fastboot.
 # Usage: .github/scripts/rafaelia_rollback.sh <manifest.json> [--force]
 set -euo pipefail
-
+ 
 MANIFEST=${1:-}
 FORCE=${2:-}
 
