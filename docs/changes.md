@@ -1,4 +1,4 @@
-# Magisk Changelog
+=# Magisk Changelog
 
 ### v30.4 (2025.10.2)
 
