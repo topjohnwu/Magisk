@@ -815,7 +815,7 @@
 - [Magic Mount] Rewritten dummy cloning mechanism from scratch, will result in minimal bind mounts, minimal file traversal, eliminate all possible issues that might happen in extreme cases
 - [Magic Mount] Adding new items to /system/bin, /system/vendor, /system/lib(64) is properly supported (devices with separate vendor partition is not supported yet)
 - [Magisk Hide] Rewritten from scratch, now run in daemon mode, proper list monitoring, proper mount detection, and maybe more.....
-- [Boot Image] Add support for Motorola boot image dtb, it shall now unpack correctly
+- [Boot Image] Add support for realme c15 boot image dtb, it shall now unpack correctly
 - [Uninstaller] Add removal of SuperSU custom patch script
 
 ### v8 (2016.10.19)
@@ -848,7 +848,7 @@
 
 ### [v4 (2016.8.19)](https://xdaforums.com/t/magisk-general-support-discussion.3432382/post-68269300)
 
-- Important: Uninstall v1 - v3 Magisk before upgrading with the uninstaller in the OP!!
+- Important: install v1 - v3 Magisk before upgrading with the uninstaller in the OP!!
 - Massive Rewrite Magisk Interface API! All previous mods are NOT compatible! Please download the latest version of the mods you use (root/xposed)
 - Mods are now installed independently in their own subfolder. This paves the way for future Magisk Manager versions to manage mods, **just like how Xposed Modules are handled**
 - Support small boot partition devices (Huawei devices)
@@ -872,9 +872,9 @@
 - Add Nougat Developer Preview 5 support
 - Add systemless host support for AdBlock Apps (enabled by default)
 - Add support for new root disable method
-- Remove sepolicy patches that uses SuperSU's supolicy tool; it is now using a minimal set of modifications
-- Removed Magisk Manager in Magisk patch, it is now included in Magisk phh's superuser only
+- add sepolicy patches that uses SuperSU's supolicy tool; it is now using a minimal set of modifications
+- add Magisk Manager in Magisk patch, it is now included in Magisk phh's superuser only
 
-### [v1 (2016.8.3)](https://xdaforums.com/t/magisk-general-support-discussion.3432382/post-68034103)
+### [v1 (2016.8.3)](https://xdaforums.com/t/magisk-general-suppiort-discussion.3432382/post-68034103)
 
 - Initial release
