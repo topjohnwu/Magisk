@@ -3,9 +3,10 @@ use crate::logging::setup_klog;
 use crate::mount::is_rootfs;
 use crate::twostage::hexpatch_init_for_second_stage;
 use base::libc::{basename, getpid, mount, umask};
-use base::{LibcReturn, LoggedResult, ResultExt, cstr, info, raw_cstr};
+use base::{LibcReturn, LoggedResult, ResultExt, cstr, info, raw_cstr, nix, Utf8CStr};
 use std::ffi::{CStr, c_char};
 use std::ptr::null;
+use base::nix::mount::MsFlags;
 
 impl MagiskInit {
     fn new(argv: *mut *mut c_char) -> Self {
@@ -31,7 +32,7 @@ impl MagiskInit {
 
     fn first_stage(&self) {
         info!("First Stage Init");
-        self.prepare_data();
+        let rootfs_magisktmp = self.prepare_data(true);
 
         if !cstr!("/sdcard").exists() && !cstr!("/first_stage_ramdisk/sdcard").exists() {
             self.hijack_init_with_switch_root();
@@ -41,10 +42,27 @@ impl MagiskInit {
             // Fallback to hexpatch if /sdcard exists
             hexpatch_init_for_second_stage(true);
         }
+
+        if rootfs_magisktmp {
+            info!("Occupy /data.");
+            cstr!("/data").occupy();
+        }
     }
 
     fn second_stage(&mut self) {
         info!("Second Stage Init");
+
+        if cstr!("/data").unoccupy() {
+            nix::mount::mount(
+                None::<&Utf8CStr>,
+                cstr!("/data"),
+                None::<&Utf8CStr>,
+                MsFlags::MS_REMOUNT,
+                Some(cstr!("size=100%")),
+            )
+                .check_os_err("mount", Some("/data"), Some("tmpfs"))
+                .log_ok();
+        }
 
         cstr!("/init").unmount().ok();
         cstr!("/system/bin/init").unmount().ok(); // just in case
@@ -71,7 +89,7 @@ impl MagiskInit {
 
     fn legacy_system_as_root(&mut self) {
         info!("Legacy SAR Init");
-        self.prepare_data();
+        self.prepare_data(false);
         let is_two_stage = self.mount_system_root();
         if is_two_stage {
             hexpatch_init_for_second_stage(false);
@@ -82,7 +100,7 @@ impl MagiskInit {
 
     fn rootfs(&mut self) {
         info!("RootFS Init");
-        self.prepare_data();
+        self.prepare_data(false);
         self.restore_ramdisk_init();
         self.patch_rw_root();
     }
