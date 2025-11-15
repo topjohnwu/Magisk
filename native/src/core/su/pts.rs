@@ -141,7 +141,7 @@ fn pump_tty_impl(ptmx: File, pump_stdin: bool) -> LoggedResult<()> {
                 if raw_fd == STDIN_FILENO {
                     pump_via_splice(FileOrStd::StdIn.as_file(), &ptmx, &pipe_fd)?;
                 } else if raw_fd == raw_ptmx {
-                    pump_via_splice(&ptmx, FileOrStd::StdIn.as_file(), &pipe_fd)?;
+                    pump_via_splice(&ptmx, FileOrStd::StdOut.as_file(), &pipe_fd)?;
                 } else if raw_fd == raw_sig {
                     sync_winsize(raw_ptmx);
                     signal_fd.as_ref().unwrap().read_signal()?;
