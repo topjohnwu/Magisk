@@ -1,5 +1,4 @@
 #![feature(format_args_nl)]
-#![feature(btree_extract_if)]
 #![feature(iter_intersperse)]
 #![feature(try_blocks)]
 
