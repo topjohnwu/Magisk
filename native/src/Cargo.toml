@@ -49,8 +49,8 @@ x509-cert = "0.3.0-rc.2"
 der = "0.8.0-rc.9"
 
 [patch.crates-io]
-pb-rs = { git = "https://github.com/tafia/quick-protobuf.git" }
-quick-protobuf = { git = "https://github.com/tafia/quick-protobuf.git" }
+pb-rs = { git = "https://github.com/topjohnwu/quick-protobuf.git" }
+quick-protobuf = { git = "https://github.com/topjohnwu/quick-protobuf.git" }
 lz4-sys = { path = "external/lz4-sys" }
 
 [profile.dev]
