@@ -1,16 +1,16 @@
 [versions]
 kotlin = "2.2.21"
-android = "8.13.0"
-ksp = "2.3.0"
+android = "8.13.1"
+ksp = "2.3.3"
 rikka = "1.3.0"
-navigation = "2.9.5"
+navigation = "2.9.6"
 libsu = "6.0.0"
-okhttp = "5.3.0"
+okhttp = "5.3.2"
 retrofit = "3.0.0"
-room = "2.8.3"
+room = "2.8.4"
 
 [libraries]
-bcpkix = { module = "org.bouncycastle:bcpkix-jdk18on", version = "1.82" }
+bcpkix = { module = "org.bouncycastle:bcpkix-jdk18on", version = "1.83" }
 commons-compress = { module = "org.apache.commons:commons-compress", version = "1.28.0" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 retrofit-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "retrofit" }
@@ -23,10 +23,10 @@ timber = { module = "com.jakewharton.timber:timber", version = "5.0.1" }
 jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version = "7.1.0.202411261347-r" }
 
 # AndroidX
-activity = { module = "androidx.activity:activity", version = "1.11.0" }
+activity = { module = "androidx.activity:activity", version = "1.12.0" }
 appcompat = { module = "androidx.appcompat:appcompat", version = "1.7.1" }
 core-ktx = { module = "androidx.core:core-ktx", version = "1.17.0" }
-core-splashscreen = { module = "androidx.core:core-splashscreen", version = "1.0.1" }
+core-splashscreen = { module = "androidx.core:core-splashscreen", version = "1.2.0" }
 constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version = "2.2.1" }
 fragment-ktx = { module = "androidx.fragment:fragment-ktx", version = "1.8.9" }
 navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigation" }
@@ -62,6 +62,6 @@ android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref
 ksp-plugin = { module = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
 navigation-safe-args-plugin = { module = "androidx.navigation:navigation-safe-args-gradle-plugin", version.ref = "navigation" }
 lsparanoid-plugin = { module = "org.lsposed.lsparanoid:gradle-plugin", version = "0.6.0" }
-moshi-plugin = { module = "dev.zacsweers.moshix:dev.zacsweers.moshix.gradle.plugin", version = "0.32.0" }
+moshi-plugin = { module = "dev.zacsweers.moshix:dev.zacsweers.moshix.gradle.plugin", version = "0.34.1" }
 
 [plugins]
