@@ -813,7 +813,7 @@ dependencies = [
 [[package]]
 name = "pb-rs"
 version = "0.10.0"
-source = "git+https://github.com/tafia/quick-protobuf.git#54e7d6c5d981c6f7cec2e9a2167c10ed0f9392b4"
+source = "git+https://github.com/topjohnwu/quick-protobuf.git#980b0fb0ff81f59c0faa6e6db490fb8ecf59c633"
 dependencies = [
  "log",
  "nom",
@@ -882,7 +882,7 @@ dependencies = [
 [[package]]
 name = "quick-protobuf"
 version = "0.8.1"
-source = "git+https://github.com/tafia/quick-protobuf.git#54e7d6c5d981c6f7cec2e9a2167c10ed0f9392b4"
+source = "git+https://github.com/topjohnwu/quick-protobuf.git#980b0fb0ff81f59c0faa6e6db490fb8ecf59c633"
 dependencies = [
  "byteorder",
 ]

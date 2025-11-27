@@ -10,3 +10,6 @@ target-dir = "../out/rust"
 build-std = ["std", "panic_abort"]
 build-std-features = ["panic_immediate_abort", "optimize_for_size"]
 profile-rustflags = true
+
+[profile.release]
+rustflags = ["-Z", "location-detail=none", "-Z", "fmt-debug=none"]
