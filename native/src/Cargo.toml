@@ -24,8 +24,8 @@ bytemuck = "1.24.0"
 fdt = "0.1.5"
 const_format = "0.2.35"
 bit-set = "0.8.0"
-syn = "2.0.108"
-quote = "1.0.41"
+syn = "2.0.111"
+quote = "1.0.42"
 proc-macro2 = "1.0.103"
 pb-rs = { version = "0.10.0", default-features = false }
 quick-protobuf = "0.8.1"
@@ -33,20 +33,20 @@ flate2 = { version = "1.1.5", default-features = false }
 bzip2 = "0.6.1"
 zopfli = "0.8.3"
 lz4 = "1.28.1"
-lzma-rust2 = { version = "0.15.1", default-features = false }
+lzma-rust2 = { version = "0.15.2", default-features = false }
 nix = "0.30.1"
 bitflags = "2.10.0"
 
 # Rust crypto crates are tied together
-sha1 = "0.11.0-rc.2"
-sha2 = "0.11.0-rc.2"
-digest = "0.11.0-rc.3"
-p256 = "0.14.0-rc.0"
-p384 = "0.14.0-rc.0"
-p521 = "0.14.0-rc.0"
-rsa = "0.10.0-rc.9"
+sha1 = "0.11.0-rc.3"
+sha2 = "0.11.0-rc.3"
+digest = "0.11.0-rc.4"
+p256 = "0.14.0-rc.1"
+p384 = "0.14.0-rc.1"
+p521 = "0.14.0-rc.1"
+rsa = "0.10.0-rc.10"
 x509-cert = "0.3.0-rc.2"
-der = "0.8.0-rc.9"
+der = "0.8.0-rc.10"
 
 [patch.crates-io]
 pb-rs = { git = "https://github.com/topjohnwu/quick-protobuf.git" }
