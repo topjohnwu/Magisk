@@ -1,4 +1,5 @@
-use crate::{Directory, LibcReturn, OsResult, ResultExt, Utf8CStr, Utf8CStrBufArr, WalkResult::{Continue, Skip}};
+use crate::WalkResult::{Continue, Skip};
+use crate::{Directory, LibcReturn, OsResult, ResultExt, Utf8CStr, Utf8CStrBufArr};
 use nix::mount::{MntFlags, MsFlags, mount, umount2};
 
 impl Utf8CStr {
@@ -83,44 +84,50 @@ impl Utf8CStr {
     }
 
     pub fn occupy(&self) {
-        Directory::open(self).and_then(|mut dir| {
-            dir.pre_order_walk(|entry| {
-                let mut path = Utf8CStrBufArr::default();
-                entry.resolve_path(&mut path)?;
-                let path = path.as_utf8_cstr();
-                mount(
-                    Some(path),
-                    path,
-                    None::<&Utf8CStr>,
-                    MsFlags::MS_BIND | MsFlags::MS_RDONLY,
-                    None::<&Utf8CStr>,
-                ).check_os_err("occupy", Some(path), None)?;
-                Ok(Continue)
-            }).log_ok();
-            Ok(())
-        }).log_ok();
+        Directory::open(self)
+            .map(|mut dir| {
+                dir.pre_order_walk(|entry| {
+                    let mut path = Utf8CStrBufArr::default();
+                    entry.resolve_path(&mut path)?;
+                    let path = path.as_utf8_cstr();
+                    mount(
+                        Some(path),
+                        path,
+                        None::<&Utf8CStr>,
+                        MsFlags::MS_BIND | MsFlags::MS_RDONLY,
+                        None::<&Utf8CStr>,
+                    )
+                    .check_os_err("occupy", Some(path), None)?;
+                    Ok(Continue)
+                })
+                .log_ok();
+            })
+            .log_ok();
     }
 
     pub fn unoccupy(&self) -> bool {
         let mut ok = false;
-        Directory::open(self).and_then(|mut dir| {
-            ok = dir.pre_order_walk(|entry| {
-                let mut path = Utf8CStrBufArr::default();
-                entry.resolve_path(&mut path)?;
-                let path = path.as_utf8_cstr();
-                umount2(
-                    path,
-                    MntFlags::MNT_DETACH,
-                ).check_os_err("unoccupy", Some(path), None)?;
-                if entry.is_dir() {
-                    Ok(Skip)
-                } else {
-                    Ok(Continue)
-                }
-            }).is_ok();
-            Ok(())
-        }).log_ok();
+        Directory::open(self)
+            .map(|mut dir| {
+                ok = dir
+                    .pre_order_walk(|entry| {
+                        let mut path = Utf8CStrBufArr::default();
+                        entry.resolve_path(&mut path)?;
+                        let path = path.as_utf8_cstr();
+                        umount2(path, MntFlags::MNT_DETACH).check_os_err(
+                            "unoccupy",
+                            Some(path),
+                            None,
+                        )?;
+                        if entry.is_dir() {
+                            Ok(Skip)
+                        } else {
+                            Ok(Continue)
+                        }
+                    })
+                    .is_ok();
+            })
+            .log_ok();
         ok
     }
-
 }
