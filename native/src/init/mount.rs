@@ -73,39 +73,22 @@ pub(crate) fn is_rootfs() -> bool {
 }
 
 impl MagiskInit {
-    pub(crate) fn prepare_data(&self, use_rootfs: bool) -> bool {
+    pub(crate) fn prepare_data(&self) {
         debug!("Setup data tmp");
         cstr!("/data").mkdir(0o755).log_ok();
+        nix::mount::mount(
+            Some(cstr!("magisk")),
+            cstr!("/data"),
+            Some(cstr!("tmpfs")),
+            MsFlags::empty(),
+            Some(cstr!("mode=755")),
+        )
+        .check_os_err("mount", Some("/data"), Some("tmpfs"))
+        .log_ok();
 
-        let mut rootfs_magisktmp = false;
-
-        if use_rootfs {
-            cstr!("/magisk").mkdir(0o755).log_ok();
-            rootfs_magisktmp = cstr!("/magisk").bind_mount_to(cstr!("/data"), false)
-                .is_ok();
-        }
-
-        if rootfs_magisktmp {
-            cstr!("/init").rename_to(cstr!("/magisk/magiskinit")).log_ok();
-            cstr!("/.backup").copy_to(cstr!("/magisk/.backup")).ok();
-            cstr!("/overlay.d").rename_to(cstr!("/magisk/overlay.d")).ok();
-        } else {
-            nix::mount::mount(
-                Some(cstr!("magisk")),
-                cstr!("/data"),
-                Some(cstr!("tmpfs")),
-                MsFlags::empty(),
-                Some(cstr!("mode=755")),
-            )
-                .check_os_err("mount", Some("/data"), Some("tmpfs"))
-                .log_ok();
-
-            cstr!("/init").copy_to(cstr!("/data/magiskinit")).ok();
-            cstr!("/.backup").copy_to(cstr!("/data/.backup")).ok();
-            cstr!("/overlay.d").copy_to(cstr!("/data/overlay.d")).ok();
-        }
-
-        rootfs_magisktmp
+        cstr!("/init").copy_to(cstr!("/data/magiskinit")).ok();
+        cstr!("/.backup").copy_to(cstr!("/data/.backup")).ok();
+        cstr!("/overlay.d").copy_to(cstr!("/data/overlay.d")).ok();
     }
 
     pub(crate) fn exec_init(&mut self) {
