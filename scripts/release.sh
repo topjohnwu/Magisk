@@ -36,25 +36,6 @@ disable_version_config() {
   sed -i "s:^version=:# version=:g" $CONFIG
 }
 
-bump_canary_version() {
-  # Update version code
-  local code=$(grep_prop magisk.versionCode $GCONFIG)
-  code=$((code + 1))
-  local tag="canary-$code"
-  sed -i "s:versionCode=.*:versionCode=${code}:g" $GCONFIG
-
-  # Commit version code changes
-  git add -u .
-  git status
-  git commit -m "Release new canary build" -m "[skip ci]"
-  git tag $tag
-
-  # Update version name
-  local ver=$(git rev-parse --short=8 HEAD)
-  sed -i "s:version=.*:version=${ver}:g" $CONFIG
-  sed -i "1s:.*:## Magisk (${ver}) (${code}):" $NOTES
-}
-
 # $1 = ver
 set_version() {
   local ver=$1
@@ -69,89 +50,45 @@ set_version() {
   git add -u .
   git status
   git commit -m "Release Magisk v$ver" -m "[skip ci]"
-  git tag $tag
 }
 
-build_apk() {
+# $1 = ver
+build() {
+  [ -z $1 ] && exit 1
+  local ver=$1
+  git pull
+  set_version $ver
   $BUILDCMD clean
   $BUILDCMD all
   $BUILDCMD -r all
 }
 
-build_canary() {
-  bump_canary_version
-  build_apk
-}
-
-# $1 = ver
-build_public() {
-  [ -z $1 ] && exit 1
-  local ver=$1
-  set_version $ver
-  build_apk
-}
-
 upload() {
-  # Verify pattern
-  [[ "$1" =~ canary|beta|stable ]]
-  local type=$1
-
   gh auth status
 
-  local latest_tag=$(git describe --abbrev=0 --tags)
-  local ver=$(grep_prop version $CONFIG)
   local code=$(grep_prop magisk.versionCode $GCONFIG)
-  local out=$(grep_prop outdir $CONFIG)
-  local tag title
+  local ver=$(echo - | awk "{ print $code / 1000 }")
+  local tag="v$ver"
+  local title="Magisk v$ver"
 
+  local out=$(grep_prop outdir $CONFIG)
   if [ -z $out ]; then
     out=out
   fi
 
+  git tag $tag
   git push origin master
   git push --tags
 
   # Prepare release notes
   tail -n +3 $NOTES > release.md
 
-  case $type in
-    canary )
-      tag="canary-$code"
-      title="Magisk ($ver) ($code)"
+  # Publish release
+  local release_apk="Magisk-v${ver}.apk"
+  cp $out/app-release.apk $release_apk
+  gh release create --verify-tag $tag -p -t "$title" -F release.md $release_apk $out/app-debug.apk $NOTES
 
-      # Assert tag format
-      [ $latest_tag = $tag ]
-
-      # Publish release
-      gh release create --verify-tag $tag -p -t "$title" -F release.md $out/app-release.apk $out/app-debug.apk $NOTES
-      ;;
-    beta|stable )
-      tag="v$ver"
-      title="Magisk v$ver"
-
-      # Assert tag format
-      [ $latest_tag = $tag ]
-
-      # Publish release
-      local release_apk="Magisk-v${ver}.apk"
-      cp $out/app-release.apk $release_apk
-      gh release create --verify-tag $tag -p -t "$title" -F release.md $release_apk $out/app-debug.apk $NOTES
-      rm -f $release_apk
-      ;;
-  esac
-
-  # If publishing stable, make it not prerelease and explicitly latest
-  if [ $type = "stable" ]; then
-    gh release edit $tag --prerelease=false --latest
-  fi
-
-  rm -f release.md
-}
-
-revert() {
-  local latest_tag=$(git describe --abbrev=0 --tags)
-  git tag -d $latest_tag
-  git reset --hard HEAD~
+  rm -f $release_apk release.md
 }
 
 # Use GNU sed on macOS
@@ -160,14 +97,10 @@ if command -v gsed >/dev/null; then
   export -f sed
 fi
 
-git pull
-
 trap disable_version_config EXIT
 ensure_config
 case $1 in
-  canary ) build_canary ;;
-  public ) build_public $2 ;;
-  upload ) upload $2 ;;
-  revert ) revert ;;
+  build ) build $2 ;;
+  upload ) upload ;;
   * ) exit 1 ;;
 esac
