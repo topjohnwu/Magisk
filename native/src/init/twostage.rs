@@ -86,9 +86,7 @@ impl MagiskInit {
         }
 
         // Binding mounting from rootfs is not supported before Linux 3.12
-        cstr!("/sdcard")
-            .create(OFlag::O_RDONLY | OFlag::O_CLOEXEC, 0)
-            .log_ok();
+        cstr!("/sdcard").create(OFlag::O_RDONLY | OFlag::O_CLOEXEC, 0).log_ok();
         cstr!("/data/magiskinit")
             .bind_mount_to(cstr!("/sdcard"), false)
             .log_ok();

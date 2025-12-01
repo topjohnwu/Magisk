@@ -3,10 +3,10 @@ use crate::logging::setup_klog;
 use crate::mount::is_rootfs;
 use crate::twostage::hexpatch_init_for_second_stage;
 use base::libc::{basename, getpid, mount, umask};
-use base::nix::mount::MsFlags;
-use base::{LibcReturn, LoggedResult, ResultExt, Utf8CStr, cstr, info, nix, raw_cstr};
+use base::{LibcReturn, LoggedResult, ResultExt, cstr, info, raw_cstr, nix, Utf8CStr};
 use std::ffi::{CStr, c_char};
 use std::ptr::null;
+use base::nix::mount::MsFlags;
 
 impl MagiskInit {
     fn new(argv: *mut *mut c_char) -> Self {
@@ -60,8 +60,8 @@ impl MagiskInit {
                 MsFlags::MS_REMOUNT,
                 Some(cstr!("size=100%")),
             )
-            .check_os_err("mount", Some("/data"), Some("tmpfs"))
-            .log_ok();
+                .check_os_err("mount", Some("/data"), Some("tmpfs"))
+                .log_ok();
         }
 
         cstr!("/init").unmount().ok();
