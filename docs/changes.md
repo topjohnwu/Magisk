@@ -1,5 +1,10 @@
 # Magisk Changelog
 
+### v30.5 (2025.12.1)
+
+- [General] Improve commandline argument parsing logic
+- [resetprop] Properly support Android versions with property overrides
+
 ### v30.4 (2025.10.2)
 
 - [MagiskSU] Fix several implementation bugs
