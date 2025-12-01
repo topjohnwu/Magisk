@@ -110,7 +110,7 @@ impl SePolicy {
             allow(["kernel"], ["rootfs", "tmpfs"], ["chr_file"], ["write"]);
 
             // Allow magiskinit daemon to handle mock selinuxfs
-            allow(["kernel"], ["rootfs", "tmpfs"], ["fifo_file"], ["open", "read", "write"]);
+            allow(["kernel"], ["tmpfs"], ["fifo_file"], ["open", "read", "write"]);
 
             // For relabelling files
             allow(["rootfs"], ["labeledfs", "tmpfs"], ["filesystem"], ["associate"]);

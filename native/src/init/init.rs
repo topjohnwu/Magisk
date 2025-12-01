@@ -1,10 +1,9 @@
 use crate::ffi::{BootConfig, MagiskInit, backup_init, magisk_proxy_main};
 use crate::logging::setup_klog;
-use crate::mount::{is_rootfs, occupy, unoccupy};
+use crate::mount::is_rootfs;
 use crate::twostage::hexpatch_init_for_second_stage;
 use base::libc::{basename, getpid, mount, umask};
-use base::nix::mount::MsFlags;
-use base::{LibcReturn, LoggedResult, ResultExt, Utf8CStr, cstr, info, nix, raw_cstr};
+use base::{LibcReturn, LoggedResult, ResultExt, cstr, info, raw_cstr};
 use std::ffi::{CStr, c_char};
 use std::ptr::null;
 
@@ -32,7 +31,7 @@ impl MagiskInit {
 
     fn first_stage(&self) {
         info!("First Stage Init");
-        let rootfs_magisktmp = self.prepare_data(true);
+        self.prepare_data();
 
         if !cstr!("/sdcard").exists() && !cstr!("/first_stage_ramdisk/sdcard").exists() {
             self.hijack_init_with_switch_root();
@@ -42,27 +41,10 @@ impl MagiskInit {
             // Fallback to hexpatch if /sdcard exists
             hexpatch_init_for_second_stage(true);
         }
-
-        if rootfs_magisktmp {
-            info!("Occupy /data");
-            occupy(cstr!("/data"));
-        }
     }
 
     fn second_stage(&mut self) {
         info!("Second Stage Init");
-
-        if unoccupy(cstr!("/data")) {
-            nix::mount::mount(
-                None::<&Utf8CStr>,
-                cstr!("/data"),
-                None::<&Utf8CStr>,
-                MsFlags::MS_REMOUNT,
-                Some(cstr!("size=100%")),
-            )
-            .check_os_err("mount", Some("/data"), Some("tmpfs"))
-            .log_ok();
-        }
 
         cstr!("/init").unmount().ok();
         cstr!("/system/bin/init").unmount().ok(); // just in case
@@ -89,7 +71,7 @@ impl MagiskInit {
 
     fn legacy_system_as_root(&mut self) {
         info!("Legacy SAR Init");
-        self.prepare_data(false);
+        self.prepare_data();
         let is_two_stage = self.mount_system_root();
         if is_two_stage {
             hexpatch_init_for_second_stage(false);
@@ -100,7 +82,7 @@ impl MagiskInit {
 
     fn rootfs(&mut self) {
         info!("RootFS Init");
-        self.prepare_data(false);
+        self.prepare_data();
         self.restore_ramdisk_init();
         self.patch_rw_root();
     }

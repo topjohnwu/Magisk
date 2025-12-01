@@ -84,14 +84,20 @@ impl MagiskInit {
                 .log_ok();
             debug!("Symlink /storage/self/primary -> /system/system/bin/init");
         }
+        cstr!("/init").rename_to(cstr!("/sdcard")).log_ok();
 
-        // Binding mounting from rootfs is not supported before Linux 3.12
-        cstr!("/sdcard")
-            .create(OFlag::O_RDONLY | OFlag::O_CLOEXEC, 0)
-            .log_ok();
-        cstr!("/data/magiskinit")
+        // First try to mount magiskinit from rootfs to workaround Samsung RKP
+        if cstr!("/sdcard")
             .bind_mount_to(cstr!("/sdcard"), false)
-            .log_ok();
-        debug!("Bind mount /data/magiskinit -> /sdcard");
+            .is_ok()
+        {
+            debug!("Bind mount /sdcard -> /sdcard");
+        } else {
+            // Binding mounting from rootfs is not supported before Linux 3.12
+            cstr!("/data/magiskinit")
+                .bind_mount_to(cstr!("/sdcard"), false)
+                .log_ok();
+            debug!("Bind mount /data/magiskinit -> /sdcard");
+        }
     }
 }
