@@ -1,3 +1,4 @@
+![default_wallpaper](https://github.com/topjohnwu/Magisk/assets/120102599/3d7006a9-10fa-406e-ac1e-1a314dc73839)
 # Developer Guides
 
 ## BusyBox
