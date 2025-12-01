@@ -1,6 +1,4 @@
 use crate::ffi::MagiskInit;
-use base::WalkResult::{Continue, Skip};
-use base::nix::mount::{MntFlags, mount, umount2};
 use base::{
     Directory, FsPathBuilder, LibcReturn, LoggedResult, ResultExt, Utf8CStr, cstr, debug, libc,
     nix, parse_mount_info, raw_cstr,
@@ -62,54 +60,6 @@ pub(crate) fn is_device_mounted(dev: u64, target: Pin<&mut CxxString>) -> bool {
         }
     }
     false
-}
-
-pub(crate) fn occupy(path: &Utf8CStr) {
-    Directory::open(path)
-        .map(|mut dir| {
-            dir.pre_order_walk(|entry| {
-                let mut path = cstr::buf::default();
-                entry.resolve_path(&mut path)?;
-                let path = path.as_utf8_cstr();
-                mount(
-                    Some(path),
-                    path,
-                    None::<&Utf8CStr>,
-                    MsFlags::MS_BIND | MsFlags::MS_RDONLY,
-                    None::<&Utf8CStr>,
-                )
-                .check_os_err("occupy", Some(path), None)?;
-                Ok(Continue)
-            })
-            .log_ok();
-        })
-        .log_ok();
-}
-
-pub(crate) fn unoccupy(path: &Utf8CStr) -> bool {
-    let mut ok = false;
-    Directory::open(path)
-        .map(|mut dir| {
-            ok = dir
-                .pre_order_walk(|entry| {
-                    let mut path = cstr::buf::default();
-                    entry.resolve_path(&mut path)?;
-                    let path = path.as_utf8_cstr();
-                    umount2(path, MntFlags::MNT_DETACH).check_os_err(
-                        "unoccupy",
-                        Some(path),
-                        None,
-                    )?;
-                    if entry.is_dir() {
-                        Ok(Skip)
-                    } else {
-                        Ok(Continue)
-                    }
-                })
-                .is_ok();
-        })
-        .log_ok();
-    ok
 }
 
 const RAMFS_MAGIC: u32 = 0x858458f6;

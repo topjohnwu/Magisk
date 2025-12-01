@@ -1,6 +1,6 @@
 use crate::ffi::{BootConfig, MagiskInit, backup_init, magisk_proxy_main};
 use crate::logging::setup_klog;
-use crate::mount::{is_rootfs, occupy, unoccupy};
+use crate::mount::is_rootfs;
 use crate::twostage::hexpatch_init_for_second_stage;
 use base::libc::{basename, getpid, mount, umask};
 use base::nix::mount::MsFlags;
@@ -44,15 +44,15 @@ impl MagiskInit {
         }
 
         if rootfs_magisktmp {
-            info!("Occupy /data");
-            occupy(cstr!("/data"));
+            info!("Occupy /data.");
+            cstr!("/data").occupy();
         }
     }
 
     fn second_stage(&mut self) {
         info!("Second Stage Init");
 
-        if unoccupy(cstr!("/data")) {
+        if cstr!("/data").unoccupy() {
             nix::mount::mount(
                 None::<&Utf8CStr>,
                 cstr!("/data"),
