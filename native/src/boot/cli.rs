@@ -205,7 +205,7 @@ Supported actions:
     dumped to the file 'header', which can be used to modify header
     configurations during repacking.
     Return values:
-    0:valid    1:error    2:chromeos
+    0:valid    1:error    2:chromeos    3:vendor_boot
 
   repack [-n] <origbootimg> [outbootimg]
     Repack boot image components using files from the current directory
