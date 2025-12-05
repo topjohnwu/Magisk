@@ -53,6 +53,19 @@ static bool check_env(const char *name) {
     return val != nullptr && val == "true"sv;
 }
 
+static bool guess_lzma(const uint8_t *buf, size_t len) {
+    // 0     : (pb * 5 + lp) * 9 + lc
+    // 1 - 4 : dict size, must be 2^n
+    // 5 - 12: all 0xFF
+    if (len <= 13) return false;
+    if (memcmp(buf, "\x5d", 1) != 0) return false;
+    uint32_t dict_sz = 0;
+    memcpy(&dict_sz, buf + 1, sizeof(dict_sz));
+    if (dict_sz == 0 || (dict_sz & (dict_sz - 1)) != 0) return false;
+    if (memcmp(buf + 5, "\xff\xff\xff\xff\xff\xff\xff\xff", 8) != 0) return false;
+    return true;
+}
+
 FileFormat check_fmt(const void *buf, size_t len) {
     if (CHECKED_MATCH(CHROMEOS_MAGIC)) {
         return FileFormat::CHROMEOS;
@@ -66,8 +79,7 @@ FileFormat check_fmt(const void *buf, size_t len) {
         return FileFormat::LZOP;
     } else if (CHECKED_MATCH(XZ_MAGIC)) {
         return FileFormat::XZ;
-    } else if (len >= 13 && memcmp(buf, "\x5d\x00\x00", 3) == 0
-            && (((char *)buf)[12] == '\xff' || ((char *)buf)[12] == '\x00')) {
+    } else if (guess_lzma(static_cast<const uint8_t *>(buf), len)) {
         return FileFormat::LZMA;
     } else if (CHECKED_MATCH(BZIP_MAGIC)) {
         return FileFormat::BZIP2;
