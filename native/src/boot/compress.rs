@@ -1,8 +1,6 @@
 use crate::ffi::{FileFormat, check_fmt};
 use base::nix::fcntl::OFlag;
-use base::{
-    Chunker, FileOrStd, LoggedResult, ReadExt, ResultExt, Utf8CStr, Utf8CString, WriteExt, log_err,
-};
+use base::{Chunker, FileOrStd, LoggedResult, ReadExt, Utf8CStr, Utf8CString, WriteExt, log_err};
 use bzip2::Compression as BzCompression;
 use bzip2::read::BzDecoder;
 use bzip2::write::BzEncoder;
@@ -218,16 +216,21 @@ impl<R: Read> Read for LZ4BlockDecoder<R> {
 
 // Top-level APIs
 
-pub fn get_encoder<'a, W: Write + 'a>(format: FileFormat, w: W) -> Box<dyn WriteFinish<W> + 'a> {
-    match format {
+pub fn get_encoder<'a, W: Write + 'a>(
+    format: FileFormat,
+    w: W,
+) -> std::io::Result<Box<dyn WriteFinish<W> + 'a>> {
+    Ok(match format {
         FileFormat::XZ => {
             let mut opt = XzOptions::with_preset(9);
             opt.set_check_sum_type(CheckType::Crc32);
-            Box::new(XzWriter::new(w, opt).unwrap())
+            Box::new(XzWriter::new(w, opt)?)
         }
-        FileFormat::LZMA => {
-            Box::new(LzmaWriter::new_use_header(w, &LzmaOptions::with_preset(9), None).unwrap())
-        }
+        FileFormat::LZMA => Box::new(LzmaWriter::new_use_header(
+            w,
+            &LzmaOptions::with_preset(9),
+            None,
+        )?),
         FileFormat::BZIP2 => Box::new(BzEncoder::new(w, BzCompression::best())),
         FileFormat::LZ4 => {
             let encoder = LZ4FrameEncoderBuilder::new()
@@ -237,8 +240,7 @@ pub fn get_encoder<'a, W: Write + 'a>(format: FileFormat, w: W) -> Box<dyn Write
                 .block_checksum(BlockChecksum::BlockChecksumEnabled)
                 .level(9)
                 .auto_flush(true)
-                .build(w)
-                .unwrap();
+                .build(w)?;
             Box::new(encoder)
         }
         FileFormat::LZ4_LEGACY => Box::new(LZ4BlockEncoder::new(w, false)),
@@ -250,23 +252,26 @@ pub fn get_encoder<'a, W: Write + 'a>(format: FileFormat, w: W) -> Box<dyn Write
                 maximum_block_splits: 1,
                 ..Default::default()
             };
-            Box::new(ZopFliEncoder::new_buffered(opt, BlockType::Dynamic, w).unwrap())
+            Box::new(ZopFliEncoder::new_buffered(opt, BlockType::Dynamic, w)?)
         }
         FileFormat::GZIP => Box::new(GzEncoder::new(w, GzCompression::best())),
         _ => unreachable!(),
-    }
+    })
 }
 
-pub fn get_decoder<'a, R: Read + 'a>(format: FileFormat, r: R) -> Box<dyn Read + 'a> {
-    match format {
+pub fn get_decoder<'a, R: Read + 'a>(
+    format: FileFormat,
+    r: R,
+) -> std::io::Result<Box<dyn Read + 'a>> {
+    Ok(match format {
         FileFormat::XZ => Box::new(XzReader::new(r, true)),
-        FileFormat::LZMA => Box::new(LzmaReader::new_mem_limit(r, u32::MAX, None).unwrap()),
+        FileFormat::LZMA => Box::new(LzmaReader::new_mem_limit(r, u32::MAX, None)?),
         FileFormat::BZIP2 => Box::new(BzDecoder::new(r)),
-        FileFormat::LZ4 => Box::new(LZ4FrameDecoder::new(r).unwrap()),
+        FileFormat::LZ4 => Box::new(LZ4FrameDecoder::new(r)?),
         FileFormat::LZ4_LG | FileFormat::LZ4_LEGACY => Box::new(LZ4BlockDecoder::new(r)),
         FileFormat::ZOPFLI | FileFormat::GZIP => Box::new(MultiGzDecoder::new(r)),
         _ => unreachable!(),
-    }
+    })
 }
 
 // C++ FFI
@@ -274,9 +279,9 @@ pub fn get_decoder<'a, R: Read + 'a>(format: FileFormat, r: R) -> Box<dyn Read +
 pub fn compress_bytes(format: FileFormat, in_bytes: &[u8], out_fd: RawFd) {
     let mut out_file = unsafe { ManuallyDrop::new(File::from_raw_fd(out_fd)) };
 
-    let mut encoder = get_encoder(format, out_file.deref_mut());
     let _: LoggedResult<()> = try {
-        encoder.write_all(in_bytes)?;
+        let mut encoder = get_encoder(format, out_file.deref_mut())?;
+        std::io::copy(&mut Cursor::new(in_bytes), encoder.deref_mut())?;
         encoder.finish()?;
     };
 }
@@ -284,8 +289,10 @@ pub fn compress_bytes(format: FileFormat, in_bytes: &[u8], out_fd: RawFd) {
 pub fn decompress_bytes(format: FileFormat, in_bytes: &[u8], out_fd: RawFd) {
     let mut out_file = unsafe { ManuallyDrop::new(File::from_raw_fd(out_fd)) };
 
-    let mut decoder = get_decoder(format, in_bytes);
-    std::io::copy(decoder.as_mut(), out_file.deref_mut()).log_ok();
+    let _: LoggedResult<()> = try {
+        let mut decoder = get_decoder(format, in_bytes)?;
+        std::io::copy(decoder.as_mut(), out_file.deref_mut())?;
+    };
 }
 
 // Command-line entry points
@@ -341,7 +348,7 @@ pub(crate) fn decompress_cmd(infile: &Utf8CStr, outfile: Option<&Utf8CStr>) -> L
         FileOrStd::File(outfile.create(OFlag::O_WRONLY | OFlag::O_TRUNC, 0o644)?)
     };
 
-    let mut decoder = get_decoder(format, Cursor::new(buf).chain(input.as_file()));
+    let mut decoder = get_decoder(format, Cursor::new(buf).chain(input.as_file()))?;
     std::io::copy(decoder.as_mut(), &mut output.as_file())?;
 
     if rm_in {
@@ -384,7 +391,7 @@ pub(crate) fn compress_cmd(
         FileOrStd::File(outfile)
     };
 
-    let mut encoder = get_encoder(method, output.as_file());
+    let mut encoder = get_encoder(method, output.as_file())?;
     std::io::copy(&mut input.as_file(), encoder.as_mut())?;
     encoder.finish()?;
 

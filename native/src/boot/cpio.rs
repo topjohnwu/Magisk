@@ -691,8 +691,8 @@ impl CpioEntry {
         if self.mode & S_IFMT != S_IFREG {
             return false;
         }
-        let mut encoder = get_encoder(FileFormat::XZ, Vec::new());
         let Ok(data): std::io::Result<Vec<u8>> = (try {
+            let mut encoder = get_encoder(FileFormat::XZ, Vec::new())?;
             encoder.write_all(&self.data)?;
             encoder.finish()?
         }) else {
@@ -710,7 +710,7 @@ impl CpioEntry {
         }
 
         let Ok(data): std::io::Result<Vec<u8>> = (try {
-            let mut decoder = get_decoder(FileFormat::XZ, Cursor::new(&self.data));
+            let mut decoder = get_decoder(FileFormat::XZ, Cursor::new(&self.data))?;
             let mut data = Vec::new();
             std::io::copy(decoder.as_mut(), &mut data)?;
             data
