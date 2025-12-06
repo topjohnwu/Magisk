@@ -125,9 +125,6 @@ impl SePolicy {
             // Let init run stuffs
             allow(["init"], [proc], ["process"], all);
 
-            // For mounting loop devices, mirrors, tmpfs
-            allow(["kernel"], ["fs_type", "dev_type", "file_type"], ["file"], ["read", "write"]);
-
             // Zygisk rules
             allow(["zygote"], ["zygote"], ["process"], ["execmem"]);
             allow(["zygote"], ["fs_type"], ["filesystem"], ["unmount"]);
