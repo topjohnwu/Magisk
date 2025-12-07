@@ -19,7 +19,7 @@
 #endif
 
 // Extreme verbose logging
-//#define ZLOGV(...) ZLOGD(__VA_ARGS__)
+// #define ZLOGV(...) ZLOGD(__VA_ARGS__)
 #define ZLOGV(...) (void*)0
 
 void hook_entry();
