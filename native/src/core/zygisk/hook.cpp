@@ -11,6 +11,7 @@
 
 #include "zygisk.hpp"
 #include "module.hpp"
+#include "jni_hooks.hpp"
 
 using namespace std;
 
@@ -93,27 +94,11 @@ constexpr const char *kForkApp = "nativeForkAndSpecialize";
 constexpr const char *kSpecializeApp = "nativeSpecializeAppProcess";
 constexpr const char *kForkServer = "nativeForkSystemServer";
 
-// Global contexts:
-//
-// HookContext lives as long as Zygisk is loaded in memory. It tracks the process's function
-// hooking state and bootstraps code injection until we replace the process specialization methods.
-//
-// ZygiskContext lives during the process specialization process. It implements Zygisk
-// features, such as loading modules and customizing process fork/specialization.
-
-ZygiskContext *g_ctx;
-struct HookContext;
-static HookContext *g_hook;
-
 using JNIMethods = std::span<JNINativeMethod>;
 using JNIMethodsDyn = std::pair<unique_ptr<JNINativeMethod[]>, size_t>;
 
-struct HookContext {
-#include "jni_hooks.hpp"
+struct HookContext : JniHookDefinitions {
 
-    // std::array<JNINativeMethod> fork_app_methods;
-    // std::array<JNINativeMethod> specialize_app_methods;
-    // std::array<JNINativeMethod> fork_server_methods;
     vector<tuple<dev_t, ino_t, const char *, void **>> plt_backup;
     const NativeBridgeRuntimeCallbacks *runtime_callbacks = nullptr;
     void *self_handle = nullptr;
@@ -132,6 +117,23 @@ private:
     int hook_jni_methods(JNIEnv *env, jclass clazz, JNIMethods methods) const;
     JNIMethodsDyn get_jni_methods(JNIEnv *env, jclass clazz) const;
 };
+
+// -----------------------------------------------------------------
+
+// Global contexts:
+//
+// HookContext lives as long as Zygisk is loaded in memory. It tracks the process's function
+// hooking state and bootstraps code injection until we replace the process specialization methods.
+//
+// ZygiskContext lives during the process specialization process. It implements Zygisk
+// features, such as loading modules and customizing process fork/specialization.
+
+ZygiskContext *g_ctx;
+static HookContext *g_hook;
+
+static JniHookDefinitions *get_defs() {
+    return g_hook;
+}
 
 // -----------------------------------------------------------------
 
