@@ -6,6 +6,7 @@ use crate::codegen::gen_cxx_binding;
 #[path = "../include/codegen.rs"]
 mod codegen;
 
+#[allow(clippy::unwrap_used)]
 fn main() {
     println!("cargo:rerun-if-changed=resetprop/proto/persistent_properties.proto");
 

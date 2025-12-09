@@ -7,11 +7,12 @@ use crate::socket::IpcRead;
 use base::{LoggedResult, ResultExt, WriteExt, debug, error, exit_on_error, libc, warn};
 use std::os::fd::IntoRawFd;
 use std::os::unix::net::{UCred, UnixStream};
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 use std::time::{Duration, Instant};
 
 #[allow(unused_imports)]
 use std::os::fd::AsRawFd;
+use std::sync::nonpoison::Mutex;
 
 const DEFAULT_SHELL: &str = "/system/bin/sh";
 
@@ -132,7 +133,7 @@ impl MagiskD {
 
         let info = self.get_su_info(cred.uid as i32);
         {
-            let mut access = info.access.lock().unwrap();
+            let mut access = info.access.lock();
 
             // Talk to su manager
             let mut app = SuAppContext {
@@ -203,7 +204,7 @@ impl MagiskD {
         }
 
         let cached = self.cached_su_info.load();
-        if cached.uid == uid && cached.access.lock().unwrap().is_fresh() {
+        if cached.uid == uid && cached.access.lock().is_fresh() {
             return cached;
         }
 

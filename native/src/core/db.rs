@@ -187,7 +187,7 @@ unsafe extern "C" fn read_db_row<T: SqlTable>(
 
 impl MagiskD {
     fn with_db<F: FnOnce(*mut sqlite3) -> i32>(&self, f: F) -> i32 {
-        let mut db = self.sql_connection.lock().unwrap();
+        let mut db = self.sql_connection.lock();
         if db.is_none() {
             let raw_db = open_and_init_db();
             *db = NonNull::new(raw_db).map(Sqlite3);

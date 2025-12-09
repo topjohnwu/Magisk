@@ -20,9 +20,10 @@ use std::io::{IoSlice, Read, Write};
 use std::mem::ManuallyDrop;
 use std::os::fd::{FromRawFd, IntoRawFd, RawFd};
 use std::ptr::null_mut;
+use std::sync::Arc;
 use std::sync::atomic::{AtomicI32, Ordering};
-use std::sync::{Arc, Mutex};
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::sync::nonpoison::Mutex;
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use std::{fs, io};
 
 #[allow(dead_code, non_camel_case_types)]
@@ -117,12 +118,12 @@ fn write_log_to_pipe(mut logd: &File, prio: i32, msg: &Utf8CStr) -> io::Result<u
 static MAGISK_LOGD_FD: Mutex<Option<Arc<File>>> = Mutex::new(None);
 
 fn with_logd_fd<R, F: FnOnce(&File) -> io::Result<R>>(f: F) {
-    let fd = MAGISK_LOGD_FD.lock().unwrap().clone();
+    let fd = MAGISK_LOGD_FD.lock().clone();
     if let Some(logd) = fd
         && f(&logd).is_err()
     {
         // If any error occurs, shut down the logd pipe
-        *MAGISK_LOGD_FD.lock().unwrap() = None;
+        *MAGISK_LOGD_FD.lock() = None;
     }
 }
 
@@ -265,7 +266,9 @@ fn logfile_write_loop(mut pipe: File) -> io::Result<()> {
             _ => continue,
         };
 
-        let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
+        let now = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap_or(Duration::ZERO);
 
         // Note: the obvious better implementation is to use the rust chrono crate, however
         // the crate cannot fetch the proper local timezone without pulling in a bunch of
@@ -322,7 +325,7 @@ pub fn start_log_daemon() {
         let file = unsafe { File::from_raw_fd(arg as RawFd) };
         logfile_write_loop(file).ok();
         // If any error occurs, shut down the logd pipe
-        *MAGISK_LOGD_FD.lock().unwrap() = None;
+        *MAGISK_LOGD_FD.lock() = None;
         0
     }
 
@@ -331,7 +334,7 @@ pub fn start_log_daemon() {
         chown(path.as_utf8_cstr(), Some(Uid::from(0)), Some(Gid::from(0)))?;
         let read = path.open(OFlag::O_RDWR | OFlag::O_CLOEXEC)?;
         let write = path.open(OFlag::O_WRONLY | OFlag::O_CLOEXEC)?;
-        *MAGISK_LOGD_FD.lock().unwrap() = Some(Arc::new(write));
+        *MAGISK_LOGD_FD.lock() = Some(Arc::new(write));
         unsafe {
             new_daemon_thread(logfile_writer_thread, read.into_raw_fd() as usize);
         }

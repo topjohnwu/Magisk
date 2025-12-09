@@ -7,11 +7,14 @@ edition.workspace = true
 crate-type = ["staticlib", "rlib"]
 path = "lib.rs"
 
-[build-dependencies]
-cxx-gen = { workspace = true }
-
 [features]
 no-main = []
+
+[lints]
+workspace = true
+
+[build-dependencies]
+cxx-gen = { workspace = true }
 
 [dependencies]
 base = { workspace = true }

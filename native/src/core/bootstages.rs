@@ -82,7 +82,7 @@ impl MagiskD {
         Command::new(&tmp_bb)
             .arg("--install")
             .arg("-s")
-            .arg(tmp_bb.parent_dir().unwrap())
+            .arg(tmp_bb.parent_dir().unwrap_or_default())
             .stdout(Stdio::null())
             .stderr(Stdio::null())
             .status()
@@ -186,13 +186,13 @@ impl MagiskD {
         setup_preinit_dir();
         self.ensure_manager();
         if self.zygisk_enabled.load(Ordering::Relaxed) {
-            self.zygisk.lock().unwrap().reset(true);
+            self.zygisk.lock().reset(true);
         }
     }
 
     pub fn boot_stage_handler(&self, client: UnixStream, code: RequestCode) {
         // Make sure boot stage execution is always serialized
-        let mut state = self.boot_stage_lock.lock().unwrap();
+        let mut state = self.boot_stage_lock.lock();
 
         match code {
             RequestCode::POST_FS_DATA => {

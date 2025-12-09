@@ -53,6 +53,9 @@ pb-rs = { git = "https://github.com/topjohnwu/quick-protobuf.git" }
 quick-protobuf = { git = "https://github.com/topjohnwu/quick-protobuf.git" }
 lz4-sys = { path = "external/lz4-sys" }
 
+[workspace.lints.clippy]
+unwrap_used = "deny"
+
 [profile.dev]
 opt-level = "z"
 lto = "thin"
