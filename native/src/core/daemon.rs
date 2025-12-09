@@ -31,8 +31,9 @@ use std::io::{BufReader, Write};
 use std::os::fd::{AsFd, AsRawFd, IntoRawFd, RawFd};
 use std::os::unix::net::{UCred, UnixListener, UnixStream};
 use std::process::{Command, exit};
+use std::sync::OnceLock;
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::{Mutex, OnceLock};
+use std::sync::nonpoison::Mutex;
 use std::time::Duration;
 
 // Global magiskd singleton
@@ -105,7 +106,7 @@ impl MagiskD {
                 denylist_handler(-1);
 
                 // Restore native bridge property
-                self.zygisk.lock().unwrap().restore_prop();
+                self.zygisk.lock().restore_prop();
 
                 client.write_pod(&0).log_ok();
 
@@ -129,7 +130,7 @@ impl MagiskD {
                 self.prune_su_access();
                 scan_deny_apps();
                 if self.zygisk_enabled.load(Ordering::Relaxed) {
-                    self.zygisk.lock().unwrap().reset(false);
+                    self.zygisk.lock().reset(false);
                 }
             }
             RequestCode::SQLITE_CMD => {

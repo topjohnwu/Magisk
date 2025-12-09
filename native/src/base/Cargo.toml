@@ -9,6 +9,9 @@ path = "lib.rs"
 [features]
 selinux = []
 
+[lints]
+workspace = true
+
 [build-dependencies]
 cxx-gen = { workspace = true }
 

@@ -248,7 +248,7 @@ pub fn get_encoder<'a, W: Write + 'a>(
         FileFormat::ZOPFLI => {
             // These options are already better than gzip -9
             let opt = ZopfliOptions {
-                iteration_count: NonZeroU64::new(1).unwrap(),
+                iteration_count: unsafe { NonZeroU64::new_unchecked(1) },
                 maximum_block_splits: 1,
                 ..Default::default()
             };

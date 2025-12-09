@@ -15,6 +15,9 @@ check-signature = []
 check-client = []
 su-check-db = []
 
+[lints]
+workspace = true
+
 [build-dependencies]
 cxx-gen = { workspace = true }
 pb-rs = { workspace = true }

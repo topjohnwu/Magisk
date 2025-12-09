@@ -10,6 +10,7 @@ use nix::mount::MsFlags;
 use nix::sys::stat::{Mode, SFlag, mknod};
 use num_traits::AsPrimitive;
 use std::cmp::Ordering::{Greater, Less};
+use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
 
 pub fn setup_preinit_dir() {
@@ -203,9 +204,8 @@ pub fn find_preinit_device() -> String {
     }
     Path::new(&info.source)
         .file_name()
-        .unwrap()
-        .to_str()
-        .unwrap()
+        .and_then(OsStr::to_str)
+        .unwrap_or_default()
         .to_string()
 }
 

@@ -44,7 +44,9 @@ impl Extra<'_> {
             IntList(list) => {
                 cmd.args(["--es", self.key]);
                 let mut tmp = String::new();
-                list.iter().for_each(|i| write!(&mut tmp, "{i},").unwrap());
+                list.iter().for_each(|i| {
+                    write!(&mut tmp, "{i},").ok();
+                });
                 tmp.pop();
                 cmd.arg(&tmp);
             }
@@ -67,7 +69,9 @@ impl Extra<'_> {
             IntList(list) => {
                 tmp = format!("{}:s:", self.key);
                 if !list.is_empty() {
-                    list.iter().for_each(|i| write!(&mut tmp, "{i},").unwrap());
+                    list.iter().for_each(|i| {
+                        write!(&mut tmp, "{i},").ok();
+                    });
                     tmp.pop();
                 }
             }
@@ -202,8 +206,11 @@ impl SuAppContext<'_> {
             let mut pfd = [PollFd::new(fd.as_fd(), PollFlags::POLLIN)];
 
             // Wait for data input for at most 70 seconds
-            nix::poll::poll(&mut pfd, PollTimeout::try_from(70 * 1000).unwrap())
-                .check_os_err("poll", None, None)?;
+            nix::poll::poll(
+                &mut pfd,
+                PollTimeout::try_from(70 * 1000).unwrap_or(PollTimeout::NONE),
+            )
+            .check_os_err("poll", None, None)?;
             fd
         };
 

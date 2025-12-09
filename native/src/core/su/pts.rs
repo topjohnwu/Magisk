@@ -99,7 +99,6 @@ fn pump_tty_impl(ptmx: File, pump_stdin: bool) -> LoggedResult<()> {
     let mut signal_fd: Option<SignalFd> = None;
 
     let raw_ptmx = ptmx.as_raw_fd();
-    let mut raw_sig = -1;
 
     let mut poll_fds = Vec::with_capacity(3);
     poll_fds.push(PollFd::new(ptmx.as_fd(), PollFlags::POLLIN));
@@ -111,12 +110,14 @@ fn pump_tty_impl(ptmx: File, pump_stdin: bool) -> LoggedResult<()> {
             .check_os_err("pthread_sigmask", None, None)?;
         let sig = SignalFd::with_flags(&set, SfdFlags::SFD_CLOEXEC)
             .into_os_result("signalfd", None, None)?;
-        raw_sig = sig.as_raw_fd();
         signal_fd = Some(sig);
-        poll_fds.push(PollFd::new(
-            signal_fd.as_ref().unwrap().as_fd(),
-            PollFlags::POLLIN,
-        ));
+        unsafe {
+            // SAFETY: signal_fd is always Some
+            poll_fds.push(PollFd::new(
+                signal_fd.as_ref().unwrap_unchecked().as_fd(),
+                PollFlags::POLLIN,
+            ));
+        }
 
         // We also need to pump stdin to ptmx
         poll_fds.push(PollFd::new(
@@ -142,9 +143,11 @@ fn pump_tty_impl(ptmx: File, pump_stdin: bool) -> LoggedResult<()> {
                     pump_via_splice(FileOrStd::StdIn.as_file(), &ptmx, &pipe_fd)?;
                 } else if raw_fd == raw_ptmx {
                     pump_via_splice(&ptmx, FileOrStd::StdOut.as_file(), &pipe_fd)?;
-                } else if raw_fd == raw_sig {
+                } else if let Some(sig) = &signal_fd
+                    && raw_fd == sig.as_raw_fd()
+                {
                     sync_winsize(raw_ptmx);
-                    signal_fd.as_ref().unwrap().read_signal()?;
+                    sig.read_signal()?;
                 }
             } else if pfd
                 .revents()
