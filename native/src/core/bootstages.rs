@@ -131,10 +131,15 @@ impl MagiskD {
         }
 
         // Check safe mode
+        let on_charger = get_prop(cstr!("ro.boot.bootreason")).contains("charge");
         let boot_cnt = self.get_db_setting(DbEntryKey::BootloopCount);
-        self.set_db_setting(DbEntryKey::BootloopCount, boot_cnt + 1)
-            .log()
-            .ok();
+        if !on_charger {
+            self.set_db_setting(DbEntryKey::BootloopCount, boot_cnt + 1)
+                .log()
+                .ok();
+        } else {
+            info!("Boot caused by charging, don't enable safe mode");
+        }
         let safe_mode = boot_cnt >= 2
             || get_prop(cstr!("persist.sys.safemode")) == "1"
             || get_prop(cstr!("ro.sys.safemode")) == "1"
