@@ -1,3 +1,5 @@
+cargo-features = ["panic-immediate-abort"]
+
 [workspace]
 exclude = ["external"]
 members = ["base", "base/derive", "boot", "core", "init", "sepolicy"]
@@ -59,12 +61,12 @@ unwrap_used = "deny"
 [profile.dev]
 opt-level = "z"
 lto = "thin"
-panic = "abort"
+panic = "immediate-abort"
 debug = "none"
 
 [profile.release]
 opt-level = "z"
 lto = "fat"
 codegen-units = 1
-panic = "abort"
+panic = "immediate-abort"
 strip = true
