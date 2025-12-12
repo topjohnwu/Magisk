@@ -3,12 +3,19 @@
 # The actual compilation will have the target overriden by command-line.
 target = "aarch64-linux-android"
 # Enable cross language LTO, and explicitly set dwarf-version for ThinLTO
-rustflags = ["-Z", "dwarf-version=4", "-C", "linker-plugin-lto"]
+rustflags = [
+    "-Z",
+    "dwarf-version=4",
+    "-C",
+    "linker-plugin-lto",
+    "-C",
+    "force-unwind-tables=no",
+]
 target-dir = "../out/rust"
 
 [unstable]
 build-std = ["std", "panic_abort"]
-build-std-features = ["panic_immediate_abort", "optimize_for_size"]
+build-std-features = ["optimize_for_size"]
 profile-rustflags = true
 
 [profile.release]
