@@ -15,7 +15,7 @@ derive = { path = "base/derive" }
 magiskpolicy = { path = "sepolicy" }
 cxx = { path = "external/cxx-rs" }
 cxx-gen = { path = "external/cxx-rs/gen/lib" }
-libc = "0.2.177"
+libc = "0.2.178"
 cfg-if = "1.0.4"
 num-traits = "0.2.19"
 num-derive = "0.4.2"
@@ -35,7 +35,7 @@ flate2 = { version = "1.1.5", default-features = false }
 bzip2 = "0.6.1"
 zopfli = "0.8.3"
 lz4 = "1.28.1"
-lzma-rust2 = { version = "0.15.2", default-features = false }
+lzma-rust2 = { version = "0.15.4", default-features = false }
 nix = "0.30.1"
 bitflags = "2.10.0"
 
