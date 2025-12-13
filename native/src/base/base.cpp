@@ -3,6 +3,7 @@
 #include <sys/prctl.h>
 #include <sys/mman.h>
 #include <android/log.h>
+#include <linux/fs.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <syscall.h>
@@ -16,6 +17,12 @@ using namespace std;
 
 #ifndef __call_bypassing_fortify
 #define __call_bypassing_fortify(fn) (&fn)
+#endif
+
+#ifdef __LP64__
+static_assert(BLKGETSIZE64 == 0x80081272);
+#else
+static_assert(BLKGETSIZE64 == 0x80041272);
 #endif
 
 // Override libc++ new implementation to optimize final build size

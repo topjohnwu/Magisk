@@ -1,6 +1,7 @@
 #include <sys/mount.h>
 #include <android/dlext.h>
 #include <dlfcn.h>
+#include <poll.h>
 
 #include <base.hpp>
 #include <core.hpp>
