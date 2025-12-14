@@ -4,14 +4,14 @@ use std::fs::File;
 use std::io::BufReader;
 use std::mem::ManuallyDrop;
 use std::ops::DerefMut;
-use std::os::fd::{BorrowedFd, FromRawFd, OwnedFd, RawFd};
+use std::os::fd::{BorrowedFd, FromRawFd, RawFd};
 
 use crate::ffi::{FnBoolStr, FnBoolStrStr};
 use crate::files::map_file_at;
 pub(crate) use crate::xwrap::*;
 use crate::{
-    BufReadExt, Directory, LoggedResult, ResultExt, Utf8CStr, clone_attr, cstr, fclone_attr,
-    map_fd, map_file, slice_from_ptr,
+    BufReadExt, ResultExt, Utf8CStr, clone_attr, cstr, fclone_attr, map_fd, map_file,
+    slice_from_ptr,
 };
 use cfg_if::cfg_if;
 use libc::{c_char, mode_t};
@@ -50,14 +50,6 @@ unsafe extern "C" fn rm_rf_for_cxx(path: *const c_char) -> bool {
             Err(_) => false,
         }
     }
-}
-
-#[unsafe(no_mangle)]
-unsafe extern "C" fn frm_rf(fd: OwnedFd) -> bool {
-    fn inner(fd: OwnedFd) -> LoggedResult<()> {
-        Directory::try_from(fd)?.remove_all()
-    }
-    inner(fd).is_ok()
 }
 
 pub(crate) fn map_file_for_cxx(path: &Utf8CStr, rw: bool) -> &'static mut [u8] {

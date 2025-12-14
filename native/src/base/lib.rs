@@ -39,7 +39,7 @@ mod ffi {
     }
 
     unsafe extern "C++" {
-        include!("misc.hpp");
+        include!("base.hpp");
 
         #[cxx_name = "Utf8CStr"]
         type Utf8CStrRef<'a> = &'a crate::cstr::Utf8CStr;
@@ -62,11 +62,11 @@ mod ffi {
         fn parse_prop_file_rs(name: Utf8CStrRef, f: &FnBoolStrStr);
         #[cxx_name = "file_readline"]
         fn file_readline_for_cxx(fd: i32, f: &FnBoolStr);
+        fn xpipe2(fds: &mut [i32; 2], flags: i32) -> i32;
     }
 
     #[namespace = "rust"]
     extern "Rust" {
-        fn xpipe2(fds: &mut [i32; 2], flags: i32) -> i32;
         #[cxx_name = "map_file"]
         fn map_file_for_cxx(path: Utf8CStrRef, rw: bool) -> &'static mut [u8];
         #[cxx_name = "map_file_at"]
