@@ -12,6 +12,8 @@
 #include <base.hpp>
 #include <sepolicy.hpp>
 
+using kv_pairs = std::vector<std::pair<std::string, std::string>>;
+
 #include "init-rs.hpp"
 
 int magisk_proxy_main(int, char *argv[]);
