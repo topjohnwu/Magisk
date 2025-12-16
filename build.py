@@ -406,6 +406,7 @@ def build_apk(module: str):
             gradlew,
             f"{module}:assemble{build_type}",
             f"-PconfigPath={props}",
+            f"-PabiList={','.join(build_abis.keys())}",
         ],
         env=env,
     )

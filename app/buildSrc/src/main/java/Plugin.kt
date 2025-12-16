@@ -46,11 +46,25 @@ class MagiskPlugin : Plugin<Project> {
     private fun Project.applyPlugin() {
         initRandom(rootProject.file("dict.txt"))
         props.clear()
-        rootProject.file("gradle.properties").inputStream().use { props.load(it) }
+
+        // Get gradle properties relevant to Magisk
+        props.putAll(properties.filter { (key, _) -> key.startsWith("magisk.") })
+
+        // Load config.prop
         val configPath: String? by this
-        val config = rootFile(configPath ?: "config.prop")
-        if (config.exists())
-            config.inputStream().use { props.load(it) }
+        val configFile = rootFile(configPath ?: "config.prop")
+        if (configFile.exists()) {
+            configFile.inputStream().use {
+                val config = Properties()
+                config.load(it)
+                // Remove properties that should be passed by commandline
+                config.remove("abiList")
+                props.putAll(config)
+            }
+        }
+
+        // Commandline override
+        findProperty("abiList")?.let { props.put("abiList", it) }
 
         val repo = FileRepository(rootFile(".git"))
         val refId = repo.refDatabase.exactRef("HEAD").objectId
