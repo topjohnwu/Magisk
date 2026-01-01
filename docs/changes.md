@@ -1,3 +1,4 @@
+IMEI
 # Magisk Changelog
 
 ### v30.6 (2025.12.1)
