@@ -159,6 +159,9 @@ is_child_zygote = Argument("is_child_zygote", jboolean, True)
 # q_alt
 is_top_app = Argument("is_top_app", jboolean, True)
 
+# q running on xr
+is_perception_app = Argument("is_perception_app", jboolean, False)
+
 # r
 pkg_data_info_list = Argument("pkg_data_info_list", JArray(jstring), True)
 whitelisted_data_info_list = Argument(
@@ -167,10 +170,10 @@ whitelisted_data_info_list = Argument(
 mount_data_dirs = Argument("mount_data_dirs", jboolean, True)
 mount_storage_dirs = Argument("mount_storage_dirs", jboolean, True)
 
-# u
+# u qpr2
 mount_sysprop_overrides = Argument("mount_sysprop_overrides", jboolean, True)
 
-# b
+# b qpr2
 use_fifo_ui = Argument("use_fifo_ui", jboolean, False)
 
 # server
@@ -487,6 +490,29 @@ spec_u = SpecializeApp(
     ],
 )
 
+spec_xr_u = SpecializeApp(
+    "xr_u",
+    [
+        uid,
+        gid,
+        gids,
+        runtime_flags,
+        rlimits,
+        mount_external,
+        se_info,
+        nice_name,
+        is_child_zygote,
+        instruction_set,
+        app_data_dir,
+        is_top_app,
+        is_perception_app,
+        pkg_data_info_list,
+        whitelisted_data_info_list,
+        mount_data_dirs,
+        mount_storage_dirs,
+    ],
+)
+
 spec_samsung_q = SpecializeApp(
     "samsung_q",
     [
@@ -582,7 +608,7 @@ with open("jni_hooks.hpp", "w") as f:
     f.write(
         gen_jni_def(
             "specialize_app_methods",
-            [spec_q, spec_q_alt, spec_r, spec_u, spec_samsung_q],
+            [spec_q, spec_q_alt, spec_r, spec_u, spec_xr_u, spec_samsung_q],
         )
     )
 
