@@ -137,7 +137,9 @@ case "$1" in
     # Back up PREINITDEVICE from existing partition before OTA on A-only devices
     if ! $backuptool_ab; then
       initialize
-      RECOVERYMODE=false
+      # Suppress ui_print for this stage
+      ui_print() { return; }
+      get_flags
       find_boot_image
       $MAGISKBIN/magiskboot unpack "$BOOTIMAGE"
       $MAGISKBIN/magiskboot cpio ramdisk.cpio "extract .backup/.magisk config.orig"
