@@ -915,8 +915,6 @@ void repack(Utf8CStr src_img, Utf8CStr out_img, bool skip_comp) {
         file_align();
     }
 
-    off.tail = lseek(fd, 0, SEEK_CUR);
-
     // Proprietary stuffs
     if (boot.flags[SEANDROID_FLAG]) {
         xwrite(fd, SEANDROID_MAGIC, 16);
@@ -927,6 +925,7 @@ void repack(Utf8CStr src_img, Utf8CStr out_img, bool skip_comp) {
         xwrite(fd, LG_BUMP_MAGIC, 16);
     }
 
+	off.tail = lseek(fd, 0, SEEK_CUR);
     file_align();
 
     // vbmeta
