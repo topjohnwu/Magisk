@@ -292,7 +292,7 @@ static int find_dtb_offset(const uint8_t *buf, unsigned sz) {
         auto fdt_hdr = reinterpret_cast<const fdt_header *>(curr);
 
         // Check that fdt_header.totalsize does not overflow kernel image size or is empty dtb
-		// https://github.com/torvalds/linux/commit/7b937cc243e5b1df8780a0aa743ce800df6c68d1
+        // https://github.com/torvalds/linux/commit/7b937cc243e5b1df8780a0aa743ce800df6c68d1
         uint32_t totalsize = fdt_hdr->totalsize;
         if (totalsize > end - curr || totalsize <= 0x48)
             continue;
@@ -925,7 +925,7 @@ void repack(Utf8CStr src_img, Utf8CStr out_img, bool skip_comp) {
         xwrite(fd, LG_BUMP_MAGIC, 16);
     }
 
-	off.tail = lseek(fd, 0, SEEK_CUR);
+    off.tail = lseek(fd, 0, SEEK_CUR);
     file_align();
 
     // vbmeta
