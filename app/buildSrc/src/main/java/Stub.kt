@@ -8,13 +8,14 @@ import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
-import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.named
+import org.gradle.kotlin.dsl.register
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -82,17 +83,15 @@ private abstract class ManifestUpdater: DefaultTask() {
     @get:Input
     abstract val applicationId: Property<String>
 
+    @get:Input
+    abstract val factoryClass: Property<String>
+
+    @get:Input
+    abstract val appClass: Property<String>
+
     @get:InputFile
     @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val mergedManifest: RegularFileProperty
-
-    @get:InputFiles
-    @get:PathSensitive(PathSensitivity.RELATIVE)
-    abstract val factoryClassDir: DirectoryProperty
-
-    @get:InputFiles
-    @get:PathSensitive(PathSensitivity.RELATIVE)
-    abstract val appClassDir: DirectoryProperty
 
     @get:OutputFile
     abstract val outputManifest: RegularFileProperty
@@ -170,25 +169,18 @@ private abstract class ManifestUpdater: DefaultTask() {
 
         // Shuffle the order of the components
         cmpList.shuffle(RANDOM)
-        val (factoryPkg, factoryClass) = factoryClassDir.asFileTree.firstNotNullOf {
-            it.parentFile!!.name to it.name.removeSuffix(".java")
-        }
-        val (appPkg, appClass) = appClassDir.asFileTree.firstNotNullOf {
-            it.parentFile!!.name to it.name.removeSuffix(".java")
-        }
         val components = cmpList.joinToString("\n\n")
             .replace("\${applicationId}", applicationId.get())
         val manifest = mergedManifest.asFile.get().readText().replace(Regex(".*\\<application"), """
             |<application
-            |    android:appComponentFactory="$factoryPkg.$factoryClass"
-            |    android:name="$appPkg.$appClass"""".ind(1)
+            |    android:appComponentFactory="${factoryClass.get()}"
+            |    android:name="${appClass.get()}"""".ind(1)
         ).replace(Regex(".*\\<\\/application"), "$components\n    </application")
         outputManifest.get().asFile.writeText(manifest)
     }
 }
 
-
-private fun genStubClasses(factoryOutDir: File, appOutDir: File) {
+private fun genStubClasses(outDir: File): Pair<String, String> {
     val classNameGenerator = sequence {
         fun notJavaKeyword(name: String) = when (name) {
             "do", "if", "for", "int", "new", "try" -> false
@@ -217,7 +209,7 @@ private fun genStubClasses(factoryOutDir: File, appOutDir: File) {
         }
     }.distinct().iterator()
 
-    fun genClass(type: String, outDir: File) {
+    fun genClass(type: String, outDir: File): String {
         val clzName = classNameGenerator.next()
         val (pkg, name) = clzName.split('.')
         val pkgDir = File(outDir, pkg)
@@ -226,10 +218,12 @@ private fun genStubClasses(factoryOutDir: File, appOutDir: File) {
             it.println("package $pkg;")
             it.println("public class $name extends com.topjohnwu.magisk.$type {}")
         }
+        return clzName
     }
 
-    genClass("DelegateComponentFactory", factoryOutDir)
-    genClass("StubApplication", appOutDir)
+    val factory = genClass("DelegateComponentFactory", outDir)
+    val app = genClass("StubApplication", outDir)
+    return Pair(factory, app)
 }
 
 private fun genEncryptedResources(res: ByteArray, outDir: File) {
@@ -264,74 +258,76 @@ private fun genEncryptedResources(res: ByteArray, outDir: File) {
     }
 }
 
+private abstract class TaskWithDir : DefaultTask() {
+    @get:OutputDirectory
+    abstract val outputFolder: DirectoryProperty
+}
+
 fun Project.setupStubApk() {
     setupAppCommon()
 
-    androidComponents.onVariants { variant ->
-        val variantName = variant.name
-        val variantCapped = variantName.replaceFirstChar { it.uppercase() }
-        val manifestUpdater =
-            project.tasks.register("${variantName}ManifestProducer", ManifestUpdater::class.java) {
-                dependsOn("generate${variantCapped}ObfuscatedClass")
-                applicationId = variant.applicationId
-                appClassDir.set(layout.buildDirectory.dir("generated/source/app/$variantName"))
-                factoryClassDir.set(layout.buildDirectory.dir("generated/source/factory/$variantName"))
-            }
-        variant.artifacts.use(manifestUpdater)
-            .wiredWithFiles(
-                ManifestUpdater::mergedManifest,
-                ManifestUpdater::outputManifest)
-            .toTransform(SingleArtifact.MERGED_MANIFEST)
-    }
+    androidAppComponents {
+        onVariants { variant ->
+            val variantName = variant.name
+            val variantCapped = variantName.replaceFirstChar { it.uppercase() }
+            val variantLowered = variantName.lowercase()
 
-    androidApp.applicationVariants.all {
-        val variantCapped = name.replaceFirstChar { it.uppercase() }
-        val variantLowered = name.lowercase()
-        val outFactoryClassDir = layout.buildDirectory.file("generated/source/factory/${variantLowered}").get().asFile
-        val outAppClassDir = layout.buildDirectory.file("generated/source/app/${variantLowered}").get().asFile
-        val outResDir = layout.buildDirectory.dir("generated/source/res/${variantLowered}").get().asFile
-        val aapt = File(androidApp.sdkDirectory, "build-tools/${androidApp.buildToolsVersion}/aapt2")
-        val apk = layout.buildDirectory.file("intermediates/linked_resources_binary_format/" +
-                "${variantLowered}/process${variantCapped}Resources/linked-resources-binary-format-${variantLowered}.ap_").get().asFile
+            val componentJavaOutDir = layout.buildDirectory
+                .dir("generated/${variantLowered}/components").get().asFile
 
-        val genManifestTask = tasks.register("generate${variantCapped}ObfuscatedClass") {
-            inputs.property("seed", RAND_SEED)
-            outputs.dirs(outFactoryClassDir, outAppClassDir)
-            doLast {
-                outFactoryClassDir.mkdirs()
-                outAppClassDir.mkdirs()
-                genStubClasses(outFactoryClassDir, outAppClassDir)
-            }
-        }
-        registerJavaGeneratingTask(genManifestTask, outFactoryClassDir, outAppClassDir)
+            val (factory, app) = genStubClasses(componentJavaOutDir)
 
-        val processResourcesTask = tasks.named("process${variantCapped}Resources") {
-            outputs.dir(outResDir)
-            doLast {
-                val apkTmp = File("${apk}.tmp")
-                providers.exec {
-                    commandLine(aapt, "optimize", "-o", apkTmp, "--collapse-resource-names", apk)
-                }.result.get()
-
-                val bos = ByteArrayOutputStream()
-                ZipFile(apkTmp).use { src ->
-                    ZipOutputStream(apk.outputStream()).use {
-                        it.setLevel(Deflater.BEST_COMPRESSION)
-                        it.putNextEntry(ZipEntry("AndroidManifest.xml"))
-                        src.getInputStream(src.getEntry("AndroidManifest.xml")).transferTo(it)
-                        it.closeEntry()
-                    }
-                    DeflaterOutputStream(bos, Deflater(Deflater.BEST_COMPRESSION)).use {
-                        src.getInputStream(src.getEntry("resources.arsc")).transferTo(it)
-                    }
+            val manifestUpdater =
+                project.tasks.register("${variantName}ManifestProducer", ManifestUpdater::class.java) {
+                    applicationId = variant.applicationId
+                    factoryClass.set(factory)
+                    appClass.set(app)
                 }
-                apkTmp.delete()
-                genEncryptedResources(bos.toByteArray(), outResDir)
+            variant.artifacts.use(manifestUpdater)
+                .wiredWithFiles(
+                    ManifestUpdater::mergedManifest,
+                    ManifestUpdater::outputManifest)
+                .toTransform(SingleArtifact.MERGED_MANIFEST)
+
+            val aapt = sdkComponents.aapt2.get().executable.get().asFile
+            val apk = layout.buildDirectory.file("intermediates/linked_resources_binary_format/" +
+                    "${variantLowered}/process${variantCapped}Resources/" +
+                    "linked-resources-binary-format-${variantLowered}.ap_").get().asFile
+
+            val genResourcesTask = tasks.register("generate${variantCapped}BundledResources", TaskWithDir::class) {
+                dependsOn("process${variantCapped}Resources")
+                outputFolder.set(layout.buildDirectory.dir("generated/${variantLowered}/resources"))
+
+                doLast {
+                    val apkTmp = File("${apk}.tmp")
+                    providers.exec {
+                        commandLine(aapt, "optimize", "-o", apkTmp, "--collapse-resource-names", apk)
+                    }.result.get()
+
+                    val bos = ByteArrayOutputStream()
+                    ZipFile(apkTmp).use { src ->
+                        ZipOutputStream(apk.outputStream()).use {
+                            it.setLevel(Deflater.BEST_COMPRESSION)
+                            it.putNextEntry(ZipEntry("AndroidManifest.xml"))
+                            src.getInputStream(src.getEntry("AndroidManifest.xml")).transferTo(it)
+                            it.closeEntry()
+                        }
+                        DeflaterOutputStream(bos, Deflater(Deflater.BEST_COMPRESSION)).use {
+                            src.getInputStream(src.getEntry("resources.arsc")).transferTo(it)
+                        }
+                    }
+                    apkTmp.delete()
+                    genEncryptedResources(bos.toByteArray(), outputFolder.get().asFile)
+                }
+            }
+
+            variant.sources.java?.let {
+                it.addStaticSourceDirectory(componentJavaOutDir.path)
+                it.addGeneratedSourceDirectory(genResourcesTask, TaskWithDir::outputFolder)
             }
         }
-
-        registerJavaGeneratingTask(processResourcesTask, outResDir)
     }
+
     // Override optimizeReleaseResources task
     val apk = layout.buildDirectory.file("intermediates/linked_resources_binary_format/" +
             "release/processReleaseResources/linked-resources-binary-format-release.ap_").get().asFile

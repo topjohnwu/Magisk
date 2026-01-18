@@ -33,9 +33,5 @@
 # is used.
 -keep,allowobfuscation,allowshrinking class kotlin.coroutines.Continuation
 
-# Excessive obfuscation
--flattenpackagehierarchy
--allowaccessmodification
-
 -dontwarn org.junit.**
 -dontwarn org.apache.**

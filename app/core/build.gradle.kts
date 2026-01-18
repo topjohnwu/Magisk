@@ -1,6 +1,5 @@
 plugins {
     id("com.android.library")
-    kotlin("android")
     kotlin("plugin.parcelize")
     id("dev.zacsweers.moshix")
     id("com.google.devtools.ksp")
