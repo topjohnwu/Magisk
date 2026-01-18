@@ -1,8 +1,7 @@
 plugins {
     id("com.android.application")
-    kotlin("android")
     kotlin("plugin.parcelize")
-    kotlin("kapt")
+    id("com.android.legacy-kapt")
     id("androidx.navigation.safeargs.kotlin")
 }
 
@@ -24,6 +23,10 @@ android {
 
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
+    }
+
+    defaultConfig {
+        proguardFile("proguard-rules.pro")
     }
 
     buildTypes {

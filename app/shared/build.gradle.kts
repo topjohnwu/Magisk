@@ -6,4 +6,5 @@ setupCommon()
 
 android {
     namespace = "com.topjohnwu.shared"
+    enableKotlin = false
 }

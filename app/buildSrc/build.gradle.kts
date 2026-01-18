@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
-
 plugins {
     `kotlin-dsl`
 }
@@ -21,6 +19,7 @@ gradlePlugin {
 dependencies {
     implementation(kotlin("gradle-plugin", libs.versions.kotlin.get()))
     implementation(libs.android.gradle.plugin)
+    implementation(libs.android.kapt.plugin)
     implementation(libs.ksp.plugin)
     implementation(libs.navigation.safe.args.plugin)
     implementation(libs.lsparanoid.plugin)
