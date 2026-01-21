@@ -137,10 +137,10 @@ struct Add {
 #[derive(FromArgs)]
 #[argh(subcommand, name = "ls")]
 struct List {
-    #[argh(positional, default = r#"String::from("/")"#)]
-    path: String,
     #[argh(switch, short = 'r')]
     recursive: bool,
+    #[argh(positional, default = r#"String::from("/")"#)]
+    path: String,
 }
 
 pub(crate) fn print_cpio_usage() {
