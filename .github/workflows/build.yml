@@ -20,7 +20,7 @@ jobs:
       fail-fast: false
     steps:
       - name: Check out
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: "recursive"
 
@@ -39,14 +39,14 @@ jobs:
         run: ./app/gradlew --stop
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ github.sha }}
           path: out
           compression-level: 9
 
       - name: Upload mapping and native debug symbols
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ github.sha }}-symbols
           path: app/apk/build/outputs
@@ -61,7 +61,7 @@ jobs:
         os: [windows-2025, ubuntu-24.04]
     steps:
       - name: Check out
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: "recursive"
 
@@ -90,10 +90,10 @@ jobs:
 
     steps:
       - name: Check out
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: ${{ github.sha }}
           path: out
@@ -112,7 +112,7 @@ jobs:
 
       - name: Upload logs on error
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: "avd-logs-${{ matrix.version }}"
           path: |
@@ -131,10 +131,10 @@ jobs:
 
     steps:
       - name: Check out
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: ${{ github.sha }}
           path: out
@@ -154,7 +154,7 @@ jobs:
 
       - name: Upload logs on error
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: "avd32-logs-${{ matrix.version }}"
           path: |
@@ -177,10 +177,10 @@ jobs:
 
     steps:
       - name: Check out
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: ${{ github.sha }}
           path: out
@@ -196,7 +196,7 @@ jobs:
 
       - name: Upload logs on error
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: "cvd-logs-${{ matrix.device }}"
           path: |
