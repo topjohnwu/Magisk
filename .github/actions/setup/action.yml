@@ -1,4 +1,4 @@
-name: Magisk Setup
+iname: Magisk Setup
 inputs:
   is-asset-build:
     required: false
