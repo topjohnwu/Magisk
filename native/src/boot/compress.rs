@@ -7,11 +7,9 @@ use bzip2::write::BzEncoder;
 use flate2::Compression as GzCompression;
 use flate2::read::MultiGzDecoder;
 use flate2::write::GzEncoder;
-use lz4::block::CompressionMode;
-use lz4::liblz4::BlockChecksum;
-use lz4::{
-    BlockMode, BlockSize, ContentChecksum, Decoder as LZ4FrameDecoder, Encoder as LZ4FrameEncoder,
-    EncoderBuilder as LZ4FrameEncoderBuilder,
+use lz4_flex::frame::{
+    BlockSize as LZ4BlockSize, FrameDecoder as LZ4FrameDecoder, FrameEncoder as LZ4FrameEncoder,
+    FrameInfo as LZ4FrameInfo,
 };
 use lzma_rust2::{CheckType, LzmaOptions, LzmaReader, LzmaWriter, XzOptions, XzReader, XzWriter};
 use std::cmp::min;
@@ -51,9 +49,7 @@ impl<W: Write> WriteFinish<W> for BufWriter<ZopFliEncoder<W>> {
 
 impl<W: Write> WriteFinish<W> for LZ4FrameEncoder<W> {
     fn finish(self: Box<Self>) -> std::io::Result<W> {
-        let (w, r) = Self::finish(*self);
-        r?;
-        Ok(w)
+        Ok(Self::finish(*self)?)
     }
 }
 
@@ -65,40 +61,31 @@ impl<W: Write> WriteFinish<W> for LZ4FrameEncoder<W> {
 // LZ4BlockEncoder
 
 const LZ4_BLOCK_SIZE: usize = 0x800000;
-const LZ4HC_CLEVEL_MAX: i32 = 12;
+const LZ4HC_CLEVEL_MAX: u8 = 12;
 const LZ4_MAGIC: u32 = 0x184c2102;
 
 struct LZ4BlockEncoder<W: Write> {
     write: W,
     chunker: Chunker,
-    out_buf: Box<[u8]>,
     total: u32,
     is_lg: bool,
 }
 
 impl<W: Write> LZ4BlockEncoder<W> {
     fn new(write: W, is_lg: bool) -> Self {
-        let out_sz = lz4::block::compress_bound(LZ4_BLOCK_SIZE).unwrap_or(LZ4_BLOCK_SIZE);
         LZ4BlockEncoder {
             write,
             chunker: Chunker::new(LZ4_BLOCK_SIZE),
-            // SAFETY: all bytes will be initialized before it is used
-            out_buf: unsafe { Box::new_uninit_slice(out_sz).assume_init() },
             total: 0,
             is_lg,
         }
     }
 
-    fn encode_block(write: &mut W, out_buf: &mut [u8], chunk: &[u8]) -> std::io::Result<()> {
-        let compressed_size = lz4::block::compress_to_buffer(
-            chunk,
-            Some(CompressionMode::HIGHCOMPRESSION(LZ4HC_CLEVEL_MAX)),
-            false,
-            out_buf,
-        )?;
-        let block_size = compressed_size as u32;
+    fn encode_block(write: &mut W, chunk: &[u8]) -> std::io::Result<()> {
+        let compressed = lz4_flex::block::compress_hc_to_vec(chunk, LZ4HC_CLEVEL_MAX);
+        let block_size = compressed.len() as u32;
         write.write_pod(&block_size)?;
-        write.write_all(&out_buf[..compressed_size])
+        write.write_all(&compressed)
     }
 }
 
@@ -123,7 +110,7 @@ impl<W: Write> Write for LZ4BlockEncoder<W> {
             let (b, chunk) = self.chunker.add_data(buf);
             buf = b;
             if let Some(chunk) = chunk {
-                Self::encode_block(&mut self.write, &mut self.out_buf, chunk)?;
+                Self::encode_block(&mut self.write, chunk)?;
             }
         }
         Ok(())
@@ -134,7 +121,7 @@ impl<W: Write> WriteFinish<W> for LZ4BlockEncoder<W> {
     fn finish(mut self: Box<Self>) -> std::io::Result<W> {
         let chunk = self.chunker.get_available();
         if !chunk.is_empty() {
-            Self::encode_block(&mut self.write, &mut self.out_buf, chunk)?;
+            Self::encode_block(&mut self.write, chunk)?;
         }
         if self.is_lg {
             self.write.write_pod(&self.total)?;
@@ -155,10 +142,12 @@ struct LZ4BlockDecoder<R: Read> {
 
 impl<R: Read> LZ4BlockDecoder<R> {
     fn new(read: R) -> Self {
-        let compressed_sz = lz4::block::compress_bound(LZ4_BLOCK_SIZE).unwrap_or(LZ4_BLOCK_SIZE);
         Self {
             read,
-            in_buf: unsafe { Box::new_uninit_slice(compressed_sz).assume_init() },
+            in_buf: unsafe {
+                Box::new_uninit_slice(lz4_flex::block::get_maximum_output_size(LZ4_BLOCK_SIZE))
+                    .assume_init()
+            },
             out_buf: unsafe { Box::new_uninit_slice(LZ4_BLOCK_SIZE).assume_init() },
             out_len: 0,
             out_pos: 0,
@@ -200,11 +189,8 @@ impl<R: Read> Read for LZ4BlockDecoder<R> {
                 }
             }
 
-            self.out_len = lz4::block::decompress_to_buffer(
-                compressed_block,
-                Some(LZ4_BLOCK_SIZE as i32),
-                &mut self.out_buf,
-            )?;
+            self.out_len = lz4_flex::block::decompress_into(compressed_block, &mut self.out_buf)
+                .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e))?;
             self.out_pos = 0;
         }
         let copy_len = min(buf.len(), self.out_len - self.out_pos);
@@ -232,17 +218,14 @@ pub fn get_encoder<'a, W: Write + 'a>(
             None,
         )?),
         FileFormat::BZIP2 => Box::new(BzEncoder::new(w, BzCompression::best())),
-        FileFormat::LZ4 => {
-            let encoder = LZ4FrameEncoderBuilder::new()
-                .block_size(BlockSize::Max4MB)
-                .block_mode(BlockMode::Independent)
-                .checksum(ContentChecksum::ChecksumEnabled)
-                .block_checksum(BlockChecksum::BlockChecksumEnabled)
-                .level(9)
-                .auto_flush(true)
-                .build(w)?;
-            Box::new(encoder)
-        }
+        FileFormat::LZ4 => Box::new(LZ4FrameEncoder::with_compression_level(
+            LZ4FrameInfo::new()
+                .block_size(LZ4BlockSize::Max4MB)
+                .block_checksums(true)
+                .content_checksum(true),
+            w,
+            LZ4HC_CLEVEL_MAX,
+        )),
         FileFormat::LZ4_LEGACY => Box::new(LZ4BlockEncoder::new(w, false)),
         FileFormat::LZ4_LG => Box::new(LZ4BlockEncoder::new(w, true)),
         FileFormat::ZOPFLI => {
@@ -267,7 +250,7 @@ pub fn get_decoder<'a, R: Read + 'a>(
         FileFormat::XZ => Box::new(XzReader::new(r, true)),
         FileFormat::LZMA => Box::new(LzmaReader::new_mem_limit(r, u32::MAX, None)?),
         FileFormat::BZIP2 => Box::new(BzDecoder::new(r)),
-        FileFormat::LZ4 => Box::new(LZ4FrameDecoder::new(r)?),
+        FileFormat::LZ4 => Box::new(LZ4FrameDecoder::new(r)),
         FileFormat::LZ4_LG | FileFormat::LZ4_LEGACY => Box::new(LZ4BlockDecoder::new(r)),
         FileFormat::ZOPFLI | FileFormat::GZIP => Box::new(MultiGzDecoder::new(r)),
         _ => unreachable!(),

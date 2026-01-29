@@ -11,18 +11,6 @@ LOCAL_SRC_FILES := \
     xz-embedded/xz_dec_stream.c
 include $(BUILD_STATIC_LIBRARY)
 
-# liblz4.a
-include $(CLEAR_VARS)
-LOCAL_MODULE := liblz4
-LOCAL_C_INCLUDES := $(LOCAL_PATH)/lz4/lib
-LOCAL_EXPORT_C_INCLUDES := $(LOCAL_C_INCLUDES)
-LOCAL_SRC_FILES := \
-    lz4/lib/lz4.c \
-    lz4/lib/lz4frame.c \
-    lz4/lib/lz4hc.c \
-    lz4/lib/xxhash.c
-include $(BUILD_STATIC_LIBRARY)
-
 SE_PATH := $(LOCAL_PATH)/selinux
 
 # libsepol.a
