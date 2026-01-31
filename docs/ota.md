@@ -21,7 +21,7 @@ It is possible to have the OTA installed to the inactive slot and have the Magis
 
 <p align="center"><img src="images/ota_done.png" width="250"/> <img src="images/install_inactive_slot.png" width="250"/></p>
 
-- After installation is done, press the reboot button in the Magisk app. Under-the-hood, the Magisk app forces your device to switch to the updated slot, bypassing any possible post-OTA verifications.
+- After installation is done, follow the final instructions at the end of the Magisk installation on how to reboot into the new slot, currently involving going back to the regular system update and hitting "restart now" (previous method of using reboot within Magisk App may not result in rebooting to new slot). Under-the-hood, the Magisk app tracks your device switch to the updated slot, bypassing any possible post-OTA verifications.
 
 <p align="center"><img src="images/manager_reboot.png" width="250"/></p>
 
