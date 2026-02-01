@@ -143,6 +143,8 @@ void BootConfig::set(const kv_pairs &kv) noexcept {
             strscpy(hardware_plat.data(), value.data(), hardware_plat.size());
         } else if (key == "androidboot.fstab_suffix") {
             strscpy(fstab_suffix.data(), value.data(), fstab_suffix.size());
+        } else if (key == "androidboot.mode") {
+            strscpy(boot_mode.data(), value.data(), boot_mode.size());
         } else if (key == "qemu") {
             emulator = true;
         } else if (key == "androidboot.partition_map") {
