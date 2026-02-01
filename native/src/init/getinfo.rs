@@ -10,6 +10,10 @@ impl BootConfig {
         debug!("rootwait=[{}]", self.rootwait);
         unsafe {
             debug!(
+                "boot_mode=[{}]",
+                Utf8CStr::from_ptr_unchecked(self.boot_mode.as_ptr())
+            );
+            debug!(
                 "slot=[{}]",
                 Utf8CStr::from_ptr_unchecked(self.slot.as_ptr())
             );

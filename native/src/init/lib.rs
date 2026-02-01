@@ -35,6 +35,7 @@ pub mod ffi {
         fstab_suffix: [c_char; 32],
         hardware: [c_char; 32],
         hardware_plat: [c_char; 32],
+        boot_mode: [c_char; 16],
         partition_map: Vec<KeyValue>,
     }
 
