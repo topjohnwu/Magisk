@@ -1,30 +1,30 @@
-# Magisk Changelog
+   ماجيسك تغيير السجل. 
 
-### v30.6 (2025.12.1)
+### V30.6 (2025.12.1)
 
-- [MagiskInit] Revert a change that could result in bootloops
+#   ماجيسك تغيير السجل.   [ماجيك إنيت]  ارجع إلى تغيير قد يؤدي إلى التمهيد.
 
-### v30.5 (2025.12.1)
+### V30.5 (2025.12.1)
 
-- [General] Improve commandline argument parsing logic
-- [resetprop] Properly support Android versions with property overrides
+- [عام.]  تحسين حجة سطر القيادة تحليل المنطق.
+- [إعادة الضبط]  دعم إصدارات Android بشكل صحيح مع تجاوزات العقارات
 
-### v30.4 (2025.10.2)
+### V30.4 (2025.10.2)
 
-- [MagiskSU] Fix several implementation bugs
+- [MagiskSU]  إصلاح العديد من أخطاء التنفيذ.
 
-### v30.3 (2025.9.29)
+### V30.3 (2025.9.29)
 
-- [General] Support installing Magisk into vendor_boot partition
-- [MagiskPolicy] Support new sepolicy binary format introduced in Android 16 QPR2
-- [Core] Migrate much more code into Rust
-- [MagiskSU] Fallback to older implementation when the kernel doesn't support zero userspace copy APIs
+- [عام.] دعم تثبيت Magisk في قسم vendor_boot
+- [السياسة السحرية]  دعم تنسيق ثنائي جديد للسياسات تم تقديمه في Android 16 QPR2
+- [الأساسية.]  هجر المزيد من التعليمات البرمجية إلى الصدأ
+- [MagiskSU]  ارجع إلى التنفيذ القديم عندما لا تدعم النواة واجهات برمجة تطبيقات نسخ مساحة المستخدم صفرًا
 
-### v30.2 (2025.8.6)
+### V30.2 (2025.8.6)
 
-- [Core] Fix an edge case breaking modules when overlayfs is involved
-- [Core] Fix module `.replace` functionality in certain situations
-- [resetprop] Reduce property modification traces
+- [الأساسية.]  إصلاح وحدات كسر حالة الحافة عند مشاركة التراكبات.
+- [الأساسية.]   إصلاح وحدة. '.replace` وظائف في حالات معينة. 
+- [إعادة الضبط]  تقليل آثار تعديل الممتلكات.
 
 ### v30.1 (2025.7.3)
 
@@ -50,7 +50,7 @@
 ### v28.1 (2024.12.6)
 
 - [App] Fix stub APK download link
-- [App] Fix support for Android lower than 8.0
+  ارجع إلى التنفيذ القديم عندما لا تدعم النواة واجهات برمجة تطبيقات نسخ مساحة المستخدم صفرًا ####] Fix support for Android lower than 8.0
 - [General] Fix support for MTK Samsung devices
 - [MagiskInit] Fix a regression for 2SI devices
 - [MagiskPolicy] Fix a regression causing `overlay.d` replaced files to be not accessible
