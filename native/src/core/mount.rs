@@ -5,13 +5,17 @@ use base::{
     FsPathBuilder, LibcReturn, LoggedResult, MountInfo, ResultExt, Utf8CStr, Utf8CStrBuf, cstr,
     debug, info, libc, parse_mount_info, warn,
 };
-use libc::{c_uint, dev_t};
+use libc::{c_uint, dev_t, major};
 use nix::mount::MsFlags;
 use nix::sys::stat::{Mode, SFlag, mknod};
 use num_traits::AsPrimitive;
 use std::cmp::Ordering::{Greater, Less};
 use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
+
+// Linux allocated devices: 240-254 are reserved for LOCAL/EXPERIMENTAL use.
+const DYNAMIC_MAJOR_MIN: u32 = 240;
+const DYNAMIC_MAJOR_MAX: u32 = 254;
 
 pub fn setup_preinit_dir() {
     let magisk_tmp = get_magisk_tmp();
@@ -90,12 +94,14 @@ pub fn clean_mounts() {
 // when partitions have the same fs type, the order is:
 // - data: it has sufficient space and can be safely written
 // - cache: size is limited, but still can be safely written
+// - klogdump: available on some Smartisan devices and can be safely written
 // - metadata: size is limited, and it might cause unexpected behavior if written
 // - persist: it's the last resort, as it's dangerous to write to it
 #[derive(PartialEq, Eq, PartialOrd, Ord)]
 enum PartId {
     Data,
     Cache,
+    Klogdump,
     Metadata,
     Persist,
 }
@@ -138,11 +144,19 @@ pub fn find_preinit_device() -> String {
             } else {
                 return None;
             }
+            // use device major number to filter out device-mapper
+            let maj = major(info.device as dev_t) as u32;
+            if maj >= DYNAMIC_MAJOR_MIN && maj <= DYNAMIC_MAJOR_MAX {
+                if !info.source.contains("/vd") && !info.source.contains("/by-name/") {
+                    return None;
+                }
+            }
             // take data iff it's not encrypted or file-based encrypted without metadata
             // other partitions are always taken
             match info.target.as_str() {
                 "/persist" | "/mnt/vendor/persist" => Some((PartId::Persist, info)),
                 "/metadata" => Some((PartId::Metadata, info)),
+                "/klogdump" => Some((PartId::Klogdump, info)),
                 "/cache" => Some((PartId::Cache, info)),
                 "/data" => Some((PartId::Data, info))
                     .take_if(|_| matches!(encrypt_type, EncryptType::None | EncryptType::File)),
