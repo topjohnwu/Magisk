@@ -118,7 +118,7 @@ int su_client_main(int argc, char *argv[]) {
     string shell = DEFAULT_SHELL;
 
     int c;
-    while ((c = getopt_long(argc, argv, "+:himpds:VvuZ:Mt:g:G:", long_opts, nullptr)) != -1) {
+    while ((c = getopt_long(argc, argv, "+:himpds:VvZ:Mt:g:G:", long_opts, nullptr)) != -1) {
         switch (c) {
             case 'h':
                 usage(EXIT_SUCCESS);
