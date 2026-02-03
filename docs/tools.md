@@ -292,7 +292,7 @@ Options:
                                 as a primary group if the option -g is not specified
   -Z, --context CONTEXT         Change SELinux context
   -t, --target PID              PID to take mount namespace from
-                                pid 0 means magisk global mount namespacen
+                                pid 0 means magisk global mount namespace
   -m, -p,
   --preserve-environment        Preserve the entire environment
   -v, --version                 Display version number and exit
