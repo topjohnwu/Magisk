@@ -448,7 +448,7 @@ void exec_root_shell(int client, int pid, SuRequest &req, MntNsMode mode) {
         auto f = xopen_file("/proc/self/attr/exec", "we");
         if (f) fprintf(f.get(), "%s", req.context.c_str());
     }
-    if (req.target_uid != AID_ROOT || req.drop_cap || proc_is_restricted(pid))
+    if (req.drop_cap || proc_is_restricted(pid))
         drop_caps();
     if (req.target_uid != AID_ROOT || req.gids.size() > 0)
         set_identity(req.target_uid, req.gids);
