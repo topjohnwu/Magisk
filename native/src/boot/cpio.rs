@@ -74,19 +74,19 @@ struct Exists {
 #[derive(FromArgs)]
 #[argh(subcommand, name = "backup")]
 struct Backup {
-    #[argh(positional, arg_name = "orig")]
-    origin: String,
     #[argh(switch, short = 'n')]
     skip_compress: bool,
+    #[argh(positional, arg_name = "orig")]
+    origin: String,
 }
 
 #[derive(FromArgs)]
 #[argh(subcommand, name = "rm")]
 struct Remove {
-    #[argh(positional, arg_name = "entry")]
-    path: String,
     #[argh(switch, short = 'r')]
     recursive: bool,
+    #[argh(positional, arg_name = "entry")]
+    path: String,
 }
 
 #[derive(FromArgs)]
