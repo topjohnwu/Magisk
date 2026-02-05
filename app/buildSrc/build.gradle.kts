@@ -25,4 +25,5 @@ dependencies {
     implementation(libs.lsparanoid.plugin)
     implementation(libs.moshi.plugin)
     implementation(libs.jgit)
+    implementation(libs.protobuf.plugin)
 }

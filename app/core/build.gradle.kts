@@ -1,14 +1,32 @@
+import com.google.protobuf.gradle.id
+
 plugins {
     id("com.android.library")
     kotlin("plugin.parcelize")
     id("dev.zacsweers.moshix")
     id("com.google.devtools.ksp")
+    id("com.google.protobuf")
 }
 
 setupCoreLib()
 
 ksp {
     arg("room.generateKotlin", "true")
+}
+
+protobuf {
+    protoc {
+        artifact = libs.protobuf.protoc.get().toString()
+    }
+    generateProtoTasks {
+        ofNonTest().forEach { task ->
+            task.builtins {
+                id("java") {
+                    option("lite")
+                }
+            }
+        }
+    }
 }
 
 android {
@@ -40,6 +58,8 @@ dependencies {
     api(libs.markwon.core)
     implementation(libs.bcpkix)
     implementation(libs.commons.compress)
+    implementation(libs.xz)
+    implementation(libs.protobuf.javalite)
 
     api(libs.libsu.core)
     api(libs.libsu.service)

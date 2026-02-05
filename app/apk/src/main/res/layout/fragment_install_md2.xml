@@ -161,7 +161,7 @@
                         <Button
                             style="@style/WidgetFoundation.Button.Text"
                             gone="@{viewModel.step != 1}"
-                            isEnabled="@{viewModel.method == @id/method_patch ? viewModel.data != null : viewModel.method != -1}"
+                            isEnabled="@{(viewModel.method == @id/method_patch || viewModel.method == @id/method_download) ? viewModel.data != null : viewModel.method != -1}"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:onClick="@{() -> viewModel.install()}"
@@ -189,6 +189,13 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/select_patch_file" />
+
+                        <RadioButton
+                            android:id="@+id/method_download"
+                            style="@style/WidgetFoundation.RadioButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/download_patch_file" />
 
                         <RadioButton
                             android:id="@+id/method_direct"
