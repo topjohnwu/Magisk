@@ -33,8 +33,8 @@ interface LocaleSetting {
 
         private val systemLocale: Locale = Locale.getDefault()
 
-        override var currentLocale: Locale = systemLocale
         override var appLocale: Locale? = null
+        override var currentLocale: Locale = systemLocale
 
         init {
             setLocale(Config.locale)
@@ -167,10 +167,18 @@ interface LocaleSetting {
             LocaleConfig.fromContextIgnoringOverride(context)
         }
 
-        val useLocaleManager get() =
-            (if (isRunningAsStub) Build.VERSION.SDK_INT >= 34 else Build.VERSION.SDK_INT >= 33) &&
-                Intent(Settings.ACTION_APP_LOCALE_SETTINGS, Uri.fromParts("package", AppContext.packageName, null))
-                    .resolveActivity(AppContext.packageManager) != null
+        private val localeManagerUsable get() =
+            if (isRunningAsStub) Build.VERSION.SDK_INT >= 34 else Build.VERSION.SDK_INT >= 33
+
+        val useLocaleManager by lazy {
+            localeManagerUsable &&
+                    localeSettingsIntent.resolveActivity(AppContext.packageManager) != null
+        }
+
+        val localeSettingsIntent get() = Intent(
+            Settings.ACTION_APP_LOCALE_SETTINGS,
+            Uri.fromParts("package", AppContext.packageName, null),
+        )
 
         val instance: LocaleSetting by lazy {
             // Initialize available locale list

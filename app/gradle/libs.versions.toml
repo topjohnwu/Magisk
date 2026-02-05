@@ -3,7 +3,7 @@ kotlin = "2.3.0"
 android = "9.0.0"
 ksp = "2.3.4"
 rikka = "1.3.0"
-navigation = "2.9.6"
+navigation = "2.9.7"
 libsu = "6.0.0"
 okhttp = "5.3.2"
 retrofit = "3.0.0"
@@ -23,7 +23,7 @@ timber = { module = "com.jakewharton.timber:timber", version = "5.0.1" }
 jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version = "7.1.0.202411261347-r" }
 
 # AndroidX
-activity = { module = "androidx.activity:activity", version = "1.12.2" }
+activity = { module = "androidx.activity:activity", version = "1.12.3" }
 appcompat = { module = "androidx.appcompat:appcompat", version = "1.7.1" }
 core-ktx = { module = "androidx.core:core-ktx", version = "1.17.0" }
 core-splashscreen = { module = "androidx.core:core-splashscreen", version = "1.2.0" }
@@ -63,6 +63,6 @@ android-kapt-plugin = { module = "com.android.legacy-kapt:com.android.legacy-kap
 ksp-plugin = { module = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
 navigation-safe-args-plugin = { module = "androidx.navigation:navigation-safe-args-gradle-plugin", version.ref = "navigation" }
 lsparanoid-plugin = { module = "org.lsposed.lsparanoid:gradle-plugin", version = "0.6.0" }
-moshi-plugin = { module = "dev.zacsweers.moshix:dev.zacsweers.moshix.gradle.plugin", version = "0.34.2" }
+moshi-plugin = { module = "dev.zacsweers.moshix:dev.zacsweers.moshix.gradle.plugin", version = "0.34.4" }
 
 [plugins]

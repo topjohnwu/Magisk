@@ -104,7 +104,7 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Handler {
     override fun onItemAction(view: View, item: BaseSettingsItem) {
         when (item) {
             Theme -> SettingsFragmentDirections.actionSettingsFragmentToThemeFragment().navigate()
-            LanguageSystem -> launchAppLocaleSettings(view.activity)
+            LanguageSystem -> view.activity.startActivity(LocaleSetting.localeSettingsIntent)
             AddShortcut -> AddHomeIconEvent().publish()
             SystemlessHosts -> createHosts()
             DenyListConfig -> SettingsFragmentDirections.actionSettingsFragmentToDenyFragment().navigate()
@@ -114,12 +114,6 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Handler {
             Zygisk -> if (Zygisk.mismatch) SnackbarEvent(R.string.reboot_apply_change).publish()
             else -> Unit
         }
-    }
-
-    private fun launchAppLocaleSettings(activity: Activity) {
-        val intent = Intent(Settings.ACTION_APP_LOCALE_SETTINGS)
-        intent.data = Uri.fromParts("package", activity.packageName, null)
-        activity.startActivity(intent)
     }
 
     private fun openUrlIfNecessary(view: View) {
