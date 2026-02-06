@@ -1,5 +1,3 @@
-#![feature(try_blocks)]
-
 pub use base;
 use std::fmt::Write;
 

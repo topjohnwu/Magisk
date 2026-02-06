@@ -103,7 +103,7 @@ fn hex2byte(hex: &[u8]) -> Vec<u8> {
 }
 
 pub fn hexpatch(file: &Utf8CStr, from: &Utf8CStr, to: &Utf8CStr) -> bool {
-    let res: LoggedResult<bool> = try {
+    let res = || -> LoggedResult<bool> {
         let mut map = MappedFile::open_rw(file)?;
         let pattern = hex2byte(from.as_bytes());
         let patch = hex2byte(to.as_bytes());
@@ -112,7 +112,7 @@ pub fn hexpatch(file: &Utf8CStr, from: &Utf8CStr, to: &Utf8CStr) -> bool {
         for off in &v {
             eprintln!("Patch @ {off:#010X} [{from}] -> [{to}]");
         }
-        !v.is_empty()
-    };
+        Ok(!v.is_empty())
+    }();
     res.unwrap_or(false)
 }

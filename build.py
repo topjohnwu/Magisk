@@ -80,7 +80,7 @@ support_targets = {"magisk", "magiskinit", "magiskboot", "magiskpolicy", "resetp
 default_targets = support_targets - {"resetprop"}
 rust_targets = default_targets.copy()
 clean_targets = {"native", "cpp", "rust", "app"}
-ondk_version = "r29.4"
+ondk_version = "r29.5"
 
 # Global vars
 config = {}

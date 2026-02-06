@@ -699,11 +699,11 @@ impl CpioEntry {
         if self.mode & S_IFMT != S_IFREG {
             return false;
         }
-        let Ok(data): std::io::Result<Vec<u8>> = (try {
+        let Ok(data) = || -> std::io::Result<Vec<u8>> {
             let mut encoder = get_encoder(FileFormat::XZ, Vec::new())?;
             encoder.write_all(&self.data)?;
-            encoder.finish()?
-        }) else {
+            encoder.finish()
+        }() else {
             eprintln!("xz compression failed");
             return false;
         };
@@ -717,12 +717,12 @@ impl CpioEntry {
             return false;
         }
 
-        let Ok(data): std::io::Result<Vec<u8>> = (try {
+        let Ok(data) = || -> std::io::Result<Vec<u8>> {
             let mut decoder = get_decoder(FileFormat::XZ, Cursor::new(&self.data))?;
             let mut data = Vec::new();
             std::io::copy(decoder.as_mut(), &mut data)?;
-            data
-        }) else {
+            Ok(data)
+        }() else {
             eprintln!("xz compression failed");
             return false;
         };

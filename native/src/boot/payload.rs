@@ -164,10 +164,11 @@ pub fn extract_boot_from_payload(
                 out_file.seek(SeekFrom::Start(out_offset))?;
                 let fmt = check_fmt(data);
 
-                let Ok(_): std::io::Result<()> = (try {
+                let Ok(_) = || -> std::io::Result<()> {
                     let mut decoder = get_decoder(fmt, Cursor::new(data))?;
                     std::io::copy(decoder.as_mut(), &mut out_file)?;
-                }) else {
+                    Ok(())
+                }() else {
                     return Err(bad_payload!("decompression failed"));
                 };
             }

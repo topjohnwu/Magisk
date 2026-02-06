@@ -1,4 +1,3 @@
-#![feature(vec_into_raw_parts)]
 #![allow(clippy::missing_safety_doc)]
 
 pub use {const_format, libc, nix};

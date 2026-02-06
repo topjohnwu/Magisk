@@ -1,4 +1,3 @@
-#![feature(try_blocks)]
 #![feature(fn_traits)]
 #![feature(unix_socket_ancillary_data)]
 #![feature(unix_socket_peek)]

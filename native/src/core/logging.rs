@@ -329,7 +329,7 @@ pub fn start_log_daemon() {
         0
     }
 
-    let _: LoggedResult<()> = try {
+    let _ = || -> LoggedResult<()> {
         path.mkfifo(0o666).log_ok();
         chown(path.as_utf8_cstr(), Some(Uid::from(0)), Some(Gid::from(0)))?;
         let read = path.open(OFlag::O_RDWR | OFlag::O_CLOEXEC)?;
@@ -338,5 +338,6 @@ pub fn start_log_daemon() {
         unsafe {
             new_daemon_thread(logfile_writer_thread, read.into_raw_fd() as usize);
         }
-    };
+        Ok(())
+    }();
 }

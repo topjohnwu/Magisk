@@ -46,12 +46,13 @@ pub fn setup_preinit_dir() {
                 let target = Utf8CStr::from_string(&mut target);
                 let mut preinit_dir = resolve_preinit_dir(target);
                 let preinit_dir = Utf8CStr::from_string(&mut preinit_dir);
-                let r: LoggedResult<()> = try {
+                let r = || -> LoggedResult<()> {
                     preinit_dir.mkdir(0o700)?;
                     mnt_path.mkdirs(0o755)?;
                     mnt_path.remove().ok();
                     mnt_path.create_symlink_to(preinit_dir)?;
-                };
+                    Ok(())
+                }();
                 if r.is_ok() {
                     info!("* Found preinit dir: {}", preinit_dir);
                     return;
@@ -68,11 +69,12 @@ pub fn setup_module_mount() {
     let module_mnt = cstr::buf::default()
         .join_path(get_magisk_tmp())
         .join_path(MODULEMNT);
-    let _: LoggedResult<()> = try {
+    let _ = || -> LoggedResult<()> {
         module_mnt.mkdir(0o755)?;
         cstr!(MODULEROOT).bind_mount_to(&module_mnt, false)?;
         module_mnt.remount_mount_point_flags(MsFlags::MS_RDONLY)?;
-    };
+        Ok(())
+    }();
 }
 
 pub fn clean_mounts() {
@@ -85,10 +87,11 @@ pub fn clean_mounts() {
     buf.clear();
 
     let worker_dir = buf.append_path(magisk_tmp).append_path(WORKERDIR);
-    let _: LoggedResult<()> = try {
+    let _ = || -> LoggedResult<()> {
         worker_dir.set_mount_private(true)?;
         worker_dir.unmount()?;
-    };
+        Ok(())
+    }();
 }
 
 // when partitions have the same fs type, the order is:
@@ -146,10 +149,11 @@ pub fn find_preinit_device() -> String {
             }
             // use device major number to filter out device-mapper
             let maj = major(info.device as dev_t) as u32;
-            if maj >= DYNAMIC_MAJOR_MIN && maj <= DYNAMIC_MAJOR_MAX {
-                if !info.source.contains("/vd") && !info.source.contains("/by-name/") {
-                    return None;
-                }
+            if (DYNAMIC_MAJOR_MIN..=DYNAMIC_MAJOR_MAX).contains(&maj)
+                && !info.source.contains("/vd")
+                && !info.source.contains("/by-name/")
+            {
+                return None;
             }
             // take data iff it's not encrypted or file-based encrypted without metadata
             // other partitions are always taken
@@ -196,13 +200,14 @@ pub fn find_preinit_device() -> String {
         let mut buf = cstr::buf::default();
         let mirror_dir = buf.append_path(&tmp).append_path(PREINITMIRR);
         let preinit_dir = Utf8CStr::from_string(&mut preinit_dir);
-        let _: LoggedResult<()> = try {
+        let _ = || -> LoggedResult<()> {
             preinit_dir.mkdirs(0o700)?;
             mirror_dir.mkdirs(0o755)?;
             mirror_dir.unmount().ok();
             mirror_dir.remove().ok();
             mirror_dir.create_symlink_to(preinit_dir)?;
-        };
+            Ok(())
+        }();
         if std::env::var_os("MAKEDEV").is_some() {
             buf.clear();
             let dev_path = buf.append_path(&tmp).append_path(PREINITDEV);
