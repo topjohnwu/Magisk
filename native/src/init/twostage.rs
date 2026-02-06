@@ -28,7 +28,7 @@ pub(crate) fn hexpatch_init_for_second_stage(writable: bool) {
         // If we cannot directly modify /init, we need to bind mount a replacement on top of it
         let src = cstr!("/init");
         let dest = cstr!("/data/init");
-        let _: LoggedResult<()> = try {
+        let _ = || -> LoggedResult<()> {
             {
                 let mut fd = dest.create(OFlag::O_CREAT | OFlag::O_WRONLY, 0)?;
                 fd.write_all(init.as_ref())?;
@@ -36,7 +36,8 @@ pub(crate) fn hexpatch_init_for_second_stage(writable: bool) {
             let attr = src.follow_link().get_attr()?;
             dest.set_attr(&attr)?;
             dest.bind_mount_to(src, false)?;
-        };
+            Ok(())
+        }();
     }
 }
 

@@ -215,14 +215,14 @@ impl MagiskD {
 
     #[cfg(feature = "su-check-db")]
     fn build_su_info(&self, uid: i32) -> Arc<SuInfo> {
-        let result: LoggedResult<Arc<SuInfo>> = try {
+        let result = || -> LoggedResult<Arc<SuInfo>> {
             let cfg = self.get_db_settings()?;
 
             // Check multiuser settings
             let eval_uid = match cfg.multiuser_mode {
                 MultiuserMode::OwnerOnly => {
                     if to_user_id(uid) != 0 {
-                        return Arc::new(SuInfo::deny(uid));
+                        return Ok(Arc::new(SuInfo::deny(uid)));
                     }
                     uid
                 }
@@ -243,25 +243,25 @@ impl MagiskD {
 
             // If it's the manager, allow it silently
             if to_app_id(uid) == to_app_id(mgr_uid) {
-                return Arc::new(SuInfo::allow(uid));
+                return Ok(Arc::new(SuInfo::allow(uid)));
             }
 
             // Check su access settings
             match cfg.root_access {
                 RootAccess::Disabled => {
                     warn!("Root access is disabled!");
-                    return Arc::new(SuInfo::deny(uid));
+                    return Ok(Arc::new(SuInfo::deny(uid)));
                 }
                 RootAccess::AdbOnly => {
                     if uid != AID_SHELL {
                         warn!("Root access limited to ADB only!");
-                        return Arc::new(SuInfo::deny(uid));
+                        return Ok(Arc::new(SuInfo::deny(uid)));
                     }
                 }
                 RootAccess::AppsOnly => {
                     if uid == AID_SHELL {
                         warn!("Root access is disabled for ADB!");
-                        return Arc::new(SuInfo::deny(uid));
+                        return Ok(Arc::new(SuInfo::deny(uid)));
                     }
                 }
                 _ => {}
@@ -269,19 +269,19 @@ impl MagiskD {
 
             // If still not determined, check if manager exists
             if access.policy == SuPolicy::Query && mgr_uid < 0 {
-                return Arc::new(SuInfo::deny(uid));
+                return Ok(Arc::new(SuInfo::deny(uid)));
             }
 
             // Finally, the SuInfo
-            Arc::new(SuInfo {
+            Ok(Arc::new(SuInfo {
                 uid,
                 eval_uid,
                 mgr_pkg,
                 mgr_uid,
                 cfg,
                 access: Mutex::new(AccessInfo::new(access)),
-            })
-        };
+            }))
+        }();
 
         result.unwrap_or(Arc::new(SuInfo::deny(uid)))
     }

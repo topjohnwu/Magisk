@@ -1,4 +1,3 @@
-#![feature(try_blocks)]
 #![allow(clippy::missing_safety_doc)]
 
 use logging::setup_klog;

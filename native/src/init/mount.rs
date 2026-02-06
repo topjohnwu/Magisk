@@ -17,7 +17,7 @@ unsafe extern "C" {
 }
 
 pub(crate) fn switch_root(path: &Utf8CStr) {
-    let res: LoggedResult<()> = try {
+    || -> LoggedResult<()> {
         debug!("Switch root to {}", path);
         let mut mounts = BTreeSet::new();
         let rootfs = Directory::open(cstr!("/"))?;
@@ -48,8 +48,9 @@ pub(crate) fn switch_root(path: &Utf8CStr) {
 
         debug!("Cleaning rootfs");
         rootfs.remove_all()?;
-    };
-    res.ok();
+        Ok(())
+    }()
+    .ok();
 }
 
 pub(crate) fn is_device_mounted(dev: u64, target: Pin<&mut CxxString>) -> bool {

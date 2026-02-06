@@ -157,7 +157,7 @@ impl ZygiskState {
 
 impl MagiskD {
     pub fn zygisk_handler(&self, mut client: UnixStream) {
-        let _: LoggedResult<()> = try {
+        let _ = || -> LoggedResult<()> {
             let code = ZygiskRequest {
                 repr: client.read_decodable()?,
             };
@@ -171,7 +171,8 @@ impl MagiskD {
                 ZygiskRequest::GetModDir => self.get_mod_dir(client)?,
                 _ => {}
             }
-        };
+            Ok(())
+        }();
     }
 
     fn get_module_fds(&self, is_64_bit: bool) -> Option<Vec<RawFd>> {

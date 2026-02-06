@@ -279,20 +279,22 @@ pub fn get_decoder<'a, R: Read + 'a>(
 pub fn compress_bytes(format: FileFormat, in_bytes: &[u8], out_fd: RawFd) {
     let mut out_file = unsafe { ManuallyDrop::new(File::from_raw_fd(out_fd)) };
 
-    let _: LoggedResult<()> = try {
+    let _ = || -> LoggedResult<()> {
         let mut encoder = get_encoder(format, out_file.deref_mut())?;
         std::io::copy(&mut Cursor::new(in_bytes), encoder.deref_mut())?;
         encoder.finish()?;
-    };
+        Ok(())
+    }();
 }
 
 pub fn decompress_bytes(format: FileFormat, in_bytes: &[u8], out_fd: RawFd) {
     let mut out_file = unsafe { ManuallyDrop::new(File::from_raw_fd(out_fd)) };
 
-    let _: LoggedResult<()> = try {
+    let _ = || -> LoggedResult<()> {
         let mut decoder = get_decoder(format, in_bytes)?;
         std::io::copy(decoder.as_mut(), out_file.deref_mut())?;
-    };
+        Ok(())
+    }();
 }
 
 // Command-line entry points
