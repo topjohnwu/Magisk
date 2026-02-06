@@ -1,4 +1,5 @@
-# Magisk Changelog
+# Magisk Changelog no error rebot # animation samsung # - Changelog
+
 
 ### v30.6 (2025.12.1)
 
@@ -58,7 +59,7 @@
 ### v28.0 (2024.10.10)
 
 - [General] Support 16k page size
-- [General] Add basic support for RISC-V (not built in releases)
+- [General] Add basic support for  (not built in releases)
 - [General] Use a minimal libc to build static executables (`magiskinit` and `magiskboot`) for smaller sizes
 - [Core] Remove unnecessary mirror for magic mount
 - [Core] Update boot image detection logic to support more devices
