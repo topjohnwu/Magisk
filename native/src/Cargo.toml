@@ -34,7 +34,7 @@ quick-protobuf = "0.8.1"
 flate2 = { version = "1.1.5", default-features = false }
 bzip2 = "0.6.1"
 zopfli = "0.8.3"
-lz4 = "1.28.1"
+lz4_flex = { git = "https://github.com/PSeitz/lz4_flex.git", rev = "1c08f39e1ab52f2824763e0a57f2aa925f392167", default-features = false, features = ["hc", "std", "frame"] }
 lzma-rust2 = { version = "0.15.4", default-features = false }
 nix = "0.30.1"
 bitflags = "2.10.0"
@@ -53,7 +53,6 @@ der = "0.8.0-rc.10"
 [patch.crates-io]
 pb-rs = { git = "https://github.com/topjohnwu/quick-protobuf.git" }
 quick-protobuf = { git = "https://github.com/topjohnwu/quick-protobuf.git" }
-lz4-sys = { path = "external/lz4-sys" }
 
 [workspace.lints.clippy]
 unwrap_used = "deny"

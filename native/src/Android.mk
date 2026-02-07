@@ -79,7 +79,6 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := magiskboot
 LOCAL_STATIC_LIBRARIES := \
     libbase \
-    liblz4 \
     libboot-rs
 
 LOCAL_SRC_FILES := \
