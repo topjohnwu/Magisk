@@ -248,11 +248,7 @@ impl SuAppContext<'_> {
     }
 
     fn app_log(&self) {
-        let command = if self.request.command.is_empty() {
-            &self.request.shell
-        } else {
-            &self.request.command
-        };
+        let command = &self.request.command.join(" ");
         let extras = [
             Extra {
                 key: "from.uid",
