@@ -43,7 +43,7 @@ int quit_signals[] = { SIGALRM, SIGABRT, SIGHUP, SIGPIPE, SIGQUIT, SIGTERM, SIGI
     "Usage: su [options] [--] [user [argument...]]\n\n"
     "Options:\n"
     "  -s, --shell SHELL             Use SHELL instead of the default " DEFAULT_SHELL "\n"
-    "  -i, --interactive             Force pseudo-terminal allocation\n"
+    "  -i, --interactive             Force pseudo-terminal allocation when using -c\n"
     "  -g, --group GROUP             Specify the primary group\n"
     "  -G, --supp-group GROUP        Specify a supplementary group\n"
     "                                The first specified supplementary group is also used\n"
@@ -196,9 +196,13 @@ end:
         }
     }
 
+    bool has_command = false;
     req.command.emplace_back(shell.c_str());
     if (optind < argc) {
         for (int i = optind; i < argc; ++i) {
+            if (strcmp(argv[i], "-c") == 0) {
+                has_command = true;
+            }
             req.command.push_back(argv[i]);
         }
         optind = argc;
@@ -217,8 +221,8 @@ end:
         return EACCES;
     }
 
+    interactive |= !has_command;
     // Determine which one of our streams are attached to a TTY
-    interactive |= req.command.size() == 1;
     int atty = 0;
     if (isatty(STDIN_FILENO) && interactive)  atty |= ATTY_IN;
     if (isatty(STDOUT_FILENO) && interactive) atty |= ATTY_OUT;

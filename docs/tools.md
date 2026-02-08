@@ -285,7 +285,7 @@ Usage: su [options] [--] [user [argument...]]
 
 Options:
   -s, --shell SHELL             Use SHELL instead of the default /system/bin/sh
-  -i, --interactive             Force pseudo-terminal allocation
+  -i, --interactive             Force pseudo-terminal allocation when using -c
   -g, --group GROUP             Specify the primary group
   -G, --supp-group GROUP        Specify a supplementary group
                                 The first specified supplementary group is also used
