@@ -248,7 +248,13 @@ impl SuAppContext<'_> {
     }
 
     fn app_log(&self) {
-        let command = &self.request.command.join(" ");
+        let mut command = self.request.command.join(" ");
+        if self.request.command.len() >= 4
+            && self.request.command[1] == "-c"
+            && !self.request.command[2].contains(b" ")
+        {
+            command = format!("(Syntax Error) {}", command);
+        }
         let extras = [
             Extra {
                 key: "from.uid",
@@ -280,7 +286,7 @@ impl SuAppContext<'_> {
             },
             Extra {
                 key: "command",
-                value: Str(command),
+                value: Str(&command),
             },
             Extra {
                 key: "notify",
