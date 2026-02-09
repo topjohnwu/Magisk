@@ -224,7 +224,7 @@ end:
     interactive |= !has_command;
     // Determine which one of our streams are attached to a TTY
     int atty = 0;
-    if (isatty(STDIN_FILENO) && interactive)  atty |= ATTY_IN;
+    if (isatty(STDIN_FILENO) && interactive) atty |= ATTY_IN;
     if (isatty(STDOUT_FILENO) && interactive) atty |= ATTY_OUT;
     if (isatty(STDERR_FILENO) && interactive) atty |= ATTY_ERR;
 
@@ -410,8 +410,26 @@ void exec_root_shell(int client, int pid, SuRequest &req, MntNsMode mode) {
     }
 
     vector<const char *> argv;
-    for (auto &str: req.command) {
-        argv.push_back(str.c_str());
+    string cmd;
+    if (req.command.size() >= 4 &&
+        string_view(req.command[1].c_str()) == "-c" &&
+        string_view(req.command[2].c_str()).find(' ') == string::npos) {
+        LOGD("su: unsupported command line from pid=[%d]\n", pid);
+        cmd = req.command[2].c_str();
+        for (size_t i = 3; i < req.command.size(); ++i) {
+            cmd += ' ';
+            cmd += req.command[i].c_str();
+        }
+
+        argv.reserve(4);
+        argv.push_back(req.command[0].c_str());
+        argv.push_back(req.command[1].c_str());
+        argv.push_back(cmd.c_str());
+    } else {
+        argv.reserve(req.command.size() + 1);
+        for (auto &arg: req.command) {
+            argv.push_back(arg.c_str());
+        }
     }
     argv.push_back(nullptr);
 
