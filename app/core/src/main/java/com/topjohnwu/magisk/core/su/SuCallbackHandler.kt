@@ -53,10 +53,12 @@ object SuCallbackHandler {
     private fun handleLogging(context: Context, data: Bundle) {
         val fromUid = data.getIntComp("from.uid", -1)
         val notify = data.getBoolean("notify", true)
+        val needLog = data.getBoolean("log", true)
         val policy = data.getIntComp("policy", SuPolicy.ALLOW)
         val toUid = data.getIntComp("to.uid", -1)
         val pid = data.getIntComp("pid", -1)
         val command = data.getString("command", "")
+        val legacyCmd = data.getBoolean("legacy_cmd", false)
         val target = data.getIntComp("target", -1)
         val seContext = data.getString("context", "")
         val gids = data.getString("gids", "")
@@ -70,9 +72,9 @@ object SuCallbackHandler {
         }.getOrNull() ?: createSuLog(fromUid, toUid, pid, command, policy, target, seContext, gids)
 
         if (notify)
-            notify(context, log.action >= SuPolicy.ALLOW, log.appName)
-
-        runBlocking { ServiceLocator.logRepo.insert(log) }
+            notify(context, log.action >= SuPolicy.ALLOW, log.appName, legacyCmd)
+        if (needLog)
+            runBlocking { ServiceLocator.logRepo.insert(log) }
     }
 
     private fun handleNotify(context: Context, data: Bundle) {
@@ -86,17 +88,24 @@ object SuCallbackHandler {
             pm.getPackageInfo(uid, pid)?.applicationInfo?.getLabel(pm)
         }.getOrNull() ?: "[UID] $uid"
 
-        notify(context, policy >= SuPolicy.ALLOW, appName)
+        notify(context, policy >= SuPolicy.ALLOW, appName, false)
     }
 
-    private fun notify(context: Context, granted: Boolean, appName: String) {
+    private fun notify(
+        context: Context, granted: Boolean,
+        appName: String, legacyCmd: Boolean
+    ) {
         if (Config.suNotification == Config.Value.NOTIFICATION_TOAST) {
             val resId = if (granted)
                 R.string.su_allow_toast
             else
                 R.string.su_deny_toast
 
-            context.toast(context.getString(resId, appName), Toast.LENGTH_SHORT)
+            var str = context.getString(resId, appName)
+            if (legacyCmd) {
+                str += "\n${context.getString(R.string.su_legacy_cmd)}"
+            }
+            context.toast(str, Toast.LENGTH_SHORT)
         }
     }
 }

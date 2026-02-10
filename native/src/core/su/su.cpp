@@ -414,7 +414,6 @@ void exec_root_shell(int client, int pid, SuRequest &req, MntNsMode mode) {
     if (req.command.size() >= 4 &&
         string_view(req.command[1].c_str()) == "-c" &&
         string_view(req.command[2].c_str()).find(' ') == string::npos) {
-        LOGD("su: unsupported command line from pid=[%d]\n", pid);
         cmd = req.command[2].c_str();
         for (size_t i = 3; i < req.command.size(); ++i) {
             cmd += ' ';

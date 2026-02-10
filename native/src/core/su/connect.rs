@@ -229,31 +229,15 @@ impl SuAppContext<'_> {
         };
     }
 
-    fn app_notify(&self) {
-        let extras = [
-            Extra {
-                key: "from.uid",
-                value: Int(self.cred.uid.as_()),
-            },
-            Extra {
-                key: "pid",
-                value: Int(self.cred.pid.unwrap_or(-1).as_()),
-            },
-            Extra {
-                key: "policy",
-                value: Int(self.settings.policy.repr),
-            },
-        ];
-        self.exec_cmd("notify", &extras, true);
-    }
-
     fn app_log(&self) {
         let mut command = self.request.command.join(" ");
+        let mut legacy_cmd = false;
         if self.request.command.len() >= 4
             && self.request.command[1] == "-c"
             && !self.request.command[2].contains(b" ")
         {
             command = format!("(Syntax Error) {}", command);
+            legacy_cmd = true;
         }
         let extras = [
             Extra {
@@ -289,8 +273,16 @@ impl SuAppContext<'_> {
                 value: Str(&command),
             },
             Extra {
+                key: "legacy_cmd",
+                value: Bool(legacy_cmd),
+            },
+            Extra {
                 key: "notify",
                 value: Bool(self.settings.notify),
+            },
+            Extra {
+                key: "log",
+                value: Bool(self.settings.log),
             },
         ];
         self.exec_cmd("log", &extras, true);
@@ -311,11 +303,7 @@ impl SuAppContext<'_> {
         }
 
         // Notify su usage to application
-        if self.settings.log {
-            self.app_log();
-        } else if self.settings.notify {
-            self.app_notify();
-        }
+        self.app_log();
 
         exit(0);
     }
