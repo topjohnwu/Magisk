@@ -6,7 +6,7 @@ static JniHookDefinitions *get_defs();
 
 struct JniHookDefinitions {
 
-std::array<JNINativeMethod, 11> fork_app_methods = {{
+std::array<JNINativeMethod, 12> fork_app_methods = {{
     // nativeForkAndSpecialize_l
     {
         "nativeForkAndSpecialize",
@@ -204,9 +204,32 @@ std::array<JNINativeMethod, 11> fork_app_methods = {{
             return ctx.pid;
         }
     },
+    // nativeForkAndSpecialize_nubia_u
+    {
+        "nativeForkAndSpecialize",
+        "(II[II[[IILjava/lang/String;Ljava/lang/String;[I[IZLjava/lang/String;Ljava/lang/String;ZZ[Ljava/lang/String;[Ljava/lang/String;ZZZLjava/lang/String;)I",
+        (void *) +[] [[clang::no_stack_protector]] (JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags, jobjectArray rlimits, jint mount_external, jstring se_info, jstring nice_name, jintArray fds_to_close, jintArray fds_to_ignore, jboolean is_child_zygote, jstring instruction_set, jstring app_data_dir, jboolean is_top_app, jboolean use_fifo_ui, jobjectArray pkg_data_info_list, jobjectArray whitelisted_data_info_list, jboolean mount_data_dirs, jboolean mount_storage_dirs, jboolean mount_sysprop_overrides, jstring _9) static -> jint {
+            AppSpecializeArgs_v5 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);
+            args.fds_to_ignore = &fds_to_ignore;
+            args.is_child_zygote = &is_child_zygote;
+            args.is_top_app = &is_top_app;
+            args.pkg_data_info_list = &pkg_data_info_list;
+            args.whitelisted_data_info_list = &whitelisted_data_info_list;
+            args.mount_data_dirs = &mount_data_dirs;
+            args.mount_storage_dirs = &mount_storage_dirs;
+            args.mount_sysprop_overrides = &mount_sysprop_overrides;
+            ZygiskContext ctx(env, &args);
+            ctx.nativeForkAndSpecialize_pre();
+            reinterpret_cast<jint(*)(JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags, jobjectArray rlimits, jint mount_external, jstring se_info, jstring nice_name, jintArray fds_to_close, jintArray fds_to_ignore, jboolean is_child_zygote, jstring instruction_set, jstring app_data_dir, jboolean is_top_app, jboolean use_fifo_ui, jobjectArray pkg_data_info_list, jobjectArray whitelisted_data_info_list, jboolean mount_data_dirs, jboolean mount_storage_dirs, jboolean mount_sysprop_overrides, jstring _9)>(get_defs()->fork_app_methods[11].fnPtr)(
+                env, clazz, uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, fds_to_close, fds_to_ignore, is_child_zygote, instruction_set, app_data_dir, is_top_app, use_fifo_ui, pkg_data_info_list, whitelisted_data_info_list, mount_data_dirs, mount_storage_dirs, mount_sysprop_overrides, _9
+            );
+            ctx.nativeForkAndSpecialize_post();
+            return ctx.pid;
+        }
+    },
 }};
 
-std::array<JNINativeMethod, 6> specialize_app_methods = {{
+std::array<JNINativeMethod, 7> specialize_app_methods = {{
     // nativeSpecializeAppProcess_q
     {
         "nativeSpecializeAppProcess",
@@ -303,13 +326,34 @@ std::array<JNINativeMethod, 6> specialize_app_methods = {{
     {
         "nativeSpecializeAppProcess",
         "(II[II[[IILjava/lang/String;IILjava/lang/String;ZLjava/lang/String;Ljava/lang/String;)V",
-        (void *) +[] [[clang::no_stack_protector]] (JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags, jobjectArray rlimits, jint mount_external, jstring se_info, jint _9, jint _10, jstring nice_name, jboolean is_child_zygote, jstring instruction_set, jstring app_data_dir) static -> void {
+        (void *) +[] [[clang::no_stack_protector]] (JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags, jobjectArray rlimits, jint mount_external, jstring se_info, jint _10, jint _11, jstring nice_name, jboolean is_child_zygote, jstring instruction_set, jstring app_data_dir) static -> void {
             AppSpecializeArgs_v5 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);
             args.is_child_zygote = &is_child_zygote;
             ZygiskContext ctx(env, &args);
             ctx.nativeSpecializeAppProcess_pre();
-            reinterpret_cast<void(*)(JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags, jobjectArray rlimits, jint mount_external, jstring se_info, jint _9, jint _10, jstring nice_name, jboolean is_child_zygote, jstring instruction_set, jstring app_data_dir)>(get_defs()->specialize_app_methods[5].fnPtr)(
-                env, clazz, uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, _9, _10, nice_name, is_child_zygote, instruction_set, app_data_dir
+            reinterpret_cast<void(*)(JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags, jobjectArray rlimits, jint mount_external, jstring se_info, jint _10, jint _11, jstring nice_name, jboolean is_child_zygote, jstring instruction_set, jstring app_data_dir)>(get_defs()->specialize_app_methods[5].fnPtr)(
+                env, clazz, uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, _10, _11, nice_name, is_child_zygote, instruction_set, app_data_dir
+            );
+            ctx.nativeSpecializeAppProcess_post();
+        }
+    },
+    // nativeSpecializeAppProcess_nubia_u
+    {
+        "nativeSpecializeAppProcess",
+        "(II[II[[IILjava/lang/String;Ljava/lang/String;ZLjava/lang/String;Ljava/lang/String;Z[Ljava/lang/String;[Ljava/lang/String;ZZZLjava/lang/String;)V",
+        (void *) +[] [[clang::no_stack_protector]] (JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags, jobjectArray rlimits, jint mount_external, jstring se_info, jstring nice_name, jboolean is_child_zygote, jstring instruction_set, jstring app_data_dir, jboolean is_top_app, jobjectArray pkg_data_info_list, jobjectArray whitelisted_data_info_list, jboolean mount_data_dirs, jboolean mount_storage_dirs, jboolean mount_sysprop_overrides, jstring _12) static -> void {
+            AppSpecializeArgs_v5 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);
+            args.is_child_zygote = &is_child_zygote;
+            args.is_top_app = &is_top_app;
+            args.pkg_data_info_list = &pkg_data_info_list;
+            args.whitelisted_data_info_list = &whitelisted_data_info_list;
+            args.mount_data_dirs = &mount_data_dirs;
+            args.mount_storage_dirs = &mount_storage_dirs;
+            args.mount_sysprop_overrides = &mount_sysprop_overrides;
+            ZygiskContext ctx(env, &args);
+            ctx.nativeSpecializeAppProcess_pre();
+            reinterpret_cast<void(*)(JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags, jobjectArray rlimits, jint mount_external, jstring se_info, jstring nice_name, jboolean is_child_zygote, jstring instruction_set, jstring app_data_dir, jboolean is_top_app, jobjectArray pkg_data_info_list, jobjectArray whitelisted_data_info_list, jboolean mount_data_dirs, jboolean mount_storage_dirs, jboolean mount_sysprop_overrides, jstring _12)>(get_defs()->specialize_app_methods[6].fnPtr)(
+                env, clazz, uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, is_child_zygote, instruction_set, app_data_dir, is_top_app, pkg_data_info_list, whitelisted_data_info_list, mount_data_dirs, mount_storage_dirs, mount_sysprop_overrides, _12
             );
             ctx.nativeSpecializeAppProcess_post();
         }
@@ -336,12 +380,12 @@ std::array<JNINativeMethod, 2> fork_server_methods = {{
     {
         "nativeForkSystemServer",
         "(II[IIII[[IJJ)I",
-        (void *) +[] [[clang::no_stack_protector]] (JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags, jint _11, jint _12, jobjectArray rlimits, jlong permitted_capabilities, jlong effective_capabilities) static -> jint {
+        (void *) +[] [[clang::no_stack_protector]] (JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags, jint _13, jint _14, jobjectArray rlimits, jlong permitted_capabilities, jlong effective_capabilities) static -> jint {
             ServerSpecializeArgs_v1 args(uid, gid, gids, runtime_flags, permitted_capabilities, effective_capabilities);
             ZygiskContext ctx(env, &args);
             ctx.nativeForkSystemServer_pre();
-            reinterpret_cast<jint(*)(JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags, jint _11, jint _12, jobjectArray rlimits, jlong permitted_capabilities, jlong effective_capabilities)>(get_defs()->fork_server_methods[1].fnPtr)(
-                env, clazz, uid, gid, gids, runtime_flags, _11, _12, rlimits, permitted_capabilities, effective_capabilities
+            reinterpret_cast<jint(*)(JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags, jint _13, jint _14, jobjectArray rlimits, jlong permitted_capabilities, jlong effective_capabilities)>(get_defs()->fork_server_methods[1].fnPtr)(
+                env, clazz, uid, gid, gids, runtime_flags, _13, _14, rlimits, permitted_capabilities, effective_capabilities
             );
             ctx.nativeForkSystemServer_post();
             return ctx.pid;
