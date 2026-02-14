@@ -11,6 +11,7 @@ import subprocess
 import sys
 import tarfile
 import urllib.request
+import time
 from pathlib import Path
 from zipfile import ZipFile
 
@@ -95,10 +96,12 @@ force_out = False
 
 def mv(source: Path, target: Path):
     try:
+        if target.exists():
+            rm_rf(target)
         shutil.move(source, target)
         vprint(f"mv {source} -> {target}")
-    except:
-        pass
+    except Exception as e:
+        vprint(f"Failed to mv {source} -> {target}: {e}")
 
 
 def cp(source: Path, target: Path):
@@ -129,6 +132,8 @@ def rm_on_error(func, path, _):
 
 def rm_rf(path: Path):
     vprint(f"rm -rf {path}")
+    if not path.exists():
+        return
     if sys.version_info >= (3, 12):
         shutil.rmtree(path, ignore_errors=False, onexc=rm_on_error)
     else:
@@ -239,7 +244,7 @@ def build_cpp_src(targets: set[str]):
 def run_cargo(cmds: list[str]):
     ensure_paths()
     env = os.environ.copy()
-    env["PATH"] = f"{rust_sysroot / "bin"}{os.pathsep}{env["PATH"]}"
+    env["PATH"] = f"{rust_sysroot / 'bin'}{os.pathsep}{env['PATH']}"
     env["CARGO_BUILD_RUSTFLAGS"] = f"-Z threads={min(8, cpu_count)}"
     # Cargo calls executables in $RUSTROOT/lib/rustlib/$TRIPLE/bin, we need
     # to make sure the runtime linker also search $RUSTROOT/lib for libraries.
@@ -577,23 +582,60 @@ def cargo_cli():
     os.chdir(Path("..", ".."))
 
 
+def progress_bar(current, total, width=40):
+    percent = float(current) / total
+    filled = int(width * percent)
+    bar = "=" * filled + "-" * (width - filled)
+    sys.stdout.write(f"\r[{bar}] {percent:7.2%}")
+    sys.stdout.flush()
+
+
 def setup_ndk():
     ensure_paths()
     url = f"https://github.com/topjohnwu/ondk/releases/download/{ondk_version}/ondk-{ondk_version}-{os_name}.tar.xz"
-    ndk_archive = url.split("/")[-1]
+    ndk_archive_path = Path(ndk_root, url.split("/")[-1])
     ondk_path = Path(ndk_root, f"ondk-{ondk_version}")
 
-    header(f"* Downloading and extracting {ndk_archive}")
+    header(f"* Setting up Magisk NDK ({ondk_version})")
+
+    if not ndk_archive_path.exists():
+        print(f"Downloading {url}...")
+        try:
+            with urllib.request.urlopen(url) as response:
+                total_size = int(response.getheader('Content-Length').strip())
+                downloaded = 0
+                block_size = 8192
+                with open(ndk_archive_path, 'wb') as out_file:
+                    while True:
+                        buffer = response.read(block_size)
+                        if not buffer:
+                            break
+                        downloaded += len(buffer)
+                        out_file.write(buffer)
+                        progress_bar(downloaded, total_size)
+            print("\nDownload complete.")
+        except Exception as e:
+            if ndk_archive_path.exists():
+                ndk_archive_path.unlink()
+            error(f"Download failed: {e}")
+
+    print(f"Extracting {ndk_archive_path.name}...")
     rm_rf(ondk_path)
-    with urllib.request.urlopen(url) as response:
-        with tarfile.open(mode="r|xz", fileobj=response) as tar:
+    try:
+        with tarfile.open(ndk_archive_path, mode="r:xz") as tar:
             if hasattr(tarfile, "data_filter"):
                 tar.extractall(ndk_root, filter="tar")
             else:
                 tar.extractall(ndk_root)
+        print("Extraction complete.")
+    except Exception as e:
+        error(f"Extraction failed: {e}")
 
+    print("Finalizing installation...")
     rm_rf(ndk_path)
     mv(ondk_path, ndk_path)
+    # ndk_archive_path.unlink() # Keep it to avoid redownload if move fails
+    header("Magisk NDK setup complete!")
 
 
 def setup_rustup():
@@ -714,10 +756,10 @@ def ensure_paths():
         return
 
     try:
-        sdk_path = Path(os.environ["ANDROID_HOME"])
+        sdk_path = Path(os.environ["ANDROID_HOME"].strip())
     except KeyError:
         try:
-            sdk_path = Path(os.environ["ANDROID_SDK_ROOT"])
+            sdk_path = Path(os.environ["ANDROID_SDK_ROOT"].strip())
         except KeyError:
             error("Please set Android SDK path to environment variable ANDROID_HOME")
 

@@ -43,7 +43,7 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Handler {
         // Customization
         val list = mutableListOf(
             Customization,
-            Theme, if (LocaleSetting.useLocaleManager) LanguageSystem else Language
+            Theme, Background, if (LocaleSetting.useLocaleManager) LanguageSystem else Language
         )
         if (isRunningAsStub && ShortcutManagerCompat.isRequestPinShortcutSupported(context))
             list.add(AddShortcut)
@@ -104,6 +104,7 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Handler {
     override fun onItemAction(view: View, item: BaseSettingsItem) {
         when (item) {
             Theme -> SettingsFragmentDirections.actionSettingsFragmentToThemeFragment().navigate()
+            Background -> pickBackground(view.activity)
             LanguageSystem -> view.activity.startActivity(LocaleSetting.localeSettingsIntent)
             AddShortcut -> AddHomeIconEvent().publish()
             SystemlessHosts -> createHosts()
@@ -114,6 +115,14 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Handler {
             Zygisk -> if (Zygisk.mismatch) SnackbarEvent(R.string.reboot_apply_change).publish()
             else -> Unit
         }
+    }
+
+    private fun pickBackground(activity: Activity) {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "image/*"
+        }
+        activity.startActivityForResult(intent, Const.ID.SELECT_IMAGE)
     }
 
     private fun openUrlIfNecessary(view: View) {

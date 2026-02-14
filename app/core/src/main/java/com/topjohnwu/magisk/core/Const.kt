@@ -36,6 +36,7 @@ object Const {
     object ID {
         const val DOWNLOAD_JOB_ID = 6
         const val CHECK_UPDATE_JOB_ID = 7
+        const val SELECT_IMAGE = 1001
     }
 
     object Url {

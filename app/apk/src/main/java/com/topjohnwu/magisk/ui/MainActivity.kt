@@ -3,12 +3,16 @@ package com.topjohnwu.magisk.ui
 import android.Manifest
 import android.Manifest.permission.REQUEST_INSTALL_PACKAGES
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.ApplicationInfo
+import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.view.forEach
@@ -38,6 +42,7 @@ import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.magisk.view.Shortcuts
 import kotlinx.coroutines.launch
 import java.io.File
+import java.io.InputStream
 import com.topjohnwu.magisk.core.R as CoreR
 
 class MainViewModel : BaseViewModel()
@@ -75,6 +80,7 @@ class MainActivity : NavigationActivity<ActivityMainMd2Binding>(), SplashScreenH
     override fun onResume() {
         super.onResume()
         splashController.onResume()
+        loadBackground()
     }
 
     @SuppressLint("InlinedApi")
@@ -135,6 +141,32 @@ class MainActivity : NavigationActivity<ActivityMainMd2Binding>(), SplashScreenH
 
         if (!isRootFragment) {
             requestNavigationHidden(requiresAnimation = savedInstanceState == null)
+        }
+        
+        loadBackground()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == Const.ID.SELECT_IMAGE && resultCode == Activity.RESULT_OK && data != null) {
+            val uri = data.data ?: return
+            contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            Config.backgroundUri = uri.toString()
+            loadBackground()
+        }
+    }
+
+    private fun loadBackground() {
+        val uriString = Config.backgroundUri
+        if (uriString.isEmpty()) return
+        
+        try {
+            val uri = Uri.parse(uriString)
+            val inputStream: InputStream? = contentResolver.openInputStream(uri)
+            val drawable = Drawable.createFromStream(inputStream, uri.toString())
+            binding.root.background = drawable
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
