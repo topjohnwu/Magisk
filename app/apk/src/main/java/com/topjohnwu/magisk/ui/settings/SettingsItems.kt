@@ -63,7 +63,7 @@ object Theme : BaseSettingsItem.Blank() {
 }
 
 object Background : BaseSettingsItem.Blank() {
-    override val icon = R.drawable.ic_image
+    override val icon = R.drawable.ic_paint
     override val title = CoreR.string.settings_background_title.asText()
     override val description = CoreR.string.settings_background_summary.asText()
 }
