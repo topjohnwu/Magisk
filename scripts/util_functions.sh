@@ -1,3 +1,5 @@
+#!/system/bin/sh
+
 ############################################
 # Magisk General Utility Functions
 ############################################
@@ -43,13 +45,13 @@ grep_cmdline() {
 grep_prop() {
   local REGEX="s/^$1=//p"
   shift
-  local FILES=$@
+  local FILES="$*"
   [ -z "$FILES" ] && FILES='/system/build.prop'
   cat $FILES 2>/dev/null | dos2unix | sed -n "$REGEX" | head -n 1
 }
 
 grep_get_prop() {
-  local result=$(grep_prop $@)
+  local result=$(grep_prop "$@")
   if [ -z "$result" ]; then
     # Fallback to getprop
     getprop "$1"
@@ -103,7 +105,8 @@ setup_flashable() {
   $BOOTMODE && return
   if [ -z $OUTFD ] || readlink /proc/$$/fd/$OUTFD | grep -q /tmp; then
     # We will have to manually find out OUTFD
-    for FD in $(ls /proc/$$/fd); do
+    for FD in /proc/$$/fd/*; do
+      FD="${FD##*/}"
       if readlink /proc/$$/fd/$FD | grep -q pipe; then
         if ps | grep -v grep | grep -qE " 3 $FD |status_fd=$FD"; then
           OUTFD=$FD
