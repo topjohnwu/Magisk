@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import glob
+import hashlib
 import multiprocessing
 import os
 import platform
@@ -81,6 +82,13 @@ default_targets = support_targets - {"resetprop"}
 rust_targets = default_targets.copy()
 clean_targets = {"native", "cpp", "rust", "app"}
 ondk_version = "r29.5"
+ondk_archive_sha256 = {
+    "r29.5": {
+        "darwin": "44d131e19e87c8a42b686eff7f1826f59b1ede80ae445e3e6c808bdbff6a6cca",
+        "linux": "8dac26853af704692e8804e752df55ed070e7a5d9619a2c1095aecb3b84c6741",
+        "windows": "ead769d9e831648e662fcf6533670546f545ed121b68389d1fa9a80744a01e81",
+    }
+}
 
 # Global vars
 config = {}
@@ -581,16 +589,41 @@ def setup_ndk():
     ensure_paths()
     url = f"https://github.com/topjohnwu/ondk/releases/download/{ondk_version}/ondk-{ondk_version}-{os_name}.tar.xz"
     ndk_archive = url.split("/")[-1]
+    expected_sha256 = ondk_archive_sha256.get(ondk_version, {}).get(os_name)
     ondk_path = Path(ndk_root, f"ondk-{ondk_version}")
+    dl_file = Path(ndk_root, f"{ndk_archive}.download")
 
-    header(f"* Downloading and extracting {ndk_archive}")
+    if not expected_sha256:
+        error(f"Missing SHA-256 for ONDK {ondk_version} on {os_name}")
+
+    header(f"* Downloading, verifying, and extracting {ndk_archive}")
     rm_rf(ondk_path)
+    rm_rf(dl_file)
     with urllib.request.urlopen(url) as response:
-        with tarfile.open(mode="r|xz", fileobj=response) as tar:
+        hasher = hashlib.sha256()
+        with open(dl_file, "wb") as tar_xz:
+            while True:
+                chunk = response.read(1024 * 1024)
+                if len(chunk) == 0:
+                    break
+                hasher.update(chunk)
+                tar_xz.write(chunk)
+        digest = hasher.hexdigest()
+
+    if digest != expected_sha256:
+        rm_rf(dl_file)
+        error(
+            f"SHA-256 mismatch for {ndk_archive}: expected {expected_sha256}, got {digest}"
+        )
+
+    try:
+        with tarfile.open(dl_file, mode="r:xz") as tar:
             if hasattr(tarfile, "data_filter"):
                 tar.extractall(ndk_root, filter="tar")
             else:
                 tar.extractall(ndk_root)
+    finally:
+        rm_rf(dl_file)
 
     rm_rf(ndk_path)
     mv(ondk_path, ndk_path)
