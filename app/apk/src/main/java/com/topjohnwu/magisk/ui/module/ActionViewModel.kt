@@ -24,6 +24,8 @@ import java.io.IOException
 
 class ActionViewModel : BaseViewModel() {
 
+    private fun shellQuote(arg: String): String = "'${arg.replace("'", "'\"'\"'")}'"
+
     enum class State {
         RUNNING, SUCCESS, FAILED
     }
@@ -46,7 +48,7 @@ class ActionViewModel : BaseViewModel() {
     fun startRunAction() = viewModelScope.launch {
         onResult(withContext(Dispatchers.IO) {
             try {
-                Shell.cmd("run_action \'${args.id}\'")
+                Shell.cmd("run_action ${shellQuote(args.id)}")
                     .to(outItems, logItems)
                     .exec().isSuccess
             } catch (e: IOException) {
