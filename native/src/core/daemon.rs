@@ -173,7 +173,7 @@ impl MagiskD {
 
     #[cfg(not(feature = "check-client"))]
     fn is_client(&self, pid: i32) -> bool {
-        true
+        false
     }
 
     fn handle_requests(&'static self, mut client: UnixStream) {

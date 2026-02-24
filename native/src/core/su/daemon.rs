@@ -288,6 +288,6 @@ impl MagiskD {
 
     #[cfg(not(feature = "su-check-db"))]
     fn build_su_info(&self, uid: i32) -> Arc<SuInfo> {
-        Arc::new(SuInfo::allow(uid))
+        Arc::new(SuInfo::deny(uid))
     }
 }
