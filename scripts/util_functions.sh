@@ -61,10 +61,21 @@ grep_get_prop() {
 getvar() {
   local VARNAME=$1
   local VALUE
+  local ESCAPED
   local PROPPATH='/data/.magisk /cache/.magisk'
+
+  case "$VARNAME" in
+    ''|*[!a-zA-Z0-9_]*)
+      return 1
+      ;;
+  esac
+
   [ ! -z $MAGISKTMP ] && PROPPATH="$MAGISKTMP/.magisk/config $PROPPATH"
-  VALUE=$(grep_prop $VARNAME $PROPPATH)
-  [ ! -z $VALUE ] && eval $VARNAME=\$VALUE
+  VALUE=$(grep_prop "$VARNAME" $PROPPATH)
+  [ -z "$VALUE" ] && return 0
+
+  ESCAPED=$(printf '%s' "$VALUE" | sed "s/'/'\\\\''/g")
+  eval "$VARNAME='$ESCAPED'"
 }
 
 is_mounted() {
