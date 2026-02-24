@@ -624,6 +624,19 @@ mktouch() {
   chmod 644 $1
 }
 
+resolve_module_target() {
+  local ROOT="$1"
+  local TARGET="$2"
+  local REL="${TARGET#/}"
+
+  case "$REL" in
+    ''|/*|*'//'*) return 1;;
+    ..|../*|*/../*|*/..) return 1;;
+  esac
+
+  printf '%s/%s' "$ROOT" "$REL"
+}
+
 boot_actions() { return; }
 
 # Require ZIPFILE to be set
@@ -713,14 +726,24 @@ install_module() {
 
   # Handle replace folders
   for TARGET in $REPLACE; do
+    local TARGET_PATH
     ui_print "- Replace target: $TARGET"
-    mktouch $MODPATH$TARGET/.replace
+    TARGET_PATH=$(resolve_module_target "$MODPATH" "$TARGET") || {
+      ui_print "! Invalid replace target: $TARGET"
+      continue
+    }
+    mktouch "$TARGET_PATH/.replace"
   done
 
   for TARGET in $REMOVE; do
+    local TARGET_PATH
     ui_print "- Remove target: $TARGET"
-    mkdir -p $(dirname $MODPATH$TARGET) 2>/dev/null
-    mknod $MODPATH$TARGET c 0 0
+    TARGET_PATH=$(resolve_module_target "$MODPATH" "$TARGET") || {
+      ui_print "! Invalid remove target: $TARGET"
+      continue
+    }
+    mkdir -p "$(dirname "$TARGET_PATH")" 2>/dev/null
+    mknod "$TARGET_PATH" c 0 0
   done
 
   if $BOOTMODE; then
