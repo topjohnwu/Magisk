@@ -20,6 +20,7 @@ open class FlashZip(
     private val console: MutableList<String>,
     private val logs: MutableList<String>
 ) {
+    private fun shellQuote(arg: String): String = "'${arg.replace("'", "'\"'\"'")}'"
 
     private val installDir = File(AppContext.cacheDir, "flash")
     private lateinit var zipFile: File
@@ -46,8 +47,8 @@ open class FlashZip(
             }
         }
 
+        val binary = File(installDir, "update-binary")
         try {
-            val binary = File(installDir, "update-binary")
             AppContext.assets.open("module_installer.sh").use { it.writeTo(binary) }
         } catch (e: IOException) {
             console.add("! Unzip error")
@@ -56,7 +57,9 @@ open class FlashZip(
 
         console.add("- Installing ${mUri.displayName}")
 
-        return Shell.cmd("sh $installDir/update-binary dummy 1 \'$zipFile\'")
+        return Shell.cmd(
+            "sh ${shellQuote(binary.path)} dummy 1 ${shellQuote(zipFile.path)}"
+        )
             .to(console, logs).exec().isSuccess
     }
 
