@@ -123,7 +123,7 @@ interface LocaleSetting {
             names.add(AppContext.getString(R.string.system_default))
             tags.add("")
 
-            if (Build.VERSION.SDK_INT >= 34) {
+            if ((Build.VERSION.SDK_INT == 34 && !isRunningAsStub) || Build.VERSION.SDK_INT >= 35) {
                 // Use platform LocaleConfig parser
                 val config = localeConfig
                 val list = config.supportedLocales ?: LocaleList.getEmptyLocaleList()
@@ -168,7 +168,7 @@ interface LocaleSetting {
         }
 
         private val localeManagerUsable get() =
-            if (isRunningAsStub) Build.VERSION.SDK_INT >= 34 else Build.VERSION.SDK_INT >= 33
+            if (isRunningAsStub) Build.VERSION.SDK_INT >= 35 else Build.VERSION.SDK_INT >= 33
 
         val useLocaleManager by lazy {
             localeManagerUsable &&
