@@ -3,6 +3,7 @@ plugins {
     kotlin("plugin.parcelize")
     id("com.android.legacy-kapt")
     id("androidx.navigation.safeargs.kotlin")
+    alias(libs.plugins.compose.compiler)
 }
 
 setupMainApk()
@@ -19,6 +20,8 @@ kapt {
 android {
     buildFeatures {
         dataBinding = true
+        compose = true
+        buildConfig = true
     }
 
     compileOptions {
@@ -30,7 +33,11 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField("boolean", "COMPOSE_UI", "true")
+        }
         release {
+            buildConfigField("boolean", "COMPOSE_UI", "false")
             isMinifyEnabled = true
             isShrinkResources = true
         }
@@ -39,6 +46,7 @@ android {
 
 dependencies {
     implementation(project(":core"))
+    implementation(libs.foundation.layout)
     coreLibraryDesugaring(libs.jdk.libs)
 
     implementation(libs.indeterminate.checkbox)
@@ -56,6 +64,21 @@ dependencies {
     implementation(libs.fragment.ktx)
     implementation(libs.appcompat)
     implementation(libs.material)
+
+    implementation(libs.core.ktx)
+    implementation(libs.activity.compose)
+    implementation(libs.navigation.compose)
+    implementation(libs.lifecycle.viewmodel.compose)
+    implementation(libs.compose.ui)
+    implementation(libs.compose.foundation)
+    implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.compose.material.icons)
+    implementation(libs.material3)
+    implementation(libs.material3windowsize)
+    implementation(libs.material3adaptivenavigation)
+    implementation(libs.coil.compose)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.moshi)
 
     // Make sure kapt runs with a proper kotlin-stdlib
     kapt(kotlin("stdlib"))

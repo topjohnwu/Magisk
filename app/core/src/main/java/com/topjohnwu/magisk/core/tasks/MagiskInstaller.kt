@@ -197,6 +197,17 @@ abstract class MagiskInstallImpl protected constructor(
     private suspend fun InputStream.copyAndCloseOut(out: OutputStream) =
         out.use { copyAll(it, 1024 * 1024) }
 
+    private fun InputStream.readFully(buffer: ByteArray): Boolean {
+        var offset = 0
+        while (offset < buffer.size) {
+            val read = read(buffer, offset, buffer.size - offset)
+            if (read < 0) return false
+            if (read == 0) continue
+            offset += read
+        }
+        return true
+    }
+
     private class NoAvailableStream(s: InputStream) : FilterInputStream(s) {
         // Make sure available is never called on the actual stream and always return 0
         // to reduce max buffer size and avoid OOM
@@ -380,20 +391,25 @@ abstract class MagiskInstallImpl protected constructor(
             try {
                 val bufSize = 1024 * 1024
                 val buf = ByteBuffer.allocate(bufSize)
-                buf.position(input.read(buf.array()).coerceAtLeast(0)).flip()
-                while (buf.hasRemaining()) {
-                    try {
-                        Os.write(fd, buf)
-                    } catch (e: ErrnoException) {
-                        if (e.errno != OsConstants.EPIPE)
-                            throw e
-                        // If SIGPIPE, then the other side is closed, we're done
-                        break
+                var pipeClosed = false
+                while (true) {
+                    val read = input.read(buf.array())
+                    if (read < 0) break
+                    if (read == 0) continue
+                    buf.clear()
+                    buf.limit(read)
+                    while (buf.hasRemaining()) {
+                        try {
+                            Os.write(fd, buf)
+                        } catch (e: ErrnoException) {
+                            if (e.errno != OsConstants.EPIPE)
+                                throw e
+                            // If SIGPIPE, then the other side is closed, we're done
+                            pipeClosed = true
+                            break
+                        }
                     }
-                    if (!buf.hasRemaining()) {
-                        buf.limit(bufSize)
-                        buf.position(input.read(buf.array()).coerceAtLeast(0)).flip()
-                    }
+                    if (pipeClosed) break
                 }
             } finally {
                 Os.close(fd)
@@ -435,7 +451,7 @@ abstract class MagiskInstallImpl protected constructor(
         try {
             PushbackInputStream(uri.inputStream().buffered(1024 * 1024), 512).use { src ->
                 val head = ByteArray(512)
-                if (src.read(head) != head.size) {
+                if (!src.readFully(head)) {
                     console.add("! Invalid input file")
                     return false
                 }

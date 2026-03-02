@@ -7,7 +7,6 @@ enum class Theme(
     val themeName: String,
     val themeRes: Int
 ) {
-
     Piplup(
         themeName = "Piplup",
         themeRes = R.style.ThemeFoundationMD2_Piplup
@@ -39,12 +38,16 @@ enum class Theme(
     Fraxure(
         themeName = "Fraxure (Legacy)",
         themeRes = R.style.ThemeFoundationMD2_Fraxure
+    ),
+    Default(
+        themeName = "Default (Dynamic)",
+        themeRes = R.style.ThemeFoundationMD2_Default
     );
 
-    val isSelected get() = Config.themeOrdinal == ordinal
+    val isSelected get() = selected == this
 
     companion object {
-        val selected get() = values().getOrNull(Config.themeOrdinal) ?: Piplup
+        val selected get() = values().getOrNull(Config.themeOrdinal) ?: Default
     }
 
 }

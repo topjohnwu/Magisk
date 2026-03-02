@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Monet dynamic splash color on Android 12+ (light mode) -->
+    <color name="splash_background">@android:color/system_accent1_100</color>
+</resources>

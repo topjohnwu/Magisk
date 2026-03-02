@@ -76,7 +76,12 @@ class JobService : BaseJobService() {
     private fun checkUpdate(params: JobParameters): Boolean {
         GlobalScope.launch(Dispatchers.IO) {
             Info.fetchUpdate(ServiceLocator.networkService)?.let {
-                if (Info.env.isActive && BuildConfig.APP_VERSION_CODE < it.versionCode)
+                val hasMagiskUpdate = when {
+                    Info.isRooted && Info.env.isUnsupported -> true
+                    Info.env.isActive -> Info.env.versionCode < it.versionCode
+                    else -> false
+                }
+                if (hasMagiskUpdate)
                     Notifications.updateAvailable()
                 jobFinished(params, false)
             }

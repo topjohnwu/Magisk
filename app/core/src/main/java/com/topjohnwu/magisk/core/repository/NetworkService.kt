@@ -77,19 +77,25 @@ class NetworkService(
     private inline fun Release.asPublicInfo(selector: (ReleaseAssets) -> Boolean): UpdateInfo {
         val version = tag.drop(1)
         val date = dateFormat.format(createdTime)
+        val apk = assets.find(selector)
+            ?: assets.find { it.name.endsWith(".apk", ignoreCase = true) }
+            ?: throw IllegalStateException("No APK asset found for release: $tag")
         return UpdateInfo(
             version = version,
             versionCode = versionCode,
-            link = assets.find(selector)!!.url,
+            link = apk.url,
             note = "## $date $name\n\n$body"
         )
     }
 
     private inline fun Release.asCanaryInfo(selector: (ReleaseAssets) -> Boolean): UpdateInfo {
+        val apk = assets.find(selector)
+            ?: assets.find { it.name.endsWith(".apk", ignoreCase = true) }
+            ?: throw IllegalStateException("No APK asset found for release: $tag")
         return UpdateInfo(
             version = name.substring(8, 16),
             versionCode = versionCode,
-            link = assets.find(selector)!!.url,
+            link = apk.url,
             note = "## $name\n\n$body"
         )
     }
@@ -103,7 +109,10 @@ class NetworkService(
     private suspend fun fetchBetaUpdate() = findRelease { true }.asInfo()
 
     private suspend fun fetchDebugUpdate() =
-        findRelease { true }.asInfo { it.name == "app-debug.apk" }
+        findRelease { true }.asInfo {
+            it.name.endsWith(".apk", ignoreCase = true) &&
+                it.name.contains("debug", ignoreCase = true)
+        }
 
     private suspend fun fetchCustomUpdate(url: String): UpdateInfo {
         val info = raw.fetchUpdateJson(url).magisk

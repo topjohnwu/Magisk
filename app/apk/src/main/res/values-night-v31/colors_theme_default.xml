@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="theme_default_primary">@android:color/system_accent1_800</color>
+    <color name="theme_default_primary_variant">@android:color/system_accent1_600</color>
+    <color name="theme_default_secondary">@android:color/system_accent2_800</color>
+    <color name="theme_default_secondary_variant">@android:color/system_accent2_600</color>
+    <color name="theme_default_surface">@android:color/system_neutral1_100</color>
+    <color name="theme_default_surface_variant">@android:color/system_neutral1_200</color>
+    <color name="theme_default_surface_surface_variant">@android:color/system_neutral2_300</color>
+    <color name="theme_default_on_primary">@android:color/system_accent1_200</color>
+    <color name="theme_default_on_primary_variant">@android:color/system_accent1_300</color>
+    <color name="theme_default_on_secondary">@android:color/system_accent2_200</color>
+    <color name="theme_default_on_background">@android:color/system_neutral1_900</color>
+    <color name="theme_default_error">@android:color/system_error_800</color>
+    <color name="theme_default_on_error">@android:color/system_error_200</color>
+    <color name="theme_default_on_surface">@android:color/system_neutral1_900</color>
+    <color name="theme_default_on_surface_variant">@android:color/system_neutral2_700</color>
+    <color name="theme_default_disabled">@android:color/system_neutral2_500</color>
+    <color name="theme_default_disabled_variant">@android:color/system_neutral2_400</color>
+</resources>

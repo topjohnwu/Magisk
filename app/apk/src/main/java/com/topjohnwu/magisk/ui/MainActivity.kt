@@ -10,6 +10,8 @@ import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.view.forEach
 import androidx.core.view.isGone
@@ -22,6 +24,7 @@ import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.arch.NavigationActivity
 import com.topjohnwu.magisk.arch.startAnimations
 import com.topjohnwu.magisk.arch.viewModel
+import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
@@ -33,6 +36,7 @@ import com.topjohnwu.magisk.core.model.module.LocalModule
 import com.topjohnwu.magisk.core.tasks.AppMigration
 import com.topjohnwu.magisk.databinding.ActivityMainMd2Binding
 import com.topjohnwu.magisk.ui.home.HomeFragmentDirections
+import com.topjohnwu.magisk.ui.compose.MagiskAppContainer
 import com.topjohnwu.magisk.ui.theme.Theme
 import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.magisk.view.Shortcuts
@@ -50,11 +54,17 @@ class MainActivity : NavigationActivity<ActivityMainMd2Binding>(), SplashScreenH
     override val splashController = SplashController(this)
     override val snackbarView: View
         get() {
+            if (!binded) {
+                return window.decorView
+            }
             val fragmentOverride = currentFragment?.snackbarView
             return fragmentOverride ?: super.snackbarView
         }
     override val snackbarAnchorView: View?
         get() {
+            if (!binded) {
+                return null
+            }
             val fragmentAnchor = currentFragment?.snackbarAnchorView
             return when {
                 fragmentAnchor?.isVisible == true -> fragmentAnchor
@@ -79,6 +89,37 @@ class MainActivity : NavigationActivity<ActivityMainMd2Binding>(), SplashScreenH
 
     @SuppressLint("InlinedApi")
     override fun onCreateUi(savedInstanceState: Bundle?) {
+        val section =
+            if (intent.action == Intent.ACTION_APPLICATION_PREFERENCES)
+                Const.Nav.SETTINGS
+            else
+                intent.getStringExtra(Const.Key.OPEN_SECTION)
+        if (BuildConfig.COMPOSE_UI) {
+            showUnsupportedMessage()
+            askForHomeShortcut()
+
+            // Ask permission to post notifications for background update check
+            if (Config.checkUpdate) {
+                withPermission(Manifest.permission.POST_NOTIFICATIONS) {
+                    Config.checkUpdate = it
+                }
+            }
+
+            setContent {
+                val darkMode = when (Config.darkTheme) {
+                    AppCompatDelegate.MODE_NIGHT_YES -> true
+                    AppCompatDelegate.MODE_NIGHT_NO -> false
+                    else -> androidx.compose.foundation.isSystemInDarkTheme()
+                }
+                MagiskAppContainer(
+                    useDynamicColor = Theme.selected == Theme.Default,
+                    darkTheme = darkMode,
+                    openSection = section
+                )
+            }
+            return
+        }
+
         setContentView()
         showUnsupportedMessage()
         askForHomeShortcut()
@@ -125,12 +166,6 @@ class MainActivity : NavigationActivity<ActivityMainMd2Binding>(), SplashScreenH
             findItem(R.id.modulesFragment)?.isEnabled = Info.env.isActive && LocalModule.loaded()
         }
 
-        val section =
-            if (intent.action == Intent.ACTION_APPLICATION_PREFERENCES)
-                Const.Nav.SETTINGS
-            else
-                intent.getStringExtra(Const.Key.OPEN_SECTION)
-
         getScreen(section)?.navigate()
 
         if (!isRootFragment) {
@@ -140,7 +175,7 @@ class MainActivity : NavigationActivity<ActivityMainMd2Binding>(), SplashScreenH
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            android.R.id.home -> onBackPressed()
+            android.R.id.home -> onBackPressedDispatcher.onBackPressed()
             else -> return super.onOptionsItemSelected(item)
         }
         return true
@@ -276,3 +311,5 @@ class MainActivity : NavigationActivity<ActivityMainMd2Binding>(), SplashScreenH
         }
     }
 }
+
+

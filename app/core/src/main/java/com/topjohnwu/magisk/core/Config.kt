@@ -106,7 +106,8 @@ object Config : PreferenceConfig, DBConfig {
 
     var safetyNotice by preference(Key.SAFETY, true)
     var darkTheme by preference(Key.DARK_THEME, -1)
-    var themeOrdinal by preference(Key.THEME_ORDINAL, 0)
+    // Keep a sentinel as default so Theme.selected can route to the dynamic default theme.
+    var themeOrdinal by preference(Key.THEME_ORDINAL, -1)
 
     private var checkUpdatePrefs by preference(Key.CHECK_UPDATES, true)
     private var localePrefs by preference(Key.LOCALE, "")

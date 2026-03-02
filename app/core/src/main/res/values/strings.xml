@@ -24,8 +24,28 @@
     <string name="home_follow_title">Follow Us</string>
     <string name="home_item_source">Source</string>
     <string name="home_support_content">Magisk is, and always will be, free, and open source. However, you can show us that you care by making a donation.</string>
+    <string name="home_section_magisk_core">Magisk Core</string>
+    <string name="home_section_application">Application</string>
     <string name="home_installed_version">Installed</string>
     <string name="home_latest_version">Latest</string>
+    <string name="home_version">Version</string>
+    <string name="home_channel">Channel</string>
+    <string name="home_section_contributors">Contributors</string>
+    <string name="home_status_ready">Magisk is ready</string>
+    <string name="home_status_inactive">Magisk inactive</string>
+    <string name="home_status_ready_subtitle">System modified and secured</string>
+    <string name="home_status_inactive_subtitle">Follow the guide to install</string>
+    <string name="home_ramdisk">Ramdisk</string>
+    <string name="home_state_up_to_date">UP TO DATE</string>
+    <string name="home_state_update_ready">UPDATE READY</string>
+    <string name="home_state_inactive">INACTIVE</string>
+    <string name="home_update_magisk">Update Magisk</string>
+    <string name="home_maintain">Maintain</string>
+    <string name="home_update_app_now">Update app now</string>
+    <string name="home_reinstall_app">Reinstall app</string>
+    <string name="home_uninstall_environment">Uninstall Magisk Environment</string>
+    <string name="uninstall_restore_images_subtitle">Restore stock boot images</string>
+    <string name="uninstall_complete_subtitle">Completely remove Magisk</string>
     <string name="invalid_update_channel">Invalid update channel</string>
     <string name="uninstall_magisk_title">Uninstall Magisk</string>
     <string name="uninstall_magisk_msg">All modules will be disabled/removed!\nRoot will be removed!\nAny internal storage unencrypted through the use of Magisk will be re-encrypted!</string>
@@ -41,6 +61,10 @@
     <string name="manager_download_install">Press to download and install</string>
     <string name="direct_install">Direct install (Recommended)</string>
     <string name="install_inactive_slot">Install to inactive slot (After OTA)</string>
+    <string name="install_select_patch_file_subtitle">Select a boot image to patch</string>
+    <string name="install_direct_install_subtitle">Recommended for most users</string>
+    <string name="install_inactive_slot_subtitle">Useful after OTA updates</string>
+    <string name="install_complete_options_first">Please complete the options step first</string>
     <string name="install_inactive_slot_msg">Your device will be FORCED to boot to the current inactive slot after a reboot!\nOnly use this option after OTA is done.\nContinue?</string>
     <string name="setup_title">Additional setup</string>
     <string name="select_patch_file">Select and patch a file</string>
@@ -76,6 +100,7 @@
     <string name="none">None</string>
     <string name="superuser_toggle_notification">Notifications</string>
     <string name="superuser_toggle_revoke">Revoke</string>
+    <string name="superuser_logs">Superuser logs</string>
     <string name="superuser_policy_none">No apps have asked for Superuser permission yet.</string>
 
     <!--Logs-->
@@ -93,6 +118,7 @@
     <!--MagiskHide-->
     <string name="show_system_app">Show system apps</string>
     <string name="show_os_app">Show OS apps</string>
+    <string name="denylist_process_count">%1$d/%2$d processes</string>
     <string name="hide_filter_hint">Filter by name</string>
     <string name="hide_search">Search</string>
 
@@ -113,12 +139,18 @@
     <string name="suspend_text_riru">Module suspended because %1$s is enabled</string>
     <string name="suspend_text_zygisk">Module suspended because %1$s isn\'t enabled</string>
     <string name="zygisk_module_unloaded">Zygisk module not loaded due to incompatibility</string>
+    <string name="module_badge_update">UPDATE</string>
+    <string name="module_badge_updated">UPDATED</string>
+    <string name="module_badge_removing">REMOVING</string>
+    <string name="module_badge_disabled">DISABLED</string>
     <string name="module_empty">No module installed</string>
     <string name="confirm_install">Install module %1$s?</string>
     <string name="confirm_install_title">Install confirmation</string>
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Theme mode</string>
+    <string name="settings_section_personalization">Personalization</string>
+    <string name="settings_section_update_network">Update &amp; network</string>
     <string name="settings_dark_mode_message">Select mode which best suits your style!</string>
     <string name="settings_dark_mode_light">Always light</string>
     <string name="settings_dark_mode_system">Follow system</string>
@@ -131,8 +163,8 @@
     <string name="settings_restore_app_summary">Unhide the app and restore the original APK</string>
     <string name="language">Language</string>
     <string name="system_default">(System default)</string>
-    <string name="settings_check_update_title">Check for updates</string>
-    <string name="settings_check_update_summary">Periodically check for updates in the background</string>
+    <string name="settings_check_update_title">Check for Magisk updates</string>
+    <string name="settings_check_update_summary">Periodically check for Magisk updates in the background</string>
     <string name="settings_update_channel_title">Update channel</string>
     <string name="settings_update_stable">Stable</string>
     <string name="settings_update_beta">Beta</string>
