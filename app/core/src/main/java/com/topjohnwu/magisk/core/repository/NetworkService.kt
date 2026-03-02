@@ -17,13 +17,33 @@ import com.topjohnwu.magisk.core.model.UpdateInfo
 import retrofit2.HttpException
 import timber.log.Timber
 import java.io.IOException
+import java.util.concurrent.TimeUnit
 
 class NetworkService(
     private val raw: RawUrl,
     private val api: GithubApiServices,
 ) {
+
+    private data class UpdateCache(
+        val value: UpdateInfo?,
+        val timestamp: Long,
+        val channel: Int,
+    )
+
+    private val cacheTtlMs = TimeUnit.MINUTES.toMillis(30)
+    private var updateCache: UpdateCache? = null
+    private val versionCache = mutableMapOf<Int, UpdateCache>()
+
+    private fun isCacheValid(cache: UpdateCache?, channel: Int): Boolean {
+        cache ?: return false
+        if (cache.channel != channel) return false
+        return System.currentTimeMillis() - cache.timestamp < cacheTtlMs
+    }
+
     suspend fun fetchUpdate() = safe {
-        var info = when (Config.updateChannel) {
+        val channel = Config.updateChannel
+        updateCache?.takeIf { isCacheValid(it, channel) }?.value ?: run {
+            var info = when (channel) {
             DEFAULT_CHANNEL -> if (BuildConfig.DEBUG) fetchDebugUpdate() else fetchStableUpdate()
             STABLE_CHANNEL -> fetchStableUpdate()
             BETA_CHANNEL -> fetchBetaUpdate()
@@ -31,18 +51,25 @@ class NetworkService(
             CUSTOM_CHANNEL -> fetchCustomUpdate(Config.customChannelUrl)
             else -> throw IllegalArgumentException()
         }
-        if (info.versionCode < Info.env.versionCode &&
-            Config.updateChannel == DEFAULT_CHANNEL &&
-            !BuildConfig.DEBUG
-        ) {
-            Config.updateChannel = BETA_CHANNEL
-            info = fetchBetaUpdate()
+            if (info.versionCode < Info.env.versionCode &&
+                channel == DEFAULT_CHANNEL &&
+                !BuildConfig.DEBUG
+            ) {
+                Config.updateChannel = BETA_CHANNEL
+                info = fetchBetaUpdate()
+            }
+            updateCache = UpdateCache(info, System.currentTimeMillis(), Config.updateChannel)
+            info
         }
-        info
     }
 
     suspend fun fetchUpdate(version: Int) = safe {
-        findRelease { it.versionCode == version }.asInfo()
+        val channel = Config.updateChannel
+        versionCache[version]?.takeIf { isCacheValid(it, channel) }?.value ?: run {
+            val info = findRelease { it.versionCode == version }.asInfo()
+            versionCache[version] = UpdateCache(info, System.currentTimeMillis(), channel)
+            info
+        }
     }
 
     // Keep going through all release pages until we find a match

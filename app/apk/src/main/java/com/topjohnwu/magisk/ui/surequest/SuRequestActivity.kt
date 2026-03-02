@@ -7,23 +7,37 @@ import android.os.Build
 import android.os.Bundle
 import android.view.Window
 import android.view.WindowManager
+import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.lifecycle.lifecycleScope
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.UIActivity
 import com.topjohnwu.magisk.arch.viewModel
+import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.core.base.UntrackedActivity
+import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.su.SuCallbackHandler
 import com.topjohnwu.magisk.core.su.SuCallbackHandler.REQUEST
 import com.topjohnwu.magisk.databinding.ActivityRequestBinding
+import com.topjohnwu.magisk.events.ShowUIEvent
 import com.topjohnwu.magisk.ui.theme.Theme
+import com.topjohnwu.magisk.ui.compose.surequest.SuRequestScreen
+import com.topjohnwu.magisk.ui.compose.surequest.suRequestColorScheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import com.topjohnwu.magisk.arch.ViewEvent
 
 open class SuRequestActivity : UIActivity<ActivityRequestBinding>(), UntrackedActivity {
 
     override val layoutRes: Int = R.layout.activity_request
     override val viewModel: SuRequestViewModel by viewModel()
+    private val useCompose = BuildConfig.COMPOSE_UI
+    private val composeVisible = mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -34,6 +48,31 @@ open class SuRequestActivity : UIActivity<ActivityRequestBinding>(), UntrackedAc
             window.setHideOverlayWindows(true)
         }
         setTheme(Theme.selected.themeRes)
+
+        if (useCompose) {
+            setContent {
+                val darkMode = when (Config.darkTheme) {
+                    AppCompatDelegate.MODE_NIGHT_YES -> true
+                    AppCompatDelegate.MODE_NIGHT_NO -> false
+                    else -> androidx.compose.foundation.isSystemInDarkTheme()
+                }
+                val dynamic = Theme.selected == Theme.Default
+                val scheme = suRequestColorScheme(useDynamicColor = dynamic, darkTheme = darkMode)
+
+                MaterialTheme(colorScheme = scheme) {
+                    val showUi by remember { composeVisible }
+                    SuRequestScreen(
+                        viewModel = viewModel,
+                        showContent = showUi,
+                        onTimeoutSelected = { viewModel.selectedItemPosition = it },
+                        onSpinnerTouched = { viewModel.spinnerTouched() },
+                        onGrant = { viewModel.grantPressed() },
+                        onDeny = { viewModel.denyPressed() }
+                    )
+                }
+            }
+        }
+
         super.onCreate(savedInstanceState)
 
         if (intent.action == Intent.ACTION_VIEW) {
@@ -65,5 +104,14 @@ open class SuRequestActivity : UIActivity<ActivityRequestBinding>(), UntrackedAc
 
     override fun finish() {
         super.finishAndRemoveTask()
+    }
+
+    override fun onEventDispatched(event: ViewEvent) {
+        if (useCompose && event is ShowUIEvent) {
+            setAccessibilityDelegate(event.delegate)
+            composeVisible.value = true
+            return
+        }
+        super.onEventDispatched(event)
     }
 }

@@ -23,6 +23,9 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -50,6 +53,7 @@ fun LogsScreen(
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val activity = LocalContext.current as? UIActivity<*>
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     LaunchedEffect(Unit) { viewModel.refresh() }
     LaunchedEffect(state.message) {
@@ -57,6 +61,14 @@ fun LogsScreen(
             snackbarHostState.showSnackbar(msg)
             viewModel.consumeMessage()
         }
+    }
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) viewModel.refresh()
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -165,7 +177,7 @@ class LogsComposeViewModel(private val repo: LogRepository) : ViewModel() {
 
     fun clearMagiskLogs() {
         repo.clearMagiskLogs {
-            postMessageText("Logs cleared")
+            postMessageText(AppContext.getString(CoreR.string.logs_cleared))
             refresh()
         }
     }
@@ -179,7 +191,8 @@ class LogsComposeViewModel(private val repo: LogRepository) : ViewModel() {
                 logFile.toString()
             }
             withContext(Dispatchers.Main) {
-                result.onSuccess { postMessageText("Saved to: $it") }.onFailure { postMessageText("Save failed") }
+                result.onSuccess { postMessageText(AppContext.getString(CoreR.string.saved_to_path, it)) }
+                    .onFailure { postMessageText(AppContext.getString(CoreR.string.failure)) }
             }
         }
     }

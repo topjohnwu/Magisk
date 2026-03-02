@@ -38,7 +38,7 @@ class DieEvent : ViewEvent(), ActivityExecutor {
     }
 }
 
-class ShowUIEvent(private val delegate: View.AccessibilityDelegate?)
+class ShowUIEvent(val delegate: View.AccessibilityDelegate?)
     : ViewEvent(), ActivityExecutor {
     override fun invoke(activity: UIActivity<*>) {
         activity.setContentView()

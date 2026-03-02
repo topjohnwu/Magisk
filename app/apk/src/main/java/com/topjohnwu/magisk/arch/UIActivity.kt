@@ -104,7 +104,11 @@ abstract class UIActivity<Binding : ViewDataBinding>
     }
 
     fun setAccessibilityDelegate(delegate: View.AccessibilityDelegate?) {
-        binding.root.rootView.accessibilityDelegate = delegate
+        if (binded) {
+            binding.root.rootView.accessibilityDelegate = delegate
+        } else {
+            window?.decorView?.rootView?.accessibilityDelegate = delegate
+        }
     }
 
     fun showSnackbar(

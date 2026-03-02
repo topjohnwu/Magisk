@@ -9,8 +9,9 @@ okhttp = "5.3.2"
 retrofit = "3.0.0"
 room = "2.8.4"
 foundationLayout = "1.10.4"
-material3 = "1.4.0"
 coil = "2.7.0"
+material3 = "1.4.0"
+uiGraphics = "1.10.3"
 
 [libraries]
 bcpkix = { module = "org.bouncycastle:bcpkix-jdk18on", version = "1.83" }
@@ -82,6 +83,8 @@ navigation-safe-args-plugin = { module = "androidx.navigation:navigation-safe-ar
 lsparanoid-plugin = { module = "org.lsposed.lsparanoid:gradle-plugin", version = "0.6.0" }
 moshi-plugin = { module = "dev.zacsweers.moshix:dev.zacsweers.moshix.gradle.plugin", version = "0.34.4" }
 foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayout" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
+androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics", version.ref = "uiGraphics" }
 
 [plugins]
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

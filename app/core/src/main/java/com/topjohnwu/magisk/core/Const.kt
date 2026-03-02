@@ -40,6 +40,7 @@ object Const {
 
     object Url {
         const val PATREON_URL = "https://www.patreon.com/topjohnwu"
+        const val PAYPAL_URL = "https://www.paypal.me/topjohnwu"
         const val SOURCE_CODE_URL = "https://github.com/topjohnwu/Magisk"
 
         const val GITHUB_API_URL = "https://api.github.com/"

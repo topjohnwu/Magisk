@@ -47,6 +47,8 @@ android {
 dependencies {
     implementation(project(":core"))
     implementation(libs.foundation.layout)
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.ui.graphics)
     coreLibraryDesugaring(libs.jdk.libs)
 
     implementation(libs.indeterminate.checkbox)

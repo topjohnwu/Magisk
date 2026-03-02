@@ -9,6 +9,11 @@
     <string name="section_home">Home</string>
     <string name="section_theme">Themes</string>
     <string name="denylist">DenyList</string>
+    <string name="modules_search_placeholder">Search modules</string>
+    <string name="modules_show_actions">Show actions</string>
+    <string name="modules_hide_actions">Hide actions</string>
+    <string name="modules_refresh">Refresh</string>
+    <string name="modules_no_results">No modules match your search</string>
 
     <!--Home-->
     <string name="no_connection">No connection available</string>
@@ -277,5 +282,6 @@
     <string name="app_not_found">No app found to handle this action</string>
     <string name="reboot_apply_change">Reboot to apply changes</string>
     <string name="restore_app_confirmation">This will restore the hidden app back to the original app. Do you really want to do this?</string>
+    <string name="saved_to_path">Saved to: %1$s</string>
 
 </resources>

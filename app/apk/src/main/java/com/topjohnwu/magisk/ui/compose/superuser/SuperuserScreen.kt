@@ -38,6 +38,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.drawable.toBitmap
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -68,12 +71,21 @@ fun SuperuserScreen(
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     var pendingRevoke by remember { mutableStateOf<PolicyUiItem?>(null) }
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     LaunchedEffect(state.message) {
         state.message?.let { msg ->
             snackbarHostState.showSnackbar(msg)
             viewModel.consumeMessage()
         }
+    }
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) viewModel.reload()
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -333,7 +345,11 @@ private fun StylishMagiskPolicyCard(
                                 shape = RoundedCornerShape(8.dp)
                             ) {
                                 Text(
-                                    text = if (isAllowed) "AUTHORIZED" else if (item.policy == SuPolicy.RESTRICT) "RESTRICTED" else "DENIED",
+                                    text = when {
+                                        isAllowed -> AppContext.getString(CoreR.string.grant)
+                                        item.policy == SuPolicy.RESTRICT -> AppContext.getString(CoreR.string.restrict)
+                                        else -> AppContext.getString(CoreR.string.deny)
+                                    },
                                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
                                     style = MaterialTheme.typography.labelSmall,
                                     color = statusColor,
@@ -381,14 +397,14 @@ private fun StylishMagiskPolicyCard(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            ExpressiveActionPill(Icons.Rounded.Notifications, "Notify", item.notification, onToggleNotify, Modifier.weight(1f))
-                            ExpressiveActionPill(Icons.Rounded.BugReport, "Logs", item.logging, onToggleLog, Modifier.weight(1f))
-                            ExpressiveActionPill(Icons.Rounded.Delete, "Revoke", false, onRevoke, Modifier.weight(1f), isError = true)
+                            ExpressiveActionPill(Icons.Rounded.Notifications, AppContext.getString(CoreR.string.superuser_toggle_notification), item.notification, onToggleNotify, Modifier.weight(1f))
+                            ExpressiveActionPill(Icons.Rounded.BugReport, AppContext.getString(CoreR.string.superuser_logs), item.logging, onToggleLog, Modifier.weight(1f))
+                            ExpressiveActionPill(Icons.Rounded.Delete, AppContext.getString(CoreR.string.superuser_toggle_revoke), false, onRevoke, Modifier.weight(1f), isError = true)
                         }
                         
                         Spacer(Modifier.height(16.dp))
                         Text(
-                            text = "Package: ${item.packageName}",
+                            text = AppContext.getString(CoreR.string.home_package) + ": ${item.packageName}",
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                             modifier = Modifier.fillMaxWidth(),

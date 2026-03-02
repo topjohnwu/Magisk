@@ -53,6 +53,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Collections
 import com.topjohnwu.magisk.core.R as CoreR
 
@@ -196,7 +197,7 @@ private class ModuleActionComposeViewModel : ViewModel() {
     fun start(actionId: String, actionName: String) {
         if (started) return
         started = true
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             _state.update { it.copy(running = true, success = false) }
             val success = runCatching {
                 Shell.cmd("run_action ${shellQuote(actionId)}")
@@ -204,12 +205,14 @@ private class ModuleActionComposeViewModel : ViewModel() {
                     .exec()
                     .isSuccess
             }.getOrDefault(false)
-            _state.update {
-                it.copy(
-                    running = false,
-                    success = success,
-                    message = if (success) AppContext.getString(CoreR.string.done_action, actionName) else it.message
-                )
+            withContext(Dispatchers.Main) {
+                _state.update {
+                    it.copy(
+                        running = false,
+                        success = success,
+                        message = if (success) AppContext.getString(CoreR.string.done_action, actionName) else it.message
+                    )
+                }
             }
         }
     }

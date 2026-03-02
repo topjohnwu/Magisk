@@ -31,6 +31,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -63,6 +66,7 @@ fun SuperuserLogsScreen(
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val activity = LocalContext.current as? UIActivity<*>
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     LaunchedEffect(Unit) { viewModel.refresh() }
     LaunchedEffect(state.message) {
@@ -70,6 +74,14 @@ fun SuperuserLogsScreen(
             snackbarHostState.showSnackbar(msg)
             viewModel.consumeMessage()
         }
+    }
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) viewModel.refresh()
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -196,7 +208,7 @@ private fun TimelineLogItem(index: Int, total: Int, item: SuLogUiItem) {
                             shape = RoundedCornerShape(8.dp)
                         ) {
                             Text(
-                                text = if (item.allowed) "GRANTED" else "DENIED",
+                                text = if (item.allowed) AppContext.getString(CoreR.string.grant) else AppContext.getString(CoreR.string.deny),
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = if (item.allowed) Color(0xFF4CAF50) else MaterialTheme.colorScheme.error,
@@ -269,7 +281,7 @@ class SuperuserLogsComposeViewModel(private val repo: LogRepository) : ViewModel
                 logFile.uri.toString()
             }
             withContext(Dispatchers.Main) {
-                result.onSuccess { path -> _state.update { it.copy(message = "Saved to: $path") } }
+                result.onSuccess { path -> _state.update { it.copy(message = AppContext.getString(CoreR.string.saved_to_path, path)) } }
                       .onFailure { _state.update { it.copy(message = AppContext.getString(CoreR.string.failure)) } }
             }
         }
