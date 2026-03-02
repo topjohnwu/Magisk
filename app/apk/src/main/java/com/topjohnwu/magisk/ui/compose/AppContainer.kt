@@ -76,6 +76,7 @@ fun MagiskAppContainer(
                 if (Info.isRooted && Info.env.isActive) add(AppDestination.Modules)
                 if (Info.showSuperUser) add(AppDestination.Superuser)
                 add(AppDestination.Logs)
+                add(AppDestination.Settings)
             }
         }
         val rootRoutes = rootDestinations.map { it.route }.toSet()
@@ -103,7 +104,7 @@ fun MagiskAppContainer(
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             topBar = {
-                // Fissa e strutturale: occupa spazio ma ha l'effetto vetro
+                // Fissa strutturale: occupa il suo spazio in alto
                 MagiskFloatingTopBar(
                     currentRoute = currentRoute,
                     currentRoot = currentRoot,
@@ -119,7 +120,7 @@ fun MagiskAppContainer(
         ) { paddingValues ->
             Box(modifier = Modifier
                 .fillMaxSize()
-                .padding(top = paddingValues.calculateTopPadding())) { // Usa il padding dello Scaffold
+                .padding(top = paddingValues.calculateTopPadding())) { // Gestione spazio Top Bar
                 
                 NavHost(
                     navController = navController, 
@@ -129,28 +130,40 @@ fun MagiskAppContainer(
                         if (initialState.destination.route in rootRoutes && targetState.destination.route in rootRoutes) {
                             fadeIn(tween(400)) + scaleIn(initialScale = 0.92f, animationSpec = tween(400, easing = EaseOutQuart))
                         } else {
-                            slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Start, tween(450, easing = EaseInOutQuart)) + fadeIn(tween(300))
+                            slideIntoContainer(
+                                AnimatedContentTransitionScope.SlideDirection.Start, 
+                                animationSpec = tween(500, easing = EaseOutQuart)
+                            ) + fadeIn(animationSpec = tween(300))
                         }
                     },
                     exitTransition = {
                         if (initialState.destination.route in rootRoutes && targetState.destination.route in rootRoutes) {
                             fadeOut(tween(300)) + scaleOut(targetScale = 0.95f, animationSpec = tween(300))
                         } else {
-                            slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Start, tween(450, easing = EaseInOutQuart)) + fadeOut(tween(300))
+                            slideOutOfContainer(
+                                AnimatedContentTransitionScope.SlideDirection.Start, 
+                                animationSpec = tween(500, easing = EaseOutQuart)
+                            ) + fadeOut(animationSpec = tween(300))
                         }
                     },
                     popEnterTransition = {
                         if (initialState.destination.route in rootRoutes && targetState.destination.route in rootRoutes) {
                             fadeIn(tween(400)) + scaleIn(initialScale = 0.92f, animationSpec = tween(400, easing = EaseOutQuart))
                         } else {
-                            slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.End, tween(450, easing = EaseInOutQuart)) + fadeIn(tween(300))
+                            slideIntoContainer(
+                                AnimatedContentTransitionScope.SlideDirection.End, 
+                                animationSpec = tween(500, easing = EaseOutQuart)
+                            ) + fadeIn(animationSpec = tween(300))
                         }
                     },
                     popExitTransition = {
                         if (initialState.destination.route in rootRoutes && targetState.destination.route in rootRoutes) {
                             fadeOut(tween(300)) + scaleOut(targetScale = 0.95f, animationSpec = tween(300))
                         } else {
-                            slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.End, tween(450, easing = EaseInOutQuart)) + fadeOut(tween(300))
+                            slideOutOfContainer(
+                                AnimatedContentTransitionScope.SlideDirection.End, 
+                                animationSpec = tween(500, easing = EaseOutQuart)
+                            ) + fadeOut(animationSpec = tween(300))
                         }
                     }
                 ) {
@@ -176,7 +189,7 @@ fun MagiskAppContainer(
                     }
                 }
 
-                // Navbar fluttuante (Overlay)
+
                 if (isRootRoute) {
                     Box(modifier = Modifier.align(Alignment.BottomCenter)) {
                         MagiskFloatingBottomBar(destinations = rootDestinations, current = currentDestination, onNavigate = { route ->
@@ -320,9 +333,6 @@ private fun MagiskFloatingBottomBar(destinations: List<AppDestination>, current:
                 Box(modifier = Modifier.height(64.dp).weight(1f).clip(CircleShape).clickable { onNavigate(dest.route) }, contentAlignment = Alignment.Center) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                         Icon(imageVector = if (selected) dest.selectedIcon else dest.icon, contentDescription = stringResource(id = dest.labelRes), modifier = Modifier.size(26.dp).scale(scale), tint = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)
-                        AnimatedVisibility(visible = selected, enter = fadeIn() + expandVertically(), exit = fadeOut() + shrinkVertically()) {
-                            Text(text = stringResource(id = dest.labelRes), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(top = 4.dp))
-                        }
                     }
                 }
             }
@@ -334,7 +344,8 @@ private enum class AppDestination(val route: String, val icon: ImageVector, val 
     Home(AppRoute.Home, Icons.Rounded.Home, Icons.Rounded.Home, CoreR.string.section_home),
     Modules(AppRoute.Modules, Icons.Rounded.Extension, Icons.Rounded.Extension, CoreR.string.modules),
     Superuser(AppRoute.Superuser, Icons.Rounded.Shield, Icons.Rounded.Shield, CoreR.string.superuser),
-    Logs(AppRoute.Logs, Icons.Rounded.Terminal, Icons.Rounded.Terminal, CoreR.string.logs);
+    Logs(AppRoute.Logs, Icons.Rounded.Terminal, Icons.Rounded.Terminal, CoreR.string.logs),
+    Settings(AppRoute.Settings, Icons.Rounded.Settings, Icons.Rounded.Settings, CoreR.string.settings);
     companion object { val entries = values().toList() }
 }
 
