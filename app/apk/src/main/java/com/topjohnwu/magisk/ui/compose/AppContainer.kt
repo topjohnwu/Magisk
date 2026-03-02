@@ -76,7 +76,6 @@ fun MagiskAppContainer(
                 if (Info.isRooted && Info.env.isActive) add(AppDestination.Modules)
                 if (Info.showSuperUser) add(AppDestination.Superuser)
                 add(AppDestination.Logs)
-                add(AppDestination.Settings)
             }
         }
         val rootRoutes = rootDestinations.map { it.route }.toSet()
@@ -104,7 +103,6 @@ fun MagiskAppContainer(
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             topBar = {
-                // Fissa strutturale: occupa il suo spazio in alto
                 MagiskFloatingTopBar(
                     currentRoute = currentRoute,
                     currentRoot = currentRoot,
@@ -120,7 +118,7 @@ fun MagiskAppContainer(
         ) { paddingValues ->
             Box(modifier = Modifier
                 .fillMaxSize()
-                .padding(top = paddingValues.calculateTopPadding())) { // Gestione spazio Top Bar
+                .padding(top = paddingValues.calculateTopPadding())) { 
                 
                 NavHost(
                     navController = navController, 
@@ -188,7 +186,6 @@ fun MagiskAppContainer(
                         ModuleActionScreen(actionId = id, actionName = safeName, onBack = { navController.popBackStack() })
                     }
                 }
-
 
                 if (isRootRoute) {
                     Box(modifier = Modifier.align(Alignment.BottomCenter)) {
@@ -331,9 +328,12 @@ private fun MagiskFloatingBottomBar(destinations: List<AppDestination>, current:
                 val selected = current?.route == dest.route
                 val scale by animateFloatAsState(targetValue = if (selected) { 1.2f } else { 1f }, animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow), label = "iconScale")
                 Box(modifier = Modifier.height(64.dp).weight(1f).clip(CircleShape).clickable { onNavigate(dest.route) }, contentAlignment = Alignment.Center) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                        Icon(imageVector = if (selected) dest.selectedIcon else dest.icon, contentDescription = stringResource(id = dest.labelRes), modifier = Modifier.size(26.dp).scale(scale), tint = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
+                    Icon(
+                        imageVector = if (selected) dest.selectedIcon else dest.icon, 
+                        contentDescription = stringResource(id = dest.labelRes), 
+                        modifier = Modifier.size(26.dp).scale(scale), 
+                        tint = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             }
         }
