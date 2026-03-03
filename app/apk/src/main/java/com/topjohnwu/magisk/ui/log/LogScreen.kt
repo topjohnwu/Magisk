@@ -23,6 +23,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -82,12 +84,14 @@ fun LogScreen(viewModel: LogViewModel) {
                 when (selectedTab) {
                     0 -> SuLogTab(
                         logs = uiState.suLogs,
-                        onClear = { viewModel.clearLog() }
+                        onClear = { viewModel.clearLog() },
+                        nestedScrollConnection = scrollBehavior.nestedScrollConnection
                     )
                     1 -> MagiskLogTab(
                         log = uiState.magiskLog,
                         onSave = { viewModel.saveMagiskLog() },
-                        onClear = { viewModel.clearMagiskLog() }
+                        onClear = { viewModel.clearMagiskLog() },
+                        nestedScrollConnection = scrollBehavior.nestedScrollConnection
                     )
                 }
             }
@@ -96,7 +100,7 @@ fun LogScreen(viewModel: LogViewModel) {
 }
 
 @Composable
-private fun SuLogTab(logs: List<SuLog>, onClear: () -> Unit) {
+private fun SuLogTab(logs: List<SuLog>, onClear: () -> Unit, nestedScrollConnection: NestedScrollConnection) {
     Column(modifier = Modifier.fillMaxSize()) {
         if (logs.isEmpty()) {
             Box(
@@ -115,6 +119,7 @@ private fun SuLogTab(logs: List<SuLog>, onClear: () -> Unit) {
             LazyColumn(
                 modifier = Modifier
                     .weight(1f)
+                    .nestedScroll(nestedScrollConnection)
                     .padding(horizontal = 12.dp),
                 contentPadding = PaddingValues(bottom = 88.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -197,7 +202,7 @@ private fun SuLogCard(log: SuLog) {
 }
 
 @Composable
-private fun MagiskLogTab(log: String, onSave: () -> Unit, onClear: () -> Unit) {
+private fun MagiskLogTab(log: String, onSave: () -> Unit, onClear: () -> Unit, nestedScrollConnection: NestedScrollConnection) {
     Column(modifier = Modifier.fillMaxSize()) {
         if (log.isBlank()) {
             Box(
@@ -216,6 +221,7 @@ private fun MagiskLogTab(log: String, onSave: () -> Unit, onClear: () -> Unit) {
             Box(
                 modifier = Modifier
                     .weight(1f)
+                    .nestedScroll(nestedScrollConnection)
                     .horizontalScroll(rememberScrollState())
                     .verticalScroll(rememberScrollState())
                     .padding(12.dp)
