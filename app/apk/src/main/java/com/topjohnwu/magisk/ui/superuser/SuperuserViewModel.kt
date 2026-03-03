@@ -57,6 +57,7 @@ class SuperuserViewModel(
     data class UiState(
         val loading: Boolean = true,
         val policies: List<PolicyItem> = emptyList(),
+        val suRestrict: Boolean = Config.suRestrict,
     )
 
     private val _uiState = MutableStateFlow(UiState())
@@ -106,8 +107,12 @@ class SuperuserViewModel(
                 { it.appName.lowercase(Locale.ROOT) },
                 { it.packageName }
             ))
-            _uiState.update { it.copy(loading = false, policies = policies) }
+            _uiState.update { it.copy(loading = false, policies = policies, suRestrict = Config.suRestrict) }
         }
+    }
+
+    fun refreshSuRestrict() {
+        _uiState.update { it.copy(suRestrict = Config.suRestrict) }
     }
 
     fun deletePressed(item: PolicyItem) {

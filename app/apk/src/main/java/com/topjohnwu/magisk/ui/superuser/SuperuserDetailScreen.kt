@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -47,10 +48,12 @@ fun SuperuserDetailScreen(
     val item = items.firstOrNull()
     val scrollBehavior = MiuixScrollBehavior()
 
+    LaunchedEffect(Unit) { viewModel.refreshSuRestrict() }
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = item?.title ?: "",
+                title = stringResource(CoreR.string.superuser_setting),
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
@@ -114,7 +117,7 @@ fun SuperuserDetailScreen(
             item {
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Column {
-                        if (item.showSlider) {
+                        if (uiState.suRestrict || item.isRestricted) {
                             SwitchRow(
                                 title = stringResource(CoreR.string.settings_su_restrict_title),
                                 summary = stringResource(

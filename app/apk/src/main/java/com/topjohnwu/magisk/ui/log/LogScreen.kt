@@ -113,7 +113,7 @@ fun LogScreen(viewModel: LogViewModel) {
                 onTabSelected = { selectedTab = it },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 8.dp)
+                    .padding(horizontal = 12.dp, vertical = 8.dp)
             )
 
             if (uiState.loading) {
