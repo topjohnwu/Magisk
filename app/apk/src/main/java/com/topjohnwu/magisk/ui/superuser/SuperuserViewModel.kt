@@ -20,8 +20,6 @@ import com.topjohnwu.magisk.core.ktx.getLabel
 import com.topjohnwu.magisk.core.model.su.SuPolicy
 import com.topjohnwu.magisk.dialog.SuperuserRevokeDialog
 import com.topjohnwu.magisk.events.AuthEvent
-import com.topjohnwu.magisk.events.SnackbarEvent
-import com.topjohnwu.magisk.utils.asText
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -115,12 +113,13 @@ class SuperuserViewModel(
         _uiState.update { it.copy(suRestrict = Config.suRestrict) }
     }
 
-    fun deletePressed(item: PolicyItem) {
+    fun deletePressed(item: PolicyItem, onDeleted: () -> Unit = {}) {
         fun updateState() = viewModelScope.launch {
             db.delete(item.policy.uid)
             _uiState.update { state ->
                 state.copy(policies = state.policies.filter { it.policy.uid != item.policy.uid })
             }
+            onDeleted()
         }
 
         if (Config.suAuth) {
@@ -139,7 +138,7 @@ class SuperuserViewModel(
                 .filter { it.policy.uid == item.policy.uid }
                 .forEach { it.notification = item.notification }
             val res = if (item.notification) R.string.su_snack_notif_on else R.string.su_snack_notif_off
-            SnackbarEvent(res.asText(item.appName)).publish()
+            showSnackbar(AppContext.getString(res, item.appName))
         }
     }
 
@@ -152,7 +151,7 @@ class SuperuserViewModel(
                 .filter { it.policy.uid == item.policy.uid }
                 .forEach { it.logging = item.logging }
             val res = if (item.logging) R.string.su_snack_log_on else R.string.su_snack_log_off
-            SnackbarEvent(res.asText(item.appName)).publish()
+            showSnackbar(AppContext.getString(res, item.appName))
         }
     }
 
@@ -166,7 +165,7 @@ class SuperuserViewModel(
                     .filter { it.policy.uid == item.policy.uid }
                     .forEach { it.policyValue = newPolicy }
                 val res = if (newPolicy >= SuPolicy.ALLOW) R.string.su_snack_grant else R.string.su_snack_deny
-                SnackbarEvent(res.asText(item.appName)).publish()
+                showSnackbar(AppContext.getString(res, item.appName))
             }
         }
 

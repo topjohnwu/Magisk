@@ -152,8 +152,7 @@ fun SuperuserDetailScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
-                            viewModel.deletePressed(item)
-                            onBack()
+                            viewModel.deletePressed(item, onDeleted = onBack)
                         }
                 ) {
                     RevokeRow()
