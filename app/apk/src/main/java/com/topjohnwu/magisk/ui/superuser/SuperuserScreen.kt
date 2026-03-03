@@ -1,14 +1,16 @@
 package com.topjohnwu.magisk.ui.superuser
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,23 +22,21 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import com.topjohnwu.magisk.ui.util.rememberDrawablePainter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.topjohnwu.magisk.core.model.su.SuPolicy
+import com.topjohnwu.magisk.ui.navigation.LocalNavigator
+import com.topjohnwu.magisk.ui.navigation.Route
+import com.topjohnwu.magisk.ui.util.rememberDrawablePainter
 import top.yukonga.miuix.kmp.basic.Card
 import top.yukonga.miuix.kmp.basic.CircularProgressIndicator
 import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
 import top.yukonga.miuix.kmp.basic.Scaffold
-import top.yukonga.miuix.kmp.basic.Slider
 import top.yukonga.miuix.kmp.basic.Switch
 import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.basic.TextButton
 import top.yukonga.miuix.kmp.basic.TopAppBar
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import com.topjohnwu.magisk.core.R as CoreR
@@ -45,6 +45,7 @@ import com.topjohnwu.magisk.core.R as CoreR
 fun SuperuserScreen(viewModel: SuperuserViewModel) {
     val uiState by viewModel.uiState.collectAsState()
     val scrollBehavior = MiuixScrollBehavior()
+    val navigator = LocalNavigator.current
 
     Scaffold(
         topBar = {
@@ -94,7 +95,11 @@ fun SuperuserScreen(viewModel: SuperuserViewModel) {
         ) {
             item { Spacer(Modifier.height(4.dp)) }
             items(uiState.policies, key = { "${it.policy.uid}_${it.packageName}" }) { item ->
-                PolicyCard(item = item, viewModel = viewModel)
+                PolicyCard(
+                    item = item,
+                    onToggle = { viewModel.togglePolicy(item) },
+                    onDetail = { navigator.push(Route.SuperuserDetail(item.policy.uid)) },
+                )
             }
             item { Spacer(Modifier.height(4.dp)) }
         }
@@ -102,16 +107,26 @@ fun SuperuserScreen(viewModel: SuperuserViewModel) {
 }
 
 @Composable
-private fun PolicyCard(item: PolicyItem, viewModel: SuperuserViewModel) {
+private fun PolicyCard(
+    item: PolicyItem,
+    onToggle: () -> Unit,
+    onDetail: () -> Unit,
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .alpha(if (item.isEnabled) 1f else 0.5f)
     ) {
-        Column {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(IntrinsicSize.Min),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Row(
                 modifier = Modifier
-                    .clickable { item.isExpanded = !item.isExpanded }
+                    .weight(1f)
+                    .clickable(onClick = onDetail)
                     .padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -132,85 +147,27 @@ private fun PolicyCard(item: PolicyItem, viewModel: SuperuserViewModel) {
                         color = MiuixTheme.colorScheme.onSurfaceVariantSummary
                     )
                 }
-                Spacer(Modifier.width(8.dp))
-                if (item.showSlider) {
-                    PolicySlider(
-                        value = item.policyValue,
-                        onValueChange = { viewModel.updatePolicy(item, it) }
-                    )
-                } else {
-                    Switch(
-                        checked = item.isEnabled,
-                        onCheckedChange = { viewModel.togglePolicy(item) }
-                    )
-                }
             }
 
-            AnimatedVisibility(visible = item.isExpanded) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp, vertical = 4.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    TextButton(
-                        text = stringResource(CoreR.string.superuser_toggle_notification),
-                        onClick = { viewModel.updateNotify(item) },
-                        modifier = Modifier.weight(1f)
-                    )
-                    TextButton(
-                        text = stringResource(CoreR.string.logs),
-                        onClick = { viewModel.updateLogging(item) },
-                        modifier = Modifier.weight(1f)
-                    )
-                    TextButton(
-                        text = stringResource(CoreR.string.superuser_toggle_revoke),
-                        onClick = { viewModel.deletePressed(item) },
-                        modifier = Modifier.weight(1f)
-                    )
-                }
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .padding(vertical = 12.dp)
+                    .width(0.5.dp)
+                    .background(MiuixTheme.colorScheme.dividerLine)
+            )
+
+            Box(
+                modifier = Modifier
+                    .clickable(onClick = onToggle)
+                    .padding(horizontal = 20.dp, vertical = 16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Switch(
+                    checked = item.isEnabled,
+                    onCheckedChange = { onToggle() }
+                )
             }
         }
     }
 }
-
-@Composable
-private fun PolicySlider(value: Int, onValueChange: (Int) -> Unit) {
-    val sliderValue = when (value) {
-        SuPolicy.DENY -> 0f
-        SuPolicy.RESTRICT -> 0.5f
-        SuPolicy.ALLOW -> 1f
-        else -> 0f
-    }
-    val label = when (value) {
-        SuPolicy.DENY -> stringResource(CoreR.string.deny)
-        SuPolicy.RESTRICT -> stringResource(CoreR.string.restrict)
-        SuPolicy.ALLOW -> stringResource(CoreR.string.grant)
-        else -> stringResource(CoreR.string.deny)
-    }
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.width(96.dp)
-    ) {
-        Text(
-            text = label,
-            style = MiuixTheme.textStyles.body2,
-            color = MiuixTheme.colorScheme.onSurfaceVariantSummary
-        )
-        Slider(
-            value = sliderValue,
-            onValueChange = { newVal ->
-                val newPolicy = when {
-                    newVal < 0.25f -> SuPolicy.DENY
-                    newVal < 0.75f -> SuPolicy.RESTRICT
-                    else -> SuPolicy.ALLOW
-                }
-                if (newPolicy != value) onValueChange(newPolicy)
-            },
-            steps = 1,
-            modifier = Modifier.fillMaxWidth()
-        )
-    }
-}
-
