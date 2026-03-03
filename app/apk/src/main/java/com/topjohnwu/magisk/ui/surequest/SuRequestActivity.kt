@@ -5,8 +5,11 @@ import android.content.pm.ActivityInfo
 import android.content.res.Resources
 import android.os.Build
 import android.os.Bundle
+import android.view.View
 import android.view.Window
 import android.view.WindowManager
+import androidx.activity.compose.setContent
+import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.lifecycleScope
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.UIActivity
@@ -14,16 +17,19 @@ import com.topjohnwu.magisk.arch.viewModel
 import com.topjohnwu.magisk.core.base.UntrackedActivity
 import com.topjohnwu.magisk.core.su.SuCallbackHandler
 import com.topjohnwu.magisk.core.su.SuCallbackHandler.REQUEST
-import com.topjohnwu.magisk.databinding.ActivityRequestBinding
+import com.topjohnwu.magisk.ui.theme.MagiskTheme
 import com.topjohnwu.magisk.ui.theme.Theme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-open class SuRequestActivity : UIActivity<ActivityRequestBinding>(), UntrackedActivity {
+open class SuRequestActivity : UIActivity<ViewDataBinding>(), UntrackedActivity {
 
-    override val layoutRes: Int = R.layout.activity_request
+    override val layoutRes: Int = 0
     override val viewModel: SuRequestViewModel by viewModel()
+
+    override val snackbarView: View
+        get() = window.decorView.findViewById(android.R.id.content)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -51,6 +57,17 @@ open class SuRequestActivity : UIActivity<ActivityRequestBinding>(), UntrackedAc
         } else {
             finish()
         }
+
+        if (viewModel.useTapjackProtection) {
+            window.decorView.rootView.accessibilityDelegate =
+                SuRequestViewModel.EmptyAccessibilityDelegate
+        }
+
+        setContent {
+            MagiskTheme {
+                SuRequestScreen(viewModel = viewModel)
+            }
+        }
     }
 
     override fun getTheme(): Resources.Theme {
@@ -59,6 +76,7 @@ open class SuRequestActivity : UIActivity<ActivityRequestBinding>(), UntrackedAc
         return theme
     }
 
+    @Deprecated("Use OnBackPressedDispatcher")
     override fun onBackPressed() {
         viewModel.denyPressed()
     }

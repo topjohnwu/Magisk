@@ -16,6 +16,3 @@ interface ActivityExecutor {
     operator fun invoke(activity: UIActivity<*>)
 }
 
-interface FragmentExecutor {
-    operator fun invoke(fragment: BaseFragment<*>)
-}
