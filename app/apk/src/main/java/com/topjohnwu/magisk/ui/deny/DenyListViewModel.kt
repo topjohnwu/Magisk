@@ -2,54 +2,64 @@ package com.topjohnwu.magisk.ui.deny
 
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager.MATCH_UNINSTALLED_PACKAGES
-import androidx.databinding.Bindable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
-import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.arch.AsyncLoadViewModel
 import com.topjohnwu.magisk.core.AppContext
 import com.topjohnwu.magisk.core.ktx.concurrentMap
-import com.topjohnwu.magisk.databinding.bindExtra
-import com.topjohnwu.magisk.databinding.filterList
-import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.toCollection
 import kotlinx.coroutines.withContext
 
 class DenyListViewModel : AsyncLoadViewModel() {
 
-    var isShowSystem = false
-        set(value) {
-            field = value
-            doQuery(query)
+    private val _loading = MutableStateFlow(true)
+    val loading: StateFlow<Boolean> = _loading.asStateFlow()
+
+    private val _allApps = MutableStateFlow<List<DenyAppState>>(emptyList())
+
+    private val _query = MutableStateFlow("")
+    val query: StateFlow<String> = _query.asStateFlow()
+
+    private val _showSystem = MutableStateFlow(false)
+    val showSystem: StateFlow<Boolean> = _showSystem.asStateFlow()
+
+    private val _showOS = MutableStateFlow(false)
+    val showOS: StateFlow<Boolean> = _showOS.asStateFlow()
+
+    val filteredApps: StateFlow<List<DenyAppState>> = combine(
+        _allApps, _query, _showSystem, _showOS
+    ) { apps, q, showSys, showOS ->
+        apps.filter { app ->
+            val passFilter = app.isChecked ||
+                ((showSys || !app.info.isSystemApp()) &&
+                ((showSys && showOS) || app.info.isApp()))
+            val passQuery = q.isBlank() ||
+                app.info.label.contains(q, true) ||
+                app.info.packageName.contains(q, true) ||
+                app.processes.any { it.process.name.contains(q, true) }
+            passFilter && passQuery
         }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    var isShowOS = false
-        set(value) {
-            field = value
-            doQuery(query)
-        }
-
-    var query = ""
-        set(value) {
-            field = value
-            doQuery(value)
-        }
-
-    val items = filterList<DenyListRvItem>(viewModelScope)
-    val extraBindings = bindExtra {
-        it.put(BR.viewModel, this)
-    }
-
-    @get:Bindable
-    var loading = true
-        private set(value) = set(value, field, { field = it }, BR.loading)
+    fun setQuery(q: String) { _query.value = q }
+    fun setShowSystem(v: Boolean) { _showSystem.value = v }
+    fun setShowOS(v: Boolean) { _showOS.value = v }
 
     @SuppressLint("InlinedApi")
     override suspend fun doLoadWork() {
-        loading = true
+        _loading.value = true
         val apps = withContext(Dispatchers.Default) {
             val pm = AppContext.packageManager
             val denyList = Shell.cmd("magisk --denylist ls").exec().out
@@ -59,31 +69,69 @@ class DenyListViewModel : AsyncLoadViewModel() {
                     .filter { AppContext.packageName != it.packageName }
                     .concurrentMap { AppProcessInfo(it, pm, denyList) }
                     .filter { it.processes.isNotEmpty() }
-                    .concurrentMap { DenyListRvItem(it) }
+                    .concurrentMap { DenyAppState(it) }
                     .toCollection(ArrayList(size))
             }
-            apps.sort()
+            apps.sortWith(compareBy(
+                { it.processes.count { p -> p.isEnabled } == 0 },
+                { it.info }
+            ))
             apps
         }
-        items.set(apps)
-        doQuery(query)
+        _allApps.value = apps
+        _loading.value = false
+    }
+}
+
+class DenyAppState(val info: AppProcessInfo) : Comparable<DenyAppState> {
+    val processes = info.processes.map { DenyProcessState(it) }
+    var isExpanded by mutableStateOf(false)
+
+    val itemsChecked: Int get() = processes.count { it.isEnabled }
+    val isChecked: Boolean get() = itemsChecked > 0
+    val checkedPercent: Float get() = if (processes.isEmpty()) 0f else itemsChecked.toFloat() / processes.size
+
+    fun toggleAll() {
+        if (isChecked) {
+            Shell.cmd("magisk --denylist rm ${info.packageName}").submit()
+            processes.filter { it.isEnabled }.forEach { proc ->
+                if (proc.process.isIsolated) {
+                    proc.toggle()
+                } else {
+                    proc.isEnabled = false
+                }
+            }
+        } else {
+            processes
+                .filterNot { it.isEnabled }
+                .filter { if (isExpanded) true else it.defaultSelection }
+                .forEach { it.toggle() }
+        }
     }
 
-    private fun doQuery(s: String) {
-        items.filter {
-            fun filterSystem() = isShowSystem || !it.info.isSystemApp()
+    override fun compareTo(other: DenyAppState) = comparator.compare(this, other)
 
-            fun filterOS() = (isShowSystem && isShowOS) || it.info.isApp()
+    companion object {
+        private val comparator = compareBy<DenyAppState>(
+            { it.itemsChecked == 0 },
+            { it.info }
+        )
+    }
+}
 
-            fun filterQuery(): Boolean {
-                fun inName() = it.info.label.contains(s, true)
-                fun inPackage() = it.info.packageName.contains(s, true)
-                fun inProcesses() = it.processes.any { p -> p.process.name.contains(s, true) }
-                return inName() || inPackage() || inProcesses()
-            }
+class DenyProcessState(val process: ProcessInfo) {
+    var isEnabled by mutableStateOf(process.isEnabled)
 
-            (it.isChecked || (filterSystem() && filterOS())) && filterQuery()
-        }
-        loading = false
+    val defaultSelection get() =
+        process.isIsolated || process.isAppZygote || process.name == process.packageName
+
+    val displayName: String =
+        if (process.isIsolated) "(isolated) ${process.name}" else process.name
+
+    fun toggle() {
+        isEnabled = !isEnabled
+        val arg = if (isEnabled) "add" else "rm"
+        val (name, pkg) = process
+        Shell.cmd("magisk --denylist $arg $pkg \'$name\'").submit()
     }
 }
