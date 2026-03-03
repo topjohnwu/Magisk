@@ -18,8 +18,6 @@ import com.topjohnwu.magisk.core.base.IActivityExtension
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.ktx.reflectField
 import com.topjohnwu.magisk.core.wrap
-import rikka.insets.WindowInsetsHelper
-import rikka.layoutinflater.view.LayoutInflaterFactory
 
 abstract class UIActivity
     : AppCompatActivity(), ViewModelHolder, IActivityExtension {
@@ -38,9 +36,6 @@ abstract class UIActivity
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        layoutInflater.factory2 = LayoutInflaterFactory(delegate)
-            .addOnViewCreatedListener(WindowInsetsHelper.LISTENER)
-
         extension.onCreate(savedInstanceState)
         if (isRunningAsStub) {
             val delegate = delegate

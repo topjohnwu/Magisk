@@ -32,9 +32,6 @@ dependencies {
     implementation(project(":core"))
     coreLibraryDesugaring(libs.jdk.libs)
 
-    implementation(libs.rikka.layoutinflater)
-    implementation(libs.rikka.insets)
-
     implementation(libs.appcompat)
     implementation(libs.material)
 
