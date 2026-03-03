@@ -13,7 +13,6 @@ import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.findNavController
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.ActivityExecutor
 import com.topjohnwu.magisk.arch.ContextExecutor
@@ -79,14 +78,6 @@ class HomeFragment : Fragment(), MenuProvider, ViewModelHolder {
 
     override fun onMenuItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.action_settings ->
-                activity?.let {
-                    NavigationActivity.navigate(
-                        HomeFragmentDirections.actionHomeFragmentToSettingsFragment(),
-                        it.findNavController(R.id.main_nav_host),
-                        it.contentResolver,
-                    )
-                }
             R.id.action_reboot -> (activity as? NavigationActivity<*>)?.let {
                 RebootMenu.inflate(it).show()
             }
