@@ -22,64 +22,80 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import top.yukonga.miuix.kmp.basic.Card
 import top.yukonga.miuix.kmp.basic.CircularProgressIndicator
+import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
+import top.yukonga.miuix.kmp.basic.Scaffold
 import top.yukonga.miuix.kmp.basic.Switch
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.basic.TextButton
+import top.yukonga.miuix.kmp.basic.TopAppBar
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import com.topjohnwu.magisk.core.R as CoreR
 
 @Composable
 fun ModuleScreen(viewModel: ModuleViewModel) {
     val uiState by viewModel.uiState.collectAsState()
+    val scrollBehavior = MiuixScrollBehavior()
 
-    if (uiState.loading) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator()
-        }
-        return
-    }
-
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 12.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        item { Spacer(Modifier.height(4.dp)) }
-
-        item {
-            TextButton(
-                text = stringResource(CoreR.string.module_action_install_external),
-                onClick = { viewModel.installPressed() },
-                modifier = Modifier.fillMaxWidth()
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = stringResource(CoreR.string.modules),
+                scrollBehavior = scrollBehavior
             )
         }
-
-        if (uiState.modules.isEmpty()) {
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 32.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = stringResource(CoreR.string.module_empty),
-                        style = MiuixTheme.textStyles.body1,
-                        color = MiuixTheme.colorScheme.onSurfaceVariantSummary
-                    )
-                }
+    ) { padding ->
+        if (uiState.loading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
             }
-        } else {
-            items(uiState.modules, key = { it.module.id }) { item ->
-                ModuleCard(item = item, viewModel = viewModel)
-            }
+            return@Scaffold
         }
 
-        item { Spacer(Modifier.height(4.dp)) }
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(horizontal = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            item { Spacer(Modifier.height(4.dp)) }
+
+            item {
+                TextButton(
+                    text = stringResource(CoreR.string.module_action_install_external),
+                    onClick = { viewModel.installPressed() },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            if (uiState.modules.isEmpty()) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 32.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(CoreR.string.module_empty),
+                            style = MiuixTheme.textStyles.body1,
+                            color = MiuixTheme.colorScheme.onSurfaceVariantSummary
+                        )
+                    }
+                }
+            } else {
+                items(uiState.modules, key = { it.module.id }) { item ->
+                    ModuleCard(item = item, viewModel = viewModel)
+                }
+            }
+
+            item { Spacer(Modifier.height(4.dp)) }
+        }
     }
 }
 

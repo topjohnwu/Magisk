@@ -5,22 +5,29 @@ import android.Manifest.permission.REQUEST_INSTALL_PACKAGES
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.ApplicationInfo
+import android.net.Uri
 import android.os.Bundle
-import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.activity.compose.setContent
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.core.content.pm.ShortcutManagerCompat
-import androidx.core.view.forEach
-import androidx.core.view.isGone
-import androidx.core.view.isVisible
+import androidx.core.net.toUri
+import androidx.databinding.ViewDataBinding
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.NavDirections
-import com.topjohnwu.magisk.MainDirections
-import com.topjohnwu.magisk.R
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.NavEntry
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
+import androidx.navigation3.ui.NavDisplay
 import com.topjohnwu.magisk.arch.BaseViewModel
-import com.topjohnwu.magisk.arch.NavigationActivity
-import com.topjohnwu.magisk.arch.startAnimations
+import com.topjohnwu.magisk.arch.UIActivity
+import com.topjohnwu.magisk.arch.VMFactory
 import com.topjohnwu.magisk.arch.viewModel
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
@@ -29,40 +36,43 @@ import com.topjohnwu.magisk.core.base.SplashController
 import com.topjohnwu.magisk.core.base.SplashScreenHost
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.ktx.toast
-import com.topjohnwu.magisk.core.model.module.LocalModule
 import com.topjohnwu.magisk.core.tasks.AppMigration
-import com.topjohnwu.magisk.databinding.ActivityMainMd2Binding
+import com.topjohnwu.magisk.ui.deny.DenyListScreen
+import com.topjohnwu.magisk.ui.deny.DenyListViewModel
+import com.topjohnwu.magisk.ui.flash.FlashScreen
+import com.topjohnwu.magisk.ui.flash.FlashUtils
+import com.topjohnwu.magisk.ui.flash.FlashViewModel
+import com.topjohnwu.magisk.ui.install.InstallScreen
+import com.topjohnwu.magisk.ui.install.InstallViewModel
+import com.topjohnwu.magisk.ui.module.ActionScreen
+import com.topjohnwu.magisk.ui.module.ActionViewModel
+import com.topjohnwu.magisk.ui.navigation.CollectNavEvents
+import com.topjohnwu.magisk.ui.navigation.LocalNavigator
+import com.topjohnwu.magisk.ui.navigation.Navigator
+import com.topjohnwu.magisk.ui.navigation.ObserveViewEvents
+import com.topjohnwu.magisk.ui.navigation.Route
+import com.topjohnwu.magisk.ui.navigation.rememberNavigator
+import com.topjohnwu.magisk.ui.theme.MagiskTheme
 import com.topjohnwu.magisk.ui.theme.Theme
 import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.magisk.view.Shortcuts
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import java.io.File
+import androidx.compose.runtime.Composable
 import com.topjohnwu.magisk.core.R as CoreR
 
 class MainViewModel : BaseViewModel()
 
-class MainActivity : NavigationActivity<ActivityMainMd2Binding>(), SplashScreenHost {
+class MainActivity : UIActivity<ViewDataBinding>(), SplashScreenHost {
 
-    override val layoutRes = R.layout.activity_main_md2
+    override val layoutRes = 0
     override val viewModel by viewModel<MainViewModel>()
-    override val navHostId: Int = R.id.main_nav_host
     override val splashController = SplashController(this)
     override val snackbarView: View
-        get() {
-            val fragmentOverride = currentFragment?.snackbarView
-            return fragmentOverride ?: super.snackbarView
-        }
-    override val snackbarAnchorView: View?
-        get() {
-            val fragmentAnchor = currentFragment?.snackbarAnchorView
-            return when {
-                fragmentAnchor?.isVisible == true -> fragmentAnchor
-                binding.mainNavigation.isVisible -> return binding.mainNavigation
-                else -> null
-            }
-        }
+        get() = window.decorView.findViewById(android.R.id.content)
+    override val snackbarAnchorView: View? get() = null
 
-    private var isRootFragment = true
+    private val intentState = MutableStateFlow(0)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Theme.selected.themeRes)
@@ -78,11 +88,9 @@ class MainActivity : NavigationActivity<ActivityMainMd2Binding>(), SplashScreenH
 
     @SuppressLint("InlinedApi")
     override fun onCreateUi(savedInstanceState: Bundle?) {
-        setContentView()
         showUnsupportedMessage()
         askForHomeShortcut()
 
-        // Ask permission to post notifications for background update check
         if (Config.checkUpdate) {
             withPermission(Manifest.permission.POST_NOTIFICATIONS) {
                 Config.checkUpdate = it
@@ -91,101 +99,99 @@ class MainActivity : NavigationActivity<ActivityMainMd2Binding>(), SplashScreenH
 
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 
-        navigation.addOnDestinationChangedListener { _, destination, _ ->
-            isRootFragment = when (destination.id) {
-                R.id.homeFragment,
-                R.id.modulesFragment,
-                R.id.superuserFragment,
-                R.id.logFragment,
-                R.id.settingsFragment -> true
-                else -> false
-            }
+        val initialTab = getInitialTab(intent)
 
-            setDisplayHomeAsUpEnabled(!isRootFragment)
-            requestNavigationHidden(!isRootFragment)
+        setContent {
+            MagiskTheme {
+                val navigator = rememberNavigator(Route.Main)
+                CompositionLocalProvider(LocalNavigator provides navigator) {
+                    HandleFlashIntent(navigator)
 
-            binding.mainNavigation.menu.forEach {
-                if (it.itemId == destination.id) {
-                    it.isChecked = true
+                    NavDisplay(
+                        backStack = navigator.backStack,
+                        onBack = { navigator.pop() },
+                        entryDecorators = listOf(
+                            rememberSaveableStateHolderNavEntryDecorator(),
+                            rememberViewModelStoreNavEntryDecorator()
+                        ),
+                        entryProvider = entryProvider {
+                            entry<Route.Main> {
+                                MainScreen(initialTab = initialTab)
+                            }
+                            entry<Route.Install> { _ ->
+                                val vm: InstallViewModel = androidx.lifecycle.viewmodel.compose.viewModel(factory = VMFactory)
+                                ObserveViewEvents(vm)
+                                CollectNavEvents(vm, navigator)
+                                InstallScreen(vm, onBack = { navigator.pop() })
+                            }
+                            entry<Route.DenyList> { _ ->
+                                val vm: DenyListViewModel = androidx.lifecycle.viewmodel.compose.viewModel(factory = VMFactory)
+                                ObserveViewEvents(vm)
+                                DenyListScreen(vm, onBack = { navigator.pop() })
+                            }
+                            entry<Route.Flash> { key ->
+                                val vm: FlashViewModel = androidx.lifecycle.viewmodel.compose.viewModel(factory = VMFactory)
+                                LaunchedEffect(key) {
+                                    if (vm.flashAction.isEmpty()) {
+                                        vm.flashAction = key.action
+                                        vm.flashUri = key.additionalData?.let { Uri.parse(it) }
+                                        vm.startFlashing()
+                                    }
+                                }
+                                ObserveViewEvents(vm)
+                                FlashScreen(vm, onBack = { navigator.pop() })
+                            }
+                            entry<Route.Action> { key ->
+                                val vm: ActionViewModel = androidx.lifecycle.viewmodel.compose.viewModel(factory = VMFactory)
+                                LaunchedEffect(key) {
+                                    if (vm.actionId.isEmpty()) {
+                                        vm.actionId = key.id
+                                        vm.actionName = key.name
+                                        vm.startRunAction()
+                                    }
+                                }
+                                ObserveViewEvents(vm)
+                                ActionScreen(vm, actionName = key.name, onBack = { navigator.pop() })
+                            }
+                        }
+                    )
                 }
             }
         }
+    }
 
-        setSupportActionBar(binding.mainToolbar)
-
-        binding.mainNavigation.setOnItemSelectedListener {
-            getScreen(it.itemId)?.navigate()
-            true
-        }
-        binding.mainNavigation.setOnItemReselectedListener {
-            // https://issuetracker.google.com/issues/124538620
-        }
-        binding.mainNavigation.menu.apply {
-            findItem(R.id.superuserFragment)?.isEnabled = Info.showSuperUser
-            findItem(R.id.modulesFragment)?.isEnabled = Info.env.isActive && LocalModule.loaded()
-        }
-
-        val section =
-            if (intent.action == Intent.ACTION_APPLICATION_PREFERENCES)
-                Const.Nav.SETTINGS
-            else
-                intent.getStringExtra(Const.Key.OPEN_SECTION)
-
-        getScreen(section)?.navigate()
-
-        if (!isRootFragment) {
-            requestNavigationHidden(requiresAnimation = savedInstanceState == null)
+    @Composable
+    private fun HandleFlashIntent(navigator: Navigator) {
+        val intentVersion by intentState.collectAsState()
+        LaunchedEffect(intentVersion) {
+            val currentIntent = intent ?: return@LaunchedEffect
+            if (currentIntent.action == FlashUtils.INTENT_FLASH) {
+                val action = currentIntent.getStringExtra(FlashUtils.EXTRA_FLASH_ACTION)
+                    ?: return@LaunchedEffect
+                val uri = currentIntent.getStringExtra(FlashUtils.EXTRA_FLASH_URI)
+                navigator.push(Route.Flash(action, uri))
+                currentIntent.action = null
+            }
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> onBackPressed()
-            else -> return super.onOptionsItemSelected(item)
-        }
-        return true
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        intentState.value += 1
     }
 
-    fun setDisplayHomeAsUpEnabled(isEnabled: Boolean) {
-        binding.mainToolbar.startAnimations()
-        when {
-            isEnabled -> binding.mainToolbar.setNavigationIcon(R.drawable.ic_back_md2)
-            else -> binding.mainToolbar.navigationIcon = null
-        }
-    }
-
-    internal fun requestNavigationHidden(hide: Boolean = true, requiresAnimation: Boolean = true) {
-        val bottomView = binding.mainNavigation
-        if (requiresAnimation) {
-            bottomView.isVisible = true
-            bottomView.isHidden = hide
+    private fun getInitialTab(intent: Intent?): Int {
+        val section = if (intent?.action == Intent.ACTION_APPLICATION_PREFERENCES) {
+            Const.Nav.SETTINGS
         } else {
-            bottomView.isGone = hide
+            intent?.getStringExtra(Const.Key.OPEN_SECTION)
         }
-    }
-
-    fun invalidateToolbar() {
-        //binding.mainToolbar.startAnimations()
-        binding.mainToolbar.invalidate()
-    }
-
-    private fun getScreen(name: String?): NavDirections? {
-        return when (name) {
-            Const.Nav.SUPERUSER -> MainDirections.actionSuperuserFragment()
-            Const.Nav.MODULES -> MainDirections.actionModuleFragment()
-            Const.Nav.SETTINGS -> MainDirections.actionSettingsFragment()
-            else -> null
-        }
-    }
-
-    private fun getScreen(id: Int): NavDirections? {
-        return when (id) {
-            R.id.homeFragment -> MainDirections.actionHomeFragment()
-            R.id.modulesFragment -> MainDirections.actionModuleFragment()
-            R.id.superuserFragment -> MainDirections.actionSuperuserFragment()
-            R.id.logFragment -> MainDirections.actionLogFragment()
-            R.id.settingsFragment -> MainDirections.actionSettingsFragment()
-            else -> null
+        return when (section) {
+            Const.Nav.SUPERUSER -> Tab.SUPERUSER.ordinal
+            Const.Nav.MODULES -> Tab.MODULES.ordinal
+            Const.Nav.SETTINGS -> Tab.SETTINGS.ordinal
+            else -> Tab.HOME.ordinal
         }
     }
 
@@ -226,8 +232,8 @@ class MainActivity : NavigationActivity<ActivityMainMd2Binding>(), SplashScreenH
 
         if (!Info.isEmulator && Info.env.isActive && System.getenv("PATH")
                 ?.split(':')
-                ?.filterNot { File("$it/magisk").exists() }
-                ?.any { File("$it/su").exists() } == true) {
+                ?.filterNot { java.io.File("$it/magisk").exists() }
+                ?.any { java.io.File("$it/su").exists() } == true) {
             MagiskDialog(this).apply {
                 setTitle(CoreR.string.unsupport_general_title)
                 setMessage(CoreR.string.unsupport_other_su_msg)
@@ -258,7 +264,6 @@ class MainActivity : NavigationActivity<ActivityMainMd2Binding>(), SplashScreenH
     private fun askForHomeShortcut() {
         if (isRunningAsStub && !Config.askedHome &&
             ShortcutManagerCompat.isRequestPinShortcutSupported(this)) {
-            // Ask and show dialog
             Config.askedHome = true
             MagiskDialog(this).apply {
                 setTitle(CoreR.string.add_shortcut_title)

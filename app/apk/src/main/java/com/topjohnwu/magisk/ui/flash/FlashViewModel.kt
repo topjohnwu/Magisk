@@ -41,7 +41,8 @@ class FlashViewModel : BaseViewModel() {
     val showReboot: StateFlow<Boolean> = _showReboot.asStateFlow()
 
     val consoleItems = mutableStateListOf<String>()
-    lateinit var args: FlashFragmentArgs
+    var flashAction: String = ""
+    var flashUri: android.net.Uri? = null
 
     private val logItems = mutableListOf<String>().synchronized()
     private val outItems = object : CallbackList<String>() {
@@ -53,7 +54,8 @@ class FlashViewModel : BaseViewModel() {
     }
 
     fun startFlashing() {
-        val (action, uri) = args
+        val action = flashAction
+        val uri = flashUri
 
         viewModelScope.launch {
             val result = when (action) {

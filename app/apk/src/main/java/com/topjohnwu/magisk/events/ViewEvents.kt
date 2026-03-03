@@ -3,11 +3,9 @@ package com.topjohnwu.magisk.events
 import android.content.Context
 import android.view.View
 import androidx.annotation.StringRes
-import androidx.navigation.NavDirections
 import com.google.android.material.snackbar.Snackbar
 import com.topjohnwu.magisk.arch.ActivityExecutor
 import com.topjohnwu.magisk.arch.ContextExecutor
-import com.topjohnwu.magisk.arch.NavigationActivity
 import com.topjohnwu.magisk.arch.UIActivity
 import com.topjohnwu.magisk.arch.ViewEvent
 import com.topjohnwu.magisk.core.base.ContentResultCallback
@@ -67,18 +65,6 @@ class GetContentEvent(
 ) : ViewEvent(), ActivityExecutor {
     override fun invoke(activity: UIActivity<*>) {
         activity.getContent(type, callback)
-    }
-}
-
-class NavigationEvent(
-    private val directions: NavDirections,
-    private val pop: Boolean
-) : ViewEvent(), ActivityExecutor {
-    override fun invoke(activity: UIActivity<*>) {
-        (activity as? NavigationActivity<*>)?.apply {
-            if (pop) navigation.popBackStack()
-            directions.navigate()
-        }
     }
 }
 

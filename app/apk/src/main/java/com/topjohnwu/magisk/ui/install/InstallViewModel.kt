@@ -15,7 +15,8 @@ import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.repository.NetworkService
 import com.topjohnwu.magisk.dialog.SecondSlotWarningDialog
 import com.topjohnwu.magisk.events.GetContentEvent
-import com.topjohnwu.magisk.ui.flash.FlashFragment
+import com.topjohnwu.magisk.core.Const
+import com.topjohnwu.magisk.ui.navigation.Route
 import io.noties.markwon.Markwon
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -96,9 +97,16 @@ class InstallViewModel(svc: NetworkService, markwon: Markwon) : BaseViewModel() 
 
     fun install() {
         when (_uiState.value.method) {
-            Method.PATCH -> FlashFragment.patch(data.value!!).navigate(true)
-            Method.DIRECT -> FlashFragment.flash(false).navigate(true)
-            Method.INACTIVE_SLOT -> FlashFragment.flash(true).navigate(true)
+            Method.PATCH -> navigateTo(Route.Flash(
+                action = Const.Value.PATCH_FILE,
+                additionalData = data.value!!.toString()
+            ))
+            Method.DIRECT -> navigateTo(Route.Flash(
+                action = Const.Value.FLASH_MAGISK
+            ))
+            Method.INACTIVE_SLOT -> navigateTo(Route.Flash(
+                action = Const.Value.FLASH_INACTIVE_SLOT
+            ))
             else -> error("Unknown method")
         }
     }

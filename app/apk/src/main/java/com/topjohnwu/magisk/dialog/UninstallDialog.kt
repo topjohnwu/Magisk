@@ -3,13 +3,13 @@ package com.topjohnwu.magisk.dialog
 import android.app.ProgressDialog
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
-import com.topjohnwu.magisk.arch.NavigationActivity
 import com.topjohnwu.magisk.arch.UIActivity
+import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.R
 import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.tasks.MagiskInstaller
 import com.topjohnwu.magisk.events.DialogBuilder
-import com.topjohnwu.magisk.ui.flash.FlashFragment
+import com.topjohnwu.magisk.ui.flash.FlashUtils
 import com.topjohnwu.magisk.view.MagiskDialog
 import kotlinx.coroutines.launch
 
@@ -50,8 +50,14 @@ class UninstallDialog : DialogBuilder {
     }
 
     private fun completeUninstall(dialog: MagiskDialog) {
-        (dialog.ownerActivity as NavigationActivity<*>)
-            .navigation.navigate(FlashFragment.uninstall())
+        val activity = dialog.ownerActivity ?: return
+        val intent = android.content.Intent(activity, activity.javaClass).apply {
+            action = FlashUtils.INTENT_FLASH
+            putExtra(FlashUtils.EXTRA_FLASH_ACTION, Const.Value.UNINSTALL)
+            flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or
+                android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        activity.startActivity(intent)
     }
 
 }

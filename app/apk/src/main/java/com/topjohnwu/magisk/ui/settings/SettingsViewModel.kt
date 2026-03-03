@@ -14,6 +14,7 @@ import com.topjohnwu.magisk.core.utils.RootUtils
 import com.topjohnwu.magisk.events.AddHomeIconEvent
 import com.topjohnwu.magisk.events.AuthEvent
 import com.topjohnwu.magisk.events.SnackbarEvent
+import com.topjohnwu.magisk.ui.navigation.Route
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,7 +29,7 @@ class SettingsViewModel : BaseViewModel() {
     val zygiskMismatch get() = Config.zygisk != Info.isZygiskEnabled
 
     fun navigateToDenyList() {
-        SettingsFragmentDirections.actionSettingsFragmentToDenyFragment().navigate()
+        navigateTo(Route.DenyList)
     }
 
     fun requestAddShortcut() {

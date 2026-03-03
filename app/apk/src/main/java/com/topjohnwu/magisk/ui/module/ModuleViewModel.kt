@@ -5,7 +5,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.MutableLiveData
-import com.topjohnwu.magisk.MainDirections
 import com.topjohnwu.magisk.arch.AsyncLoadViewModel
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
@@ -22,6 +21,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
+import com.topjohnwu.magisk.ui.navigation.Route
 import kotlinx.parcelize.Parcelize
 import com.topjohnwu.magisk.core.R as CoreR
 
@@ -115,7 +115,7 @@ class ModuleViewModel : AsyncLoadViewModel() {
     }
 
     fun runAction(id: String, name: String) {
-        MainDirections.actionActionFragment(id, name).navigate()
+        navigateTo(Route.Action(id, name))
     }
 
     fun toggleEnabled(item: ModuleItem) {

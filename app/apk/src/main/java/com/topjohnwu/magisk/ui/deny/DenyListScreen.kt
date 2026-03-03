@@ -32,80 +32,107 @@ import androidx.compose.ui.unit.dp
 import top.yukonga.miuix.kmp.basic.Card
 import top.yukonga.miuix.kmp.basic.Checkbox
 import top.yukonga.miuix.kmp.basic.CircularProgressIndicator
+import top.yukonga.miuix.kmp.basic.Icon
+import top.yukonga.miuix.kmp.basic.IconButton
 import top.yukonga.miuix.kmp.basic.LinearProgressIndicator
+import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
+import top.yukonga.miuix.kmp.basic.Scaffold
 import top.yukonga.miuix.kmp.basic.Switch
 import top.yukonga.miuix.kmp.basic.Text
+import top.yukonga.miuix.kmp.basic.TopAppBar
+import top.yukonga.miuix.kmp.icon.MiuixIcons
+import top.yukonga.miuix.kmp.icon.extended.Back
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import com.topjohnwu.magisk.core.R as CoreR
 
 @Composable
-fun DenyListScreen(viewModel: DenyListViewModel) {
+fun DenyListScreen(viewModel: DenyListViewModel, onBack: () -> Unit) {
     val loading by viewModel.loading.collectAsState()
     val apps by viewModel.filteredApps.collectAsState()
     val query by viewModel.query.collectAsState()
     val showSystem by viewModel.showSystem.collectAsState()
     val showOS by viewModel.showOS.collectAsState()
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        // Search input
-        SearchInput(
-            query = query,
-            onQueryChange = viewModel::setQuery,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 4.dp)
-        )
-
-        // Filter chips
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            FilterChip(
-                label = stringResource(CoreR.string.show_system_app),
-                checked = showSystem,
-                onCheckedChange = viewModel::setShowSystem
-            )
-            FilterChip(
-                label = stringResource(CoreR.string.show_os_app),
-                checked = showOS,
-                enabled = showSystem,
-                onCheckedChange = viewModel::setShowOS
+    val scrollBehavior = MiuixScrollBehavior()
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = stringResource(CoreR.string.denylist),
+                navigationIcon = {
+                    IconButton(
+                        modifier = Modifier.padding(start = 16.dp),
+                        onClick = onBack
+                    ) {
+                        Icon(
+                            imageVector = MiuixIcons.Back,
+                            contentDescription = null,
+                            tint = MiuixTheme.colorScheme.onBackground
+                        )
+                    }
+                },
+                scrollBehavior = scrollBehavior
             )
         }
-
-        Spacer(Modifier.height(8.dp))
-
-        if (loading) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = stringResource(CoreR.string.loading),
-                        style = MiuixTheme.textStyles.headline2
-                    )
-                    Spacer(Modifier.height(16.dp))
-                    CircularProgressIndicator()
-                }
-            }
-        } else {
-            LazyColumn(
+    ) { padding ->
+        Column(modifier = Modifier.fillMaxSize().padding(padding)) {
+            SearchInput(
+                query = query,
+                onQueryChange = viewModel::setQuery,
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 4.dp)
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(horizontal = 12.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                items(
-                    items = apps,
-                    key = { it.info.packageName }
-                ) { app ->
-                    DenyAppCard(app)
+                FilterChip(
+                    label = stringResource(CoreR.string.show_system_app),
+                    checked = showSystem,
+                    onCheckedChange = viewModel::setShowSystem
+                )
+                FilterChip(
+                    label = stringResource(CoreR.string.show_os_app),
+                    checked = showOS,
+                    enabled = showSystem,
+                    onCheckedChange = viewModel::setShowOS
+                )
+            }
+
+            Spacer(Modifier.height(8.dp))
+
+            if (loading) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = stringResource(CoreR.string.loading),
+                            style = MiuixTheme.textStyles.headline2
+                        )
+                        Spacer(Modifier.height(16.dp))
+                        CircularProgressIndicator()
+                    }
                 }
-                item { Spacer(Modifier.height(8.dp)) }
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 12.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(
+                        items = apps,
+                        key = { it.info.packageName }
+                    ) { app ->
+                        DenyAppCard(app)
+                    }
+                    item { Spacer(Modifier.height(8.dp)) }
+                }
             }
         }
     }
@@ -153,7 +180,6 @@ private fun FilterChip(
 private fun DenyAppCard(app: DenyAppState) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column {
-            // Progress bar showing percentage of checked processes
             if (app.checkedPercent > 0f) {
                 LinearProgressIndicator(
                     progress = app.checkedPercent,
@@ -161,7 +187,6 @@ private fun DenyAppCard(app: DenyAppState) {
                 )
             }
 
-            // App row
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -192,7 +217,6 @@ private fun DenyAppCard(app: DenyAppState) {
                 )
             }
 
-            // Expanded process list
             AnimatedVisibility(visible = app.isExpanded) {
                 Column(
                     modifier = Modifier

@@ -33,41 +33,55 @@ import com.topjohnwu.magisk.core.R as CoreR
 import top.yukonga.miuix.kmp.basic.Card
 import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.LinearProgressIndicator
+import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
+import top.yukonga.miuix.kmp.basic.Scaffold
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.basic.TextButton
+import top.yukonga.miuix.kmp.basic.TopAppBar
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
+    val scrollBehavior = MiuixScrollBehavior()
 
-    Column(
-        modifier = Modifier
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 16.dp)
-            .padding(top = 8.dp, bottom = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        if (uiState.isNoticeVisible) {
-            NoticeCard(onHide = viewModel::hideNotice)
-        }
-
-        MagiskCard(viewModel = viewModel)
-
-        ManagerCard(viewModel = viewModel, uiState = uiState)
-
-        if (Info.env.isActive) {
-            TextButton(
-                text = stringResource(CoreR.string.uninstall_magisk_title),
-                onClick = { viewModel.onDeletePressed() },
-                modifier = Modifier.fillMaxWidth()
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = stringResource(CoreR.string.section_home),
+                scrollBehavior = scrollBehavior
             )
         }
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .padding(padding)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp)
+                .padding(bottom = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            if (uiState.isNoticeVisible) {
+                NoticeCard(onHide = viewModel::hideNotice)
+            }
 
-        SupportCard(onLinkClicked = { viewModel.onLinkPressed(it) })
+            MagiskCard(viewModel = viewModel)
 
-        DevelopersCard(onLinkClicked = { openLink(context, it) })
+            ManagerCard(viewModel = viewModel, uiState = uiState)
+
+            if (Info.env.isActive) {
+                TextButton(
+                    text = stringResource(CoreR.string.uninstall_magisk_title),
+                    onClick = { viewModel.onDeletePressed() },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            SupportCard(onLinkClicked = { viewModel.onLinkPressed(it) })
+
+            DevelopersCard(onLinkClicked = { openLink(context, it) })
+        }
     }
 }
 

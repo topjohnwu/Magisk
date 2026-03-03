@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     kotlin("plugin.parcelize")
     kotlin("plugin.compose")
+    kotlin("plugin.serialization")
     id("com.android.legacy-kapt")
     id("androidx.navigation.safeargs.kotlin")
 }
@@ -68,6 +69,13 @@ dependencies {
     implementation(libs.lifecycle.runtime.compose)
     implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.miuix)
+    implementation(libs.miuix.icons)
+    implementation(libs.miuix.navigation3.ui)
+
+    // Navigation3
+    implementation(libs.navigation3.runtime)
+    implementation(libs.navigationevent.compose)
+    implementation(libs.lifecycle.viewmodel.navigation3)
 
     // Make sure kapt runs with a proper kotlin-stdlib
     kapt(kotlin("stdlib"))

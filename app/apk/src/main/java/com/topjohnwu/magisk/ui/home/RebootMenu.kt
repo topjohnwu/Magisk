@@ -34,7 +34,7 @@ object RebootMenu {
 
     fun inflate(activity: Activity): PopupMenu {
         val themeWrapper = ContextThemeWrapper(activity, R.style.Foundation_PopupMenu)
-        val menu = PopupMenu(themeWrapper, activity.findViewById(R.id.action_reboot))
+        val menu = PopupMenu(themeWrapper, activity.window.decorView)
         activity.menuInflater.inflate(R.menu.menu_reboot, menu.menu)
         menu.setOnMenuItemClickListener(RebootMenu::reboot)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
