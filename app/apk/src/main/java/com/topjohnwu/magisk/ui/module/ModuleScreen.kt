@@ -44,7 +44,8 @@ fun ModuleScreen(viewModel: ModuleViewModel) {
                 title = stringResource(CoreR.string.modules),
                 scrollBehavior = scrollBehavior
             )
-        }
+        },
+        popupHost = { }
     ) { padding ->
         if (uiState.loading) {
             Box(

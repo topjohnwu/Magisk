@@ -56,6 +56,10 @@ import com.topjohnwu.magisk.ui.theme.Theme
 import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.magisk.view.MagiskDialogHost
 import com.topjohnwu.magisk.view.Shortcuts
+import top.yukonga.miuix.kmp.utils.MiuixPopupUtils.Companion.MiuixPopupHost
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Modifier
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.Composable
@@ -102,59 +106,62 @@ class MainActivity : UIActivity(), SplashScreenHost {
 
         setContent {
             MagiskTheme {
-                MagiskDialogHost()
-                val navigator = rememberNavigator(Route.Main)
-                CompositionLocalProvider(LocalNavigator provides navigator) {
-                    HandleFlashIntent(navigator)
+                Box(modifier = Modifier.fillMaxSize()) {
+                    val navigator = rememberNavigator(Route.Main)
+                    CompositionLocalProvider(LocalNavigator provides navigator) {
+                        HandleFlashIntent(navigator)
 
-                    NavDisplay(
-                        backStack = navigator.backStack,
-                        onBack = { navigator.pop() },
-                        entryDecorators = listOf(
-                            rememberSaveableStateHolderNavEntryDecorator(),
-                            rememberViewModelStoreNavEntryDecorator()
-                        ),
-                        entryProvider = entryProvider {
-                            entry<Route.Main> {
-                                MainScreen(initialTab = initialTab)
-                            }
-                            entry<Route.Install> { _ ->
-                                val vm: InstallViewModel = androidx.lifecycle.viewmodel.compose.viewModel(factory = VMFactory)
-                                ObserveViewEvents(vm)
-                                CollectNavEvents(vm, navigator)
-                                InstallScreen(vm, onBack = { navigator.pop() })
-                            }
-                            entry<Route.DenyList> { _ ->
-                                val vm: DenyListViewModel = androidx.lifecycle.viewmodel.compose.viewModel(factory = VMFactory)
-                                ObserveViewEvents(vm)
-                                DenyListScreen(vm, onBack = { navigator.pop() })
-                            }
-                            entry<Route.Flash> { key ->
-                                val vm: FlashViewModel = androidx.lifecycle.viewmodel.compose.viewModel(factory = VMFactory)
-                                LaunchedEffect(key) {
-                                    if (vm.flashAction.isEmpty()) {
-                                        vm.flashAction = key.action
-                                        vm.flashUri = key.additionalData?.let { Uri.parse(it) }
-                                        vm.startFlashing()
-                                    }
+                        NavDisplay(
+                            backStack = navigator.backStack,
+                            onBack = { navigator.pop() },
+                            entryDecorators = listOf(
+                                rememberSaveableStateHolderNavEntryDecorator(),
+                                rememberViewModelStoreNavEntryDecorator()
+                            ),
+                            entryProvider = entryProvider {
+                                entry<Route.Main> {
+                                    MainScreen(initialTab = initialTab)
                                 }
-                                ObserveViewEvents(vm)
-                                FlashScreen(vm, onBack = { navigator.pop() })
-                            }
-                            entry<Route.Action> { key ->
-                                val vm: ActionViewModel = androidx.lifecycle.viewmodel.compose.viewModel(factory = VMFactory)
-                                LaunchedEffect(key) {
-                                    if (vm.actionId.isEmpty()) {
-                                        vm.actionId = key.id
-                                        vm.actionName = key.name
-                                        vm.startRunAction()
-                                    }
+                                entry<Route.Install> { _ ->
+                                    val vm: InstallViewModel = androidx.lifecycle.viewmodel.compose.viewModel(factory = VMFactory)
+                                    ObserveViewEvents(vm)
+                                    CollectNavEvents(vm, navigator)
+                                    InstallScreen(vm, onBack = { navigator.pop() })
                                 }
-                                ObserveViewEvents(vm)
-                                ActionScreen(vm, actionName = key.name, onBack = { navigator.pop() })
+                                entry<Route.DenyList> { _ ->
+                                    val vm: DenyListViewModel = androidx.lifecycle.viewmodel.compose.viewModel(factory = VMFactory)
+                                    ObserveViewEvents(vm)
+                                    DenyListScreen(vm, onBack = { navigator.pop() })
+                                }
+                                entry<Route.Flash> { key ->
+                                    val vm: FlashViewModel = androidx.lifecycle.viewmodel.compose.viewModel(factory = VMFactory)
+                                    LaunchedEffect(key) {
+                                        if (vm.flashAction.isEmpty()) {
+                                            vm.flashAction = key.action
+                                            vm.flashUri = key.additionalData?.let { Uri.parse(it) }
+                                            vm.startFlashing()
+                                        }
+                                    }
+                                    ObserveViewEvents(vm)
+                                    FlashScreen(vm, onBack = { navigator.pop() })
+                                }
+                                entry<Route.Action> { key ->
+                                    val vm: ActionViewModel = androidx.lifecycle.viewmodel.compose.viewModel(factory = VMFactory)
+                                    LaunchedEffect(key) {
+                                        if (vm.actionId.isEmpty()) {
+                                            vm.actionId = key.id
+                                            vm.actionName = key.name
+                                            vm.startRunAction()
+                                        }
+                                    }
+                                    ObserveViewEvents(vm)
+                                    ActionScreen(vm, actionName = key.name, onBack = { navigator.pop() })
+                                }
                             }
-                        }
-                    )
+                        )
+                    }
+                    MagiskDialogHost()
+                    MiuixPopupHost()
                 }
             }
         }

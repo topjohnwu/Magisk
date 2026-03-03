@@ -52,7 +52,8 @@ fun SuperuserScreen(viewModel: SuperuserViewModel) {
                 title = stringResource(CoreR.string.superuser),
                 scrollBehavior = scrollBehavior
             )
-        }
+        },
+        popupHost = { }
     ) { padding ->
         if (uiState.loading) {
             Box(

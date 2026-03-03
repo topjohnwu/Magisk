@@ -70,7 +70,8 @@ fun FlashScreen(viewModel: FlashViewModel, onBack: () -> Unit) {
                 },
                 scrollBehavior = scrollBehavior
             )
-        }
+        },
+        popupHost = { }
     ) { padding ->
         Box(modifier = Modifier.fillMaxSize().padding(padding)) {
             LazyColumn(

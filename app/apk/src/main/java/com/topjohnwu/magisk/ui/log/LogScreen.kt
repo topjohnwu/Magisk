@@ -68,7 +68,8 @@ fun LogScreen(viewModel: LogViewModel) {
                 title = stringResource(CoreR.string.logs),
                 scrollBehavior = scrollBehavior
             )
-        }
+        },
+        popupHost = { }
     ) { padding ->
         Column(modifier = Modifier
             .fillMaxSize()

@@ -63,7 +63,8 @@ fun ActionScreen(viewModel: ActionViewModel, actionName: String, onBack: () -> U
                 },
                 scrollBehavior = scrollBehavior
             )
-        }
+        },
+        popupHost = { }
     ) { padding ->
         Box(modifier = Modifier.fillMaxSize().padding(padding)) {
             LazyColumn(

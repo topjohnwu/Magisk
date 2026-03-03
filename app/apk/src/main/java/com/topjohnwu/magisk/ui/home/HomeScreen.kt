@@ -53,7 +53,8 @@ fun HomeScreen(viewModel: HomeViewModel) {
                 title = stringResource(CoreR.string.section_home),
                 scrollBehavior = scrollBehavior
             )
-        }
+        },
+        popupHost = { }
     ) { padding ->
         Column(
             modifier = Modifier
