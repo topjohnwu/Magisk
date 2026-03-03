@@ -23,7 +23,6 @@ dependencies {
     implementation(libs.android.gradle.plugin)
     implementation(libs.android.kapt.plugin)
     implementation(libs.ksp.plugin)
-    implementation(libs.navigation.safe.args.plugin)
     implementation(libs.lsparanoid.plugin)
     implementation(libs.moshi.plugin)
     implementation(libs.jgit)

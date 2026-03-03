@@ -6,15 +6,11 @@ import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.view.View
-import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.res.use
 import androidx.core.view.WindowCompat
 import androidx.databinding.ViewDataBinding
-import androidx.interpolator.view.animation.FastOutSlowInInterpolator
-import androidx.transition.AutoTransition
-import androidx.transition.TransitionManager
 import com.google.android.material.snackbar.Snackbar
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
@@ -114,14 +110,4 @@ abstract class UIActivity<Binding : ViewDataBinding>
         is ActivityExecutor -> event(this)
         else -> Unit
     }
-}
-
-fun ViewGroup.startAnimations() {
-    val transition = AutoTransition()
-        .setInterpolator(FastOutSlowInInterpolator())
-        .setDuration(400)
-    TransitionManager.beginDelayedTransition(
-        this,
-        transition
-    )
 }

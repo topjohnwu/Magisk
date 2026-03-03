@@ -4,7 +4,6 @@ plugins {
     kotlin("plugin.compose")
     kotlin("plugin.serialization")
     id("com.android.legacy-kapt")
-    id("androidx.navigation.safeargs.kotlin")
 }
 
 setupMainApk()
@@ -44,19 +43,11 @@ dependencies {
     implementation(project(":core"))
     coreLibraryDesugaring(libs.jdk.libs)
 
-    implementation(libs.indeterminate.checkbox)
     implementation(libs.rikka.layoutinflater)
     implementation(libs.rikka.insets)
-    implementation(libs.rikka.recyclerview)
-
-    implementation(libs.navigation.fragment.ktx)
-    implementation(libs.navigation.ui.ktx)
 
     implementation(libs.constraintlayout)
-    implementation(libs.swiperefreshlayout)
     implementation(libs.recyclerview)
-    implementation(libs.transition)
-    implementation(libs.fragment.ktx)
     implementation(libs.appcompat)
     implementation(libs.material)
 

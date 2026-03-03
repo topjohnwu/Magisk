@@ -1,15 +1,10 @@
 package com.topjohnwu.magisk.databinding
 
-import androidx.databinding.PropertyChangeRegistry
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
 
 abstract class RvItem {
     abstract val layoutRes: Int
-}
-
-abstract class ObservableRvItem : RvItem(), ObservableHost {
-    override var callbacks: PropertyChangeRegistry? = null
 }
 
 interface ItemWrapper<E> {
