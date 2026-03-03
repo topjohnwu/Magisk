@@ -69,7 +69,8 @@ fun DenyListScreen(viewModel: DenyListViewModel, onBack: () -> Unit) {
                 },
                 scrollBehavior = scrollBehavior
             )
-        }
+        },
+        popupHost = { }
     ) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding)) {
             SearchInput(

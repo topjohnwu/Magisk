@@ -56,7 +56,8 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
                 title = stringResource(CoreR.string.settings),
                 scrollBehavior = scrollBehavior
             )
-        }
+        },
+        popupHost = { }
     ) { padding ->
         Column(
             modifier = Modifier
