@@ -101,8 +101,7 @@
     <fragment
         android:id="@+id/superuserFragment"
         android:name="com.topjohnwu.magisk.ui.superuser.SuperuserFragment"
-        android:label="SuperuserFragment"
-        tools:layout="@layout/fragment_superuser_md2" />
+        android:label="SuperuserFragment" />
 
     <fragment
         android:id="@+id/themeFragment"
