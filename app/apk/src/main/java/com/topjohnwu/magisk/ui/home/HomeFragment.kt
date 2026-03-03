@@ -15,16 +15,21 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.arch.ActivityExecutor
+import com.topjohnwu.magisk.arch.ContextExecutor
 import com.topjohnwu.magisk.arch.NavigationActivity
+import com.topjohnwu.magisk.arch.UIActivity
 import com.topjohnwu.magisk.arch.VMFactory
+import com.topjohnwu.magisk.arch.ViewEvent
+import com.topjohnwu.magisk.arch.ViewModelHolder
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.download.DownloadEngine
 import com.topjohnwu.magisk.ui.theme.MagiskTheme
 import com.topjohnwu.magisk.core.R as CoreR
 
-class HomeFragment : Fragment(), MenuProvider {
+class HomeFragment : Fragment(), MenuProvider, ViewModelHolder {
 
-    private val viewModel by lazy {
+    override val viewModel by lazy {
         ViewModelProvider(this, VMFactory)[HomeViewModel::class.java]
     }
 
@@ -51,6 +56,14 @@ class HomeFragment : Fragment(), MenuProvider {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        startObserveLiveData()
+    }
+
+    override fun onEventDispatched(event: ViewEvent) {
+        when (event) {
+            is ContextExecutor -> event(requireContext())
+            is ActivityExecutor -> (activity as? UIActivity<*>)?.let { event(it) }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
