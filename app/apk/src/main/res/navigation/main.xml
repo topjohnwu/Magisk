@@ -8,14 +8,12 @@
     <fragment
         android:id="@+id/denyFragment"
         android:name="com.topjohnwu.magisk.ui.deny.DenyListFragment"
-        android:label="DenyListFragment"
-        tools:layout="@layout/fragment_deny_md2" />
+        android:label="DenyListFragment" />
 
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.topjohnwu.magisk.ui.home.HomeFragment"
-        android:label="HomeFragment"
-        tools:layout="@layout/fragment_home_md2">
+        android:label="HomeFragment">
 
         <action
             android:id="@+id/action_homeFragment_to_installFragment"
@@ -69,8 +67,7 @@
     <fragment
         android:id="@+id/logFragment"
         android:name="com.topjohnwu.magisk.ui.log.LogFragment"
-        android:label="LogFragment"
-        tools:layout="@layout/fragment_log_md2" />
+        android:label="LogFragment" />
 
     <fragment
         android:id="@+id/modulesFragment"
@@ -81,8 +78,7 @@
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.topjohnwu.magisk.ui.settings.SettingsFragment"
-        android:label="SettingsFragment"
-        tools:layout="@layout/fragment_settings_md2">
+        android:label="SettingsFragment">
 
         <action
             android:id="@+id/action_settingsFragment_to_themeFragment"
