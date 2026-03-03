@@ -8,11 +8,9 @@ import android.text.Spanned
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
-import android.widget.Spinner
 import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.Toolbar
@@ -22,9 +20,6 @@ import androidx.core.view.isInvisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.ImageViewCompat
 import androidx.databinding.BindingAdapter
-import androidx.databinding.InverseBindingAdapter
-import androidx.databinding.InverseBindingListener
-import androidx.databinding.InverseMethod
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
@@ -33,15 +28,11 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
-import com.google.android.material.chip.Chip
-import com.google.android.material.slider.Slider
 import com.google.android.material.textfield.TextInputLayout
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.di.ServiceLocator
-import com.topjohnwu.magisk.core.model.su.SuPolicy
 import com.topjohnwu.magisk.utils.TextHolder
 import com.topjohnwu.superuser.internal.UiThreadHandler
-import com.topjohnwu.widget.IndeterminateCheckBox
 import kotlin.math.roundToInt
 
 @BindingAdapter("gone")
@@ -208,11 +199,6 @@ fun Toolbar.setOnMenuClickListener(listener: Toolbar.OnMenuItemClickListener) {
     setOnMenuItemClickListener(listener)
 }
 
-@BindingAdapter("onCloseClicked")
-fun Chip.setOnCloseClickedListenerBinding(listener: View.OnClickListener) {
-    setOnCloseIconClickListener(listener)
-}
-
 @BindingAdapter("progressAnimated")
 fun ProgressBar.setProgressAnimated(newProgress: Int) {
     val animator = tag as? ValueAnimator
@@ -255,25 +241,6 @@ fun RecyclerView.setSpanCount(count: Int) {
     }
 }
 
-@BindingAdapter("state")
-fun setState(view: IndeterminateCheckBox, state: Boolean?) {
-    if (view.state != state)
-        view.state = state
-}
-
-@InverseBindingAdapter(attribute = "state")
-fun getState(view: IndeterminateCheckBox) = view.state
-
-@BindingAdapter("stateAttrChanged")
-fun setListeners(
-    view: IndeterminateCheckBox,
-    attrChange: InverseBindingListener
-) {
-    view.setOnStateChangedListener { _, _ ->
-        attrChange.onChange()
-    }
-}
-
 @BindingAdapter("cardBackgroundColorAttr")
 fun CardView.setCardBackgroundColorAttr(attr: Int) {
     val tv = TypedValue()
@@ -305,42 +272,3 @@ fun TextView.setText(text: TextHolder) {
     this.text = text.getText(context.resources)
 }
 
-@BindingAdapter("items", "layout")
-fun Spinner.setAdapter(items: Array<Any>, layoutRes: Int) {
-    adapter = ArrayAdapter(context, layoutRes, items)
-}
-
-@BindingAdapter("labelFormatter")
-fun Slider.setLabelFormatter(formatter: (Float) -> Int) {
-    setLabelFormatter { value -> resources.getString(formatter(value)) }
-}
-
-@InverseBindingAdapter(attribute = "android:value")
-fun Slider.getValueBinding() = value
-
-@BindingAdapter("android:valueAttrChanged")
-fun Slider.setListener(attrChange: InverseBindingListener) {
-    addOnSliderTouchListener(object : Slider.OnSliderTouchListener {
-        override fun onStartTrackingTouch(slider: Slider) = Unit
-        override fun onStopTrackingTouch(slider: Slider) = attrChange.onChange()
-    })
-}
-
-@InverseMethod("sliderValueToPolicy")
-fun policyToSliderValue(policy: Int): Float {
-    return when (policy) {
-        SuPolicy.DENY -> 1f
-        SuPolicy.RESTRICT -> 2f
-        SuPolicy.ALLOW -> 3f
-        else -> 1f
-    }
-}
-
-fun sliderValueToPolicy(value: Float): Int {
-    return when (value) {
-        1f -> SuPolicy.DENY
-        2f -> SuPolicy.RESTRICT
-        3f -> SuPolicy.ALLOW
-        else -> SuPolicy.DENY
-    }
-}
