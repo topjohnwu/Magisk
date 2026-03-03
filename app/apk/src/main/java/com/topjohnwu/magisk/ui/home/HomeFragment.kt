@@ -7,40 +7,31 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.MenuProvider
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.findNavController
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.arch.BaseFragment
-import com.topjohnwu.magisk.arch.viewModel
+import com.topjohnwu.magisk.arch.NavigationActivity
+import com.topjohnwu.magisk.arch.VMFactory
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.download.DownloadEngine
-import com.topjohnwu.magisk.databinding.FragmentHomeMd2Binding
+import com.topjohnwu.magisk.ui.theme.MagiskTheme
 import com.topjohnwu.magisk.core.R as CoreR
-import androidx.navigation.findNavController
-import com.topjohnwu.magisk.arch.NavigationActivity
 
-class HomeFragment : BaseFragment<FragmentHomeMd2Binding>(), MenuProvider {
+class HomeFragment : Fragment(), MenuProvider {
 
-    override val layoutRes = R.layout.fragment_home_md2
-    override val viewModel by viewModel<HomeViewModel>()
+    private val viewModel by lazy {
+        ViewModelProvider(this, VMFactory)[HomeViewModel::class.java]
+    }
 
     override fun onStart() {
         super.onStart()
-        activity?.setTitle(CoreR.string.section_home)
+        (activity as? NavigationActivity<*>)?.setTitle(CoreR.string.section_home)
         DownloadEngine.observeProgress(this, viewModel::onProgressUpdate)
-    }
-
-    private fun checkTitle(text: TextView, icon: ImageView) {
-        text.post {
-            if (text.layout?.getEllipsisCount(0) != 0) {
-                with (icon) {
-                    layoutParams.width = 0
-                    layoutParams.height = 0
-                    requestLayout()
-                }
-            }
-        }
     }
 
     override fun onCreateView(
@@ -48,17 +39,23 @@ class HomeFragment : BaseFragment<FragmentHomeMd2Binding>(), MenuProvider {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
-
-        // If titles are squished, hide icons
-        with(binding.homeMagiskWrapper) {
-            checkTitle(homeMagiskTitle, homeMagiskIcon)
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                MagiskTheme {
+                    HomeScreen(viewModel = viewModel)
+                }
+            }
         }
-        with(binding.homeManagerWrapper) {
-            checkTitle(homeManagerTitle, homeManagerIcon)
-        }
+    }
 
-        return binding.root
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        activity?.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.STARTED)
     }
 
     override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
@@ -77,14 +74,16 @@ class HomeFragment : BaseFragment<FragmentHomeMd2Binding>(), MenuProvider {
                         it.contentResolver,
                     )
                 }
-            R.id.action_reboot -> activity?.let { RebootMenu.inflate(it).show() }
-            else -> return super.onOptionsItemSelected(item)
+            R.id.action_reboot -> (activity as? NavigationActivity<*>)?.let {
+                RebootMenu.inflate(it).show()
+            }
+            else -> return false
         }
         return true
     }
 
     override fun onResume() {
         super.onResume()
-        viewModel.stateManagerProgress = 0
+        viewModel.resetProgress()
     }
 }
