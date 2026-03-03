@@ -29,6 +29,7 @@ class LogViewModel(
     data class UiState(
         val loading: Boolean = true,
         val magiskLog: String = "",
+        val magiskLogEntries: List<MagiskLogEntry> = emptyList(),
         val suLogs: List<SuLog> = emptyList(),
     )
 
@@ -42,9 +43,11 @@ class LogViewModel(
         withContext(Dispatchers.Default) {
             magiskLogRaw = repo.fetchMagiskLogs()
             val suLogs = repo.fetchSuLogs()
+            val entries = MagiskLogParser.parse(magiskLogRaw)
             _uiState.update { it.copy(
                 loading = false,
                 magiskLog = magiskLogRaw,
+                magiskLogEntries = entries,
                 suLogs = suLogs,
             ) }
         }
