@@ -63,7 +63,7 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
                 .verticalScroll(rememberScrollState())
                 .padding(padding)
                 .padding(horizontal = 12.dp)
-                .padding(bottom = 16.dp)
+                .padding(bottom = 88.dp)
         ) {
             CustomizationSection(viewModel)
             Spacer(Modifier.height(12.dp))

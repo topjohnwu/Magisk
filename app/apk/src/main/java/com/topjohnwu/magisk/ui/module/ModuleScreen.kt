@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.ui.module
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -61,6 +62,7 @@ fun ModuleScreen(viewModel: ModuleViewModel) {
                 .fillMaxSize()
                 .padding(padding)
                 .padding(horizontal = 12.dp),
+            contentPadding = PaddingValues(bottom = 88.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             item { Spacer(Modifier.height(4.dp)) }

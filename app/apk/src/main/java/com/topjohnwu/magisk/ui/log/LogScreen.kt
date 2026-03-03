@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.ui.log
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -115,6 +116,7 @@ private fun SuLogTab(logs: List<SuLog>, onClear: () -> Unit) {
                 modifier = Modifier
                     .weight(1f)
                     .padding(horizontal = 12.dp),
+                contentPadding = PaddingValues(bottom = 88.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 item { Spacer(Modifier.height(4.dp)) }
@@ -217,6 +219,7 @@ private fun MagiskLogTab(log: String, onSave: () -> Unit, onClear: () -> Unit) {
                     .horizontalScroll(rememberScrollState())
                     .verticalScroll(rememberScrollState())
                     .padding(12.dp)
+                    .padding(bottom = 76.dp)
             ) {
                 Text(
                     text = log,

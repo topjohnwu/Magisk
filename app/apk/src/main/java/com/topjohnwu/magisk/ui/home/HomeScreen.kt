@@ -59,7 +59,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp)
-                .padding(bottom = 16.dp),
+                .padding(bottom = 88.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             if (uiState.isNoticeVisible) {
