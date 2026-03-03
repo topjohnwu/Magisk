@@ -79,7 +79,9 @@ fun LogScreen(viewModel: LogViewModel) {
                 tabs = tabTitles,
                 selectedTabIndex = selectedTab,
                 onTabSelected = { selectedTab = it },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp)
             )
 
             if (uiState.loading) {
@@ -130,14 +132,12 @@ private fun SuLogTab(logs: List<SuLog>, onClear: () -> Unit, nestedScrollConnect
                     .weight(1f)
                     .nestedScroll(nestedScrollConnection)
                     .padding(horizontal = 12.dp),
-                contentPadding = PaddingValues(bottom = 88.dp),
+                contentPadding = PaddingValues(top = 8.dp, bottom = 88.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                item { Spacer(Modifier.height(4.dp)) }
                 items(logs, key = { it.id }) { log ->
                     SuLogCard(log)
                 }
-                item { Spacer(Modifier.height(4.dp)) }
             }
         }
 
@@ -239,14 +239,12 @@ private fun MagiskLogTab(
                     .weight(1f)
                     .nestedScroll(nestedScrollConnection)
                     .padding(horizontal = 12.dp),
-                contentPadding = PaddingValues(bottom = 88.dp),
+                contentPadding = PaddingValues(top = 8.dp, bottom = 88.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                item { Spacer(Modifier.height(4.dp)) }
                 items(entries.size, key = { it }) { index ->
                     MagiskLogCard(entries[index])
                 }
-                item { Spacer(Modifier.height(4.dp)) }
             }
         }
 
