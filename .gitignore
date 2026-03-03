@@ -12,3 +12,4 @@ native/out
 # Android Studio
 *.iml
 .idea
+.cursor
