@@ -1,14 +1,10 @@
 package com.topjohnwu.magisk.ui.flash
 
-import android.view.MenuItem
-import androidx.databinding.Bindable
-import androidx.databinding.ObservableArrayList
+import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
-import com.topjohnwu.magisk.BR
-import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
@@ -20,10 +16,12 @@ import com.topjohnwu.magisk.core.tasks.FlashZip
 import com.topjohnwu.magisk.core.tasks.MagiskInstaller
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
-import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.superuser.CallbackList
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class FlashViewModel : BaseViewModel() {
@@ -36,18 +34,20 @@ class FlashViewModel : BaseViewModel() {
     val state: LiveData<State> get() = _state
     val flashing = state.map { it == State.FLASHING }
 
-    @get:Bindable
-    var showReboot = Info.isRooted
-        set(value) = set(value, field, { field = it }, BR.showReboot)
+    private val _flashState = MutableStateFlow(State.FLASHING)
+    val flashState: StateFlow<State> = _flashState.asStateFlow()
 
-    val items = ObservableArrayList<ConsoleItem>()
+    private val _showReboot = MutableStateFlow(Info.isRooted)
+    val showReboot: StateFlow<Boolean> = _showReboot.asStateFlow()
+
+    val consoleItems = mutableStateListOf<String>()
     lateinit var args: FlashFragmentArgs
 
     private val logItems = mutableListOf<String>().synchronized()
     private val outItems = object : CallbackList<String>() {
         override fun onAddElement(e: String?) {
             e ?: return
-            items.add(ConsoleItem(e))
+            consoleItems.add(e)
             logItems.add(e)
         }
     }
@@ -62,7 +62,7 @@ class FlashViewModel : BaseViewModel() {
                     FlashZip(uri, outItems, logItems).exec()
                 }
                 Const.Value.UNINSTALL -> {
-                    showReboot = false
+                    _showReboot.value = false
                     MagiskInstaller.Uninstall(outItems, logItems).exec()
                 }
                 Const.Value.FLASH_MAGISK -> {
@@ -72,12 +72,12 @@ class FlashViewModel : BaseViewModel() {
                         MagiskInstaller.Direct(outItems, logItems).exec()
                 }
                 Const.Value.FLASH_INACTIVE_SLOT -> {
-                    showReboot = false
+                    _showReboot.value = false
                     MagiskInstaller.SecondSlot(outItems, logItems).exec()
                 }
                 Const.Value.PATCH_FILE -> {
                     uri ?: return@launch
-                    showReboot = false
+                    _showReboot.value = false
                     MagiskInstaller.Patch(uri, outItems, logItems).exec()
                 }
                 else -> {
@@ -90,17 +90,12 @@ class FlashViewModel : BaseViewModel() {
     }
 
     private fun onResult(success: Boolean) {
-        _state.value = if (success) State.SUCCESS else State.FAILED
+        val newState = if (success) State.SUCCESS else State.FAILED
+        _state.value = newState
+        _flashState.value = newState
     }
 
-    fun onMenuItemClicked(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.action_save -> savePressed()
-        }
-        return true
-    }
-
-    private fun savePressed() = withExternalRW {
+    fun saveLog() = withExternalRW {
         viewModelScope.launch(Dispatchers.IO) {
             val name = "magisk_install_log_%s.log".format(
                 System.currentTimeMillis().toTime(timeFormatStandard)
