@@ -72,8 +72,7 @@
     <fragment
         android:id="@+id/modulesFragment"
         android:name="com.topjohnwu.magisk.ui.module.ModuleFragment"
-        android:label="ModuleFragment"
-        tools:layout="@layout/fragment_module_md2" />
+        android:label="ModuleFragment" />
 
     <fragment
         android:id="@+id/settingsFragment"

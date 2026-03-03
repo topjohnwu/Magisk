@@ -1,45 +1,71 @@
 package com.topjohnwu.magisk.ui.module
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
-import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.arch.BaseFragment
-import com.topjohnwu.magisk.arch.viewModel
+import android.view.ViewGroup
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import com.topjohnwu.magisk.arch.ActivityExecutor
+import com.topjohnwu.magisk.arch.ContextExecutor
+import com.topjohnwu.magisk.arch.NavigationActivity
+import com.topjohnwu.magisk.arch.UIActivity
+import com.topjohnwu.magisk.arch.VMFactory
+import com.topjohnwu.magisk.arch.ViewEvent
+import com.topjohnwu.magisk.arch.ViewModelHolder
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.displayName
-import com.topjohnwu.magisk.databinding.FragmentModuleMd2Binding
-import rikka.recyclerview.addEdgeSpacing
-import rikka.recyclerview.addInvalidateItemDecorationsObserver
-import rikka.recyclerview.addItemSpacing
-import rikka.recyclerview.fixEdgeEffect
+import com.topjohnwu.magisk.ui.theme.MagiskTheme
 import com.topjohnwu.magisk.core.R as CoreR
 
-class ModuleFragment : BaseFragment<FragmentModuleMd2Binding>() {
+class ModuleFragment : Fragment(), ViewModelHolder {
 
-    override val layoutRes = R.layout.fragment_module_md2
-    override val viewModel by viewModel<ModuleViewModel>()
+    override val viewModel by lazy {
+        ViewModelProvider(this, VMFactory)[ModuleViewModel::class.java]
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        startObserveLiveData()
+    }
 
     override fun onStart() {
         super.onStart()
-        activity?.title = resources.getString(CoreR.string.modules)
-        viewModel.data.observe(this) {
+        (activity as? NavigationActivity<*>)?.setTitle(CoreR.string.modules)
+        (viewModel as ModuleViewModel).data.observe(this) {
             it ?: return@observe
+            val vm = viewModel as ModuleViewModel
             val displayName = runCatching { it.displayName }.getOrNull() ?: return@observe
-            viewModel.requestInstallLocalModule(it, displayName)
-            viewModel.data.value = null
+            vm.requestInstallLocalModule(it, displayName)
+            vm.data.value = null
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        binding.moduleList.apply {
-            addEdgeSpacing(top = R.dimen.l_50, bottom = R.dimen.l1)
-            addItemSpacing(R.dimen.l1, R.dimen.l_50, R.dimen.l1)
-            fixEdgeEffect()
-            post { addInvalidateItemDecorationsObserver() }
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                MagiskTheme {
+                    ModuleScreen(viewModel = viewModel as ModuleViewModel)
+                }
+            }
         }
     }
 
-    override fun onPreBind(binding: FragmentModuleMd2Binding) = Unit
+    override fun onResume() {
+        super.onResume()
+        (viewModel as ModuleViewModel).startLoading()
+    }
 
+    override fun onEventDispatched(event: ViewEvent) {
+        when (event) {
+            is ContextExecutor -> event(requireContext())
+            is ActivityExecutor -> (activity as? UIActivity<*>)?.let { event(it) }
+        }
+    }
 }
