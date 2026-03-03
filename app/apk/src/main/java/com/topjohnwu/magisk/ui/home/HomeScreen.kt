@@ -3,8 +3,11 @@ package com.topjohnwu.magisk.ui.home
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.os.Build
+import android.os.PowerManager
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -20,6 +23,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -27,18 +34,28 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
+import androidx.core.content.getSystemService
 import androidx.core.net.toUri
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.core.Config
+import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.ktx.reboot
+import com.topjohnwu.magisk.ui.component.ListPopupDefaults.MenuPositionProvider
 import com.topjohnwu.magisk.core.R as CoreR
 import top.yukonga.miuix.kmp.basic.Card
+import top.yukonga.miuix.kmp.basic.DropdownImpl
 import top.yukonga.miuix.kmp.basic.Icon
+import top.yukonga.miuix.kmp.basic.IconButton
 import top.yukonga.miuix.kmp.basic.LinearProgressIndicator
+import top.yukonga.miuix.kmp.basic.ListPopupColumn
 import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
+import top.yukonga.miuix.kmp.basic.PopupPositionProvider
 import top.yukonga.miuix.kmp.basic.Scaffold
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.basic.TextButton
 import top.yukonga.miuix.kmp.basic.TopAppBar
+import top.yukonga.miuix.kmp.extra.SuperListPopup
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Composable
@@ -51,7 +68,12 @@ fun HomeScreen(viewModel: HomeViewModel) {
         topBar = {
             TopAppBar(
                 title = stringResource(CoreR.string.section_home),
-                scrollBehavior = scrollBehavior
+                scrollBehavior = scrollBehavior,
+                actions = {
+                    if (Info.isRooted) {
+                        RebootButton()
+                    }
+                }
             )
         },
         popupHost = { }
@@ -87,6 +109,72 @@ fun HomeScreen(viewModel: HomeViewModel) {
         }
     }
 }
+
+@Composable
+private fun RebootButton() {
+    val showMenu = remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    var safeModeEnabled by remember { mutableIntStateOf(Config.bootloop) }
+
+    val showUserspace = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
+        context.getSystemService<PowerManager>()?.isRebootingUserspaceSupported == true
+    val showSafeMode = Const.Version.atLeast_28_0()
+
+    val items = buildList {
+        add(RebootOption(CoreR.string.reboot) { reboot() })
+        if (showUserspace) {
+            add(RebootOption(CoreR.string.reboot_userspace) { reboot("userspace") })
+        }
+        add(RebootOption(CoreR.string.reboot_recovery) { reboot("recovery") })
+        add(RebootOption(CoreR.string.reboot_bootloader) { reboot("bootloader") })
+        add(RebootOption(CoreR.string.reboot_download) { reboot("download") })
+        add(RebootOption(CoreR.string.reboot_edl) { reboot("edl") })
+        if (showSafeMode) {
+            add(RebootOption(CoreR.string.reboot_safe_mode) {
+                val newVal = if (safeModeEnabled >= 2) 0 else 2
+                Config.bootloop = newVal
+                safeModeEnabled = newVal
+            })
+        }
+    }
+
+    Box {
+        IconButton(
+            modifier = Modifier.padding(end = 16.dp),
+            onClick = { showMenu.value = true },
+            holdDownState = showMenu.value,
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.ic_restart),
+                contentDescription = stringResource(CoreR.string.reboot),
+            )
+        }
+        SuperListPopup(
+            show = showMenu,
+            popupPositionProvider = MenuPositionProvider,
+            alignment = PopupPositionProvider.Align.End,
+            onDismissRequest = { showMenu.value = false }
+        ) {
+            ListPopupColumn {
+                items.forEachIndexed { index, item ->
+                    val isSafeMode = item.labelRes == CoreR.string.reboot_safe_mode
+                    DropdownImpl(
+                        text = stringResource(item.labelRes),
+                        optionSize = items.size,
+                        isSelected = isSafeMode && safeModeEnabled >= 2,
+                        index = index,
+                        onSelectedIndexChange = {
+                            item.action()
+                            if (!isSafeMode) showMenu.value = false
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
+private class RebootOption(val labelRes: Int, val action: () -> Unit)
 
 @Composable
 private fun NoticeCard(onHide: () -> Unit) {
