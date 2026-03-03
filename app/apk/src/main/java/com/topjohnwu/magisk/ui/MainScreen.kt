@@ -23,6 +23,7 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -83,22 +84,26 @@ fun MainScreen(initialTab: Int = 0) {
             when (Tab.entries[page]) {
                 Tab.HOME -> {
                     val vm: HomeViewModel = viewModel(factory = VMFactory)
+                    LaunchedEffect(Unit) { vm.startLoading() }
                     ObserveViewEvents(vm)
                     CollectNavEvents(vm, navigator)
                     HomeScreen(vm)
                 }
                 Tab.SUPERUSER -> {
                     val vm: SuperuserViewModel = viewModel(factory = VMFactory)
+                    LaunchedEffect(Unit) { vm.startLoading() }
                     ObserveViewEvents(vm)
                     SuperuserScreen(vm)
                 }
                 Tab.LOG -> {
                     val vm: LogViewModel = viewModel(factory = VMFactory)
+                    LaunchedEffect(Unit) { vm.startLoading() }
                     ObserveViewEvents(vm)
                     LogScreen(vm)
                 }
                 Tab.MODULES -> {
                     val vm: ModuleViewModel = viewModel(factory = VMFactory)
+                    LaunchedEffect(Unit) { vm.startLoading() }
                     ObserveViewEvents(vm)
                     CollectNavEvents(vm, navigator)
                     ModuleScreen(vm)
