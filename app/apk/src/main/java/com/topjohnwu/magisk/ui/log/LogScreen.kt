@@ -1,5 +1,7 @@
 package com.topjohnwu.magisk.ui.log
 
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -12,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -28,6 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -41,6 +45,9 @@ import androidx.compose.ui.unit.sp
 import com.topjohnwu.magisk.core.ktx.timeDateFormat
 import com.topjohnwu.magisk.core.ktx.toTime
 import com.topjohnwu.magisk.core.model.su.SuLog
+import com.topjohnwu.magisk.ui.util.rememberDrawablePainter
+import top.yukonga.miuix.kmp.basic.Icon
+import top.yukonga.miuix.kmp.basic.IconButton
 import top.yukonga.miuix.kmp.basic.Card
 import top.yukonga.miuix.kmp.basic.CircularProgressIndicator
 import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
@@ -50,6 +57,9 @@ import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.basic.TextButton
 import top.yukonga.miuix.kmp.basic.TopAppBar
 import top.yukonga.miuix.kmp.theme.MiuixTheme
+import top.yukonga.miuix.kmp.icon.MiuixIcons
+import top.yukonga.miuix.kmp.icon.extended.Delete
+import top.yukonga.miuix.kmp.icon.extended.Download
 import com.topjohnwu.magisk.core.R as CoreR
 
 @Composable
@@ -66,6 +76,28 @@ fun LogScreen(viewModel: LogViewModel) {
         topBar = {
             TopAppBar(
                 title = stringResource(CoreR.string.logs),
+                actions = {
+                    if (selectedTab == 1) {
+                        IconButton(onClick = { viewModel.saveMagiskLog() }) {
+                            Icon(
+                                imageVector = MiuixIcons.Download,
+                                contentDescription = stringResource(CoreR.string.save_log),
+                            )
+                        }
+                    }
+                    IconButton(
+                        modifier = Modifier.padding(end = 16.dp),
+                        onClick = {
+                            if (selectedTab == 0) viewModel.clearLog()
+                            else viewModel.clearMagiskLog()
+                        }
+                    ) {
+                        Icon(
+                            imageVector = MiuixIcons.Delete,
+                            contentDescription = stringResource(CoreR.string.clear_log),
+                        )
+                    }
+                },
                 scrollBehavior = scrollBehavior
             )
         },
@@ -158,54 +190,115 @@ private fun SuLogTab(logs: List<SuLog>, onClear: () -> Unit, nestedScrollConnect
 @Composable
 private fun SuLogCard(log: SuLog) {
     val res = LocalContext.current.resources
+    val pm = LocalContext.current.packageManager
+    val icon = remember(log.packageName) {
+        runCatching {
+            pm.getApplicationInfo(log.packageName, 0).loadIcon(pm)
+        }.getOrDefault(pm.defaultActivityIcon)
+    }
+    val allowed = log.action >= 2
+
+    val uidPidText = buildString {
+        append("UID: ${log.toUid}  PID: ${log.fromPid}")
+        if (log.target != -1) {
+            val target = if (log.target == 0) "magiskd" else log.target.toString()
+            append("  → $target")
+        }
+    }
+
+    val details = buildString {
+        if (log.context.isNotEmpty()) {
+            append(res.getString(CoreR.string.selinux_context, log.context))
+        }
+        if (log.gids.isNotEmpty()) {
+            if (isNotEmpty()) append("\n")
+            append(res.getString(CoreR.string.supp_group, log.gids))
+        }
+        if (log.command.isNotEmpty()) {
+            if (isNotEmpty()) append("\n")
+            append(log.command)
+        }
+    }
+
     Card(modifier = Modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(12.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.Top
             ) {
-                Text(
-                    text = log.appName,
-                    style = MiuixTheme.textStyles.body1,
+                Image(
+                    painter = rememberDrawablePainter(icon),
+                    contentDescription = log.appName,
+                    modifier = Modifier.size(36.dp)
                 )
-                val allowed = log.action >= 2
+                Spacer(Modifier.width(10.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = log.appName,
+                        style = MiuixTheme.textStyles.body1,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    Text(
+                        text = uidPidText,
+                        style = MiuixTheme.textStyles.body2,
+                        color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+                Spacer(Modifier.width(8.dp))
+                Column(horizontalAlignment = Alignment.End) {
+                    Text(
+                        text = log.time.toTime(timeDateFormat),
+                        fontSize = 11.sp,
+                        fontFamily = FontFamily.Monospace,
+                        color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                        maxLines = 1,
+                    )
+                }
+            }
+
+            if (details.isNotEmpty()) {
+                Spacer(Modifier.height(6.dp))
                 Text(
-                    text = if (allowed) stringResource(CoreR.string.grant) else stringResource(CoreR.string.deny),
-                    style = MiuixTheme.textStyles.body2,
-                    color = if (allowed) MiuixTheme.colorScheme.onSurfaceVariantSummary
-                        else MiuixTheme.colorScheme.primary
+                    text = details,
+                    fontFamily = FontFamily.Monospace,
+                    fontSize = 12.sp,
+                    lineHeight = 16.sp,
+                    color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
                 )
             }
 
-            Spacer(Modifier.height(4.dp))
-
-            val info = buildString {
-                val date = log.time.toTime(timeDateFormat)
-                val toUid = res.getString(CoreR.string.target_uid, log.toUid)
-                val fromPid = res.getString(CoreR.string.pid, log.fromPid)
-                append("$date\n$toUid  $fromPid")
-                if (log.target != -1) {
-                    val pid = if (log.target == 0) "magiskd" else log.target.toString()
-                    val target = res.getString(CoreR.string.target_pid, pid)
-                    append("  $target")
-                }
-                if (log.context.isNotEmpty()) {
-                    val context = res.getString(CoreR.string.selinux_context, log.context)
-                    append("\n$context")
-                }
-                if (log.gids.isNotEmpty()) {
-                    val gids = res.getString(CoreR.string.supp_group, log.gids)
-                    append("\n$gids")
-                }
-                append("\n${log.command}")
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                SuActionIcon(allowed)
             }
+        }
+    }
+}
 
-            Text(
-                text = info,
-                style = MiuixTheme.textStyles.body2,
-                color = MiuixTheme.colorScheme.onSurfaceVariantSummary
-            )
+@Composable
+private fun SuActionIcon(allowed: Boolean) {
+    val color = if (allowed) Color(0xFF4CAF50) else Color(0xFFF44336)
+    Canvas(modifier = Modifier.size(18.dp)) {
+        val stroke = androidx.compose.ui.graphics.drawscope.Stroke(
+            width = 2.dp.toPx(),
+            cap = androidx.compose.ui.graphics.StrokeCap.Round
+        )
+        if (allowed) {
+            val path = androidx.compose.ui.graphics.Path().apply {
+                moveTo(size.width * 0.2f, size.height * 0.5f)
+                lineTo(size.width * 0.42f, size.height * 0.72f)
+                lineTo(size.width * 0.8f, size.height * 0.28f)
+            }
+            drawPath(path, color, style = stroke)
+        } else {
+            drawLine(color, Offset(size.width * 0.25f, size.height * 0.25f), Offset(size.width * 0.75f, size.height * 0.75f), strokeWidth = 2.dp.toPx(), cap = androidx.compose.ui.graphics.StrokeCap.Round)
+            drawLine(color, Offset(size.width * 0.75f, size.height * 0.25f), Offset(size.width * 0.25f, size.height * 0.75f), strokeWidth = 2.dp.toPx(), cap = androidx.compose.ui.graphics.StrokeCap.Round)
         }
     }
 }
@@ -291,7 +384,7 @@ private fun MagiskLogCard(entry: MagiskLogEntry) {
                         Text(
                             text = entry.tag,
                             style = MiuixTheme.textStyles.body1,
-                            fontWeight = FontWeight.Medium,
+                            fontWeight = FontWeight.Normal,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )
