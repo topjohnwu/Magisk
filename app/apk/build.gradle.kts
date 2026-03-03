@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     kotlin("plugin.parcelize")
+    kotlin("plugin.compose")
     id("com.android.legacy-kapt")
     id("androidx.navigation.safeargs.kotlin")
 }
@@ -19,6 +20,7 @@ kapt {
 android {
     buildFeatures {
         dataBinding = true
+        compose = true
     }
 
     compileOptions {
@@ -56,6 +58,16 @@ dependencies {
     implementation(libs.fragment.ktx)
     implementation(libs.appcompat)
     implementation(libs.material)
+
+    // Compose
+    implementation(platform(libs.compose.bom))
+    implementation(libs.compose.ui)
+    implementation(libs.compose.ui.tooling.preview)
+    debugImplementation(libs.compose.ui.tooling)
+    implementation(libs.activity.compose)
+    implementation(libs.lifecycle.runtime.compose)
+    implementation(libs.lifecycle.viewmodel.compose)
+    implementation(libs.miuix)
 
     // Make sure kapt runs with a proper kotlin-stdlib
     kapt(kotlin("stdlib"))
