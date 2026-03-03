@@ -130,6 +130,7 @@ class MainActivity : UIActivity(), SplashScreenHost {
                                 }
                                 entry<Route.DenyList> { _ ->
                                     val vm: DenyListViewModel = androidx.lifecycle.viewmodel.compose.viewModel(factory = VMFactory)
+                                    LaunchedEffect(Unit) { vm.startLoading() }
                                     ObserveViewEvents(vm)
                                     DenyListScreen(vm, onBack = { navigator.pop() })
                                 }

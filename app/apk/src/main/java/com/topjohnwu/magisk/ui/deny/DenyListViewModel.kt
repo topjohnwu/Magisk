@@ -22,6 +22,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.toCollection
 import kotlinx.coroutines.withContext
 
+enum class SortBy { NAME, PACKAGE_NAME, INSTALL_TIME, UPDATE_TIME }
+
 class DenyListViewModel : AsyncLoadViewModel() {
 
     private val _loading = MutableStateFlow(true)
@@ -38,10 +40,24 @@ class DenyListViewModel : AsyncLoadViewModel() {
     private val _showOS = MutableStateFlow(false)
     val showOS: StateFlow<Boolean> = _showOS.asStateFlow()
 
+    private val _sortBy = MutableStateFlow(SortBy.NAME)
+    val sortBy: StateFlow<SortBy> = _sortBy.asStateFlow()
+
+    private val _sortReverse = MutableStateFlow(false)
+    val sortReverse: StateFlow<Boolean> = _sortReverse.asStateFlow()
+
     val filteredApps: StateFlow<List<DenyAppState>> = combine(
-        _allApps, _query, _showSystem, _showOS
-    ) { apps, q, showSys, showOS ->
-        apps.filter { app ->
+        _allApps, _query, _showSystem, _showOS, _sortBy, _sortReverse
+    ) { args ->
+        @Suppress("UNCHECKED_CAST")
+        val apps = args[0] as List<DenyAppState>
+        val q = args[1] as String
+        val showSys = args[2] as Boolean
+        val showOS = args[3] as Boolean
+        val sort = args[4] as SortBy
+        val reverse = args[5] as Boolean
+
+        val filtered = apps.filter { app ->
             val passFilter = app.isChecked ||
                 ((showSys || !app.info.isSystemApp()) &&
                 ((showSys && showOS) || app.info.isApp()))
@@ -51,11 +67,26 @@ class DenyListViewModel : AsyncLoadViewModel() {
                 app.processes.any { it.process.name.contains(q, true) }
             passFilter && passQuery
         }
+
+        val secondary: Comparator<DenyAppState> = when (sort) {
+            SortBy.NAME -> compareBy(String.CASE_INSENSITIVE_ORDER) { it.info.label }
+            SortBy.PACKAGE_NAME -> compareBy(String.CASE_INSENSITIVE_ORDER) { it.info.packageName }
+            SortBy.INSTALL_TIME -> compareByDescending { it.info.firstInstallTime }
+            SortBy.UPDATE_TIME -> compareByDescending { it.info.lastUpdateTime }
+        }
+        val comparator = compareBy<DenyAppState> { it.itemsChecked == 0 }
+            .then(if (reverse) secondary.reversed() else secondary)
+        filtered.sortedWith(comparator)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     fun setQuery(q: String) { _query.value = q }
-    fun setShowSystem(v: Boolean) { _showSystem.value = v }
+    fun setShowSystem(v: Boolean) {
+        _showSystem.value = v
+        if (!v) _showOS.value = false
+    }
     fun setShowOS(v: Boolean) { _showOS.value = v }
+    fun setSortBy(s: SortBy) { _sortBy.value = s }
+    fun toggleSortReverse() { _sortReverse.value = !_sortReverse.value }
 
     @SuppressLint("InlinedApi")
     override suspend fun doLoadWork() {

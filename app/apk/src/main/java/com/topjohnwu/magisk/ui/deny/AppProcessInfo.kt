@@ -46,6 +46,10 @@ class AppProcessInfo(
     val label = info.getLabel(pm)
     val iconImage: Drawable = runCatching { info.loadIcon(pm) }.getOrDefault(pm.defaultActivityIcon)
     val packageName: String get() = info.packageName
+    var firstInstallTime: Long = 0L
+        private set
+    var lastUpdateTime: Long = 0L
+        private set
     val processes = fetchProcesses(pm)
 
     override fun compareTo(other: AppProcessInfo) = comparator.compare(this, other)
@@ -91,6 +95,9 @@ class AppProcessInfo(
             // Exceed binder data transfer limit, parse the package locally
             pm.getPackageArchiveInfo(info.sourceDir, flag) ?: return emptyList()
         }
+
+        firstInstallTime = packageInfo.firstInstallTime
+        lastUpdateTime = packageInfo.lastUpdateTime
 
         val processSet = TreeSet<ProcessInfo>(compareBy({ it.name }, { it.isIsolated }))
         processSet += packageInfo.activities.toProcessList()
