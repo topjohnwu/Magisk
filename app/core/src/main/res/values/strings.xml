@@ -94,6 +94,12 @@
     <string name="show_system_app">Show system apps</string>
     <string name="show_os_app">Show OS apps</string>
     <string name="hide_filter_hint">Filter by name</string>
+    <string name="sort_by_name">Sort by name</string>
+    <string name="sort_by_package_name">Sort by package name</string>
+    <string name="sort_by_install_time">Sort by install time</string>
+    <string name="sort_by_update_time">Sort by update time</string>
+    <string name="sort_reverse">Reverse order</string>
+    <string name="menu_sort">Sort</string>
     <string name="hide_search">Search</string>
 
     <!--Module-->
