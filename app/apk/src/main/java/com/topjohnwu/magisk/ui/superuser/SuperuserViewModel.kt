@@ -47,6 +47,7 @@ class PolicyItem(
     var logging by mutableStateOf(policy.logging)
 
     val isEnabled get() = policyValue >= SuPolicy.ALLOW
+    val isRestricted get() = policyValue == SuPolicy.RESTRICT
 }
 
 class SuperuserViewModel(
@@ -173,6 +174,11 @@ class SuperuserViewModel(
 
     fun togglePolicy(item: PolicyItem) {
         val newPolicy = if (item.isEnabled) SuPolicy.DENY else SuPolicy.ALLOW
+        updatePolicy(item, newPolicy)
+    }
+
+    fun toggleRestrict(item: PolicyItem) {
+        val newPolicy = if (item.isRestricted) SuPolicy.ALLOW else SuPolicy.RESTRICT
         updatePolicy(item, newPolicy)
     }
 }

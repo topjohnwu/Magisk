@@ -28,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
@@ -90,7 +91,8 @@ fun MainScreen(initialTab: Int = 0) {
                     HomeScreen(vm)
                 }
                 Tab.SUPERUSER -> {
-                    val vm: SuperuserViewModel = viewModel(factory = VMFactory)
+                    val activity = LocalContext.current as androidx.activity.ComponentActivity
+                    val vm: SuperuserViewModel = viewModel(viewModelStoreOwner = activity, factory = VMFactory)
                     LaunchedEffect(Unit) { vm.startLoading() }
                     ObserveViewEvents(vm)
                     SuperuserScreen(vm)

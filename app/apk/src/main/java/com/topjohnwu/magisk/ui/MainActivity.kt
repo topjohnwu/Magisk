@@ -45,6 +45,8 @@ import com.topjohnwu.magisk.ui.install.InstallScreen
 import com.topjohnwu.magisk.ui.install.InstallViewModel
 import com.topjohnwu.magisk.ui.module.ActionScreen
 import com.topjohnwu.magisk.ui.module.ActionViewModel
+import com.topjohnwu.magisk.ui.superuser.SuperuserDetailScreen
+import com.topjohnwu.magisk.ui.superuser.SuperuserViewModel
 import com.topjohnwu.magisk.ui.navigation.CollectNavEvents
 import com.topjohnwu.magisk.ui.navigation.LocalNavigator
 import com.topjohnwu.magisk.ui.navigation.Navigator
@@ -145,6 +147,13 @@ class MainActivity : UIActivity(), SplashScreenHost {
                                     }
                                     ObserveViewEvents(vm)
                                     FlashScreen(vm, onBack = { navigator.pop() })
+                                }
+                                entry<Route.SuperuserDetail> { key ->
+                                    val vm: SuperuserViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
+                                        viewModelStoreOwner = this@MainActivity, factory = VMFactory
+                                    )
+                                    ObserveViewEvents(vm)
+                                    SuperuserDetailScreen(uid = key.uid, viewModel = vm, onBack = { navigator.pop() })
                                 }
                                 entry<Route.Action> { key ->
                                     val vm: ActionViewModel = androidx.lifecycle.viewmodel.compose.viewModel(factory = VMFactory)
