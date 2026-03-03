@@ -1,36 +1,63 @@
 package com.topjohnwu.magisk.ui.superuser
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
-import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.arch.BaseFragment
-import com.topjohnwu.magisk.arch.viewModel
-import com.topjohnwu.magisk.databinding.FragmentSuperuserMd2Binding
-import rikka.recyclerview.addEdgeSpacing
-import rikka.recyclerview.addItemSpacing
-import rikka.recyclerview.fixEdgeEffect
+import android.view.ViewGroup
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import com.topjohnwu.magisk.arch.ActivityExecutor
+import com.topjohnwu.magisk.arch.ContextExecutor
+import com.topjohnwu.magisk.arch.NavigationActivity
+import com.topjohnwu.magisk.arch.UIActivity
+import com.topjohnwu.magisk.arch.VMFactory
+import com.topjohnwu.magisk.arch.ViewEvent
+import com.topjohnwu.magisk.arch.ViewModelHolder
+import com.topjohnwu.magisk.ui.theme.MagiskTheme
 import com.topjohnwu.magisk.core.R as CoreR
 
-class SuperuserFragment : BaseFragment<FragmentSuperuserMd2Binding>() {
+class SuperuserFragment : Fragment(), ViewModelHolder {
 
-    override val layoutRes = R.layout.fragment_superuser_md2
-    override val viewModel by viewModel<SuperuserViewModel>()
+    override val viewModel by lazy {
+        ViewModelProvider(this, VMFactory)[SuperuserViewModel::class.java]
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        startObserveLiveData()
+    }
 
     override fun onStart() {
         super.onStart()
-        activity?.title = resources.getString(CoreR.string.superuser)
+        (activity as? NavigationActivity<*>)?.setTitle(CoreR.string.superuser)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        binding.superuserList.apply {
-            addEdgeSpacing(top = R.dimen.l_50, bottom = R.dimen.l1)
-            addItemSpacing(R.dimen.l1, R.dimen.l_50, R.dimen.l1)
-            fixEdgeEffect()
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                MagiskTheme {
+                    SuperuserScreen(viewModel = viewModel as SuperuserViewModel)
+                }
+            }
         }
     }
 
-    override fun onPreBind(binding: FragmentSuperuserMd2Binding) {}
+    override fun onResume() {
+        super.onResume()
+        (viewModel as SuperuserViewModel).startLoading()
+    }
 
+    override fun onEventDispatched(event: ViewEvent) {
+        when (event) {
+            is ContextExecutor -> event(requireContext())
+            is ActivityExecutor -> (activity as? UIActivity<*>)?.let { event(it) }
+        }
+    }
 }
