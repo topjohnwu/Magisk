@@ -77,14 +77,6 @@
         android:label="SettingsFragment">
 
         <action
-            android:id="@+id/action_settingsFragment_to_themeFragment"
-            app:destination="@id/themeFragment"
-            app:enterAnim="@anim/fragment_enter"
-            app:exitAnim="@anim/fragment_exit"
-            app:popEnterAnim="@anim/fragment_enter_pop"
-            app:popExitAnim="@anim/fragment_exit_pop" />
-
-        <action
             android:id="@+id/action_settingsFragment_to_denyFragment"
             app:destination="@id/denyFragment"
             app:enterAnim="@anim/fragment_enter"
@@ -98,12 +90,6 @@
         android:id="@+id/superuserFragment"
         android:name="com.topjohnwu.magisk.ui.superuser.SuperuserFragment"
         android:label="SuperuserFragment" />
-
-    <fragment
-        android:id="@+id/themeFragment"
-        android:name="com.topjohnwu.magisk.ui.theme.ThemeFragment"
-        android:label="ThemeFragment"
-        tools:layout="@layout/fragment_theme_md2" />
 
     <action
         android:id="@+id/action_homeFragment"

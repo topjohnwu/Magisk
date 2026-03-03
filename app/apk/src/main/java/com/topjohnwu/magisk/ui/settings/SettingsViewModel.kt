@@ -27,10 +27,6 @@ class SettingsViewModel : BaseViewModel() {
 
     val zygiskMismatch get() = Config.zygisk != Info.isZygiskEnabled
 
-    fun navigateToTheme() {
-        SettingsFragmentDirections.actionSettingsFragmentToThemeFragment().navigate()
-    }
-
     fun navigateToDenyList() {
         SettingsFragmentDirections.actionSettingsFragmentToDenyFragment().navigate()
     }

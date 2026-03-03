@@ -78,11 +78,6 @@ private fun CustomizationSection(viewModel: SettingsViewModel) {
 
     SmallTitle(text = stringResource(CoreR.string.settings_customization))
     Card(modifier = Modifier.fillMaxWidth()) {
-        SuperArrow(
-            title = stringResource(CoreR.string.section_theme),
-            onClick = { viewModel.navigateToTheme() }
-        )
-
         if (LocaleSetting.useLocaleManager) {
             val locale = LocaleSetting.instance.appLocale
             val summary = locale?.getDisplayName(locale) ?: stringResource(CoreR.string.system_default)
