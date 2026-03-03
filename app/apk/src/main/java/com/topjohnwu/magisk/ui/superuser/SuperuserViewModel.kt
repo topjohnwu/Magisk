@@ -18,8 +18,6 @@ import com.topjohnwu.magisk.core.R
 import com.topjohnwu.magisk.core.data.magiskdb.PolicyDao
 import com.topjohnwu.magisk.core.ktx.getLabel
 import com.topjohnwu.magisk.core.model.su.SuPolicy
-import com.topjohnwu.magisk.dialog.SuperuserRevokeDialog
-import com.topjohnwu.magisk.events.AuthEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -51,6 +49,8 @@ class PolicyItem(
 class SuperuserViewModel(
     private val db: PolicyDao
 ) : AsyncLoadViewModel() {
+
+    var authenticate: (onSuccess: () -> Unit) -> Unit = { it() }
 
     data class UiState(
         val loading: Boolean = true,
@@ -113,19 +113,15 @@ class SuperuserViewModel(
         _uiState.update { it.copy(suRestrict = Config.suRestrict) }
     }
 
-    fun deletePressed(item: PolicyItem, onDeleted: () -> Unit = {}) {
-        fun updateState() = viewModelScope.launch {
+    val requiresAuth get() = Config.suAuth
+
+    fun performDelete(item: PolicyItem, onDeleted: () -> Unit = {}) {
+        viewModelScope.launch {
             db.delete(item.policy.uid)
             _uiState.update { state ->
                 state.copy(policies = state.policies.filter { it.policy.uid != item.policy.uid })
             }
             onDeleted()
-        }
-
-        if (Config.suAuth) {
-            AuthEvent { updateState() }.publish()
-        } else {
-            SuperuserRevokeDialog(item.title) { updateState() }.show()
         }
     }
 
@@ -170,7 +166,7 @@ class SuperuserViewModel(
         }
 
         if (Config.suAuth) {
-            AuthEvent { updateState() }.publish()
+            authenticate { updateState() }
         } else {
             updateState()
         }

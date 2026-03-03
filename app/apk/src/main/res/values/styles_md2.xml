@@ -10,15 +10,8 @@
 
     <!--endregion-->
 
-    <style name="Foundation.PopupMenu" parent="Widget.MaterialComponents.PopupMenu">
-        <item name="android:itemTextAppearance">@style/AppearanceFoundation.Caption</item>
-        <item name="android:textStyle">bold</item>
-    </style>
-
     <style name="Foundation.Default">
         <item name="android:includeFontPadding">false</item>
-        <item name="actionBarSize">@dimen/internal_action_bar_size</item>
-        <item name="popupMenuStyle">@style/Foundation.PopupMenu</item>
     </style>
 
     <style name="Foundation.Floating" parent="Empty">

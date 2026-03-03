@@ -12,7 +12,6 @@ import com.topjohnwu.magisk.core.model.su.SuLog
 import com.topjohnwu.magisk.core.repository.LogRepository
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
-import com.topjohnwu.magisk.events.SnackbarEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -53,7 +52,7 @@ class LogViewModel(
         }
     }
 
-    fun saveMagiskLog() = withExternalRW {
+    fun saveMagiskLog() {
         viewModelScope.launch(Dispatchers.IO) {
             val filename = "magisk_log_%s.log".format(
                 System.currentTimeMillis().toTime(timeFormatStandard))
@@ -85,18 +84,18 @@ class LogViewModel(
                 ProcessBuilder("logcat", "-d").start()
                     .inputStream.reader().use { it.copyTo(file) }
             }
-            SnackbarEvent(logFile.toString()).publish()
+            showSnackbar(logFile.toString())
         }
     }
 
     fun clearMagiskLog() = repo.clearMagiskLogs {
-        SnackbarEvent(R.string.logs_cleared).publish()
+        showSnackbar(R.string.logs_cleared)
         startLoading()
     }
 
     fun clearLog() = viewModelScope.launch {
         repo.clearLogs()
-        SnackbarEvent(R.string.logs_cleared).publish()
+        showSnackbar(R.string.logs_cleared)
         startLoading()
     }
 }

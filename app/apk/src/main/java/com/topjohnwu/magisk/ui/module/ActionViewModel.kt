@@ -1,8 +1,6 @@
 package com.topjohnwu.magisk.ui.module
 
 import androidx.compose.runtime.mutableStateListOf
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.core.ktx.synchronized
@@ -10,7 +8,6 @@ import com.topjohnwu.magisk.core.ktx.timeFormatStandard
 import com.topjohnwu.magisk.core.ktx.toTime
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
-import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.superuser.CallbackList
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
@@ -27,9 +24,6 @@ class ActionViewModel : BaseViewModel() {
     enum class State {
         RUNNING, SUCCESS, FAILED
     }
-
-    private val _state = MutableLiveData(State.RUNNING)
-    val state: LiveData<State> get() = _state
 
     private val _actionState = MutableStateFlow(State.RUNNING)
     val actionState: StateFlow<State> = _actionState.asStateFlow()
@@ -61,12 +55,10 @@ class ActionViewModel : BaseViewModel() {
     }
 
     private fun onResult(success: Boolean) {
-        val newState = if (success) State.SUCCESS else State.FAILED
-        _state.value = newState
-        _actionState.value = newState
+        _actionState.value = if (success) State.SUCCESS else State.FAILED
     }
 
-    fun saveLog() = withExternalRW {
+    fun saveLog() {
         viewModelScope.launch(Dispatchers.IO) {
             val name = "%s_action_log_%s.log".format(
                 actionName,
@@ -81,7 +73,7 @@ class ActionViewModel : BaseViewModel() {
                     }
                 }
             }
-            SnackbarEvent(file.toString()).publish()
+            showSnackbar(file.toString())
         }
     }
 }
