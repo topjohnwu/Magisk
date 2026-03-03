@@ -55,7 +55,10 @@ fun SuperuserDetailScreen(
             TopAppBar(
                 title = stringResource(CoreR.string.superuser_setting),
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
+                    IconButton(
+                        modifier = Modifier.padding(start = 16.dp),
+                        onClick = onBack
+                    ) {
                         Icon(
                             imageVector = MiuixIcons.Back,
                             contentDescription = stringResource(CoreR.string.back),
