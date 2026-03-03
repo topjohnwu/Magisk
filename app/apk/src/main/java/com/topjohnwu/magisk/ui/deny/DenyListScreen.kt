@@ -270,6 +270,7 @@ private fun DenyAppCard(app: DenyAppState) {
                         color = MiuixTheme.colorScheme.onSurfaceVariantSummary
                     )
                 }
+                Spacer(Modifier.width(8.dp))
                 Checkbox(
                     checked = app.isChecked,
                     onCheckedChange = { app.toggleAll() }
@@ -307,6 +308,7 @@ private fun ProcessRow(proc: DenyProcessState) {
                 else MiuixTheme.colorScheme.onSurfaceVariantSummary,
             modifier = Modifier.weight(1f)
         )
+        Spacer(Modifier.width(8.dp))
         Checkbox(
             checked = proc.isEnabled,
             onCheckedChange = { proc.toggle() }

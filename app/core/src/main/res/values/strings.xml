@@ -87,6 +87,7 @@
     <string name="save_log">Save log</string>
     <string name="clear_log">Clear log</string>
     <string name="back">Back</string>
+    <string name="superuser_setting">Superuser Setting</string>
     <string name="enabled">Enabled</string>
     <string name="disabled">Disabled</string>
     <string name="pid">PID: %1$d</string>
