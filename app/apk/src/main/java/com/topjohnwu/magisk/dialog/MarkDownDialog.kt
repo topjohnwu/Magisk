@@ -1,17 +1,26 @@
 package com.topjohnwu.magisk.dialog
 
-import android.view.LayoutInflater
 import android.widget.TextView
 import androidx.annotation.CallSuper
-import androidx.lifecycle.lifecycleScope
-import com.topjohnwu.magisk.R
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.events.DialogBuilder
 import com.topjohnwu.magisk.view.MagiskDialog
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import top.yukonga.miuix.kmp.basic.Text
 import java.io.IOException
 import com.topjohnwu.magisk.core.R as CoreR
 
@@ -21,19 +30,40 @@ abstract class MarkDownDialog : DialogBuilder {
 
     @CallSuper
     override fun build(dialog: MagiskDialog) {
-        with(dialog) {
-            val view = LayoutInflater.from(context).inflate(R.layout.markdown_window_md2, null)
-            setView(view)
-            val tv = view.findViewById<TextView>(R.id.md_txt)
-            activity.lifecycleScope.launch {
-                try {
-                    val text = withContext(Dispatchers.IO) { getMarkdownText() }
-                    ServiceLocator.markwon.setMarkdown(tv, text)
-                } catch (e: IOException) {
-                    Timber.e(e)
-                    tv.setText(CoreR.string.download_file_error)
-                }
-            }
+        dialog.setView {
+            MarkdownContent(::getMarkdownText)
+        }
+    }
+}
+
+@Composable
+private fun MarkdownContent(getMarkdownText: suspend () -> String) {
+    var mdText by remember { mutableStateOf<String?>(null) }
+    var error by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        try {
+            mdText = withContext(Dispatchers.IO) { getMarkdownText() }
+        } catch (e: IOException) {
+            Timber.e(e)
+            error = true
+        }
+    }
+
+    when {
+        error -> Text(stringResource(CoreR.string.download_file_error))
+        mdText != null -> {
+            val text = mdText!!
+            AndroidView(
+                factory = { context ->
+                    TextView(context).apply {
+                        ServiceLocator.markwon.setMarkdown(this, text)
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 300.dp)
+            )
         }
     }
 }

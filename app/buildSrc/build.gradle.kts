@@ -21,7 +21,6 @@ dependencies {
     implementation("org.jetbrains.kotlin:compose-compiler-gradle-plugin:${libs.versions.kotlin.get()}")
     implementation("org.jetbrains.kotlin:kotlin-serialization:${libs.versions.kotlin.get()}")
     implementation(libs.android.gradle.plugin)
-    implementation(libs.android.kapt.plugin)
     implementation(libs.ksp.plugin)
     implementation(libs.lsparanoid.plugin)
     implementation(libs.moshi.plugin)

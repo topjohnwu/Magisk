@@ -3,23 +3,12 @@ plugins {
     kotlin("plugin.parcelize")
     kotlin("plugin.compose")
     kotlin("plugin.serialization")
-    id("com.android.legacy-kapt")
 }
 
 setupMainApk()
 
-kapt {
-    correctErrorTypes = true
-    useBuildCache = true
-    mapDiagnosticLocations = true
-    javacOptions {
-        option("-Xmaxerrs", "1000")
-    }
-}
-
 android {
     buildFeatures {
-        dataBinding = true
         compose = true
     }
 
@@ -46,8 +35,6 @@ dependencies {
     implementation(libs.rikka.layoutinflater)
     implementation(libs.rikka.insets)
 
-    implementation(libs.constraintlayout)
-    implementation(libs.recyclerview)
     implementation(libs.appcompat)
     implementation(libs.material)
 
@@ -67,7 +54,4 @@ dependencies {
     implementation(libs.navigation3.runtime)
     implementation(libs.navigationevent.compose)
     implementation(libs.lifecycle.viewmodel.navigation3)
-
-    // Make sure kapt runs with a proper kotlin-stdlib
-    kapt(kotlin("stdlib"))
 }

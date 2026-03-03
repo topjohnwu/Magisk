@@ -10,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.res.use
 import androidx.core.view.WindowCompat
-import androidx.databinding.ViewDataBinding
 import com.google.android.material.snackbar.Snackbar
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
@@ -22,16 +21,12 @@ import com.topjohnwu.magisk.core.wrap
 import rikka.insets.WindowInsetsHelper
 import rikka.layoutinflater.view.LayoutInflaterFactory
 
-abstract class UIActivity<Binding : ViewDataBinding>
+abstract class UIActivity
     : AppCompatActivity(), ViewModelHolder, IActivityExtension {
 
-    protected lateinit var binding: Binding
-    protected abstract val layoutRes: Int
     override val extension = ActivityExtension(this)
 
-    protected val binded get() = ::binding.isInitialized
-
-    open val snackbarView get() = binding.root
+    abstract val snackbarView: View
     open val snackbarAnchorView: View? get() = null
 
     init {
@@ -48,7 +43,6 @@ abstract class UIActivity<Binding : ViewDataBinding>
 
         extension.onCreate(savedInstanceState)
         if (isRunningAsStub) {
-            // Overwrite private members to avoid nasty "false" stack traces being logged
             val delegate = delegate
             val clz = delegate.javaClass
             clz.reflectField("mActivityHandlesConfigFlagsChecked").set(delegate, true)
@@ -59,8 +53,6 @@ abstract class UIActivity<Binding : ViewDataBinding>
 
         startObserveLiveData()
 
-        // We need to set the window background explicitly since for whatever reason it's not
-        // propagated upstream
         obtainStyledAttributes(intArrayOf(android.R.attr.windowBackground))
             .use { it.getDrawable(0) }
             .also { window.setBackgroundDrawable(it) }
@@ -69,7 +61,6 @@ abstract class UIActivity<Binding : ViewDataBinding>
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             window?.decorView?.post {
-                // If navigation bar is short enough (gesture navigation enabled), make it transparent
                 if ((window.decorView.rootWindowInsets?.systemWindowInsetBottom
                         ?: 0) < Resources.getSystem().displayMetrics.density * 40) {
                     window.navigationBarColor = Color.TRANSPARENT

@@ -5,12 +5,10 @@ import android.Manifest.permission.REQUEST_INSTALL_PACKAGES
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.annotation.SuppressLint
 import android.os.Bundle
-import androidx.databinding.PropertyChangeRegistry
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.topjohnwu.magisk.core.R
-import com.topjohnwu.magisk.databinding.ObservableHost
 import com.topjohnwu.magisk.events.BackPressEvent
 import com.topjohnwu.magisk.events.DialogBuilder
 import com.topjohnwu.magisk.events.DialogEvent
@@ -20,9 +18,7 @@ import com.topjohnwu.magisk.ui.navigation.Route
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 
-abstract class BaseViewModel : ViewModel(), ObservableHost {
-
-    override var callbacks: PropertyChangeRegistry? = null
+abstract class BaseViewModel : ViewModel() {
 
     private val _viewEvents = MutableLiveData<ViewEvent>()
     val viewEvents: LiveData<ViewEvent> get() = _viewEvents

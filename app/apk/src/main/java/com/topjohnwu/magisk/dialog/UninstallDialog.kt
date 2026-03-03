@@ -31,7 +31,7 @@ class UninstallDialog : DialogBuilder {
     }
 
     @Suppress("DEPRECATION")
-    private fun restore(activity: UIActivity<*>) {
+    private fun restore(activity: UIActivity) {
         val dialog = ProgressDialog(activity).apply {
             setMessage(activity.getString(R.string.restore_img_msg))
             show()

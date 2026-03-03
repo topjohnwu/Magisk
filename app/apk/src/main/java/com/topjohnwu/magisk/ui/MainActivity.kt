@@ -17,7 +17,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.net.toUri
-import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
@@ -55,6 +54,7 @@ import com.topjohnwu.magisk.ui.navigation.rememberNavigator
 import com.topjohnwu.magisk.ui.theme.MagiskTheme
 import com.topjohnwu.magisk.ui.theme.Theme
 import com.topjohnwu.magisk.view.MagiskDialog
+import com.topjohnwu.magisk.view.MagiskDialogHost
 import com.topjohnwu.magisk.view.Shortcuts
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -63,9 +63,8 @@ import com.topjohnwu.magisk.core.R as CoreR
 
 class MainViewModel : BaseViewModel()
 
-class MainActivity : UIActivity<ViewDataBinding>(), SplashScreenHost {
+class MainActivity : UIActivity(), SplashScreenHost {
 
-    override val layoutRes = 0
     override val viewModel by viewModel<MainViewModel>()
     override val splashController = SplashController(this)
     override val snackbarView: View
@@ -103,6 +102,7 @@ class MainActivity : UIActivity<ViewDataBinding>(), SplashScreenHost {
 
         setContent {
             MagiskTheme {
+                MagiskDialogHost()
                 val navigator = rememberNavigator(Route.Main)
                 CompositionLocalProvider(LocalNavigator provides navigator) {
                     HandleFlashIntent(navigator)
