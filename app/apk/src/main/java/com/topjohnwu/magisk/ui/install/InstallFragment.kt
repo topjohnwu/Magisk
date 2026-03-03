@@ -1,18 +1,58 @@
 package com.topjohnwu.magisk.ui.install
 
-import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.arch.BaseFragment
-import com.topjohnwu.magisk.arch.viewModel
-import com.topjohnwu.magisk.databinding.FragmentInstallMd2Binding
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import com.topjohnwu.magisk.arch.ActivityExecutor
+import com.topjohnwu.magisk.arch.ContextExecutor
+import com.topjohnwu.magisk.arch.NavigationActivity
+import com.topjohnwu.magisk.arch.UIActivity
+import com.topjohnwu.magisk.arch.VMFactory
+import com.topjohnwu.magisk.arch.ViewEvent
+import com.topjohnwu.magisk.arch.ViewModelHolder
+import com.topjohnwu.magisk.ui.theme.MagiskTheme
 import com.topjohnwu.magisk.core.R as CoreR
 
-class InstallFragment : BaseFragment<FragmentInstallMd2Binding>() {
+class InstallFragment : Fragment(), ViewModelHolder {
 
-    override val layoutRes = R.layout.fragment_install_md2
-    override val viewModel by viewModel<InstallViewModel>()
+    override val viewModel by lazy {
+        ViewModelProvider(this, VMFactory)[InstallViewModel::class.java]
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        startObserveLiveData()
+    }
 
     override fun onStart() {
         super.onStart()
-        requireActivity().setTitle(CoreR.string.install)
+        (activity as? NavigationActivity<*>)?.setTitle(CoreR.string.install)
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                MagiskTheme {
+                    InstallScreen(viewModel = viewModel as InstallViewModel)
+                }
+            }
+        }
+    }
+
+    override fun onEventDispatched(event: ViewEvent) {
+        when (event) {
+            is ContextExecutor -> event(requireContext())
+            is ActivityExecutor -> (activity as? UIActivity<*>)?.let { event(it) }
+        }
     }
 }

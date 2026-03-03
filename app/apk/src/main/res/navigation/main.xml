@@ -59,8 +59,7 @@
     <fragment
         android:id="@+id/installFragment"
         android:name="com.topjohnwu.magisk.ui.install.InstallFragment"
-        android:label="InstallFragment"
-        tools:layout="@layout/fragment_install_md2" />
+        android:label="InstallFragment" />
 
     <fragment
         android:id="@+id/logFragment"
