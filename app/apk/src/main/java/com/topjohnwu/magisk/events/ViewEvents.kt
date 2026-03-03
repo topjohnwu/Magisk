@@ -19,24 +19,24 @@ class PermissionEvent(
     private val callback: (Boolean) -> Unit
 ) : ViewEvent(), ActivityExecutor {
 
-    override fun invoke(activity: UIActivity<*>) =
+    override fun invoke(activity: UIActivity) =
         activity.withPermission(permission, callback)
 }
 
 class BackPressEvent : ViewEvent(), ActivityExecutor {
-    override fun invoke(activity: UIActivity<*>) {
+    override fun invoke(activity: UIActivity) {
         activity.onBackPressed()
     }
 }
 
 class DieEvent : ViewEvent(), ActivityExecutor {
-    override fun invoke(activity: UIActivity<*>) {
+    override fun invoke(activity: UIActivity) {
         activity.finish()
     }
 }
 
 class RecreateEvent : ViewEvent(), ActivityExecutor {
-    override fun invoke(activity: UIActivity<*>) {
+    override fun invoke(activity: UIActivity) {
         activity.relaunch()
     }
 }
@@ -45,7 +45,7 @@ class AuthEvent(
     private val callback: () -> Unit
 ) : ViewEvent(), ActivityExecutor {
 
-    override fun invoke(activity: UIActivity<*>) {
+    override fun invoke(activity: UIActivity) {
         activity.withAuthentication { if (it) callback() }
     }
 }
@@ -54,7 +54,7 @@ class GetContentEvent(
     private val type: String,
     private val callback: ContentResultCallback
 ) : ViewEvent(), ActivityExecutor {
-    override fun invoke(activity: UIActivity<*>) {
+    override fun invoke(activity: UIActivity) {
         activity.getContent(type, callback)
     }
 }
@@ -83,7 +83,7 @@ class SnackbarEvent(
         builder: Snackbar.() -> Unit = {}
     ) : this(msg.asText(), length, builder)
 
-    override fun invoke(activity: UIActivity<*>) {
+    override fun invoke(activity: UIActivity) {
         activity.showSnackbar(msg.getText(activity.resources), length, builder)
     }
 }
@@ -91,7 +91,7 @@ class SnackbarEvent(
 class DialogEvent(
     private val builder: DialogBuilder
 ) : ViewEvent(), ActivityExecutor {
-    override fun invoke(activity: UIActivity<*>) {
+    override fun invoke(activity: UIActivity) {
         MagiskDialog(activity).apply(builder::build).show()
     }
 }

@@ -15,7 +15,7 @@ import com.topjohnwu.magisk.arch.ViewEvent
 fun ObserveViewEvents(viewModel: BaseViewModel) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
-    val activity = context as? UIActivity<*>
+    val activity = context as? UIActivity
 
     DisposableEffect(viewModel, lifecycleOwner) {
         val observer = { event: ViewEvent ->

@@ -13,6 +13,6 @@ interface ContextExecutor {
 }
 
 interface ActivityExecutor {
-    operator fun invoke(activity: UIActivity<*>)
+    operator fun invoke(activity: UIActivity)
 }
 

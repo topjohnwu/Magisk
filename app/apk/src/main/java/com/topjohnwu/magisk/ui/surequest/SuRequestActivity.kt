@@ -9,7 +9,6 @@ import android.view.View
 import android.view.Window
 import android.view.WindowManager
 import androidx.activity.compose.setContent
-import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.lifecycleScope
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.UIActivity
@@ -23,9 +22,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-open class SuRequestActivity : UIActivity<ViewDataBinding>(), UntrackedActivity {
+open class SuRequestActivity : UIActivity(), UntrackedActivity {
 
-    override val layoutRes: Int = 0
     override val viewModel: SuRequestViewModel by viewModel()
 
     override val snackbarView: View
