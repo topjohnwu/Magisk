@@ -50,11 +50,11 @@ import top.yukonga.miuix.kmp.basic.NavigationItem
 import com.topjohnwu.magisk.core.R as CoreR
 
 enum class Tab(val titleRes: Int, val iconRes: Int) {
-    HOME(CoreR.string.section_home, R.drawable.ic_home_md2),
-    SUPERUSER(CoreR.string.superuser, R.drawable.ic_superuser_md2),
-    LOG(CoreR.string.logs, R.drawable.ic_bug_md2),
-    MODULES(CoreR.string.modules, R.drawable.ic_module_md2),
-    SETTINGS(CoreR.string.settings, R.drawable.ic_settings_md2);
+    HOME(CoreR.string.section_home, R.drawable.ic_home_outlined_md2),
+    SUPERUSER(CoreR.string.superuser, R.drawable.ic_superuser_outlined_md2),
+    LOG(CoreR.string.logs, R.drawable.ic_bug_outlined_md2),
+    MODULES(CoreR.string.modules, R.drawable.ic_module_outlined_md2),
+    SETTINGS(CoreR.string.settings, R.drawable.ic_settings_outlined_md2);
 }
 
 @Composable

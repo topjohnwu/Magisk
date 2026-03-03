@@ -11,13 +11,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.res.use
 import androidx.core.view.WindowCompat
-import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
 import com.google.android.material.snackbar.Snackbar
-import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.base.ActivityExtension
@@ -94,17 +92,6 @@ abstract class UIActivity<Binding : ViewDataBinding>
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         extension.onSaveInstanceState(outState)
-    }
-
-    fun setContentView() {
-        binding = DataBindingUtil.setContentView<Binding>(this, layoutRes).also {
-            it.setVariable(BR.viewModel, viewModel)
-            it.lifecycleOwner = this
-        }
-    }
-
-    fun setAccessibilityDelegate(delegate: View.AccessibilityDelegate?) {
-        binding.root.rootView.accessibilityDelegate = delegate
     }
 
     fun showSnackbar(

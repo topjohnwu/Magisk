@@ -1,7 +1,5 @@
 package com.topjohnwu.magisk.ui.superuser
 
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -25,9 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.painter.BitmapPainter
-import androidx.compose.ui.graphics.painter.Painter
+import com.topjohnwu.magisk.ui.util.rememberDrawablePainter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.topjohnwu.magisk.core.model.su.SuPolicy
@@ -213,15 +209,3 @@ private fun PolicySlider(value: Int, onValueChange: (Int) -> Unit) {
     }
 }
 
-@Composable
-private fun rememberDrawablePainter(drawable: Drawable): Painter {
-    return remember(drawable) {
-        val w = drawable.intrinsicWidth.coerceAtLeast(1)
-        val h = drawable.intrinsicHeight.coerceAtLeast(1)
-        val bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
-        val canvas = android.graphics.Canvas(bitmap)
-        drawable.setBounds(0, 0, w, h)
-        drawable.draw(canvas)
-        BitmapPainter(bitmap.asImageBitmap())
-    }
-}

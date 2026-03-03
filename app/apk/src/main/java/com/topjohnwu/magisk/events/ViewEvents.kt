@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.events
 
 import android.content.Context
-import android.view.View
 import androidx.annotation.StringRes
 import com.google.android.material.snackbar.Snackbar
 import com.topjohnwu.magisk.arch.ActivityExecutor
@@ -33,14 +32,6 @@ class BackPressEvent : ViewEvent(), ActivityExecutor {
 class DieEvent : ViewEvent(), ActivityExecutor {
     override fun invoke(activity: UIActivity<*>) {
         activity.finish()
-    }
-}
-
-class ShowUIEvent(private val delegate: View.AccessibilityDelegate?)
-    : ViewEvent(), ActivityExecutor {
-    override fun invoke(activity: UIActivity<*>) {
-        activity.setContentView()
-        activity.setAccessibilityDelegate(delegate)
     }
 }
 
