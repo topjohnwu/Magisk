@@ -26,4 +26,10 @@
         android:title="@string/modules"
         tools:showAsAction="always" />
 
+    <item
+        android:id="@+id/settingsFragment"
+        android:icon="@drawable/ic_settings_md2"
+        android:title="@string/settings"
+        tools:showAsAction="always" />
+
 </menu>
