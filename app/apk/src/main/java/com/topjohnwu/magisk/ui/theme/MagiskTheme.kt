@@ -3,7 +3,9 @@ package com.topjohnwu.magisk.ui.theme
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import com.topjohnwu.magisk.core.Config
+import top.yukonga.miuix.kmp.theme.LocalContentColor
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import top.yukonga.miuix.kmp.theme.darkColorScheme
 import top.yukonga.miuix.kmp.theme.lightColorScheme
@@ -18,5 +20,10 @@ fun MagiskTheme(
         else -> isSystemInDarkTheme()
     }
     val colors = if (darkTheme) darkColorScheme() else lightColorScheme()
-    MiuixTheme(colors = colors, content = content)
+    MiuixTheme(colors = colors) {
+        CompositionLocalProvider(
+            LocalContentColor provides MiuixTheme.colorScheme.onBackground,
+            content = content
+        )
+    }
 }

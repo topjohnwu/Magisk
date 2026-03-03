@@ -6,11 +6,6 @@ import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.MotionEvent
-import android.view.View
-import android.view.ViewGroup
-import android.view.accessibility.AccessibilityEvent
-import android.view.accessibility.AccessibilityNodeInfo
-import android.view.accessibility.AccessibilityNodeProvider
 import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -27,8 +22,6 @@ import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.model.su.SuPolicy.Companion.ALLOW
 import com.topjohnwu.magisk.core.model.su.SuPolicy.Companion.DENY
 import com.topjohnwu.magisk.core.su.SuRequestHandler
-import com.topjohnwu.magisk.events.AuthEvent
-import com.topjohnwu.magisk.events.DieEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit.SECONDS
@@ -37,6 +30,9 @@ class SuRequestViewModel(
     policyDB: PolicyDao,
     private val timeoutPrefs: SharedPreferences
 ) : BaseViewModel() {
+
+    var authenticate: (onSuccess: () -> Unit) -> Unit = { it() }
+    var finishActivity: () -> Unit = {}
 
     var icon by mutableStateOf<Drawable?>(null)
     var title by mutableStateOf("")
@@ -57,7 +53,7 @@ class SuRequestViewModel(
     fun grantPressed() {
         cancelTimer()
         if (Config.suAuth) {
-            AuthEvent { respond(ALLOW) }.publish()
+            authenticate { respond(ALLOW) }
         } else {
             respond(ALLOW)
         }
@@ -76,7 +72,7 @@ class SuRequestViewModel(
             if (handler.start(intent))
                 showDialog()
             else
-                DieEvent().publish()
+                finishActivity()
         }
     }
 
@@ -112,7 +108,7 @@ class SuRequestViewModel(
 
         viewModelScope.launch {
             handler.respond(action, Config.Value.TIMEOUT_LIST[pos])
-            DieEvent().publish()
+            finishActivity()
         }
     }
 
@@ -139,16 +135,4 @@ class SuRequestViewModel(
         }
     }
 
-    object EmptyAccessibilityDelegate : View.AccessibilityDelegate() {
-        override fun sendAccessibilityEvent(host: View, eventType: Int) {}
-        override fun performAccessibilityAction(host: View, action: Int, args: Bundle?) = true
-        override fun sendAccessibilityEventUnchecked(host: View, event: AccessibilityEvent) {}
-        override fun dispatchPopulateAccessibilityEvent(host: View, event: AccessibilityEvent) = true
-        override fun onPopulateAccessibilityEvent(host: View, event: AccessibilityEvent) {}
-        override fun onInitializeAccessibilityEvent(host: View, event: AccessibilityEvent) {}
-        override fun onInitializeAccessibilityNodeInfo(host: View, info: AccessibilityNodeInfo) {}
-        override fun addExtraDataToAccessibilityNodeInfo(host: View, info: AccessibilityNodeInfo, extraDataKey: String, arguments: Bundle?) {}
-        override fun onRequestSendAccessibilityEvent(host: ViewGroup, child: View, event: AccessibilityEvent): Boolean = false
-        override fun getAccessibilityNodeProvider(host: View): AccessibilityNodeProvider? = null
-    }
 }

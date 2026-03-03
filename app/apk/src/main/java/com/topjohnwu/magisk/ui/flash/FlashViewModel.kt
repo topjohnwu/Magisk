@@ -1,9 +1,6 @@
 package com.topjohnwu.magisk.ui.flash
 
 import androidx.compose.runtime.mutableStateListOf
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.core.Const
@@ -16,7 +13,6 @@ import com.topjohnwu.magisk.core.tasks.FlashZip
 import com.topjohnwu.magisk.core.tasks.MagiskInstaller
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
-import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.superuser.CallbackList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,10 +25,6 @@ class FlashViewModel : BaseViewModel() {
     enum class State {
         FLASHING, SUCCESS, FAILED
     }
-
-    private val _state = MutableLiveData(State.FLASHING)
-    val state: LiveData<State> get() = _state
-    val flashing = state.map { it == State.FLASHING }
 
     private val _flashState = MutableStateFlow(State.FLASHING)
     val flashState: StateFlow<State> = _flashState.asStateFlow()
@@ -83,7 +75,6 @@ class FlashViewModel : BaseViewModel() {
                     MagiskInstaller.Patch(uri, outItems, logItems).exec()
                 }
                 else -> {
-                    back()
                     return@launch
                 }
             }
@@ -92,12 +83,10 @@ class FlashViewModel : BaseViewModel() {
     }
 
     private fun onResult(success: Boolean) {
-        val newState = if (success) State.SUCCESS else State.FAILED
-        _state.value = newState
-        _flashState.value = newState
+        _flashState.value = if (success) State.SUCCESS else State.FAILED
     }
 
-    fun saveLog() = withExternalRW {
+    fun saveLog() {
         viewModelScope.launch(Dispatchers.IO) {
             val name = "magisk_install_log_%s.log".format(
                 System.currentTimeMillis().toTime(timeFormatStandard)
@@ -111,7 +100,7 @@ class FlashViewModel : BaseViewModel() {
                     }
                 }
             }
-            SnackbarEvent(file.toString()).publish()
+            showSnackbar(file.toString())
         }
     }
 

@@ -1,20 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="WidgetFoundation.Appbar" parent="Widget.MaterialComponents.AppBarLayout.Surface" />
-
-    <style name="WidgetFoundation.Toolbar" parent="Widget.MaterialComponents.Toolbar.Surface">
-        <item name="titleTextAppearance">@style/AppearanceFoundation.Title</item>
-        <item name="titleTextColor">?colorOnSurface</item>
-        <item name="subtitleTextAppearance">@style/AppearanceFoundation.Caption</item>
-        <item name="subtitleTextColor">?colorOnSurfaceVariant</item>
-        <item name="android:background">@android:color/transparent</item>
-        <item name="contentInsetStartWithNavigation">0dp</item>
-        <item name="android:layout_height">?actionBarSize</item>
-        <item name="android:theme">@style/ThemeOverlay.MaterialComponents.ActionBar</item>
-    </style>
-
-
     <style name="WidgetFoundation.Card" parent="Widget.MaterialComponents.CardView">
         <item name="android:focusable">auto</item>
         <item name="cardBackgroundColor">?colorSurfaceVariant</item>

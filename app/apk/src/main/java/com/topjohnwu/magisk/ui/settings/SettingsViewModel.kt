@@ -11,9 +11,7 @@ import com.topjohnwu.magisk.core.R
 import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.tasks.AppMigration
 import com.topjohnwu.magisk.core.utils.RootUtils
-import com.topjohnwu.magisk.events.AddHomeIconEvent
-import com.topjohnwu.magisk.events.AuthEvent
-import com.topjohnwu.magisk.events.SnackbarEvent
+import com.topjohnwu.magisk.view.Shortcuts
 import com.topjohnwu.magisk.ui.navigation.Route
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,12 +26,14 @@ class SettingsViewModel : BaseViewModel() {
 
     val zygiskMismatch get() = Config.zygisk != Info.isZygiskEnabled
 
+    var authenticate: (onSuccess: () -> Unit) -> Unit = { it() }
+
     fun navigateToDenyList() {
         navigateTo(Route.DenyList)
     }
 
     fun requestAddShortcut() {
-        AddHomeIconEvent().publish()
+        Shortcuts.addHomeIcon(AppContext)
     }
 
     fun hideApp(activity: Activity, name: String) {
@@ -63,13 +63,9 @@ class SettingsViewModel : BaseViewModel() {
         }
     }
 
-    fun withDownloadPathPermission(action: () -> Unit) = withExternalRW(action)
-
-    fun withNotificationPermission(action: () -> Unit) = withPostNotificationPermission(action)
-
-    fun withAuth(action: () -> Unit) = AuthEvent(action).publish()
+    fun withAuth(action: () -> Unit) = authenticate(action)
 
     fun notifyZygiskChange() {
-        if (zygiskMismatch) SnackbarEvent(R.string.reboot_apply_change).publish()
+        if (zygiskMismatch) showSnackbar(R.string.reboot_apply_change)
     }
 }

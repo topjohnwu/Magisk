@@ -3,39 +3,43 @@ package com.topjohnwu.magisk.ui
 import android.Manifest
 import android.Manifest.permission.REQUEST_INSTALL_PACKAGES
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
+import android.content.res.Resources
+import android.graphics.Color
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
-import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.core.content.pm.ShortcutManagerCompat
-import androidx.core.net.toUri
-import androidx.lifecycle.ViewModelProvider
+import androidx.core.content.res.use
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
-import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import com.topjohnwu.magisk.arch.BaseViewModel
-import com.topjohnwu.magisk.arch.UIActivity
 import com.topjohnwu.magisk.arch.VMFactory
-import com.topjohnwu.magisk.arch.viewModel
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.base.ActivityExtension
 import com.topjohnwu.magisk.core.base.SplashController
 import com.topjohnwu.magisk.core.base.SplashScreenHost
 import com.topjohnwu.magisk.core.isRunningAsStub
+import com.topjohnwu.magisk.core.ktx.reflectField
 import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.tasks.AppMigration
+import com.topjohnwu.magisk.core.wrap
 import com.topjohnwu.magisk.ui.deny.DenyListScreen
 import com.topjohnwu.magisk.ui.deny.DenyListViewModel
 import com.topjohnwu.magisk.ui.flash.FlashScreen
@@ -50,13 +54,10 @@ import com.topjohnwu.magisk.ui.superuser.SuperuserViewModel
 import com.topjohnwu.magisk.ui.navigation.CollectNavEvents
 import com.topjohnwu.magisk.ui.navigation.LocalNavigator
 import com.topjohnwu.magisk.ui.navigation.Navigator
-import com.topjohnwu.magisk.ui.navigation.ObserveViewEvents
 import com.topjohnwu.magisk.ui.navigation.Route
 import com.topjohnwu.magisk.ui.navigation.rememberNavigator
 import com.topjohnwu.magisk.ui.theme.MagiskTheme
 import com.topjohnwu.magisk.ui.theme.Theme
-import com.topjohnwu.magisk.view.MagiskDialog
-import com.topjohnwu.magisk.view.MagiskDialogHost
 import com.topjohnwu.magisk.view.Shortcuts
 import top.yukonga.miuix.kmp.utils.MiuixPopupUtils.Companion.MiuixPopupHost
 import androidx.compose.foundation.layout.Box
@@ -65,30 +66,76 @@ import androidx.compose.ui.Modifier
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.saveable.rememberSaveable
 import com.topjohnwu.magisk.core.R as CoreR
 
-class MainViewModel : BaseViewModel()
+class MainActivity : AppCompatActivity(), SplashScreenHost {
 
-class MainActivity : UIActivity(), SplashScreenHost {
-
-    override val viewModel by viewModel<MainViewModel>()
+    override val extension = ActivityExtension(this)
     override val splashController = SplashController(this)
-    override val snackbarView: View
-        get() = window.decorView.findViewById(android.R.id.content)
-    override val snackbarAnchorView: View? get() = null
 
     private val intentState = MutableStateFlow(0)
+    internal val showInvalidState = MutableStateFlow(false)
+    internal val showUnsupported = MutableStateFlow<List<Pair<Int, Int>>>(emptyList())
+    internal val showShortcutPrompt = MutableStateFlow(false)
+
+    init {
+        AppCompatDelegate.setDefaultNightMode(Config.darkTheme)
+    }
+
+    override fun attachBaseContext(base: Context) {
+        super.attachBaseContext(base.wrap())
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        extension.onCreate(savedInstanceState)
+        if (isRunningAsStub) {
+            val delegate = delegate
+            val clz = delegate.javaClass
+            clz.reflectField("mActivityHandlesConfigFlagsChecked").set(delegate, true)
+            clz.reflectField("mActivityHandlesConfigFlags").set(delegate, 0)
+        }
+
         setTheme(Theme.selected.themeRes)
         splashController.preOnCreate()
         super.onCreate(savedInstanceState)
         splashController.onCreate(savedInstanceState)
+
+        setupWindow()
     }
 
     override fun onResume() {
         super.onResume()
         splashController.onResume()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        extension.onSaveInstanceState(outState)
+    }
+
+    private fun setupWindow() {
+        obtainStyledAttributes(intArrayOf(android.R.attr.windowBackground))
+            .use { it.getDrawable(0) }
+            .also { window.setBackgroundDrawable(it) }
+
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            window?.decorView?.post {
+                if ((window.decorView.rootWindowInsets?.systemWindowInsetBottom
+                        ?: 0) < Resources.getSystem().displayMetrics.density * 40) {
+                    window.navigationBarColor = Color.TRANSPARENT
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                        window.navigationBarDividerColor = Color.TRANSPARENT
+                    }
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        window.isNavigationBarContrastEnforced = false
+                        window.isStatusBarContrastEnforced = false
+                    }
+                }
+            }
+        }
     }
 
     @SuppressLint("InlinedApi")
@@ -97,7 +144,7 @@ class MainActivity : UIActivity(), SplashScreenHost {
         askForHomeShortcut()
 
         if (Config.checkUpdate) {
-            withPermission(Manifest.permission.POST_NOTIFICATIONS) {
+            extension.withPermission(Manifest.permission.POST_NOTIFICATIONS) {
                 Config.checkUpdate = it
             }
         }
@@ -126,14 +173,12 @@ class MainActivity : UIActivity(), SplashScreenHost {
                                 }
                                 entry<Route.Install> { _ ->
                                     val vm: InstallViewModel = androidx.lifecycle.viewmodel.compose.viewModel(factory = VMFactory)
-                                    ObserveViewEvents(vm)
                                     CollectNavEvents(vm, navigator)
                                     InstallScreen(vm, onBack = { navigator.pop() })
                                 }
                                 entry<Route.DenyList> { _ ->
                                     val vm: DenyListViewModel = androidx.lifecycle.viewmodel.compose.viewModel(factory = VMFactory)
                                     LaunchedEffect(Unit) { vm.startLoading() }
-                                    ObserveViewEvents(vm)
                                     DenyListScreen(vm, onBack = { navigator.pop() })
                                 }
                                 entry<Route.Flash> { key ->
@@ -145,14 +190,17 @@ class MainActivity : UIActivity(), SplashScreenHost {
                                             vm.startFlashing()
                                         }
                                     }
-                                    ObserveViewEvents(vm)
                                     FlashScreen(vm, onBack = { navigator.pop() })
                                 }
                                 entry<Route.SuperuserDetail> { key ->
                                     val vm: SuperuserViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
                                         viewModelStoreOwner = this@MainActivity, factory = VMFactory
                                     )
-                                    ObserveViewEvents(vm)
+                                    LaunchedEffect(Unit) {
+                                        vm.authenticate = { onSuccess ->
+                                            extension.withAuthentication { if (it) onSuccess() }
+                                        }
+                                    }
                                     SuperuserDetailScreen(uid = key.uid, viewModel = vm, onBack = { navigator.pop() })
                                 }
                                 entry<Route.Action> { key ->
@@ -164,13 +212,12 @@ class MainActivity : UIActivity(), SplashScreenHost {
                                             vm.startRunAction()
                                         }
                                     }
-                                    ObserveViewEvents(vm)
                                     ActionScreen(vm, actionName = key.name, onBack = { navigator.pop() })
                                 }
                             }
                         )
                     }
-                    MagiskDialogHost()
+                    MainActivityDialogs(activity = this@MainActivity)
                     MiuixPopupHost()
                 }
             }
@@ -213,68 +260,44 @@ class MainActivity : UIActivity(), SplashScreenHost {
     }
 
     @SuppressLint("InlinedApi")
-    override fun showInvalidStateMessage(): Unit = runOnUiThread {
-        MagiskDialog(this).apply {
-            setTitle(CoreR.string.unsupport_nonroot_stub_title)
-            setMessage(CoreR.string.unsupport_nonroot_stub_msg)
-            setButton(MagiskDialog.ButtonType.POSITIVE) {
-                text = CoreR.string.install
-                onClick {
-                    withPermission(REQUEST_INSTALL_PACKAGES) {
-                        if (!it) {
-                            toast(CoreR.string.install_unknown_denied, Toast.LENGTH_SHORT)
-                            showInvalidStateMessage()
-                        } else {
-                            lifecycleScope.launch {
-                                AppMigration.restore(this@MainActivity)
-                            }
-                        }
-                    }
+    override fun showInvalidStateMessage() {
+        showInvalidState.value = true
+    }
+
+    internal fun handleInvalidStateInstall() {
+        extension.withPermission(REQUEST_INSTALL_PACKAGES) {
+            if (!it) {
+                toast(CoreR.string.install_unknown_denied, Toast.LENGTH_SHORT)
+                showInvalidState.value = true
+            } else {
+                lifecycleScope.launch {
+                    AppMigration.restore(this@MainActivity)
                 }
             }
-            setCancelable(false)
-            show()
         }
     }
 
     private fun showUnsupportedMessage() {
-        if (Info.env.isUnsupported) {
-            MagiskDialog(this).apply {
-                setTitle(CoreR.string.unsupport_magisk_title)
-                setMessage(CoreR.string.unsupport_magisk_msg, Const.Version.MIN_VERSION)
-                setButton(MagiskDialog.ButtonType.POSITIVE) { text = android.R.string.ok }
-                setCancelable(false)
-            }.show()
-        }
+        val messages = mutableListOf<Pair<Int, Int>>()
 
+        if (Info.env.isUnsupported) {
+            messages.add(CoreR.string.unsupport_magisk_title to CoreR.string.unsupport_magisk_msg)
+        }
         if (!Info.isEmulator && Info.env.isActive && System.getenv("PATH")
                 ?.split(':')
                 ?.filterNot { java.io.File("$it/magisk").exists() }
                 ?.any { java.io.File("$it/su").exists() } == true) {
-            MagiskDialog(this).apply {
-                setTitle(CoreR.string.unsupport_general_title)
-                setMessage(CoreR.string.unsupport_other_su_msg)
-                setButton(MagiskDialog.ButtonType.POSITIVE) { text = android.R.string.ok }
-                setCancelable(false)
-            }.show()
+            messages.add(CoreR.string.unsupport_general_title to CoreR.string.unsupport_other_su_msg)
         }
-
         if (applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM != 0) {
-            MagiskDialog(this).apply {
-                setTitle(CoreR.string.unsupport_general_title)
-                setMessage(CoreR.string.unsupport_system_app_msg)
-                setButton(MagiskDialog.ButtonType.POSITIVE) { text = android.R.string.ok }
-                setCancelable(false)
-            }.show()
+            messages.add(CoreR.string.unsupport_general_title to CoreR.string.unsupport_system_app_msg)
+        }
+        if (applicationInfo.flags and ApplicationInfo.FLAG_EXTERNAL_STORAGE != 0) {
+            messages.add(CoreR.string.unsupport_general_title to CoreR.string.unsupport_external_storage_msg)
         }
 
-        if (applicationInfo.flags and ApplicationInfo.FLAG_EXTERNAL_STORAGE != 0) {
-            MagiskDialog(this).apply {
-                setTitle(CoreR.string.unsupport_general_title)
-                setMessage(CoreR.string.unsupport_external_storage_msg)
-                setButton(MagiskDialog.ButtonType.POSITIVE) { text = android.R.string.ok }
-                setCancelable(false)
-            }.show()
+        if (messages.isNotEmpty()) {
+            showUnsupported.value = messages
         }
     }
 
@@ -282,20 +305,64 @@ class MainActivity : UIActivity(), SplashScreenHost {
         if (isRunningAsStub && !Config.askedHome &&
             ShortcutManagerCompat.isRequestPinShortcutSupported(this)) {
             Config.askedHome = true
-            MagiskDialog(this).apply {
-                setTitle(CoreR.string.add_shortcut_title)
-                setMessage(CoreR.string.add_shortcut_msg)
-                setButton(MagiskDialog.ButtonType.NEGATIVE) {
-                    text = android.R.string.cancel
-                }
-                setButton(MagiskDialog.ButtonType.POSITIVE) {
-                    text = android.R.string.ok
-                    onClick {
-                        Shortcuts.addHomeIcon(this@MainActivity)
-                    }
-                }
-                setCancelable(true)
-            }.show()
+            showShortcutPrompt.value = true
+        }
+    }
+}
+
+@Composable
+private fun MainActivityDialogs(activity: MainActivity) {
+    val showInvalid by activity.showInvalidState.collectAsState()
+    val unsupportedMessages by activity.showUnsupported.collectAsState()
+    val showShortcut by activity.showShortcutPrompt.collectAsState()
+
+    val invalidDialog = com.topjohnwu.magisk.ui.component.rememberConfirmDialog(
+        onConfirm = {
+            activity.showInvalidState.value = false
+            activity.handleInvalidStateInstall()
+        },
+        onDismiss = {}
+    )
+
+    LaunchedEffect(showInvalid) {
+        if (showInvalid) {
+            invalidDialog.showConfirm(
+                title = activity.getString(CoreR.string.unsupport_nonroot_stub_title),
+                content = activity.getString(CoreR.string.unsupport_nonroot_stub_msg),
+                confirm = activity.getString(CoreR.string.install),
+            )
+        }
+    }
+
+    for ((index, pair) in unsupportedMessages.withIndex()) {
+        val (titleRes, msgRes) = pair
+        val show = rememberSaveable { androidx.compose.runtime.mutableStateOf(true) }
+        com.topjohnwu.magisk.ui.component.rememberConfirmDialog(
+            onConfirm = { show.value = false },
+        ).also { dialog ->
+            LaunchedEffect(Unit) {
+                dialog.showConfirm(
+                    title = activity.getString(titleRes),
+                    content = activity.getString(msgRes),
+                )
+            }
+        }
+    }
+
+    val shortcutDialog = com.topjohnwu.magisk.ui.component.rememberConfirmDialog(
+        onConfirm = {
+            activity.showShortcutPrompt.value = false
+            Shortcuts.addHomeIcon(activity)
+        },
+        onDismiss = { activity.showShortcutPrompt.value = false }
+    )
+
+    LaunchedEffect(showShortcut) {
+        if (showShortcut) {
+            shortcutDialog.showConfirm(
+                title = activity.getString(CoreR.string.add_shortcut_title),
+                content = activity.getString(CoreR.string.add_shortcut_msg),
+            )
         }
     }
 }

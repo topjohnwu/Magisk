@@ -20,13 +20,24 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import android.widget.Toast
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.lifecycleScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -41,7 +52,21 @@ import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.ktx.reboot
+import com.topjohnwu.magisk.core.download.DownloadEngine
+import com.topjohnwu.magisk.core.download.Subject
+import com.topjohnwu.magisk.core.ktx.reboot
+import com.topjohnwu.magisk.core.ktx.toast
+import com.topjohnwu.magisk.core.tasks.MagiskInstaller
+import com.topjohnwu.magisk.ui.MainActivity
+import com.topjohnwu.magisk.ui.component.ConfirmResult
+import com.topjohnwu.magisk.ui.component.LoadingDialogHandle
+import com.topjohnwu.magisk.ui.component.MarkdownTextAsync
+import com.topjohnwu.magisk.ui.component.rememberConfirmDialog
+import com.topjohnwu.magisk.ui.component.rememberLoadingDialog
 import com.topjohnwu.magisk.ui.component.ListPopupDefaults.MenuPositionProvider
+import com.topjohnwu.magisk.ui.flash.FlashUtils
+import com.topjohnwu.magisk.ui.navigation.Route
+import kotlinx.coroutines.launch
 import com.topjohnwu.magisk.core.R as CoreR
 import top.yukonga.miuix.kmp.basic.Card
 import top.yukonga.miuix.kmp.basic.DropdownImpl
@@ -62,7 +87,61 @@ import top.yukonga.miuix.kmp.theme.MiuixTheme
 fun HomeScreen(viewModel: HomeViewModel) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
+    val activity = context as MainActivity
     val scrollBehavior = MiuixScrollBehavior()
+    val scope = rememberCoroutineScope()
+    val loadingDialog = rememberLoadingDialog()
+    val navigator = com.topjohnwu.magisk.ui.navigation.LocalNavigator.current
+
+    val showUninstallDialog = rememberSaveable { mutableStateOf(false) }
+    val showManagerDialog = rememberSaveable { mutableStateOf(false) }
+    val showEnvFixDialog = rememberSaveable { mutableStateOf(false) }
+    var envFixCode by remember { mutableIntStateOf(0) }
+
+    LaunchedEffect(uiState.showUninstall) {
+        if (uiState.showUninstall) {
+            showUninstallDialog.value = true
+            viewModel.onUninstallConsumed()
+        }
+    }
+    LaunchedEffect(uiState.showManagerInstall) {
+        if (uiState.showManagerInstall) {
+            showManagerDialog.value = true
+            viewModel.onManagerInstallConsumed()
+        }
+    }
+    LaunchedEffect(uiState.envFixCode) {
+        if (uiState.envFixCode != 0) {
+            envFixCode = uiState.envFixCode
+            showEnvFixDialog.value = true
+            viewModel.onEnvFixConsumed()
+        }
+    }
+
+    if (showUninstallDialog.value) {
+        UninstallComposableDialog(
+            showDialog = showUninstallDialog,
+            activity = activity,
+            loadingDialog = loadingDialog,
+        )
+    }
+
+    if (showManagerDialog.value) {
+        ManagerInstallComposableDialog(
+            showDialog = showManagerDialog,
+            activity = activity,
+        )
+    }
+
+    if (showEnvFixDialog.value) {
+        EnvFixComposableDialog(
+            showDialog = showEnvFixDialog,
+            code = envFixCode,
+            activity = activity,
+            loadingDialog = loadingDialog,
+            onNavigateInstall = { viewModel.onMagiskPressed() },
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -454,4 +533,157 @@ private fun openLink(context: Context, url: String) {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         })
     } catch (_: ActivityNotFoundException) { }
+}
+
+@Composable
+private fun UninstallComposableDialog(
+    showDialog: MutableState<Boolean>,
+    activity: MainActivity,
+    loadingDialog: LoadingDialogHandle,
+) {
+    val scope = rememberCoroutineScope()
+    top.yukonga.miuix.kmp.extra.SuperDialog(
+        show = showDialog,
+        title = stringResource(CoreR.string.uninstall_magisk_title),
+        onDismissRequest = { showDialog.value = false },
+    ) {
+        Text(
+            text = stringResource(CoreR.string.uninstall_magisk_msg),
+            style = MiuixTheme.textStyles.body1,
+            color = MiuixTheme.colorScheme.onSurface,
+        )
+        Spacer(Modifier.height(16.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            TextButton(
+                text = stringResource(CoreR.string.restore_img),
+                onClick = {
+                    showDialog.value = false
+                    scope.launch {
+                        val success = loadingDialog.withLoading {
+                            MagiskInstaller.Restore().exec()
+                        }
+                        activity.toast(
+                            if (success) CoreR.string.restore_done else CoreR.string.restore_fail,
+                            Toast.LENGTH_SHORT
+                        )
+                    }
+                }
+            )
+            Spacer(Modifier.width(8.dp))
+            TextButton(
+                text = stringResource(CoreR.string.complete_uninstall),
+                onClick = {
+                    showDialog.value = false
+                    val intent = Intent(activity, activity.javaClass).apply {
+                        action = FlashUtils.INTENT_FLASH
+                        putExtra(FlashUtils.EXTRA_FLASH_ACTION, Const.Value.UNINSTALL)
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    }
+                    activity.startActivity(intent)
+                }
+            )
+        }
+    }
+}
+
+@Composable
+private fun ManagerInstallComposableDialog(
+    showDialog: MutableState<Boolean>,
+    activity: MainActivity,
+) {
+    top.yukonga.miuix.kmp.extra.SuperDialog(
+        show = showDialog,
+        title = stringResource(CoreR.string.install),
+        onDismissRequest = { showDialog.value = false },
+    ) {
+        MarkdownTextAsync {
+            val text = Info.update.note
+            java.io.File(activity.cacheDir, "${Info.update.versionCode}.md").writeText(text)
+            text
+        }
+        Spacer(Modifier.height(16.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            TextButton(
+                text = stringResource(android.R.string.cancel),
+                onClick = { showDialog.value = false }
+            )
+            Spacer(Modifier.width(8.dp))
+            TextButton(
+                text = stringResource(CoreR.string.install),
+                onClick = {
+                    showDialog.value = false
+                    DownloadEngine.startWithActivity(activity, activity.extension, Subject.App())
+                }
+            )
+        }
+    }
+}
+
+@Composable
+private fun EnvFixComposableDialog(
+    showDialog: MutableState<Boolean>,
+    code: Int,
+    activity: MainActivity,
+    loadingDialog: LoadingDialogHandle,
+    onNavigateInstall: () -> Unit,
+) {
+    val scope = rememberCoroutineScope()
+    val needsFullFix = code == 2 ||
+        Info.env.versionCode != com.topjohnwu.magisk.core.BuildConfig.APP_VERSION_CODE ||
+        Info.env.versionString != com.topjohnwu.magisk.core.BuildConfig.APP_VERSION_NAME
+
+    top.yukonga.miuix.kmp.extra.SuperDialog(
+        show = showDialog,
+        title = stringResource(CoreR.string.env_fix_title),
+        onDismissRequest = { showDialog.value = false },
+    ) {
+        Text(
+            text = stringResource(
+                if (needsFullFix) CoreR.string.env_full_fix_msg else CoreR.string.env_fix_msg
+            ),
+            style = MiuixTheme.textStyles.body1,
+            color = MiuixTheme.colorScheme.onSurface,
+        )
+        Spacer(Modifier.height(16.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            TextButton(
+                text = stringResource(android.R.string.cancel),
+                onClick = { showDialog.value = false }
+            )
+            Spacer(Modifier.width(8.dp))
+            TextButton(
+                text = stringResource(android.R.string.ok),
+                onClick = {
+                    showDialog.value = false
+                    if (needsFullFix) {
+                        onNavigateInstall()
+                    } else {
+                        scope.launch {
+                            val success = loadingDialog.withLoading {
+                                MagiskInstaller.FixEnv().exec()
+                            }
+                            activity.toast(
+                                if (success) CoreR.string.reboot_delay_toast else CoreR.string.setup_fail,
+                                Toast.LENGTH_LONG
+                            )
+                            if (success) {
+                                @Suppress("DEPRECATION")
+                                android.os.Handler(android.os.Looper.getMainLooper())
+                                    .postDelayed({ reboot() }, 5000)
+                            }
+                        }
+                    }
+                }
+            )
+        }
+    }
 }

@@ -10,7 +10,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -20,6 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.ui.component.rememberConfirmDialog
 import top.yukonga.miuix.kmp.basic.Card
 import top.yukonga.miuix.kmp.basic.Checkbox
 import top.yukonga.miuix.kmp.basic.Icon
@@ -37,6 +41,28 @@ import com.topjohnwu.magisk.core.R as CoreR
 @Composable
 fun InstallScreen(viewModel: InstallViewModel, onBack: () -> Unit) {
     val uiState by viewModel.uiState.collectAsState()
+
+    val filePicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        uri?.let { viewModel.onPatchFileSelected(it) }
+    }
+
+    val secondSlotDialog = rememberConfirmDialog()
+    val secondSlotTitle = stringResource(android.R.string.dialog_alert_title)
+    val secondSlotMsg = stringResource(CoreR.string.install_inactive_slot_msg)
+
+    LaunchedEffect(uiState.requestFilePicker) {
+        if (uiState.requestFilePicker) {
+            filePicker.launch("*/*")
+            viewModel.onFilePickerConsumed()
+        }
+    }
+
+    LaunchedEffect(uiState.showSecondSlotWarning) {
+        if (uiState.showSecondSlotWarning) {
+            secondSlotDialog.showConfirm(title = secondSlotTitle, content = secondSlotMsg)
+            viewModel.onSecondSlotWarningConsumed()
+        }
+    }
 
     val scrollBehavior = MiuixScrollBehavior()
     Scaffold(

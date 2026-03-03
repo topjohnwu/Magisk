@@ -1,13 +1,11 @@
 package com.topjohnwu.magisk.ui.home
 
 import android.content.ActivityNotFoundException
-import android.content.Context
 import android.content.Intent
 import android.widget.Toast
 import androidx.core.net.toUri
 import com.topjohnwu.magisk.arch.AsyncLoadViewModel
-import com.topjohnwu.magisk.arch.ContextExecutor
-import com.topjohnwu.magisk.arch.ViewEvent
+import com.topjohnwu.magisk.core.AppContext
 import com.topjohnwu.magisk.core.BuildConfig
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
@@ -16,10 +14,6 @@ import com.topjohnwu.magisk.core.download.Subject.App
 import com.topjohnwu.magisk.core.ktx.await
 import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.repository.NetworkService
-import com.topjohnwu.magisk.dialog.EnvFixDialog
-import com.topjohnwu.magisk.dialog.ManagerInstallDialog
-import com.topjohnwu.magisk.dialog.UninstallDialog
-import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.magisk.ui.navigation.Route
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -42,6 +36,9 @@ class HomeViewModel(
         val appState: State = State.LOADING,
         val managerRemoteVersion: String = "",
         val managerProgress: Int = 0,
+        val showUninstall: Boolean = false,
+        val showManagerInstall: Boolean = false,
+        val envFixCode: Int = 0,
     )
 
     private val _uiState = MutableStateFlow(UiState())
@@ -87,7 +84,16 @@ class HomeViewModel(
         ensureEnv()
     }
 
-    override fun onNetworkChanged(network: Boolean) = startLoading()
+    private val networkObserver: (Boolean) -> Unit = { startLoading() }
+
+    init {
+        Info.isConnected.observeForever(networkObserver)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        Info.isConnected.removeObserver(networkObserver)
+    }
 
     fun onProgressUpdate(progress: Float, subject: Subject) {
         if (subject is App)
@@ -98,31 +104,41 @@ class HomeViewModel(
         _uiState.update { it.copy(managerProgress = 0) }
     }
 
-    fun onLinkPressed(link: String) = object : ViewEvent(), ContextExecutor {
-        override fun invoke(context: Context) {
-            val intent = Intent(Intent.ACTION_VIEW, link.toUri())
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            try {
-                context.startActivity(intent)
-            } catch (e: ActivityNotFoundException) {
-                context.toast(CoreR.string.open_link_failed_toast, Toast.LENGTH_SHORT)
-            }
-        }
-    }.publish()
-
-    fun onDeletePressed() = UninstallDialog().show()
-
-    fun onManagerPressed() = when (_uiState.value.appState) {
-        State.LOADING -> SnackbarEvent(CoreR.string.loading).publish()
-        State.INVALID -> SnackbarEvent(CoreR.string.no_connection).publish()
-        else -> withExternalRW {
-            withInstallPermission {
-                ManagerInstallDialog().show()
-            }
+    fun onLinkPressed(link: String) {
+        val intent = Intent(Intent.ACTION_VIEW, link.toUri())
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        try {
+            AppContext.startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            AppContext.toast(CoreR.string.open_link_failed_toast, Toast.LENGTH_SHORT)
         }
     }
 
-    fun onMagiskPressed() = withExternalRW {
+    fun onDeletePressed() {
+        _uiState.update { it.copy(showUninstall = true) }
+    }
+
+    fun onUninstallConsumed() {
+        _uiState.update { it.copy(showUninstall = false) }
+    }
+
+    fun onManagerPressed() {
+        when (_uiState.value.appState) {
+            State.LOADING -> showSnackbar(CoreR.string.loading)
+            State.INVALID -> showSnackbar(CoreR.string.no_connection)
+            else -> _uiState.update { it.copy(showManagerInstall = true) }
+        }
+    }
+
+    fun onManagerInstallConsumed() {
+        _uiState.update { it.copy(showManagerInstall = false) }
+    }
+
+    fun onEnvFixConsumed() {
+        _uiState.update { it.copy(envFixCode = 0) }
+    }
+
+    fun onMagiskPressed() {
         navigateTo(Route.Install)
     }
 
@@ -136,7 +152,7 @@ class HomeViewModel(
         val cmd = "env_check ${Info.env.versionString} ${Info.env.versionCode}"
         val code = Shell.cmd(cmd).await().code
         if (code != 0) {
-            EnvFixDialog(this, code).show()
+            _uiState.update { it.copy(envFixCode = code) }
         }
         checkedEnv = true
     }

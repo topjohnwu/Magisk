@@ -42,6 +42,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.VMFactory
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.base.SplashScreenHost
 import com.topjohnwu.magisk.core.model.module.LocalModule
 import com.topjohnwu.magisk.ui.home.HomeScreen
 import com.topjohnwu.magisk.ui.home.HomeViewModel
@@ -51,7 +52,6 @@ import com.topjohnwu.magisk.ui.module.ModuleScreen
 import com.topjohnwu.magisk.ui.module.ModuleViewModel
 import com.topjohnwu.magisk.ui.navigation.CollectNavEvents
 import com.topjohnwu.magisk.ui.navigation.LocalNavigator
-import com.topjohnwu.magisk.ui.navigation.ObserveViewEvents
 import com.topjohnwu.magisk.ui.settings.SettingsScreen
 import com.topjohnwu.magisk.ui.settings.SettingsViewModel
 import com.topjohnwu.magisk.ui.superuser.SuperuserScreen
@@ -86,33 +86,39 @@ fun MainScreen(initialTab: Int = Tab.HOME.ordinal) {
                 Tab.HOME -> {
                     val vm: HomeViewModel = viewModel(factory = VMFactory)
                     LaunchedEffect(Unit) { vm.startLoading() }
-                    ObserveViewEvents(vm)
                     CollectNavEvents(vm, navigator)
                     HomeScreen(vm)
                 }
                 Tab.SUPERUSER -> {
-                    val activity = LocalContext.current as androidx.activity.ComponentActivity
+                    val activity = LocalContext.current as MainActivity
                     val vm: SuperuserViewModel = viewModel(viewModelStoreOwner = activity, factory = VMFactory)
-                    LaunchedEffect(Unit) { vm.startLoading() }
-                    ObserveViewEvents(vm)
+                    LaunchedEffect(Unit) {
+                        vm.authenticate = { onSuccess ->
+                            activity.extension.withAuthentication { if (it) onSuccess() }
+                        }
+                        vm.startLoading()
+                    }
                     SuperuserScreen(vm)
                 }
                 Tab.LOG -> {
                     val vm: LogViewModel = viewModel(factory = VMFactory)
                     LaunchedEffect(Unit) { vm.startLoading() }
-                    ObserveViewEvents(vm)
                     LogScreen(vm)
                 }
                 Tab.MODULES -> {
                     val vm: ModuleViewModel = viewModel(factory = VMFactory)
                     LaunchedEffect(Unit) { vm.startLoading() }
-                    ObserveViewEvents(vm)
                     CollectNavEvents(vm, navigator)
                     ModuleScreen(vm)
                 }
                 Tab.SETTINGS -> {
+                    val activity = LocalContext.current as MainActivity
                     val vm: SettingsViewModel = viewModel(factory = VMFactory)
-                    ObserveViewEvents(vm)
+                    LaunchedEffect(Unit) {
+                        vm.authenticate = { onSuccess ->
+                            activity.extension.withAuthentication { if (it) onSuccess() }
+                        }
+                    }
                     CollectNavEvents(vm, navigator)
                     SettingsScreen(vm)
                 }

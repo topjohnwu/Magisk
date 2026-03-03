@@ -18,12 +18,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.topjohnwu.magisk.ui.component.ConfirmResult
+import com.topjohnwu.magisk.ui.component.rememberConfirmDialog
 import com.topjohnwu.magisk.ui.util.rememberDrawablePainter
+import kotlinx.coroutines.launch
 import top.yukonga.miuix.kmp.basic.Card
 import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.IconButton
@@ -47,6 +51,10 @@ fun SuperuserDetailScreen(
     val items = uiState.policies.filter { it.policy.uid == uid }
     val item = items.firstOrNull()
     val scrollBehavior = MiuixScrollBehavior()
+    val scope = rememberCoroutineScope()
+    val revokeDialog = rememberConfirmDialog()
+    val revokeTitle = stringResource(CoreR.string.su_revoke_title)
+    val revokeMsg = item?.let { stringResource(CoreR.string.su_revoke_msg, it.appName) } ?: ""
 
     LaunchedEffect(Unit) { viewModel.refreshSuRestrict() }
 
@@ -155,7 +163,19 @@ fun SuperuserDetailScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
-                            viewModel.deletePressed(item, onDeleted = onBack)
+                            if (viewModel.requiresAuth) {
+                                viewModel.authenticate { viewModel.performDelete(item, onBack) }
+                            } else {
+                                scope.launch {
+                                    val result = revokeDialog.awaitConfirm(
+                                        title = revokeTitle,
+                                        content = revokeMsg,
+                                    )
+                                    if (result == ConfirmResult.Confirmed) {
+                                        viewModel.performDelete(item, onBack)
+                                    }
+                                }
+                            }
                         }
                 ) {
                     RevokeRow()

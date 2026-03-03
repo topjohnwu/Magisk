@@ -1,28 +1,26 @@
 package com.topjohnwu.magisk.ui.module
 
+import android.content.Context
 import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.MutableLiveData
 import com.topjohnwu.magisk.arch.AsyncLoadViewModel
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.core.base.ContentResultCallback
+import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.core.model.module.LocalModule
 import com.topjohnwu.magisk.core.model.module.OnlineModule
-import com.topjohnwu.magisk.dialog.LocalModuleInstallDialog
-import com.topjohnwu.magisk.dialog.OnlineModuleInstallDialog
-import com.topjohnwu.magisk.events.GetContentEvent
-import com.topjohnwu.magisk.events.SnackbarEvent
+import com.topjohnwu.magisk.ui.flash.FlashUtils
+import com.topjohnwu.magisk.view.Notifications
 import kotlinx.coroutines.Dispatchers
+import kotlinx.parcelize.Parcelize
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
 import com.topjohnwu.magisk.ui.navigation.Route
-import kotlinx.parcelize.Parcelize
 import com.topjohnwu.magisk.core.R as CoreR
 
 class ModuleItem(val module: LocalModule) {
@@ -53,6 +51,15 @@ class ModuleItem(val module: LocalModule) {
     val updateReady get() = module.outdated && !isRemoved && isEnabled
 }
 
+@Parcelize
+class OnlineModuleSubject(
+    override val module: OnlineModule,
+    override val autoLaunch: Boolean,
+    override val notifyId: Int = Notifications.nextId()
+) : Subject.Module() {
+    override fun pendingIntent(context: Context) = FlashUtils.installIntent(context, file)
+}
+
 class ModuleViewModel : AsyncLoadViewModel() {
 
     data class UiState(
@@ -62,8 +69,6 @@ class ModuleViewModel : AsyncLoadViewModel() {
 
     private val _uiState = MutableStateFlow(UiState())
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
-
-    val data get() = uri
 
     override suspend fun doLoadWork() {
         _uiState.update { it.copy(loading = true) }
@@ -80,7 +85,16 @@ class ModuleViewModel : AsyncLoadViewModel() {
         }
     }
 
-    override fun onNetworkChanged(network: Boolean) = startLoading()
+    private val networkObserver: (Boolean) -> Unit = { startLoading() }
+
+    init {
+        Info.isConnected.observeForever(networkObserver)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        Info.isConnected.removeObserver(networkObserver)
+    }
 
     private suspend fun loadUpdateInfo() {
         withContext(Dispatchers.IO) {
@@ -92,26 +106,8 @@ class ModuleViewModel : AsyncLoadViewModel() {
         }
     }
 
-    fun downloadPressed(item: OnlineModule?) =
-        if (item != null && Info.isConnected.value == true) {
-            withExternalRW { OnlineModuleInstallDialog(item).show() }
-        } else {
-            SnackbarEvent(CoreR.string.no_connection).publish()
-        }
-
-    fun installPressed() = withExternalRW {
-        GetContentEvent("application/zip", UriCallback()).publish()
-    }
-
-    fun requestInstallLocalModule(uri: Uri, displayName: String) {
-        LocalModuleInstallDialog(this, uri, displayName).show()
-    }
-
-    @Parcelize
-    class UriCallback : ContentResultCallback {
-        override fun onActivityResult(result: Uri) {
-            uri.value = result
-        }
+    fun confirmLocalInstall(uri: Uri) {
+        navigateTo(Route.Flash(Const.Value.FLASH_ZIP, uri.toString()))
     }
 
     fun runAction(id: String, name: String) {
@@ -126,9 +122,5 @@ class ModuleViewModel : AsyncLoadViewModel() {
     fun toggleRemove(item: ModuleItem) {
         item.isRemoved = !item.isRemoved
         item.module.remove = item.isRemoved
-    }
-
-    companion object {
-        private val uri = MutableLiveData<Uri?>()
     }
 }

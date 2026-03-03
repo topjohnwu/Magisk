@@ -2,13 +2,16 @@ package com.topjohnwu.magisk.ui.settings
 
 import android.app.Activity
 import android.os.Build
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
@@ -34,6 +37,7 @@ import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.tasks.AppMigration
 import com.topjohnwu.magisk.core.utils.LocaleSetting
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
+import top.yukonga.miuix.kmp.basic.ButtonDefaults
 import top.yukonga.miuix.kmp.basic.Card
 import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
 import top.yukonga.miuix.kmp.basic.Scaffold
@@ -45,6 +49,7 @@ import top.yukonga.miuix.kmp.extra.SuperArrow
 import top.yukonga.miuix.kmp.extra.SuperDropdown
 import top.yukonga.miuix.kmp.extra.SuperSwitch
 import top.yukonga.miuix.kmp.extra.SuperDialog
+import top.yukonga.miuix.kmp.theme.MiuixTheme
 import com.topjohnwu.magisk.core.R as CoreR
 
 @Composable
@@ -193,10 +198,8 @@ private fun AppSettingsSection(viewModel: SettingsViewModel) {
             summary = stringResource(CoreR.string.settings_check_update_summary),
             checked = checkUpdate,
             onCheckedChange = { newValue ->
-                viewModel.withNotificationPermission {
-                    checkUpdate = newValue
-                    Config.checkUpdate = newValue
-                }
+                checkUpdate = newValue
+                Config.checkUpdate = newValue
             }
         )
 
@@ -210,7 +213,7 @@ private fun AppSettingsSection(viewModel: SettingsViewModel) {
             title = stringResource(CoreR.string.settings_download_path_title),
             summary = MediaStoreUtils.fullPath(Config.downloadDir),
             onClick = {
-                viewModel.withDownloadPathPermission { showDownloadDialog = true }
+                showDownloadDialog = true
             }
         )
 
@@ -566,6 +569,7 @@ private fun HideAppDialog(show: Boolean, onDismiss: () -> Unit, onConfirm: (Stri
 
     SuperDialog(
         show = showState,
+        title = stringResource(CoreR.string.settings_hide_app_title),
         onDismissRequest = onDismiss,
         insideMargin = DpSize(24.dp, 24.dp)
     ) {
@@ -574,14 +578,25 @@ private fun HideAppDialog(show: Boolean, onDismiss: () -> Unit, onConfirm: (Stri
                 value = appName,
                 onValueChange = { appName = it },
                 modifier = Modifier.fillMaxWidth(),
-                label = stringResource(CoreR.string.settings_app_name_hint)
+                label = stringResource(CoreR.string.settings_app_name_hint),
             )
             Spacer(Modifier.height(16.dp))
-            TextButton(
-                text = stringResource(android.R.string.ok),
-                onClick = { if (!isError) onConfirm(appName) },
-                modifier = Modifier.fillMaxWidth()
-            )
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                TextButton(
+                    text = stringResource(android.R.string.cancel),
+                    onClick = onDismiss,
+                    modifier = Modifier.weight(1f)
+                )
+                Spacer(Modifier.width(20.dp))
+                TextButton(
+                    text = stringResource(android.R.string.ok),
+                    onClick = { if (!isError) onConfirm(appName) },
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.textButtonColorsPrimary()
+                )
+            }
         }
     }
 }
@@ -593,19 +608,32 @@ private fun RestoreDialog(show: Boolean, onDismiss: () -> Unit, onConfirm: () ->
 
     SuperDialog(
         show = showState,
+        title = stringResource(CoreR.string.settings_restore_app_title),
         onDismissRequest = onDismiss,
         insideMargin = DpSize(24.dp, 24.dp)
     ) {
         Column(modifier = Modifier.padding(top = 8.dp)) {
             top.yukonga.miuix.kmp.basic.Text(
-                text = stringResource(CoreR.string.restore_app_confirmation)
+                text = stringResource(CoreR.string.restore_app_confirmation),
+                color = MiuixTheme.colorScheme.onSurface,
             )
             Spacer(Modifier.height(16.dp))
-            TextButton(
-                text = stringResource(android.R.string.ok),
-                onClick = onConfirm,
-                modifier = Modifier.fillMaxWidth()
-            )
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                TextButton(
+                    text = stringResource(android.R.string.cancel),
+                    onClick = onDismiss,
+                    modifier = Modifier.weight(1f)
+                )
+                Spacer(Modifier.width(20.dp))
+                TextButton(
+                    text = stringResource(android.R.string.ok),
+                    onClick = onConfirm,
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.textButtonColorsPrimary()
+                )
+            }
         }
     }
 }
