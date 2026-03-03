@@ -33,52 +33,70 @@ import androidx.compose.ui.unit.dp
 import com.topjohnwu.magisk.core.model.su.SuPolicy
 import top.yukonga.miuix.kmp.basic.Card
 import top.yukonga.miuix.kmp.basic.CircularProgressIndicator
+import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
+import top.yukonga.miuix.kmp.basic.Scaffold
 import top.yukonga.miuix.kmp.basic.Slider
 import top.yukonga.miuix.kmp.basic.Switch
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.basic.TextButton
+import top.yukonga.miuix.kmp.basic.TopAppBar
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import com.topjohnwu.magisk.core.R as CoreR
 
 @Composable
 fun SuperuserScreen(viewModel: SuperuserViewModel) {
     val uiState by viewModel.uiState.collectAsState()
+    val scrollBehavior = MiuixScrollBehavior()
 
-    if (uiState.loading) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator()
-        }
-        return
-    }
-
-    if (uiState.policies.isEmpty()) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = stringResource(CoreR.string.superuser_policy_none),
-                style = MiuixTheme.textStyles.body1,
-                color = MiuixTheme.colorScheme.onSurfaceVariantSummary
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = stringResource(CoreR.string.superuser),
+                scrollBehavior = scrollBehavior
             )
         }
-        return
-    }
-
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 12.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        item { Spacer(Modifier.height(4.dp)) }
-        items(uiState.policies, key = { "${it.policy.uid}_${it.packageName}" }) { item ->
-            PolicyCard(item = item, viewModel = viewModel)
+    ) { padding ->
+        if (uiState.loading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+            return@Scaffold
         }
-        item { Spacer(Modifier.height(4.dp)) }
+
+        if (uiState.policies.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = stringResource(CoreR.string.superuser_policy_none),
+                    style = MiuixTheme.textStyles.body1,
+                    color = MiuixTheme.colorScheme.onSurfaceVariantSummary
+                )
+            }
+            return@Scaffold
+        }
+
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(horizontal = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            item { Spacer(Modifier.height(4.dp)) }
+            items(uiState.policies, key = { "${it.policy.uid}_${it.packageName}" }) { item ->
+                PolicyCard(item = item, viewModel = viewModel)
+            }
+            item { Spacer(Modifier.height(4.dp)) }
+        }
     }
 }
 

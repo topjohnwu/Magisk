@@ -34,8 +34,10 @@ import com.topjohnwu.magisk.core.tasks.AppMigration
 import com.topjohnwu.magisk.core.utils.LocaleSetting
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import top.yukonga.miuix.kmp.basic.Card
+import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
 import top.yukonga.miuix.kmp.basic.Scaffold
 import top.yukonga.miuix.kmp.basic.SmallTitle
+import top.yukonga.miuix.kmp.basic.TopAppBar
 import top.yukonga.miuix.kmp.basic.TextField
 import top.yukonga.miuix.kmp.basic.TextButton
 import top.yukonga.miuix.kmp.extra.SuperArrow
@@ -46,14 +48,22 @@ import com.topjohnwu.magisk.core.R as CoreR
 
 @Composable
 fun SettingsScreen(viewModel: SettingsViewModel) {
-    Scaffold { padding ->
+    val scrollBehavior = MiuixScrollBehavior()
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = stringResource(CoreR.string.settings),
+                scrollBehavior = scrollBehavior
+            )
+        }
+    ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .padding(padding)
                 .padding(horizontal = 12.dp)
-                .padding(top = 8.dp, bottom = 16.dp)
+                .padding(bottom = 16.dp)
         ) {
             CustomizationSection(viewModel)
             Spacer(Modifier.height(12.dp))

@@ -9,15 +9,16 @@ import androidx.databinding.PropertyChangeRegistry
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.navigation.NavDirections
 import com.topjohnwu.magisk.core.R
 import com.topjohnwu.magisk.databinding.ObservableHost
 import com.topjohnwu.magisk.events.BackPressEvent
 import com.topjohnwu.magisk.events.DialogBuilder
 import com.topjohnwu.magisk.events.DialogEvent
-import com.topjohnwu.magisk.events.NavigationEvent
 import com.topjohnwu.magisk.events.PermissionEvent
 import com.topjohnwu.magisk.events.SnackbarEvent
+import com.topjohnwu.magisk.ui.navigation.Route
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 
 abstract class BaseViewModel : ViewModel(), ObservableHost {
 
@@ -25,6 +26,9 @@ abstract class BaseViewModel : ViewModel(), ObservableHost {
 
     private val _viewEvents = MutableLiveData<ViewEvent>()
     val viewEvents: LiveData<ViewEvent> get() = _viewEvents
+
+    private val _navEvents = MutableSharedFlow<Route>(extraBufferCapacity = 1)
+    val navEvents: SharedFlow<Route> = _navEvents
 
     open fun onSaveState(state: Bundle) {}
     open fun onRestoreState(state: Bundle) {}
@@ -76,8 +80,8 @@ abstract class BaseViewModel : ViewModel(), ObservableHost {
         DialogEvent(this).publish()
     }
 
-    fun NavDirections.navigate(pop: Boolean = false) {
-        _viewEvents.postValue(NavigationEvent(this, pop))
+    fun navigateTo(route: Route) {
+        _navEvents.tryEmit(route)
     }
 
 }

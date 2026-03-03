@@ -20,13 +20,20 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import top.yukonga.miuix.kmp.basic.FloatingActionButton
+import top.yukonga.miuix.kmp.basic.Icon
+import top.yukonga.miuix.kmp.basic.IconButton
+import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
+import top.yukonga.miuix.kmp.basic.Scaffold
+import top.yukonga.miuix.kmp.basic.SmallTopAppBar
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.basic.TextButton
+import top.yukonga.miuix.kmp.icon.MiuixIcons
+import top.yukonga.miuix.kmp.icon.extended.Back
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import com.topjohnwu.magisk.core.R as CoreR
 
 @Composable
-fun ActionScreen(viewModel: ActionViewModel, onClose: () -> Unit) {
+fun ActionScreen(viewModel: ActionViewModel, actionName: String, onBack: () -> Unit) {
     val actionState by viewModel.actionState.collectAsState()
     val items = viewModel.consoleItems
     val listState = rememberLazyListState()
@@ -37,45 +44,67 @@ fun ActionScreen(viewModel: ActionViewModel, onClose: () -> Unit) {
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        LazyColumn(
-            state = listState,
-            modifier = Modifier
-                .fillMaxSize()
-                .horizontalScroll(rememberScrollState())
-                .padding(horizontal = 8.dp, vertical = 4.dp)
-        ) {
-            itemsIndexed(items) { _, line ->
-                Text(
-                    text = line,
-                    fontFamily = FontFamily.Monospace,
-                    fontSize = 12.sp,
-                    lineHeight = 16.sp,
-                    color = MiuixTheme.colorScheme.onSurface,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-        }
-
-        if (actionState != ActionViewModel.State.RUNNING) {
-            TextButton(
-                text = stringResource(CoreR.string.menuSaveLog),
-                onClick = { viewModel.saveLog() },
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .padding(16.dp)
+    val scrollBehavior = MiuixScrollBehavior()
+    Scaffold(
+        topBar = {
+            SmallTopAppBar(
+                title = actionName,
+                navigationIcon = {
+                    IconButton(
+                        modifier = Modifier.padding(start = 16.dp),
+                        onClick = onBack
+                    ) {
+                        Icon(
+                            imageVector = MiuixIcons.Back,
+                            contentDescription = null,
+                            tint = MiuixTheme.colorScheme.onBackground
+                        )
+                    }
+                },
+                scrollBehavior = scrollBehavior
             )
-
-            FloatingActionButton(
-                onClick = onClose,
+        }
+    ) { padding ->
+        Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+            LazyColumn(
+                state = listState,
                 modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(16.dp)
+                    .fillMaxSize()
+                    .horizontalScroll(rememberScrollState())
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
             ) {
-                Text(
-                    text = stringResource(CoreR.string.close),
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                itemsIndexed(items) { _, line ->
+                    Text(
+                        text = line,
+                        fontFamily = FontFamily.Monospace,
+                        fontSize = 12.sp,
+                        lineHeight = 16.sp,
+                        color = MiuixTheme.colorScheme.onSurface,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+
+            if (actionState != ActionViewModel.State.RUNNING) {
+                TextButton(
+                    text = stringResource(CoreR.string.menuSaveLog),
+                    onClick = { viewModel.saveLog() },
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(16.dp)
                 )
+
+                FloatingActionButton(
+                    onClick = onBack,
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(16.dp)
+                ) {
+                    Text(
+                        text = stringResource(CoreR.string.close),
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+                }
             }
         }
     }

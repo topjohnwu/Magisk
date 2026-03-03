@@ -32,9 +32,12 @@ import com.topjohnwu.magisk.core.ktx.toTime
 import com.topjohnwu.magisk.core.model.su.SuLog
 import top.yukonga.miuix.kmp.basic.Card
 import top.yukonga.miuix.kmp.basic.CircularProgressIndicator
+import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
+import top.yukonga.miuix.kmp.basic.Scaffold
 import top.yukonga.miuix.kmp.basic.TabRow
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.basic.TextButton
+import top.yukonga.miuix.kmp.basic.TopAppBar
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import com.topjohnwu.magisk.core.R as CoreR
 
@@ -46,33 +49,46 @@ fun LogScreen(viewModel: LogViewModel) {
         stringResource(CoreR.string.superuser),
         stringResource(CoreR.string.magisk)
     )
+    val scrollBehavior = MiuixScrollBehavior()
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        TabRow(
-            tabs = tabTitles,
-            selectedTabIndex = selectedTab,
-            onTabSelected = { selectedTab = it },
-            modifier = Modifier.fillMaxWidth()
-        )
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = stringResource(CoreR.string.logs),
+                scrollBehavior = scrollBehavior
+            )
+        }
+    ) { padding ->
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .padding(padding)
+        ) {
+            TabRow(
+                tabs = tabTitles,
+                selectedTabIndex = selectedTab,
+                onTabSelected = { selectedTab = it },
+                modifier = Modifier.fillMaxWidth()
+            )
 
-        if (uiState.loading) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
-        } else {
-            when (selectedTab) {
-                0 -> SuLogTab(
-                    logs = uiState.suLogs,
-                    onClear = { viewModel.clearLog() }
-                )
-                1 -> MagiskLogTab(
-                    log = uiState.magiskLog,
-                    onSave = { viewModel.saveMagiskLog() },
-                    onClear = { viewModel.clearMagiskLog() }
-                )
+            if (uiState.loading) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                when (selectedTab) {
+                    0 -> SuLogTab(
+                        logs = uiState.suLogs,
+                        onClear = { viewModel.clearLog() }
+                    )
+                    1 -> MagiskLogTab(
+                        log = uiState.magiskLog,
+                        onSave = { viewModel.saveMagiskLog() },
+                        onClear = { viewModel.clearMagiskLog() }
+                    )
+                }
             }
         }
     }

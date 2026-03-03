@@ -9,9 +9,11 @@ okhttp = "5.3.2"
 retrofit = "3.0.0"
 room = "2.8.4"
 compose-bom = "2026.02.01"
-lifecycle = "2.9.4"
+lifecycle = "2.10.0"
 activity-compose = "1.12.4"
 miuix = "0.8.5"
+navigation3 = "1.1.0-alpha05"
+navigationevent = "1.0.2"
 
 [libraries]
 bcpkix = { module = "org.bouncycastle:bcpkix-jdk18on", version = "1.83" }
@@ -70,6 +72,11 @@ compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview"
 lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
 lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 miuix = { module = "top.yukonga.miuix.kmp:miuix-android", version.ref = "miuix" }
+miuix-icons = { module = "top.yukonga.miuix.kmp:miuix-icons-android", version.ref = "miuix" }
+miuix-navigation3-ui = { module = "top.yukonga.miuix.kmp:miuix-navigation3-ui-android", version.ref = "miuix" }
+navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "navigation3" }
+navigationevent-compose = { module = "androidx.navigationevent:navigationevent-compose", version.ref = "navigationevent" }
+lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycle" }
 
 # Build plugins
 android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "android" }

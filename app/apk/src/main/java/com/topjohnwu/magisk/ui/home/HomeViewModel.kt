@@ -20,6 +20,7 @@ import com.topjohnwu.magisk.dialog.EnvFixDialog
 import com.topjohnwu.magisk.dialog.ManagerInstallDialog
 import com.topjohnwu.magisk.dialog.UninstallDialog
 import com.topjohnwu.magisk.events.SnackbarEvent
+import com.topjohnwu.magisk.ui.navigation.Route
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -122,7 +123,7 @@ class HomeViewModel(
     }
 
     fun onMagiskPressed() = withExternalRW {
-        HomeFragmentDirections.actionHomeFragmentToInstallFragment().navigate()
+        navigateTo(Route.Install)
     }
 
     fun hideNotice() {

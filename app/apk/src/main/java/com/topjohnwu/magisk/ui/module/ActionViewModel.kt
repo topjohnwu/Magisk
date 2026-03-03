@@ -35,7 +35,8 @@ class ActionViewModel : BaseViewModel() {
     val actionState: StateFlow<State> = _actionState.asStateFlow()
 
     val consoleItems = mutableStateListOf<String>()
-    lateinit var args: ActionFragmentArgs
+    var actionId: String = ""
+    var actionName: String = ""
 
     private val logItems = mutableListOf<String>().synchronized()
     private val outItems = object : CallbackList<String>() {
@@ -49,7 +50,7 @@ class ActionViewModel : BaseViewModel() {
     fun startRunAction() = viewModelScope.launch {
         onResult(withContext(Dispatchers.IO) {
             try {
-                Shell.cmd("run_action '${args.id}'")
+                Shell.cmd("run_action '${actionId}'")
                     .to(outItems, logItems)
                     .exec().isSuccess
             } catch (e: IOException) {
@@ -68,7 +69,7 @@ class ActionViewModel : BaseViewModel() {
     fun saveLog() = withExternalRW {
         viewModelScope.launch(Dispatchers.IO) {
             val name = "%s_action_log_%s.log".format(
-                args.name,
+                actionName,
                 System.currentTimeMillis().toTime(timeFormatStandard)
             )
             val file = MediaStoreUtils.getFile(name)

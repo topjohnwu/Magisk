@@ -1,11 +1,11 @@
 package com.topjohnwu.magisk.dialog
 
 import android.net.Uri
-import com.topjohnwu.magisk.MainDirections
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.R
 import com.topjohnwu.magisk.events.DialogBuilder
 import com.topjohnwu.magisk.ui.module.ModuleViewModel
+import com.topjohnwu.magisk.ui.navigation.Route
 import com.topjohnwu.magisk.view.MagiskDialog
 
 class LocalModuleInstallDialog(
@@ -20,9 +20,9 @@ class LocalModuleInstallDialog(
             setButton(MagiskDialog.ButtonType.POSITIVE) {
                 text = android.R.string.ok
                 onClick {
-                    viewModel.apply {
-                        MainDirections.actionFlashFragment(Const.Value.FLASH_ZIP, uri).navigate()
-                    }
+                    viewModel.navigateTo(
+                        Route.Flash(Const.Value.FLASH_ZIP, uri.toString())
+                    )
                 }
             }
             setButton(MagiskDialog.ButtonType.NEGATIVE) {
