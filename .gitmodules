@@ -1,9 +1,6 @@
 [submodule "selinux"]
 	path = native/src/external/selinux
 	url = https://github.com/topjohnwu/selinux.git
-[submodule "lz4"]
-	path = native/src/external/lz4
-	url = https://github.com/lz4/lz4.git
 [submodule "libcxx"]
 	path = native/src/external/libcxx
 	url = https://github.com/topjohnwu/libcxx.git
