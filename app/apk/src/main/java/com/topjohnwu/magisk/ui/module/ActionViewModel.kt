@@ -1,11 +1,9 @@
 package com.topjohnwu.magisk.ui.module
 
-import android.view.MenuItem
-import androidx.databinding.ObservableArrayList
+import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.core.ktx.synchronized
 import com.topjohnwu.magisk.core.ktx.timeFormatStandard
@@ -13,10 +11,12 @@ import com.topjohnwu.magisk.core.ktx.toTime
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.events.SnackbarEvent
-import com.topjohnwu.magisk.ui.flash.ConsoleItem
 import com.topjohnwu.superuser.CallbackList
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -31,14 +31,17 @@ class ActionViewModel : BaseViewModel() {
     private val _state = MutableLiveData(State.RUNNING)
     val state: LiveData<State> get() = _state
 
-    val items = ObservableArrayList<ConsoleItem>()
+    private val _actionState = MutableStateFlow(State.RUNNING)
+    val actionState: StateFlow<State> = _actionState.asStateFlow()
+
+    val consoleItems = mutableStateListOf<String>()
     lateinit var args: ActionFragmentArgs
 
     private val logItems = mutableListOf<String>().synchronized()
     private val outItems = object : CallbackList<String>() {
         override fun onAddElement(e: String?) {
             e ?: return
-            items.add(ConsoleItem(e))
+            consoleItems.add(e)
             logItems.add(e)
         }
     }
@@ -46,7 +49,7 @@ class ActionViewModel : BaseViewModel() {
     fun startRunAction() = viewModelScope.launch {
         onResult(withContext(Dispatchers.IO) {
             try {
-                Shell.cmd("run_action \'${args.id}\'")
+                Shell.cmd("run_action '${args.id}'")
                     .to(outItems, logItems)
                     .exec().isSuccess
             } catch (e: IOException) {
@@ -57,17 +60,12 @@ class ActionViewModel : BaseViewModel() {
     }
 
     private fun onResult(success: Boolean) {
-        _state.value = if (success) State.SUCCESS else State.FAILED
+        val newState = if (success) State.SUCCESS else State.FAILED
+        _state.value = newState
+        _actionState.value = newState
     }
 
-    fun onMenuItemClicked(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.action_save -> savePressed()
-        }
-        return true
-    }
-
-    private fun savePressed() = withExternalRW {
+    fun saveLog() = withExternalRW {
         viewModelScope.launch(Dispatchers.IO) {
             val name = "%s_action_log_%s.log".format(
                 args.name,

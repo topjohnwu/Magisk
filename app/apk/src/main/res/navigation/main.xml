@@ -45,8 +45,7 @@
     <fragment
         android:id="@+id/actionFragment"
         android:name="com.topjohnwu.magisk.ui.module.ActionFragment"
-        android:label="ActionFragment"
-        tools:layout="@layout/fragment_action_md2" >
+        android:label="ActionFragment">
 
         <argument
             android:name="id"
