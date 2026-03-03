@@ -5,10 +5,12 @@ import android.content.pm.ActivityInfo
 import android.content.res.Resources
 import android.os.Build
 import android.os.Bundle
-import android.view.View
 import android.view.Window
 import android.view.WindowManager
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.UIActivity
@@ -21,13 +23,11 @@ import com.topjohnwu.magisk.ui.theme.Theme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import top.yukonga.miuix.kmp.utils.MiuixPopupUtils.Companion.MiuixPopupHost
 
 open class SuRequestActivity : UIActivity(), UntrackedActivity {
 
     override val viewModel: SuRequestViewModel by viewModel()
-
-    override val snackbarView: View
-        get() = window.decorView.findViewById(android.R.id.content)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -63,7 +63,10 @@ open class SuRequestActivity : UIActivity(), UntrackedActivity {
 
         setContent {
             MagiskTheme {
-                SuRequestScreen(viewModel = viewModel)
+                Box(modifier = Modifier.fillMaxSize()) {
+                    SuRequestScreen(viewModel = viewModel)
+                    MiuixPopupHost()
+                }
             }
         }
     }
