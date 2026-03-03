@@ -134,7 +134,9 @@ private fun AppSettingsSection(viewModel: SettingsViewModel) {
         val updateChannelEntries = remember {
             resources.getStringArray(CoreR.array.update_channel).toList()
         }
-        var updateChannel by remember { mutableIntStateOf(Config.updateChannel) }
+        var updateChannel by remember {
+            mutableIntStateOf(Config.updateChannel.coerceIn(0, updateChannelEntries.size - 1))
+        }
         var showUrlDialog by remember { mutableStateOf(false) }
 
         SuperDropdown(
