@@ -16,8 +16,10 @@ import android.view.accessibility.AccessibilityNodeProvider
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -29,12 +31,10 @@ import com.topjohnwu.magisk.core.base.UntrackedActivity
 import com.topjohnwu.magisk.core.su.SuCallbackHandler
 import com.topjohnwu.magisk.core.su.SuCallbackHandler.REQUEST
 import com.topjohnwu.magisk.core.wrap
-import com.topjohnwu.magisk.ui.theme.MagiskTheme
 import com.topjohnwu.magisk.ui.theme.Theme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import top.yukonga.miuix.kmp.utils.MiuixPopupUtils.Companion.MiuixPopupHost
 
 open class SuRequestActivity : AppCompatActivity(), UntrackedActivity {
 
@@ -94,10 +94,15 @@ open class SuRequestActivity : AppCompatActivity(), UntrackedActivity {
         }
 
         setContent {
-            MagiskTheme {
+            val (darkMode, useDynamicColor) = resolveSuRequestTheme(isSystemInDarkTheme())
+            MaterialTheme(
+                colorScheme = suRequestColorScheme(
+                    useDynamicColor = useDynamicColor,
+                    darkTheme = darkMode
+                )
+            ) {
                 Box(modifier = Modifier.fillMaxSize()) {
                     SuRequestScreen(viewModel = viewModel)
-                    MiuixPopupHost()
                 }
             }
         }
@@ -121,6 +126,26 @@ open class SuRequestActivity : AppCompatActivity(), UntrackedActivity {
 
     override fun finish() {
         super.finishAndRemoveTask()
+    }
+
+    private fun resolveSuRequestTheme(systemDark: Boolean): Pair<Boolean, Boolean> {
+        val monetSupported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+        return when (Config.colorMode) {
+            1 -> false to false
+            2 -> true to false
+            3 -> systemDark to monetSupported
+            4 -> false to monetSupported
+            5 -> true to monetSupported
+            else -> {
+                val darkMode = when (Config.darkTheme) {
+                    AppCompatDelegate.MODE_NIGHT_YES,
+                    Config.Value.DARK_THEME_AMOLED -> true
+                    AppCompatDelegate.MODE_NIGHT_NO -> false
+                    else -> systemDark
+                }
+                darkMode to Theme.shouldUseDynamicColor
+            }
+        }
     }
 
     private object EmptyAccessibilityDelegate : View.AccessibilityDelegate() {

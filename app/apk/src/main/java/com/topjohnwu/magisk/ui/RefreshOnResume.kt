@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.ui.compose
+package com.topjohnwu.magisk.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect

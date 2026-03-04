@@ -47,20 +47,16 @@ import com.topjohnwu.magisk.ui.flash.FlashUtils
 import com.topjohnwu.magisk.ui.flash.FlashViewModel
 import com.topjohnwu.magisk.ui.install.InstallScreen
 import com.topjohnwu.magisk.ui.install.InstallViewModel
-import com.topjohnwu.magisk.ui.module.ActionScreen
 import com.topjohnwu.magisk.ui.module.ActionViewModel
-import com.topjohnwu.magisk.ui.superuser.SuperuserDetailScreen
 import com.topjohnwu.magisk.ui.superuser.SuperuserViewModel
 import com.topjohnwu.magisk.ui.navigation.CollectNavEvents
 import com.topjohnwu.magisk.ui.navigation.LocalNavigator
 import com.topjohnwu.magisk.ui.navigation.Navigator
 import com.topjohnwu.magisk.ui.navigation.Route
 import com.topjohnwu.magisk.ui.navigation.rememberNavigator
-import com.topjohnwu.magisk.ui.compose.MagiskAppContainer
-import com.topjohnwu.magisk.ui.theme.MagiskTheme
+import com.topjohnwu.magisk.ui.MagiskAppContainer
 import com.topjohnwu.magisk.ui.theme.Theme
 import com.topjohnwu.magisk.view.Shortcuts
-import top.yukonga.miuix.kmp.utils.MiuixPopupUtils.Companion.MiuixPopupHost
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
@@ -176,7 +172,6 @@ class MainActivity : UIActivity<Any>(), SplashScreenHost {
                 openSection = section
             )
             MainActivityDialogs(activity = this@MainActivity)
-            MiuixPopupHost()
         }
     }
 
@@ -199,20 +194,6 @@ class MainActivity : UIActivity<Any>(), SplashScreenHost {
         super.onNewIntent(intent)
         setIntent(intent)
         intentState.value += 1
-    }
-
-    private fun getInitialTab(intent: Intent?): Int {
-        val section = if (intent?.action == Intent.ACTION_APPLICATION_PREFERENCES) {
-            Const.Nav.SETTINGS
-        } else {
-            intent?.getStringExtra(Const.Key.OPEN_SECTION)
-        }
-        return when (section) {
-            Const.Nav.SUPERUSER -> Tab.SUPERUSER.ordinal
-            Const.Nav.MODULES -> Tab.MODULES.ordinal
-            Const.Nav.SETTINGS -> Tab.SETTINGS.ordinal
-            else -> Tab.HOME.ordinal
-        }
     }
 
     @SuppressLint("InlinedApi")

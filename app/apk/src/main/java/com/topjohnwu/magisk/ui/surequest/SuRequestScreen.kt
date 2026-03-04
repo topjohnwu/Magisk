@@ -1,177 +1,297 @@
 package com.topjohnwu.magisk.ui.surequest
 
+import android.graphics.drawable.Drawable
 import android.view.MotionEvent
 import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.topjohnwu.magisk.core.ktx.toast
+import androidx.core.graphics.drawable.toBitmap
+import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.R as CoreR
-import com.topjohnwu.magisk.ui.util.rememberDrawablePainter
-import top.yukonga.miuix.kmp.basic.ButtonDefaults
-import top.yukonga.miuix.kmp.basic.Card
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.basic.TextButton
-import top.yukonga.miuix.kmp.extra.SuperDropdown
-import top.yukonga.miuix.kmp.theme.MiuixTheme
+import com.topjohnwu.magisk.ui.theme.magiskComposeColorScheme
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SuRequestScreen(viewModel: SuRequestViewModel) {
-    if (!viewModel.showUi) return
-
+fun SuRequestScreen(
+    viewModel: SuRequestViewModel,
+    showContent: Boolean = viewModel.showUi,
+    onTimeoutSelected: (Int) -> Unit = { viewModel.selectedItemPosition = it },
+    onSpinnerTouched: () -> Unit = { viewModel.spinnerTouched() },
+    onGrant: () -> Unit = { viewModel.grantPressed() },
+    onDeny: () -> Unit = { viewModel.denyPressed() }
+) {
     val context = LocalContext.current
-    val icon = viewModel.icon
-    val title = viewModel.title
-    val packageName = viewModel.packageName
+    val resources = context.resources
+    val timeoutItems = remember { resources.getStringArray(CoreR.array.allow_timeout).toList() }
+    val selectedTimeout = viewModel.selectedItemPosition
     val grantEnabled = viewModel.grantEnabled
-    val denyCountdown = viewModel.denyCountdown
-    val selectedPosition = viewModel.selectedItemPosition
-    val timeoutEntries = stringArrayResource(CoreR.array.allow_timeout).toList()
-
-    val denyText = if (denyCountdown > 0) {
-        "${stringResource(CoreR.string.deny)} ($denyCountdown)"
+    val denyLabel = if (viewModel.denyCountdown > 0) {
+        "${stringResource(CoreR.string.deny)} (${viewModel.denyCountdown})"
     } else {
         stringResource(CoreR.string.deny)
     }
 
+    val grantTouchFilter: (MotionEvent) -> Boolean = remember {
+        { event ->
+            val obscured = (event.flags and MotionEvent.FLAG_WINDOW_IS_OBSCURED != 0) ||
+                    (event.flags and MotionEvent.FLAG_WINDOW_IS_PARTIALLY_OBSCURED != 0)
+            if (obscured && event.action == MotionEvent.ACTION_UP) {
+                Toast.makeText(context, CoreR.string.touch_filtered_warning, Toast.LENGTH_SHORT).show()
+            }
+            obscured && Config.suTapjack
+        }
+    }
+
+    val iconPainter = remember(showContent) {
+        runCatching {
+            viewModel.packageName
+            viewModel.title
+            viewModel.safePainter()
+        }.getOrNull()
+    }
+
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.62f))
+            .statusBarsPadding()
+            .navigationBarsPadding(),
         contentAlignment = Alignment.Center
     ) {
-        Card(
+        if (!showContent) {
+            CircularProgressIndicator(color = Color.White)
+            return@Box
+        }
+
+        var dropdownExpanded by remember { mutableStateOf(false) }
+
+        Surface(
             modifier = Modifier
-                .widthIn(min = 300.dp, max = 380.dp)
-                .padding(24.dp)
+                .padding(horizontal = 24.dp, vertical = 20.dp)
+                .fillMaxWidth()
+                .widthIn(max = 420.dp),
+            shape = RoundedCornerShape(24.dp),
+            color = MaterialTheme.colorScheme.surface,
+            tonalElevation = 8.dp,
+            shadowElevation = 12.dp
         ) {
             Column(
-                modifier = Modifier.padding(20.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                modifier = Modifier.padding(24.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text(
-                    text = stringResource(CoreR.string.su_request_title),
-                    style = MiuixTheme.textStyles.headline2,
+                    text = stringResource(id = CoreR.string.su_request_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
                     textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
                 )
 
-                Spacer(Modifier.height(16.dp))
-
                 Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(horizontal = 8.dp)
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (icon != null) {
-                        Image(
-                            painter = rememberDrawablePainter(icon),
-                            contentDescription = null,
-                            modifier = Modifier.size(48.dp)
-                        )
-                        Spacer(Modifier.width(12.dp))
+                    Surface(
+                        modifier = Modifier.size(48.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        color = MaterialTheme.colorScheme.surfaceVariant
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            if (iconPainter != null) {
+                                Image(
+                                    painter = iconPainter,
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .size(36.dp)
+                                        .clip(RoundedCornerShape(6.dp))
+                                )
+                            } else {
+                                Icon(
+                                    Icons.Rounded.Security,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(24.dp),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
                     }
-                    Column {
+                    Spacer(Modifier.width(12.dp))
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.Center
+                    ) {
                         Text(
-                            text = title,
-                            style = MiuixTheme.textStyles.body1,
+                            text = viewModel.title,
+                            style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
+                            overflow = TextOverflow.Ellipsis
                         )
                         Text(
-                            text = packageName,
-                            style = MiuixTheme.textStyles.body2,
-                            color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                            text = viewModel.packageName,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                 }
 
-                Spacer(Modifier.height(16.dp))
-
-                SuperDropdown(
-                    title = stringResource(CoreR.string.request_timeout),
-                    items = timeoutEntries,
-                    selectedIndex = selectedPosition,
-                    onSelectedIndexChange = { index ->
-                        viewModel.spinnerTouched()
-                        viewModel.selectedItemPosition = index
+                Surface(
+                    onClick = {
+                        if (grantEnabled) {
+                            onSpinnerTouched()
+                            dropdownExpanded = true
+                        }
                     },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    enabled = grantEnabled
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 14.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                Icons.Rounded.Timer,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Spacer(Modifier.width(10.dp))
+                            Text(
+                                text = timeoutItems.getOrNull(selectedTimeout).orEmpty(),
+                                style = MaterialTheme.typography.bodyMedium,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                        Icon(
+                            Icons.Rounded.ExpandMore,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+
+                DropdownMenu(
+                    expanded = dropdownExpanded,
+                    onDismissRequest = { dropdownExpanded = false },
+                    modifier = Modifier.background(MaterialTheme.colorScheme.surface),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    timeoutItems.forEachIndexed { index, item ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = item,
+                                    fontWeight = if (index == selectedTimeout) FontWeight.SemiBold else FontWeight.Normal
+                                )
+                            },
+                            onClick = {
+                                dropdownExpanded = false
+                                onTimeoutSelected(index)
+                            },
+                            leadingIcon = {
+                                if (index == selectedTimeout) {
+                                    Icon(
+                                        Icons.Rounded.Check,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            }
+                        )
+                    }
+                }
+
+                Text(
+                    text = stringResource(id = CoreR.string.su_warning),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.error,
+                    fontWeight = FontWeight.SemiBold,
+                    textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                Spacer(Modifier.height(12.dp))
-
-                Text(
-                    text = stringResource(CoreR.string.su_warning),
-                    style = MiuixTheme.textStyles.body2,
-                    color = MiuixTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                )
-
-                Spacer(Modifier.height(16.dp))
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     TextButton(
-                        text = denyText,
-                        onClick = { viewModel.denyPressed() },
-                        modifier = Modifier.weight(1f)
-                    )
-                    TextButton(
-                        text = stringResource(CoreR.string.grant),
-                        enabled = grantEnabled,
-                        colors = ButtonDefaults.textButtonColorsPrimary(),
-                        onClick = { viewModel.grantPressed() },
+                        onClick = onDeny,
                         modifier = Modifier
                             .weight(1f)
-                            .then(
-                                if (viewModel.useTapjackProtection) {
-                                    Modifier.pointerInteropFilter { event ->
-                                        if (event.flags and MotionEvent.FLAG_WINDOW_IS_OBSCURED != 0 ||
-                                            event.flags and MotionEvent.FLAG_WINDOW_IS_PARTIALLY_OBSCURED != 0
-                                        ) {
-                                            if (event.action == MotionEvent.ACTION_UP) {
-                                                context.toast(
-                                                    CoreR.string.touch_filtered_warning,
-                                                    Toast.LENGTH_SHORT
-                                                )
-                                            }
-                                            true
-                                        } else {
-                                            false
-                                        }
-                                    }
-                                } else Modifier
-                            )
-                    )
+                            .heightIn(min = 44.dp)
+                    ) {
+                        Text(
+                            text = denyLabel,
+                            maxLines = 1,
+                            softWrap = false,
+                            overflow = TextOverflow.Ellipsis,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    TextButton(
+                        onClick = onGrant,
+                        enabled = grantEnabled,
+                        modifier = Modifier
+                            .weight(1f)
+                            .heightIn(min = 44.dp)
+                            .pointerInteropFilter { grantTouchFilter(it) }
+                    ) {
+                        Text(
+                            text = stringResource(id = CoreR.string.grant),
+                            maxLines = 1,
+                            softWrap = false,
+                            overflow = TextOverflow.Ellipsis,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
                 }
             }
         }
     }
+}
+
+@Composable
+fun suRequestColorScheme(useDynamicColor: Boolean, darkTheme: Boolean) =
+    magiskComposeColorScheme(
+        useDynamicColor = useDynamicColor,
+        darkTheme = darkTheme
+    )
+
+private fun SuRequestViewModel.safePainter(): Painter? {
+    val drawable: Drawable = runCatching { icon }.getOrNull() ?: return null
+    val bitmap = runCatching { drawable.toBitmap() }.getOrNull()?.asImageBitmap() ?: return null
+    return BitmapPainter(bitmap)
 }

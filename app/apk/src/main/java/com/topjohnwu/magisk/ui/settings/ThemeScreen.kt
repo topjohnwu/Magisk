@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.ui.compose.settings
+package com.topjohnwu.magisk.ui.settings
 
 import androidx.annotation.RawRes
 import androidx.annotation.StringRes

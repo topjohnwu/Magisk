@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.ui.compose.theme
+package com.topjohnwu.magisk.ui.theme
 
 import android.os.Build
 import androidx.compose.material3.ColorScheme
