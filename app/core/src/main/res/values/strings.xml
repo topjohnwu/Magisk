@@ -17,16 +17,24 @@
     <string name="update">Update</string>
     <string name="not_available">N/A</string>
     <string name="hide">Hide</string>
+    <string name="restore">Restore</string>
     <string name="home_package">Package</string>
     <string name="home_app_title">App</string>
+    <string name="home_core_title">Core</string>
+    <string name="reinstall">Reinstall</string>
     <string name="home_notice_content">Download Magisk ONLY from the official GitHub page. Files from unknown sources can be malicious!</string>
     <string name="home_support_title">Support Us</string>
     <string name="home_follow_title">Follow Us</string>
     <string name="home_item_source">Source</string>
     <string name="home_support_content">Magisk is, and always will be, free, and open source. However, you can show us that you care by making a donation.</string>
+    <string name="donate">Donate</string>
+    <string name="documents">Documents</string>
+    <string name="report_bugs">Report Bugs</string>
+    <string name="home_status_title">Status</string>
     <string name="home_installed_version">Installed</string>
     <string name="home_latest_version">Latest</string>
     <string name="invalid_update_channel">Invalid update channel</string>
+    <string name="uninstall">Uninstall</string>
     <string name="uninstall_magisk_title">Uninstall Magisk</string>
     <string name="uninstall_magisk_msg">All modules will be disabled/removed!\nRoot will be removed!\nAny internal storage unencrypted through the use of Magisk will be re-encrypted!</string>
 

@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.R as CoreR
 import com.topjohnwu.magisk.ui.util.rememberDrawablePainter
+import top.yukonga.miuix.kmp.basic.ButtonDefaults
 import top.yukonga.miuix.kmp.basic.Card
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.basic.TextButton
@@ -145,6 +146,7 @@ fun SuRequestScreen(viewModel: SuRequestViewModel) {
                     TextButton(
                         text = stringResource(CoreR.string.grant),
                         enabled = grantEnabled,
+                        colors = ButtonDefaults.textButtonColorsPrimary(),
                         onClick = { viewModel.grantPressed() },
                         modifier = Modifier
                             .weight(1f)
