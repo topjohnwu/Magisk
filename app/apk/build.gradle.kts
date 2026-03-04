@@ -30,6 +30,7 @@ android {
 
 dependencies {
     implementation(project(":core"))
+    implementation(libs.ui.graphics)
     coreLibraryDesugaring(libs.jdk.libs)
 
     implementation(libs.appcompat)

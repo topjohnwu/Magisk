@@ -527,18 +527,36 @@ class DenyListComposeViewModel : ViewModel() {
     fun setAppChecked(pkg: String, enabled: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             val app = allApps.firstOrNull { it.packageName == pkg } ?: return@launch
-            val targets = if (app.expanded) app.processes else app.processes.filter { it.defaultSelection }
             var success = true
-            targets.filter { it.enabled != enabled }.forEach { p ->
-                val cmd = if (enabled) "add" else "rm"
-                success = Shell.cmd("magisk --denylist $cmd ${p.packageName} ${shellQuote(p.name)}").exec().isSuccess && success
+            val affected = if (enabled) {
+                if (app.expanded) app.processes else app.processes.filter { it.defaultSelection }
+            } else {
+                app.processes
             }
+
+            if (enabled) {
+                affected.filter { !it.enabled }.forEach { p ->
+                    success = Shell.cmd("magisk --denylist add ${p.packageName} ${shellQuote(p.name)}")
+                        .exec().isSuccess && success
+                }
+            } else {
+                // Match legacy behavior: clear package-level denylist first.
+                success = Shell.cmd("magisk --denylist rm $pkg").exec().isSuccess
+                if (success) {
+                    // Keep explicit cleanup for isolated processes.
+                    affected.filter { it.enabled && it.isIsolated }.forEach { p ->
+                        success = Shell.cmd("magisk --denylist rm ${p.packageName} ${shellQuote(p.name)}")
+                            .exec().isSuccess && success
+                    }
+                }
+            }
+
             withContext(Dispatchers.Main) {
                 if (success) {
                     allApps = allApps.map { a ->
                         if (a.packageName != pkg) a else a.copy(
                             processes = a.processes.map { p ->
-                                if (targets.any { t -> t.name == p.name && t.packageName == p.packageName }) {
+                                if (affected.any { t -> t.name == p.name && t.packageName == p.packageName }) {
                                     p.copy(enabled = enabled)
                                 } else {
                                     p

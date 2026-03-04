@@ -626,4 +626,4 @@ class SettingsComposeViewModel : ViewModel() {
     companion object { val Factory = object : ViewModelProvider.Factory { override fun <T : ViewModel> create(modelClass: Class<T>): T { @Suppress("UNCHECKED_CAST") return SettingsComposeViewModel() as T } } }
 }
 
-private val SU_TIMEOUT_VALUES = Config.Value.TIMEOUT_LIST.map { it.toInt() }
+private val SU_TIMEOUT_VALUES = listOf(10, 15, 20, 30, 45, 60)

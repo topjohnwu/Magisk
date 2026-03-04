@@ -15,6 +15,7 @@ miuix = "0.8.5"
 navigation3 = "1.1.0-alpha05"
 navigationevent = "1.0.2"
 termux-terminal = "0.118.0"
+ui-graphics = "1.10.4"
 
 [libraries]
 bcpkix = { module = "org.bouncycastle:bcpkix-jdk18on", version = "1.83" }
@@ -80,5 +81,6 @@ android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref
 ksp-plugin = { module = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
 lsparanoid-plugin = { module = "org.lsposed.lsparanoid:gradle-plugin", version = "0.6.0" }
 moshi-plugin = { module = "dev.zacsweers.moshix:dev.zacsweers.moshix.gradle.plugin", version = "0.34.4" }
+ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics", version.ref = "ui-graphics" }
 
 [plugins]

@@ -22,7 +22,6 @@ import com.topjohnwu.magisk.core.utils.DummyList
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.inputStream
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
-import com.topjohnwu.magisk.core.utils.MediaStoreUtils.persistReadPermission
 import com.topjohnwu.magisk.core.utils.RootUtils
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils
@@ -197,17 +196,6 @@ abstract class MagiskInstallImpl protected constructor(
 
     private suspend fun InputStream.copyAndCloseOut(out: OutputStream) =
         out.use { copyAll(it, 1024 * 1024) }
-
-    private fun InputStream.readFully(buffer: ByteArray): Boolean {
-        var offset = 0
-        while (offset < buffer.size) {
-            val read = read(buffer, offset, buffer.size - offset)
-            if (read < 0) return false
-            if (read == 0) continue
-            offset += read
-        }
-        return true
-    }
 
     private class NoAvailableStream(s: InputStream) : FilterInputStream(s) {
         // Make sure available is never called on the actual stream and always return 0
@@ -392,25 +380,20 @@ abstract class MagiskInstallImpl protected constructor(
             try {
                 val bufSize = 1024 * 1024
                 val buf = ByteBuffer.allocate(bufSize)
-                var pipeClosed = false
-                while (true) {
-                    val read = input.read(buf.array())
-                    if (read < 0) break
-                    if (read == 0) continue
-                    buf.clear()
-                    buf.limit(read)
-                    while (buf.hasRemaining()) {
-                        try {
-                            Os.write(fd, buf)
-                        } catch (e: ErrnoException) {
-                            if (e.errno != OsConstants.EPIPE)
-                                throw e
-                            // If SIGPIPE, then the other side is closed, we're done
-                            pipeClosed = true
-                            break
-                        }
+                buf.position(input.read(buf.array()).coerceAtLeast(0)).flip()
+                while (buf.hasRemaining()) {
+                    try {
+                        Os.write(fd, buf)
+                    } catch (e: ErrnoException) {
+                        if (e.errno != OsConstants.EPIPE)
+                            throw e
+                        // If SIGPIPE, then the other side is closed, we're done
+                        break
                     }
-                    if (pipeClosed) break
+                    if (!buf.hasRemaining()) {
+                        buf.limit(bufSize)
+                        buf.position(input.read(buf.array()).coerceAtLeast(0)).flip()
+                    }
                 }
             } finally {
                 Os.close(fd)
@@ -450,10 +433,9 @@ abstract class MagiskInstallImpl protected constructor(
 
         // Process input file
         try {
-            uri.persistReadPermission()
             PushbackInputStream(uri.inputStream().buffered(1024 * 1024), 512).use { src ->
                 val head = ByteArray(512)
-                if (!src.readFully(head)) {
+                if (src.read(head) != head.size) {
                     console.add("! Invalid input file")
                     return false
                 }
@@ -502,11 +484,6 @@ abstract class MagiskInstallImpl protected constructor(
                     }
                 }
             }
-        } catch (e: SecurityException) {
-            console.add("! Permission denied for selected file")
-            console.add("! Process error")
-            Timber.e(e)
-            return false
         } catch (e: IOException) {
             if (e is NoBootException)
                 console.add("! No boot image found")

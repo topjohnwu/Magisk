@@ -3,9 +3,11 @@ package com.topjohnwu.magisk.ui.surequest
 import android.graphics.drawable.Drawable
 import android.view.MotionEvent
 import android.widget.Toast
+import androidx.compose.animation.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
@@ -13,18 +15,22 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.graphics.drawable.toBitmap
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.R as CoreR
@@ -64,8 +70,6 @@ fun SuRequestScreen(
 
     val iconPainter = remember(showContent) {
         runCatching {
-            viewModel.packageName
-            viewModel.title
             viewModel.safePainter()
         }.getOrNull()
     }
@@ -73,209 +77,268 @@ fun SuRequestScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.62f))
-            .statusBarsPadding()
-            .navigationBarsPadding(),
+            .background(Color.Transparent),
         contentAlignment = Alignment.Center
     ) {
         if (!showContent) {
-            CircularProgressIndicator(color = Color.White)
+            CircularProgressIndicator(strokeCap = StrokeCap.Round)
             return@Box
         }
 
         var dropdownExpanded by remember { mutableStateOf(false) }
 
-        Surface(
+        ElevatedCard(
             modifier = Modifier
-                .padding(horizontal = 24.dp, vertical = 20.dp)
-                .fillMaxWidth()
-                .widthIn(max = 420.dp),
-            shape = RoundedCornerShape(24.dp),
-            color = MaterialTheme.colorScheme.surface,
-            tonalElevation = 8.dp,
-            shadowElevation = 12.dp
+                .padding(horizontal = 20.dp)
+                .fillMaxWidth(),
+            shape = RoundedCornerShape(
+                topStart = 48.dp,
+                bottomEnd = 48.dp,
+                topEnd = 16.dp,
+                bottomStart = 16.dp
+            ),
+            colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface),
+            elevation = CardDefaults.elevatedCardElevation(defaultElevation = 12.dp)
         ) {
-            Column(
-                modifier = Modifier.padding(24.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Text(
-                    text = stringResource(id = CoreR.string.su_request_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
+            Box {
+                Icon(
+                    painter = painterResource(id = CoreR.drawable.ic_magisk_outline),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(180.dp)
+                        .align(Alignment.TopEnd)
+                        .offset(x = 40.dp, y = (-20).dp)
+                        .alpha(0.05f),
+                    tint = MaterialTheme.colorScheme.primary
                 )
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
+                Column(
+                    modifier = Modifier.padding(28.dp),
+                    verticalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
+                    // Header Row with shield icon
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Surface(
+                            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f),
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier.size(32.dp)
+                        ) {
+                            Icon(
+                                Icons.Rounded.Security, null,
+                                modifier = Modifier.padding(6.dp),
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                        }
+                        Spacer(Modifier.width(16.dp))
+                        Text(
+                            text = stringResource(id = CoreR.string.su_request_title).uppercase(),
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.Black,
+                            letterSpacing = 1.2.sp,
+                            color = MaterialTheme.colorScheme.outline
+                        )
+                    }
+
+                    // Main App Info Card
                     Surface(
-                        modifier = Modifier.size(48.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        color = MaterialTheme.colorScheme.surfaceVariant
+                        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                        shape = RoundedCornerShape(20.dp),
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            if (iconPainter != null) {
-                                Image(
-                                    painter = iconPainter,
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .size(36.dp)
-                                        .clip(RoundedCornerShape(6.dp))
+                        Row(
+                            modifier = Modifier.padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Surface(
+                                modifier = Modifier.size(64.dp),
+                                shape = RoundedCornerShape(16.dp),
+                                color = MaterialTheme.colorScheme.surface,
+                                tonalElevation = 4.dp
+                            ) {
+                                Box(contentAlignment = Alignment.Center) {
+                                    if (iconPainter != null) {
+                                        Image(
+                                            painter = iconPainter,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(44.dp)
+                                        )
+                                    } else {
+                                        Icon(
+                                            Icons.Rounded.Shield,
+                                            null,
+                                            modifier = Modifier.size(32.dp),
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                }
+                            }
+                            Spacer(Modifier.width(20.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = viewModel.title,
+                                    style = MaterialTheme.typography.headlineSmall,
+                                    fontWeight = FontWeight.Black,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
                                 )
-                            } else {
-                                Icon(
-                                    Icons.Rounded.Security,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(24.dp),
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                Text(
+                                    text = viewModel.packageName,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontWeight = FontWeight.Bold,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
                                 )
                             }
                         }
                     }
-                    Spacer(Modifier.width(12.dp))
+
+                    // Interactive Section
                     Column(
-                        modifier = Modifier.weight(1f),
-                        verticalArrangement = Arrangement.Center
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text(
-                            text = viewModel.title,
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        Text(
-                            text = viewModel.packageName,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-                }
-
-                Surface(
-                    onClick = {
-                        if (grantEnabled) {
-                            onSpinnerTouched()
-                            dropdownExpanded = true
-                        }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                    enabled = grantEnabled
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 14.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                Icons.Rounded.Timer,
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Spacer(Modifier.width(10.dp))
-                            Text(
-                                text = timeoutItems.getOrNull(selectedTimeout).orEmpty(),
-                                style = MaterialTheme.typography.bodyMedium,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        }
-                        Icon(
-                            Icons.Rounded.ExpandMore,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-
-                DropdownMenu(
-                    expanded = dropdownExpanded,
-                    onDismissRequest = { dropdownExpanded = false },
-                    modifier = Modifier.background(MaterialTheme.colorScheme.surface),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    timeoutItems.forEachIndexed { index, item ->
-                        DropdownMenuItem(
-                            text = {
-                                Text(
-                                    text = item,
-                                    fontWeight = if (index == selectedTimeout) FontWeight.SemiBold else FontWeight.Normal
-                                )
-                            },
-                            onClick = {
-                                dropdownExpanded = false
-                                onTimeoutSelected(index)
-                            },
-                            leadingIcon = {
-                                if (index == selectedTimeout) {
+                        // Timeout Selector (Custom Dropdown)
+                        Box {
+                            Surface(
+                                onClick = {
+                                    if (grantEnabled) {
+                                        onSpinnerTouched()
+                                        dropdownExpanded = true
+                                    }
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(56.dp),
+                                shape = RoundedCornerShape(16.dp),
+                                color = MaterialTheme.colorScheme.surfaceContainerHighest,
+                                enabled = grantEnabled
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(horizontal = 16.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
                                     Icon(
-                                        Icons.Rounded.Check,
-                                        contentDescription = null,
+                                        Icons.Rounded.Timer,
+                                        null,
+                                        modifier = Modifier.size(20.dp),
                                         tint = MaterialTheme.colorScheme.primary
+                                    )
+                                    Spacer(Modifier.width(12.dp))
+                                    Text(
+                                        text = timeoutItems.getOrNull(selectedTimeout).orEmpty(),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                    Icon(
+                                        Icons.Rounded.UnfoldMore,
+                                        null,
+                                        modifier = Modifier.size(20.dp),
+                                        tint = MaterialTheme.colorScheme.outline
                                     )
                                 }
                             }
-                        )
+
+                            DropdownMenu(
+                                expanded = dropdownExpanded,
+                                onDismissRequest = { dropdownExpanded = false },
+                                modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainerHigh),
+                                shape = RoundedCornerShape(16.dp)
+                            ) {
+                                timeoutItems.forEachIndexed { index, item ->
+                                    DropdownMenuItem(
+                                        text = {
+                                            Text(
+                                                text = item,
+                                                fontWeight = if (index == selectedTimeout) FontWeight.Black else FontWeight.Medium
+                                            )
+                                        },
+                                        onClick = {
+                                            dropdownExpanded = false
+                                            onTimeoutSelected(index)
+                                        },
+                                        leadingIcon = {
+                                            if (index == selectedTimeout) {
+                                                Icon(Icons.Rounded.Check, null, tint = MaterialTheme.colorScheme.primary)
+                                            }
+                                        }
+                                    )
+                                }
+                            }
+                        }
+
+                        // Warning Text Section
+                        Surface(
+                            color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.15f),
+                            shape = RoundedCornerShape(14.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(14.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                Icon(Icons.Rounded.Warning, null, modifier = Modifier.size(20.dp), tint = MaterialTheme.colorScheme.error)
+                                Text(
+                                    text = stringResource(id = CoreR.string.su_warning),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.error,
+                                    fontWeight = FontWeight.Bold,
+                                    lineHeight = 16.sp,
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
+                        }
                     }
-                }
 
-                Text(
-                    text = stringResource(id = CoreR.string.su_warning),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.error,
-                    fontWeight = FontWeight.SemiBold,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
-                )
+                    Spacer(Modifier.height(4.dp))
 
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    TextButton(
-                        onClick = onDeny,
-                        modifier = Modifier
-                            .weight(1f)
-                            .heightIn(min = 44.dp)
+                    // Buttons Action Row
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Text(
-                            text = denyLabel,
-                            maxLines = 1,
-                            softWrap = false,
-                            overflow = TextOverflow.Ellipsis,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    TextButton(
-                        onClick = onGrant,
-                        enabled = grantEnabled,
-                        modifier = Modifier
-                            .weight(1f)
-                            .heightIn(min = 44.dp)
-                            .pointerInteropFilter { grantTouchFilter(it) }
-                    ) {
-                        Text(
-                            text = stringResource(id = CoreR.string.grant),
-                            maxLines = 1,
-                            softWrap = false,
-                            overflow = TextOverflow.Ellipsis,
-                            fontWeight = FontWeight.SemiBold
-                        )
+                        Surface(
+                            onClick = onDeny,
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(60.dp),
+                            shape = RoundedCornerShape(20.dp),
+                            color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.25f)
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Text(
+                                    text = denyLabel.uppercase(),
+                                    style = MaterialTheme.typography.titleSmall,
+                                    fontWeight = FontWeight.Black,
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
+                        }
+                        
+                        Button(
+                            onClick = onGrant,
+                            enabled = grantEnabled,
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(60.dp)
+                                .pointerInteropFilter { grantTouchFilter(it) },
+                            shape = RoundedCornerShape(20.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
+                            ),
+                            elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
+                        ) {
+                            Text(
+                                text = stringResource(id = CoreR.string.grant).uppercase(),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Black
+                            )
+                        }
                     }
                 }
             }

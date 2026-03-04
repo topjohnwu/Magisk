@@ -17,58 +17,32 @@ import com.topjohnwu.magisk.core.model.UpdateInfo
 import retrofit2.HttpException
 import timber.log.Timber
 import java.io.IOException
-import java.util.concurrent.TimeUnit
 
 class NetworkService(
     private val raw: RawUrl,
     private val api: GithubApiServices,
 ) {
-    private data class UpdateCache(
-        val value: UpdateInfo,
-        val timestamp: Long,
-        val channel: Int,
-    )
-
-    private val cacheTtlMs = TimeUnit.MINUTES.toMillis(30)
-    private var updateCache: UpdateCache? = null
-    private val versionCache = mutableMapOf<Int, UpdateCache>()
-
-    private fun isCacheValid(cache: UpdateCache?, channel: Int): Boolean {
-        cache ?: return false
-        if (cache.channel != channel) return false
-        return System.currentTimeMillis() - cache.timestamp < cacheTtlMs
-    }
-
     suspend fun fetchUpdate() = safe {
-        val channel = Config.updateChannel
-        updateCache?.takeIf { isCacheValid(it, channel) }?.value ?: run {
-            var info = when (channel) {
-                DEFAULT_CHANNEL -> if (BuildConfig.DEBUG) fetchDebugUpdate() else fetchStableUpdate()
-                STABLE_CHANNEL -> fetchStableUpdate()
-                BETA_CHANNEL -> fetchBetaUpdate()
-                DEBUG_CHANNEL -> fetchDebugUpdate()
-                CUSTOM_CHANNEL -> fetchCustomUpdate(Config.customChannelUrl)
-                else -> throw IllegalArgumentException()
-            }
-            if (info.versionCode < Info.env.versionCode &&
-                channel == DEFAULT_CHANNEL &&
-                !BuildConfig.DEBUG
-            ) {
-                Config.updateChannel = BETA_CHANNEL
-                info = fetchBetaUpdate()
-            }
-            updateCache = UpdateCache(info, System.currentTimeMillis(), Config.updateChannel)
-            info
+        var info = when (Config.updateChannel) {
+            DEFAULT_CHANNEL -> if (BuildConfig.DEBUG) fetchDebugUpdate() else fetchStableUpdate()
+            STABLE_CHANNEL -> fetchStableUpdate()
+            BETA_CHANNEL -> fetchBetaUpdate()
+            DEBUG_CHANNEL -> fetchDebugUpdate()
+            CUSTOM_CHANNEL -> fetchCustomUpdate(Config.customChannelUrl)
+            else -> throw IllegalArgumentException()
         }
+        if (info.versionCode < Info.env.versionCode &&
+            Config.updateChannel == DEFAULT_CHANNEL &&
+            !BuildConfig.DEBUG
+        ) {
+            Config.updateChannel = BETA_CHANNEL
+            info = fetchBetaUpdate()
+        }
+        info
     }
 
     suspend fun fetchUpdate(version: Int) = safe {
-        val channel = Config.updateChannel
-        versionCache[version]?.takeIf { isCacheValid(it, channel) }?.value ?: run {
-            val info = findRelease { it.versionCode == version }.asInfo()
-            versionCache[version] = UpdateCache(info, System.currentTimeMillis(), channel)
-            info
-        }
+        findRelease { it.versionCode == version }.asInfo()
     }
 
     // Keep going through all release pages until we find a match
@@ -103,25 +77,19 @@ class NetworkService(
     private inline fun Release.asPublicInfo(selector: (ReleaseAssets) -> Boolean): UpdateInfo {
         val version = tag.drop(1)
         val date = dateFormat.format(createdTime)
-        val apk = assets.find(selector)
-            ?: assets.find { it.name.endsWith(".apk", ignoreCase = true) }
-            ?: throw IllegalStateException("No APK asset found for release: $tag")
         return UpdateInfo(
             version = version,
             versionCode = versionCode,
-            link = apk.url,
+            link = assets.find(selector)!!.url,
             note = "## $date $name\n\n$body"
         )
     }
 
     private inline fun Release.asCanaryInfo(selector: (ReleaseAssets) -> Boolean): UpdateInfo {
-        val apk = assets.find(selector)
-            ?: assets.find { it.name.endsWith(".apk", ignoreCase = true) }
-            ?: throw IllegalStateException("No APK asset found for release: $tag")
         return UpdateInfo(
             version = name.substring(8, 16),
             versionCode = versionCode,
-            link = apk.url,
+            link = assets.find(selector)!!.url,
             note = "## $name\n\n$body"
         )
     }
@@ -135,10 +103,7 @@ class NetworkService(
     private suspend fun fetchBetaUpdate() = findRelease { true }.asInfo()
 
     private suspend fun fetchDebugUpdate() =
-        findRelease { true }.asInfo {
-            it.name.endsWith(".apk", ignoreCase = true) &&
-                it.name.contains("debug", ignoreCase = true)
-        }
+        findRelease { true }.asInfo { it.name == "app-debug.apk" }
 
     private suspend fun fetchCustomUpdate(url: String): UpdateInfo {
         val info = raw.fetchUpdateJson(url).magisk

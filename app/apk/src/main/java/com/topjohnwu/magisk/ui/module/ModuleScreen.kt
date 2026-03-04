@@ -1,11 +1,10 @@
 package com.topjohnwu.magisk.ui.module
 
-import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-import android.app.Notification
 import android.net.Uri
 import android.os.SystemClock
+import android.provider.OpenableColumns
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts.OpenDocument
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
@@ -43,17 +42,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.topjohnwu.magisk.arch.UIActivity
+import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.core.AppContext
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.di.ServiceLocator
-import com.topjohnwu.magisk.core.download.DownloadNotifier
-import com.topjohnwu.magisk.core.download.DownloadProcessor
+import com.topjohnwu.magisk.core.download.DownloadEngine
 import com.topjohnwu.magisk.core.model.module.LocalModule
 import com.topjohnwu.magisk.core.model.module.OnlineModule
-import com.topjohnwu.magisk.core.repository.NetworkService
-import com.topjohnwu.magisk.core.utils.MediaStoreUtils
-import com.topjohnwu.magisk.core.utils.MediaStoreUtils.persistReadPermission
+import com.topjohnwu.magisk.ui.component.ConfirmResult
+import com.topjohnwu.magisk.ui.component.rememberConfirmDialog
 import com.topjohnwu.magisk.ui.RefreshOnResume
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -76,7 +73,9 @@ fun ModuleScreen(
     onRunAction: (String, String) -> Unit = { _, _ -> },
     viewModel: ModuleComposeViewModel = viewModel(factory = ModuleComposeViewModel.Factory)
 ) {
-    val activity = LocalContext.current as? UIActivity<*>
+    val context = LocalContext.current
+    val activity = context as? MainActivity
+    val scope = rememberCoroutineScope()
     val state by viewModel.state.collectAsState()
     val contentEnterState = remember {
         MutableTransitionState(false).apply { targetState = true }
@@ -84,10 +83,26 @@ fun ModuleScreen(
     var query by rememberSaveable { mutableStateOf("") }
     var showSearch by rememberSaveable { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
-    val zipPicker = rememberLauncherForActivityResult(OpenDocument()) { uri ->
+    val localInstallDialog = rememberConfirmDialog()
+    val confirmInstallTitle = stringResource(CoreR.string.confirm_install_title)
+    var pendingOnlineModule by remember { mutableStateOf<OnlineModule?>(null) }
+    val showOnlineDialog = rememberSaveable { mutableStateOf(false) }
+
+    val zipPicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         if (uri != null) {
-            uri.persistReadPermission()
-            onInstallZip(uri)
+            val displayName = context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+                val idx = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                if (cursor.moveToFirst() && idx >= 0) cursor.getString(idx) else null
+            } ?: uri.lastPathSegment ?: "module.zip"
+            scope.launch {
+                val result = localInstallDialog.awaitConfirm(
+                    title = confirmInstallTitle,
+                    content = context.getString(CoreR.string.confirm_install, displayName),
+                )
+                if (result == ConfirmResult.Confirmed) {
+                    onInstallZip(uri)
+                }
+            }
         }
     }
 
@@ -97,8 +112,29 @@ fun ModuleScreen(
     LaunchedEffect(viewModel) {
         viewModel.messages.collect { snackbarHostState.showSnackbar(it) }
     }
-    LaunchedEffect(viewModel) {
-        viewModel.installRequests.collect { onInstallZip(it) }
+
+    if (showOnlineDialog.value && pendingOnlineModule != null) {
+        OnlineModuleDialog(
+            item = pendingOnlineModule!!,
+            showDialog = showOnlineDialog,
+            onDownload = { install ->
+                showOnlineDialog.value = false
+                val host = activity
+                if (host == null) {
+                    viewModel.postMessageRes(CoreR.string.app_not_found)
+                } else {
+                    DownloadEngine.startWithActivity(
+                        host, host.extension,
+                        OnlineModuleSubject(pendingOnlineModule!!, install)
+                    )
+                }
+                pendingOnlineModule = null
+            },
+            onDismiss = {
+                showOnlineDialog.value = false
+                pendingOnlineModule = null
+            }
+        )
     }
 
     val filteredModules = remember(state.modules, query) {
@@ -143,7 +179,7 @@ fun ModuleScreen(
                             }
                             
                             Button(
-                                onClick = { zipPicker.launch(arrayOf("application/zip")) },
+                                onClick = { zipPicker.launch("application/zip") },
                                 modifier = Modifier.weight(1f).height(56.dp),
                                 shape = RoundedCornerShape(16.dp)
                             ) {
@@ -197,9 +233,14 @@ fun ModuleScreen(
                             onToggleExpanded = { viewModel.toggleExpanded(module.id) },
                             onToggleEnabled = { viewModel.toggleEnabled(module.id) },
                             onToggleRemove = { viewModel.toggleRemove(module.id) },
-                            onUpdate = {
-                                activity?.withPermission(WRITE_EXTERNAL_STORAGE) { if (it) viewModel.markUpdate(module.id) else viewModel.postExternalRwDenied() }
-                                ?: viewModel.markUpdate(module.id)
+                            onUpdate = { onlineModule ->
+                                if (onlineModule == null) return@StylishMagiskModuleCard
+                                if (Info.isConnected.value != true) {
+                                    viewModel.postMessageRes(CoreR.string.no_connection)
+                                    return@StylishMagiskModuleCard
+                                }
+                                pendingOnlineModule = onlineModule
+                                showOnlineDialog.value = true
                             },
                             onAction = { onRunAction(module.id, module.name) }
                         )
@@ -219,7 +260,7 @@ private fun StylishMagiskModuleCard(
     onToggleExpanded: () -> Unit,
     onToggleEnabled: () -> Unit,
     onToggleRemove: () -> Unit,
-    onUpdate: () -> Unit,
+    onUpdate: (OnlineModule?) -> Unit,
     onAction: () -> Unit
 ) {
     val isEnabled = module.enabled && !module.removed
@@ -468,7 +509,7 @@ private fun StylishMagiskModuleCard(
 
                             if (module.showUpdate) {
                                 Button(
-                                    onClick = onUpdate,
+                                    onClick = { onUpdate(module.update) },
                                     enabled = module.updateReady,
                                     shape = RoundedCornerShape(16.dp),
                                     modifier = Modifier
@@ -553,6 +594,53 @@ private fun EmptyStateView() {
     }
 }
 
+@Composable
+private fun OnlineModuleDialog(
+    item: OnlineModule,
+    showDialog: MutableState<Boolean>,
+    onDownload: (install: Boolean) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val svc = ServiceLocator.networkService
+    val title = stringResource(
+        CoreR.string.repo_install_title,
+        item.name, item.version, item.versionCode
+    )
+    val changelog by produceState(initialValue = AppContext.getString(CoreR.string.loading), item.changelog) {
+        val text = runCatching {
+            withContext(Dispatchers.IO) { svc.fetchString(item.changelog) }
+        }.getOrDefault("")
+        value = if (text.length > 1000) text.substring(0, 1000) else text
+    }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Black) },
+        text = {
+            Text(
+                text = changelog,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        },
+        confirmButton = {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                TextButton(onClick = { onDownload(false) }) {
+                    Text(stringResource(CoreR.string.download))
+                }
+                Button(onClick = { onDownload(true) }) {
+                    Text(stringResource(CoreR.string.install))
+                }
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(android.R.string.cancel))
+            }
+        }
+    )
+}
+
 data class ModuleUiItem(
     val id: String,
     val name: String,
@@ -572,13 +660,11 @@ data class ModuleUiItem(
 )
 data class ModuleUiState(val loading: Boolean = true, val modules: List<ModuleUiItem> = emptyList())
 
-class ModuleComposeViewModel(private val networkService: NetworkService, private val moduleProvider: suspend () -> List<LocalModule>) : ViewModel() {
+class ModuleComposeViewModel(private val moduleProvider: suspend () -> List<LocalModule>) : ViewModel() {
     private val _state = MutableStateFlow(ModuleUiState())
     val state: StateFlow<ModuleUiState> = _state
     private val _messages = MutableSharedFlow<String>(extraBufferCapacity = 1)
     val messages: SharedFlow<String> = _messages.asSharedFlow()
-    private val _installRequests = MutableSharedFlow<Uri>(extraBufferCapacity = 1)
-    val installRequests: SharedFlow<Uri> = _installRequests.asSharedFlow()
     private var refreshJob: Job? = null
     private var metadataJob: Job? = null
     private val moduleCache = linkedMapOf<String, LocalModule>()
@@ -630,39 +716,8 @@ class ModuleComposeViewModel(private val networkService: NetworkService, private
 
     fun toggleEnabled(id: String) = updateModule(id) { it.enable = !it.enable }
     fun toggleRemove(id: String) = updateModule(id) { it.remove = !it.remove }
-    fun markUpdate(id: String) {
-        val update = _state.value.modules.firstOrNull { it.id == id }?.update
-        if (update == null) {
-            _messages.tryEmit(AppContext.getString(CoreR.string.loading))
-            return
-        }
-        if (Info.isConnected.value != true) {
-            _messages.tryEmit(AppContext.getString(CoreR.string.no_connection))
-            return
-        }
-        viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
-                val file = MediaStoreUtils.getFile(update.downloadFilename)
-                val response = networkService.fetchFile(update.zipUrl)
-                response.byteStream().use { input ->
-                    DownloadProcessor(object : DownloadNotifier { override val context = AppContext; override fun notifyUpdate(id: Int, editor: (Notification.Builder) -> Unit) = Unit }).handleModule(input, file.uri)
-                }
-                file.uri
-            }.onSuccess { uri ->
-                withContext(Dispatchers.Main) {
-                    _installRequests.emit(uri)
-                    _messages.emit(AppContext.getString(CoreR.string.download_complete))
-                }
-            }.onFailure {
-                withContext(Dispatchers.Main) {
-                    _messages.emit(AppContext.getString(CoreR.string.download_file_error))
-                }
-            }
-        }
-    }
-
-    fun postExternalRwDenied() {
-        _messages.tryEmit(AppContext.getString(CoreR.string.external_rw_permission_denied))
+    fun postMessageRes(@androidx.annotation.StringRes res: Int) {
+        _messages.tryEmit(AppContext.getString(res))
     }
 
     private fun updateModule(id: String, block: (LocalModule) -> Unit) {
@@ -705,7 +760,7 @@ class ModuleComposeViewModel(private val networkService: NetworkService, private
     private suspend fun isModuleRepoLoaded(): Boolean = withTimeoutOrNull(3000) { withContext(Dispatchers.IO) { LocalModule.loaded() } } ?: false
     private suspend fun readInstalledModules(): List<LocalModule> = withTimeoutOrNull(5000) { withContext(Dispatchers.IO) { moduleProvider() } } ?: emptyList()
 
-    object Factory : ViewModelProvider.Factory { override fun <T : ViewModel> create(modelClass: Class<T>): T { @Suppress("UNCHECKED_CAST") return ModuleComposeViewModel(ServiceLocator.networkService) { LocalModule.installed() } as T } }
+    object Factory : ViewModelProvider.Factory { override fun <T : ViewModel> create(modelClass: Class<T>): T { @Suppress("UNCHECKED_CAST") return ModuleComposeViewModel { LocalModule.installed() } as T } }
 
     companion object {
         private const val MIN_REFRESH_INTERVAL_MS = 1200L

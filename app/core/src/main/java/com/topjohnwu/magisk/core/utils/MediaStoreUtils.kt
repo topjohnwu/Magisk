@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.core.utils
 
-import android.content.Intent
 import android.content.ContentUris
 import android.content.ContentValues
 import android.net.Uri
@@ -98,14 +97,6 @@ object MediaStoreUtils {
     fun Uri.inputStream() = cr.openInputStream(this) ?: throw FileNotFoundException()
 
     fun Uri.outputStream() = cr.openOutputStream(this, "rwt") ?: throw FileNotFoundException()
-
-    // Persist read permission for ACTION_OPEN_DOCUMENT Uris when available.
-    fun Uri.persistReadPermission() {
-        if (scheme != "content") return
-        runCatching {
-            cr.takePersistableUriPermission(this, Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
-    }
 
     val Uri.displayName: String get() {
         if (scheme == "file") {

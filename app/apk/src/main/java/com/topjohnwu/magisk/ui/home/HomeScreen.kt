@@ -1,9 +1,11 @@
 package com.topjohnwu.magisk.ui.home
 
-import android.Manifest.permission.REQUEST_INSTALL_PACKAGES
 import android.content.Intent
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
 import android.widget.TextView
+import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.animation.*
@@ -45,7 +47,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewModelScope
 import coil.compose.AsyncImage
-import com.topjohnwu.magisk.arch.UIActivity
 import com.topjohnwu.magisk.core.AppContext
 import com.topjohnwu.magisk.core.BuildConfig
 import com.topjohnwu.magisk.core.Config
@@ -54,10 +55,15 @@ import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.download.DownloadEngine
 import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.core.di.ServiceLocator
+import com.topjohnwu.magisk.core.ktx.await
+import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.repository.NetworkService
+import com.topjohnwu.magisk.core.tasks.AppMigration
 import com.topjohnwu.magisk.core.tasks.MagiskInstaller
 import com.topjohnwu.magisk.core.ktx.reboot
+import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.ui.RefreshOnResume
+import com.topjohnwu.magisk.ui.component.rememberLoadingDialog
 import com.topjohnwu.magisk.ui.home.HomeViewModel
 import com.topjohnwu.magisk.core.R as CoreR
 import kotlinx.coroutines.Job
@@ -74,6 +80,7 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.Query
+import com.topjohnwu.superuser.Shell
 import java.util.Locale
 
 @Composable
@@ -86,10 +93,17 @@ fun HomeScreen(
 ) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
+    val activity = context as MainActivity
+    val scope = rememberCoroutineScope()
+    val loadingDialog = rememberLoadingDialog()
     val snackbarHostState = remember { SnackbarHostState() }
     var showUninstallDialog by remember { mutableStateOf(false) }
     var showRebootDialog by remember { mutableStateOf(false) }
     var showManagerInstallSheet by remember { mutableStateOf(false) }
+    var showEnvFixDialog by remember { mutableStateOf(false) }
+    var showHideDialog by remember { mutableStateOf(false) }
+    var showRestoreDialog by remember { mutableStateOf(false) }
+    var envFixCode by remember { mutableStateOf(0) }
 
     RefreshOnResume { viewModel.refresh() }
     LaunchedEffect(viewModel) {
@@ -99,6 +113,20 @@ fun HomeScreen(
         if (rebootRequestToken > 0) {
             onRebootTokenConsumed()
             showRebootDialog = true
+        }
+    }
+    LaunchedEffect(state.envFixCode) {
+        if (state.envFixCode != 0) {
+            envFixCode = state.envFixCode
+            showEnvFixDialog = true
+            viewModel.onEnvFixConsumed()
+        }
+    }
+    LaunchedEffect(state.showHideRestore) {
+        if (state.showHideRestore) {
+            val hidden = context.packageName != BuildConfig.APP_PACKAGE_NAME
+            if (hidden) showRestoreDialog = true else showHideDialog = true
+            viewModel.onHideRestoreConsumed()
         }
     }
 
@@ -144,7 +172,9 @@ fun HomeScreen(
                         managerRemoteVersion = state.managerRemoteVersion,
                         updateChannelName = state.updateChannelName,
                         packageName = state.packageName,
-                        onAction = { viewModel.onManagerPressed { showManagerInstallSheet = true } }
+                        isHidden = context.packageName != BuildConfig.APP_PACKAGE_NAME,
+                        onAction = { viewModel.onManagerPressed { showManagerInstallSheet = true } },
+                        onHideRestore = viewModel::onHideRestorePressed
                     )
                 }
 
@@ -208,13 +238,70 @@ fun HomeScreen(
         )
     }
 
+    if (showEnvFixDialog) {
+        EnvFixExpressiveDialog(
+            code = envFixCode,
+            onDismiss = { showEnvFixDialog = false },
+            onFix = {
+                showEnvFixDialog = false
+                val needsFullFix = envFixCode == 2 ||
+                    Info.env.versionCode != BuildConfig.APP_VERSION_CODE ||
+                    Info.env.versionString != BuildConfig.APP_VERSION_NAME
+                if (needsFullFix) {
+                    onOpenInstall()
+                } else {
+                    scope.launch {
+                        val success = loadingDialog.withLoading {
+                            MagiskInstaller.FixEnv().exec()
+                        }
+                        activity.toast(
+                            if (success) CoreR.string.reboot_delay_toast else CoreR.string.setup_fail,
+                            Toast.LENGTH_LONG
+                        )
+                        if (success) {
+                            Handler(Looper.getMainLooper()).postDelayed({ reboot() }, 5000)
+                        }
+                    }
+                }
+            }
+        )
+    }
+
+    if (showHideDialog) {
+        HideAppExpressiveDialog(
+            onDismiss = { showHideDialog = false },
+            onConfirm = { appName ->
+                showHideDialog = false
+                scope.launch {
+                    loadingDialog.withLoading {
+                        AppMigration.patchAndHide(context, appName)
+                    }
+                }
+            }
+        )
+    }
+
+    if (showRestoreDialog) {
+        RestoreAppExpressiveDialog(
+            onDismiss = { showRestoreDialog = false },
+            onConfirm = {
+                showRestoreDialog = false
+                scope.launch {
+                    loadingDialog.withLoading {
+                        AppMigration.restoreApp(context)
+                    }
+                }
+            }
+        )
+    }
+
     if (showManagerInstallSheet) {
         ManagerInstallSheet(
             notes = state.managerReleaseNotes,
             onDismiss = { showManagerInstallSheet = false },
             onInstall = {
                 showManagerInstallSheet = false
-                viewModel.startManagerInstall(context)
+                DownloadEngine.startWithActivity(activity, activity.extension, Subject.App())
             }
         )
     }
@@ -537,7 +624,9 @@ private fun AppOrganicCardXL(
     managerRemoteVersion: String,
     updateChannelName: String,
     packageName: String,
-    onAction: () -> Unit
+    isHidden: Boolean,
+    onAction: () -> Unit,
+    onHideRestore: () -> Unit
 ) {
     ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
@@ -575,9 +664,24 @@ private fun AppOrganicCardXL(
                         StatusBadge(appState)
                     }
                 }
+                Spacer(Modifier.weight(1f))
+                if (Info.env.isActive) {
+                    IconButton(onClick = onHideRestore) {
+                        Icon(
+                            imageVector = if (isHidden) Icons.Rounded.Visibility else Icons.Rounded.VisibilityOff,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
             }
             Spacer(Modifier.height(32.dp))
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                BentoInfoItem(
+                    label = stringResource(id = CoreR.string.home_installed_version),
+                    value = managerInstalledVersion,
+                    modifier = Modifier.fillMaxWidth()
+                )
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -1274,6 +1378,123 @@ private fun UninstallExpressiveDialog(
     )
 }
 
+@Composable
+private fun EnvFixExpressiveDialog(
+    code: Int,
+    onDismiss: () -> Unit,
+    onFix: () -> Unit
+) {
+    val needsFullFix = code == 2 ||
+        Info.env.versionCode != BuildConfig.APP_VERSION_CODE ||
+        Info.env.versionString != BuildConfig.APP_VERSION_NAME
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = stringResource(id = CoreR.string.env_fix_title),
+                fontWeight = FontWeight.Black
+            )
+        },
+        text = {
+            Text(
+                text = stringResource(
+                    id = if (needsFullFix) CoreR.string.env_full_fix_msg else CoreR.string.env_fix_msg
+                )
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = onFix) {
+                Text(text = stringResource(id = android.R.string.ok), fontWeight = FontWeight.Bold)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(text = stringResource(id = android.R.string.cancel))
+            }
+        },
+        shape = RoundedCornerShape(24.dp),
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+    )
+}
+
+@Composable
+private fun HideAppExpressiveDialog(
+    onDismiss: () -> Unit,
+    onConfirm: (String) -> Unit
+) {
+    var appName by remember { mutableStateOf("Settings") }
+    val isError = appName.length > AppMigration.MAX_LABEL_LENGTH || appName.isBlank()
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = stringResource(id = CoreR.string.settings_hide_app_title),
+                fontWeight = FontWeight.Black
+            )
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(text = stringResource(id = CoreR.string.settings_hide_app_summary))
+                OutlinedTextField(
+                    value = appName,
+                    onValueChange = { appName = it },
+                    label = { Text(text = stringResource(id = CoreR.string.settings_app_name_hint)) },
+                    singleLine = true,
+                    isError = isError
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = { onConfirm(appName) },
+                enabled = !isError
+            ) {
+                Text(text = stringResource(id = android.R.string.ok), fontWeight = FontWeight.Bold)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(text = stringResource(id = android.R.string.cancel))
+            }
+        },
+        shape = RoundedCornerShape(24.dp),
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+    )
+}
+
+@Composable
+private fun RestoreAppExpressiveDialog(
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = stringResource(id = CoreR.string.settings_restore_app_title),
+                fontWeight = FontWeight.Black
+            )
+        },
+        text = {
+            Text(text = stringResource(id = CoreR.string.restore_app_confirmation))
+        },
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text(text = stringResource(id = android.R.string.ok), fontWeight = FontWeight.Bold)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(text = stringResource(id = android.R.string.cancel))
+            }
+        },
+        shape = RoundedCornerShape(24.dp),
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+    )
+}
+
 // Logic components
 data class ContributorLink(
     @StringRes val labelRes: Int,
@@ -1354,6 +1575,8 @@ data class HomeUiState(
     val updateChannelName: String = AppContext.getString(CoreR.string.settings_update_stable),
     val packageName: String = "",
     val envActive: Boolean = Info.env.isActive,
+    val showHideRestore: Boolean = false,
+    val envFixCode: Int = 0,
     val contributors: List<Contributor> = emptyList(),
     val contributorsLoading: Boolean = true,
     val noticeVisible: Boolean = Config.safetyNotice
@@ -1436,16 +1659,31 @@ class HomeComposeViewModel(private val svc: NetworkService) : ViewModel() {
                 BuildConfig.APP_VERSION_CODE < remote.versionCode -> HomeViewModel.State.OUTDATED
                 else -> HomeViewModel.State.UP_TO_DATE
             }
+            val magiskState = when {
+                Info.isRooted && Info.env.isUnsupported -> HomeViewModel.State.OUTDATED
+                !Info.env.isActive -> HomeViewModel.State.INVALID
+                Info.env.versionCode < BuildConfig.APP_VERSION_CODE -> HomeViewModel.State.OUTDATED
+                else -> HomeViewModel.State.UP_TO_DATE
+            }
+            val managerInstalled = "${BuildConfig.APP_VERSION_NAME} (${BuildConfig.APP_VERSION_CODE})" +
+                if (BuildConfig.DEBUG) " (D)" else ""
+
             _state.update {
                 it.copy(
-                    magiskState = if (Info.env.isActive) HomeViewModel.State.UP_TO_DATE else HomeViewModel.State.INVALID,
-                    magiskInstalledVersion = if (Info.env.isActive) "${Info.env.versionString} (${Info.env.versionCode})" else AppContext.getString(
-                        CoreR.string.not_available
-                    ),
+                    magiskState = magiskState,
+                    magiskInstalledVersion = Info.env.run {
+                        if (isActive) {
+                            "$versionString ($versionCode)" + if (isDebug) " (D)" else ""
+                        } else {
+                            AppContext.getString(CoreR.string.not_available)
+                        }
+                    },
                     appState = appState,
-                    managerInstalledVersion = BuildConfig.APP_VERSION_NAME,
-                    managerRemoteVersion = remote?.version
-                        ?: AppContext.getString(CoreR.string.not_available),
+                    managerInstalledVersion = managerInstalled,
+                    managerRemoteVersion = remote?.run {
+                        val isDebug = Config.updateChannel == Config.Value.DEBUG_CHANNEL
+                        "$version ($versionCode)" + if (isDebug) " (D)" else ""
+                    } ?: AppContext.getString(CoreR.string.not_available),
                     managerReleaseNotes = remote?.note.orEmpty(),
                     updateChannelName = AppContext.resources.getStringArray(CoreR.array.update_channel)
                         .getOrElse(Config.updateChannel) { AppContext.getString(CoreR.string.settings_update_stable) },
@@ -1454,6 +1692,7 @@ class HomeComposeViewModel(private val svc: NetworkService) : ViewModel() {
                     noticeVisible = Config.safetyNotice
                 )
             }
+            ensureEnv(magiskState)
         }
     }
 
@@ -1463,6 +1702,18 @@ class HomeComposeViewModel(private val svc: NetworkService) : ViewModel() {
 
     fun checkForMagiskUpdates() {
         refresh()
+    }
+
+    fun onHideRestorePressed() {
+        _state.update { it.copy(showHideRestore = true) }
+    }
+
+    fun onHideRestoreConsumed() {
+        _state.update { it.copy(showHideRestore = false) }
+    }
+
+    fun onEnvFixConsumed() {
+        _state.update { it.copy(envFixCode = 0) }
     }
 
     fun onManagerPressed(onShowInstallSheet: () -> Unit) {
@@ -1475,18 +1726,6 @@ class HomeComposeViewModel(private val svc: NetworkService) : ViewModel() {
             }
             else -> onShowInstallSheet()
         }
-    }
-
-    fun startManagerInstall(c: android.content.Context) {
-        val activity = c as? UIActivity<*>
-        if (activity != null) activity.withPermission(REQUEST_INSTALL_PACKAGES) {
-            if (it) DownloadEngine.startWithActivity(
-                activity,
-                activity.extension,
-                Subject.App()
-            )
-        }
-        else DownloadEngine.start(c.applicationContext, Subject.App())
     }
 
     fun restoreImages() {
@@ -1510,10 +1749,21 @@ class HomeComposeViewModel(private val svc: NetworkService) : ViewModel() {
         }
     }
 
+    private suspend fun ensureEnv(magiskState: HomeViewModel.State) {
+        if (magiskState == HomeViewModel.State.INVALID || checkedEnv) return
+        val cmd = "env_check ${Info.env.versionString} ${Info.env.versionCode}"
+        val code = runCatching { Shell.cmd(cmd).await().code }.getOrDefault(0)
+        if (code != 0) {
+            _state.update { it.copy(envFixCode = code) }
+        }
+        checkedEnv = true
+    }
+
     companion object {
         private const val CONTRIBUTORS_CACHE_TTL_MS = 30L * 60_000L
         private var contributorsCache: List<Contributor> = emptyList()
         private var contributorsCacheTimestamp: Long = 0
+        private var checkedEnv = false
     }
 
     object Factory : ViewModelProvider.Factory {

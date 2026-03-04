@@ -91,6 +91,11 @@ fun MagiskAppContainer(
         var moduleRunTitleOverride by remember { mutableStateOf<String?>(null) }
         var moduleRunSubtitleOverride by remember { mutableStateOf<String?>(null) }
         var moduleRunProcessStateOverride by remember { mutableStateOf(RouteProcessTopBarState()) }
+        val backEnabled = when (currentRoute) {
+            AppRoute.FlashPattern -> !flashProcessStateOverride.running
+            AppRoute.ModuleActionPattern -> !moduleRunProcessStateOverride.running
+            else -> true
+        }
 
         LaunchedEffect(openSection) {
             val route = when (openSection) {
@@ -134,6 +139,7 @@ fun MagiskAppContainer(
                     moduleRunTitleOverride = moduleRunTitleOverride,
                     moduleRunSubtitleOverride = moduleRunSubtitleOverride,
                     moduleRunProcessStateOverride = moduleRunProcessStateOverride,
+                    backEnabled = backEnabled,
                     onBack = { navController.popBackStack() },
                     onHomePower = { homeRebootRequestToken++ },
                     onOpenSettings = { navController.navigate(AppRoute.Settings) }
@@ -305,6 +311,7 @@ private fun MagiskFloatingTopBar(
     moduleRunTitleOverride: String?,
     moduleRunSubtitleOverride: String?,
     moduleRunProcessStateOverride: RouteProcessTopBarState,
+    backEnabled: Boolean,
     onBack: () -> Unit,
     onHomePower: () -> Unit,
     onOpenSettings: () -> Unit
@@ -329,6 +336,7 @@ private fun MagiskFloatingTopBar(
         ) {
             if (!isRootRoute) {
                 IconButton(
+                    enabled = backEnabled,
                     onClick = onBack,
                     modifier = Modifier.background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f), CircleShape)
                 ) {

@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.ui.flash
 
 import android.net.Uri
 import android.os.Build
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -79,6 +80,8 @@ fun FlashScreen(
         ?.takeIf { it.isNotBlank() }
         ?.let(::parseNavigationUriArg)
     var hasStarted by remember(action, uriArg) { mutableStateOf(false) }
+
+    BackHandler(enabled = state.running) { }
 
     LaunchedEffect(action, parsedUri) {
         viewModel.start(action, parsedUri)

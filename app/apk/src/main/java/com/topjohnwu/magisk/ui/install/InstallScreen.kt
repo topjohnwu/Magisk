@@ -4,7 +4,7 @@ import android.net.Uri
 import android.os.Build
 import android.widget.TextView
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts.OpenDocument
+import androidx.activity.result.contract.ActivityResultContracts.GetContent
 import androidx.compose.animation.*
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
@@ -26,7 +26,6 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -34,47 +33,56 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.topjohnwu.magisk.core.AppContext
-import com.topjohnwu.magisk.core.BuildConfig
+import com.topjohnwu.magisk.arch.VMFactory
 import com.topjohnwu.magisk.core.Config
-import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.di.ServiceLocator
-import com.topjohnwu.magisk.core.repository.NetworkService
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.displayName
-import com.topjohnwu.magisk.core.utils.MediaStoreUtils.persistReadPermission
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import com.topjohnwu.magisk.ui.component.ConfirmResult
+import com.topjohnwu.magisk.ui.component.rememberConfirmDialog
+import com.topjohnwu.magisk.ui.navigation.Route
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.File
 import com.topjohnwu.magisk.core.R as CoreR
 
 @Composable
 fun InstallScreen(
     onStartFlash: (action: String, uri: Uri?) -> Unit
 ) {
-    val viewModel: InstallComposeViewModel = viewModel(factory = InstallComposeViewModel.Factory)
-    val state = viewModel.state
-    val snackbarHostState = remember { SnackbarHostState() }
-    var showSlotWarning by remember { mutableStateOf(false) }
+    val viewModel: InstallViewModel = viewModel(factory = VMFactory)
+    val state by viewModel.uiState.collectAsState()
 
-    val patchPicker = rememberLauncherForActivityResult(OpenDocument()) { uri ->
-        if (uri != null) {
-            uri.persistReadPermission()
-            viewModel.setPatchUri(uri)
+    val patchPicker = rememberLauncherForActivityResult(GetContent()) { uri ->
+        uri?.let { viewModel.onPatchFileSelected(it) }
+    }
+
+    val secondSlotDialog = rememberConfirmDialog()
+    val secondSlotTitle = stringResource(android.R.string.dialog_alert_title)
+    val secondSlotMsg = stringResource(CoreR.string.install_inactive_slot_msg)
+
+    LaunchedEffect(state.requestFilePicker) {
+        if (state.requestFilePicker) {
+            patchPicker.launch("*/*")
+            viewModel.onFilePickerConsumed()
+        }
+    }
+
+    LaunchedEffect(state.showSecondSlotWarning) {
+        if (state.showSecondSlotWarning) {
+            val result = secondSlotDialog.awaitConfirm(title = secondSlotTitle, content = secondSlotMsg)
+            viewModel.onSecondSlotWarningConsumed()
+            if (result == ConfirmResult.Confirmed) {
+                viewModel.install()
+            }
         }
     }
 
     LaunchedEffect(viewModel) {
-        viewModel.messages.collect { snackbarHostState.showSnackbar(it) }
+        viewModel.navEvents.collect { route ->
+            if (route is Route.Flash) {
+                onStartFlash(route.action, route.additionalData?.let(Uri::parse))
+            }
+        }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -83,7 +91,7 @@ fun InstallScreen(
             contentPadding = PaddingValues(bottom = 140.dp, start = 20.dp, end = 20.dp, top = 12.dp),
             verticalArrangement = Arrangement.spacedBy(28.dp)
         ) {
-            if (!state.skipOptions) {
+            if (!viewModel.skipOptions) {
                 item {
                     InstallSection(
                         title = stringResource(id = CoreR.string.install_options_title),
@@ -91,21 +99,21 @@ fun InstallScreen(
                     ) {
                         ExpressiveToggleRow(
                             title = stringResource(id = CoreR.string.keep_dm_verity),
-                            checked = state.keepVerity,
+                            checked = Config.keepVerity,
                             visible = !Info.isSAR,
-                            onToggle = viewModel::setKeepVerity
+                            onToggle = { Config.keepVerity = it }
                         )
                         ExpressiveToggleRow(
                             title = stringResource(id = CoreR.string.keep_force_encryption),
-                            checked = state.keepEnc,
+                            checked = Config.keepEnc,
                             visible = Info.isFDE,
-                            onToggle = viewModel::setKeepEnc
+                            onToggle = { Config.keepEnc = it }
                         )
                         ExpressiveToggleRow(
                             title = stringResource(id = CoreR.string.recovery_mode),
-                            checked = state.recovery,
+                            checked = Config.recovery,
                             visible = !Info.ramdisk,
-                            onToggle = viewModel::setRecovery
+                            onToggle = { Config.recovery = it }
                         )
                         
                         if (state.step == 0) {
@@ -144,58 +152,40 @@ fun InstallScreen(
                             Column {
                                 ExpressiveMethodRow(
                                     title = stringResource(id = CoreR.string.select_patch_file),
-                                    subtitle = if (state.patchUri != null && state.method == InstallMethod.Patch) {
-                                        state.patchUri.displayName
+                                    subtitle = if (state.patchUri != null && state.method == InstallViewModel.Method.PATCH) {
+                                        state.patchUri?.displayName
+                                            ?: stringResource(id = CoreR.string.install_select_patch_file_subtitle)
                                     } else {
                                         stringResource(id = CoreR.string.install_select_patch_file_subtitle)
                                     },
-                                    selected = state.method == InstallMethod.Patch,
+                                    selected = state.method == InstallViewModel.Method.PATCH,
                                     icon = Icons.Rounded.FileCopy,
                                     onClick = {
-                                        viewModel.setMethod(InstallMethod.Patch)
-                                        patchPicker.launch(arrayOf("*/*"))
+                                        viewModel.selectMethod(InstallViewModel.Method.PATCH)
                                     }
                                 )
-                                if (state.isRooted) {
+                                if (viewModel.isRooted) {
                                     ExpressiveMethodRow(
                                         title = stringResource(id = CoreR.string.direct_install),
                                         subtitle = stringResource(id = CoreR.string.install_direct_install_subtitle),
-                                        selected = state.method == InstallMethod.Direct,
+                                        selected = state.method == InstallViewModel.Method.DIRECT,
                                         icon = Icons.Rounded.FlashOn,
-                                        onClick = { viewModel.setMethod(InstallMethod.Direct) }
+                                        onClick = {
+                                            viewModel.selectMethod(InstallViewModel.Method.DIRECT)
+                                            viewModel.install()
+                                        }
                                     )
                                 }
-                                if (!state.noSecondSlot) {
+                                if (!viewModel.noSecondSlot) {
                                     ExpressiveMethodRow(
                                         title = stringResource(id = CoreR.string.install_inactive_slot),
                                         subtitle = stringResource(id = CoreR.string.install_inactive_slot_subtitle),
-                                        selected = state.method == InstallMethod.InactiveSlot,
+                                        selected = state.method == InstallViewModel.Method.INACTIVE_SLOT,
                                         icon = Icons.Rounded.DynamicFeed,
-                                        onClick = { showSlotWarning = true }
-                                    )
-                                }
-                                
-                                Box(modifier = Modifier.padding(16.dp)) {
-                                    Button(
                                         onClick = {
-                                            val request = viewModel.buildFlashRequest() ?: return@Button
-                                            onStartFlash(request.action, request.uri)
-                                        },
-                                        enabled = state.canStart,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(64.dp),
-                                        shape = RoundedCornerShape(20.dp),
-                                        contentPadding = PaddingValues(horizontal = 24.dp)
-                                    ) {
-                                        Icon(Icons.Rounded.DownloadDone, null)
-                                        Spacer(Modifier.width(12.dp))
-                                        Text(
-                                            stringResource(id = CoreR.string.install_start),
-                                            style = MaterialTheme.typography.titleLarge,
-                                            fontWeight = FontWeight.Black
-                                        )
-                                    }
+                                            viewModel.selectMethod(InstallViewModel.Method.INACTIVE_SLOT)
+                                        }
+                                    )
                                 }
                             }
                         } else {
@@ -226,59 +216,6 @@ fun InstallScreen(
                 }
             }
         }
-    }
-
-    if (showSlotWarning) {
-        AlertDialog(
-            onDismissRequest = { showSlotWarning = false },
-            title = { 
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Surface(color = MaterialTheme.colorScheme.errorContainer, shape = CircleShape, modifier = Modifier.size(32.dp)) {
-                        Icon(Icons.Rounded.Warning, null, modifier = Modifier.padding(8.dp), tint = MaterialTheme.colorScheme.onErrorContainer)
-                    }
-                    Text(
-                        text = stringResource(id = CoreR.string.install_inactive_slot),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-            },
-            text = { 
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text(stringResource(id = CoreR.string.install_inactive_slot_msg), style = MaterialTheme.typography.bodyMedium)
-                    Surface(
-                        color = MaterialTheme.colorScheme.error.copy(alpha = 0.05f),
-                        shape = RoundedCornerShape(12.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(
-                            text = stringResource(id = CoreR.string.install_inactive_slot_caution),
-                            modifier = Modifier.padding(12.dp),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.error,
-                            fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                }
-            },
-            shape = RoundedCornerShape(32.dp),
-            confirmButton = {
-                Button(
-                    onClick = {
-                        viewModel.setMethod(InstallMethod.InactiveSlot)
-                        showSlotWarning = false
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
-                ) { Text(stringResource(id = android.R.string.ok), fontWeight = FontWeight.Black) }
-            },
-            dismissButton = {
-                TextButton(onClick = { showSlotWarning = false }) { Text(stringResource(id = android.R.string.cancel)) }
-            },
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
-        )
     }
 }
 
@@ -447,119 +384,4 @@ private fun MarkdownText(
             ServiceLocator.markwon.setMarkdown(textView, markdown)
         }
     )
-}
-
-private enum class InstallMethod(
-    val action: String,
-    val needsUri: Boolean
-) {
-    Patch(Const.Value.PATCH_FILE, true),
-    Direct(Const.Value.FLASH_MAGISK, false),
-    InactiveSlot(Const.Value.FLASH_INACTIVE_SLOT, false)
-}
-
-private data class FlashRequest(
-    val action: String,
-    val uri: Uri?
-)
-
-private data class InstallUiState(
-    val step: Int = if (skipOptions()) 1 else 0,
-    val skipOptions: Boolean = skipOptions(),
-    val noSecondSlot: Boolean = noSecondSlot(),
-    val isRooted: Boolean = Info.isRooted,
-    val keepVerity: Boolean = Config.keepVerity,
-    val keepEnc: Boolean = Config.keepEnc,
-    val recovery: Boolean = Config.recovery,
-    val method: InstallMethod? = null,
-    val patchUri: Uri? = null,
-    val notes: String = ""
-) {
-    val canStart: Boolean
-        get() = method != null && (!method.needsUri || patchUri != null)
-
-    companion object {
-        private fun skipOptions() = Info.isEmulator || (Info.isSAR && !Info.isFDE && Info.ramdisk)
-        private fun noSecondSlot() = !Info.isRooted || !Info.isAB || Info.isEmulator
-    }
-}
-
-private class InstallComposeViewModel(
-    private val svc: NetworkService
-) : ViewModel() {
-
-    var state by mutableStateOf(InstallUiState())
-        private set
-    private val _messages = MutableSharedFlow<String>(extraBufferCapacity = 1)
-    val messages: SharedFlow<String> = _messages.asSharedFlow()
-
-    init {
-        loadNotes()
-    }
-
-    fun nextStep() {
-        state = state.copy(step = 1)
-    }
-
-    fun setKeepVerity(value: Boolean) {
-        Config.keepVerity = value
-        state = state.copy(keepVerity = value)
-    }
-
-    fun setKeepEnc(value: Boolean) {
-        Config.keepEnc = value
-        state = state.copy(keepEnc = value)
-    }
-
-    fun setRecovery(value: Boolean) {
-        Config.recovery = value
-        state = state.copy(recovery = value)
-    }
-
-    fun setMethod(method: InstallMethod) {
-        state = state.copy(method = method)
-    }
-
-    fun setPatchUri(uri: Uri) {
-        state = state.copy(patchUri = uri)
-    }
-
-    fun buildFlashRequest(): FlashRequest? {
-        val method = state.method ?: return null
-        if (method.needsUri && state.patchUri == null) {
-            _messages.tryEmit(AppContext.getString(CoreR.string.patch_file_msg))
-            return null
-        }
-        return FlashRequest(method.action, state.patchUri)
-    }
-
-    private fun loadNotes() {
-        viewModelScope.launch {
-            val note = withContext(Dispatchers.IO) {
-                runCatching {
-                    val noteFile = File(AppContext.cacheDir, "${BuildConfig.APP_VERSION_CODE}.md")
-                    when {
-                        noteFile.exists() -> noteFile.readText()
-                        else -> {
-                            val remote = svc.fetchUpdate(BuildConfig.APP_VERSION_CODE)?.note.orEmpty()
-                            if (remote.isNotBlank()) {
-                                noteFile.writeText(remote)
-                            }
-                            remote
-                        }
-                    }
-                }.getOrDefault("")
-            }
-            state = state.copy(notes = note)
-        }
-    }
-
-    companion object {
-        val Factory = object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                @Suppress("UNCHECKED_CAST")
-                return InstallComposeViewModel(ServiceLocator.networkService) as T
-            }
-        }
-    }
 }
