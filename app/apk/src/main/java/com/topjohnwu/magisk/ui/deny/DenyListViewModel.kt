@@ -133,10 +133,7 @@ class DenyAppState(val info: AppProcessInfo) : Comparable<DenyAppState> {
                 }
             }
         } else {
-            processes
-                .filterNot { it.isEnabled }
-                .filter { if (isExpanded) true else it.defaultSelection }
-                .forEach { it.toggle() }
+            processes.filterNot { it.isEnabled }.forEach { it.toggle() }
         }
     }
 
@@ -153,11 +150,8 @@ class DenyAppState(val info: AppProcessInfo) : Comparable<DenyAppState> {
 class DenyProcessState(val process: ProcessInfo) {
     var isEnabled by mutableStateOf(process.isEnabled)
 
-    val defaultSelection get() =
-        process.isIsolated || process.isAppZygote || process.name == process.packageName
-
     val displayName: String =
-        if (process.isIsolated) "(isolated) ${process.name}" else process.name
+        if (process.isIsolated) "(isolated) ${process.name}*" else process.name
 
     fun toggle() {
         isEnabled = !isEnabled
