@@ -70,7 +70,7 @@ class ActionViewModel : BaseViewModel() {
 
             val success = withContext(Dispatchers.IO) {
                 Shell.cmd(
-                    "(export TERM=xterm-256color; run_action '$actionId') >$ptyPath 2>&1"
+                    "(export TERM=xterm-256color; run_action '$actionId') <>$ptyPath >&0 2>&0"
                 ).exec().isSuccess
             }
 
