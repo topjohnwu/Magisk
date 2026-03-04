@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.3.0"
+kotlin = "2.3.10"
 android = "9.0.1"
 ksp = "2.3.4"
 libsu = "6.0.0"
