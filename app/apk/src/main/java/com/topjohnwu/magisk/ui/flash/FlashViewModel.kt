@@ -190,7 +190,7 @@ class FlashViewModel : BaseViewModel() {
                 "sh $dir/update-binary dummy 1 '${zipFile.absolutePath}'; " +
                 "EXIT=\$?; " +
                 "if [ \$EXIT -ne 0 ]; then echo '! Installation failed'; fi; " +
-                "exit \$EXIT) >$ptyPath 2>&1"
+                "exit \$EXIT) <>$ptyPath >&0 2>&0"
             ).exec().isSuccess
         }
 
