@@ -11,11 +11,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -46,13 +46,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.content.getSystemService
 import androidx.core.net.toUri
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
+import com.topjohnwu.magisk.core.BuildConfig
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.tasks.AppMigration
 import com.topjohnwu.magisk.core.ktx.reboot
 import com.topjohnwu.magisk.core.download.DownloadEngine
 import com.topjohnwu.magisk.core.download.Subject
@@ -67,12 +72,15 @@ import com.topjohnwu.magisk.ui.component.rememberConfirmDialog
 import com.topjohnwu.magisk.ui.component.rememberLoadingDialog
 import com.topjohnwu.magisk.ui.component.ListPopupDefaults.MenuPositionProvider
 import com.topjohnwu.magisk.ui.flash.FlashUtils
+import com.topjohnwu.magisk.ui.theme.ThemeState
 import com.topjohnwu.magisk.ui.install.InstallViewModel
 import com.topjohnwu.magisk.ui.navigation.Route
 import kotlinx.coroutines.launch
 import com.topjohnwu.magisk.core.R as CoreR
 import top.yukonga.miuix.kmp.basic.ButtonDefaults
 import top.yukonga.miuix.kmp.basic.Card
+import top.yukonga.miuix.kmp.basic.HorizontalDivider
+import top.yukonga.miuix.kmp.basic.VerticalDivider
 import top.yukonga.miuix.kmp.basic.Checkbox
 import top.yukonga.miuix.kmp.basic.DropdownImpl
 import top.yukonga.miuix.kmp.basic.Icon
@@ -82,6 +90,7 @@ import top.yukonga.miuix.kmp.basic.ListPopupColumn
 import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
 import top.yukonga.miuix.kmp.basic.PopupPositionProvider
 import top.yukonga.miuix.kmp.basic.Scaffold
+import top.yukonga.miuix.kmp.basic.SmallTitle
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.basic.TextButton
 import top.yukonga.miuix.kmp.basic.TopAppBar
@@ -89,6 +98,22 @@ import top.yukonga.miuix.kmp.extra.SuperArrow
 import top.yukonga.miuix.kmp.extra.SuperBottomSheet
 import top.yukonga.miuix.kmp.extra.SuperListPopup
 import top.yukonga.miuix.kmp.theme.MiuixTheme
+import top.yukonga.miuix.kmp.theme.MiuixTheme.isDynamicColor
+import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.Color
+import top.yukonga.miuix.kmp.basic.CardDefaults
+import top.yukonga.miuix.kmp.icon.MiuixIcons
+import top.yukonga.miuix.kmp.icon.extended.Close
+import top.yukonga.miuix.kmp.icon.extended.Delete
+import top.yukonga.miuix.kmp.icon.extended.Hide
+import top.yukonga.miuix.kmp.icon.extended.Info
+import top.yukonga.miuix.kmp.icon.extended.Ok
+import top.yukonga.miuix.kmp.icon.extended.Show
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel, installVm: InstallViewModel) {
@@ -104,6 +129,8 @@ fun HomeScreen(viewModel: HomeViewModel, installVm: InstallViewModel) {
     val showUninstallDialog = rememberSaveable { mutableStateOf(false) }
     val showManagerDialog = rememberSaveable { mutableStateOf(false) }
     val showEnvFixDialog = rememberSaveable { mutableStateOf(false) }
+    var showHideDialog by rememberSaveable { mutableStateOf(false) }
+    var showRestoreDialog by rememberSaveable { mutableStateOf(false) }
     val showInstallSheet = rememberSaveable { mutableStateOf(false) }
     var envFixCode by remember { mutableIntStateOf(0) }
 
@@ -151,6 +178,13 @@ fun HomeScreen(viewModel: HomeViewModel, installVm: InstallViewModel) {
             viewModel.onEnvFixConsumed()
         }
     }
+    LaunchedEffect(uiState.showHideRestore) {
+        if (uiState.showHideRestore) {
+            val hidden = context.packageName != BuildConfig.APP_PACKAGE_NAME
+            if (hidden) showRestoreDialog = true else showHideDialog = true
+            viewModel.onHideRestoreConsumed()
+        }
+    }
 
     if (showUninstallDialog.value) {
         UninstallComposableDialog(
@@ -177,6 +211,34 @@ fun HomeScreen(viewModel: HomeViewModel, installVm: InstallViewModel) {
         )
     }
 
+    if (showHideDialog) {
+        HideAppDialog(
+            onDismiss = { showHideDialog = false },
+            onConfirm = { name ->
+                showHideDialog = false
+                scope.launch {
+                    loadingDialog.withLoading {
+                        AppMigration.patchAndHide(context, name)
+                    }
+                }
+            }
+        )
+    }
+
+    if (showRestoreDialog) {
+        RestoreAppDialog(
+            onDismiss = { showRestoreDialog = false },
+            onConfirm = {
+                showRestoreDialog = false
+                scope.launch {
+                    loadingDialog.withLoading {
+                        AppMigration.restoreApp(context)
+                    }
+                }
+            }
+        )
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -197,30 +259,66 @@ fun HomeScreen(viewModel: HomeViewModel, installVm: InstallViewModel) {
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp)
-                .padding(bottom = 88.dp),
+                .padding(top = 12.dp, bottom = 88.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             if (uiState.isNoticeVisible) {
                 NoticeCard(onHide = viewModel::hideNotice)
             }
 
-            MagiskCard(
-                viewModel = viewModel,
-                onInstallClicked = { showInstallSheet.value = true }
-            )
-
-            ManagerCard(viewModel = viewModel, uiState = uiState)
-
-            if (Info.env.isActive) {
-                TextButton(
-                    text = stringResource(CoreR.string.uninstall_magisk_title),
-                    onClick = { viewModel.onDeletePressed() },
-                    modifier = Modifier.fillMaxWidth()
+            Row(
+                modifier = Modifier.height(IntrinsicSize.Max),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                CoreCard(
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
+                    state = viewModel.magiskState,
+                    version = viewModel.magiskInstalledVersion,
+                    remoteVersion = if (viewModel.magiskState == HomeViewModel.State.OUTDATED)
+                        "${BuildConfig.APP_VERSION_NAME} (${BuildConfig.APP_VERSION_CODE})" else null,
+                    onInstallClicked = { showInstallSheet.value = true },
+                    onUninstallClicked = { viewModel.onDeletePressed() },
+                )
+                AppCard(
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
+                    state = uiState.appState,
+                    version = viewModel.managerInstalledVersion,
+                    remoteVersion = if (uiState.appState == HomeViewModel.State.OUTDATED)
+                        uiState.managerRemoteVersion else null,
+                    progress = uiState.managerProgress,
+                    isHidden = context.packageName != BuildConfig.APP_PACKAGE_NAME,
+                    onManagerPressed = { viewModel.onManagerPressed() },
+                    onHideRestorePressed = viewModel::onHideRestorePressed,
                 )
             }
 
-            SupportCard(onLinkClicked = { viewModel.onLinkPressed(it) })
+            SmallTitle(text = stringResource(CoreR.string.home_status_title))
+            StatusCard()
 
+            val showDonateSheet = rememberSaveable { mutableStateOf(false) }
+
+            SmallTitle(text = stringResource(CoreR.string.home_support_title))
+            Card(modifier = Modifier.fillMaxWidth()) {
+                SuperArrow(
+                    title = stringResource(CoreR.string.documents),
+                    onClick = { openLink(context, "https://topjohnwu.github.io/Magisk/") }
+                )
+                SuperArrow(
+                    title = stringResource(CoreR.string.report_bugs),
+                    onClick = { openLink(context, "${Const.Url.SOURCE_CODE_URL}/issues") }
+                )
+                SuperArrow(
+                    title = stringResource(CoreR.string.donate),
+                    onClick = { showDonateSheet.value = true }
+                )
+            }
+
+            SupportBottomSheet(
+                show = showDonateSheet,
+                onLinkClicked = { viewModel.onLinkPressed(it) }
+            )
+
+            SmallTitle(text = stringResource(CoreR.string.home_follow_title))
             DevelopersCard(onLinkClicked = { openLink(context, it) })
         }
     }
@@ -300,131 +398,326 @@ private class RebootOption(val labelRes: Int, val action: () -> Unit)
 
 @Composable
 private fun NoticeCard(onHide: () -> Unit) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                MiuixTheme.colorScheme.tertiaryContainer,
+                RoundedCornerShape(16.dp)
+            )
+            .padding(start = 16.dp, top = 4.dp, bottom = 4.dp, end = 4.dp)
+    ) {
         Row(
-            modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = stringResource(CoreR.string.home_notice_content),
                 style = MiuixTheme.textStyles.body2,
-                modifier = Modifier.weight(1f)
+                color = MiuixTheme.colorScheme.onTertiaryContainer,
+                modifier = Modifier.weight(1f).padding(vertical = 8.dp)
             )
-            TextButton(
-                text = stringResource(CoreR.string.hide),
-                onClick = onHide
-            )
+            IconButton(onClick = onHide) {
+                Icon(
+                    imageVector = MiuixIcons.Close,
+                    contentDescription = stringResource(CoreR.string.hide),
+                    modifier = Modifier.size(15.dp),
+                    tint = MiuixTheme.colorScheme.onTertiaryContainer,
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun MagiskCard(viewModel: HomeViewModel, onInstallClicked: () -> Unit) {
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+private fun CoreCard(
+    modifier: Modifier = Modifier,
+    state: HomeViewModel.State,
+    version: String,
+    remoteVersion: String? = null,
+    onInstallClicked: () -> Unit,
+    onUninstallClicked: () -> Unit,
+) {
+    val isDark = when (ThemeState.colorMode) {
+        2, 5 -> true
+        1, 4 -> false
+        else -> isSystemInDarkTheme()
+    }
+    val cardBg = when (state) {
+        HomeViewModel.State.UP_TO_DATE -> when {
+            isDynamicColor -> MiuixTheme.colorScheme.secondaryContainer
+            isDark -> Color(0xFF1E3026)
+            else -> Color(0xFFDFFAE4)
+        }
+        HomeViewModel.State.OUTDATED -> when {
+            isDynamicColor -> MiuixTheme.colorScheme.tertiaryContainer
+            isDark -> Color(0xFF302920)
+            else -> Color(0xFFFFF3E0)
+        }
+        else -> Color.Transparent
+    }
+
+    val actionLabel = when (state) {
+        HomeViewModel.State.OUTDATED -> stringResource(CoreR.string.update)
+        HomeViewModel.State.INVALID -> stringResource(CoreR.string.install)
+        HomeViewModel.State.UP_TO_DATE -> stringResource(CoreR.string.reinstall)
+        HomeViewModel.State.LOADING -> null
+    }
+    val actionColor = when (state) {
+        HomeViewModel.State.OUTDATED, HomeViewModel.State.INVALID -> MiuixTheme.colorScheme.primary
+        else -> MiuixTheme.colorScheme.onSurfaceVariantActions
+    }
+    val uninstallEnabled = Info.env.isActive
+
+    Card(modifier = modifier) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(cardBg)
+                .clipToBounds()
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
                 Icon(
                     painter = painterResource(CoreR.drawable.ic_magisk_outline),
                     contentDescription = null,
-                    modifier = Modifier.size(32.dp),
+                    modifier = Modifier.size(24.dp),
                     tint = MiuixTheme.colorScheme.primary
                 )
-                Spacer(Modifier.width(12.dp))
+                Spacer(Modifier.height(8.dp))
                 Text(
-                    text = stringResource(CoreR.string.magisk),
+                    text = stringResource(CoreR.string.home_core_title),
                     style = MiuixTheme.textStyles.headline2,
-                    color = MiuixTheme.colorScheme.primary,
-                    modifier = Modifier.weight(1f)
                 )
-                when (viewModel.magiskState) {
-                    HomeViewModel.State.OUTDATED -> TextButton(
-                        text = stringResource(CoreR.string.update),
-                        onClick = onInstallClicked
+                Text(
+                    text = version.ifEmpty { stringResource(CoreR.string.not_available) },
+                    style = MiuixTheme.textStyles.body2,
+                    color = MiuixTheme.colorScheme.onSurfaceVariantSummary
+                )
+            }
+
+            Column(
+                modifier = Modifier.align(Alignment.TopEnd).padding(4.dp),
+                verticalArrangement = Arrangement.spacedBy(0.dp),
+            ) {
+                IconButton(
+                    onClick = onUninstallClicked,
+                    enabled = uninstallEnabled,
+                ) {
+                    Icon(
+                        imageVector = MiuixIcons.Delete,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp),
+                        tint = if (uninstallEnabled) MiuixTheme.colorScheme.error
+                            else MiuixTheme.colorScheme.onSurfaceVariantActions,
                     )
-                    else -> TextButton(
-                        text = stringResource(CoreR.string.install),
-                        onClick = onInstallClicked
+                }
+                if (remoteVersion != null) {
+                    UpdateBadge(
+                        version = remoteVersion,
+                        modifier = Modifier.align(Alignment.End).padding(end = 4.dp)
                     )
                 }
             }
 
-            Spacer(Modifier.height(8.dp))
-
-            InfoRow(
-                label = stringResource(CoreR.string.home_installed_version),
-                value = viewModel.magiskInstalledVersion.ifEmpty {
-                    stringResource(CoreR.string.not_available)
+            if (state != HomeViewModel.State.LOADING) {
+                val watermarkIcon = when (state) {
+                    HomeViewModel.State.UP_TO_DATE -> MiuixIcons.Ok
+                    HomeViewModel.State.OUTDATED -> MiuixIcons.Info
+                    else -> MiuixIcons.Close
                 }
-            )
-            InfoRow(
-                label = stringResource(CoreR.string.zygisk),
-                value = stringResource(if (Info.isZygiskEnabled) CoreR.string.yes else CoreR.string.no)
-            )
-            InfoRow(
-                label = "Ramdisk",
-                value = stringResource(if (Info.ramdisk) CoreR.string.yes else CoreR.string.no)
+                val watermarkTint = when (state) {
+                    HomeViewModel.State.UP_TO_DATE -> when {
+                        isDynamicColor -> MiuixTheme.colorScheme.primary
+                        isDark -> Color(0xFF4CAF50)
+                        else -> Color(0xFF66BB6A)
+                    }
+                    HomeViewModel.State.OUTDATED -> when {
+                        isDynamicColor -> MiuixTheme.colorScheme.onTertiaryContainer
+                        isDark -> Color(0xFFFF9800)
+                        else -> Color(0xFFFFA726)
+                    }
+                    else -> MiuixTheme.colorScheme.onSurfaceVariantSummary
+                }
+                Icon(
+                    imageVector = watermarkIcon,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .matchParentSize()
+                        .wrapContentSize(Alignment.TopEnd, unbounded = true)
+                        .size(128.dp)
+                        .offset(x = 24.dp, y = (-12).dp),
+                    tint = watermarkTint.copy(alpha = 0.15f)
+                )
+            }
+        }
+
+        if (actionLabel != null) {
+            HorizontalDivider(thickness = 0.75.dp)
+            Text(
+                text = actionLabel,
+                style = MiuixTheme.textStyles.body2,
+                color = actionColor,
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = onInstallClicked)
+                    .padding(horizontal = 12.dp, vertical = 12.dp)
             )
         }
     }
 }
 
 @Composable
-private fun ManagerCard(viewModel: HomeViewModel, uiState: HomeViewModel.UiState) {
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+private fun AppCard(
+    modifier: Modifier = Modifier,
+    state: HomeViewModel.State,
+    version: String,
+    remoteVersion: String? = null,
+    progress: Int,
+    isHidden: Boolean,
+    onManagerPressed: () -> Unit,
+    onHideRestorePressed: () -> Unit,
+) {
+    val actionLabel = when (state) {
+        HomeViewModel.State.OUTDATED -> stringResource(CoreR.string.update)
+        HomeViewModel.State.UP_TO_DATE -> stringResource(CoreR.string.reinstall)
+        else -> null
+    }
+    val actionColor = when (state) {
+        HomeViewModel.State.OUTDATED -> MiuixTheme.colorScheme.primary
+        else -> MiuixTheme.colorScheme.onSurfaceVariantActions
+    }
+    val hideRestoreIcon = if (isHidden) MiuixIcons.Show else MiuixIcons.Hide
+
+    Card(modifier = modifier) {
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.padding(16.dp)) {
                 Icon(
                     painter = painterResource(R.drawable.ic_manager),
                     contentDescription = null,
-                    modifier = Modifier.size(32.dp),
+                    modifier = Modifier.size(24.dp),
                     tint = MiuixTheme.colorScheme.primary
                 )
-                Spacer(Modifier.width(12.dp))
+                Spacer(Modifier.height(8.dp))
                 Text(
                     text = stringResource(CoreR.string.home_app_title),
                     style = MiuixTheme.textStyles.headline2,
-                    color = MiuixTheme.colorScheme.primary,
-                    modifier = Modifier.weight(1f)
                 )
-                when (uiState.appState) {
-                    HomeViewModel.State.OUTDATED -> TextButton(
-                        text = stringResource(CoreR.string.update),
-                        onClick = { viewModel.onManagerPressed() }
+                Text(
+                    text = version,
+                    style = MiuixTheme.textStyles.body2,
+                    color = MiuixTheme.colorScheme.onSurfaceVariantSummary
+                )
+                if (progress in 1..99) {
+                    Spacer(Modifier.height(8.dp))
+                    LinearProgressIndicator(
+                        progress = progress / 100f,
+                        modifier = Modifier.fillMaxWidth()
                     )
-                    HomeViewModel.State.UP_TO_DATE -> TextButton(
-                        text = stringResource(CoreR.string.install),
-                        onClick = { viewModel.onManagerPressed() }
-                    )
-                    else -> {}
                 }
             }
 
-            Spacer(Modifier.height(8.dp))
-
-            InfoRow(
-                label = stringResource(CoreR.string.home_latest_version),
-                value = uiState.managerRemoteVersion.ifEmpty {
-                    stringResource(
-                        if (uiState.appState == HomeViewModel.State.LOADING) CoreR.string.loading
-                        else CoreR.string.not_available
+            Column(
+                modifier = Modifier.align(Alignment.TopEnd).padding(4.dp),
+                verticalArrangement = Arrangement.spacedBy(0.dp),
+            ) {
+                if (Info.env.isActive) {
+                    IconButton(onClick = onHideRestorePressed) {
+                        Icon(
+                            imageVector = hideRestoreIcon,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                            tint = MiuixTheme.colorScheme.primary,
+                        )
+                    }
+                }
+                if (remoteVersion != null) {
+                    UpdateBadge(
+                        version = remoteVersion,
+                        modifier = Modifier.align(Alignment.End).padding(end = 4.dp)
                     )
                 }
-            )
-            InfoRow(
-                label = stringResource(CoreR.string.home_installed_version),
-                value = viewModel.managerInstalledVersion
-            )
-            val context = LocalContext.current
-            InfoRow(
-                label = stringResource(CoreR.string.home_package),
-                value = context.packageName
-            )
+            }
+        }
 
-            if (uiState.managerProgress in 1..99) {
-                Spacer(Modifier.height(8.dp))
-                LinearProgressIndicator(
-                    progress = uiState.managerProgress / 100f,
-                    modifier = Modifier.fillMaxWidth()
+        if (actionLabel != null) {
+            HorizontalDivider(thickness = 0.75.dp)
+            Text(
+                text = actionLabel,
+                style = MiuixTheme.textStyles.body2,
+                color = actionColor,
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = onManagerPressed)
+                    .padding(horizontal = 12.dp, vertical = 12.dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun UpdateBadge(version: String, modifier: Modifier = Modifier) {
+    Text(
+        text = version,
+        color = MiuixTheme.colorScheme.onPrimary,
+        fontSize = 10.sp,
+        maxLines = 1,
+        modifier = modifier
+            .background(MiuixTheme.colorScheme.primary, RoundedCornerShape(6.dp))
+            .padding(horizontal = 6.dp, vertical = 2.dp)
+    )
+}
+
+@Composable
+private fun StatusCard() {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
+        ) {
+            Column(
+                modifier = Modifier.weight(1f).padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = stringResource(CoreR.string.ramdisk),
+                    style = MiuixTheme.textStyles.headline2,
+                )
+                Text(
+                    text = stringResource(if (Info.ramdisk) CoreR.string.yes else CoreR.string.no),
+                    style = MiuixTheme.textStyles.body2,
+                    color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                )
+            }
+            VerticalDivider(thickness = 0.75.dp)
+            Column(
+                modifier = Modifier.weight(1f).padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = stringResource(CoreR.string.zygisk),
+                    style = MiuixTheme.textStyles.headline2,
+                )
+                Text(
+                    text = stringResource(if (Info.isZygiskEnabled) CoreR.string.yes else CoreR.string.no),
+                    style = MiuixTheme.textStyles.body2,
+                    color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                )
+            }
+            VerticalDivider(thickness = 0.75.dp)
+            Column(
+                modifier = Modifier.weight(1f).padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = stringResource(CoreR.string.denylist),
+                    style = MiuixTheme.textStyles.headline2,
+                )
+                Text(
+                    text = stringResource(if (Config.denyList) CoreR.string.enabled else CoreR.string.disabled),
+                    style = MiuixTheme.textStyles.body2,
+                    color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
                 )
             }
         }
@@ -432,143 +725,133 @@ private fun ManagerCard(viewModel: HomeViewModel, uiState: HomeViewModel.UiState
 }
 
 @Composable
-private fun InfoRow(label: String, value: String) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 2.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+private fun SupportBottomSheet(
+    show: MutableState<Boolean>,
+    onLinkClicked: (String) -> Unit,
+) {
+    SuperBottomSheet(
+        show = show,
+        onDismissRequest = { show.value = false },
+        title = stringResource(CoreR.string.home_support_title),
     ) {
-        Text(
-            text = label,
-            style = MiuixTheme.textStyles.body2,
-            color = MiuixTheme.colorScheme.onSurfaceVariantSummary
-        )
-        Text(
-            text = value,
-            style = MiuixTheme.textStyles.body2,
-        )
-    }
-}
-
-@Composable
-private fun SupportCard(onLinkClicked: (String) -> Unit) {
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = stringResource(CoreR.string.home_support_title),
-                style = MiuixTheme.textStyles.headline2,
-            )
-            Spacer(Modifier.height(4.dp))
+        Column(modifier = Modifier.padding(bottom = 16.dp)) {
             Text(
                 text = stringResource(CoreR.string.home_support_content),
                 style = MiuixTheme.textStyles.body2,
-                color = MiuixTheme.colorScheme.onSurfaceVariantSummary
+                color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             )
-            Spacer(Modifier.height(8.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                LinkChip(
-                    icon = CoreR.drawable.ic_patreon,
-                    label = stringResource(CoreR.string.patreon),
-                    onClick = { onLinkClicked(com.topjohnwu.magisk.core.Const.Url.PATREON_URL) }
-                )
-                LinkChip(
-                    icon = CoreR.drawable.ic_paypal,
-                    label = stringResource(CoreR.string.paypal),
-                    onClick = { onLinkClicked("https://paypal.me/magiskdonate") }
-                )
-            }
+            SuperArrow(
+                title = stringResource(CoreR.string.patreon),
+                onClick = {
+                    show.value = false
+                    onLinkClicked(Const.Url.PATREON_URL)
+                },
+                startAction = {
+                    Icon(
+                        painter = painterResource(CoreR.drawable.ic_patreon),
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp),
+                        tint = MiuixTheme.colorScheme.onSurfaceVariantActions
+                    )
+                }
+            )
+            SuperArrow(
+                title = stringResource(CoreR.string.paypal),
+                onClick = {
+                    show.value = false
+                    onLinkClicked("https://paypal.me/magiskdonate")
+                },
+                startAction = {
+                    Icon(
+                        painter = painterResource(CoreR.drawable.ic_paypal),
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp),
+                        tint = MiuixTheme.colorScheme.onSurfaceVariantActions
+                    )
+                }
+            )
         }
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
+private data class LinkInfo(val label: String, val icon: Int, val url: String)
+private data class DeveloperInfo(val name: String, val links: List<LinkInfo>)
+
+private val developers = listOf(
+    DeveloperInfo("topjohnwu", listOf(
+        LinkInfo("Twitter", CoreR.drawable.ic_twitter, "https://twitter.com/topjohnwu"),
+        LinkInfo("GitHub", CoreR.drawable.ic_github, Const.Url.SOURCE_CODE_URL),
+    )),
+    DeveloperInfo("vvb2060", listOf(
+        LinkInfo("Twitter", CoreR.drawable.ic_twitter, "https://twitter.com/vvb2060"),
+        LinkInfo("GitHub", CoreR.drawable.ic_github, "https://github.com/vvb2060"),
+    )),
+    DeveloperInfo("yujincheng08", listOf(
+        LinkInfo("Twitter", CoreR.drawable.ic_twitter, "https://twitter.com/shanasaimoe"),
+        LinkInfo("GitHub", CoreR.drawable.ic_github, "https://github.com/yujincheng08"),
+        LinkInfo("Sponsor", CoreR.drawable.ic_favorite, "https://github.com/sponsors/yujincheng08"),
+    )),
+    DeveloperInfo("rikkawww", listOf(
+        LinkInfo("Twitter", CoreR.drawable.ic_twitter, "https://twitter.com/rikkawww"),
+        LinkInfo("GitHub", CoreR.drawable.ic_github, "https://github.com/rikkawww"),
+    )),
+    DeveloperInfo("canyie", listOf(
+        LinkInfo("Twitter", CoreR.drawable.ic_twitter, "https://twitter.com/canyie2977"),
+        LinkInfo("GitHub", CoreR.drawable.ic_github, "https://github.com/canyie"),
+    )),
+)
+
 @Composable
 private fun DevelopersCard(onLinkClicked: (String) -> Unit) {
-    val developers = listOf(
-        DeveloperInfo("topjohnwu", listOf(
-            LinkInfo("Twitter", CoreR.drawable.ic_twitter, "https://twitter.com/topjohnwu"),
-            LinkInfo("GitHub", CoreR.drawable.ic_github, com.topjohnwu.magisk.core.Const.Url.SOURCE_CODE_URL),
-        )),
-        DeveloperInfo("vvb2060", listOf(
-            LinkInfo("Twitter", CoreR.drawable.ic_twitter, "https://twitter.com/vvb2060"),
-            LinkInfo("GitHub", CoreR.drawable.ic_github, "https://github.com/vvb2060"),
-        )),
-        DeveloperInfo("yujincheng08", listOf(
-            LinkInfo("Twitter", CoreR.drawable.ic_twitter, "https://twitter.com/shanasaimoe"),
-            LinkInfo("GitHub", CoreR.drawable.ic_github, "https://github.com/yujincheng08"),
-            LinkInfo("Sponsor", CoreR.drawable.ic_favorite, "https://github.com/sponsors/yujincheng08"),
-        )),
-        DeveloperInfo("rikkawww", listOf(
-            LinkInfo("Twitter", CoreR.drawable.ic_twitter, "https://twitter.com/rikkawww"),
-            LinkInfo("GitHub", CoreR.drawable.ic_github, "https://github.com/rikkawww"),
-        )),
-        DeveloperInfo("canyie", listOf(
-            LinkInfo("Twitter", CoreR.drawable.ic_twitter, "https://twitter.com/canyie2977"),
-            LinkInfo("GitHub", CoreR.drawable.ic_github, "https://github.com/canyie"),
-        )),
-    )
+    var selectedDev by remember { mutableStateOf<DeveloperInfo?>(null) }
+    val showSheet = rememberSaveable { mutableStateOf(false) }
 
     Card(modifier = Modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = stringResource(CoreR.string.home_follow_title),
-                style = MiuixTheme.textStyles.headline2,
+        developers.forEach { dev ->
+            SuperArrow(
+                title = "@${dev.name}",
+                onClick = {
+                    selectedDev = dev
+                    showSheet.value = true
+                }
             )
-            Spacer(Modifier.height(8.dp))
-            developers.forEach { dev ->
-                DeveloperRow(dev = dev, onLinkClicked = onLinkClicked)
-                Spacer(Modifier.height(4.dp))
+        }
+    }
+
+    val currentDev = selectedDev
+    if (currentDev != null) {
+        SuperBottomSheet(
+            show = showSheet,
+            onDismissRequest = {
+                showSheet.value = false
+                selectedDev = null
+            },
+            title = "@${currentDev.name}",
+        ) {
+            Column(modifier = Modifier.padding(bottom = 16.dp)) {
+                currentDev.links.forEach { link ->
+                    SuperArrow(
+                        title = link.label,
+                        onClick = {
+                            showSheet.value = false
+                            onLinkClicked(link.url)
+                            selectedDev = null
+                        },
+                        startAction = {
+                            Icon(
+                                painter = painterResource(link.icon),
+                                contentDescription = null,
+                                modifier = Modifier.size(24.dp),
+                                tint = MiuixTheme.colorScheme.onSurfaceVariantActions
+                            )
+                        }
+                    )
+                }
             }
         }
     }
 }
-
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-private fun DeveloperRow(dev: DeveloperInfo, onLinkClicked: (String) -> Unit) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = "@${dev.name}",
-            style = MiuixTheme.textStyles.body1,
-        )
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            dev.links.forEach { link ->
-                LinkChip(
-                    icon = link.icon,
-                    label = link.label,
-                    onClick = { onLinkClicked(link.url) }
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun LinkChip(icon: Int, label: String, onClick: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .clickable(onClick = onClick)
-            .padding(vertical = 6.dp, horizontal = 4.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(4.dp)
-    ) {
-        Icon(
-            painter = painterResource(icon),
-            contentDescription = label,
-            modifier = Modifier.size(18.dp),
-            tint = MiuixTheme.colorScheme.onSurfaceVariantActions
-        )
-        Text(
-            text = label,
-            style = MiuixTheme.textStyles.body2,
-            color = MiuixTheme.colorScheme.onSurfaceVariantActions
-        )
-    }
-}
-
-private data class DeveloperInfo(val name: String, val links: List<LinkInfo>)
-private data class LinkInfo(val label: String, val icon: Int, val url: String)
 
 private fun openLink(context: Context, url: String) {
     try {
@@ -597,6 +880,7 @@ private fun InstallBottomSheet(
                     color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                 )
+                HorizontalDivider(thickness = 0.75.dp)
             }
 
             if (!installVm.skipOptions) {
@@ -860,6 +1144,79 @@ private fun EnvFixComposableDialog(
                 modifier = Modifier.weight(1f),
                 colors = ButtonDefaults.textButtonColorsPrimary()
             )
+        }
+    }
+}
+
+@Composable
+private fun HideAppDialog(onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
+    val showState = rememberSaveable { mutableStateOf(true) }
+    var appName by rememberSaveable { mutableStateOf("Settings") }
+    val isError = appName.length > AppMigration.MAX_LABEL_LENGTH || appName.isBlank()
+
+    top.yukonga.miuix.kmp.extra.SuperDialog(
+        show = showState,
+        title = stringResource(CoreR.string.settings_hide_app_title),
+        onDismissRequest = onDismiss,
+        insideMargin = DpSize(24.dp, 24.dp)
+    ) {
+        Column(modifier = Modifier.padding(top = 8.dp)) {
+            top.yukonga.miuix.kmp.basic.TextField(
+                value = appName,
+                onValueChange = { appName = it },
+                modifier = Modifier.fillMaxWidth(),
+                label = stringResource(CoreR.string.settings_app_name_hint),
+            )
+            Spacer(Modifier.height(16.dp))
+            Row(horizontalArrangement = Arrangement.SpaceBetween) {
+                TextButton(
+                    text = stringResource(android.R.string.cancel),
+                    onClick = onDismiss,
+                    modifier = Modifier.weight(1f)
+                )
+                Spacer(Modifier.width(20.dp))
+                TextButton(
+                    text = stringResource(android.R.string.ok),
+                    onClick = { if (!isError) onConfirm(appName) },
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.textButtonColorsPrimary()
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun RestoreAppDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
+    val showState = rememberSaveable { mutableStateOf(true) }
+
+    top.yukonga.miuix.kmp.extra.SuperDialog(
+        show = showState,
+        title = stringResource(CoreR.string.settings_restore_app_title),
+        onDismissRequest = onDismiss,
+        insideMargin = DpSize(24.dp, 24.dp)
+    ) {
+        Column(modifier = Modifier.padding(top = 8.dp)) {
+            Text(
+                text = stringResource(CoreR.string.restore_app_confirmation),
+                style = MiuixTheme.textStyles.body1,
+                color = MiuixTheme.colorScheme.onSurface,
+            )
+            Spacer(Modifier.height(16.dp))
+            Row(horizontalArrangement = Arrangement.SpaceBetween) {
+                TextButton(
+                    text = stringResource(android.R.string.cancel),
+                    onClick = onDismiss,
+                    modifier = Modifier.weight(1f)
+                )
+                Spacer(Modifier.width(20.dp))
+                TextButton(
+                    text = stringResource(android.R.string.ok),
+                    onClick = onConfirm,
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.textButtonColorsPrimary()
+                )
+            }
         }
     }
 }

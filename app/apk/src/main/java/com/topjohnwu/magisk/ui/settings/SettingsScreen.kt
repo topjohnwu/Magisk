@@ -249,46 +249,6 @@ private fun AppSettingsSection(viewModel: SettingsViewModel) {
             }
         )
 
-        // Hide / Restore
-        if (Info.env.isActive && Const.USER_ID == 0) {
-            val loadingDialog = rememberLoadingDialog()
-            val scope = rememberCoroutineScope()
-            if (hidden) {
-                var showRestoreDialog by remember { mutableStateOf(false) }
-                RestoreDialog(
-                    show = showRestoreDialog,
-                    onDismiss = { showRestoreDialog = false },
-                    onConfirm = {
-                        showRestoreDialog = false
-                        scope.launch {
-                            loadingDialog.withLoading { viewModel.restoreApp(context) }
-                        }
-                    }
-                )
-                SuperArrow(
-                    title = stringResource(CoreR.string.settings_restore_app_title),
-                    summary = stringResource(CoreR.string.settings_restore_app_summary),
-                    onClick = { showRestoreDialog = true }
-                )
-            } else {
-                var showHideDialog by remember { mutableStateOf(false) }
-                HideAppDialog(
-                    show = showHideDialog,
-                    onDismiss = { showHideDialog = false },
-                    onConfirm = { name ->
-                        showHideDialog = false
-                        scope.launch {
-                            loadingDialog.withLoading { viewModel.hideApp(context, name) }
-                        }
-                    }
-                )
-                SuperArrow(
-                    title = stringResource(CoreR.string.settings_hide_app_title),
-                    summary = stringResource(CoreR.string.settings_hide_app_summary),
-                    onClick = { showHideDialog = true }
-                )
-            }
-        }
     }
 }
 
