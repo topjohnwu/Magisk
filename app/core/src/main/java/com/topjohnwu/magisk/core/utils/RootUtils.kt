@@ -17,7 +17,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
-import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.AbstractQueuedSynchronizer
 
 class RootUtils(stub: Any?) : RootService() {
@@ -127,20 +126,14 @@ class RootUtils(stub: Any?) : RootService() {
             }
         }
 
-        fun await(timeoutMs: Long = 0): Boolean {
+        fun await() {
             if (!Info.isRooted)
-                return true
+                return
             if (!ShellUtils.onMainThread()) {
-                return if (timeoutMs > 0) {
-                    tryAcquireSharedNanos(1, TimeUnit.MILLISECONDS.toNanos(timeoutMs))
-                } else {
-                    acquireSharedInterruptibly(1)
-                    true
-                }
+                acquireSharedInterruptibly(1)
             } else if (state != 0) {
                 throw IllegalStateException("Cannot await on the main thread")
             }
-            return true
         }
     }
 

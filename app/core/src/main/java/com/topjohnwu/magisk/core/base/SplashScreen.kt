@@ -61,17 +61,7 @@ class SplashController<T>(private val activity: T)
         } else {
             Shell.getShell(Shell.EXECUTOR) {
                 if (isRunningAsStub && !it.isRoot) {
-                    activity.runOnUiThread {
-                        // Exit splash even in non-root stub mode, otherwise the app stays stuck
-                        // on the splash theme forever and the dialog is never reachable.
-                        splashShown = true
-                        if (activity.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
-                            doCreateUi(savedInstanceState)
-                        } else {
-                            shouldCreateUiOnResume = true
-                        }
-                        activity.showInvalidStateMessage()
-                    }
+                    activity.showInvalidStateMessage()
                     return@getShell
                 }
                 activity.initializeApp()
@@ -166,8 +156,6 @@ class SplashController<T>(private val activity: T)
         ServiceLocator.networkService
 
         // Wait for root service
-        if (!RootUtils.Connection.await(timeoutMs = 5000)) {
-            Timber.w("Root service connection timed out during splash init")
-        }
+        RootUtils.Connection.await()
     }
 }

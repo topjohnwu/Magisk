@@ -47,32 +47,3 @@ setupStubApk()
 dependencies {
     implementation(project(":shared"))
 }
-
-// Work around case-mismatched generated component sources on Windows (lsparanoid bug)
-val fixComponentCase by tasks.registering {
-    inputs.dir(layout.buildDirectory.dir("generated/debug/components"))
-    outputs.upToDateWhen { false }
-    doLast {
-        val generatedDir = layout.buildDirectory.dir("generated/debug/components").get().asFile
-        if (generatedDir.exists()) {
-            generatedDir.walkTopDown()
-                .filter { it.isFile && it.extension == "java" }
-                .forEach { file ->
-                    val className = Regex("public class\\s+(\\w+)").find(file.readText())
-                        ?.groupValues?.getOrNull(1)
-                    if (className != null && file.nameWithoutExtension != className) {
-                        val target = file.resolveSibling("$className.java")
-                        if (!target.exists()) {
-                            file.renameTo(target)
-                        }
-                    }
-                }
-        }
-    }
-}
-
-tasks.withType<JavaCompile>().configureEach {
-    if (name.contains("Debug", ignoreCase = true)) {
-        dependsOn(fixComponentCase)
-    }
-}
