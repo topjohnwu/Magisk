@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.core.su
 import android.content.Context
 import android.os.Bundle
 import android.widget.Toast
+import com.topjohnwu.magisk.core.AppContext
 import com.topjohnwu.magisk.core.BuildConfig
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.R
@@ -91,6 +92,18 @@ object SuCallbackHandler {
 
         notify(context, policy >= SuPolicy.ALLOW, appName)
         SuEvents.notifyPolicyChanged()
+    }
+
+    fun notify(granted: Boolean, appName: String) {
+        when (Config.suNotification) {
+            Config.Value.NOTIFICATION_TOAST -> {
+                val resId = if (granted) R.string.su_allow_toast else R.string.su_deny_toast
+                AppContext.toast(AppContext.getString(resId, appName), Toast.LENGTH_SHORT)
+            }
+            Config.Value.NOTIFICATION_STATUS_BAR -> {
+                Notifications.suNotification(granted, appName)
+            }
+        }
     }
 
     private fun notify(context: Context, granted: Boolean, appName: String) {
