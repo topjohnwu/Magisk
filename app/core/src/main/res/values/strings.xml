@@ -40,7 +40,10 @@
     <string name="install_start">Let\'s go</string>
     <string name="manager_download_install">Press to download and install</string>
     <string name="direct_install">Direct install (Recommended)</string>
+    <string name="direct_install_summary">Directly install Magisk to the boot partition</string>
     <string name="install_inactive_slot">Install to inactive slot (After OTA)</string>
+    <string name="install_inactive_slot_summary">Install to the inactive slot after an OTA update</string>
+    <string name="select_patch_file_summary">Patch a raw image, ODIN tar, or payload.bin file</string>
     <string name="install_inactive_slot_msg">Your device will be FORCED to boot to the current inactive slot after a reboot!\nOnly use this option after OTA is done.\nContinue?</string>
     <string name="setup_title">Additional setup</string>
     <string name="select_patch_file">Select and patch a file</string>
@@ -73,7 +76,11 @@
     <string name="su_revoke_title">Revoke?</string>
     <string name="su_revoke_msg">Confirm to revoke %1$s Superuser rights</string>
     <string name="toast">Toast</string>
+    <string name="notification">Notification</string>
     <string name="none">None</string>
+    <string name="su_notification_channel">Superuser Notifications</string>
+    <string name="su_notification_granted_title">Superuser Granted</string>
+    <string name="su_notification_denied_title">Superuser Denied</string>
     <string name="superuser_toggle_notification">Notifications</string>
     <string name="superuser_toggle_revoke">Revoke</string>
     <string name="superuser_policy_none">No apps have asked for Superuser permission yet.</string>
@@ -186,6 +193,13 @@
     <string name="settings_su_restrict_title">Restrict root capabilities</string>
     <string name="settings_su_restrict_summary">Will restrict new Superuser apps by default. Warning: this will break most apps. Don\'t enable it unless you know what you\'re doing.</string>
     <string name="settings_customization">Customization</string>
+    <string name="settings_color_mode">Color mode</string>
+    <string name="color_mode_system">System</string>
+    <string name="color_mode_light">Light</string>
+    <string name="color_mode_dark">Dark</string>
+    <string name="color_mode_monet_system">Monet (System)</string>
+    <string name="color_mode_monet_light">Monet (Light)</string>
+    <string name="color_mode_monet_dark">Monet (Dark)</string>
     <string name="setting_add_shortcut_summary">Add a pretty shortcut to the home screen in case the name and icon are difficult to recognize after hiding the app</string>
     <string name="settings_doh_title">DNS over HTTPS</string>
     <string name="settings_doh_description">Workaround DNS poisoning in some nations</string>

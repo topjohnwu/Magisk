@@ -12,9 +12,14 @@ abstract class AsyncLoadViewModel : BaseViewModel() {
     @MainThread
     fun startLoading() {
         if (loadingJob?.isActive == true) {
-            // Prevent multiple jobs from running at the same time
             return
         }
+        loadingJob = viewModelScope.launch { doLoadWork() }
+    }
+
+    @MainThread
+    fun reload() {
+        loadingJob?.cancel()
         loadingJob = viewModelScope.launch { doLoadWork() }
     }
 

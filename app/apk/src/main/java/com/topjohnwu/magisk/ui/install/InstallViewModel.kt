@@ -96,6 +96,9 @@ class InstallViewModel(svc: NetworkService, markwon: Markwon) : BaseViewModel() 
 
     fun onPatchFileSelected(uri: Uri) {
         _uiState.update { it.copy(patchUri = uri) }
+        if (_uiState.value.method == Method.PATCH) {
+            install()
+        }
     }
 
     fun install() {

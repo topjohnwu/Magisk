@@ -18,10 +18,12 @@ import com.topjohnwu.magisk.core.R
 import com.topjohnwu.magisk.core.data.magiskdb.PolicyDao
 import com.topjohnwu.magisk.core.ktx.getLabel
 import com.topjohnwu.magisk.core.model.su.SuPolicy
+import com.topjohnwu.magisk.core.su.SuEvents
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -51,6 +53,13 @@ class SuperuserViewModel(
 ) : AsyncLoadViewModel() {
 
     var authenticate: (onSuccess: () -> Unit) -> Unit = { it() }
+
+    init {
+        @OptIn(kotlinx.coroutines.FlowPreview::class)
+        viewModelScope.launch {
+            SuEvents.policyChanged.debounce(500).collect { reload() }
+        }
+    }
 
     data class UiState(
         val loading: Boolean = true,
