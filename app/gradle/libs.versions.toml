@@ -21,6 +21,7 @@ bcpkix = { module = "org.bouncycastle:bcpkix-jdk18on", version = "1.83" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil-compose" }
 coil-svg = { module = "io.coil-kt:coil-svg", version.ref = "coil-compose" }
 commons-compress = { module = "org.apache.commons:commons-compress", version = "1.28.0" }
+foundation = { module = "androidx.compose.foundation:foundation" }
 material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 material3 = { module = "androidx.compose.material3:material3" }
 navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation-compose" }
