@@ -36,7 +36,6 @@ android {
 
     buildTypes {
         release {
-            buildConfigField("boolean", "COMPOSE_UI", "false")
             isMinifyEnabled = true
             isShrinkResources = true
         }
