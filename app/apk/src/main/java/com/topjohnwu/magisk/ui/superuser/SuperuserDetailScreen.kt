@@ -131,26 +131,17 @@ fun SuperuserDetailScreen(
                         if (uiState.suRestrict || item.isRestricted) {
                             SwitchRow(
                                 title = stringResource(CoreR.string.settings_su_restrict_title),
-                                summary = stringResource(
-                                    if (item.isRestricted) CoreR.string.enabled else CoreR.string.disabled
-                                ),
                                 checked = item.isRestricted,
                                 onCheckedChange = { viewModel.toggleRestrict(item) }
                             )
                         }
                         SwitchRow(
                             title = stringResource(CoreR.string.superuser_toggle_notification),
-                            summary = stringResource(
-                                if (item.notification) CoreR.string.enabled else CoreR.string.disabled
-                            ),
                             checked = item.notification,
                             onCheckedChange = { viewModel.updateNotify(item) }
                         )
                         SwitchRow(
                             title = stringResource(CoreR.string.logs),
-                            summary = stringResource(
-                                if (item.logging) CoreR.string.enabled else CoreR.string.disabled
-                            ),
                             checked = item.logging,
                             onCheckedChange = { viewModel.updateLogging(item) }
                         )
@@ -188,7 +179,6 @@ fun SuperuserDetailScreen(
 @Composable
 private fun SwitchRow(
     title: String,
-    summary: String,
     checked: Boolean,
     onCheckedChange: () -> Unit,
 ) {
@@ -198,17 +188,11 @@ private fun SwitchRow(
             .padding(horizontal = 16.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = title,
-                style = MiuixTheme.textStyles.body1,
-            )
-            Text(
-                text = summary,
-                style = MiuixTheme.textStyles.body2,
-                color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
-            )
-        }
+        Text(
+            text = title,
+            style = MiuixTheme.textStyles.body1,
+            modifier = Modifier.weight(1f),
+        )
         Spacer(Modifier.width(16.dp))
         Switch(
             checked = checked,
