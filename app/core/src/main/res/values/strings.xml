@@ -70,7 +70,6 @@
     <string name="install_select_patch_file_subtitle">Select a boot image to patch</string>
     <string name="install_direct_install_subtitle">Recommended for most users</string>
     <string name="install_inactive_slot_subtitle">Useful after OTA updates</string>
-    <string name="after_ota">After OTA</string>
     <string name="install_complete_options_first">Please complete the options step first</string>
     <string name="install_inactive_slot_msg">Your device will be FORCED to boot to the current inactive slot after a reboot!\nOnly use this option after OTA is done.\nContinue?</string>
     <string name="install_inactive_slot_caution">CAUTION: This will switch the active boot slot.</string>
@@ -132,6 +131,9 @@
     <string name="hide_filter_hint">Filter by name</string>
     <string name="hide_search">Search</string>
     <string name="denylist_search_filters">Search &amp; filters</string>
+    <string name="denylist_sort_active_first">Active first</string>
+    <string name="denylist_sort_name_asc">Name A-Z</string>
+    <string name="denylist_sort_name_desc">Name Z-A</string>
 
     <!--Module-->
     <string name="no_info_provided">(No info provided)</string>

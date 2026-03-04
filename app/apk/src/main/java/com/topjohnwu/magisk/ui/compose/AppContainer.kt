@@ -154,88 +154,122 @@ fun MagiskAppContainer(
                         .fillMaxSize()
                         .padding(bottom = if (reserveBottomForLogs) LOGS_RESERVED_BOTTOM_SPACE else 0.dp),
                     enterTransition = {
-                        fadeIn(animationSpec = tween(durationMillis = 140, easing = LinearOutSlowInEasing))
+                        val isTopLevelNav = initialState.destination.route in listOf(AppRoute.Home, AppRoute.Superuser, AppRoute.Modules, AppRoute.Logs) &&
+                                targetState.destination.route in listOf(AppRoute.Home, AppRoute.Superuser, AppRoute.Modules, AppRoute.Logs)
+                        if (isTopLevelNav) {
+                            fadeIn(animationSpec = tween(300, easing = LinearOutSlowInEasing)) +
+                                    scaleIn(initialScale = 0.97f, animationSpec = tween(300, easing = FastOutSlowInEasing))
+                        } else {
+                            slideIntoContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.Start,
+                                animationSpec = tween(400, easing = FastOutSlowInEasing)
+                            ) + fadeIn(animationSpec = tween(400, easing = LinearOutSlowInEasing)) +
+                                    scaleIn(initialScale = 0.95f, animationSpec = tween(400, easing = FastOutSlowInEasing))
+                        }
                     },
                     exitTransition = {
-                        fadeOut(animationSpec = tween(durationMillis = 110, easing = LinearEasing))
+                        val isTopLevelNav = initialState.destination.route in listOf(AppRoute.Home, AppRoute.Superuser, AppRoute.Modules, AppRoute.Logs) &&
+                                targetState.destination.route in listOf(AppRoute.Home, AppRoute.Superuser, AppRoute.Modules, AppRoute.Logs)
+                        if (isTopLevelNav) {
+                            fadeOut(animationSpec = tween(300, easing = LinearOutSlowInEasing)) +
+                                    scaleOut(targetScale = 1.03f, animationSpec = tween(300, easing = FastOutSlowInEasing))
+                        } else {
+                            slideOutOfContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.Start,
+                                animationSpec = tween(400, easing = FastOutSlowInEasing)
+                            ) + fadeOut(animationSpec = tween(400, easing = LinearEasing)) +
+                                    scaleOut(targetScale = 1.05f, animationSpec = tween(400, easing = FastOutSlowInEasing))
+                        }
                     },
                     popEnterTransition = {
-                        fadeIn(animationSpec = tween(durationMillis = 140, easing = LinearOutSlowInEasing))
+                        val isTopLevelNav = initialState.destination.route in listOf(AppRoute.Home, AppRoute.Superuser, AppRoute.Modules, AppRoute.Logs) &&
+                                targetState.destination.route in listOf(AppRoute.Home, AppRoute.Superuser, AppRoute.Modules, AppRoute.Logs)
+                        if (isTopLevelNav) {
+                            fadeIn(animationSpec = tween(300, easing = LinearOutSlowInEasing)) +
+                                    scaleIn(initialScale = 1.03f, animationSpec = tween(300, easing = FastOutSlowInEasing))
+                        } else {
+                            slideIntoContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.End,
+                                animationSpec = tween(400, easing = FastOutSlowInEasing)
+                            ) + fadeIn(animationSpec = tween(400, easing = LinearOutSlowInEasing)) +
+                                    scaleIn(initialScale = 1.05f, animationSpec = tween(400, easing = FastOutSlowInEasing))
+                        }
                     },
                     popExitTransition = {
-                        fadeOut(animationSpec = tween(durationMillis = 110, easing = LinearEasing))
+                        val isTopLevelNav = initialState.destination.route in listOf(AppRoute.Home, AppRoute.Superuser, AppRoute.Modules, AppRoute.Logs) &&
+                                targetState.destination.route in listOf(AppRoute.Home, AppRoute.Superuser, AppRoute.Modules, AppRoute.Logs)
+                        if (isTopLevelNav) {
+                            fadeOut(animationSpec = tween(300, easing = LinearOutSlowInEasing)) +
+                                    scaleOut(targetScale = 0.97f, animationSpec = tween(300, easing = FastOutSlowInEasing))
+                        } else {
+                            slideOutOfContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.End,
+                                animationSpec = tween(400, easing = FastOutSlowInEasing)
+                            ) + fadeOut(animationSpec = tween(400, easing = LinearEasing)) +
+                                    scaleOut(targetScale = 0.95f, animationSpec = tween(400, easing = FastOutSlowInEasing))
+                        }
                     }
                 ) {
                     composable(AppRoute.Home) {
-                        RouteContentEnter {
-                            HomeScreen(
-                                rebootRequestToken = if (homeRebootRequestToken > homeRebootConsumedToken) {
-                                    homeRebootRequestToken
-                                } else {
-                                    0
-                                },
-                                onRebootTokenConsumed = {
-                                    homeRebootConsumedToken = homeRebootRequestToken
-                                },
-                                onOpenInstall = { navController.navigate(AppRoute.Install) },
-                                onOpenUninstall = { navController.navigate(AppRoute.flash(Const.Value.UNINSTALL, null)) }
-                            )
-                        }
+                        HomeScreen(
+                            rebootRequestToken = if (homeRebootRequestToken > homeRebootConsumedToken) {
+                                homeRebootRequestToken
+                            } else {
+                                0
+                            },
+                            onRebootTokenConsumed = {
+                                homeRebootConsumedToken = homeRebootRequestToken
+                            },
+                            onOpenInstall = { navController.navigate(AppRoute.Install) },
+                            onOpenUninstall = { navController.navigate(AppRoute.flash(Const.Value.UNINSTALL, null)) }
+                        )
                     }
                     composable(AppRoute.Modules) { ModuleScreen(onInstallZip = { uri -> navController.navigate(AppRoute.flash(Const.Value.FLASH_ZIP, uri.toString())) }, onRunAction = { id, name -> navController.navigate(AppRoute.moduleAction(id, name)) }) }
                     composable(AppRoute.Superuser) { SuperuserScreen(onOpenLogs = { navController.navigate(AppRoute.History) }) }
-                    composable(AppRoute.Logs) { RouteContentEnter { LogsScreen() } }
+                    composable(AppRoute.Logs) { LogsScreen() }
                     
                     composable(AppRoute.Settings) {
-                        RouteContentEnter {
-                            SettingsScreen(
-                                onOpenDenyList = { navController.navigate(AppRoute.DenyList) },
-                                onOpenTheme = { navController.navigate(AppRoute.Theme) }
-                            )
-                        }
+                        SettingsScreen(
+                            onOpenDenyList = { navController.navigate(AppRoute.DenyList) },
+                            onOpenTheme = { navController.navigate(AppRoute.Theme) }
+                        )
                     }
                     composable(AppRoute.Theme) {
-                        RouteContentEnter {
-                            ThemeScreen(
-                                onThemeChanged = { (context as? android.app.Activity)?.recreate() }
-                            )
-                        }
+                        ThemeScreen(
+                            onThemeChanged = { (context as? android.app.Activity)?.recreate() }
+                        )
                     }
-                    composable(AppRoute.History) { RouteContentEnter { SuperuserLogsScreen() } }
-                    composable(AppRoute.DenyList) { RouteContentEnter { DenyListScreen(onBack = { navController.popBackStack() }) } }
-                    composable(AppRoute.Install) { RouteContentEnter { InstallScreen(onStartFlash = { action, uri -> navController.navigate(AppRoute.flash(action, uri?.toString())) }) } }
+                    composable(AppRoute.History) { SuperuserLogsScreen() }
+                    composable(AppRoute.DenyList) { DenyListScreen(onBack = { navController.popBackStack() }) }
+                    composable(AppRoute.Install) { InstallScreen(onStartFlash = { action, uri -> navController.navigate(AppRoute.flash(action, uri?.toString())) }) }
                     composable(route = AppRoute.FlashPattern, arguments = listOf(navArgument("action") { type = NavType.StringType }, navArgument("uri") { type = NavType.StringType; nullable = true; defaultValue = null })) { entry ->
                         val action = entry.arguments?.getString("action").orEmpty()
                         val uriArg = entry.arguments?.getString("uri")
-                        RouteContentEnter {
-                            FlashScreen(
-                                action = action,
-                                uriArg = uriArg,
-                                onTitleStateChange = { title, subtitle, processState ->
-                                    flashTitleOverride = title
-                                    flashSubtitleOverride = subtitle
-                                    flashProcessStateOverride = processState
-                                },
-                                onBack = { navController.popBackStack() }
-                            )
-                        }
+                        FlashScreen(
+                            action = action,
+                            uriArg = uriArg,
+                            onTitleStateChange = { title, subtitle, processState ->
+                                flashTitleOverride = title
+                                flashSubtitleOverride = subtitle
+                                flashProcessStateOverride = processState
+                            },
+                            onBack = { navController.popBackStack() }
+                        )
                     }
                     composable(route = AppRoute.ModuleActionPattern, arguments = listOf(navArgument("id") { type = NavType.StringType }, navArgument("name") { type = NavType.StringType; defaultValue = "" })) { entry ->
                         val id = entry.arguments?.getString("id").orEmpty()
                         val name = entry.arguments?.getString("name").orEmpty()
                         val safeName = runCatching { Uri.decode(name) }.getOrDefault(name)
-                        RouteContentEnter {
-                            ModuleActionScreen(
-                                actionId = id,
-                                actionName = safeName,
-                                onTitleStateChange = { title, subtitle, processState ->
-                                    moduleRunTitleOverride = title
-                                    moduleRunSubtitleOverride = subtitle
-                                    moduleRunProcessStateOverride = processState
-                                },
-                                onBack = { navController.popBackStack() }
-                            )
-                        }
+                        ModuleActionScreen(
+                            actionId = id,
+                            actionName = safeName,
+                            onTitleStateChange = { title, subtitle, processState ->
+                                moduleRunTitleOverride = title
+                                moduleRunSubtitleOverride = subtitle
+                                moduleRunProcessStateOverride = processState
+                            },
+                            onBack = { navController.popBackStack() }
+                        )
                     }
                 }
 
@@ -494,23 +528,6 @@ private fun ExpressiveSnackbar(snackbarData: SnackbarData) {
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun RouteContentEnter(
-    content: @Composable () -> Unit
-) {
-    val visibleState = remember {
-        MutableTransitionState(false).apply { targetState = true }
-    }
-    AnimatedVisibility(
-        visibleState = visibleState,
-        enter = fadeIn(animationSpec = tween(durationMillis = 120, easing = LinearOutSlowInEasing)),
-        exit = fadeOut(animationSpec = tween(durationMillis = 80, easing = LinearEasing)),
-        label = "routeContentEnter"
-    ) {
-        content()
     }
 }
 

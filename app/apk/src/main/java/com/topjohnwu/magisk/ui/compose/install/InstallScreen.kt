@@ -171,7 +171,6 @@ fun InstallScreen(
                                         subtitle = stringResource(id = CoreR.string.install_inactive_slot_subtitle),
                                         selected = state.method == InstallMethod.InactiveSlot,
                                         icon = Icons.Rounded.DynamicFeed,
-                                        isOta = true,
                                         onClick = { showSlotWarning = true }
                                     )
                                 }
@@ -234,10 +233,16 @@ fun InstallScreen(
             onDismissRequest = { showSlotWarning = false },
             title = { 
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Surface(color = MaterialTheme.colorScheme.errorContainer, shape = CircleShape, modifier = Modifier.size(36.dp)) {
+                    Surface(color = MaterialTheme.colorScheme.errorContainer, shape = CircleShape, modifier = Modifier.size(32.dp)) {
                         Icon(Icons.Rounded.Warning, null, modifier = Modifier.padding(8.dp), tint = MaterialTheme.colorScheme.onErrorContainer)
                     }
-                    Text(stringResource(id = CoreR.string.install_inactive_slot), fontWeight = FontWeight.Black) 
+                    Text(
+                        text = stringResource(id = CoreR.string.install_inactive_slot),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
                 }
             },
             text = { 
@@ -360,7 +365,6 @@ private fun ExpressiveMethodRow(
     subtitle: String, 
     selected: Boolean, 
     icon: ImageVector, 
-    isOta: Boolean = false,
     onClick: () -> Unit
 ) {
     val backgroundColor by animateColorAsState(
@@ -400,32 +404,10 @@ private fun ExpressiveMethodRow(
                         title,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.ExtraBold,
-                        color = if (selected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant
+                        color = if (selected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
-                    if (isOta) {
-                        val chipContainer = if (selected) {
-                            MaterialTheme.colorScheme.secondary.copy(alpha = 0.16f)
-                        } else {
-                            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.40f)
-                        }
-                        val chipText = if (selected) {
-                            MaterialTheme.colorScheme.secondary
-                        } else {
-                            MaterialTheme.colorScheme.onSurfaceVariant
-                        }
-                        Surface(
-                            color = chipContainer,
-                            shape = RoundedCornerShape(8.dp)
-                        ) {
-                            Text(
-                                stringResource(id = CoreR.string.after_ota).uppercase(),
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
-                                style = MaterialTheme.typography.labelSmall,
-                                fontWeight = FontWeight.Black,
-                                color = chipText
-                            )
-                        }
-                    }
                 }
                 Text(
                     subtitle,

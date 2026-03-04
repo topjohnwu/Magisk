@@ -3,22 +3,21 @@ package com.topjohnwu.magisk.ui.compose.denylist
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
-import androidx.activity.compose.BackHandler
+import androidx.annotation.StringRes
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.ArrowRight
+import androidx.compose.material.icons.automirrored.rounded.NavigateNext
+import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.SettingsSuggest
+import androidx.compose.material.icons.rounded.SwapVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,10 +25,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.font.FontWeight
@@ -52,13 +53,11 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.Locale
 
 @Composable
 fun DenyListScreen(
@@ -77,9 +76,9 @@ fun DenyListScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 20.dp, vertical = 12.dp),
-            contentPadding = PaddingValues(bottom = 140.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+                .padding(horizontal = 20.dp),
+            contentPadding = PaddingValues(top = 16.dp, bottom = 140.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             item {
                 DenyListSearchSection(
@@ -88,7 +87,9 @@ fun DenyListScreen(
                     showSystem = state.showSystem,
                     onToggleSystem = { viewModel.setShowSystem(!state.showSystem) },
                     showOs = state.showOs,
-                    onToggleOs = { viewModel.setShowOs(!state.showOs) }
+                    onToggleOs = { viewModel.setShowOs(!state.showOs) },
+                    sortMethod = state.sortMethod,
+                    onSortMethodSelected = viewModel::setSortMethod
                 )
             }
             when {
@@ -111,7 +112,7 @@ fun DenyListScreen(
                 }
                 else -> {
                     items(state.items, key = { it.packageName }) { item ->
-                        OrganicDenyListCard(
+                        StylishDenyListCard(
                             item = item,
                             onToggleExpanded = { viewModel.toggleExpanded(item.packageName) },
                             onToggleApp = {
@@ -147,199 +148,277 @@ private fun DenyListSearchSection(
     showSystem: Boolean,
     onToggleSystem: () -> Unit,
     showOs: Boolean,
-    onToggleOs: () -> Unit
+    onToggleOs: () -> Unit,
+    sortMethod: DenyListSortMethod,
+    onSortMethodSelected: (DenyListSortMethod) -> Unit
 ) {
+    var showSortMenu by remember { mutableStateOf(false) }
     val chipColors = FilterChipDefaults.filterChipColors(
         containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
         labelColor = MaterialTheme.colorScheme.onSurfaceVariant,
         selectedContainerColor = MaterialTheme.colorScheme.primary,
-        selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
-        disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.32f),
-        disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.45f)
+        selectedLabelColor = MaterialTheme.colorScheme.onPrimary
     )
-    Column {
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 12.dp)
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Surface(
-                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f),
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.size(32.dp)
-            ) {
-                Icon(
-                    Icons.Rounded.Search, null,
-                    modifier = Modifier.padding(6.dp),
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-            }
-            Spacer(Modifier.width(16.dp))
             Text(
                 text = stringResource(id = CoreR.string.denylist_search_filters),
                 style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.Black,
                 letterSpacing = 1.2.sp,
-                color = MaterialTheme.colorScheme.outline
+                color = MaterialTheme.colorScheme.outline,
+                modifier = Modifier.weight(1f)
             )
-        }
-        
-        ElevatedCard(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(28.dp),
-            colors = CardDefaults.elevatedCardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
-            ),
-            elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
-        ) {
-            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                OutlinedTextField(
-                    value = query,
-                    onValueChange = onQueryChange,
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    placeholder = { Text(text = AppContext.getString(CoreR.string.hide_filter_hint)) },
-                    shape = RoundedCornerShape(16.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                        unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-                        focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                        focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        cursorColor = MaterialTheme.colorScheme.primary,
-                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
-                    )
+
+            Box {
+                AssistChip(
+                    onClick = { showSortMenu = true },
+                    label = {
+                        Text(
+                            text = stringResource(id = sortMethod.labelRes),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Rounded.SwapVert,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    },
+                    shape = RoundedCornerShape(12.dp)
                 )
-                
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    FilterChip(
-                        selected = showSystem,
-                        onClick = onToggleSystem,
-                        label = { Text(stringResource(id = CoreR.string.show_system_app), fontWeight = FontWeight.Black) },
-                        shape = RoundedCornerShape(12.dp),
-                        colors = chipColors
-                    )
-                    FilterChip(
-                        selected = showOs,
-                        enabled = showSystem,
-                        onClick = onToggleOs,
-                        label = { Text(stringResource(id = CoreR.string.show_os_app), fontWeight = FontWeight.Black) },
-                        shape = RoundedCornerShape(12.dp),
-                        colors = chipColors
-                    )
+
+                DropdownMenu(
+                    expanded = showSortMenu,
+                    onDismissRequest = { showSortMenu = false }
+                ) {
+                    DenyListSortMethod.entries.forEach { method ->
+                        DropdownMenuItem(
+                            text = { Text(stringResource(id = method.labelRes)) },
+                            onClick = {
+                                onSortMethodSelected(method)
+                                showSortMenu = false
+                            },
+                            leadingIcon = if (method == sortMethod) {
+                                { Icon(Icons.Rounded.Check, contentDescription = null) }
+                            } else {
+                                null
+                            }
+                        )
+                    }
                 }
             }
+        }
+
+        OutlinedTextField(
+            value = query,
+            onValueChange = onQueryChange,
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            placeholder = { Text(text = AppContext.getString(CoreR.string.hide_filter_hint)) },
+            leadingIcon = { Icon(Icons.Rounded.Search, null) },
+            shape = RoundedCornerShape(16.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
+            )
+        )
+        
+        Row(
+            modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            FilterChip(
+                selected = showSystem,
+                onClick = onToggleSystem,
+                label = { Text(stringResource(id = CoreR.string.show_system_app), fontWeight = FontWeight.Black) },
+                shape = RoundedCornerShape(12.dp),
+                colors = chipColors
+            )
+            FilterChip(
+                selected = showOs,
+                enabled = showSystem,
+                onClick = onToggleOs,
+                label = { Text(stringResource(id = CoreR.string.show_os_app), fontWeight = FontWeight.Black) },
+                shape = RoundedCornerShape(12.dp),
+                colors = chipColors
+            )
         }
     }
 }
 
 @Composable
-private fun OrganicDenyListCard(
+private fun StylishDenyListCard(
     item: DenyListAppUi,
     onToggleExpanded: () -> Unit,
     onToggleApp: () -> Unit,
     onToggleProcess: (DenyListProcessUi) -> Unit
 ) {
     val isAnyChecked = item.checkedCount > 0
-    val transition = updateTransition(targetState = item.expanded, label = "denyCardExpand")
+    val transition = updateTransition(targetState = item.expanded, label = "cardTransition")
     
+    val elevation by transition.animateDp(label = "elevation") { if (it) 10.dp else 2.dp }
     val rotation by transition.animateFloat(label = "rotation") { if (it) 90f else 0f }
-    val elevation by transition.animateDp(label = "elevation") { if (it) 8.dp else 2.dp }
+    val cardScale by transition.animateFloat(label = "cardScale") { if (it) 1f else 0.992f }
+    
     val containerColor by animateColorAsState(
         targetValue = when {
             item.expanded -> MaterialTheme.colorScheme.surfaceContainerHighest
-            isAnyChecked -> MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+            isAnyChecked -> MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f)
             else -> MaterialTheme.colorScheme.surfaceContainerHigh
         },
+        animationSpec = tween(durationMillis = 280, easing = FastOutSlowInEasing),
         label = "color"
     )
 
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(topEnd = 48.dp, bottomStart = 48.dp, topStart = 16.dp, bottomEnd = 16.dp))
-            .animateContentSize(spring(stiffness = Spring.StiffnessLow)),
+            .animateContentSize(spring(stiffness = Spring.StiffnessMediumLow))
+            .scale(cardScale),
         shape = RoundedCornerShape(topEnd = 48.dp, bottomStart = 48.dp, topStart = 16.dp, bottomEnd = 16.dp),
         onClick = onToggleExpanded,
         colors = CardDefaults.elevatedCardColors(containerColor = containerColor),
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = elevation)
     ) {
-        Column(modifier = Modifier.padding(20.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Surface(
-                    modifier = Modifier.size(52.dp),
-                    shape = RoundedCornerShape(14.dp),
-                    color = MaterialTheme.colorScheme.surface,
-                    tonalElevation = 2.dp
-                ) {
-                    Image(
-                        painter = BitmapPainter(item.icon.toBitmap().asImageBitmap()),
-                        contentDescription = null,
-                        modifier = Modifier.padding(8.dp)
-                    )
-                }
-                Spacer(modifier = Modifier.width(16.dp))
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(item.label, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Black, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    Text(item.packageName, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Box {
+            Icon(
+                painter = painterResource(id = CoreR.drawable.ic_magisk_outline),
+                contentDescription = null,
+                modifier = Modifier.size(140.dp).align(Alignment.TopEnd).offset(x = 40.dp, y = (-30).dp).alpha(0.04f),
+                tint = MaterialTheme.colorScheme.primary
+            )
+
+            Column(modifier = Modifier.padding(24.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                    Box(contentAlignment = Alignment.BottomEnd) {
+                        Surface(
+                            modifier = Modifier.size(56.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            color = MaterialTheme.colorScheme.surface,
+                            tonalElevation = 4.dp
+                        ) {
+                            Image(
+                                painter = BitmapPainter(item.icon.toBitmap().asImageBitmap()),
+                                contentDescription = null,
+                                modifier = Modifier.padding(8.dp)
+                            )
+                        }
+                        if (isAnyChecked) {
+                            Box(
+                                modifier = Modifier
+                                    .size(18.dp)
+                                    .clip(CircleShape)
+                                    .background(MaterialTheme.colorScheme.primary)
+                                    .border(2.dp, MaterialTheme.colorScheme.surface, CircleShape)
+                            )
+                        }
+                    }
                     
-                    Surface(
-                        color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.6f),
-                        shape = RoundedCornerShape(8.dp),
-                        modifier = Modifier.padding(top = 6.dp)
-                    ) {
+                    Column(modifier = Modifier.weight(1f).padding(horizontal = 16.dp)) {
                         Text(
-                            text = stringResource(
-                                id = CoreR.string.denylist_process_count,
-                                item.checkedCount,
-                                item.processes.size
-                            ).uppercase(),
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
-                            style = MaterialTheme.typography.labelSmall,
+                            text = item.label,
+                            style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Black,
-                            letterSpacing = 0.5.sp
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Surface(
+                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text(
+                                text = item.packageName,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.Black,
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                        
+                        if (isAnyChecked) {
+                            Spacer(Modifier.height(8.dp))
+                            Text(
+                                text = "${item.checkedCount}/${item.processes.size} ATTIVI",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                letterSpacing = 0.5.sp
+                            )
+                        }
+                    }
+                    
+                    AnimatedVisibility(
+                        visible = item.expanded,
+                        enter = fadeIn() + scaleIn(initialScale = 0.85f),
+                        exit = fadeOut() + scaleOut(targetScale = 0.85f)
+                    ) {
+                        TriStateCheckbox(
+                            state = item.selectionState, 
+                            onClick = onToggleApp,
+                            colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.primary)
                         )
                     }
+                    
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Rounded.NavigateNext,
+                        contentDescription = null,
+                        modifier = Modifier.rotate(rotation).padding(start = 12.dp),
+                        tint = MaterialTheme.colorScheme.outline
+                    )
                 }
-                
-                TriStateCheckbox(
-                    state = item.selectionState, 
-                    onClick = onToggleApp,
-                    colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.primary)
-                )
-                
-                Icon(
-                    imageVector = Icons.AutoMirrored.Rounded.ArrowRight,
-                    contentDescription = null,
-                    modifier = Modifier.rotate(rotation).padding(start = 8.dp),
-                    tint = MaterialTheme.colorScheme.outline
-                )
-            }
 
-            AnimatedVisibility(
-                visible = item.expanded,
-                enter = expandVertically(spring(stiffness = Spring.StiffnessLow)) + fadeIn(),
-                exit = shrinkVertically(spring(stiffness = Spring.StiffnessLow)) + fadeOut()
-            ) {
-                Column {
-                    Spacer(Modifier.height(16.dp))
-                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
-                    Spacer(Modifier.height(8.dp))
-                    item.processes.forEach { process ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(12.dp))
-                                .clickable { onToggleProcess(process) }
-                                .padding(vertical = 10.dp, horizontal = 4.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Checkbox(checked = process.enabled, onCheckedChange = { onToggleProcess(process) })
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Column {
-                                Text(process.displayName, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
-                                Text(process.packageName, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f))
+                AnimatedVisibility(
+                    visible = item.expanded,
+                    enter = expandVertically(expandFrom = Alignment.Top) + slideInVertically(initialOffsetY = { it / 10 }) + fadeIn(),
+                    exit = shrinkVertically(shrinkTowards = Alignment.Top) + fadeOut()
+                ) {
+                    Column {
+                        Spacer(Modifier.height(24.dp))
+                        item.processes.forEach { process ->
+                            Surface(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp)
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .clickable { onToggleProcess(process) },
+                                color = if (process.enabled) MaterialTheme.colorScheme.primary.copy(alpha = 0.08f) 
+                                        else Color.Transparent,
+                                shape = RoundedCornerShape(16.dp)
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(12.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Checkbox(
+                                        checked = process.enabled, 
+                                        onCheckedChange = { onToggleProcess(process) }
+                                    )
+                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Column {
+                                        Text(
+                                            text = process.displayName, 
+                                            style = MaterialTheme.typography.bodyLarge, 
+                                            fontWeight = if (process.enabled) FontWeight.Black else FontWeight.Medium,
+                                            color = if (process.enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                                        )
+                                        if (process.packageName != item.packageName) {
+                                            Text(
+                                                text = process.packageName, 
+                                                style = MaterialTheme.typography.labelSmall, 
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                                            )
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -351,20 +430,18 @@ private fun OrganicDenyListCard(
 
 @Composable
 private fun EmptyDenyListState() {
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Surface(
-                modifier = Modifier.size(120.dp),
-                shape = RoundedCornerShape(40.dp),
-                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(Icons.Rounded.SettingsSuggest, null, modifier = Modifier.size(56.dp), tint = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f))
-                }
+    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth().padding(top = 64.dp)) {
+        Surface(
+            modifier = Modifier.size(140.dp),
+            shape = RoundedCornerShape(48.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Icon(Icons.Rounded.SettingsSuggest, null, modifier = Modifier.size(64.dp), tint = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f))
             }
-            Spacer(Modifier.height(24.dp))
-            Text(AppContext.getString(CoreR.string.log_data_none), color = MaterialTheme.colorScheme.outline, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
         }
+        Spacer(Modifier.height(32.dp))
+        Text(AppContext.getString(CoreR.string.log_data_none), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.outline)
     }
 }
 
@@ -387,7 +464,20 @@ data class DenyListAppUi(val packageName: String, val label: String, val icon: D
     }
 }
 
-data class DenyListUiState(val loading: Boolean = true, val query: String = "", val showSystem: Boolean = false, val showOs: Boolean = false, val items: List<DenyListAppUi> = emptyList())
+enum class DenyListSortMethod(@StringRes val labelRes: Int) {
+    ActiveFirst(CoreR.string.denylist_sort_active_first),
+    NameAsc(CoreR.string.denylist_sort_name_asc),
+    NameDesc(CoreR.string.denylist_sort_name_desc)
+}
+
+data class DenyListUiState(
+    val loading: Boolean = true,
+    val query: String = "",
+    val showSystem: Boolean = false,
+    val showOs: Boolean = false,
+    val sortMethod: DenyListSortMethod = DenyListSortMethod.ActiveFirst,
+    val items: List<DenyListAppUi> = emptyList()
+)
 
 class DenyListComposeViewModel : ViewModel() {
     private val _state = MutableStateFlow(DenyListUiState())
@@ -415,6 +505,7 @@ class DenyListComposeViewModel : ViewModel() {
     fun setQuery(v: String) { _state.update { it.copy(query = v) }; applyFilters() }
     fun setShowSystem(v: Boolean) { _state.update { it.copy(showSystem = v, showOs = if (v) it.showOs else false) }; applyFilters() }
     fun setShowOs(v: Boolean) { _state.update { it.copy(showOs = v) }; applyFilters() }
+    fun setSortMethod(v: DenyListSortMethod) { _state.update { it.copy(sortMethod = v) }; applyFilters() }
     fun toggleExpanded(pkg: String) { allApps = allApps.map { if (it.packageName == pkg) it.copy(expanded = !it.expanded) else it }; applyFilters() }
 
     fun toggleProcess(pkg: String, name: String, pPkg: String) {
@@ -466,10 +557,18 @@ class DenyListComposeViewModel : ViewModel() {
     private fun applyFilters() {
         val st = _state.value
         val filtered = allApps.asSequence().filter { app ->
-            val passesVisibility = app.checkedCount > 0 || (st.showSystem || !app.isSystem) && (app.isAppUid || st.showSystem && st.showOs)
+            // Keep expanded cards visible while interacting, so they do not disappear/jump mid-toggle.
+            val passesVisibility = app.expanded || app.checkedCount > 0 || (st.showSystem || !app.isSystem) && (app.isAppUid || st.showSystem && st.showOs)
             passesVisibility && (st.query.isBlank() || app.label.contains(st.query, true) || app.packageName.contains(st.query, true) || app.processes.any { it.name.contains(st.query, true) })
-        }.sortedWith(compareBy({ it.checkedCount == 0 }, { it.label.lowercase() }, { it.packageName })).toList()
-        _state.update { it.copy(items = filtered) }
+        }.toList()
+
+        val sorted = when (st.sortMethod) {
+            DenyListSortMethod.ActiveFirst -> filtered.sortedWith(compareBy({ it.checkedCount == 0 }, { it.label.lowercase() }, { it.packageName }))
+            DenyListSortMethod.NameAsc -> filtered.sortedWith(compareBy({ it.label.lowercase() }, { it.packageName }))
+            DenyListSortMethod.NameDesc -> filtered.sortedWith(compareByDescending<DenyListAppUi> { it.label.lowercase() }.thenByDescending { it.packageName })
+        }
+
+        _state.update { it.copy(items = sorted) }
     }
 
     @SuppressLint("InlinedApi")
