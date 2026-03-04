@@ -1,45 +1,63 @@
 package com.topjohnwu.magisk.ui.surequest
 
+import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.Resources
 import android.os.Build
 import android.os.Bundle
+import android.view.View
+import android.view.ViewGroup
 import android.view.Window
 import android.view.WindowManager
+import android.view.accessibility.AccessibilityEvent
+import android.view.accessibility.AccessibilityNodeInfo
+import android.view.accessibility.AccessibilityNodeProvider
 import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Modifier
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.arch.UIActivity
-import com.topjohnwu.magisk.arch.viewModel
-import com.topjohnwu.magisk.BuildConfig
-import com.topjohnwu.magisk.core.base.UntrackedActivity
+import com.topjohnwu.magisk.arch.VMFactory
 import com.topjohnwu.magisk.core.Config
+import com.topjohnwu.magisk.core.base.ActivityExtension
+import com.topjohnwu.magisk.core.base.UntrackedActivity
 import com.topjohnwu.magisk.core.su.SuCallbackHandler
 import com.topjohnwu.magisk.core.su.SuCallbackHandler.REQUEST
-import com.topjohnwu.magisk.databinding.ActivityRequestBinding
-import com.topjohnwu.magisk.events.ShowUIEvent
+import com.topjohnwu.magisk.core.wrap
+import com.topjohnwu.magisk.ui.theme.MagiskTheme
 import com.topjohnwu.magisk.ui.theme.Theme
-import com.topjohnwu.magisk.ui.compose.surequest.SuRequestScreen
-import com.topjohnwu.magisk.ui.compose.surequest.suRequestColorScheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import com.topjohnwu.magisk.arch.ViewEvent
+import top.yukonga.miuix.kmp.utils.MiuixPopupUtils.Companion.MiuixPopupHost
 
-open class SuRequestActivity : UIActivity<ActivityRequestBinding>(), UntrackedActivity {
+open class SuRequestActivity : AppCompatActivity(), UntrackedActivity {
 
-    override val layoutRes: Int = R.layout.activity_request
-    override val viewModel: SuRequestViewModel by viewModel()
-    private val useCompose = BuildConfig.COMPOSE_UI
-    private val composeVisible = mutableStateOf(false)
+    private val extension = ActivityExtension(this)
+    private val viewModel: SuRequestViewModel by lazy {
+        ViewModelProvider(this, VMFactory)[SuRequestViewModel::class.java]
+    }
+
+    init {
+        val nightMode = if (Config.darkTheme == Config.Value.DARK_THEME_AMOLED) {
+            AppCompatDelegate.MODE_NIGHT_YES
+        } else {
+            Config.darkTheme
+        }
+        AppCompatDelegate.setDefaultNightMode(nightMode)
+    }
+
+    override fun attachBaseContext(base: Context) {
+        super.attachBaseContext(base.wrap())
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        extension.onCreate(savedInstanceState)
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LOCKED
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -48,33 +66,12 @@ open class SuRequestActivity : UIActivity<ActivityRequestBinding>(), UntrackedAc
             window.setHideOverlayWindows(true)
         }
         setTheme(Theme.selected.themeRes)
-
-        if (useCompose) {
-            setContent {
-                val darkMode = when (Config.darkTheme) {
-                    AppCompatDelegate.MODE_NIGHT_YES,
-                    Config.Value.DARK_THEME_AMOLED -> true
-                    AppCompatDelegate.MODE_NIGHT_NO -> false
-                    else -> androidx.compose.foundation.isSystemInDarkTheme()
-                }
-                val dynamic = Theme.shouldUseDynamicColor
-                val scheme = suRequestColorScheme(useDynamicColor = dynamic, darkTheme = darkMode)
-
-                MaterialTheme(colorScheme = scheme) {
-                    val showUi by remember { composeVisible }
-                    SuRequestScreen(
-                        viewModel = viewModel,
-                        showContent = showUi,
-                        onTimeoutSelected = { viewModel.selectedItemPosition = it },
-                        onSpinnerTouched = { viewModel.spinnerTouched() },
-                        onGrant = { viewModel.grantPressed() },
-                        onDeny = { viewModel.denyPressed() }
-                    )
-                }
-            }
-        }
-
         super.onCreate(savedInstanceState)
+
+        viewModel.finishActivity = { finish() }
+        viewModel.authenticate = { onSuccess ->
+            extension.withAuthentication { if (it) onSuccess() }
+        }
 
         if (intent.action == Intent.ACTION_VIEW) {
             val action = intent.getStringExtra("action")
@@ -91,6 +88,24 @@ open class SuRequestActivity : UIActivity<ActivityRequestBinding>(), UntrackedAc
         } else {
             finish()
         }
+
+        if (viewModel.useTapjackProtection) {
+            window.decorView.rootView.accessibilityDelegate = EmptyAccessibilityDelegate
+        }
+
+        setContent {
+            MagiskTheme {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    SuRequestScreen(viewModel = viewModel)
+                    MiuixPopupHost()
+                }
+            }
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        extension.onSaveInstanceState(outState)
     }
 
     override fun getTheme(): Resources.Theme {
@@ -99,6 +114,7 @@ open class SuRequestActivity : UIActivity<ActivityRequestBinding>(), UntrackedAc
         return theme
     }
 
+    @Deprecated("Use OnBackPressedDispatcher")
     override fun onBackPressed() {
         viewModel.denyPressed()
     }
@@ -107,12 +123,16 @@ open class SuRequestActivity : UIActivity<ActivityRequestBinding>(), UntrackedAc
         super.finishAndRemoveTask()
     }
 
-    override fun onEventDispatched(event: ViewEvent) {
-        if (useCompose && event is ShowUIEvent) {
-            setAccessibilityDelegate(event.delegate)
-            composeVisible.value = true
-            return
-        }
-        super.onEventDispatched(event)
+    private object EmptyAccessibilityDelegate : View.AccessibilityDelegate() {
+        override fun sendAccessibilityEvent(host: View, eventType: Int) {}
+        override fun performAccessibilityAction(host: View, action: Int, args: Bundle?) = true
+        override fun sendAccessibilityEventUnchecked(host: View, event: AccessibilityEvent) {}
+        override fun dispatchPopulateAccessibilityEvent(host: View, event: AccessibilityEvent) = true
+        override fun onPopulateAccessibilityEvent(host: View, event: AccessibilityEvent) {}
+        override fun onInitializeAccessibilityEvent(host: View, event: AccessibilityEvent) {}
+        override fun onInitializeAccessibilityNodeInfo(host: View, info: AccessibilityNodeInfo) {}
+        override fun addExtraDataToAccessibilityNodeInfo(host: View, info: AccessibilityNodeInfo, extraDataKey: String, arguments: Bundle?) {}
+        override fun onRequestSendAccessibilityEvent(host: ViewGroup, child: View, event: AccessibilityEvent): Boolean = false
+        override fun getAccessibilityNodeProvider(host: View): AccessibilityNodeProvider? = null
     }
 }

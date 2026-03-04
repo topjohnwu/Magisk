@@ -1,110 +1,126 @@
 package com.topjohnwu.magisk.ui.module
 
+import android.content.Context
 import android.net.Uri
-import androidx.databinding.Bindable
-import androidx.lifecycle.MutableLiveData
-import com.topjohnwu.magisk.BR
-import com.topjohnwu.magisk.MainDirections
-import com.topjohnwu.magisk.R
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import com.topjohnwu.magisk.arch.AsyncLoadViewModel
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.core.base.ContentResultCallback
+import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.core.model.module.LocalModule
 import com.topjohnwu.magisk.core.model.module.OnlineModule
-import com.topjohnwu.magisk.core.utils.MediaStoreUtils.persistReadPermission
-import com.topjohnwu.magisk.databinding.MergeObservableList
-import com.topjohnwu.magisk.databinding.RvItem
-import com.topjohnwu.magisk.databinding.bindExtra
-import com.topjohnwu.magisk.databinding.diffList
-import com.topjohnwu.magisk.databinding.set
-import com.topjohnwu.magisk.dialog.LocalModuleInstallDialog
-import com.topjohnwu.magisk.dialog.OnlineModuleInstallDialog
-import com.topjohnwu.magisk.events.GetContentEvent
-import com.topjohnwu.magisk.events.SnackbarEvent
+import com.topjohnwu.magisk.ui.flash.FlashUtils
+import com.topjohnwu.magisk.view.Notifications
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.withContext
+import com.topjohnwu.magisk.ui.navigation.Route
 import com.topjohnwu.magisk.core.R as CoreR
+
+class ModuleItem(val module: LocalModule) {
+    val showNotice: Boolean
+    val showAction: Boolean
+    val noticeText: String
+
+    init {
+        val isZygisk = module.isZygisk
+        val isRiru = module.isRiru
+        val zygiskUnloaded = isZygisk && module.zygiskUnloaded
+
+        showNotice = zygiskUnloaded ||
+            (Info.isZygiskEnabled && isRiru) ||
+            (!Info.isZygiskEnabled && isZygisk)
+        showAction = module.hasAction && !showNotice
+        noticeText = when {
+            zygiskUnloaded -> "Zygisk module not loaded due to incompatibility"
+            isRiru -> "Module suspended because Zygisk is enabled"
+            else -> "Module suspended because Zygisk isn't enabled"
+        }
+    }
+
+    var isEnabled by mutableStateOf(module.enable)
+    var isRemoved by mutableStateOf(module.remove)
+    var showUpdate by mutableStateOf(module.updateInfo != null)
+    val isUpdated = module.updated
+    val updateReady get() = module.outdated && !isRemoved && isEnabled
+}
+
+@Parcelize
+class OnlineModuleSubject(
+    override val module: OnlineModule,
+    override val autoLaunch: Boolean,
+    override val notifyId: Int = Notifications.nextId()
+) : Subject.Module() {
+    override fun pendingIntent(context: Context) = FlashUtils.installIntent(context, file)
+}
 
 class ModuleViewModel : AsyncLoadViewModel() {
 
-    val bottomBarBarrierIds = intArrayOf(R.id.module_update, R.id.module_remove)
+    data class UiState(
+        val loading: Boolean = true,
+        val modules: List<ModuleItem> = emptyList(),
+    )
 
-    private val itemsInstalled = diffList<LocalModuleRvItem>()
-
-    val items = MergeObservableList<RvItem>()
-    val extraBindings = bindExtra {
-        it.put(BR.viewModel, this)
-    }
-
-    val data get() = uri
-
-    @get:Bindable
-    var loading = true
-        private set(value) = set(value, field, { field = it }, BR.loading)
+    private val _uiState = MutableStateFlow(UiState())
+    val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
     override suspend fun doLoadWork() {
-        loading = true
+        _uiState.update { it.copy(loading = true) }
         val moduleLoaded = Info.env.isActive &&
-                withContext(Dispatchers.IO) { LocalModule.loaded() }
+            withContext(Dispatchers.IO) { LocalModule.loaded() }
         if (moduleLoaded) {
-            loadInstalled()
-            if (items.isEmpty()) {
-                items.insertItem(InstallModule)
-                    .insertList(itemsInstalled)
+            val modules = withContext(Dispatchers.Default) {
+                LocalModule.installed().map { ModuleItem(it) }
             }
+            _uiState.update { it.copy(loading = false, modules = modules) }
+            loadUpdateInfo()
+        } else {
+            _uiState.update { it.copy(loading = false) }
         }
-        loading = false
-        loadUpdateInfo()
     }
 
-    override fun onNetworkChanged(network: Boolean) = startLoading()
+    private val networkObserver: (Boolean) -> Unit = { startLoading() }
 
-    private suspend fun loadInstalled() {
-        withContext(Dispatchers.Default) {
-            val installed = LocalModule.installed().map { LocalModuleRvItem(it) }
-            itemsInstalled.update(installed)
-        }
+    init {
+        Info.isConnected.observeForever(networkObserver)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        Info.isConnected.removeObserver(networkObserver)
     }
 
     private suspend fun loadUpdateInfo() {
         withContext(Dispatchers.IO) {
-            itemsInstalled.forEach {
-                if (it.item.fetch())
-                    it.fetchedUpdateInfo()
+            _uiState.value.modules.forEach { item ->
+                if (item.module.fetch()) {
+                    item.showUpdate = item.module.updateInfo != null
+                }
             }
         }
     }
 
-    fun downloadPressed(item: OnlineModule?) =
-        if (item != null && Info.isConnected.value == true) {
-            withExternalRW { OnlineModuleInstallDialog(item).show() }
-        } else {
-            SnackbarEvent(CoreR.string.no_connection).publish()
-        }
-
-    fun installPressed() = withExternalRW {
-        GetContentEvent("application/zip", UriCallback()).publish()
-    }
-
-    fun requestInstallLocalModule(uri: Uri, displayName: String) {
-        LocalModuleInstallDialog(this, uri, displayName).show()
-    }
-
-    @Parcelize
-    class UriCallback : ContentResultCallback {
-        override fun onActivityResult(result: Uri) {
-            result.persistReadPermission()
-            uri.value = result
-        }
+    fun confirmLocalInstall(uri: Uri) {
+        navigateTo(Route.Flash(Const.Value.FLASH_ZIP, uri.toString()))
     }
 
     fun runAction(id: String, name: String) {
-        MainDirections.actionActionFragment(id, name).navigate()
+        navigateTo(Route.Action(id, name))
     }
 
-    companion object {
-        private val uri = MutableLiveData<Uri?>()
+    fun toggleEnabled(item: ModuleItem) {
+        item.isEnabled = !item.isEnabled
+        item.module.enable = item.isEnabled
+    }
+
+    fun toggleRemove(item: ModuleItem) {
+        item.isRemoved = !item.isRemoved
+        item.module.remove = item.isRemoved
     }
 }

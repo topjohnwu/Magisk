@@ -42,12 +42,11 @@ enum class Theme(
     ),
     Default(
         baseThemeName = "Default (Dynamic)",
-        themeRes = R.style.ThemeFoundationMD2_Default
+        themeRes = R.style.ThemeFoundationMD2_Piplup
     ),
     Custom(
         baseThemeName = "Custom",
-        // Keep legacy views safe: Compose supplies the actual custom color scheme.
-        themeRes = R.style.ThemeFoundationMD2_Default
+        themeRes = R.style.ThemeFoundationMD2_Piplup
     );
 
     val themeName: String
@@ -64,7 +63,6 @@ enum class Theme(
 
         val selected
             get() = when (val stored = values().getOrNull(Config.themeOrdinal) ?: Default) {
-                // AMOLED is now a dark mode option; keep old ordinals compatible by mapping it.
                 PiplupAmoled -> Piplup
                 else -> stored
             }

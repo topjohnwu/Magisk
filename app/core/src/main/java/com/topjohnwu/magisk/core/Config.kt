@@ -38,6 +38,7 @@ object Config : PreferenceConfig, DBConfig {
         const val CUSTOM_CHANNEL = "custom_channel"
         const val LOCALE = "locale"
         const val DARK_THEME = "dark_theme_extended"
+        const val COLOR_MODE = "color_mode"
         const val DOWNLOAD_DIR = "download_dir"
         const val SAFETY = "safety_notice"
         const val THEME_ORDINAL = "theme_ordinal"
@@ -99,6 +100,7 @@ object Config : PreferenceConfig, DBConfig {
         // su notification
         const val NO_NOTIFICATION = 0
         const val NOTIFICATION_TOAST = 1
+        const val NOTIFICATION_STATUS_BAR = 2
 
         // su auto response
         const val SU_PROMPT = 0
@@ -119,8 +121,8 @@ object Config : PreferenceConfig, DBConfig {
 
     var safetyNotice by preference(Key.SAFETY, true)
     var darkTheme by preference(Key.DARK_THEME, -1)
-    // Keep a sentinel as default so Theme.selected can route to the dynamic default theme.
-    var themeOrdinal by preference(Key.THEME_ORDINAL, -1)
+    var themeOrdinal by preference(Key.THEME_ORDINAL, 0)
+    var colorMode by preference(Key.COLOR_MODE, 0)
     var themeCustomLightPrimary by preference(Key.THEME_CUSTOM_LIGHT_PRIMARY, 0xFF4EAFF5.toInt())
     var themeCustomDarkPrimary by preference(Key.THEME_CUSTOM_DARK_PRIMARY, 0xFF4EAFF5.toInt())
     var themeCustomLightSecondary by preference(Key.THEME_CUSTOM_LIGHT_SECONDARY, 0xFF3E78AF.toInt())

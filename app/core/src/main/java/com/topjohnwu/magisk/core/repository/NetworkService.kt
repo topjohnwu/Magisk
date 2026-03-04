@@ -23,9 +23,8 @@ class NetworkService(
     private val raw: RawUrl,
     private val api: GithubApiServices,
 ) {
-
     private data class UpdateCache(
-        val value: UpdateInfo?,
+        val value: UpdateInfo,
         val timestamp: Long,
         val channel: Int,
     )
@@ -44,13 +43,13 @@ class NetworkService(
         val channel = Config.updateChannel
         updateCache?.takeIf { isCacheValid(it, channel) }?.value ?: run {
             var info = when (channel) {
-            DEFAULT_CHANNEL -> if (BuildConfig.DEBUG) fetchDebugUpdate() else fetchStableUpdate()
-            STABLE_CHANNEL -> fetchStableUpdate()
-            BETA_CHANNEL -> fetchBetaUpdate()
-            DEBUG_CHANNEL -> fetchDebugUpdate()
-            CUSTOM_CHANNEL -> fetchCustomUpdate(Config.customChannelUrl)
-            else -> throw IllegalArgumentException()
-        }
+                DEFAULT_CHANNEL -> if (BuildConfig.DEBUG) fetchDebugUpdate() else fetchStableUpdate()
+                STABLE_CHANNEL -> fetchStableUpdate()
+                BETA_CHANNEL -> fetchBetaUpdate()
+                DEBUG_CHANNEL -> fetchDebugUpdate()
+                CUSTOM_CHANNEL -> fetchCustomUpdate(Config.customChannelUrl)
+                else -> throw IllegalArgumentException()
+            }
             if (info.versionCode < Info.env.versionCode &&
                 channel == DEFAULT_CHANNEL &&
                 !BuildConfig.DEBUG

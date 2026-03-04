@@ -42,26 +42,6 @@
 
     <!--1st party themes-->
 
-    <style name="ThemeFoundationMD2.Default" parent="ThemeFoundationMD2">
-        <item name="colorPrimary">@color/theme_default_primary</item>
-        <item name="colorPrimaryVariant">@color/theme_default_primary_variant</item>
-        <item name="colorSecondary">@color/theme_default_secondary</item>
-        <item name="colorSecondaryVariant">@color/theme_default_secondary_variant</item>
-        <item name="colorSurface">@color/theme_default_surface</item>
-        <item name="colorSurfaceVariant">@color/theme_default_surface_variant</item>
-        <item name="colorSurfaceSurfaceVariant">@color/theme_default_surface_surface_variant</item>
-        <item name="colorOnPrimary">@color/theme_default_on_primary</item>
-        <item name="colorOnPrimaryVariant">@color/theme_default_on_primary_variant</item>
-        <item name="colorOnSecondary">@color/theme_default_on_secondary</item>
-        <item name="colorOnBackground">@color/theme_default_on_background</item>
-        <item name="colorError">@color/theme_default_error</item>
-        <item name="colorOnError">@color/theme_default_on_error</item>
-        <item name="colorOnSurface">@color/theme_default_on_surface</item>
-        <item name="colorOnSurfaceVariant">@color/theme_default_on_surface_variant</item>
-        <item name="colorDisabled">@color/theme_default_disabled</item>
-        <item name="colorDisabledVariant">@color/theme_default_disabled_variant</item>
-    </style>
-
     <style name="ThemeFoundationMD2.Piplup">
         <item name="colorPrimary">#4EAFF5</item>
         <item name="colorPrimaryVariant">#804EAFF5</item>

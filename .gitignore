@@ -12,3 +12,7 @@ native/out
 # Android Studio
 *.iml
 .idea
+.cursor
+ramdisk.img
+app/core/src/debug
+app/core/src/release

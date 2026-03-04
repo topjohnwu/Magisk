@@ -1482,6 +1482,7 @@ class HomeComposeViewModel(private val svc: NetworkService) : ViewModel() {
         if (activity != null) activity.withPermission(REQUEST_INSTALL_PACKAGES) {
             if (it) DownloadEngine.startWithActivity(
                 activity,
+                activity.extension,
                 Subject.App()
             )
         }

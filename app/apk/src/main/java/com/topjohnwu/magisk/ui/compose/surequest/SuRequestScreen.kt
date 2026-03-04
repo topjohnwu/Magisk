@@ -3,11 +3,9 @@ package com.topjohnwu.magisk.ui.compose.surequest
 import android.graphics.drawable.Drawable
 import android.view.MotionEvent
 import android.widget.Toast
-import androidx.compose.animation.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
@@ -15,7 +13,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
@@ -23,16 +20,12 @@ import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.graphics.drawable.toBitmap
-import androidx.databinding.Observable
-import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.R as CoreR
 import com.topjohnwu.magisk.ui.compose.theme.magiskComposeColorScheme
@@ -42,33 +35,21 @@ import com.topjohnwu.magisk.ui.surequest.SuRequestViewModel
 @Composable
 fun SuRequestScreen(
     viewModel: SuRequestViewModel,
-    showContent: Boolean,
-    onTimeoutSelected: (Int) -> Unit,
-    onSpinnerTouched: () -> Unit,
-    onGrant: () -> Unit,
-    onDeny: () -> Unit
+    showContent: Boolean = viewModel.showUi,
+    onTimeoutSelected: (Int) -> Unit = { viewModel.selectedItemPosition = it },
+    onSpinnerTouched: () -> Unit = { viewModel.spinnerTouched() },
+    onGrant: () -> Unit = { viewModel.grantPressed() },
+    onDeny: () -> Unit = { viewModel.denyPressed() }
 ) {
     val context = LocalContext.current
     val resources = context.resources
     val timeoutItems = remember { resources.getStringArray(CoreR.array.allow_timeout).toList() }
-    val denyDefaultLabel = stringResource(id = CoreR.string.deny)
-
-    var selectedTimeout by remember { mutableStateOf(viewModel.selectedItemPosition) }
-    var grantEnabled by remember { mutableStateOf(viewModel.grantEnabled) }
-    var denyLabel by remember { mutableStateOf(viewModel.denyText.getText(resources).toString()) }
-
-    DisposableEffect(viewModel) {
-        val callback = object : Observable.OnPropertyChangedCallback() {
-            override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
-                when (propertyId) {
-                    BR.selectedItemPosition -> selectedTimeout = viewModel.selectedItemPosition
-                    BR.grantEnabled -> grantEnabled = viewModel.grantEnabled
-                    BR.denyText -> denyLabel = viewModel.denyText.getText(resources).toString()
-                }
-            }
-        }
-        viewModel.addOnPropertyChangedCallback(callback)
-        onDispose { viewModel.removeOnPropertyChangedCallback(callback) }
+    val selectedTimeout = viewModel.selectedItemPosition
+    val grantEnabled = viewModel.grantEnabled
+    val denyLabel = if (viewModel.denyCountdown > 0) {
+        "${stringResource(CoreR.string.deny)} (${viewModel.denyCountdown})"
+    } else {
+        stringResource(CoreR.string.deny)
     }
 
     val grantTouchFilter: (MotionEvent) -> Boolean = remember {
@@ -237,7 +218,6 @@ fun SuRequestScreen(
                             },
                             onClick = {
                                 dropdownExpanded = false
-                                selectedTimeout = index
                                 onTimeoutSelected(index)
                             },
                             leadingIcon = {
@@ -275,7 +255,7 @@ fun SuRequestScreen(
                             .heightIn(min = 44.dp)
                     ) {
                         Text(
-                            text = denyLabel.ifBlank { denyDefaultLabel },
+                            text = denyLabel,
                             maxLines = 1,
                             softWrap = false,
                             overflow = TextOverflow.Ellipsis,

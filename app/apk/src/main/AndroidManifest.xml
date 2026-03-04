@@ -2,10 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <application
-        android:enableOnBackInvokedCallback="true"
-        android:localeConfig="@xml/locale_config"
-        tools:replace="android:enableOnBackInvokedCallback">
+    <uses-sdk tools:overrideLibrary="com.termux.view, com.termux.terminal" />
+
+    <application android:localeConfig="@xml/locale_config">
         <activity
             android:name=".ui.MainActivity"
             android:exported="true"

@@ -27,8 +27,9 @@ import timber.log.Timber
 import java.io.File
 import java.io.IOException
 
-interface SplashScreenHost : IActivityExtension {
+interface SplashScreenHost {
     val splashController: SplashController<*>
+    val extension: ActivityExtension
 
     fun onCreateUi(savedInstanceState: Bundle?)
     fun showInvalidStateMessage()
@@ -45,7 +46,6 @@ class SplashController<T>(private val activity: T)
 
     fun preOnCreate() {
         if (isRunningAsStub && !splashShown) {
-            // Manually apply splash theme for stub
             activity.theme.applyStyle(R.style.StubSplashTheme, true)
         }
     }
@@ -68,7 +68,6 @@ class SplashController<T>(private val activity: T)
                 activity.runOnUiThread {
                     splashShown = true
                     if (isRunningAsStub) {
-                        // Re-launch main activity without splash theme
                         activity.relaunch()
                     } else {
                         if (activity.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
@@ -102,7 +101,6 @@ class SplashController<T>(private val activity: T)
 
         if (packageName != APP_PACKAGE_NAME) {
             runCatching {
-                // Hidden, remove com.topjohnwu.magisk if exist as it could be malware
                 packageManager.getApplicationInfo(APP_PACKAGE_NAME, 0)
                 Shell.cmd("(pm uninstall $APP_PACKAGE_NAME)& >/dev/null 2>&1").exec()
             }
@@ -117,20 +115,16 @@ class SplashController<T>(private val activity: T)
 
         if (isPackageMigration) {
             runOnUiThread {
-                // Relaunch the process after package migration
                 StubApk.restartProcess(this)
             }
             return
         }
 
-        // Validate stub APK
         if (isRunningAsStub && (
-                // Version mismatch
                 Info.stub!!.version != BuildConfig.STUB_VERSION ||
-                // Not properly patched
                 intent.component!!.className.contains(AppMigration.PLACEHOLDER))
         ) {
-            withPermission(REQUEST_INSTALL_PACKAGES) { granted ->
+            extension.withPermission(REQUEST_INSTALL_PACKAGES) { granted ->
                 if (granted) {
                     lifecycleScope.launch {
                         val apk = File(cacheDir, "stub.apk")
@@ -152,10 +146,8 @@ class SplashController<T>(private val activity: T)
         JobService.schedule(this)
         Shortcuts.setupDynamic(this)
 
-        // Pre-fetch network services
         ServiceLocator.networkService
 
-        // Wait for root service
         RootUtils.Connection.await()
     }
 }

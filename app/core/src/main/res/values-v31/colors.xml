@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <!-- Keep splash static on Android 12+ to avoid Monet-related inconsistencies -->
-    <color name="splash_background">@color/ic_launcher_background</color>
-</resources>
