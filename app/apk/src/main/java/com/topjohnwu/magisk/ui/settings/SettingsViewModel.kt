@@ -1,6 +1,6 @@
 package com.topjohnwu.magisk.ui.settings
 
-import android.app.Activity
+import android.content.Context
 import android.widget.Toast
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.arch.BaseViewModel
@@ -14,10 +14,12 @@ import com.topjohnwu.magisk.core.utils.RootUtils
 import com.topjohnwu.magisk.view.Shortcuts
 import com.topjohnwu.magisk.ui.navigation.Route
 import com.topjohnwu.superuser.Shell
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class SettingsViewModel : BaseViewModel() {
 
@@ -36,12 +38,22 @@ class SettingsViewModel : BaseViewModel() {
         Shortcuts.addHomeIcon(AppContext)
     }
 
-    fun hideApp(activity: Activity, name: String) {
-        viewModelScope.launch { AppMigration.hide(activity, name) }
+    suspend fun hideApp(context: Context, name: String): Boolean {
+        val success = withContext(Dispatchers.IO) {
+            AppMigration.patchAndHide(context, name)
+        }
+        if (!success) {
+            context.toast(R.string.failure, Toast.LENGTH_LONG)
+        }
+        return success
     }
 
-    fun restoreApp(activity: Activity) {
-        viewModelScope.launch { AppMigration.restore(activity) }
+    suspend fun restoreApp(context: Context): Boolean {
+        val success = AppMigration.restoreApp(context)
+        if (!success) {
+            context.toast(R.string.failure, Toast.LENGTH_LONG)
+        }
+        return success
     }
 
     fun createHosts() {

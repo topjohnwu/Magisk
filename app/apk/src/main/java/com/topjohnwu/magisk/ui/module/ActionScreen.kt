@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.ui.module
 
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -13,20 +12,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import top.yukonga.miuix.kmp.basic.FloatingActionButton
+import com.topjohnwu.magisk.R
 import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.IconButton
 import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
 import top.yukonga.miuix.kmp.basic.Scaffold
 import top.yukonga.miuix.kmp.basic.SmallTopAppBar
 import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.basic.TextButton
 import top.yukonga.miuix.kmp.icon.MiuixIcons
 import top.yukonga.miuix.kmp.icon.extended.Back
 import top.yukonga.miuix.kmp.theme.MiuixTheme
@@ -37,6 +35,7 @@ fun ActionScreen(viewModel: ActionViewModel, actionName: String, onBack: () -> U
     val actionState by viewModel.actionState.collectAsState()
     val items = viewModel.consoleItems
     val listState = rememberLazyListState()
+    val finished = actionState != ActionViewModel.State.RUNNING
 
     LaunchedEffect(items.size) {
         if (items.isNotEmpty()) {
@@ -61,51 +60,42 @@ fun ActionScreen(viewModel: ActionViewModel, actionName: String, onBack: () -> U
                         )
                     }
                 },
+                actions = {
+                    if (finished) {
+                        IconButton(
+                            modifier = Modifier.padding(end = 16.dp),
+                            onClick = { viewModel.saveLog() }
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_save_md2),
+                                contentDescription = stringResource(CoreR.string.menuSaveLog),
+                                tint = MiuixTheme.colorScheme.onBackground
+                            )
+                        }
+                    }
+                },
                 scrollBehavior = scrollBehavior
             )
         },
         popupHost = { }
     ) { padding ->
-        Box(modifier = Modifier.fillMaxSize().padding(padding)) {
-            LazyColumn(
-                state = listState,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .horizontalScroll(rememberScrollState())
-                    .padding(horizontal = 8.dp, vertical = 4.dp)
-            ) {
-                itemsIndexed(items) { _, line ->
-                    Text(
-                        text = line,
-                        fontFamily = FontFamily.Monospace,
-                        fontSize = 12.sp,
-                        lineHeight = 16.sp,
-                        color = MiuixTheme.colorScheme.onSurface,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            }
-
-            if (actionState != ActionViewModel.State.RUNNING) {
-                TextButton(
-                    text = stringResource(CoreR.string.menuSaveLog),
-                    onClick = { viewModel.saveLog() },
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(16.dp)
+        LazyColumn(
+            state = listState,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .horizontalScroll(rememberScrollState())
+                .padding(horizontal = 8.dp, vertical = 4.dp)
+        ) {
+            itemsIndexed(items) { _, line ->
+                Text(
+                    text = line,
+                    fontFamily = FontFamily.Monospace,
+                    fontSize = 12.sp,
+                    lineHeight = 16.sp,
+                    color = MiuixTheme.colorScheme.onSurface,
+                    modifier = Modifier.fillMaxWidth()
                 )
-
-                FloatingActionButton(
-                    onClick = onBack,
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(16.dp)
-                ) {
-                    Text(
-                        text = stringResource(CoreR.string.close),
-                        modifier = Modifier.padding(horizontal = 16.dp)
-                    )
-                }
             }
         }
     }

@@ -14,7 +14,6 @@ import com.topjohnwu.magisk.core.download.Subject.App
 import com.topjohnwu.magisk.core.ktx.await
 import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.repository.NetworkService
-import com.topjohnwu.magisk.ui.navigation.Route
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -136,10 +135,6 @@ class HomeViewModel(
 
     fun onEnvFixConsumed() {
         _uiState.update { it.copy(envFixCode = 0) }
-    }
-
-    fun onMagiskPressed() {
-        navigateTo(Route.Install)
     }
 
     fun hideNotice() {

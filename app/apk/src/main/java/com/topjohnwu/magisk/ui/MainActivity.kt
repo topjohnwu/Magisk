@@ -45,8 +45,6 @@ import com.topjohnwu.magisk.ui.deny.DenyListViewModel
 import com.topjohnwu.magisk.ui.flash.FlashScreen
 import com.topjohnwu.magisk.ui.flash.FlashUtils
 import com.topjohnwu.magisk.ui.flash.FlashViewModel
-import com.topjohnwu.magisk.ui.install.InstallScreen
-import com.topjohnwu.magisk.ui.install.InstallViewModel
 import com.topjohnwu.magisk.ui.module.ActionScreen
 import com.topjohnwu.magisk.ui.module.ActionViewModel
 import com.topjohnwu.magisk.ui.superuser.SuperuserDetailScreen
@@ -171,11 +169,6 @@ class MainActivity : AppCompatActivity(), SplashScreenHost {
                                 entry<Route.Main> {
                                     MainScreen(initialTab = initialTab)
                                 }
-                                entry<Route.Install> { _ ->
-                                    val vm: InstallViewModel = androidx.lifecycle.viewmodel.compose.viewModel(factory = VMFactory)
-                                    CollectNavEvents(vm, navigator)
-                                    InstallScreen(vm, onBack = { navigator.pop() })
-                                }
                                 entry<Route.DenyList> { _ ->
                                     val vm: DenyListViewModel = androidx.lifecycle.viewmodel.compose.viewModel(factory = VMFactory)
                                     LaunchedEffect(Unit) { vm.startLoading() }
@@ -271,7 +264,9 @@ class MainActivity : AppCompatActivity(), SplashScreenHost {
                 showInvalidState.value = true
             } else {
                 lifecycleScope.launch {
-                    AppMigration.restore(this@MainActivity)
+                    if (!AppMigration.restoreApp(this@MainActivity)) {
+                        toast(CoreR.string.failure, Toast.LENGTH_LONG)
+                    }
                 }
             }
         }

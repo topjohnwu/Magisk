@@ -10,12 +10,14 @@ import com.topjohnwu.magisk.core.ktx.timeFormatStandard
 import com.topjohnwu.magisk.core.ktx.toTime
 import com.topjohnwu.magisk.core.model.su.SuLog
 import com.topjohnwu.magisk.core.repository.LogRepository
+import com.topjohnwu.magisk.core.su.SuEvents
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -24,6 +26,13 @@ import java.io.FileInputStream
 class LogViewModel(
     private val repo: LogRepository
 ) : AsyncLoadViewModel() {
+
+    init {
+        @OptIn(kotlinx.coroutines.FlowPreview::class)
+        viewModelScope.launch {
+            SuEvents.logUpdated.debounce(500).collect { reload() }
+        }
+    }
 
     data class UiState(
         val loading: Boolean = true,

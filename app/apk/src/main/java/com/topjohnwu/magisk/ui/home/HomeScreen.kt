@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.PowerManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -65,10 +67,13 @@ import com.topjohnwu.magisk.ui.component.rememberConfirmDialog
 import com.topjohnwu.magisk.ui.component.rememberLoadingDialog
 import com.topjohnwu.magisk.ui.component.ListPopupDefaults.MenuPositionProvider
 import com.topjohnwu.magisk.ui.flash.FlashUtils
+import com.topjohnwu.magisk.ui.install.InstallViewModel
 import com.topjohnwu.magisk.ui.navigation.Route
 import kotlinx.coroutines.launch
 import com.topjohnwu.magisk.core.R as CoreR
+import top.yukonga.miuix.kmp.basic.ButtonDefaults
 import top.yukonga.miuix.kmp.basic.Card
+import top.yukonga.miuix.kmp.basic.Checkbox
 import top.yukonga.miuix.kmp.basic.DropdownImpl
 import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.IconButton
@@ -80,12 +85,15 @@ import top.yukonga.miuix.kmp.basic.Scaffold
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.basic.TextButton
 import top.yukonga.miuix.kmp.basic.TopAppBar
+import top.yukonga.miuix.kmp.extra.SuperArrow
+import top.yukonga.miuix.kmp.extra.SuperBottomSheet
 import top.yukonga.miuix.kmp.extra.SuperListPopup
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Composable
-fun HomeScreen(viewModel: HomeViewModel) {
+fun HomeScreen(viewModel: HomeViewModel, installVm: InstallViewModel) {
     val uiState by viewModel.uiState.collectAsState()
+    val installUiState by installVm.uiState.collectAsState()
     val context = LocalContext.current
     val activity = context as MainActivity
     val scrollBehavior = MiuixScrollBehavior()
@@ -96,7 +104,33 @@ fun HomeScreen(viewModel: HomeViewModel) {
     val showUninstallDialog = rememberSaveable { mutableStateOf(false) }
     val showManagerDialog = rememberSaveable { mutableStateOf(false) }
     val showEnvFixDialog = rememberSaveable { mutableStateOf(false) }
+    val showInstallSheet = rememberSaveable { mutableStateOf(false) }
     var envFixCode by remember { mutableIntStateOf(0) }
+
+    val filePicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        uri?.let { installVm.onPatchFileSelected(it) }
+    }
+
+    val secondSlotDialog = rememberConfirmDialog()
+    val secondSlotTitle = stringResource(android.R.string.dialog_alert_title)
+    val secondSlotMsg = stringResource(CoreR.string.install_inactive_slot_msg)
+
+    LaunchedEffect(installUiState.requestFilePicker) {
+        if (installUiState.requestFilePicker) {
+            filePicker.launch("*/*")
+            installVm.onFilePickerConsumed()
+        }
+    }
+
+    LaunchedEffect(installUiState.showSecondSlotWarning) {
+        if (installUiState.showSecondSlotWarning) {
+            val result = secondSlotDialog.awaitConfirm(title = secondSlotTitle, content = secondSlotMsg)
+            installVm.onSecondSlotWarningConsumed()
+            if (result == ConfirmResult.Confirmed) {
+                installVm.install()
+            }
+        }
+    }
 
     LaunchedEffect(uiState.showUninstall) {
         if (uiState.showUninstall) {
@@ -139,7 +173,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
             code = envFixCode,
             activity = activity,
             loadingDialog = loadingDialog,
-            onNavigateInstall = { viewModel.onMagiskPressed() },
+            onNavigateInstall = { showInstallSheet.value = true },
         )
     }
 
@@ -170,7 +204,10 @@ fun HomeScreen(viewModel: HomeViewModel) {
                 NoticeCard(onHide = viewModel::hideNotice)
             }
 
-            MagiskCard(viewModel = viewModel)
+            MagiskCard(
+                viewModel = viewModel,
+                onInstallClicked = { showInstallSheet.value = true }
+            )
 
             ManagerCard(viewModel = viewModel, uiState = uiState)
 
@@ -187,6 +224,12 @@ fun HomeScreen(viewModel: HomeViewModel) {
             DevelopersCard(onLinkClicked = { openLink(context, it) })
         }
     }
+
+    InstallBottomSheet(
+        show = showInstallSheet,
+        installVm = installVm,
+        installUiState = installUiState,
+    )
 }
 
 @Composable
@@ -276,7 +319,7 @@ private fun NoticeCard(onHide: () -> Unit) {
 }
 
 @Composable
-private fun MagiskCard(viewModel: HomeViewModel) {
+private fun MagiskCard(viewModel: HomeViewModel, onInstallClicked: () -> Unit) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -296,11 +339,11 @@ private fun MagiskCard(viewModel: HomeViewModel) {
                 when (viewModel.magiskState) {
                     HomeViewModel.State.OUTDATED -> TextButton(
                         text = stringResource(CoreR.string.update),
-                        onClick = { viewModel.onMagiskPressed() }
+                        onClick = onInstallClicked
                     )
                     else -> TextButton(
                         text = stringResource(CoreR.string.install),
-                        onClick = { viewModel.onMagiskPressed() }
+                        onClick = onInstallClicked
                     )
                 }
             }
@@ -536,6 +579,139 @@ private fun openLink(context: Context, url: String) {
 }
 
 @Composable
+private fun InstallBottomSheet(
+    show: MutableState<Boolean>,
+    installVm: InstallViewModel,
+    installUiState: InstallViewModel.UiState,
+) {
+    SuperBottomSheet(
+        show = show,
+        onDismissRequest = { show.value = false },
+        title = stringResource(CoreR.string.install),
+    ) {
+        Column(modifier = Modifier.padding(bottom = 16.dp)) {
+            if (installUiState.notes.isNotEmpty()) {
+                Text(
+                    text = installUiState.notes,
+                    style = MiuixTheme.textStyles.body2,
+                    color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+            }
+
+            if (!installVm.skipOptions) {
+                InstallOptionsSection(installUiState, installVm)
+            }
+
+            SuperArrow(
+                title = stringResource(CoreR.string.select_patch_file),
+                summary = stringResource(CoreR.string.select_patch_file_summary),
+                onClick = {
+                    show.value = false
+                    installVm.selectMethod(InstallViewModel.Method.PATCH)
+                },
+                enabled = installUiState.step >= 1 || installVm.skipOptions
+            )
+
+            if (installVm.isRooted) {
+                SuperArrow(
+                    title = stringResource(CoreR.string.direct_install),
+                    summary = stringResource(CoreR.string.direct_install_summary),
+                    onClick = {
+                        show.value = false
+                        installVm.selectMethod(InstallViewModel.Method.DIRECT)
+                        installVm.install()
+                    },
+                    enabled = installUiState.step >= 1 || installVm.skipOptions
+                )
+            }
+
+            if (!installVm.noSecondSlot) {
+                SuperArrow(
+                    title = stringResource(CoreR.string.install_inactive_slot),
+                    summary = stringResource(CoreR.string.install_inactive_slot_summary),
+                    onClick = {
+                        show.value = false
+                        installVm.selectMethod(InstallViewModel.Method.INACTIVE_SLOT)
+                    },
+                    enabled = installUiState.step >= 1 || installVm.skipOptions
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun InstallOptionsSection(
+    uiState: InstallViewModel.UiState,
+    viewModel: InstallViewModel
+) {
+    Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(CoreR.string.install_options_title),
+                style = MiuixTheme.textStyles.headline2,
+            )
+            if (uiState.step == 0) {
+                TextButton(
+                    text = stringResource(CoreR.string.install_next),
+                    onClick = { viewModel.nextStep() }
+                )
+            }
+        }
+
+        if (uiState.step == 0) {
+            Spacer(Modifier.height(8.dp))
+            if (!Info.isSAR) {
+                CheckboxRow(
+                    label = stringResource(CoreR.string.keep_dm_verity),
+                    checked = Config.keepVerity,
+                    onCheckedChange = { Config.keepVerity = it }
+                )
+            }
+            if (Info.isFDE) {
+                CheckboxRow(
+                    label = stringResource(CoreR.string.keep_force_encryption),
+                    checked = Config.keepEnc,
+                    onCheckedChange = { Config.keepEnc = it }
+                )
+            }
+            if (!Info.ramdisk) {
+                CheckboxRow(
+                    label = stringResource(CoreR.string.recovery_mode),
+                    checked = Config.recovery,
+                    onCheckedChange = { Config.recovery = it }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun CheckboxRow(label: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Checkbox(
+            checked = checked,
+            onCheckedChange = { onCheckedChange(it) }
+        )
+        Text(
+            text = label,
+            style = MiuixTheme.textStyles.body1,
+        )
+    }
+}
+
+@Composable
 private fun UninstallComposableDialog(
     showDialog: MutableState<Boolean>,
     activity: MainActivity,
@@ -553,10 +729,7 @@ private fun UninstallComposableDialog(
             color = MiuixTheme.colorScheme.onSurface,
         )
         Spacer(Modifier.height(16.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
-        ) {
+        Row(modifier = Modifier.fillMaxWidth()) {
             TextButton(
                 text = stringResource(CoreR.string.restore_img),
                 onClick = {
@@ -570,9 +743,10 @@ private fun UninstallComposableDialog(
                             Toast.LENGTH_SHORT
                         )
                     }
-                }
+                },
+                modifier = Modifier.weight(1f)
             )
-            Spacer(Modifier.width(8.dp))
+            Spacer(Modifier.width(20.dp))
             TextButton(
                 text = stringResource(CoreR.string.complete_uninstall),
                 onClick = {
@@ -583,7 +757,9 @@ private fun UninstallComposableDialog(
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
                     }
                     activity.startActivity(intent)
-                }
+                },
+                modifier = Modifier.weight(1f),
+                colors = ButtonDefaults.textButtonColorsPrimary()
             )
         }
     }
@@ -605,21 +781,21 @@ private fun ManagerInstallComposableDialog(
             text
         }
         Spacer(Modifier.height(16.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
-        ) {
+        Row(modifier = Modifier.fillMaxWidth()) {
             TextButton(
                 text = stringResource(android.R.string.cancel),
-                onClick = { showDialog.value = false }
+                onClick = { showDialog.value = false },
+                modifier = Modifier.weight(1f)
             )
-            Spacer(Modifier.width(8.dp))
+            Spacer(Modifier.width(20.dp))
             TextButton(
                 text = stringResource(CoreR.string.install),
                 onClick = {
                     showDialog.value = false
                     DownloadEngine.startWithActivity(activity, activity.extension, Subject.App())
-                }
+                },
+                modifier = Modifier.weight(1f),
+                colors = ButtonDefaults.textButtonColorsPrimary()
             )
         }
     }
@@ -651,15 +827,13 @@ private fun EnvFixComposableDialog(
             color = MiuixTheme.colorScheme.onSurface,
         )
         Spacer(Modifier.height(16.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
-        ) {
+        Row(modifier = Modifier.fillMaxWidth()) {
             TextButton(
                 text = stringResource(android.R.string.cancel),
-                onClick = { showDialog.value = false }
+                onClick = { showDialog.value = false },
+                modifier = Modifier.weight(1f)
             )
-            Spacer(Modifier.width(8.dp))
+            Spacer(Modifier.width(20.dp))
             TextButton(
                 text = stringResource(android.R.string.ok),
                 onClick = {
@@ -682,7 +856,9 @@ private fun EnvFixComposableDialog(
                             }
                         }
                     }
-                }
+                },
+                modifier = Modifier.weight(1f),
+                colors = ButtonDefaults.textButtonColorsPrimary()
             )
         }
     }

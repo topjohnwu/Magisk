@@ -46,6 +46,7 @@ import com.topjohnwu.magisk.core.base.SplashScreenHost
 import com.topjohnwu.magisk.core.model.module.LocalModule
 import com.topjohnwu.magisk.ui.home.HomeScreen
 import com.topjohnwu.magisk.ui.home.HomeViewModel
+import com.topjohnwu.magisk.ui.install.InstallViewModel
 import com.topjohnwu.magisk.ui.log.LogScreen
 import com.topjohnwu.magisk.ui.log.LogViewModel
 import com.topjohnwu.magisk.ui.module.ModuleScreen
@@ -85,9 +86,11 @@ fun MainScreen(initialTab: Int = Tab.HOME.ordinal) {
             when (Tab.entries[page]) {
                 Tab.HOME -> {
                     val vm: HomeViewModel = viewModel(factory = VMFactory)
+                    val installVm: InstallViewModel = viewModel(factory = VMFactory)
                     LaunchedEffect(Unit) { vm.startLoading() }
                     CollectNavEvents(vm, navigator)
-                    HomeScreen(vm)
+                    CollectNavEvents(installVm, navigator)
+                    HomeScreen(vm, installVm)
                 }
                 Tab.SUPERUSER -> {
                     val activity = LocalContext.current as MainActivity

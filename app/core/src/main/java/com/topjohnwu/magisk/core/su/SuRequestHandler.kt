@@ -104,6 +104,7 @@ class SuRequestHandler(
             }
             if (time >= 0) {
                 policyDB.update(policy)
+                SuEvents.notifyPolicyChanged()
             }
         }
     }
