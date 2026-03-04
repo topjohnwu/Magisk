@@ -52,11 +52,12 @@ open class SuRequestActivity : UIActivity<ActivityRequestBinding>(), UntrackedAc
         if (useCompose) {
             setContent {
                 val darkMode = when (Config.darkTheme) {
-                    AppCompatDelegate.MODE_NIGHT_YES -> true
+                    AppCompatDelegate.MODE_NIGHT_YES,
+                    Config.Value.DARK_THEME_AMOLED -> true
                     AppCompatDelegate.MODE_NIGHT_NO -> false
                     else -> androidx.compose.foundation.isSystemInDarkTheme()
                 }
-                val dynamic = Theme.selected == Theme.Default
+                val dynamic = Theme.shouldUseDynamicColor
                 val scheme = suRequestColorScheme(useDynamicColor = dynamic, darkTheme = darkMode)
 
                 MaterialTheme(colorScheme = scheme) {

@@ -107,12 +107,13 @@ class MainActivity : NavigationActivity<ActivityMainMd2Binding>(), SplashScreenH
 
             setContent {
                 val darkMode = when (Config.darkTheme) {
-                    AppCompatDelegate.MODE_NIGHT_YES -> true
+                    AppCompatDelegate.MODE_NIGHT_YES,
+                    Config.Value.DARK_THEME_AMOLED -> true
                     AppCompatDelegate.MODE_NIGHT_NO -> false
                     else -> androidx.compose.foundation.isSystemInDarkTheme()
                 }
                 MagiskAppContainer(
-                    useDynamicColor = Theme.selected == Theme.Default,
+                    useDynamicColor = Theme.shouldUseDynamicColor,
                     darkTheme = darkMode,
                     openSection = section
                 )

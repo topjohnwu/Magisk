@@ -36,6 +36,7 @@
     <string name="home_version">Version</string>
     <string name="home_channel">Channel</string>
     <string name="home_section_contributors">Contributors</string>
+    <string name="home_maintainer">Maintainer</string>
     <string name="home_status_ready">Magisk is ready</string>
     <string name="home_status_inactive">Magisk inactive</string>
     <string name="home_status_ready_subtitle">System modified and secured</string>
@@ -69,8 +70,10 @@
     <string name="install_select_patch_file_subtitle">Select a boot image to patch</string>
     <string name="install_direct_install_subtitle">Recommended for most users</string>
     <string name="install_inactive_slot_subtitle">Useful after OTA updates</string>
+    <string name="after_ota">After OTA</string>
     <string name="install_complete_options_first">Please complete the options step first</string>
     <string name="install_inactive_slot_msg">Your device will be FORCED to boot to the current inactive slot after a reboot!\nOnly use this option after OTA is done.\nContinue?</string>
+    <string name="install_inactive_slot_caution">CAUTION: This will switch the active boot slot.</string>
     <string name="setup_title">Additional setup</string>
     <string name="select_patch_file">Select and patch a file</string>
     <string name="patch_file_msg">Select a raw image (*.img) or an ODIN tarfile (*.tar) or a payload.bin (*.bin)</string>
@@ -107,6 +110,8 @@
     <string name="superuser_toggle_revoke">Revoke</string>
     <string name="superuser_logs">Superuser logs</string>
     <string name="superuser_policy_none">No apps have asked for Superuser permission yet.</string>
+    <string name="shared_uid_label">[SharedUID] %1$s</string>
+    <string name="isolated_process_label">(isolated) %1$s</string>
 
     <!--Logs-->
     <string name="log_data_none">You\'re log-free. Try using your root apps more.</string>
@@ -126,6 +131,7 @@
     <string name="denylist_process_count">%1$d/%2$d processes</string>
     <string name="hide_filter_hint">Filter by name</string>
     <string name="hide_search">Search</string>
+    <string name="denylist_search_filters">Search &amp; filters</string>
 
     <!--Module-->
     <string name="no_info_provided">(No info provided)</string>
@@ -160,6 +166,7 @@
     <string name="settings_dark_mode_light">Always light</string>
     <string name="settings_dark_mode_system">Follow system</string>
     <string name="settings_dark_mode_dark">Always dark</string>
+    <string name="settings_dark_mode_amoled">AMOLED black</string>
     <string name="settings_download_path_title">Download path</string>
     <string name="settings_download_path_message">Files will be saved to %1$s</string>
     <string name="settings_hide_app_title">Hide the Magisk app</string>
@@ -283,5 +290,34 @@
     <string name="reboot_apply_change">Reboot to apply changes</string>
     <string name="restore_app_confirmation">This will restore the hidden app back to the original app. Do you really want to do this?</string>
     <string name="saved_to_path">Saved to: %1$s</string>
+    <string name="waiting_for_logs">Waiting for logs...</string>
+    <string name="flash_in_progress_subtitle">Installation in progress...</string>
+    <string name="root_required_operation">Root access is required for this operation</string>
+    <string name="apply">Apply</string>
+    <string name="edit">Edit</string>
+    <string name="theme_mode">Mode</string>
+    <string name="theme_appearance">Appearance</string>
+    <string name="theme_custom_themes">Custom themes</string>
+    <string name="theme_personalize_experience">Personalize your experience</string>
+    <string name="theme_custom_palette">Custom theme palette</string>
+    <string name="theme_custom_palette_subtitle">Set all core colors for your custom theme</string>
+    <string name="theme_dark_mode_subtitle_system">Use your device preference</string>
+    <string name="theme_dark_mode_subtitle_light">Always use light appearance</string>
+    <string name="theme_dark_mode_subtitle_dark">Always use dark appearance</string>
+    <string name="theme_dark_mode_subtitle_amoled">Pure black background (OLED)</string>
+    <string name="color_channel_alpha">Alpha</string>
+    <string name="color_channel_red">Red</string>
+    <string name="color_channel_green">Green</string>
+    <string name="color_channel_blue">Blue</string>
+    <string name="theme_color_light_primary">Light Primary</string>
+    <string name="theme_color_dark_primary">Dark Primary</string>
+    <string name="theme_color_light_secondary">Light Secondary</string>
+    <string name="theme_color_dark_secondary">Dark Secondary</string>
+    <string name="theme_color_light_surface">Light Surface</string>
+    <string name="theme_color_dark_surface">Dark Surface</string>
+    <string name="theme_color_light_on_surface">Light On Surface</string>
+    <string name="theme_color_dark_on_surface">Dark On Surface</string>
+    <string name="theme_color_light_error">Light Error</string>
+    <string name="theme_color_dark_error">Dark Error</string>
 
 </resources>

@@ -3,10 +3,13 @@ package com.topjohnwu.magisk.ui.compose.module
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.app.Notification
 import android.net.Uri
+import android.os.SystemClock
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.OpenDocument
 import androidx.compose.animation.*
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,6 +17,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.NavigateNext
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -22,21 +26,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.topjohnwu.magisk.arch.UIActivity
@@ -49,8 +53,15 @@ import com.topjohnwu.magisk.core.model.module.LocalModule
 import com.topjohnwu.magisk.core.model.module.OnlineModule
 import com.topjohnwu.magisk.core.repository.NetworkService
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
+import com.topjohnwu.magisk.core.utils.MediaStoreUtils.persistReadPermission
+import com.topjohnwu.magisk.ui.compose.RefreshOnResume
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -66,84 +77,82 @@ fun ModuleScreen(
     viewModel: ModuleComposeViewModel = viewModel(factory = ModuleComposeViewModel.Factory)
 ) {
     val activity = LocalContext.current as? UIActivity<*>
-    val lifecycleOwner = LocalLifecycleOwner.current
     val state by viewModel.state.collectAsState()
+    val contentEnterState = remember {
+        MutableTransitionState(false).apply { targetState = true }
+    }
     var query by rememberSaveable { mutableStateOf("") }
     var showSearch by rememberSaveable { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
     val zipPicker = rememberLauncherForActivityResult(OpenDocument()) { uri ->
-        if (uri != null) onInstallZip(uri)
+        if (uri != null) {
+            uri.persistReadPermission()
+            onInstallZip(uri)
+        }
     }
 
-    LaunchedEffect(state.message) {
-        state.message?.let {
-            snackbarHostState.showSnackbar(it)
-            viewModel.consumeMessage()
-        }
+    LaunchedEffect(Unit) { viewModel.refresh(force = true) }
+    RefreshOnResume { viewModel.refresh(force = true) }
+    
+    LaunchedEffect(viewModel) {
+        viewModel.messages.collect { snackbarHostState.showSnackbar(it) }
     }
-    LaunchedEffect(state.installUri) {
-        state.installUri?.let { uri ->
-            onInstallZip(uri)
-            viewModel.consumeInstallUri()
-        }
-    }
-    LaunchedEffect(Unit) { viewModel.refresh() }
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) viewModel.refresh()
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    LaunchedEffect(viewModel) {
+        viewModel.installRequests.collect { onInstallZip(it) }
     }
 
     val filteredModules = remember(state.modules, query) {
-        val q = query.trim().lowercase(Locale.getDefault())
+        val q = query.trim().lowercase(Locale.ROOT)
         if (q.isEmpty()) state.modules
-        else state.modules.filter { module ->
-            module.name.lowercase(Locale.getDefault()).contains(q) ||
-                module.id.lowercase(Locale.getDefault()).contains(q) ||
-                module.description.lowercase(Locale.getDefault()).contains(q)
-        }
+        else state.modules.filter { it.searchKey.contains(q) }
     }
 
-    val shapes = listOf(
-        RoundedCornerShape(topStart = 48.dp, topEnd = 12.dp, bottomStart = 12.dp, bottomEnd = 48.dp),
-        RoundedCornerShape(topStart = 12.dp, topEnd = 48.dp, bottomStart = 48.dp, bottomEnd = 12.dp),
-        RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp, bottomStart = 8.dp, bottomEnd = 32.dp),
-        RoundedCornerShape(topStart = 12.dp, topEnd = 56.dp, bottomStart = 56.dp, bottomEnd = 56.dp)
-    )
-
     Box(modifier = Modifier.fillMaxSize()) {
-        if (state.loading) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center), strokeCap = StrokeCap.Round)
+        if (state.loading && state.modules.isEmpty()) {
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(strokeCap = StrokeCap.Round)
+            }
         } else {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(bottom = 140.dp, start = 20.dp, end = 20.dp, top = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(20.dp)
+            AnimatedVisibility(
+                visibleState = contentEnterState,
+                enter = fadeIn(animationSpec = tween(durationMillis = 220)) +
+                    slideInVertically(
+                        initialOffsetY = { it / 8 },
+                        animationSpec = tween(durationMillis = 320, easing = FastOutSlowInEasing)
+                    ),
+                exit = fadeOut(animationSpec = tween(durationMillis = 120)),
+                label = "moduleContentEnter"
             ) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(bottom = 140.dp, top = 16.dp, start = 20.dp, end = 20.dp),
+                    verticalArrangement = Arrangement.spacedBy(24.dp)
+                ) {
                 item {
-                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                             Surface(
                                 onClick = { showSearch = !showSearch },
-                                modifier = Modifier.height(64.dp).weight(0.4f),
-                                shape = RoundedCornerShape(32.dp, 8.dp, 8.dp, 32.dp),
-                                color = MaterialTheme.colorScheme.secondaryContainer
+                                modifier = Modifier.height(56.dp).weight(0.3f),
+                                shape = RoundedCornerShape(16.dp),
+                                color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.7f)
                             ) {
                                 Box(contentAlignment = Alignment.Center) {
-                                    Icon(if (showSearch) Icons.Rounded.Close else Icons.Rounded.Search, null)
+                                    Icon(if (showSearch) Icons.Rounded.Close else Icons.Rounded.Search, null, tint = MaterialTheme.colorScheme.onSecondaryContainer)
                                 }
                             }
                             
                             Button(
                                 onClick = { zipPicker.launch(arrayOf("application/zip")) },
-                                modifier = Modifier.weight(1f).height(64.dp),
-                                shape = RoundedCornerShape(8.dp, 32.dp, 32.dp, 8.dp)
+                                modifier = Modifier.weight(1f).height(56.dp),
+                                shape = RoundedCornerShape(16.dp)
                             ) {
-                                Icon(Icons.Rounded.Add, null, modifier = Modifier.size(22.dp))
+                                Icon(Icons.Rounded.FileUpload, null, modifier = Modifier.size(20.dp))
                                 Spacer(Modifier.width(12.dp))
-                                Text(stringResource(id = CoreR.string.install), fontWeight = FontWeight.Black, fontSize = 16.sp)
+                                Text(
+                                    text = stringResource(id = CoreR.string.module_action_install_external),
+                                    fontWeight = FontWeight.Black
+                                )
                             }
                         }
                         
@@ -152,14 +161,14 @@ fun ModuleScreen(
                             enter = expandVertically() + fadeIn(),
                             exit = shrinkVertically() + fadeOut()
                         ) {
-                            TextField(
+                            OutlinedTextField(
                                 value = query,
                                 onValueChange = { query = it },
                                 modifier = Modifier.fillMaxWidth(),
-                                shape = RoundedCornerShape(24.dp),
-                                colors = TextFieldDefaults.colors(
-                                    focusedIndicatorColor = Color.Transparent,
-                                    unfocusedIndicatorColor = Color.Transparent
+                                shape = RoundedCornerShape(16.dp),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                    unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
                                 ),
                                 leadingIcon = { Icon(Icons.Rounded.Search, null) },
                                 placeholder = { Text(stringResource(id = CoreR.string.modules_search_placeholder)) },
@@ -170,18 +179,22 @@ fun ModuleScreen(
                 }
 
                 if (state.modules.isEmpty()) {
-                    item { EmptyStateView() }
+                    item { 
+                        Box(Modifier.fillParentMaxHeight(0.7f), contentAlignment = Alignment.Center) {
+                            EmptyStateView() 
+                        }
+                    }
                 } else if (filteredModules.isEmpty()) {
                     item {
                         Box(Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
-                            Text(stringResource(id = CoreR.string.modules_no_results), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(stringResource(id = CoreR.string.modules_no_results), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f))
                         }
                     }
                 } else {
-                    itemsIndexed(filteredModules, key = { _, m -> m.id }) { index, module ->
-                        OrganicModuleCard(
+                    itemsIndexed(filteredModules, key = { _, m -> m.id }) { _, module ->
+                        StylishMagiskModuleCard(
                             module = module,
-                            shape = shapes[index % shapes.size],
+                            onToggleExpanded = { viewModel.toggleExpanded(module.id) },
                             onToggleEnabled = { viewModel.toggleEnabled(module.id) },
                             onToggleRemove = { viewModel.toggleRemove(module.id) },
                             onUpdate = {
@@ -192,6 +205,7 @@ fun ModuleScreen(
                         )
                     }
                 }
+                }
             }
         }
         
@@ -200,150 +214,320 @@ fun ModuleScreen(
 }
 
 @Composable
-private fun OrganicModuleCard(
+private fun StylishMagiskModuleCard(
     module: ModuleUiItem,
-    shape: Shape,
+    onToggleExpanded: () -> Unit,
     onToggleEnabled: () -> Unit,
     onToggleRemove: () -> Unit,
     onUpdate: () -> Unit,
     onAction: () -> Unit
 ) {
     val isEnabled = module.enabled && !module.removed
+    val transition = updateTransition(targetState = module.expanded, label = "cardTransition")
     
-    Surface(
-        modifier = Modifier.fillMaxWidth().animateContentSize(),
-        shape = shape,
-        color = when {
-            module.removed -> MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.3f)
-            module.updateReady -> MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f)
-            !module.enabled -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
-            else -> MaterialTheme.colorScheme.surfaceContainerHigh
+    val elevation by transition.animateDp(
+        transitionSpec = {
+            spring(
+                dampingRatio = Spring.DampingRatioNoBouncy,
+                stiffness = Spring.StiffnessMediumLow
+            )
         },
-        tonalElevation = if (module.updateReady) 8.dp else 2.dp
+        label = "elevation"
+    ) { if (it) 10.dp else 2.dp }
+    val rotation by transition.animateFloat(
+        transitionSpec = {
+            spring(
+                dampingRatio = Spring.DampingRatioLowBouncy,
+                stiffness = Spring.StiffnessMediumLow
+            )
+        },
+        label = "rotation"
+    ) { if (it) 90f else 0f }
+    val cardScale by transition.animateFloat(
+        transitionSpec = {
+            spring(
+                dampingRatio = Spring.DampingRatioNoBouncy,
+                stiffness = Spring.StiffnessMediumLow
+            )
+        },
+        label = "cardScale"
+    ) { if (it) 1f else 0.992f }
+    val containerColor by animateColorAsState(
+        targetValue = when {
+            module.removed -> MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f)
+            module.updated -> MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.65f)
+            module.updateReady -> MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.8f)
+            !isEnabled -> MaterialTheme.colorScheme.surfaceContainerLow
+            else -> if (module.expanded) MaterialTheme.colorScheme.surfaceContainerHighest else MaterialTheme.colorScheme.surfaceContainerHigh
+        },
+        animationSpec = tween(durationMillis = 280, easing = FastOutSlowInEasing),
+        label = "color"
+    )
+    val stateDotColor = if (module.updateReady) {
+        MaterialTheme.colorScheme.tertiary
+    } else {
+        MaterialTheme.colorScheme.primary
+    }
+
+    ElevatedCard(
+        modifier = Modifier
+            .fillMaxWidth()
+            .animateContentSize(
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioNoBouncy,
+                    stiffness = Spring.StiffnessMediumLow
+                )
+            )
+            .scale(cardScale),
+        shape = RoundedCornerShape(topEnd = 48.dp, bottomStart = 48.dp, topStart = 16.dp, bottomEnd = 16.dp),
+        onClick = onToggleExpanded,
+        colors = CardDefaults.elevatedCardColors(containerColor = containerColor),
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = elevation)
     ) {
-        Column(modifier = Modifier.padding(24.dp)) {
-            Row(verticalAlignment = Alignment.Top, modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = module.name,
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Black,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        color = if (isEnabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                    )
-                    Spacer(Modifier.height(6.dp))
-                    Text(
-                        text = module.versionAuthor,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.alpha(if (isEnabled) 1f else 0.6f)
-                    )
-                }
-                
-                Switch(
-                    checked = isEnabled,
-                    onCheckedChange = { onToggleEnabled() },
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = MaterialTheme.colorScheme.primary,
-                        checkedTrackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
-                    )
+        Box {
+            Icon(
+                painter = painterResource(id = CoreR.drawable.ic_magisk_outline),
+                contentDescription = null,
+                modifier = Modifier.size(140.dp).align(Alignment.TopEnd).offset(x = 40.dp, y = (-30).dp).alpha(0.04f),
+                tint = MaterialTheme.colorScheme.primary
+            )
+            if (module.removed || module.updated) {
+                Icon(
+                    imageVector = if (module.removed) Icons.Rounded.DeleteForever else Icons.Rounded.SystemUpdateAlt,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(128.dp)
+                        .align(Alignment.CenterEnd)
+                        .offset(x = 24.dp)
+                        .alpha(0.08f),
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
             }
 
-            if (module.badges.isNotEmpty()) {
-                Spacer(Modifier.height(16.dp))
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    module.badges.forEach { badge ->
+            Column(modifier = Modifier.padding(24.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                    Box(contentAlignment = Alignment.BottomEnd) {
                         Surface(
-                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                            shape = RoundedCornerShape(8.dp)
+                            modifier = Modifier.size(56.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            color = MaterialTheme.colorScheme.surface,
+                            tonalElevation = 4.dp
                         ) {
-                            Text(
-                                text = badge,
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                                style = MaterialTheme.typography.labelSmall,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = MaterialTheme.colorScheme.primary
+                            Icon(Icons.Rounded.Extension, null, modifier = Modifier.padding(14.dp), tint = MaterialTheme.colorScheme.primary)
+                        }
+                        if (isEnabled) {
+                            Box(
+                                modifier = Modifier
+                                    .size(18.dp)
+                                    .clip(CircleShape)
+                                    .background(stateDotColor)
+                                    .border(2.dp, MaterialTheme.colorScheme.surface, CircleShape)
                             )
                         }
                     }
-                }
-            }
-            
-            if (module.description.isNotBlank()) {
-                Spacer(Modifier.height(16.dp))
-                Text(
-                    text = module.description,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    lineHeight = 20.sp,
-                    maxLines = 3,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.alpha(if (isEnabled) 1f else 0.7f)
-                )
-            }
-
-            if (module.noticeText != null) {
-                Spacer(Modifier.height(16.dp))
-                Surface(
-                    color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f),
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Rounded.Info, null, modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.error)
-                        Spacer(Modifier.width(10.dp))
-                        Text(module.noticeText, color = MaterialTheme.colorScheme.onErrorContainer, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                    
+                    Column(modifier = Modifier.weight(1f).padding(horizontal = 16.dp)) {
+                        Text(
+                            text = module.name,
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Black,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            textDecoration = if (module.removed) TextDecoration.LineThrough else null,
+                            color = if (isEnabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Surface(
+                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text(
+                                text = module.versionAuthor,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.Black,
+                                textDecoration = if (module.removed) TextDecoration.LineThrough else null,
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp).alpha(if (isEnabled) 1f else 0.7f)
+                            )
+                        }
+                        if (module.badges.isNotEmpty()) {
+                            Spacer(Modifier.height(8.dp))
+                            Text(
+                                text = module.badges.joinToString(" | "),
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
                     }
-                }
-            }
-
-            Spacer(Modifier.height(24.dp))
-            
-            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                if (module.showAction) {
-                    FilledTonalIconButton(
-                        onClick = onAction,
-                        modifier = Modifier.size(44.dp),
-                        shape = RoundedCornerShape(12.dp)
+                    
+                    AnimatedVisibility(
+                        visible = module.expanded,
+                        enter = fadeIn(animationSpec = tween(durationMillis = 180, delayMillis = 50)) +
+                            scaleIn(
+                                initialScale = 0.85f,
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioNoBouncy,
+                                    stiffness = Spring.StiffnessMediumLow
+                                )
+                            ),
+                        exit = fadeOut(animationSpec = tween(durationMillis = 120)) +
+                            scaleOut(targetScale = 0.85f, animationSpec = tween(durationMillis = 120))
                     ) {
-                        Icon(Icons.Rounded.Settings, null, modifier = Modifier.size(20.dp))
+                        Switch(
+                            checked = isEnabled,
+                            onCheckedChange = { onToggleEnabled() },
+                            thumbContent = if (isEnabled) {
+                                { Icon(Icons.Rounded.Check, null, Modifier.size(16.dp)) }
+                            } else null
+                        )
                     }
-                    Spacer(Modifier.width(12.dp))
-                }
-                
-                if (module.showUpdate) {
-                    Button(
-                        onClick = onUpdate,
-                        enabled = module.updateReady,
-                        shape = RoundedCornerShape(12.dp),
-                        modifier = Modifier.height(44.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-                    ) {
-                        Icon(Icons.Rounded.SystemUpdateAlt, null, modifier = Modifier.size(18.dp))
-                        Spacer(Modifier.width(8.dp))
-                        Text(stringResource(id = CoreR.string.module_badge_update), fontWeight = FontWeight.Black)
-                    }
-                }
-                
-                Spacer(Modifier.weight(1f))
-
-                IconButton(
-                    onClick = onToggleRemove,
-                    modifier = Modifier.background(
-                        if (module.removed) MaterialTheme.colorScheme.primary.copy(alpha = 0.1f) 
-                        else MaterialTheme.colorScheme.error.copy(alpha = 0.1f),
-                        CircleShape
-                    )
-                ) {
+                    
                     Icon(
-                        imageVector = if (module.removed) Icons.Rounded.SettingsBackupRestore else Icons.Rounded.DeleteForever,
+                        imageVector = Icons.AutoMirrored.Rounded.NavigateNext,
                         contentDescription = null,
-                        tint = if (module.removed) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
-                        modifier = Modifier.size(22.dp)
+                        modifier = Modifier.rotate(rotation).padding(start = 12.dp),
+                        tint = MaterialTheme.colorScheme.outline
                     )
+                }
+
+                AnimatedVisibility(
+                    visible = module.expanded,
+                    enter = expandVertically(
+                        expandFrom = Alignment.Top,
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioNoBouncy,
+                            stiffness = Spring.StiffnessLow
+                        )
+                    ) + slideInVertically(
+                        initialOffsetY = { it / 10 },
+                        animationSpec = tween(durationMillis = 260, easing = FastOutSlowInEasing)
+                    ) + fadeIn(animationSpec = tween(durationMillis = 200, delayMillis = 40)),
+                    exit = shrinkVertically(
+                        shrinkTowards = Alignment.Top,
+                        animationSpec = tween(durationMillis = 210, easing = FastOutLinearInEasing)
+                    ) + fadeOut(animationSpec = tween(durationMillis = 120)),
+                    label = "moduleCardDetails"
+                ) {
+                    Column {
+                        if (module.description.isNotBlank()) {
+                            Spacer(Modifier.height(20.dp))
+                            Text(
+                                text = module.description,
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                lineHeight = 24.sp,
+                                textDecoration = if (module.removed) TextDecoration.LineThrough else null,
+                                modifier = Modifier.alpha(if (isEnabled) 1f else 0.8f)
+                            )
+                        }
+
+                        if (module.noticeText != null) {
+                            Spacer(Modifier.height(20.dp))
+                            Surface(
+                                color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.6f),
+                                shape = RoundedCornerShape(16.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(Icons.Rounded.Warning, null, modifier = Modifier.size(20.dp), tint = MaterialTheme.colorScheme.error)
+                                    Spacer(Modifier.width(12.dp))
+                                    Text(module.noticeText, color = MaterialTheme.colorScheme.onErrorContainer, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+                                }
+                            }
+                        }
+
+                        Spacer(Modifier.height(32.dp))
+                        
+                        // ALL BUTTONS ALWAYS AT RIGHT
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.End)
+                        ) {
+                            if (module.showAction) {
+                                FilledTonalIconButton(
+                                    onClick = onAction,
+                                    modifier = Modifier
+                                        .size(52.dp)
+                                        .animateEnterExit(
+                                            enter = slideInHorizontally(
+                                                initialOffsetX = { fullWidth -> fullWidth / 3 },
+                                                animationSpec = tween(durationMillis = 220, delayMillis = 60, easing = FastOutSlowInEasing)
+                                            ) + fadeIn(animationSpec = tween(durationMillis = 180, delayMillis = 60)),
+                                            exit = slideOutHorizontally(
+                                                targetOffsetX = { fullWidth -> fullWidth / 3 },
+                                                animationSpec = tween(durationMillis = 120, easing = FastOutLinearInEasing)
+                                            ) + fadeOut(animationSpec = tween(durationMillis = 100))
+                                        ),
+                                    shape = RoundedCornerShape(16.dp)
+                                ) { Icon(Icons.Rounded.Settings, null, modifier = Modifier.size(24.dp)) }
+                            }
+
+                            if (module.showUpdate) {
+                                Button(
+                                    onClick = onUpdate,
+                                    enabled = module.updateReady,
+                                    shape = RoundedCornerShape(16.dp),
+                                    modifier = Modifier
+                                        .height(52.dp)
+                                        .animateEnterExit(
+                                            enter = slideInHorizontally(
+                                                initialOffsetX = { fullWidth -> fullWidth / 3 },
+                                                animationSpec = tween(durationMillis = 220, delayMillis = 110, easing = FastOutSlowInEasing)
+                                            ) + fadeIn(animationSpec = tween(durationMillis = 180, delayMillis = 110)),
+                                            exit = slideOutHorizontally(
+                                                targetOffsetX = { fullWidth -> fullWidth / 3 },
+                                                animationSpec = tween(durationMillis = 120, easing = FastOutLinearInEasing)
+                                            ) + fadeOut(animationSpec = tween(durationMillis = 100))
+                                        )
+                                ) {
+                                    Icon(Icons.Rounded.SystemUpdateAlt, null, modifier = Modifier.size(20.dp))
+                                    Spacer(Modifier.width(8.dp))
+                                    Text(stringResource(id = CoreR.string.update), fontWeight = FontWeight.Black)
+                                }
+                            }
+
+                            Surface(
+                                onClick = onToggleRemove,
+                                enabled = !module.updated,
+                                modifier = Modifier
+                                    .size(52.dp)
+                                    .alpha(if (module.updated) 0.45f else 1f)
+                                    .animateEnterExit(
+                                        enter = slideInHorizontally(
+                                            initialOffsetX = { fullWidth -> fullWidth / 3 },
+                                            animationSpec = tween(durationMillis = 220, delayMillis = 150, easing = FastOutSlowInEasing)
+                                        ) + fadeIn(animationSpec = tween(durationMillis = 180, delayMillis = 150)),
+                                        exit = slideOutHorizontally(
+                                            targetOffsetX = { fullWidth -> fullWidth / 3 },
+                                            animationSpec = tween(durationMillis = 120, easing = FastOutLinearInEasing)
+                                        ) + fadeOut(animationSpec = tween(durationMillis = 100))
+                                    ),
+                                shape = CircleShape,
+                                color = when {
+                                    module.updated -> MaterialTheme.colorScheme.surfaceVariant
+                                    module.removed -> MaterialTheme.colorScheme.primaryContainer
+                                    else -> MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.2f)
+                                }
+                            ) {
+                                Box(contentAlignment = Alignment.Center) {
+                                    Icon(
+                                        imageVector = if (module.removed) Icons.Rounded.SettingsBackupRestore else Icons.Rounded.DeleteForever,
+                                        contentDescription = null,
+                                        tint = when {
+                                            module.updated -> MaterialTheme.colorScheme.onSurfaceVariant
+                                            module.removed -> MaterialTheme.colorScheme.primary
+                                            else -> MaterialTheme.colorScheme.error
+                                        },
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -352,42 +536,95 @@ private fun OrganicModuleCard(
 
 @Composable
 private fun EmptyStateView() {
-    Box(modifier = Modifier.fillMaxWidth().height(400.dp), contentAlignment = Alignment.Center) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Surface(
-                modifier = Modifier.size(120.dp),
-                shape = RoundedCornerShape(40.dp),
-                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(Icons.Rounded.ExtensionOff, null, modifier = Modifier.size(56.dp), tint = MaterialTheme.colorScheme.outline)
-                }
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Surface(
+            modifier = Modifier.size(140.dp),
+            shape = RoundedCornerShape(48.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Icon(Icons.Rounded.ExtensionOff, null, modifier = Modifier.size(64.dp), tint = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f))
             }
-            Spacer(Modifier.height(24.dp))
-            Text(stringResource(id = CoreR.string.module_empty), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.outline)
-            Text(stringResource(id = CoreR.string.module_action_install_external), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.outline.copy(alpha = 0.7f))
         }
+        Spacer(Modifier.height(32.dp))
+        Text(stringResource(id = CoreR.string.module_empty), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.outline)
+        Spacer(Modifier.height(8.dp))
+        Text(stringResource(id = CoreR.string.module_action_install_external), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.outline.copy(alpha = 0.6f))
     }
 }
 
-data class ModuleUiItem(val id: String, val name: String, val versionAuthor: String, val description: String, val enabled: Boolean, val removed: Boolean, val updated: Boolean, val showAction: Boolean, val noticeText: String?, val showUpdate: Boolean, val updateReady: Boolean, val update: OnlineModule?, val badges: List<String>)
-data class ModuleUiState(val loading: Boolean = true, val modules: List<ModuleUiItem> = emptyList(), val installUri: Uri? = null, val message: String? = null)
+data class ModuleUiItem(
+    val id: String,
+    val name: String,
+    val versionAuthor: String,
+    val description: String,
+    val enabled: Boolean,
+    val removed: Boolean,
+    val updated: Boolean,
+    val showAction: Boolean,
+    val noticeText: String?,
+    val showUpdate: Boolean,
+    val updateReady: Boolean,
+    val update: OnlineModule?,
+    val badges: List<String>,
+    val searchKey: String,
+    val expanded: Boolean = false
+)
+data class ModuleUiState(val loading: Boolean = true, val modules: List<ModuleUiItem> = emptyList())
 
 class ModuleComposeViewModel(private val networkService: NetworkService, private val moduleProvider: suspend () -> List<LocalModule>) : ViewModel() {
     private val _state = MutableStateFlow(ModuleUiState())
     val state: StateFlow<ModuleUiState> = _state
+    private val _messages = MutableSharedFlow<String>(extraBufferCapacity = 1)
+    val messages: SharedFlow<String> = _messages.asSharedFlow()
+    private val _installRequests = MutableSharedFlow<Uri>(extraBufferCapacity = 1)
+    val installRequests: SharedFlow<Uri> = _installRequests.asSharedFlow()
+    private var refreshJob: Job? = null
+    private var metadataJob: Job? = null
+    private val moduleCache = linkedMapOf<String, LocalModule>()
+    private val cacheLock = Any()
+    private var lastRefreshAt = 0L
+    private var lastMetadataRefreshAt = 0L
 
-    fun refresh() {
-        viewModelScope.launch {
-            _state.update { it.copy(loading = true) }
+    fun refresh(force: Boolean = false) {
+        val now = SystemClock.elapsedRealtime()
+        if (!force && _state.value.modules.isNotEmpty() && now - lastRefreshAt < MIN_REFRESH_INTERVAL_MS) {
+            return
+        }
+        lastRefreshAt = now
+        refreshJob?.cancel()
+        metadataJob?.cancel()
+        val hadModules = _state.value.modules.isNotEmpty()
+        refreshJob = viewModelScope.launch {
+            if (!hadModules) {
+                _state.update { it.copy(loading = true) }
+            }
             val list = if (Info.env.isActive && isModuleRepoLoaded()) readInstalledModules() else emptyList()
-            _state.update { it.copy(loading = false, modules = list.map { it.toUiItem() }) }
-            if (list.isNotEmpty()) {
-                launch(Dispatchers.IO) {
+            synchronized(cacheLock) {
+                moduleCache.clear()
+                list.forEach { moduleCache[it.id] = it }
+            }
+            val currentExpanded = _state.value.modules.filter { it.expanded }.map { it.id }.toSet()
+            _state.update { it.copy(loading = false, modules = list.map { it.toUiItem(currentExpanded.contains(it.id)) }) }
+            if (list.isNotEmpty() && now - lastMetadataRefreshAt >= MIN_METADATA_REFRESH_INTERVAL_MS) {
+                lastMetadataRefreshAt = now
+                metadataJob = launch(Dispatchers.IO) {
                     list.forEach { runCatching { it.fetch() } }
-                    withContext(Dispatchers.Main) { _state.update { it.copy(modules = list.map { it.toUiItem() }) } }
+                    val currentExpandedMetadata = _state.value.modules.filter { it.expanded }.map { it.id }.toSet()
+                    val updatedUi = list.map { it.toUiItem(currentExpandedMetadata.contains(it.id)) }
+                    withContext(Dispatchers.Main) {
+                        _state.update { st -> st.copy(modules = updatedUi) }
+                    }
                 }
             }
+        }
+    }
+
+    fun toggleExpanded(id: String) {
+        _state.update { st ->
+            st.copy(modules = st.modules.map { 
+                if (it.id == id) it.copy(expanded = !it.expanded) else it 
+            })
         }
     }
 
@@ -395,8 +632,14 @@ class ModuleComposeViewModel(private val networkService: NetworkService, private
     fun toggleRemove(id: String) = updateModule(id) { it.remove = !it.remove }
     fun markUpdate(id: String) {
         val update = _state.value.modules.firstOrNull { it.id == id }?.update
-        if (update == null) { _state.update { it.copy(message = AppContext.getString(CoreR.string.loading)) }; return }
-        if (Info.isConnected.value != true) { _state.update { it.copy(message = AppContext.getString(CoreR.string.no_connection)) }; return }
+        if (update == null) {
+            _messages.tryEmit(AppContext.getString(CoreR.string.loading))
+            return
+        }
+        if (Info.isConnected.value != true) {
+            _messages.tryEmit(AppContext.getString(CoreR.string.no_connection))
+            return
+        }
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val file = MediaStoreUtils.getFile(update.downloadFilename)
@@ -405,23 +648,75 @@ class ModuleComposeViewModel(private val networkService: NetworkService, private
                     DownloadProcessor(object : DownloadNotifier { override val context = AppContext; override fun notifyUpdate(id: Int, editor: (Notification.Builder) -> Unit) = Unit }).handleModule(input, file.uri)
                 }
                 file.uri
-            }.onSuccess { uri -> withContext(Dispatchers.Main) { _state.update { it.copy(installUri = uri, message = AppContext.getString(CoreR.string.download_complete)) } } }
-            .onFailure { withContext(Dispatchers.Main) { _state.update { it.copy(message = AppContext.getString(CoreR.string.download_file_error)) } } }
+            }.onSuccess { uri ->
+                withContext(Dispatchers.Main) {
+                    _installRequests.emit(uri)
+                    _messages.emit(AppContext.getString(CoreR.string.download_complete))
+                }
+            }.onFailure {
+                withContext(Dispatchers.Main) {
+                    _messages.emit(AppContext.getString(CoreR.string.download_file_error))
+                }
+            }
         }
     }
 
-    fun postExternalRwDenied() { _state.update { it.copy(message = AppContext.getString(CoreR.string.external_rw_permission_denied)) } }
-    private fun updateModule(id: String, block: (LocalModule) -> Unit) { viewModelScope.launch { val modules = readInstalledModules().toMutableList().apply { find { it.id == id }?.let(block) }; _state.update { it.copy(modules = modules.map { it.toUiItem() }) } } }
+    fun postExternalRwDenied() {
+        _messages.tryEmit(AppContext.getString(CoreR.string.external_rw_permission_denied))
+    }
+
+    private fun updateModule(id: String, block: (LocalModule) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val module = synchronized(cacheLock) { moduleCache[id] } ?: run {
+                val list = readInstalledModules()
+                synchronized(cacheLock) {
+                    moduleCache.clear()
+                    list.forEach { moduleCache[it.id] = it }
+                }
+                val currentExp = _state.value.modules.filter { it.expanded }.map { it.id }.toSet()
+                withContext(Dispatchers.Main) {
+                    _state.update { it.copy(modules = list.map { m -> m.toUiItem(currentExp.contains(m.id)) }) }
+                }
+                synchronized(cacheLock) { moduleCache[id] } ?: return@launch
+            }
+            val ok = runCatching { block(module) }.isSuccess
+            if (!ok) {
+                withContext(Dispatchers.Main) {
+                    _messages.emit(AppContext.getString(CoreR.string.failure))
+                }
+                return@launch
+            }
+            val currentExpanded = _state.value.modules.find { it.id == id }?.expanded ?: false
+            val updatedUi = module.toUiItem(currentExpanded)
+            withContext(Dispatchers.Main) {
+                _state.update { st ->
+                    val index = st.modules.indexOfFirst { it.id == id }
+                    if (index < 0) st
+                    else {
+                        val copy = st.modules.toMutableList()
+                        copy[index] = updatedUi
+                        st.copy(modules = copy)
+                    }
+                }
+            }
+        }
+    }
+
     private suspend fun isModuleRepoLoaded(): Boolean = withTimeoutOrNull(3000) { withContext(Dispatchers.IO) { LocalModule.loaded() } } ?: false
     private suspend fun readInstalledModules(): List<LocalModule> = withTimeoutOrNull(5000) { withContext(Dispatchers.IO) { moduleProvider() } } ?: emptyList()
-    fun consumeMessage() { _state.update { it.copy(message = null) } }
-    fun consumeInstallUri() { _state.update { it.copy(installUri = null) } }
 
     object Factory : ViewModelProvider.Factory { override fun <T : ViewModel> create(modelClass: Class<T>): T { @Suppress("UNCHECKED_CAST") return ModuleComposeViewModel(ServiceLocator.networkService) { LocalModule.installed() } as T } }
+
+    companion object {
+        private const val MIN_REFRESH_INTERVAL_MS = 1200L
+        private const val MIN_METADATA_REFRESH_INTERVAL_MS = 30_000L
+    }
 }
 
-private fun LocalModule.toUiItem(): ModuleUiItem {
-    val zygiskLabel = "Zygisk"
+private fun LocalModule.toUiItem(expanded: Boolean = false): ModuleUiItem {
+    val zygiskLabel = AppContext.getString(CoreR.string.zygisk)
+    val safeName = name.ifBlank { id }
+    val safeDescription = description
     val noticeText: String? = when {
         zygiskUnloaded -> AppContext.getString(CoreR.string.zygisk_module_unloaded)
         Info.isZygiskEnabled && isRiru -> AppContext.getString(CoreR.string.suspend_text_riru, zygiskLabel)
@@ -430,9 +725,9 @@ private fun LocalModule.toUiItem(): ModuleUiItem {
     }
     return ModuleUiItem(
         id,
-        name.ifBlank { id },
+        safeName,
         AppContext.getString(CoreR.string.module_version_author, version, author),
-        description,
+        safeDescription,
         enable,
         remove,
         updated,
@@ -446,7 +741,14 @@ private fun LocalModule.toUiItem(): ModuleUiItem {
             if (updated) add(AppContext.getString(CoreR.string.module_badge_updated))
             if (remove) add(AppContext.getString(CoreR.string.module_badge_removing))
             if (!enable) add(AppContext.getString(CoreR.string.module_badge_disabled))
-        }
+        },
+        buildString {
+            append(safeName.lowercase(Locale.ROOT))
+            append('\n')
+            append(id.lowercase(Locale.ROOT))
+            append('\n')
+            append(safeDescription.lowercase(Locale.ROOT))
+        },
+        expanded
     )
 }
-

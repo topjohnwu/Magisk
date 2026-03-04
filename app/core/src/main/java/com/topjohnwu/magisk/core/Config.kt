@@ -41,6 +41,16 @@ object Config : PreferenceConfig, DBConfig {
         const val DOWNLOAD_DIR = "download_dir"
         const val SAFETY = "safety_notice"
         const val THEME_ORDINAL = "theme_ordinal"
+        const val THEME_CUSTOM_LIGHT_PRIMARY = "theme_custom_light_primary"
+        const val THEME_CUSTOM_DARK_PRIMARY = "theme_custom_dark_primary"
+        const val THEME_CUSTOM_LIGHT_SECONDARY = "theme_custom_light_secondary"
+        const val THEME_CUSTOM_DARK_SECONDARY = "theme_custom_dark_secondary"
+        const val THEME_CUSTOM_LIGHT_SURFACE = "theme_custom_light_surface"
+        const val THEME_CUSTOM_DARK_SURFACE = "theme_custom_dark_surface"
+        const val THEME_CUSTOM_LIGHT_ON_SURFACE = "theme_custom_light_on_surface"
+        const val THEME_CUSTOM_DARK_ON_SURFACE = "theme_custom_dark_on_surface"
+        const val THEME_CUSTOM_LIGHT_ERROR = "theme_custom_light_error"
+        const val THEME_CUSTOM_DARK_ERROR = "theme_custom_dark_error"
         const val ASKED_HOME = "asked_home"
         const val DOH = "doh"
         const val RAND_NAME = "rand_name"
@@ -60,6 +70,9 @@ object Config : PreferenceConfig, DBConfig {
     }
 
     object Value {
+        // Theme mode
+        const val DARK_THEME_AMOLED = -2
+
         // Update channels
         const val DEFAULT_CHANNEL = -1
         const val STABLE_CHANNEL = 0
@@ -108,6 +121,16 @@ object Config : PreferenceConfig, DBConfig {
     var darkTheme by preference(Key.DARK_THEME, -1)
     // Keep a sentinel as default so Theme.selected can route to the dynamic default theme.
     var themeOrdinal by preference(Key.THEME_ORDINAL, -1)
+    var themeCustomLightPrimary by preference(Key.THEME_CUSTOM_LIGHT_PRIMARY, 0xFF4EAFF5.toInt())
+    var themeCustomDarkPrimary by preference(Key.THEME_CUSTOM_DARK_PRIMARY, 0xFF4EAFF5.toInt())
+    var themeCustomLightSecondary by preference(Key.THEME_CUSTOM_LIGHT_SECONDARY, 0xFF3E78AF.toInt())
+    var themeCustomDarkSecondary by preference(Key.THEME_CUSTOM_DARK_SECONDARY, 0xFF3E78AF.toInt())
+    var themeCustomLightSurface by preference(Key.THEME_CUSTOM_LIGHT_SURFACE, 0xFFF9F9F9.toInt())
+    var themeCustomDarkSurface by preference(Key.THEME_CUSTOM_DARK_SURFACE, 0xFF0D0D0D.toInt())
+    var themeCustomLightOnSurface by preference(Key.THEME_CUSTOM_LIGHT_ON_SURFACE, 0xFF444444.toInt())
+    var themeCustomDarkOnSurface by preference(Key.THEME_CUSTOM_DARK_ON_SURFACE, 0xFFD8D8D8.toInt())
+    var themeCustomLightError by preference(Key.THEME_CUSTOM_LIGHT_ERROR, 0xFFCC0047.toInt())
+    var themeCustomDarkError by preference(Key.THEME_CUSTOM_DARK_ERROR, 0xFFEF8282.toInt())
 
     private var checkUpdatePrefs by preference(Key.CHECK_UPDATES, true)
     private var localePrefs by preference(Key.LOCALE, "")

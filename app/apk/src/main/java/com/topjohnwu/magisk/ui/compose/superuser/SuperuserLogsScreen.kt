@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.ui.compose.superuser
 
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+import android.graphics.Bitmap
 import androidx.compose.animation.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -22,7 +23,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Fill
+import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -31,9 +34,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -47,10 +47,17 @@ import com.topjohnwu.magisk.core.ktx.toTime
 import com.topjohnwu.magisk.core.model.su.SuLog
 import com.topjohnwu.magisk.core.model.su.SuPolicy
 import com.topjohnwu.magisk.core.repository.LogRepository
+import com.topjohnwu.magisk.ui.compose.RefreshOnResume
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
+import androidx.core.graphics.drawable.toBitmap
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -66,124 +73,152 @@ fun SuperuserLogsScreen(
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val activity = LocalContext.current as? UIActivity<*>
-    val lifecycleOwner = LocalLifecycleOwner.current
 
-    LaunchedEffect(Unit) { viewModel.refresh() }
-    LaunchedEffect(state.message) {
-        state.message?.let { msg ->
-            snackbarHostState.showSnackbar(msg)
-            viewModel.consumeMessage()
-        }
-    }
-
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) viewModel.refresh()
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    RefreshOnResume { viewModel.refresh() }
+    LaunchedEffect(viewModel) {
+        viewModel.messages.collect { snackbarHostState.showSnackbar(it) }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 24.dp, vertical = 12.dp)
+                .padding(horizontal = 20.dp, vertical = 12.dp)
         ) {
-            // Expressive Action Toolbar
-            ElevatedCard(
-                shape = RoundedCornerShape(28.dp),
-                colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
             ) {
-                Row(
-                    modifier = Modifier.padding(12.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    FilledTonalButton(
-                        onClick = { viewModel.clearLogs() },
-                        modifier = Modifier.weight(1f).height(48.dp),
-                        shape = RoundedCornerShape(16.dp)
-                    ) {
-                        Icon(Icons.Rounded.DeleteSweep, null, modifier = Modifier.size(20.dp))
-                        Spacer(Modifier.width(8.dp))
-                        Text(stringResource(id = CoreR.string.menuClearLog), fontWeight = FontWeight.Bold)
-                    }
-                    Button(
-                        onClick = {
-                            activity?.withPermission(WRITE_EXTERNAL_STORAGE) { granted ->
-                                if (granted) viewModel.saveLogs() else viewModel.postExternalRwDenied()
-                            } ?: viewModel.saveLogs()
-                        },
-                        modifier = Modifier.weight(1f).height(48.dp),
-                        shape = RoundedCornerShape(16.dp)
-                    ) {
-                        Icon(Icons.Rounded.SaveAlt, null, modifier = Modifier.size(20.dp))
-                        Spacer(Modifier.width(8.dp))
-                        Text(stringResource(id = CoreR.string.menuSaveLog), fontWeight = FontWeight.Bold)
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Timeline Content
-            when {
-                state.loading && state.items.isEmpty() -> {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(strokeCap = StrokeCap.Round)
-                    }
-                }
-                state.items.isEmpty() -> {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Icon(Icons.Rounded.History, null, modifier = Modifier.size(64.dp), tint = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
-                            Spacer(Modifier.height(16.dp))
-                            Text(stringResource(id = CoreR.string.log_data_none), color = MaterialTheme.colorScheme.outline)
+                // Timeline Content
+                when {
+                    state.loading && state.items.isEmpty() -> {
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator(strokeCap = StrokeCap.Round)
                         }
                     }
-                }
-                else -> {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(bottom = 120.dp)
-                    ) {
-                        itemsIndexed(state.items, key = { _, item -> item.id }) { index, item ->
-                            TimelineLogItem(index, state.items.size, item)
+                    state.items.isEmpty() -> {
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Surface(
+                                    modifier = Modifier.size(120.dp),
+                                    shape = RoundedCornerShape(40.dp),
+                                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                                ) {
+                                    Box(contentAlignment = Alignment.Center) {
+                                        Icon(Icons.Rounded.History, null, modifier = Modifier.size(56.dp), tint = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f))
+                                    }
+                                }
+                                Spacer(Modifier.height(24.dp))
+                                Text(stringResource(id = CoreR.string.log_data_none), color = MaterialTheme.colorScheme.outline, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    }
+                    else -> {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(bottom = 16.dp),
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            itemsIndexed(state.items, key = { _, item -> item.id }) { index, item ->
+                                TimelineLogItem(index, state.items.size, item)
+                            }
                         }
                     }
                 }
             }
+
+            Spacer(modifier = Modifier.height(12.dp))
+            SuperuserLogActionButtons(
+                onClear = { viewModel.clearLogs() },
+                onSave = {
+                    activity?.withPermission(WRITE_EXTERNAL_STORAGE) { granted ->
+                        if (granted) viewModel.saveLogs() else viewModel.postExternalRwDenied()
+                    } ?: viewModel.saveLogs()
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
+                    .padding(bottom = 8.dp)
+            )
         }
 
         SnackbarHost(
             hostState = snackbarHostState,
-            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 110.dp)
+            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 120.dp)
         )
     }
 }
 
 @Composable
+private fun SuperuserLogActionButtons(
+    onClear: () -> Unit,
+    onSave: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Surface(
+            onClick = onClear,
+            modifier = Modifier
+                .height(56.dp)
+                .weight(0.3f),
+            shape = RoundedCornerShape(16.dp),
+            color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.65f)
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Icon(
+                    imageVector = Icons.Rounded.DeleteSweep,
+                    contentDescription = stringResource(CoreR.string.menuClearLog),
+                    tint = MaterialTheme.colorScheme.onErrorContainer
+                )
+            }
+        }
+
+        Button(
+            onClick = onSave,
+            modifier = Modifier
+                .weight(1f)
+                .height(56.dp),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Icon(Icons.Rounded.SaveAlt, null, modifier = Modifier.size(20.dp))
+            Spacer(Modifier.width(12.dp))
+            Text(stringResource(CoreR.string.menuSaveLog).uppercase(), fontWeight = FontWeight.Black)
+        }
+    }
+}
+
+@Composable
 private fun TimelineLogItem(index: Int, total: Int, item: SuLogUiItem) {
-    Row(modifier = Modifier.fillMaxWidth()) {
+    val decisionColor = if (item.allowed) {
+        MaterialTheme.colorScheme.primary
+    } else {
+        MaterialTheme.colorScheme.error
+    }
+
+    Row(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
         // Timeline aesthetics
         Column(
-            modifier = Modifier.width(48.dp),
+            modifier = Modifier.width(48.dp).fillMaxHeight(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(
                 modifier = Modifier
-                    .width(2.dp)
+                    .width(3.dp)
                     .weight(1f)
-                    .background(if (index == 0) Color.Transparent else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                    .background(if (index == 0) Color.Transparent else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
             )
             
-            HexagonNode(color = if (item.allowed) Color(0xFF4CAF50) else MaterialTheme.colorScheme.error)
+            HexagonNode(color = decisionColor)
             
             Box(
                 modifier = Modifier
-                    .width(2.dp)
+                    .width(3.dp)
                     .weight(1f)
-                    .background(if (index == total - 1) Color.Transparent else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                    .background(if (index == total - 1) Color.Transparent else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
             )
         }
 
@@ -191,43 +226,78 @@ private fun TimelineLogItem(index: Int, total: Int, item: SuLogUiItem) {
         ElevatedCard(
             shape = RoundedCornerShape(topEnd = 32.dp, bottomStart = 32.dp, topStart = 8.dp, bottomEnd = 8.dp),
             modifier = Modifier.padding(vertical = 8.dp, horizontal = 4.dp).weight(1f),
-            colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
+            colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
         ) {
             Box {
                 Icon(
                     painter = painterResource(id = CoreR.drawable.ic_magisk_outline),
                     contentDescription = null,
-                    modifier = Modifier.size(80.dp).align(Alignment.TopEnd).offset(x = 20.dp, y = (-10).dp).alpha(0.05f),
+                    modifier = Modifier.size(100.dp).align(Alignment.TopEnd).offset(x = 20.dp, y = (-15).dp).alpha(0.04f),
                     tint = MaterialTheme.colorScheme.primary
                 )
                 Column(modifier = Modifier.padding(20.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(item.appName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.ExtraBold, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        val appIconPainter = remember(item.icon) { BitmapPainter(item.icon.asImageBitmap()) }
                         Surface(
-                            color = (if (item.allowed) Color(0xFF4CAF50) else MaterialTheme.colorScheme.error).copy(alpha = 0.1f),
+                            modifier = Modifier.size(34.dp),
+                            shape = RoundedCornerShape(10.dp),
+                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f)
+                        ) {
+                            Icon(
+                                painter = appIconPainter,
+                                contentDescription = null,
+                                modifier = Modifier.padding(6.dp),
+                                tint = Color.Unspecified
+                            )
+                        }
+                        Spacer(Modifier.width(10.dp))
+                        Text(item.appName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Black, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Surface(
+                            color = decisionColor.copy(alpha = 0.12f),
                             shape = RoundedCornerShape(8.dp)
                         ) {
                             Text(
-                                text = if (item.allowed) AppContext.getString(CoreR.string.grant) else AppContext.getString(CoreR.string.deny),
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                                text = (if (item.allowed) AppContext.getString(CoreR.string.grant) else AppContext.getString(CoreR.string.deny)).uppercase(),
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                                 style = MaterialTheme.typography.labelSmall,
-                                color = if (item.allowed) Color(0xFF4CAF50) else MaterialTheme.colorScheme.error,
-                                fontWeight = FontWeight.Black
+                                color = decisionColor,
+                                fontWeight = FontWeight.Black,
+                                letterSpacing = 0.5.sp
                             )
                         }
                     }
                     Spacer(modifier = Modifier.height(12.dp))
+                    
+                    // FORMATTED INFO SECTION
                     Surface(
-                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f),
                         shape = RoundedCornerShape(12.dp),
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text(
-                            text = item.info,
-                            modifier = Modifier.padding(12.dp),
-                            style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace, fontSize = 10.sp, lineHeight = 14.sp),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        Column(modifier = Modifier.padding(12.dp)) {
+                            item.infoLines.forEachIndexed { index, line ->
+                                Text(
+                                    text = line,
+                                    style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace),
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    fontSize = 10.sp
+                                )
+                                if (index != item.infoLines.lastIndex) {
+                                    Spacer(Modifier.height(4.dp))
+                                }
+                            }
+                            
+                            if (item.command.isNotBlank()) {
+                                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f))
+                                Text(
+                                    text = item.command,
+                                    style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace),
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    fontSize = 10.sp,
+                                    lineHeight = 14.sp
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -237,7 +307,7 @@ private fun TimelineLogItem(index: Int, total: Int, item: SuLogUiItem) {
 
 @Composable
 private fun HexagonNode(color: Color) {
-    Canvas(modifier = Modifier.size(24.dp)) {
+    Canvas(modifier = Modifier.size(28.dp).padding(4.dp)) {
         val path = Path().apply {
             val radius = size.minDimension / 2
             val centerX = size.width / 2
@@ -251,66 +321,111 @@ private fun HexagonNode(color: Color) {
             close()
         }
         drawPath(path, color)
-        drawPath(path, Color.White.copy(alpha = 0.3f), style = Fill)
+        drawPath(path, Color.White.copy(alpha = 0.25f), style = Fill)
     }
 }
 
-// Logic components remain identical
-data class SuLogUiItem(val id: Int, val appName: String, val allowed: Boolean, val info: String)
-data class SuperuserLogsUiState(val loading: Boolean = true, val items: List<SuLogUiItem> = emptyList(), val message: String? = null)
+data class SuLogUiItem(
+    val id: Int, 
+    val appName: String, 
+    val icon: Bitmap,
+    val allowed: Boolean, 
+    val infoLines: List<String>,
+    val command: String
+)
+
+data class SuperuserLogsUiState(val loading: Boolean = true, val items: List<SuLogUiItem> = emptyList())
 
 class SuperuserLogsComposeViewModel(private val repo: LogRepository) : ViewModel() {
     private val _state = MutableStateFlow(SuperuserLogsUiState())
     val state: StateFlow<SuperuserLogsUiState> = _state
+    private val _messages = MutableSharedFlow<String>(extraBufferCapacity = 1)
+    val messages: SharedFlow<String> = _messages.asSharedFlow()
+    private var refreshJob: Job? = null
+    private val pm = AppContext.packageManager
+    private val iconCache = mutableMapOf<String, Bitmap>()
+
     fun refresh() {
-        viewModelScope.launch {
-            _state.update { it.copy(loading = true) }
-            val logs = withContext(Dispatchers.IO) { repo.fetchSuLogs() }
-            _state.update { it.copy(loading = false, items = logs.map { it.toUiItem() }) }
+        refreshJob?.cancel()
+        val hadItems = _state.value.items.isNotEmpty()
+        refreshJob = viewModelScope.launch {
+            if (!hadItems) {
+                _state.update { it.copy(loading = true) }
+            }
+            val items = withContext(Dispatchers.IO) {
+                repo.fetchSuLogs().map { it.toUiItem() }
+            }
+            _state.update { it.copy(loading = false, items = items) }
         }
     }
-    fun clearLogs() { viewModelScope.launch { withContext(Dispatchers.IO) { repo.clearLogs() }; _state.update { it.copy(message = AppContext.getString(CoreR.string.logs_cleared)) }; refresh() } }
+    fun clearLogs() {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) { repo.clearLogs() }
+            _messages.emit(AppContext.getString(CoreR.string.logs_cleared))
+            refresh()
+        }
+    }
     fun saveLogs() {
         viewModelScope.launch(Dispatchers.IO) {
             val result = runCatching {
                 val name = "superuser_log_%s.log".format(System.currentTimeMillis().toTime(timeFormatStandard))
                 val logFile = MediaStoreUtils.getFile(name)
                 logFile.uri.outputStream().bufferedWriter().use { writer ->
-                    state.value.items.forEach { writer.write("${it.appName}\n${it.info}\n\n") }
+                    state.value.items.forEach { item ->
+                        writer.write("${item.appName}\n")
+                        item.infoLines.forEach { line -> writer.write("$line\n") }
+                        if (item.command.isNotBlank()) {
+                            writer.write("${item.command}\n")
+                        }
+                        writer.write("\n")
+                    }
                 }
                 logFile.uri.toString()
             }
             withContext(Dispatchers.Main) {
-                result.onSuccess { path -> _state.update { it.copy(message = AppContext.getString(CoreR.string.saved_to_path, path)) } }
-                      .onFailure { _state.update { it.copy(message = AppContext.getString(CoreR.string.failure)) } }
+                result.onSuccess { path -> _messages.emit(AppContext.getString(CoreR.string.saved_to_path, path)) }
+                      .onFailure { _messages.emit(AppContext.getString(CoreR.string.failure)) }
             }
         }
     }
-    fun postExternalRwDenied() { _state.update { it.copy(message = AppContext.getString(CoreR.string.external_rw_permission_denied)) } }
-    fun consumeMessage() { _state.update { it.copy(message = null) } }
-    private fun SuLog.toUiItem(): SuLogUiItem = SuLogUiItem(id, appName, action >= SuPolicy.ALLOW, buildInfo())
-    private fun SuLog.buildInfo(): String {
+    fun postExternalRwDenied() { _messages.tryEmit(AppContext.getString(CoreR.string.external_rw_permission_denied)) }
+    
+    private fun SuLog.toUiItem(): SuLogUiItem {
         val res = AppContext.resources
-        val sb = StringBuilder()
-        val date = time.toTime(timeDateFormat)
-        val toUidText = res.getString(CoreR.string.target_uid, toUid)
-        val fromPidText = res.getString(CoreR.string.pid, fromPid)
-        sb.append("$date\n$toUidText  $fromPidText")
-        if (target != -1) {
-            val pid = if (target == 0) "magiskd" else target.toString()
-            val targetText = res.getString(CoreR.string.target_pid, pid)
-            sb.append("  $targetText")
+        val infoLines = mutableListOf<String>()
+        infoLines += time.toTime(timeDateFormat)
+        val primaryLine = buildString {
+            append(res.getString(CoreR.string.target_uid, toUid))
+            append("  ")
+            append(res.getString(CoreR.string.pid, fromPid))
+            if (target != -1) {
+                val pid = if (target == 0) "magiskd" else target.toString()
+                append("  ")
+                append(res.getString(CoreR.string.target_pid, pid))
+            }
         }
+        infoLines += primaryLine
         if (context.isNotEmpty()) {
-            val contextText = res.getString(CoreR.string.selinux_context, context)
-            sb.append("\n$contextText")
+            infoLines += res.getString(CoreR.string.selinux_context, context)
         }
         if (gids.isNotEmpty()) {
-            val gidsText = res.getString(CoreR.string.supp_group, gids)
-            sb.append("\n$gidsText")
+            infoLines += res.getString(CoreR.string.supp_group, gids)
         }
-        sb.append("\n$command")
-        return sb.toString()
+        val icon = iconCache.getOrPut(packageName) {
+            runCatching { pm.getApplicationIcon(packageName) }
+                .getOrDefault(pm.defaultActivityIcon)
+                .toBitmap()
+        }
+        
+        return SuLogUiItem(
+            id = id,
+            appName = appName,
+            icon = icon,
+            allowed = action >= SuPolicy.ALLOW,
+            infoLines = infoLines,
+            command = command
+        )
     }
+
     companion object { val Factory = object : ViewModelProvider.Factory { override fun <T : ViewModel> create(modelClass: Class<T>): T { @Suppress("UNCHECKED_CAST") return SuperuserLogsComposeViewModel(ServiceLocator.logRepo) as T } } }
 }

@@ -7,6 +7,7 @@ import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.ktx.writeTo
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.displayName
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.inputStream
+import com.topjohnwu.magisk.core.utils.MediaStoreUtils.persistReadPermission
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -35,7 +36,11 @@ open class FlashZip(
             File(installDir, "install.zip").also {
                 console.add("- Copying zip to temp directory")
                 try {
+                    mUri.persistReadPermission()
                     mUri.inputStream().writeTo(it)
+                } catch (e: SecurityException) {
+                    console.add("! Permission denied for selected file")
+                    throw IOException(e)
                 } catch (e: IOException) {
                     when (e) {
                         is FileNotFoundException -> console.add("! Invalid Uri")
@@ -54,7 +59,8 @@ open class FlashZip(
             throw e
         }
 
-        console.add("- Installing ${mUri.displayName}")
+        val displayName = runCatching { mUri.displayName }.getOrDefault(mUri.toString())
+        console.add("- Installing $displayName")
 
         return Shell.cmd("sh $installDir/update-binary dummy 1 \'$zipFile\'")
             .to(console, logs).exec().isSuccess

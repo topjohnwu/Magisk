@@ -12,6 +12,7 @@ import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.base.ContentResultCallback
 import com.topjohnwu.magisk.core.model.module.LocalModule
 import com.topjohnwu.magisk.core.model.module.OnlineModule
+import com.topjohnwu.magisk.core.utils.MediaStoreUtils.persistReadPermission
 import com.topjohnwu.magisk.databinding.MergeObservableList
 import com.topjohnwu.magisk.databinding.RvItem
 import com.topjohnwu.magisk.databinding.bindExtra
@@ -94,6 +95,7 @@ class ModuleViewModel : AsyncLoadViewModel() {
     @Parcelize
     class UriCallback : ContentResultCallback {
         override fun onActivityResult(result: Uri) {
+            result.persistReadPermission()
             uri.value = result
         }
     }

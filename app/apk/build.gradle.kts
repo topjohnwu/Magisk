@@ -30,12 +30,11 @@ android {
 
     defaultConfig {
         proguardFile("proguard-rules.pro")
+        // Enable Compose UI by default (including debug and any custom non-release build type)
+        buildConfigField("boolean", "COMPOSE_UI", "true")
     }
 
     buildTypes {
-        debug {
-            buildConfigField("boolean", "COMPOSE_UI", "true")
-        }
         release {
             buildConfigField("boolean", "COMPOSE_UI", "false")
             isMinifyEnabled = true
@@ -47,8 +46,7 @@ android {
 dependencies {
     implementation(project(":core"))
     implementation(libs.foundation.layout)
-    implementation(libs.androidx.material3)
-    implementation(libs.androidx.ui.graphics)
+    implementation(libs.ui.graphics)
     coreLibraryDesugaring(libs.jdk.libs)
 
     implementation(libs.indeterminate.checkbox)
@@ -79,6 +77,7 @@ dependencies {
     implementation(libs.material3windowsize)
     implementation(libs.material3adaptivenavigation)
     implementation(libs.coil.compose)
+    implementation(libs.coil.svg)
     implementation(libs.retrofit)
     implementation(libs.retrofit.moshi)
 

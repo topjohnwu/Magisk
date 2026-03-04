@@ -1,10 +1,12 @@
 package com.topjohnwu.magisk.ui.compose.install
 
 import android.net.Uri
+import android.os.Build
 import android.widget.TextView
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.OpenDocument
 import androidx.compose.animation.*
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,17 +14,22 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -39,7 +46,12 @@ import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.repository.NetworkService
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.displayName
+import com.topjohnwu.magisk.core.utils.MediaStoreUtils.persistReadPermission
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -55,25 +67,28 @@ fun InstallScreen(
     var showSlotWarning by remember { mutableStateOf(false) }
 
     val patchPicker = rememberLauncherForActivityResult(OpenDocument()) { uri ->
-        if (uri != null) viewModel.setPatchUri(uri)
+        if (uri != null) {
+            uri.persistReadPermission()
+            viewModel.setPatchUri(uri)
+        }
     }
 
-    LaunchedEffect(state.message) {
-        state.message?.let {
-            snackbarHostState.showSnackbar(it)
-            viewModel.consumeMessage()
-        }
+    LaunchedEffect(viewModel) {
+        viewModel.messages.collect { snackbarHostState.showSnackbar(it) }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(bottom = 120.dp, start = 24.dp, end = 24.dp, top = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+            contentPadding = PaddingValues(bottom = 140.dp, start = 20.dp, end = 20.dp, top = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(28.dp)
         ) {
             if (!state.skipOptions) {
                 item {
-                    InstallSection(stringResource(id = CoreR.string.install_options_title), Icons.Rounded.Tune) {
+                    InstallSection(
+                        title = stringResource(id = CoreR.string.install_options_title),
+                        icon = Icons.Rounded.Tune
+                    ) {
                         ExpressiveToggleRow(
                             title = stringResource(id = CoreR.string.keep_dm_verity),
                             checked = state.keepVerity,
@@ -92,79 +107,107 @@ fun InstallScreen(
                             visible = !Info.ramdisk,
                             onToggle = viewModel::setRecovery
                         )
+                        
                         if (state.step == 0) {
-                            Spacer(Modifier.height(12.dp))
-                            Button(
-                                onClick = viewModel::nextStep,
-                                modifier = Modifier.fillMaxWidth().height(56.dp).padding(horizontal = 20.dp),
-                                shape = RoundedCornerShape(16.dp)
-                            ) {
-                                Text(stringResource(id = CoreR.string.install_next), fontWeight = FontWeight.Bold)
+                            Box(modifier = Modifier.padding(16.dp)) {
+                                Button(
+                                    onClick = viewModel::nextStep,
+                                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                                    shape = RoundedCornerShape(16.dp),
+                                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                                ) {
+                                    Text(
+                                        stringResource(id = CoreR.string.install_next),
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.ExtraBold
+                                    )
+                                    Spacer(Modifier.width(8.dp))
+                                    Icon(Icons.AutoMirrored.Rounded.ArrowForward, null, modifier = Modifier.size(20.dp))
+                                }
                             }
-                            Spacer(Modifier.height(8.dp))
                         }
                     }
                 }
             }
 
             item {
-                InstallSection(stringResource(id = CoreR.string.install_method_title), Icons.Rounded.SettingsSuggest) {
-                    if (state.step >= 1) {
-                        ExpressiveMethodRow(
-                            title = stringResource(id = CoreR.string.select_patch_file),
-                            subtitle = if (state.patchUri != null && state.method == InstallMethod.Patch) {
-                                state.patchUri.displayName
-                            } else {
-                                stringResource(id = CoreR.string.install_select_patch_file_subtitle)
-                            },
-                            selected = state.method == InstallMethod.Patch,
-                            icon = Icons.Rounded.FileCopy,
-                            onClick = {
-                                viewModel.setMethod(InstallMethod.Patch)
-                                patchPicker.launch(arrayOf("*/*"))
+                InstallSection(
+                    title = stringResource(id = CoreR.string.install_method_title),
+                    icon = Icons.Rounded.SettingsSuggest
+                ) {
+                    AnimatedContent(
+                        targetState = state.step >= 1,
+                        transitionSpec = { fadeIn() togetherWith fadeOut() },
+                        label = "methodContent"
+                    ) { isStepReady ->
+                        if (isStepReady) {
+                            Column {
+                                ExpressiveMethodRow(
+                                    title = stringResource(id = CoreR.string.select_patch_file),
+                                    subtitle = if (state.patchUri != null && state.method == InstallMethod.Patch) {
+                                        state.patchUri.displayName
+                                    } else {
+                                        stringResource(id = CoreR.string.install_select_patch_file_subtitle)
+                                    },
+                                    selected = state.method == InstallMethod.Patch,
+                                    icon = Icons.Rounded.FileCopy,
+                                    onClick = {
+                                        viewModel.setMethod(InstallMethod.Patch)
+                                        patchPicker.launch(arrayOf("*/*"))
+                                    }
+                                )
+                                if (state.isRooted) {
+                                    ExpressiveMethodRow(
+                                        title = stringResource(id = CoreR.string.direct_install),
+                                        subtitle = stringResource(id = CoreR.string.install_direct_install_subtitle),
+                                        selected = state.method == InstallMethod.Direct,
+                                        icon = Icons.Rounded.FlashOn,
+                                        onClick = { viewModel.setMethod(InstallMethod.Direct) }
+                                    )
+                                }
+                                if (!state.noSecondSlot) {
+                                    ExpressiveMethodRow(
+                                        title = stringResource(id = CoreR.string.install_inactive_slot),
+                                        subtitle = stringResource(id = CoreR.string.install_inactive_slot_subtitle),
+                                        selected = state.method == InstallMethod.InactiveSlot,
+                                        icon = Icons.Rounded.DynamicFeed,
+                                        isOta = true,
+                                        onClick = { showSlotWarning = true }
+                                    )
+                                }
+                                
+                                Box(modifier = Modifier.padding(16.dp)) {
+                                    Button(
+                                        onClick = {
+                                            val request = viewModel.buildFlashRequest() ?: return@Button
+                                            onStartFlash(request.action, request.uri)
+                                        },
+                                        enabled = state.canStart,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(64.dp),
+                                        shape = RoundedCornerShape(20.dp),
+                                        contentPadding = PaddingValues(horizontal = 24.dp)
+                                    ) {
+                                        Icon(Icons.Rounded.DownloadDone, null)
+                                        Spacer(Modifier.width(12.dp))
+                                        Text(
+                                            stringResource(id = CoreR.string.install_start),
+                                            style = MaterialTheme.typography.titleLarge,
+                                            fontWeight = FontWeight.Black
+                                        )
+                                    }
+                                }
                             }
-                        )
-                        if (state.isRooted) {
-                            ExpressiveMethodRow(
-                                title = stringResource(id = CoreR.string.direct_install),
-                                subtitle = stringResource(id = CoreR.string.install_direct_install_subtitle),
-                                selected = state.method == InstallMethod.Direct,
-                                icon = Icons.Rounded.FlashOn,
-                                onClick = { viewModel.setMethod(InstallMethod.Direct) }
-                            )
-                        }
-                        if (!state.noSecondSlot) {
-                            ExpressiveMethodRow(
-                                title = stringResource(id = CoreR.string.install_inactive_slot),
-                                subtitle = stringResource(id = CoreR.string.install_inactive_slot_subtitle),
-                                selected = state.method == InstallMethod.InactiveSlot,
-                                icon = Icons.Rounded.DynamicFeed,
-                                onClick = { showSlotWarning = true }
-                            )
-                        }
-                        
-                        Spacer(Modifier.height(16.dp))
-                        Button(
-                            onClick = {
-                                val request = viewModel.buildFlashRequest() ?: return@Button
-                                onStartFlash(request.action, request.uri)
-                            },
-                            enabled = state.canStart,
-                            modifier = Modifier.fillMaxWidth().height(60.dp).padding(horizontal = 20.dp),
-                            shape = RoundedCornerShape(20.dp)
-                        ) {
-                            Icon(Icons.Rounded.InstallDesktop, null)
-                            Spacer(Modifier.width(12.dp))
-                            Text(stringResource(id = CoreR.string.install_start), fontWeight = FontWeight.Black)
-                        }
-                        Spacer(Modifier.height(8.dp))
-                    } else {
-                        Box(modifier = Modifier.padding(20.dp)) {
-                            Text(
-                                stringResource(id = CoreR.string.install_complete_options_first),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                            )
+                        } else {
+                            Box(modifier = Modifier.padding(24.dp).fillMaxWidth(), contentAlignment = Alignment.Center) {
+                                Text(
+                                    stringResource(id = CoreR.string.install_complete_options_first),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                                    textAlign = TextAlign.Center
+                                )
+                            }
                         }
                     }
                 }
@@ -172,7 +215,10 @@ fun InstallScreen(
 
             if (state.notes.isNotBlank()) {
                 item {
-                    InstallSection(stringResource(id = CoreR.string.release_notes), Icons.Rounded.HistoryEdu) {
+                    InstallSection(
+                        title = stringResource(id = CoreR.string.release_notes),
+                        icon = Icons.Rounded.HistoryEdu
+                    ) {
                         MarkdownText(
                             markdown = state.notes,
                             modifier = Modifier.padding(20.dp)
@@ -181,29 +227,220 @@ fun InstallScreen(
                 }
             }
         }
-
-        SnackbarHost(
-            hostState = snackbarHostState,
-            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 110.dp)
-        )
     }
 
     if (showSlotWarning) {
         AlertDialog(
             onDismissRequest = { showSlotWarning = false },
-            title = { Text(stringResource(id = CoreR.string.install_inactive_slot), fontWeight = FontWeight.Black) },
-            text = { Text(stringResource(id = CoreR.string.install_inactive_slot_msg)) },
-            shape = RoundedCornerShape(28.dp),
+            title = { 
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Surface(color = MaterialTheme.colorScheme.errorContainer, shape = CircleShape, modifier = Modifier.size(36.dp)) {
+                        Icon(Icons.Rounded.Warning, null, modifier = Modifier.padding(8.dp), tint = MaterialTheme.colorScheme.onErrorContainer)
+                    }
+                    Text(stringResource(id = CoreR.string.install_inactive_slot), fontWeight = FontWeight.Black) 
+                }
+            },
+            text = { 
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text(stringResource(id = CoreR.string.install_inactive_slot_msg), style = MaterialTheme.typography.bodyMedium)
+                    Surface(
+                        color = MaterialTheme.colorScheme.error.copy(alpha = 0.05f),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = stringResource(id = CoreR.string.install_inactive_slot_caution),
+                            modifier = Modifier.padding(12.dp),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.error,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            },
+            shape = RoundedCornerShape(32.dp),
             confirmButton = {
-                TextButton(onClick = {
-                    viewModel.setMethod(InstallMethod.InactiveSlot)
-                    showSlotWarning = false
-                }) { Text(stringResource(id = android.R.string.ok), fontWeight = FontWeight.Bold) }
+                Button(
+                    onClick = {
+                        viewModel.setMethod(InstallMethod.InactiveSlot)
+                        showSlotWarning = false
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                ) { Text(stringResource(id = android.R.string.ok), fontWeight = FontWeight.Black) }
             },
             dismissButton = {
                 TextButton(onClick = { showSlotWarning = false }) { Text(stringResource(id = android.R.string.cancel)) }
-            }
+            },
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
         )
+    }
+}
+
+@Composable
+private fun InstallSection(
+    title: String,
+    icon: ImageVector,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    Column(modifier = Modifier.animateContentSize(spring(stiffness = androidx.compose.animation.core.Spring.StiffnessLow))) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 12.dp)
+        ) {
+            Surface(
+                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.size(32.dp)
+            ) {
+                Icon(
+                    icon, null,
+                    modifier = Modifier.padding(6.dp),
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            }
+            Spacer(Modifier.width(16.dp))
+            Text(
+                text = title.uppercase(),
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Black,
+                letterSpacing = 1.2.sp,
+                color = MaterialTheme.colorScheme.outline
+            )
+        }
+        
+        ElevatedCard(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(28.dp),
+            colors = CardDefaults.elevatedCardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+            ),
+            elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(vertical = 8.dp),
+                content = content
+            )
+        }
+    }
+}
+
+@Composable
+private fun ExpressiveToggleRow(title: String, checked: Boolean, visible: Boolean, onToggle: (Boolean) -> Unit) {
+    if (!visible) return
+    Surface(
+        color = Color.Transparent,
+        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).clickable { onToggle(!checked) }
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 24.dp, vertical = 18.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                title, 
+                modifier = Modifier.weight(1f), 
+                style = MaterialTheme.typography.titleMedium, 
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Switch(
+                checked = checked, 
+                onCheckedChange = onToggle,
+                thumbContent = if (checked) {
+                    { Icon(Icons.Rounded.Check, null, Modifier.size(16.dp)) }
+                } else null
+            )
+        }
+    }
+}
+
+@Composable
+private fun ExpressiveMethodRow(
+    title: String, 
+    subtitle: String, 
+    selected: Boolean, 
+    icon: ImageVector, 
+    isOta: Boolean = false,
+    onClick: () -> Unit
+) {
+    val backgroundColor by animateColorAsState(
+        if (selected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.30f)
+        else Color.Transparent,
+        label = "bg"
+    )
+
+    Surface(
+        color = backgroundColor,
+        shape = RoundedCornerShape(20.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp, vertical = 4.dp)
+            .clip(RoundedCornerShape(20.dp))
+            .clickable { onClick() }
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Surface(
+                color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                shape = CircleShape,
+                modifier = Modifier.size(48.dp)
+            ) {
+                Icon(
+                    icon, null,
+                    modifier = Modifier.padding(12.dp),
+                    tint = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Spacer(Modifier.width(16.dp))
+            Column(Modifier.weight(1f)) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        title,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = if (selected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    if (isOta) {
+                        val chipContainer = if (selected) {
+                            MaterialTheme.colorScheme.secondary.copy(alpha = 0.16f)
+                        } else {
+                            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.40f)
+                        }
+                        val chipText = if (selected) {
+                            MaterialTheme.colorScheme.secondary
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        }
+                        Surface(
+                            color = chipContainer,
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text(
+                                stringResource(id = CoreR.string.after_ota).uppercase(),
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Black,
+                                color = chipText
+                            )
+                        }
+                    }
+                }
+                Text(
+                    subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+            RadioButton(
+                selected = selected,
+                onClick = null,
+                colors = RadioButtonDefaults.colors(selectedColor = MaterialTheme.colorScheme.primary)
+            )
+        }
     }
 }
 
@@ -219,70 +456,15 @@ private fun MarkdownText(
             TextView(context).apply {
                 setTextColor(textColor)
                 textSize = 14f
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    lineHeight = (textSize * 1.4f).toInt()
+                }
             }
         },
         update = { textView ->
             ServiceLocator.markwon.setMarkdown(textView, markdown)
         }
     )
-}
-
-@Composable
-private fun InstallSection(title: String, icon: ImageVector, content: @Composable ColumnScope.() -> Unit) {
-    Column {
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(start = 8.dp, bottom = 12.dp)) {
-            Icon(icon, null, modifier = Modifier.size(20.dp), tint = MaterialTheme.colorScheme.primary)
-            Spacer(Modifier.width(12.dp))
-            Text(
-                text = title.uppercase(),
-                style = MaterialTheme.typography.labelLarge,
-                fontWeight = FontWeight.Black,
-                letterSpacing = 1.5.sp,
-                color = MaterialTheme.colorScheme.outline
-            )
-        }
-        ElevatedCard(
-            shape = RoundedCornerShape(topEnd = 40.dp, bottomStart = 40.dp, topStart = 12.dp, bottomEnd = 12.dp),
-            colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
-        ) {
-            Column(modifier = Modifier.padding(vertical = 8.dp), content = content)
-        }
-    }
-}
-
-@Composable
-private fun ExpressiveToggleRow(title: String, checked: Boolean, visible: Boolean, onToggle: (Boolean) -> Unit) {
-    if (!visible) return
-    Row(
-        modifier = Modifier.fillMaxWidth().clickable { onToggle(!checked) }.padding(20.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(title, modifier = Modifier.weight(1f), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-        Switch(checked = checked, onCheckedChange = onToggle)
-    }
-}
-
-@Composable
-private fun ExpressiveMethodRow(title: String, subtitle: String, selected: Boolean, icon: ImageVector, onClick: () -> Unit) {
-    Row(
-        modifier = Modifier.fillMaxWidth().clickable { onClick() }.padding(20.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Surface(
-            color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-            shape = CircleShape,
-            modifier = Modifier.size(44.dp)
-        ) {
-            Icon(icon, null, modifier = Modifier.padding(10.dp), tint = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary)
-        }
-        Spacer(Modifier.width(20.dp))
-        Column(Modifier.weight(1f)) {
-            Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-            Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
-        }
-        RadioButton(selected = selected, onClick = null)
-    }
-    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.14f))
 }
 
 private enum class InstallMethod(
@@ -309,8 +491,7 @@ private data class InstallUiState(
     val recovery: Boolean = Config.recovery,
     val method: InstallMethod? = null,
     val patchUri: Uri? = null,
-    val notes: String = "",
-    val message: String? = null
+    val notes: String = ""
 ) {
     val canStart: Boolean
         get() = method != null && (!method.needsUri || patchUri != null)
@@ -327,6 +508,8 @@ private class InstallComposeViewModel(
 
     var state by mutableStateOf(InstallUiState())
         private set
+    private val _messages = MutableSharedFlow<String>(extraBufferCapacity = 1)
+    val messages: SharedFlow<String> = _messages.asSharedFlow()
 
     init {
         loadNotes()
@@ -362,14 +545,10 @@ private class InstallComposeViewModel(
     fun buildFlashRequest(): FlashRequest? {
         val method = state.method ?: return null
         if (method.needsUri && state.patchUri == null) {
-            state = state.copy(message = AppContext.getString(CoreR.string.patch_file_msg))
+            _messages.tryEmit(AppContext.getString(CoreR.string.patch_file_msg))
             return null
         }
         return FlashRequest(method.action, state.patchUri)
-    }
-
-    fun consumeMessage() {
-        state = state.copy(message = null)
     }
 
     private fun loadNotes() {

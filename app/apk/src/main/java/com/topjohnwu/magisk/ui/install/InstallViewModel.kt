@@ -20,6 +20,7 @@ import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.base.ContentResultCallback
 import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.repository.NetworkService
+import com.topjohnwu.magisk.core.utils.MediaStoreUtils.persistReadPermission
 import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.dialog.SecondSlotWarningDialog
 import com.topjohnwu.magisk.events.GetContentEvent
@@ -127,6 +128,7 @@ class InstallViewModel(svc: NetworkService, markwon: Markwon) : BaseViewModel() 
         }
 
         override fun onActivityResult(result: Uri) {
+            result.persistReadPermission()
             uri.value = result
         }
     }

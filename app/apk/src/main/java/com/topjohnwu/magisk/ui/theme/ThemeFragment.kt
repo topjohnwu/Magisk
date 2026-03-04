@@ -6,10 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.lifecycle.ViewModelProvider
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseFragment
-import com.topjohnwu.magisk.arch.viewModel
+import com.topjohnwu.magisk.arch.VMFactory
 import com.topjohnwu.magisk.databinding.FragmentThemeMd2Binding
 import com.topjohnwu.magisk.databinding.ItemThemeBindingImpl
 import com.topjohnwu.magisk.core.R as CoreR
@@ -17,7 +18,9 @@ import com.topjohnwu.magisk.core.R as CoreR
 class ThemeFragment : BaseFragment<FragmentThemeMd2Binding>() {
 
     override val layoutRes = R.layout.fragment_theme_md2
-    override val viewModel by viewModel<ThemeViewModel>()
+    override val viewModel: ThemeViewModel by lazy(LazyThreadSafetyMode.NONE) {
+        ViewModelProvider(this, VMFactory)[ThemeViewModel::class.java]
+    }
 
     private fun <T> Array<T>.paired(): List<Pair<T, T?>> {
         val iterator = iterator()
@@ -38,7 +41,7 @@ class ThemeFragment : BaseFragment<FragmentThemeMd2Binding>() {
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
-        for ((a, b) in Theme.values().paired()) {
+        for ((a, b) in Theme.displayOrder.toTypedArray().paired()) {
             val c = inflater.inflate(R.layout.item_theme_container, null, false)
             val left = c.findViewById<FrameLayout>(R.id.left)
             val right = c.findViewById<FrameLayout>(R.id.right)

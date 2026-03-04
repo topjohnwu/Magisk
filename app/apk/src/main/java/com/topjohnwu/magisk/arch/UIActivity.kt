@@ -41,7 +41,12 @@ abstract class UIActivity<Binding : ViewDataBinding>
     open val snackbarAnchorView: View? get() = null
 
     init {
-        AppCompatDelegate.setDefaultNightMode(Config.darkTheme)
+        val nightMode = if (Config.darkTheme == Config.Value.DARK_THEME_AMOLED) {
+            AppCompatDelegate.MODE_NIGHT_YES
+        } else {
+            Config.darkTheme
+        }
+        AppCompatDelegate.setDefaultNightMode(nightMode)
     }
 
     override fun attachBaseContext(base: Context) {

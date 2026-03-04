@@ -22,6 +22,7 @@ import com.topjohnwu.magisk.core.utils.DummyList
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.inputStream
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
+import com.topjohnwu.magisk.core.utils.MediaStoreUtils.persistReadPermission
 import com.topjohnwu.magisk.core.utils.RootUtils
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils
@@ -449,6 +450,7 @@ abstract class MagiskInstallImpl protected constructor(
 
         // Process input file
         try {
+            uri.persistReadPermission()
             PushbackInputStream(uri.inputStream().buffered(1024 * 1024), 512).use { src ->
                 val head = ByteArray(512)
                 if (!src.readFully(head)) {
@@ -500,6 +502,11 @@ abstract class MagiskInstallImpl protected constructor(
                     }
                 }
             }
+        } catch (e: SecurityException) {
+            console.add("! Permission denied for selected file")
+            console.add("! Process error")
+            Timber.e(e)
+            return false
         } catch (e: IOException) {
             if (e is NoBootException)
                 console.add("! No boot image found")

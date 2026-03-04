@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.ui.compose.surequest
 
 import android.graphics.drawable.Drawable
-import android.os.Build
 import android.view.MotionEvent
 import android.widget.Toast
 import androidx.compose.animation.*
@@ -36,7 +35,7 @@ import androidx.databinding.Observable
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.R as CoreR
-import com.topjohnwu.magisk.ui.compose.fallbackColorScheme
+import com.topjohnwu.magisk.ui.compose.theme.magiskComposeColorScheme
 import com.topjohnwu.magisk.ui.surequest.SuRequestViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -52,6 +51,7 @@ fun SuRequestScreen(
     val context = LocalContext.current
     val resources = context.resources
     val timeoutItems = remember { resources.getStringArray(CoreR.array.allow_timeout).toList() }
+    val denyDefaultLabel = stringResource(id = CoreR.string.deny)
 
     var selectedTimeout by remember { mutableStateOf(viewModel.selectedItemPosition) }
     var grantEnabled by remember { mutableStateOf(viewModel.grantEnabled) }
@@ -93,233 +93,210 @@ fun SuRequestScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.6f))
+            .background(Color.Black.copy(alpha = 0.62f))
+            .statusBarsPadding()
+            .navigationBarsPadding(),
+        contentAlignment = Alignment.Center
     ) {
         if (!showContent) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center), color = Color.White)
-        } else {
+            CircularProgressIndicator(color = Color.White)
+            return@Box
+        }
+
+        var dropdownExpanded by remember { mutableStateOf(false) }
+
+        Surface(
+            modifier = Modifier
+                .padding(horizontal = 24.dp, vertical = 20.dp)
+                .fillMaxWidth()
+                .widthIn(max = 420.dp),
+            shape = RoundedCornerShape(24.dp),
+            color = MaterialTheme.colorScheme.surface,
+            tonalElevation = 8.dp,
+            shadowElevation = 12.dp
+        ) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .statusBarsPadding()
-                    .navigationBarsPadding(),
-                horizontalAlignment = Alignment.CenterHorizontally
+                modifier = Modifier.padding(24.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Spacer(Modifier.weight(0.15f))
+                Text(
+                    text = stringResource(id = CoreR.string.su_request_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-                // 1. Header & Content Card
-                Surface(
-                    modifier = Modifier
-                        .padding(horizontal = 24.dp)
-                        .fillMaxWidth()
-                        .widthIn(max = 400.dp),
-                    shape = RoundedCornerShape(40.dp),
-                    color = MaterialTheme.colorScheme.surface,
-                    tonalElevation = 8.dp,
-                    shadowElevation = 12.dp
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column(
-                        modifier = Modifier.padding(32.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(20.dp)
+                    Surface(
+                        modifier = Modifier.size(48.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        color = MaterialTheme.colorScheme.surfaceVariant
                     ) {
-                        // App Identity Section
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Surface(
-                                modifier = Modifier.size(90.dp),
-                                shape = RoundedCornerShape(28.dp),
-                                color = MaterialTheme.colorScheme.primaryContainer,
-                                tonalElevation = 2.dp
-                            ) {
-                                Box(contentAlignment = Alignment.Center) {
-                                    if (iconPainter != null) {
-                                        Image(
-                                            painter = iconPainter,
-                                            contentDescription = null,
-                                            modifier = Modifier
-                                                .size(56.dp)
-                                                .clip(RoundedCornerShape(8.dp))
-                                        )
-                                    } else {
-                                        Icon(
-                                            Icons.Rounded.Security,
-                                            null,
-                                            modifier = Modifier.size(44.dp),
-                                            tint = MaterialTheme.colorScheme.onPrimaryContainer
-                                        )
-                                    }
-                                }
-                            }
-                            Spacer(Modifier.height(16.dp))
-                            Text(
-                                text = stringResource(id = CoreR.string.su_request_title).uppercase(),
-                                style = MaterialTheme.typography.labelLarge,
-                                fontWeight = FontWeight.Black,
-                                color = MaterialTheme.colorScheme.primary,
-                                letterSpacing = 1.5.sp
-                            )
-                            Spacer(Modifier.height(8.dp))
-                            Text(
-                                text = viewModel.title,
-                                style = MaterialTheme.typography.headlineSmall,
-                                fontWeight = FontWeight.ExtraBold,
-                                textAlign = TextAlign.Center
-                            )
-                            Text(
-                                text = viewModel.packageName,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.alpha(0.6f),
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        }
-
-                        // Security Disclaimer
-                        Surface(
-                            color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.2f),
-                            shape = RoundedCornerShape(16.dp),
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Row(
-                                modifier = Modifier.padding(16.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            if (iconPainter != null) {
+                                Image(
+                                    painter = iconPainter,
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .size(36.dp)
+                                        .clip(RoundedCornerShape(6.dp))
+                                )
+                            } else {
                                 Icon(
-                                    Icons.Rounded.GppMaybe,
-                                    null,
-                                    tint = MaterialTheme.colorScheme.error,
-                                    modifier = Modifier.size(24.dp)
+                                    Icons.Rounded.Security,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(24.dp),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
-                                Spacer(Modifier.width(12.dp))
-                                Text(
-                                    text = stringResource(id = CoreR.string.su_warning),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onErrorContainer,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                        }
-
-                        // Timer Dropdown
-                        var dropdownExpanded by remember { mutableStateOf(false) }
-                        Surface(
-                            onClick = { if (grantEnabled) { dropdownExpanded = true; onSpinnerTouched() } },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(56.dp),
-                            shape = RoundedCornerShape(16.dp),
-                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
-                            enabled = grantEnabled
-                        ) {
-                            Row(
-                                modifier = Modifier.padding(horizontal = 20.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        Icons.Rounded.Timer,
-                                        null,
-                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                    Spacer(Modifier.width(12.dp))
-                                    Text(
-                                        text = timeoutItems.getOrNull(selectedTimeout) ?: "",
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                }
-                                Icon(Icons.Rounded.UnfoldMore, null, tint = MaterialTheme.colorScheme.outline)
-                            }
-                            DropdownMenu(
-                                expanded = dropdownExpanded,
-                                onDismissRequest = { dropdownExpanded = false },
-                                modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainerHighest),
-                                shape = RoundedCornerShape(16.dp)
-                            ) {
-                                timeoutItems.forEachIndexed { index, item ->
-                                    DropdownMenuItem(
-                                        text = { 
-                                            Text(
-                                                item, 
-                                                fontWeight = if (index == selectedTimeout) FontWeight.Black else FontWeight.Medium
-                                            ) 
-                                        },
-                                        onClick = {
-                                            dropdownExpanded = false
-                                            selectedTimeout = index
-                                            onTimeoutSelected(index)
-                                        },
-                                        leadingIcon = {
-                                            if (index == selectedTimeout) {
-                                                Icon(Icons.Rounded.Check, null, tint = MaterialTheme.colorScheme.primary)
-                                            }
-                                        }
-                                    )
-                                }
                             }
                         }
                     }
+                    Spacer(Modifier.width(12.dp))
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = viewModel.title,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = viewModel.packageName,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
                 }
 
-                Spacer(Modifier.weight(1f))
-
-                // 2. Bottom Floating Action Bar (Glass style)
                 Surface(
+                    onClick = {
+                        if (grantEnabled) {
+                            onSpinnerTouched()
+                            dropdownExpanded = true
+                        }
+                    },
                     modifier = Modifier
-                        .padding(24.dp)
                         .fillMaxWidth()
-                        .widthIn(max = 400.dp)
-                        .height(88.dp),
-                    shape = RoundedCornerShape(32.dp),
-                    color = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.88f),
-                    tonalElevation = 12.dp,
-                    shadowElevation = 16.dp
+                        .height(48.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    enabled = grantEnabled
                 ) {
                     Row(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(horizontal = 16.dp),
+                            .padding(horizontal = 14.dp),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        OutlinedButton(
-                            onClick = onDeny,
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(56.dp),
-                            shape = RoundedCornerShape(20.dp),
-                            border = androidx.compose.foundation.BorderStroke(
-                                1.dp,
-                                MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                Icons.Rounded.Timer,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
                             )
-                        ) {
+                            Spacer(Modifier.width(10.dp))
                             Text(
-                                denyLabel.uppercase(),
-                                fontWeight = FontWeight.Black,
-                                color = MaterialTheme.colorScheme.error
+                                text = timeoutItems.getOrNull(selectedTimeout).orEmpty(),
+                                style = MaterialTheme.typography.bodyMedium,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
                         }
+                        Icon(
+                            Icons.Rounded.ExpandMore,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
 
-                        Button(
-                            onClick = onGrant,
-                            enabled = grantEnabled,
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(56.dp)
-                                .pointerInteropFilter { grantTouchFilter(it) },
-                            shape = RoundedCornerShape(20.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-                        ) {
-                            Icon(Icons.Rounded.Shield, null, modifier = Modifier.size(18.dp))
-                            Spacer(Modifier.width(8.dp))
-                            Text(
-                                stringResource(id = CoreR.string.grant).uppercase(),
-                                fontWeight = FontWeight.Black
-                            )
-                        }
+                DropdownMenu(
+                    expanded = dropdownExpanded,
+                    onDismissRequest = { dropdownExpanded = false },
+                    modifier = Modifier.background(MaterialTheme.colorScheme.surface),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    timeoutItems.forEachIndexed { index, item ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = item,
+                                    fontWeight = if (index == selectedTimeout) FontWeight.SemiBold else FontWeight.Normal
+                                )
+                            },
+                            onClick = {
+                                dropdownExpanded = false
+                                selectedTimeout = index
+                                onTimeoutSelected(index)
+                            },
+                            leadingIcon = {
+                                if (index == selectedTimeout) {
+                                    Icon(
+                                        Icons.Rounded.Check,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            }
+                        )
+                    }
+                }
+
+                Text(
+                    text = stringResource(id = CoreR.string.su_warning),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.error,
+                    fontWeight = FontWeight.SemiBold,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    TextButton(
+                        onClick = onDeny,
+                        modifier = Modifier
+                            .weight(1f)
+                            .heightIn(min = 44.dp)
+                    ) {
+                        Text(
+                            text = denyLabel.ifBlank { denyDefaultLabel },
+                            maxLines = 1,
+                            softWrap = false,
+                            overflow = TextOverflow.Ellipsis,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    TextButton(
+                        onClick = onGrant,
+                        enabled = grantEnabled,
+                        modifier = Modifier
+                            .weight(1f)
+                            .heightIn(min = 44.dp)
+                            .pointerInteropFilter { grantTouchFilter(it) }
+                    ) {
+                        Text(
+                            text = stringResource(id = CoreR.string.grant),
+                            maxLines = 1,
+                            softWrap = false,
+                            overflow = TextOverflow.Ellipsis,
+                            fontWeight = FontWeight.SemiBold
+                        )
                     }
                 }
             }
@@ -328,13 +305,11 @@ fun SuRequestScreen(
 }
 
 @Composable
-fun suRequestColorScheme(useDynamicColor: Boolean, darkTheme: Boolean) = when {
-    useDynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-        if (darkTheme) androidx.compose.material3.dynamicDarkColorScheme(LocalContext.current)
-        else androidx.compose.material3.dynamicLightColorScheme(LocalContext.current)
-    }
-    else -> fallbackColorScheme(darkTheme)
-}
+fun suRequestColorScheme(useDynamicColor: Boolean, darkTheme: Boolean) =
+    magiskComposeColorScheme(
+        useDynamicColor = useDynamicColor,
+        darkTheme = darkTheme
+    )
 
 private fun SuRequestViewModel.safePainter(): Painter? {
     val drawable: Drawable = runCatching { icon }.getOrNull() ?: return null
