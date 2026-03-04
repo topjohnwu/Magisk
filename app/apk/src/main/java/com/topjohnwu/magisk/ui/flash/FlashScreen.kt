@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.ui.terminal.TerminalComposeView
 import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.IconButton
 import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
@@ -34,15 +35,7 @@ import com.topjohnwu.magisk.core.R as CoreR
 fun FlashScreen(viewModel: FlashViewModel, onBack: () -> Unit) {
     val flashState by viewModel.flashState.collectAsState()
     val showReboot by viewModel.showReboot.collectAsState()
-    val items = viewModel.consoleItems
-    val listState = rememberLazyListState()
     val finished = flashState != FlashViewModel.State.FLASHING
-
-    LaunchedEffect(items.size) {
-        if (items.isNotEmpty()) {
-            listState.animateScrollToItem(items.size - 1)
-        }
-    }
 
     val statusText = when (flashState) {
         FlashViewModel.State.FLASHING -> stringResource(CoreR.string.flashing)
@@ -98,23 +91,44 @@ fun FlashScreen(viewModel: FlashViewModel, onBack: () -> Unit) {
         },
         popupHost = { }
     ) { padding ->
-        LazyColumn(
-            state = listState,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .horizontalScroll(rememberScrollState())
-                .padding(horizontal = 8.dp, vertical = 4.dp)
-        ) {
-            itemsIndexed(items) { _, line ->
-                Text(
-                    text = line,
-                    fontFamily = FontFamily.Monospace,
-                    fontSize = 12.sp,
-                    lineHeight = 16.sp,
-                    color = MiuixTheme.colorScheme.onSurface,
-                    modifier = Modifier.fillMaxWidth()
-                )
+        if (viewModel.useTerminal) {
+            val session by viewModel.termSession.collectAsState()
+            TerminalComposeView(
+                session = session,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+                onViewCreated = { viewModel.setTerminalView(it) },
+                onEmulatorReady = { viewModel.onEmulatorReady() },
+            )
+        } else {
+            val items = viewModel.consoleItems
+            val listState = rememberLazyListState()
+
+            LaunchedEffect(items.size) {
+                if (items.isNotEmpty()) {
+                    listState.animateScrollToItem(items.size - 1)
+                }
+            }
+
+            LazyColumn(
+                state = listState,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .horizontalScroll(rememberScrollState())
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
+            ) {
+                itemsIndexed(items) { _, line ->
+                    Text(
+                        text = line,
+                        fontFamily = FontFamily.Monospace,
+                        fontSize = 12.sp,
+                        lineHeight = 16.sp,
+                        color = MiuixTheme.colorScheme.onSurface,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
         }
     }

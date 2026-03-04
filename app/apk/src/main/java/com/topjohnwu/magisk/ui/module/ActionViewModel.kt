@@ -1,23 +1,23 @@
 package com.topjohnwu.magisk.ui.module
 
-import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.viewModelScope
+import com.termux.terminal.TerminalSession
+import com.termux.view.TerminalView
 import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.core.ktx.synchronized
 import com.topjohnwu.magisk.core.ktx.timeFormatStandard
 import com.topjohnwu.magisk.core.ktx.toTime
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
-import com.topjohnwu.superuser.CallbackList
+import com.topjohnwu.magisk.ui.terminal.TerminalSessionCallback
 import com.topjohnwu.superuser.Shell
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
-import java.io.IOException
 
 class ActionViewModel : BaseViewModel() {
 
@@ -28,34 +28,54 @@ class ActionViewModel : BaseViewModel() {
     private val _actionState = MutableStateFlow(State.RUNNING)
     val actionState: StateFlow<State> = _actionState.asStateFlow()
 
-    val consoleItems = mutableStateListOf<String>()
+    private val _termSession = MutableStateFlow<TerminalSession?>(null)
+    val termSession: StateFlow<TerminalSession?> = _termSession.asStateFlow()
+
     var actionId: String = ""
     var actionName: String = ""
 
     private val logItems = mutableListOf<String>().synchronized()
-    private val outItems = object : CallbackList<String>() {
-        override fun onAddElement(e: String?) {
-            e ?: return
-            consoleItems.add(e)
-            logItems.add(e)
+    private val emulatorReady = CompletableDeferred<Unit>()
+
+    val sessionCallback = TerminalSessionCallback()
+
+    fun setTerminalView(view: TerminalView) {
+        sessionCallback.terminalView = view
+    }
+
+    fun onEmulatorReady() {
+        if (!emulatorReady.isCompleted) {
+            emulatorReady.complete(Unit)
         }
     }
 
-    fun startRunAction() = viewModelScope.launch {
-        onResult(withContext(Dispatchers.IO) {
-            try {
-                Shell.cmd("run_action '${actionId}'")
-                    .to(outItems, logItems)
-                    .exec().isSuccess
-            } catch (e: IOException) {
-                Timber.e(e)
-                false
-            }
-        })
-    }
+    fun startRunAction() {
+        viewModelScope.launch {
+            val session = TerminalSession(
+                "/system/bin/sh", "/",
+                arrayOf("sh", "-c", "exec sleep 2147483647"),
+                arrayOf("TERM=xterm-256color"),
+                5000, sessionCallback
+            )
+            _termSession.value = session
+            emulatorReady.await()
 
-    private fun onResult(success: Boolean) {
-        _actionState.value = if (success) State.SUCCESS else State.FAILED
+            val ptyPath = withContext(Dispatchers.IO) {
+                Shell.cmd("readlink /proc/${session.pid}/fd/0").exec().out.firstOrNull()
+            }
+            if (ptyPath == null) {
+                _actionState.value = State.FAILED
+                return@launch
+            }
+
+            val success = withContext(Dispatchers.IO) {
+                Shell.cmd(
+                    "(export TERM=xterm-256color; run_action '$actionId') >$ptyPath 2>&1"
+                ).exec().isSuccess
+            }
+
+            _actionState.value = if (success) State.SUCCESS else State.FAILED
+        }
     }
 
     fun saveLog() {
@@ -66,14 +86,24 @@ class ActionViewModel : BaseViewModel() {
             )
             val file = MediaStoreUtils.getFile(name)
             file.uri.outputStream().bufferedWriter().use { writer ->
-                synchronized(logItems) {
-                    logItems.forEach {
-                        writer.write(it)
-                        writer.newLine()
+                val transcript = _termSession.value?.emulator?.screen?.transcriptText
+                if (transcript != null) {
+                    writer.write(transcript)
+                } else {
+                    synchronized(logItems) {
+                        logItems.forEach {
+                            writer.write(it)
+                            writer.newLine()
+                        }
                     }
                 }
             }
             showSnackbar(file.toString())
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        _termSession.value?.finishIfRunning()
     }
 }
