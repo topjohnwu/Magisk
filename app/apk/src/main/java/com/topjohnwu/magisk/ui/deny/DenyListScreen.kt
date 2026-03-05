@@ -29,6 +29,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.topjohnwu.magisk.ui.component.ListPopupDefaults.MenuPositionProvider
 import com.topjohnwu.magisk.ui.util.rememberDrawablePainter
+import androidx.compose.ui.state.ToggleableState
 import top.yukonga.miuix.kmp.basic.Card
 import top.yukonga.miuix.kmp.basic.Checkbox
 import top.yukonga.miuix.kmp.basic.CircularProgressIndicator
@@ -272,8 +273,12 @@ private fun DenyAppCard(app: DenyAppState) {
                 }
                 Spacer(Modifier.width(8.dp))
                 Checkbox(
-                    checked = app.isChecked,
-                    onCheckedChange = { app.toggleAll() }
+                    state = when {
+                        app.itemsChecked == 0 -> ToggleableState.Off
+                        app.checkedPercent < 1f -> ToggleableState.Indeterminate
+                        else -> ToggleableState.On
+                    },
+                    onClick = { app.toggleAll() }
                 )
             }
 
@@ -310,8 +315,8 @@ private fun ProcessRow(proc: DenyProcessState) {
         )
         Spacer(Modifier.width(8.dp))
         Checkbox(
-            checked = proc.isEnabled,
-            onCheckedChange = { proc.toggle() }
+            state = ToggleableState(proc.isEnabled),
+            onClick = { proc.toggle() }
         )
     }
 }
