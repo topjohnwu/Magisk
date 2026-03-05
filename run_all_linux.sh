@@ -17,6 +17,7 @@ CF_BRANCH="${CF_BRANCH:-aosp-android-latest-release}"
 CF_DEVICE="${CF_DEVICE:-aosp_cf_x86_64_only_phone}"
 CF_HOME_DEFAULT="$HOME/aosp_cf_phone"
 CF_HOME="${CF_HOME:-$CF_HOME_DEFAULT}"
+CI_OUTDIR="${CI_OUTDIR:-out-ci}"
 
 PYTHON_BIN=
 SDKMANAGER=
@@ -51,6 +52,10 @@ Options:
 Env overrides:
   AVD_64_API=34
   AVD_32_API=30
+  AVD_PATCH_APK=/path/to/magisk.apk
+  AVD_PATCH_APK_DEBUG=/path/to/debug.apk
+  AVD_PATCH_APK_RELEASE=/path/to/release.apk
+  CI_OUTDIR=out-ci
   AVD_MEMORY_MB=4096
   AVD_TEST_LOG=1
   AVD_ALLOW_SOFT_ACCEL=1
@@ -63,6 +68,11 @@ EOF
 require_command() {
   local cmd="$1"
   command -v "$cmd" >/dev/null 2>&1 || die "Required command not found: $cmd"
+}
+
+require_file() {
+  local f="$1"
+  [[ -f "$f" ]] || die "Required file missing: $f"
 }
 
 prepare_python() {
@@ -92,6 +102,55 @@ prepare_android_env() {
 record_failure() {
   local job="$1"
   FAILURES+=("$job")
+}
+
+apk_has_entry() {
+  local apk="$1"
+  local entry="$2"
+  "$PYTHON_BIN" - "$apk" "$entry" <<'PY' >/dev/null 2>&1
+import sys, zipfile
+apk, entry = sys.argv[1], sys.argv[2]
+with zipfile.ZipFile(apk, "r") as zf:
+    if entry not in zf.namelist():
+        raise SystemExit(1)
+PY
+}
+
+validate_pipeline_artifacts() {
+  require_file out/app-debug.apk
+  require_file out/app-release.apk
+  require_file out/test.apk
+
+  # AVD/CF patching needs busybox for emulator ABIs.
+  local abi
+  for abi in x86 x86_64; do
+    apk_has_entry out/app-debug.apk "lib/${abi}/libbusybox.so" || \
+      die "out/app-debug.apk missing lib/${abi}/libbusybox.so"
+    apk_has_entry out/app-release.apk "lib/${abi}/libbusybox.so" || \
+      die "out/app-release.apk missing lib/${abi}/libbusybox.so"
+  done
+
+  if [[ -n "${AVD_PATCH_APK:-}" ]]; then
+    require_file "$AVD_PATCH_APK"
+    for abi in x86 x86_64; do
+      apk_has_entry "$AVD_PATCH_APK" "lib/${abi}/libbusybox.so" || \
+        die "AVD_PATCH_APK missing lib/${abi}/libbusybox.so: $AVD_PATCH_APK"
+    done
+  fi
+  if [[ -n "${AVD_PATCH_APK_DEBUG:-}" ]]; then
+    require_file "$AVD_PATCH_APK_DEBUG"
+    for abi in x86 x86_64; do
+      apk_has_entry "$AVD_PATCH_APK_DEBUG" "lib/${abi}/libbusybox.so" || \
+        die "AVD_PATCH_APK_DEBUG missing lib/${abi}/libbusybox.so: $AVD_PATCH_APK_DEBUG"
+    done
+  fi
+  if [[ -n "${AVD_PATCH_APK_RELEASE:-}" ]]; then
+    require_file "$AVD_PATCH_APK_RELEASE"
+    for abi in x86 x86_64; do
+      apk_has_entry "$AVD_PATCH_APK_RELEASE" "lib/${abi}/libbusybox.so" || \
+        die "AVD_PATCH_APK_RELEASE missing lib/${abi}/libbusybox.so: $AVD_PATCH_APK_RELEASE"
+    done
+  fi
 }
 
 run_optional_job() {
@@ -142,12 +201,21 @@ run_builds() {
 
   log "Build debug (CI: ./build.py -v all)"
   "$PYTHON_BIN" build.py -v all
+  validate_pipeline_artifacts
 
   log "Stop Gradle daemon"
   bash ./app/gradlew --stop || true
 
-  log "Test build profile (CI: ./build.py -v -c .github/ci.prop all)"
-  "$PYTHON_BIN" build.py -v -c .github/ci.prop all
+  # Keep CI profile outputs separated so we do not overwrite out/app-debug.apk
+  # and out/test.apk that are required by AVD/Cuttlefish tests.
+  log "Test build profile (CI: ./build.py -v -c .github/ci.prop all) in $CI_OUTDIR"
+  local ci_cfg
+  ci_cfg="$(mktemp)"
+  cp .github/ci.prop "$ci_cfg"
+  echo "outdir=$CI_OUTDIR" >> "$ci_cfg"
+  "$PYTHON_BIN" build.py -v -c "$ci_cfg" all
+  rm -f "$ci_cfg"
+  validate_pipeline_artifacts
 
   log "Stop Gradle daemon"
   bash ./app/gradlew --stop || true
@@ -175,6 +243,10 @@ run_avd_matrix() {
   }
 
   export AVD_TEST_LOG="${AVD_TEST_LOG:-1}"
+  export AVD_PATCH_APK="${AVD_PATCH_APK:-}"
+  export AVD_PATCH_APK_DEBUG="${AVD_PATCH_APK_DEBUG:-}"
+  export AVD_PATCH_APK_RELEASE="${AVD_PATCH_APK_RELEASE:-}"
+  validate_pipeline_artifacts
 
   if [[ -n "${AVD_ALLOW_SOFT_ACCEL:-}" ]]; then
     warn "Software acceleration enabled (AVD_ALLOW_SOFT_ACCEL=1). Tests may be very slow."
