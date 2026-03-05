@@ -37,6 +37,7 @@ class SuRequestViewModel(
     var icon by mutableStateOf<Drawable?>(null)
     var title by mutableStateOf("")
     var packageName by mutableStateOf("")
+    var isSharedUid by mutableStateOf(false)
 
     var selectedItemPosition by mutableIntStateOf(0)
     var grantEnabled by mutableStateOf(false)
@@ -81,14 +82,14 @@ class SuRequestViewModel(
         val info = handler.pkgInfo
         val app = info.applicationInfo
 
+        isSharedUid = info.sharedUserId != null
         if (app == null) {
             icon = pm.defaultActivityIcon
-            title = "[SharedUID] ${info.sharedUserId}"
+            title = info.sharedUserId.toString()
             packageName = info.sharedUserId.toString()
         } else {
-            val prefix = if (info.sharedUserId == null) "" else "[SharedUID] "
             icon = app.loadIcon(pm)
-            title = "$prefix${app.getLabel(pm)}"
+            title = app.getLabel(pm)
             packageName = info.packageName
         }
 
