@@ -36,7 +36,7 @@ class PolicyItem(
     val icon: Drawable,
     val appName: String,
 ) {
-    val title get() = if (isSharedUid) "[SharedUID] $appName" else appName
+    val title get() = appName
     val showSlider = Config.suRestrict || policy.policy == SuPolicy.RESTRICT
 
     var isExpanded by mutableStateOf(false)

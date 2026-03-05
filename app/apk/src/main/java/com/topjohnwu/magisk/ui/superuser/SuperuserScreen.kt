@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -28,6 +29,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.topjohnwu.magisk.ui.navigation.LocalNavigator
 import com.topjohnwu.magisk.ui.navigation.Route
 import com.topjohnwu.magisk.ui.util.rememberDrawablePainter
@@ -141,11 +143,19 @@ private fun PolicyCard(
                         text = item.title,
                         style = MiuixTheme.textStyles.body1,
                     )
-                    Text(
-                        text = item.packageName,
-                        style = MiuixTheme.textStyles.body2,
-                        color = MiuixTheme.colorScheme.onSurfaceVariantSummary
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = item.packageName,
+                            style = MiuixTheme.textStyles.body2,
+                            color = MiuixTheme.colorScheme.onSurfaceVariantSummary
+                        )
+                        if (item.isSharedUid) {
+                            Spacer(Modifier.width(6.dp))
+                            SharedUidBadge()
+                        }
+                    }
                 }
             }
 
@@ -170,4 +180,17 @@ private fun PolicyCard(
             }
         }
     }
+}
+
+@Composable
+internal fun SharedUidBadge(modifier: Modifier = Modifier) {
+    Text(
+        text = "SharedUID",
+        color = MiuixTheme.colorScheme.onPrimary,
+        fontSize = 10.sp,
+        maxLines = 1,
+        modifier = modifier
+            .background(MiuixTheme.colorScheme.primary, RoundedCornerShape(6.dp))
+            .padding(horizontal = 6.dp, vertical = 2.dp)
+    )
 }
