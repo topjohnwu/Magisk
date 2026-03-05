@@ -67,6 +67,7 @@ import com.topjohnwu.magisk.core.tasks.MagiskInstaller
 import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.ui.component.ConfirmResult
 import com.topjohnwu.magisk.ui.component.LoadingDialogHandle
+import com.topjohnwu.magisk.ui.component.MarkdownText
 import com.topjohnwu.magisk.ui.component.MarkdownTextAsync
 import com.topjohnwu.magisk.ui.component.rememberConfirmDialog
 import com.topjohnwu.magisk.ui.component.rememberLoadingDialog
@@ -819,12 +820,9 @@ private fun InstallBottomSheet(
     ) {
         Column(modifier = Modifier.padding(bottom = 16.dp)) {
             if (installUiState.notes.isNotEmpty()) {
-                Text(
-                    text = installUiState.notes,
-                    style = MiuixTheme.textStyles.body2,
-                    color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                )
+                Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+                    MarkdownText(installUiState.notes)
+                }
                 HorizontalDivider(thickness = 0.75.dp)
             }
 

@@ -17,7 +17,7 @@ object VMFactory : ViewModelProvider.Factory {
             LogViewModel::class.java -> LogViewModel(ServiceLocator.logRepo)
             SuperuserViewModel::class.java -> SuperuserViewModel(ServiceLocator.policyDB)
             InstallViewModel::class.java ->
-                InstallViewModel(ServiceLocator.networkService, ServiceLocator.markwon)
+                InstallViewModel(ServiceLocator.networkService)
             SuRequestViewModel::class.java ->
                 SuRequestViewModel(ServiceLocator.policyDB, ServiceLocator.timeoutPrefs)
             else -> modelClass.newInstance()
