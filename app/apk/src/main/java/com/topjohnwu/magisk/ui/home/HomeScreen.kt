@@ -72,7 +72,6 @@ import com.topjohnwu.magisk.ui.component.rememberConfirmDialog
 import com.topjohnwu.magisk.ui.component.rememberLoadingDialog
 import com.topjohnwu.magisk.ui.component.ListPopupDefaults.MenuPositionProvider
 import com.topjohnwu.magisk.ui.flash.FlashUtils
-import com.topjohnwu.magisk.ui.theme.ThemeState
 import com.topjohnwu.magisk.ui.install.InstallViewModel
 import com.topjohnwu.magisk.ui.navigation.Route
 import kotlinx.coroutines.launch
@@ -98,11 +97,7 @@ import top.yukonga.miuix.kmp.extra.SuperArrow
 import top.yukonga.miuix.kmp.extra.SuperBottomSheet
 import top.yukonga.miuix.kmp.extra.SuperListPopup
 import top.yukonga.miuix.kmp.theme.MiuixTheme
-import top.yukonga.miuix.kmp.theme.MiuixTheme.isDynamicColor
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
@@ -437,25 +432,6 @@ private fun CoreCard(
     onInstallClicked: () -> Unit,
     onUninstallClicked: () -> Unit,
 ) {
-    val isDark = when (ThemeState.colorMode) {
-        2, 5 -> true
-        1, 4 -> false
-        else -> isSystemInDarkTheme()
-    }
-    val cardBg = when (state) {
-        HomeViewModel.State.UP_TO_DATE -> when {
-            isDynamicColor -> MiuixTheme.colorScheme.secondaryContainer
-            isDark -> Color(0xFF1E3026)
-            else -> Color(0xFFDFFAE4)
-        }
-        HomeViewModel.State.OUTDATED -> when {
-            isDynamicColor -> MiuixTheme.colorScheme.tertiaryContainer
-            isDark -> Color(0xFF302920)
-            else -> Color(0xFFFFF3E0)
-        }
-        else -> Color.Transparent
-    }
-
     val actionLabel = when (state) {
         HomeViewModel.State.OUTDATED -> stringResource(CoreR.string.update)
         HomeViewModel.State.INVALID -> stringResource(CoreR.string.install)
@@ -472,7 +448,6 @@ private fun CoreCard(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(cardBg)
                 .clipToBounds()
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
@@ -518,36 +493,6 @@ private fun CoreCard(
                 }
             }
 
-            if (state != HomeViewModel.State.LOADING) {
-                val watermarkIcon = when (state) {
-                    HomeViewModel.State.UP_TO_DATE -> MiuixIcons.Ok
-                    HomeViewModel.State.OUTDATED -> MiuixIcons.Info
-                    else -> MiuixIcons.Close
-                }
-                val watermarkTint = when (state) {
-                    HomeViewModel.State.UP_TO_DATE -> when {
-                        isDynamicColor -> MiuixTheme.colorScheme.primary
-                        isDark -> Color(0xFF4CAF50)
-                        else -> Color(0xFF66BB6A)
-                    }
-                    HomeViewModel.State.OUTDATED -> when {
-                        isDynamicColor -> MiuixTheme.colorScheme.onTertiaryContainer
-                        isDark -> Color(0xFFFF9800)
-                        else -> Color(0xFFFFA726)
-                    }
-                    else -> MiuixTheme.colorScheme.onSurfaceVariantSummary
-                }
-                Icon(
-                    imageVector = watermarkIcon,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .matchParentSize()
-                        .wrapContentSize(Alignment.TopEnd, unbounded = true)
-                        .size(128.dp)
-                        .offset(x = 24.dp, y = (-12).dp),
-                    tint = watermarkTint.copy(alpha = 0.15f)
-                )
-            }
         }
 
         if (actionLabel != null) {
