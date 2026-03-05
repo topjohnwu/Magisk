@@ -15,7 +15,7 @@ object VMFactory : ViewModelProvider.Factory {
             HomeViewModel::class.java -> HomeViewModel(ServiceLocator.networkService)
             SuperuserViewModel::class.java -> SuperuserViewModel(ServiceLocator.policyDB)
             InstallViewModel::class.java ->
-                InstallViewModel(ServiceLocator.networkService, ServiceLocator.markwon)
+                InstallViewModel(ServiceLocator.networkService)
             SuRequestViewModel::class.java ->
                 SuRequestViewModel(ServiceLocator.policyDB, ServiceLocator.timeoutPrefs)
             else -> modelClass.newInstance()

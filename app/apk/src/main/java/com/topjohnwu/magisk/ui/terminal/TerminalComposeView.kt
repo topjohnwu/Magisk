@@ -6,6 +6,7 @@ import android.util.TypedValue
 import android.view.KeyEvent
 import android.view.MotionEvent
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import com.termux.terminal.TerminalSession
@@ -18,7 +19,11 @@ fun TerminalComposeView(
     modifier: Modifier = Modifier,
     onViewCreated: (TerminalView) -> Unit = {},
     onEmulatorReady: () -> Unit = {},
+    onViewDisposed: () -> Unit = {},
 ) {
+    DisposableEffect(Unit) {
+        onDispose { onViewDisposed() }
+    }
     AndroidView(
         factory = { context ->
             val textSizePx = TypedValue.applyDimension(

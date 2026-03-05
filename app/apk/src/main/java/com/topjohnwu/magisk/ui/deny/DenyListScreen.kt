@@ -390,8 +390,11 @@ private fun StylishDenyListCard(
                             color = MaterialTheme.colorScheme.surface,
                             tonalElevation = 4.dp
                         ) {
+                            val iconPainter = remember(item.packageName, item.icon) {
+                                BitmapPainter(item.icon.toBitmap().asImageBitmap())
+                            }
                             Image(
-                                painter = BitmapPainter(item.icon.toBitmap().asImageBitmap()),
+                                painter = iconPainter,
                                 contentDescription = null,
                                 modifier = Modifier.padding(8.dp)
                             )
@@ -575,16 +578,63 @@ data class DenyListProcessUi(val name: String, val packageName: String, val isIs
     val displayName: String get() = if (isIsolated) AppContext.getString(CoreR.string.isolated_process_label, name) else name
 }
 
-data class DenyListAppUi(val packageName: String, val label: String, val icon: Drawable, val isSystem: Boolean, val isAppUid: Boolean, val expanded: Boolean, val processes: List<DenyListProcessUi>) {
-    val checkedCount: Int get() = processes.count { it.enabled }
-    val selectionState: ToggleableState get() {
-        val targets = if (expanded) processes else processes.filter { it.defaultSelection }
-        if (targets.isEmpty()) return ToggleableState.Off
-        val enabled = targets.count { it.enabled }
-        return when {
-            enabled == 0 -> ToggleableState.Off
-            enabled == targets.size -> ToggleableState.On
-            else -> ToggleableState.Indeterminate
+data class DenyListAppUi(
+    val packageName: String,
+    val label: String,
+    val icon: Drawable,
+    val isSystem: Boolean,
+    val isAppUid: Boolean,
+    val expanded: Boolean,
+    val processes: List<DenyListProcessUi>,
+    val checkedCount: Int,
+    val selectionState: ToggleableState
+) {
+    val sortKey: String by lazy(LazyThreadSafetyMode.NONE) { label.lowercase() }
+    val searchKey: String by lazy(LazyThreadSafetyMode.NONE) {
+        buildString {
+            append(label.lowercase())
+            append('|')
+            append(packageName.lowercase())
+            processes.forEach {
+                append('|')
+                append(it.name.lowercase())
+            }
+        }
+    }
+    
+    companion object {
+        fun deriveSelectionState(processes: List<DenyListProcessUi>, expanded: Boolean): ToggleableState {
+            val targets = if (expanded) processes else processes.filter { it.defaultSelection }
+            if (targets.isEmpty()) return ToggleableState.Off
+            val enabled = targets.count { it.enabled }
+            return when {
+                enabled == 0 -> ToggleableState.Off
+                enabled == targets.size -> ToggleableState.On
+                else -> ToggleableState.Indeterminate
+            }
+        }
+
+        fun create(
+            packageName: String,
+            label: String,
+            icon: Drawable,
+            isSystem: Boolean,
+            isAppUid: Boolean,
+            expanded: Boolean,
+            processes: List<DenyListProcessUi>
+        ): DenyListAppUi {
+            val checkedCount = processes.count { it.enabled }
+            return DenyListAppUi(
+                packageName = packageName,
+                label = label,
+                icon = icon,
+                isSystem = isSystem,
+                isAppUid = isAppUid,
+                expanded = expanded,
+                processes = processes,
+                checkedCount = checkedCount,
+                selectionState = deriveSelectionState(processes, expanded)
+            )
         }
     }
 }
@@ -611,6 +661,7 @@ class DenyListComposeViewModel : ViewModel() {
     val messages: SharedFlow<String> = _messages.asSharedFlow()
     private var allApps: List<DenyListAppUi> = emptyList()
     private var refreshJob: Job? = null
+    private var queryApplyJob: Job? = null
 
     fun refresh() {
         refreshJob?.cancel()
@@ -627,11 +678,23 @@ class DenyListComposeViewModel : ViewModel() {
         }
     }
 
-    fun setQuery(v: String) { _state.update { it.copy(query = v) }; applyFilters() }
+    fun setQuery(v: String) {
+        _state.update { it.copy(query = v) }
+        queryApplyJob?.cancel()
+        queryApplyJob = viewModelScope.launch {
+            kotlinx.coroutines.delay(120)
+            applyFilters()
+        }
+    }
     fun setShowSystem(v: Boolean) { _state.update { it.copy(showSystem = v, showOs = if (v) it.showOs else false) }; applyFilters() }
     fun setShowOs(v: Boolean) { _state.update { it.copy(showOs = v) }; applyFilters() }
     fun setSortMethod(v: DenyListSortMethod) { _state.update { it.copy(sortMethod = v) }; applyFilters() }
-    fun toggleExpanded(pkg: String) { allApps = allApps.map { if (it.packageName == pkg) it.copy(expanded = !it.expanded) else it }; applyFilters() }
+    fun toggleExpanded(pkg: String) {
+        allApps = allApps.map { app ->
+            if (app.packageName == pkg) rebuildAppState(app, expanded = !app.expanded) else app
+        }
+        applyFilters()
+    }
 
     fun toggleProcess(pkg: String, name: String, pPkg: String) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -642,7 +705,16 @@ class DenyListComposeViewModel : ViewModel() {
             val result = Shell.cmd("magisk --denylist $cmd $pPkg ${shellQuote(name)}").exec()
             withContext(Dispatchers.Main) {
                 if (result.isSuccess) {
-                    allApps = allApps.map { a -> if (a.packageName != pkg) a else a.copy(processes = a.processes.map { p -> if (p.name == name && p.packageName == pPkg) p.copy(enabled = enabled) else p }) }
+                    allApps = allApps.map { a ->
+                        if (a.packageName != pkg) {
+                            a
+                        } else {
+                            val updatedProcesses = a.processes.map { p ->
+                                if (p.name == name && p.packageName == pPkg) p.copy(enabled = enabled) else p
+                            }
+                            rebuildAppState(a, processes = updatedProcesses)
+                        }
+                    }
                     applyFilters()
                 } else { postFailure() }
             }
@@ -679,15 +751,18 @@ class DenyListComposeViewModel : ViewModel() {
             withContext(Dispatchers.Main) {
                 if (success) {
                     allApps = allApps.map { a ->
-                        if (a.packageName != pkg) a else a.copy(
-                            processes = a.processes.map { p ->
+                        if (a.packageName != pkg) {
+                            a
+                        } else {
+                            val updatedProcesses = a.processes.map { p ->
                                 if (affected.any { t -> t.name == p.name && t.packageName == p.packageName }) {
                                     p.copy(enabled = enabled)
                                 } else {
                                     p
                                 }
                             }
-                        )
+                            rebuildAppState(a, processes = updatedProcesses)
+                        }
                     }
                     applyFilters()
                 } else { postFailure() }
@@ -697,18 +772,33 @@ class DenyListComposeViewModel : ViewModel() {
 
     private fun postFailure() { _messages.tryEmit(AppContext.getString(CoreR.string.failure)) }
 
+    private fun rebuildAppState(
+        app: DenyListAppUi,
+        processes: List<DenyListProcessUi> = app.processes,
+        expanded: Boolean = app.expanded
+    ): DenyListAppUi {
+        val checkedCount = processes.count { it.enabled }
+        return app.copy(
+            expanded = expanded,
+            processes = processes,
+            checkedCount = checkedCount,
+            selectionState = DenyListAppUi.deriveSelectionState(processes, expanded)
+        )
+    }
+
     private fun applyFilters() {
         val st = _state.value
+        val queryLower = st.query.trim().lowercase()
         val filtered = allApps.asSequence().filter { app ->
             // Keep expanded cards visible while interacting, so they do not disappear/jump mid-toggle.
             val passesVisibility = app.expanded || app.checkedCount > 0 || (st.showSystem || !app.isSystem) && (app.isAppUid || st.showSystem && st.showOs)
-            passesVisibility && (st.query.isBlank() || app.label.contains(st.query, true) || app.packageName.contains(st.query, true) || app.processes.any { it.name.contains(st.query, true) })
+            passesVisibility && (queryLower.isBlank() || app.searchKey.contains(queryLower))
         }.toList()
 
         val sorted = when (st.sortMethod) {
-            DenyListSortMethod.ActiveFirst -> filtered.sortedWith(compareBy({ it.checkedCount == 0 }, { it.label.lowercase() }, { it.packageName }))
-            DenyListSortMethod.NameAsc -> filtered.sortedWith(compareBy({ it.label.lowercase() }, { it.packageName }))
-            DenyListSortMethod.NameDesc -> filtered.sortedWith(compareByDescending<DenyListAppUi> { it.label.lowercase() }.thenByDescending { it.packageName })
+            DenyListSortMethod.ActiveFirst -> filtered.sortedWith(compareBy({ it.checkedCount == 0 }, { it.sortKey }, { it.packageName }))
+            DenyListSortMethod.NameAsc -> filtered.sortedWith(compareBy({ it.sortKey }, { it.packageName }))
+            DenyListSortMethod.NameDesc -> filtered.sortedWith(compareByDescending<DenyListAppUi> { it.sortKey }.thenByDescending { it.packageName })
         }
 
         _state.update { it.copy(items = sorted) }
@@ -722,8 +812,35 @@ class DenyListComposeViewModel : ViewModel() {
             .filter { it.packageName != AppContext.packageName }
             .mapNotNull { app -> runCatching {
                 val proc = AppProcessInfo(app, pm, denyList)
-                if (proc.processes.isEmpty()) null else DenyListAppUi(app.packageName, proc.label, proc.iconImage, proc.isSystemApp(), proc.isApp(), false, proc.processes.map { DenyListProcessUi(it.name, it.packageName, it.isIsolated, it.isAppZygote, it.isIsolated || it.isAppZygote || it.name == it.packageName, it.isEnabled) })
+                if (proc.processes.isEmpty()) {
+                    null
+                } else {
+                    DenyListAppUi.create(
+                        packageName = app.packageName,
+                        label = proc.label,
+                        icon = proc.iconImage,
+                        isSystem = proc.isSystemApp(),
+                        isAppUid = proc.isApp(),
+                        expanded = false,
+                        processes = proc.processes.map {
+                            DenyListProcessUi(
+                                it.name,
+                                it.packageName,
+                                it.isIsolated,
+                                it.isAppZygote,
+                                it.isIsolated || it.isAppZygote || it.name == it.packageName,
+                                it.isEnabled
+                            )
+                        }
+                    )
+                }
             }.getOrNull() }.toList()
+    }
+
+    override fun onCleared() {
+        queryApplyJob?.cancel()
+        refreshJob?.cancel()
+        super.onCleared()
     }
 
     companion object {

@@ -8,7 +8,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,7 +22,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -47,6 +45,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -69,11 +68,11 @@ import com.topjohnwu.magisk.core.ktx.toTime
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.ui.RouteProcessTopBarState
+import com.topjohnwu.magisk.ui.terminal.StyledLogLine
 import com.topjohnwu.superuser.CallbackList
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -98,7 +97,7 @@ fun ModuleActionScreen(
     val lines = viewModel.lines
     val snackbarHostState = remember { SnackbarHostState() }
     val listState = rememberLazyListState()
-    val horizontalScroll = rememberScrollState()
+    val hasLogs by remember { derivedStateOf { lines.isNotEmpty() } }
     var hasStarted by remember(actionId) { mutableStateOf(false) }
 
     // Prevent back navigation while running
@@ -113,12 +112,15 @@ fun ModuleActionScreen(
     LaunchedEffect(lines.size) {
         val last = lines.lastIndex
         if (last >= 0) {
-            delay(30)
-            listState.animateScrollToItem(last)
+            val lastVisible = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1
+            val shouldStickToBottom = lastVisible >= last - 3 || !listState.canScrollForward
+            if (shouldStickToBottom) {
+                listState.scrollToItem(last)
+            }
         }
     }
     LaunchedEffect(state.running, state.success, lines.size, actionName) {
-        if (state.running || lines.isNotEmpty()) {
+        if (state.running || hasLogs) {
             hasStarted = true
         }
         val title = actionName.takeIf { it.isNotBlank() }
@@ -154,14 +156,13 @@ fun ModuleActionScreen(
             LogContainer(
                 lines = lines,
                 listState = listState,
-                horizontalScroll = horizontalScroll,
                 modifier = Modifier.weight(1f)
             )
 
             // Actions Section
             ActionButtons(
                 state = state,
-                hasLogs = lines.isNotEmpty(),
+                hasLogs = hasLogs,
                 onSaveLog = { viewModel.saveLog(actionName) },
                 onClose = onBack
             )
@@ -254,7 +255,6 @@ private fun ActionHeader(state: ModuleActionUiState, actionName: String) {
 private fun LogContainer(
     lines: List<String>,
     listState: androidx.compose.foundation.lazy.LazyListState,
-    horizontalScroll: androidx.compose.foundation.ScrollState,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
@@ -289,7 +289,6 @@ private fun LogContainer(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(16.dp)
-                    .horizontalScroll(horizontalScroll)
             ) {
                 if (lines.isEmpty()) {
                     Text(
@@ -304,14 +303,14 @@ private fun LogContainer(
                         state = listState,
                         verticalArrangement = Arrangement.spacedBy(2.dp)
                     ) {
-                        itemsIndexed(lines) { _, line ->
-                            Text(
-                                text = line,
-                                color = if (line.startsWith("!")) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
-                                fontFamily = FontFamily.Monospace,
-                                style = MaterialTheme.typography.bodySmall,
-                                softWrap = false,
-                                fontSize = 11.sp
+                        itemsIndexed(
+                            items = lines,
+                            key = { index, _ -> index }
+                        ) { _, line ->
+                            StyledLogLine(
+                                line = line,
+                                colors = MaterialTheme.colorScheme,
+                                modifier = Modifier.fillMaxWidth()
                             )
                         }
                     }

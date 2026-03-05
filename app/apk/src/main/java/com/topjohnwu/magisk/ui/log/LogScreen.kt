@@ -1,81 +1,33 @@
 package com.topjohnwu.magisk.ui.log
 
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
-import androidx.compose.animation.togetherWith
+import androidx.compose.animation.*
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowDownward
-import androidx.compose.material.icons.rounded.Article
-import androidx.compose.material.icons.rounded.BugReport
-import androidx.compose.material.icons.rounded.Close
-import androidx.compose.material.icons.rounded.Dangerous
-import androidx.compose.material.icons.rounded.DeleteSweep
-import androidx.compose.material.icons.rounded.Error
-import androidx.compose.material.icons.rounded.HelpOutline
-import androidx.compose.material.icons.rounded.Info
-import androidx.compose.material.icons.rounded.SaveAlt
-import androidx.compose.material.icons.rounded.Search
-import androidx.compose.material.icons.rounded.Terminal
-import androidx.compose.material.icons.rounded.Warning
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.rounded.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -96,21 +48,16 @@ import com.topjohnwu.magisk.core.repository.LogRepository
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.ui.RefreshOnResume
+import com.topjohnwu.magisk.ui.terminal.ansiLogText
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import com.topjohnwu.magisk.core.R as CoreR
 
 @Composable
 fun LogsScreen(
-    viewModel: LogsComposeViewModel = viewModel(factory = LogsComposeViewModel.Factory)
+    viewModel: MagiskLogViewModel = viewModel(factory = MagiskLogViewModel.Factory)
 ) {
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -120,35 +67,17 @@ fun LogsScreen(
 
     var filter by remember { mutableStateOf(LogDisplayFilter.ALL) }
     var searchQuery by remember { mutableStateOf("") }
-    var isSearchActive by remember { mutableStateOf(false) }
+    var showSearch by remember { mutableStateOf(false) }
 
     val filteredLogs = remember(state.visibleLogs, filter, searchQuery) {
         val base = when (filter) {
             LogDisplayFilter.ALL -> state.visibleLogs
-            LogDisplayFilter.ISSUES -> state.visibleLogs.filter {
-                it.level == MagiskLogLevel.WARN || it.level == MagiskLogLevel.ERROR || it.level == MagiskLogLevel.FATAL
-            }
-
-            LogDisplayFilter.MAGISK -> state.visibleLogs.filter {
-                it.tag.contains(
-                    "magisk",
-                    ignoreCase = true
-                )
-            }
-
-            LogDisplayFilter.SU -> state.visibleLogs.filter {
-                it.message.startsWith("su:", ignoreCase = true) || it.raw.startsWith(
-                    "su:",
-                    ignoreCase = true
-                )
-            }
+            LogDisplayFilter.ISSUES -> state.visibleLogs.filter { it.isIssue }
+            LogDisplayFilter.MAGISK -> state.visibleLogs.filter { it.isMagisk }
+            LogDisplayFilter.SU -> state.visibleLogs.filter { it.isSu }
         }
         if (searchQuery.isEmpty()) base
-        else base.filter {
-            it.message.contains(searchQuery, ignoreCase = true) ||
-                    it.tag.contains(searchQuery, ignoreCase = true) ||
-                    it.raw.contains(searchQuery, ignoreCase = true)
-        }
+        else base.filter { it.contains(searchQuery) }
     }
 
     val canScrollDown by remember { derivedStateOf { listState.canScrollForward } }
@@ -157,538 +86,324 @@ fun LogsScreen(
     LaunchedEffect(viewModel) {
         viewModel.messages.collect { snackbarHostState.showSnackbar(it) }
     }
-    LaunchedEffect(filteredLogs.lastOrNull()?.id) {
-        val last = filteredLogs.lastIndex
-        if (last >= 0 && !listState.isScrollInProgress) {
-            listState.animateScrollToItem(last)
-        }
-    }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    val shapes = listOf(
+        RoundedCornerShape(topStart = 48.dp, topEnd = 12.dp, bottomStart = 12.dp, bottomEnd = 48.dp),
+        RoundedCornerShape(topStart = 12.dp, topEnd = 48.dp, bottomStart = 48.dp, bottomEnd = 12.dp),
+        RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp, bottomStart = 8.dp, bottomEnd = 32.dp),
+        RoundedCornerShape(topStart = 12.dp, topEnd = 56.dp, bottomStart = 56.dp, bottomEnd = 56.dp)
+    )
+
+    Box(modifier = Modifier.fillMaxSize().navigationBarsPadding()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .padding(horizontal = 20.dp)
+                .padding(top = 12.dp)
         ) {
+            // Action Row
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Surface(
+                    onClick = { showSearch = !showSearch },
+                    modifier = Modifier.height(64.dp).weight(0.35f),
+                    shape = RoundedCornerShape(32.dp, 8.dp, 8.dp, 32.dp),
+                    color = MaterialTheme.colorScheme.secondaryContainer,
+                    tonalElevation = 2.dp
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        AnimatedContent(
+                            targetState = showSearch,
+                            transitionSpec = {
+                                (fadeIn() + scaleIn()).togetherWith(fadeOut() + scaleOut())
+                            },
+                            label = "searchIcon"
+                        ) { isSearch ->
+                            Icon(
+                                imageVector = if (isSearch) Icons.Rounded.Close else Icons.Rounded.Search, 
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+                        }
+                    }
+                }
+                
+                Surface(
+                    modifier = Modifier.weight(1f).height(64.dp),
+                    shape = RoundedCornerShape(8.dp, 32.dp, 32.dp, 8.dp),
+                    color = MaterialTheme.colorScheme.primary,
+                    tonalElevation = 4.dp
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        IconButton(
+                            onClick = viewModel::refresh,
+                            colors = IconButtonDefaults.iconButtonColors(contentColor = MaterialTheme.colorScheme.onPrimary)
+                        ) { Icon(Icons.Rounded.Refresh, null) }
+                        
+                        IconButton(
+                            onClick = { activity?.withPermission(WRITE_EXTERNAL_STORAGE) { if (it) viewModel.saveMagiskLog() } },
+                            colors = IconButtonDefaults.iconButtonColors(contentColor = MaterialTheme.colorScheme.onPrimary)
+                        ) { Icon(Icons.Rounded.SaveAlt, null) }
+                        
+                        IconButton(
+                            onClick = viewModel::clearMagiskLogs, 
+                            colors = IconButtonDefaults.iconButtonColors(contentColor = MaterialTheme.colorScheme.errorContainer)
+                        ) { Icon(Icons.Rounded.DeleteSweep, null) }
+                    }
+                }
+            }
+
+            AnimatedVisibility(
+                visible = showSearch,
+                enter = expandVertically(animationSpec = spring(stiffness = Spring.StiffnessLow)) + fadeIn(),
+                exit = shrinkVertically(animationSpec = spring(stiffness = Spring.StiffnessLow)) + fadeOut()
+            ) {
+                Column {
+                    Spacer(Modifier.height(12.dp))
+                    TextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        placeholder = { Text("Search logs...") },
+                        leadingIcon = { Icon(Icons.Rounded.Search, null) },
+                        trailingIcon = { 
+                            if (searchQuery.isNotEmpty()) {
+                                IconButton(onClick = { searchQuery = "" }) { Icon(Icons.Rounded.Close, null) }
+                            } 
+                        },
+                        shape = RoundedCornerShape(24.dp),
+                        colors = TextFieldDefaults.colors(
+                            focusedIndicatorColor = Color.Transparent, 
+                            unfocusedIndicatorColor = Color.Transparent,
+                            focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                        ),
+                        singleLine = true
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            // Filter Chips - Now Centered
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
+            ) {
+                LogFilterChip(selected = filter == LogDisplayFilter.ALL, label = "Tutti", badge = state.visibleLogs.size, onClick = { filter = LogDisplayFilter.ALL })
+                LogFilterChip(selected = filter == LogDisplayFilter.ISSUES, label = "Problemi", badge = state.visibleLogs.count { it.isIssue }, onClick = { filter = LogDisplayFilter.ISSUES }, isError = true)
+                LogFilterChip(selected = filter == LogDisplayFilter.MAGISK, label = "Magisk", badge = state.visibleLogs.count { it.isMagisk }, onClick = { filter = LogDisplayFilter.MAGISK })
+                LogFilterChip(selected = filter == LogDisplayFilter.SU, label = "su", badge = state.visibleLogs.count { it.isSu }, onClick = { filter = LogDisplayFilter.SU })
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            // Log Content
             if (state.loading && state.visibleLogs.isEmpty()) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(strokeCap = StrokeCap.Round)
                 }
-            } else if (state.visibleLogs.isEmpty()) {
-                EmptyLogState(stringResource(CoreR.string.log_data_magisk_none))
+            } else if (filteredLogs.isEmpty()) {
+                EmptyLogState("Nessun log trovato")
             } else {
-                val issueCount = state.visibleLogs.count {
-                    it.level == MagiskLogLevel.WARN || it.level == MagiskLogLevel.ERROR || it.level == MagiskLogLevel.FATAL
-                }
-                val magiskCount =
-                    state.visibleLogs.count { it.tag.contains("magisk", ignoreCase = true) }
-                val suCount = state.visibleLogs.count {
-                    it.message.startsWith("su:", ignoreCase = true) || it.raw.startsWith(
-                        "su:",
-                        ignoreCase = true
-                    )
-                }
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp)
-                ) {
-                    AnimatedContent(
-                        targetState = isSearchActive,
-                        transitionSpec = {
-                            fadeIn() togetherWith fadeOut()
-                        },
-                        modifier = Modifier.weight(1f),
-                        label = "search_transition"
-                    ) { active ->
-                        if (active) {
-                            TextField(
-                                value = searchQuery,
-                                onValueChange = { searchQuery = it },
-                                modifier = Modifier.fillMaxWidth(),
-                                placeholder = { Text("Cerca nei log...", fontSize = 14.sp) },
-                                leadingIcon = {
-                                    Icon(
-                                        Icons.Rounded.Search,
-                                        null,
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                },
-                                trailingIcon = {
-                                    IconButton(onClick = {
-                                        isSearchActive = false
-                                        searchQuery = ""
-                                    }) {
-                                        Icon(Icons.Rounded.Close, null)
-                                    }
-                                },
-                                colors = TextFieldDefaults.colors(
-                                    focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-                                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-                                    focusedIndicatorColor = Color.Transparent,
-                                    unfocusedIndicatorColor = Color.Transparent
-                                ),
-                                shape = RoundedCornerShape(12.dp),
-                                singleLine = true,
-                                textStyle = MaterialTheme.typography.bodyMedium
-                            )
-                        } else {
-                            LogsFilterBar(
-                                selected = filter,
-                                total = state.visibleLogs.size,
-                                issues = issueCount,
-                                magisk = magiskCount,
-                                su = suCount,
-                                onSelected = { filter = it }
-                            )
-                        }
-                    }
-
-                    if (!isSearchActive) {
-                        Spacer(Modifier.width(8.dp))
-                        Surface(
-                            onClick = { isSearchActive = true },
-                            color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f),
-                            shape = RoundedCornerShape(12.dp),
-                            modifier = Modifier.size(48.dp)
-                        ) {
-                            Box(contentAlignment = Alignment.Center) {
-                                Icon(
-                                    Icons.Rounded.Search,
-                                    null,
-                                    tint = MaterialTheme.colorScheme.onSecondaryContainer
-                                )
-                            }
-                        }
-                    }
-                }
-
-                Spacer(Modifier.height(12.dp))
-
                 LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
                     state = listState,
+                    modifier = Modifier.fillMaxWidth().weight(1f),
                     contentPadding = PaddingValues(bottom = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(filteredLogs, key = { it.id }) { item ->
-                        CutePrettyLogCard(item = item)
+                    itemsIndexed(filteredLogs, key = { _, item -> item.id }) { index, item ->
+                        LogEntryOrganicCard(item, shapes[index % shapes.size])
                     }
                 }
             }
-
-            Spacer(modifier = Modifier.height(12.dp))
-            LogsActionButtons(
-                onClear = { viewModel.clearMagiskLogs() },
-                onSave = {
-                    activity?.withPermission(WRITE_EXTERNAL_STORAGE) {
-                        if (it) viewModel.saveMagiskLog() else viewModel.postExternalRwDenied()
-                    } ?: viewModel.saveMagiskLog()
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .navigationBarsPadding()
-                    .padding(bottom = 8.dp)
-            )
         }
 
-        // FAB to scroll to bottom
+        // FAB to Scroll to Bottom
         AnimatedVisibility(
-            visible = canScrollDown,
-            enter = scaleIn() + fadeIn(),
-            exit = scaleOut() + fadeOut(),
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(bottom = 90.dp, end = 20.dp)
+            visible = canScrollDown, 
+            modifier = Modifier.align(Alignment.BottomEnd).padding(24.dp),
+            enter = scaleIn(animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)) + fadeIn(),
+            exit = scaleOut() + fadeOut()
         ) {
             FloatingActionButton(
-                onClick = {
-                    scope.launch {
-                        if (filteredLogs.isNotEmpty()) {
-                            listState.animateScrollToItem(filteredLogs.lastIndex)
-                        }
-                    }
-                },
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                onClick = { scope.launch { if (filteredLogs.isNotEmpty()) listState.animateScrollToItem(filteredLogs.lastIndex) } },
                 shape = CircleShape,
-                modifier = Modifier.size(48.dp)
-            ) {
-                Icon(Icons.Rounded.ArrowDownward, null)
-            }
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 6.dp)
+            ) { Icon(Icons.Rounded.KeyboardDoubleArrowDown, null) }
         }
 
-        SnackbarHost(
-            hostState = snackbarHostState,
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 120.dp)
-        )
+        SnackbarHost(hostState = snackbarHostState, modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 16.dp))
     }
 }
 
 @Composable
-private fun CutePrettyLogCard(item: MagiskLogUiItem) {
-    val accentColor = item.level.color()
-    val hasMeta = item.timestamp != null || item.pid != null || item.tid != null
-
-    Card(
-        shape = RoundedCornerShape(32.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
-        ),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Box {
-            // Background Watermark
-            Icon(
-                painter = painterResource(id = CoreR.drawable.ic_magisk_outline),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(100.dp)
-                    .align(Alignment.TopEnd)
-                    .offset(x = 20.dp, y = (-15).dp)
-                    .alpha(0.04f),
-                tint = accentColor
-            )
-
-            Column(modifier = Modifier.padding(16.dp)) {
-                // HEADER ROW: [Badge] Tag
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    // 1. Symbol (Level Badge) - Perfect Circle
-                    Surface(
-                        shape = CircleShape,
-                        color = accentColor.copy(alpha = 0.25f),
-                        modifier = Modifier.size(32.dp)
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Text(
-                                text = item.level.shortLabel,
-                                color = accentColor,
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Black
-                            )
-                        }
-                    }
-
-                    Spacer(Modifier.width(10.dp))
-
-                    // 2. Tag (Nome)
-                    Text(
-                        text = item.tag,
-                        style = MaterialTheme.typography.labelLarge,
-                        color = accentColor,
-                        fontWeight = FontWeight.ExtraBold,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f, fill = false)
-                    )
-                }
-
-                if (hasMeta) {
-                    Spacer(Modifier.height(8.dp))
-                    val metaText = buildList {
-                        item.timestamp?.let { add(it) }
-                        item.pid?.let { add("pid:$it") }
-                        item.tid?.let { add("tid:$it") }
-                    }.joinToString("   ")
-
-                    Text(
-                        text = metaText,
-                        style = MaterialTheme.typography.labelSmall.copy(fontFamily = FontFamily.Monospace),
-                        color = MaterialTheme.colorScheme.outline
-                    )
-                }
-
-                Spacer(Modifier.height(12.dp))
-
-                // Message area - New Line (LOG A CAPO) - Cozy Bubble
-                Surface(
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.04f),
-                    shape = RoundedCornerShape(20.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    SelectionContainer {
-                        Text(
-                            text = item.message.ifBlank { item.raw },
-                            modifier = Modifier.padding(16.dp),
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                fontFamily = FontFamily.Monospace,
-                                lineHeight = 20.sp
-                            ),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontSize = 12.sp
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun LogsFilterBar(
-    selected: LogDisplayFilter,
-    total: Int,
-    issues: Int,
-    magisk: Int,
-    su: Int,
-    onSelected: (LogDisplayFilter) -> Unit
-) {
-    val scroll = rememberScrollState()
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .horizontalScroll(scroll),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        LogFilterChip(
-            selected = selected == LogDisplayFilter.ALL,
-            label = "Tutti",
-            badge = total,
-            onClick = { onSelected(LogDisplayFilter.ALL) }
-        )
-        LogFilterChip(
-            selected = selected == LogDisplayFilter.ISSUES,
-            label = "Problemi",
-            badge = issues,
-            onClick = { onSelected(LogDisplayFilter.ISSUES) }
-        )
-        LogFilterChip(
-            selected = selected == LogDisplayFilter.MAGISK,
-            label = "Magisk",
-            badge = magisk,
-            onClick = { onSelected(LogDisplayFilter.MAGISK) }
-        )
-        LogFilterChip(
-            selected = selected == LogDisplayFilter.SU,
-            label = "su",
-            badge = su,
-            onClick = { onSelected(LogDisplayFilter.SU) }
-        )
-    }
-}
-
-@Composable
-private fun LogFilterChip(
-    selected: Boolean,
-    label: String,
-    badge: Int,
-    onClick: () -> Unit
-) {
+private fun LogFilterChip(selected: Boolean, label: String, badge: Int, onClick: () -> Unit, isError: Boolean = false) {
     FilterChip(
         selected = selected,
         onClick = onClick,
-        label = {
+        label = { 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(label)
                 if (badge > 0) {
                     Spacer(Modifier.width(6.dp))
-                    Surface(
-                        color = if (selected) MaterialTheme.colorScheme.onSecondaryContainer.copy(
-                            alpha = 0.2f
-                        )
-                        else MaterialTheme.colorScheme.secondaryContainer,
-                        shape = RoundedCornerShape(10.dp)
-                    ) {
-                        Text(
-                            text = badge.toString(),
-                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 1.dp),
-                            style = MaterialTheme.typography.labelSmall,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
+                    Text(badge.toString(), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black, modifier = Modifier.alpha(0.6f))
                 }
             }
         },
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(12.dp),
+        colors = if (isError && !selected) FilterChipDefaults.filterChipColors(labelColor = MaterialTheme.colorScheme.error) else FilterChipDefaults.filterChipColors()
     )
 }
 
 @Composable
-private fun LogsActionButtons(
-    onClear: () -> Unit,
-    onSave: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+private fun LogEntryOrganicCard(item: MagiskLogUiItem, shape: Shape) {
+    val levelColor = item.level.color()
+    val isMagisk = item.isMagisk
+    
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = shape,
+        color = if (isMagisk) MaterialTheme.colorScheme.surfaceContainerHighest else MaterialTheme.colorScheme.surfaceContainerHigh,
+        tonalElevation = if (isMagisk) 8.dp else 1.dp,
+        border = if (isMagisk) BorderStroke(1.dp, levelColor.copy(alpha = 0.3f)) else null
     ) {
-        Surface(
-            onClick = onClear,
-            modifier = Modifier
-                .height(52.dp)
-                .weight(0.3f),
-            shape = RoundedCornerShape(14.dp),
-            color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.7f)
-        ) {
-            Box(contentAlignment = Alignment.Center) {
-                Icon(
-                    imageVector = Icons.Rounded.DeleteSweep,
-                    contentDescription = stringResource(CoreR.string.menuClearLog),
-                    tint = MaterialTheme.colorScheme.onErrorContainer
-                )
+        Row(modifier = Modifier.height(IntrinsicSize.Min)) {
+            if (item.isIssue) {
+                Box(modifier = Modifier.width(6.dp).fillMaxHeight().background(levelColor))
             }
-        }
-
-        Button(
-            onClick = onSave,
-            modifier = Modifier
-                .weight(1f)
-                .height(52.dp),
-            shape = RoundedCornerShape(14.dp)
-        ) {
-            Icon(Icons.Rounded.SaveAlt, null, modifier = Modifier.size(20.dp))
-            Spacer(Modifier.width(12.dp))
-            Text(stringResource(CoreR.string.menuSaveLog).uppercase(), fontWeight = FontWeight.Bold)
+            Column(modifier = Modifier.padding(16.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Surface(
+                        color = levelColor.copy(alpha = 0.15f),
+                        shape = CircleShape,
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Icon(item.level.icon(), null, tint = levelColor, modifier = Modifier.size(18.dp))
+                        }
+                    }
+                    Spacer(Modifier.width(12.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = item.tag,
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.Black,
+                            color = if (isMagisk) MaterialTheme.colorScheme.primary else levelColor,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        if (item.timestamp.isNotBlank()) {
+                            Text(item.timestamp, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
+                        }
+                    }
+                    
+                    if (item.pid != 0) {
+                        Surface(
+                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f), 
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text("P:${item.pid}", modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp), style = MaterialTheme.typography.labelSmall, fontSize = 10.sp, fontFamily = FontFamily.Monospace)
+                        }
+                    }
+                }
+                
+                Spacer(Modifier.height(12.dp))
+                
+                Surface(
+                    color = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.8f),
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    SelectionContainer {
+                        Text(
+                            text = ansiLogText(item.message, MaterialTheme.colorScheme),
+                            style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace, lineHeight = 18.sp),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontSize = 12.sp,
+                            modifier = Modifier.padding(12.dp)
+                        )
+                    }
+                }
+            }
         }
     }
 }
 
 @Composable
 private fun EmptyLogState(message: String) {
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Surface(
-                modifier = Modifier.size(100.dp),
-                shape = RoundedCornerShape(32.dp),
-                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        Icons.Rounded.Terminal,
-                        null,
-                        modifier = Modifier.size(48.dp),
-                        tint = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)
-                    )
-                }
-            }
-            Spacer(Modifier.height(20.dp))
-            Text(
-                message,
-                color = MaterialTheme.colorScheme.outline,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
-        }
+    Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+        Icon(Icons.Rounded.History, null, modifier = Modifier.size(64.dp), tint = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+        Spacer(Modifier.height(12.dp))
+        Text(message, color = MaterialTheme.colorScheme.outline, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
     }
 }
 
-data class LogsUiState(
-    val loading: Boolean = true,
+// Logic components with unique names to avoid Kapt conflicts
+data class MagiskLogScreenUiState(
+    val loading: Boolean = true, 
     val visibleLogs: List<MagiskLogUiItem> = emptyList()
 )
 
-enum class LogDisplayFilter {
-    ALL,
-    ISSUES,
-    MAGISK,
-    SU
-}
+enum class LogDisplayFilter { ALL, ISSUES, MAGISK, SU }
 
-enum class MagiskLogLevel {
-    VERBOSE,
-    DEBUG,
-    INFO,
-    WARN,
-    ERROR,
-    FATAL,
-    UNKNOWN;
-
-    val shortLabel: String
-        get() = when (this) {
-            VERBOSE -> "V"
-            DEBUG -> "D"
-            INFO -> "I"
-            WARN -> "W"
-            ERROR -> "E"
-            FATAL -> "F"
-            UNKNOWN -> "?"
-        }
-
-    @Composable
-    fun color(): Color = when (this) {
-        VERBOSE -> MaterialTheme.colorScheme.outline
-        DEBUG -> MaterialTheme.colorScheme.primary
-        INFO -> MaterialTheme.colorScheme.tertiary
-        WARN -> Color(0xFFF4B400)
-        ERROR -> MaterialTheme.colorScheme.error
-        FATAL -> MaterialTheme.colorScheme.error
-        UNKNOWN -> MaterialTheme.colorScheme.outline
+enum class MagiskLogLevel(val code: Char, val shortLabel: String) {
+    VERBOSE('V', "V"), DEBUG('D', "D"), INFO('I', "I"), WARN('W', "W"), ERROR('E', "E"), FATAL('F', "F"), UNKNOWN('?', "?");
+    @Composable fun color() = when(this) {
+        WARN -> Color(0xFFF4B400); ERROR, FATAL -> MaterialTheme.colorScheme.error
+        DEBUG -> MaterialTheme.colorScheme.primary; INFO -> MaterialTheme.colorScheme.tertiary
+        else -> MaterialTheme.colorScheme.outline
     }
-
-    fun icon(): ImageVector = when (this) {
-        VERBOSE -> Icons.Rounded.Article
-        DEBUG -> Icons.Rounded.BugReport
-        INFO -> Icons.Rounded.Info
-        WARN -> Icons.Rounded.Warning
-        ERROR -> Icons.Rounded.Error
-        FATAL -> Icons.Rounded.Dangerous
-        UNKNOWN -> Icons.Rounded.HelpOutline
+    fun icon() = when(this) {
+        WARN -> Icons.Rounded.Warning; ERROR, FATAL -> Icons.Rounded.Dangerous
+        DEBUG -> Icons.Rounded.BugReport; else -> Icons.Rounded.Info
     }
+    companion object { fun from(c: Char) = entries.find { it.code == c } ?: UNKNOWN }
 }
 
 data class MagiskLogUiItem(
     val id: Int,
-    val raw: String,
-    val message: String,
-    val level: MagiskLogLevel,
-    val timestamp: String?,
+    val timestamp: String,
     val tag: String,
-    val pid: Int?,
-    val tid: Int?
-)
+    val level: MagiskLogLevel,
+    val message: String,
+    val raw: String,
+    val pid: Int = 0,
+    val tid: Int = 0
+) {
+    val isIssue get() = level == MagiskLogLevel.WARN || level == MagiskLogLevel.ERROR || level == MagiskLogLevel.FATAL
+    val isMagisk get() = tag.contains("magisk", ignoreCase = true)
+    val isSu get() = message.contains("su:", ignoreCase = true) || raw.contains("su:", ignoreCase = true)
+    fun contains(q: String) = tag.contains(q, true) || message.contains(q, true) || raw.contains(q, true)
+}
 
-class LogsComposeViewModel(private val repo: LogRepository) : ViewModel() {
-    private val _state = MutableStateFlow(LogsUiState())
-    val state: StateFlow<LogsUiState> = _state
+class MagiskLogViewModel(private val repo: LogRepository) : ViewModel() {
+    private val _state = MutableStateFlow(MagiskLogScreenUiState())
+    val state = _state.asStateFlow()
     private val _messages = MutableSharedFlow<String>(extraBufferCapacity = 1)
-    val messages: SharedFlow<String> = _messages.asSharedFlow()
-    private var refreshJob: Job? = null
+    val messages = _messages.asSharedFlow()
 
     fun refresh() {
-        refreshJob?.cancel()
-        val hadLogs = _state.value.visibleLogs.isNotEmpty()
-        refreshJob = viewModelScope.launch {
-            if (!hadLogs) {
-                _state.update { it.copy(loading = true) }
-            }
-            val logItems = withContext(Dispatchers.IO) {
-                val fetched = repo.fetchMagiskLogs()
-                val visibleRaw = fetched.takeLast(MAX_RENDER_CHARS)
-                val parsedLines = if (visibleRaw.isBlank()) {
-                    emptyList()
-                } else {
-                    visibleRaw
-                        .split('\n')
-                        .let { list ->
-                            if (list.size > MAX_RENDER_LINES) list.takeLast(
-                                MAX_RENDER_LINES
-                            ) else list
-                        }
-                        .map { line ->
-                            if (line.length > MAX_RENDER_LINE_CHARS) line.take(
-                                MAX_RENDER_LINE_CHARS
-                            ) else line
-                        }
+        viewModelScope.launch {
+            _state.update { it.copy(loading = true) }
+            val raw = withContext(Dispatchers.IO) { repo.fetchMagiskLogs() }
+            val items = withContext(Dispatchers.Default) {
+                MagiskLogParser.parse(raw).mapIndexed { i, e ->
+                    MagiskLogUiItem(i, e.timestamp, e.tag, MagiskLogLevel.from(e.level), e.message, e.message, e.pid, e.tid)
                 }
-                parsedLines.mapIndexedNotNull { index, line -> parseLogLine(index, line) }
             }
-            _state.update { it.copy(loading = false, visibleLogs = logItems) }
+            _state.update { it.copy(loading = false, visibleLogs = items) }
         }
     }
 
     fun clearMagiskLogs() {
         repo.clearMagiskLogs {
-            _state.update { it.copy(visibleLogs = emptyList()) }
             _messages.tryEmit(AppContext.getString(CoreR.string.logs_cleared))
             refresh()
         }
@@ -697,113 +412,27 @@ class LogsComposeViewModel(private val repo: LogRepository) : ViewModel() {
     fun saveMagiskLog() {
         viewModelScope.launch(Dispatchers.IO) {
             val result = runCatching {
-                val filename = "magisk_log_%s.log".format(
-                    System.currentTimeMillis().toTime(timeFormatStandard)
-                )
+                val filename = "magisk_log_%s.log".format(System.currentTimeMillis().toTime(timeFormatStandard))
                 val logFile = MediaStoreUtils.getFile(filename)
                 val raw = repo.fetchMagiskLogs()
-                logFile.uri.outputStream().bufferedWriter().use {
-                    it.write("---Magisk Logs---\n${Info.env.versionString}\n\n$raw")
-                }
+                logFile.uri.outputStream().bufferedWriter().use { it.write("---Magisk Logs---\n${Info.env.versionString}\n\n$raw") }
                 logFile.toString()
             }
             withContext(Dispatchers.Main) {
-                result.onSuccess {
-                    _messages.emit(
-                        AppContext.getString(
-                            CoreR.string.saved_to_path,
-                            it
-                        )
-                    )
-                }
+                result.onSuccess { _messages.emit(AppContext.getString(CoreR.string.saved_to_path, it)) }
                     .onFailure { _messages.emit(AppContext.getString(CoreR.string.failure)) }
             }
         }
     }
 
-    fun postExternalRwDenied() {
-        _messages.tryEmit(AppContext.getString(CoreR.string.external_rw_permission_denied))
-    }
-
-    private fun parseLogLine(index: Int, line: String): MagiskLogUiItem? {
-        val raw = line.trimEnd()
-        if (raw.isBlank()) {
-            return null
-        }
-
-        fullLogcatRegex.matchEntire(raw)?.let { match ->
-            return MagiskLogUiItem(
-                id = index,
-                raw = raw,
-                message = match.groupValues[6].trim(),
-                level = parseLevelToken(match.groupValues[4]),
-                timestamp = match.groupValues[1],
-                tag = match.groupValues[5].trim().ifEmpty { "Log" },
-                pid = match.groupValues[2].toIntOrNull(),
-                tid = match.groupValues[3].toIntOrNull()
-            )
-        }
-
-        simpleLogcatRegex.matchEntire(raw)?.let { match ->
-            val timestamp = match.groupValues[1].ifBlank { null }
-            return MagiskLogUiItem(
-                id = index,
-                raw = raw,
-                message = match.groupValues[4].trim(),
-                level = parseLevelToken(match.groupValues[2]),
-                timestamp = timestamp,
-                tag = match.groupValues[3].trim().ifEmpty { "Log" },
-                pid = null,
-                tid = null
-            )
-        }
-
-        val lower = raw.lowercase()
-        val level = when {
-            raw.startsWith("!") || "error" in lower || "fatal" in lower || "fail" in lower -> MagiskLogLevel.ERROR
-            "warn" in lower -> MagiskLogLevel.WARN
-            "debug" in lower -> MagiskLogLevel.DEBUG
-            else -> MagiskLogLevel.INFO
-        }
-
-        return MagiskLogUiItem(
-            id = index,
-            raw = raw,
-            message = raw,
-            level = level,
-            timestamp = null,
-            tag = if ("magisk" in lower) "Magisk" else "Log",
-            pid = null,
-            tid = null
-        )
-    }
-
-    private fun parseLevelToken(token: String): MagiskLogLevel {
-        return when (token.uppercase()) {
-            "V" -> MagiskLogLevel.VERBOSE
-            "D" -> MagiskLogLevel.DEBUG
-            "I" -> MagiskLogLevel.INFO
-            "W" -> MagiskLogLevel.WARN
-            "E" -> MagiskLogLevel.ERROR
-            "F", "A" -> MagiskLogLevel.FATAL
-            else -> MagiskLogLevel.UNKNOWN
-        }
-    }
+    fun postExternalRwDenied() { _messages.tryEmit(AppContext.getString(CoreR.string.external_rw_permission_denied)) }
 
     companion object {
-        private const val MAX_RENDER_CHARS = 60_000
-        private const val MAX_RENDER_LINES = 1_500
-        private const val MAX_RENDER_LINE_CHARS = 2_000
-        private const val TIMESTAMP_REGEX =
-            "(?:\\d{2}-\\d{2}|\\d{4}-\\d{2}-\\d{2})\\s+\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{3,6})?"
-        private val fullLogcatRegex =
-            Regex("""^\s*($TIMESTAMP_REGEX)\s+(\d+)\s+(\d+)\s+([VDIWEAF])\s+([^:]+?)\s*:\s*(.*)$""")
-        private val simpleLogcatRegex =
-            Regex("""^\s*(?:($TIMESTAMP_REGEX)\s+)?([VDIWEAF])\s+([^:]+?)\s*:\s*(.*)$""")
+        private const val LOG_LINE_LIMIT = 500
         val Factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 @Suppress("UNCHECKED_CAST")
-                return LogsComposeViewModel(ServiceLocator.logRepo) as T
+                return MagiskLogViewModel(ServiceLocator.logRepo) as T
             }
         }
     }

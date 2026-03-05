@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -156,6 +157,7 @@ fun HomeScreen(
     val activity = context as MainActivity
     val scope = rememberCoroutineScope()
     val loadingDialog = rememberLoadingDialog()
+    val isHiddenApp = remember(context.packageName) { context.packageName != BuildConfig.APP_PACKAGE_NAME }
     val snackbarHostState = remember { SnackbarHostState() }
     var showUninstallDialog by remember { mutableStateOf(false) }
     var showRebootDialog by remember { mutableStateOf(false) }
@@ -184,32 +186,34 @@ fun HomeScreen(
     }
     LaunchedEffect(state.showHideRestore) {
         if (state.showHideRestore) {
-            val hidden = context.packageName != BuildConfig.APP_PACKAGE_NAME
-            if (hidden) showRestoreDialog = true else showHideDialog = true
+            if (isHiddenApp) showRestoreDialog = true else showHideDialog = true
             viewModel.onHideRestoreConsumed()
         }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(bottom = 140.dp)
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(bottom = 140.dp),
+            verticalArrangement = Arrangement.spacedBy(28.dp)
         ) {
-            ExpressiveHeader(
-                envActive = state.envActive
-            )
+            item {
+                ExpressiveHeader(envActive = state.envActive)
+            }
 
-            Column(
-                modifier = Modifier.padding(horizontal = 20.dp),
-                verticalArrangement = Arrangement.spacedBy(28.dp)
-            ) {
-                if (state.noticeVisible) {
-                    NoticeCard(onHide = viewModel::hideNotice)
+            if (state.noticeVisible) {
+                item {
+                    Box(modifier = Modifier.padding(horizontal = 20.dp)) {
+                        NoticeCard(onHide = viewModel::hideNotice)
+                    }
                 }
+            }
 
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            item {
+                Column(
+                    modifier = Modifier.padding(horizontal = 20.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
                     SectionHeader(
                         stringResource(id = CoreR.string.home_section_magisk_core),
                         Icons.Rounded.VerifiedUser
@@ -220,8 +224,13 @@ fun HomeScreen(
                         onAction = onOpenInstall
                     )
                 }
+            }
 
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            item {
+                Column(
+                    modifier = Modifier.padding(horizontal = 20.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
                     SectionHeader(
                         stringResource(id = CoreR.string.home_section_application),
                         Icons.Rounded.AppShortcut
@@ -232,7 +241,7 @@ fun HomeScreen(
                         managerRemoteVersion = state.managerRemoteVersion,
                         updateChannelName = state.updateChannelName,
                         packageName = state.packageName,
-                        isHidden = context.packageName != BuildConfig.APP_PACKAGE_NAME,
+                        isHidden = isHiddenApp,
                         onAction = {
                             viewModel.onManagerPressed {
                                 showManagerInstallSheet = true
@@ -241,12 +250,21 @@ fun HomeScreen(
                         onHideRestore = viewModel::onHideRestorePressed
                     )
                 }
+            }
 
-                if (state.envActive) {
-                    UninstallAction(onClick = { showUninstallDialog = true })
+            if (state.envActive) {
+                item {
+                    Box(modifier = Modifier.padding(horizontal = 20.dp)) {
+                        UninstallAction(onClick = { showUninstallDialog = true })
+                    }
                 }
+            }
 
-                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            item {
+                Column(
+                    modifier = Modifier.padding(horizontal = 20.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
                     SectionHeader(
                         stringResource(id = CoreR.string.home_section_contributors),
                         Icons.Rounded.Groups
@@ -254,10 +272,16 @@ fun HomeScreen(
                     ContributorsExpressiveList(
                         state.contributors,
                         state.contributorsLoading,
-                        onOpen = { viewModel.openLink(context, it) })
+                        onOpen = { viewModel.openLink(context, it) }
+                    )
                 }
+            }
 
-                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            item {
+                Column(
+                    modifier = Modifier.padding(horizontal = 20.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
                     SectionHeader(
                         stringResource(id = CoreR.string.home_support_title),
                         Icons.Rounded.Favorite
@@ -489,7 +513,10 @@ private fun HomeMarkdownText(
         },
         update = { textView ->
             textView.setTextColor(textColor)
-            ServiceLocator.markwon.setMarkdown(textView, markdown)
+            if (textView.tag != markdown) {
+                ServiceLocator.markwon.setMarkdown(textView, markdown)
+                textView.tag = markdown
+            }
         }
     )
 }

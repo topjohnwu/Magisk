@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.ui.theme
 
-import android.os.Build
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -18,9 +17,11 @@ fun magiskComposeColorScheme(
     darkTheme: Boolean,
     selectedTheme: Theme = Theme.selected
 ): ColorScheme {
+    val dynamicSupported = Theme.supportsMonet
+    val shouldApplyDynamic = selectedTheme == Theme.Default && useDynamicColor && dynamicSupported
     val scheme = if (selectedTheme == Theme.Default) {
         when {
-            useDynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+            shouldApplyDynamic -> {
                 if (darkTheme) dynamicDarkColorScheme(LocalContext.current)
                 else dynamicLightColorScheme(LocalContext.current)
             }

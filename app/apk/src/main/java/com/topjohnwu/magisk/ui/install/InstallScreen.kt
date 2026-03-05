@@ -441,7 +441,10 @@ private fun MarkdownText(
             }
         },
         update = { textView ->
-            ServiceLocator.markwon.setMarkdown(textView, markdown)
+            if (textView.tag != markdown) {
+                ServiceLocator.markwon.setMarkdown(textView, markdown)
+                textView.tag = markdown
+            }
         }
     )
 }

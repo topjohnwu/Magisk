@@ -8,27 +8,22 @@ import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.res.Resources
 import android.graphics.Color
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.content.res.use
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
-import androidx.navigation3.runtime.entryProvider
-import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
-import androidx.navigation3.ui.NavDisplay
 import com.topjohnwu.magisk.arch.UIActivity
-import com.topjohnwu.magisk.arch.VMFactory
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
@@ -40,30 +35,13 @@ import com.topjohnwu.magisk.core.ktx.reflectField
 import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.tasks.AppMigration
 import com.topjohnwu.magisk.core.wrap
-import com.topjohnwu.magisk.ui.deny.DenyListScreen
-import com.topjohnwu.magisk.ui.deny.DenyListViewModel
-import com.topjohnwu.magisk.ui.flash.FlashScreen
 import com.topjohnwu.magisk.ui.flash.FlashUtils
-import com.topjohnwu.magisk.ui.flash.FlashViewModel
-import com.topjohnwu.magisk.ui.install.InstallScreen
-import com.topjohnwu.magisk.ui.install.InstallViewModel
-import com.topjohnwu.magisk.ui.module.ActionViewModel
-import com.topjohnwu.magisk.ui.superuser.SuperuserViewModel
-import com.topjohnwu.magisk.ui.navigation.CollectNavEvents
-import com.topjohnwu.magisk.ui.navigation.LocalNavigator
 import com.topjohnwu.magisk.ui.navigation.Navigator
 import com.topjohnwu.magisk.ui.navigation.Route
-import com.topjohnwu.magisk.ui.navigation.rememberNavigator
-import com.topjohnwu.magisk.ui.MagiskAppContainer
 import com.topjohnwu.magisk.ui.theme.Theme
 import com.topjohnwu.magisk.view.Shortcuts
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.ui.Modifier
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.saveable.rememberSaveable
 import com.topjohnwu.magisk.core.R as CoreR
 
 class MainActivity : UIActivity<Any>(), SplashScreenHost {
@@ -126,7 +104,8 @@ class MainActivity : UIActivity<Any>(), SplashScreenHost {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             window?.decorView?.post {
                 if ((window.decorView.rootWindowInsets?.systemWindowInsetBottom
-                        ?: 0) < Resources.getSystem().displayMetrics.density * 40) {
+                        ?: 0) < Resources.getSystem().displayMetrics.density * 40
+                ) {
                     window.navigationBarColor = Color.TRANSPARENT
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                         window.navigationBarDividerColor = Color.TRANSPARENT
@@ -163,6 +142,7 @@ class MainActivity : UIActivity<Any>(), SplashScreenHost {
             val darkMode = when (Config.darkTheme) {
                 AppCompatDelegate.MODE_NIGHT_YES,
                 Config.Value.DARK_THEME_AMOLED -> true
+
                 AppCompatDelegate.MODE_NIGHT_NO -> false
                 else -> androidx.compose.foundation.isSystemInDarkTheme()
             }
@@ -225,7 +205,8 @@ class MainActivity : UIActivity<Any>(), SplashScreenHost {
         if (!Info.isEmulator && Info.env.isActive && System.getenv("PATH")
                 ?.split(':')
                 ?.filterNot { java.io.File("$it/magisk").exists() }
-                ?.any { java.io.File("$it/su").exists() } == true) {
+                ?.any { java.io.File("$it/su").exists() } == true
+        ) {
             messages.add(CoreR.string.unsupport_general_title to CoreR.string.unsupport_other_su_msg)
         }
         if (applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM != 0) {
@@ -242,7 +223,8 @@ class MainActivity : UIActivity<Any>(), SplashScreenHost {
 
     private fun askForHomeShortcut() {
         if (isRunningAsStub && !Config.askedHome &&
-            ShortcutManagerCompat.isRequestPinShortcutSupported(this)) {
+            ShortcutManagerCompat.isRequestPinShortcutSupported(this)
+        ) {
             Config.askedHome = true
             showShortcutPrompt.value = true
         }

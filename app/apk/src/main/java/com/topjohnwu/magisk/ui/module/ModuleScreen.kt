@@ -115,6 +115,7 @@ import com.topjohnwu.magisk.ui.component.ConfirmResult
 import com.topjohnwu.magisk.ui.component.rememberConfirmDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -138,6 +139,7 @@ fun ModuleScreen(
     val scope = rememberCoroutineScope()
     val state by viewModel.state.collectAsState()
     var query by rememberSaveable { mutableStateOf("") }
+    var appliedQuery by rememberSaveable { mutableStateOf("") }
     var showSearch by rememberSaveable { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
     val localInstallDialog = rememberConfirmDialog()
@@ -170,6 +172,10 @@ fun ModuleScreen(
     LaunchedEffect(viewModel) {
         viewModel.messages.collect { snackbarHostState.showSnackbar(it) }
     }
+    LaunchedEffect(query) {
+        delay(120)
+        appliedQuery = query
+    }
 
     if (showOnlineDialog.value && pendingOnlineModule != null) {
         OnlineModuleDialog(
@@ -195,8 +201,8 @@ fun ModuleScreen(
         )
     }
 
-    val filteredModules = remember(state.modules, query) {
-        val q = query.trim().lowercase(Locale.ROOT)
+    val filteredModules = remember(state.modules, appliedQuery) {
+        val q = appliedQuery.trim().lowercase(Locale.ROOT)
         if (q.isEmpty()) state.modules
         else state.modules.filter { it.searchKey.contains(q) }
     }

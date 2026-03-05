@@ -223,34 +223,42 @@ fun MagiskAppContainer(
                         .padding(bottom = if (reserveBottomForLogs) LOGS_RESERVED_BOTTOM_SPACE else 0.dp),
                     enterTransition = {
                         unifiedScreenEnterTransition(
-                            getNavigationDirection(
+                            direction = getNavigationDirection(
                                 initialState.destination.route,
                                 targetState.destination.route
-                            )
+                            ),
+                            initialRoute = initialState.destination.route,
+                            targetRoute = targetState.destination.route
                         )
                     },
                     exitTransition = {
                         unifiedScreenExitTransition(
-                            getNavigationDirection(
+                            direction = getNavigationDirection(
                                 initialState.destination.route,
                                 targetState.destination.route
-                            )
+                            ),
+                            initialRoute = initialState.destination.route,
+                            targetRoute = targetState.destination.route
                         )
                     },
                     popEnterTransition = {
                         unifiedScreenEnterTransition(
-                            getNavigationDirection(
+                            direction = getNavigationDirection(
                                 initialState.destination.route,
                                 targetState.destination.route
-                            )
+                            ),
+                            initialRoute = initialState.destination.route,
+                            targetRoute = targetState.destination.route
                         )
                     },
                     popExitTransition = {
                         unifiedScreenExitTransition(
-                            getNavigationDirection(
+                            direction = getNavigationDirection(
                                 initialState.destination.route,
                                 targetState.destination.route
-                            )
+                            ),
+                            initialRoute = initialState.destination.route,
+                            targetRoute = targetState.destination.route
                         )
                     }
                 ) {
@@ -851,36 +859,48 @@ private fun getNavigationDirection(
     }
 }
 
-private const val SCREEN_NAV_SLIDE_MS = 320
-private const val SCREEN_NAV_FADE_IN_MS = 260
-private const val SCREEN_NAV_FADE_OUT_MS = 220
-private const val SCREEN_NAV_SCALE_MS = 300
+private const val ROOT_NAV_FADE_MS = 120
+
+private val ROOT_ROUTES = setOf(
+    AppRoute.Home,
+    AppRoute.Modules,
+    AppRoute.Superuser,
+    AppRoute.Logs
+)
+
+private fun isRootRoute(route: String?): Boolean = route in ROOT_ROUTES
 
 private fun AnimatedContentTransitionScope<*>.unifiedScreenEnterTransition(
-    direction: AnimatedContentTransitionScope.SlideDirection
+    direction: AnimatedContentTransitionScope.SlideDirection,
+    initialRoute: String?,
+    targetRoute: String?
 ): EnterTransition {
+    val rootToRoot = isRootRoute(initialRoute) && isRootRoute(targetRoute)
+    if (rootToRoot) {
+        return fadeIn(animationSpec = tween(ROOT_NAV_FADE_MS, easing = LinearOutSlowInEasing))
+    }
     return slideIntoContainer(
         towards = direction,
-        animationSpec = tween(SCREEN_NAV_SLIDE_MS, easing = FastOutSlowInEasing)
+        animationSpec = tween(220, easing = FastOutSlowInEasing)
     ) + fadeIn(
-        animationSpec = tween(SCREEN_NAV_FADE_IN_MS, easing = LinearOutSlowInEasing)
-    ) + scaleIn(
-        initialScale = 0.98f,
-        animationSpec = tween(SCREEN_NAV_SCALE_MS, easing = FastOutSlowInEasing)
+        animationSpec = tween(170, easing = LinearOutSlowInEasing)
     )
 }
 
 private fun AnimatedContentTransitionScope<*>.unifiedScreenExitTransition(
-    direction: AnimatedContentTransitionScope.SlideDirection
+    direction: AnimatedContentTransitionScope.SlideDirection,
+    initialRoute: String?,
+    targetRoute: String?
 ): ExitTransition {
+    val rootToRoot = isRootRoute(initialRoute) && isRootRoute(targetRoute)
+    if (rootToRoot) {
+        return fadeOut(animationSpec = tween(ROOT_NAV_FADE_MS, easing = FastOutLinearInEasing))
+    }
     return slideOutOfContainer(
         towards = direction,
-        animationSpec = tween(SCREEN_NAV_SLIDE_MS, easing = FastOutSlowInEasing)
+        animationSpec = tween(220, easing = FastOutSlowInEasing)
     ) + fadeOut(
-        animationSpec = tween(SCREEN_NAV_FADE_OUT_MS, easing = FastOutLinearInEasing)
-    ) + scaleOut(
-        targetScale = 0.98f,
-        animationSpec = tween(SCREEN_NAV_SCALE_MS, easing = FastOutSlowInEasing)
+        animationSpec = tween(140, easing = FastOutLinearInEasing)
     )
 }
 

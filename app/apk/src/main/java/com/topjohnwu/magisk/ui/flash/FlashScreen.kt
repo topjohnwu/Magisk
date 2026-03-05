@@ -9,7 +9,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,7 +23,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -49,6 +47,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -64,22 +63,25 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.core.net.toFile
 import com.topjohnwu.magisk.core.AppContext
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.ktx.reboot
 import com.topjohnwu.magisk.core.ktx.timeFormatStandard
 import com.topjohnwu.magisk.core.ktx.toTime
-import com.topjohnwu.magisk.core.tasks.FlashZip
+import com.topjohnwu.magisk.core.ktx.writeTo
 import com.topjohnwu.magisk.core.tasks.MagiskInstaller
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
+import com.topjohnwu.magisk.core.utils.MediaStoreUtils.displayName
+import com.topjohnwu.magisk.core.utils.MediaStoreUtils.inputStream
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.ui.RouteProcessTopBarState
+import com.topjohnwu.magisk.ui.terminal.StyledLogLine
 import com.topjohnwu.superuser.CallbackList
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -88,6 +90,10 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
+import java.io.File
+import java.io.FileNotFoundException
+import java.io.IOException
 import java.util.Collections
 import com.topjohnwu.magisk.core.R as CoreR
 
@@ -103,7 +109,7 @@ fun FlashScreen(
     val lines = viewModel.lines
     val snackbarHostState = remember { SnackbarHostState() }
     val listState = rememberLazyListState()
-    val horizontalScroll = rememberScrollState()
+    val hasLogs by remember { derivedStateOf { lines.isNotEmpty() } }
     val parsedUri = uriArg
         ?.takeIf { it.isNotBlank() }
         ?.let(::parseNavigationUriArg)
@@ -120,12 +126,15 @@ fun FlashScreen(
     LaunchedEffect(lines.size) {
         val last = lines.lastIndex
         if (last >= 0) {
-            delay(30)
-            listState.animateScrollToItem(last)
+            val lastVisible = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1
+            val shouldStickToBottom = lastVisible >= last - 3 || !listState.canScrollForward
+            if (shouldStickToBottom) {
+                listState.scrollToItem(last)
+            }
         }
     }
     LaunchedEffect(state.running, state.success, lines.size) {
-        if (state.running || lines.isNotEmpty()) {
+        if (state.running || hasLogs) {
             hasStarted = true
         }
         val title = AppContext.getString(CoreR.string.flash_screen_title)
@@ -159,13 +168,12 @@ fun FlashScreen(
             LogContainer(
                 lines = lines,
                 listState = listState,
-                horizontalScroll = horizontalScroll,
                 modifier = Modifier.weight(1f)
             )
 
             ActionButtons(
                 state = state,
-                hasLogs = lines.isNotEmpty(),
+                hasLogs = hasLogs,
                 onSaveLog = viewModel::saveLog,
                 onReboot = viewModel::rebootNow,
                 onClose = onBack
@@ -257,7 +265,6 @@ private fun FlashHeader(state: FlashUiState) {
 private fun LogContainer(
     lines: List<String>,
     listState: androidx.compose.foundation.lazy.LazyListState,
-    horizontalScroll: androidx.compose.foundation.ScrollState,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
@@ -290,7 +297,6 @@ private fun LogContainer(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(16.dp)
-                    .horizontalScroll(horizontalScroll)
             ) {
                 if (lines.isEmpty()) {
                     Text(
@@ -305,14 +311,14 @@ private fun LogContainer(
                         state = listState,
                         verticalArrangement = Arrangement.spacedBy(2.dp)
                     ) {
-                        itemsIndexed(lines) { _, line ->
-                            Text(
-                                text = line,
-                                color = if (line.startsWith("!")) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
-                                fontFamily = FontFamily.Monospace,
-                                style = MaterialTheme.typography.bodySmall,
-                                softWrap = false,
-                                fontSize = 11.sp
+                        itemsIndexed(
+                            items = lines,
+                            key = { index, _ -> index }
+                        ) { _, line ->
+                            StyledLogLine(
+                                line = line,
+                                colors = MaterialTheme.colorScheme,
+                                modifier = Modifier.fillMaxWidth()
                             )
                         }
                     }
@@ -449,11 +455,7 @@ private class FlashComposeViewModel : ViewModel() {
                 }
             }
             val result = when (action) {
-                Const.Value.FLASH_ZIP -> if (uri == null) false else FlashZip(
-                    uri,
-                    outItems,
-                    logs
-                ).exec()
+                Const.Value.FLASH_ZIP -> if (uri == null) false else flashZipWithLogs(uri)
 
                 Const.Value.UNINSTALL -> {
                     _state.update { it.copy(showReboot = false) }; MagiskInstaller.Uninstall(
@@ -487,6 +489,57 @@ private class FlashComposeViewModel : ViewModel() {
             _state.update { it.copy(running = false, success = result) }
         }
     }
+    
+    private suspend fun flashZipWithLogs(uri: Uri): Boolean {
+        val installDir = File(AppContext.cacheDir, "flash")
+        val prep = withContext(Dispatchers.IO) {
+            try {
+                installDir.deleteRecursively()
+                installDir.mkdirs()
+
+                val zipFile = if (uri.scheme == "file") {
+                    uri.toFile()
+                } else {
+                    File(installDir, "install.zip").also {
+                        try {
+                            uri.inputStream().writeTo(it)
+                        } catch (e: IOException) {
+                            val msg = if (e is FileNotFoundException) "Invalid Uri" else "Cannot copy to cache"
+                            return@withContext msg to null
+                        }
+                    }
+                }
+
+                val binary = File(installDir, "update-binary")
+                AppContext.assets.open("module_installer.sh").use { it.writeTo(binary) }
+
+                val name = uri.displayName
+                null to Triple(installDir, zipFile, name)
+            } catch (e: Exception) {
+                Timber.e(e)
+                "Unable to extract files" to null
+            }
+        }
+
+        val (error, prepResult) = prep
+        if (prepResult == null) {
+            outItems.add("! ${error ?: "Installation failed"}")
+            return false
+        }
+
+        val (dir, zipFile, displayName) = prepResult
+        outItems.add("- Installing $displayName")
+
+        val success = withContext(Dispatchers.IO) {
+            Shell.cmd(
+                "sh $dir/update-binary dummy 1 '${zipFile.absolutePath}'"
+            ).to(outItems, logs).exec().isSuccess
+        }
+        if (!success) outItems.add("! Installation failed")
+
+        Shell.cmd("cd /", "rm -rf $dir ${Const.TMPDIR}").submit()
+        return success
+    }
 
     fun saveLog() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -496,7 +549,9 @@ private class FlashComposeViewModel : ViewModel() {
                 )
                 val file = MediaStoreUtils.getFile(name)
                 file.uri.outputStream().bufferedWriter()
-                    .use { writer -> synchronized(logs) { logs.forEach { writer.write(it); writer.newLine() } } }
+                    .use { writer ->
+                        synchronized(logs) { logs.forEach { writer.write(it); writer.newLine() } }
+                    }
                 file.toString()
             }.onSuccess { path -> _messages.emit(path) }
                 .onFailure { _messages.emit(AppContext.getString(CoreR.string.failure)) }

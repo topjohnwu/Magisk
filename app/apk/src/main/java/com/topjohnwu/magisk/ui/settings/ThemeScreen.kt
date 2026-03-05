@@ -528,6 +528,7 @@ private fun ThemeCard(
     customColors: CustomThemeColors? = null,
     onClick: () -> Unit
 ) {
+    val defaultUsesStaticFallback = theme == Theme.Default && !Theme.supportsMonet
     val previewGradient = when (theme) {
         Theme.Piplup -> listOf(Color(0xFF0061A4), Color(0xFF7AC8FF))
         Theme.PiplupAmoled -> listOf(Color(0xFF050505), Color(0xFF0B6AAE))
@@ -537,14 +538,18 @@ private fun ThemeCard(
         Theme.Mew -> listOf(Color(0xFF924271), Color(0xFFD07AB4))
         Theme.Salamence -> listOf(Color(0xFF006782), Color(0xFF4CA8C7))
         Theme.Fraxure -> listOf(Color(0xFF3D5467), Color(0xFF93A9BD))
-        Theme.Default -> listOf(
-            Color(0xFFE85CF0),
-            Color(0xFF8A7BFF),
-            Color(0xFF58B8FF),
-            Color(0xFF57E2E7),
-            Color(0xFF62EB9A),
-            Color(0xFFB6EF64)
-        )
+        Theme.Default -> if (defaultUsesStaticFallback) {
+            listOf(Color(0xFF0061A4), Color(0xFF7AC8FF))
+        } else {
+            listOf(
+                Color(0xFFE85CF0),
+                Color(0xFF8A7BFF),
+                Color(0xFF58B8FF),
+                Color(0xFF57E2E7),
+                Color(0xFF62EB9A),
+                Color(0xFFB6EF64)
+            )
+        }
 
         Theme.Custom -> listOf(
             Color(customColors?.lightPrimary ?: Config.themeCustomLightPrimary),
@@ -562,7 +567,7 @@ private fun ThemeCard(
         Theme.Mew -> Color(0xFFFFD8E9)
         Theme.Salamence -> Color(0xFFBBE9FF)
         Theme.Fraxure -> Color(0xFFD8E7F3)
-        Theme.Default -> Color(0xFFD9E2EA)
+        Theme.Default -> if (defaultUsesStaticFallback) Color(0xFFD1E4FF) else Color(0xFFD9E2EA)
         Theme.Custom -> Color(customColors?.lightSecondary ?: Config.themeCustomLightSecondary)
     }
     val iconTint = if (iconContainerColor.luminance() > 0.45f) Color(0xFF111827) else Color.White
@@ -630,13 +635,28 @@ private fun ThemeCard(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = theme.themeName,
+                        text = if (defaultUsesStaticFallback) "Default (Magisk)" else theme.themeName,
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Black,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f)
                     )
+                    if (defaultUsesStaticFallback) {
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f)
+                        ) {
+                            Text(
+                                text = "STATIC",
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Black,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                        }
+                        Spacer(Modifier.width(8.dp))
+                    }
                     Surface(
                         shape = CircleShape,
                         color = accentColor,
@@ -992,7 +1012,7 @@ private fun themeWatermarkRes(theme: Theme): Int? = when (theme) {
     Theme.Mew -> CoreR.raw.mew
     Theme.Salamence -> CoreR.raw.salamence
     Theme.Fraxure -> CoreR.raw.fraxure
-    Theme.Default -> CoreR.raw.dynamic_default
+    Theme.Default -> if (Theme.supportsMonet) CoreR.raw.dynamic_default else CoreR.raw.piplup
     Theme.Custom -> CoreR.raw.custom_pokeball
 }
 
