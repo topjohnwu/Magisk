@@ -60,7 +60,7 @@
     <string name="flash_screen_title">Installation</string>
 
     <!--Superuser-->
-    <string name="su_request_title">Superuser request</string>
+    <string name="su_request_title">This app is requesting root permission. Grants full access to your device. Deny if you\'re not sure!</string>
     <string name="touch_filtered_warning">Because an app is obscuring a Superuser request, Magisk can\'t verify your response.</string>
     <string name="deny">Deny</string>
     <string name="prompt">Prompt</string>

@@ -4,6 +4,7 @@ import android.view.MotionEvent
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.topjohnwu.magisk.ui.superuser.SharedUidBadge
 import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.R as CoreR
 import com.topjohnwu.magisk.ui.util.rememberDrawablePainter
@@ -64,21 +66,13 @@ fun SuRequestScreen(viewModel: SuRequestViewModel) {
     ) {
         Card(
             modifier = Modifier
-                .widthIn(min = 300.dp, max = 380.dp)
+                .widthIn(min = 320.dp, max = 420.dp)
                 .padding(24.dp)
         ) {
             Column(
                 modifier = Modifier.padding(20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = stringResource(CoreR.string.su_request_title),
-                    style = MiuixTheme.textStyles.headline2,
-                    textAlign = TextAlign.Center,
-                )
-
-                Spacer(Modifier.height(16.dp))
-
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.padding(horizontal = 8.dp)
@@ -92,13 +86,20 @@ fun SuRequestScreen(viewModel: SuRequestViewModel) {
                         Spacer(Modifier.width(12.dp))
                     }
                     Column {
-                        Text(
-                            text = title,
-                            style = MiuixTheme.textStyles.body1,
-                            fontWeight = FontWeight.Bold,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = title,
+                                style = MiuixTheme.textStyles.body1,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.weight(1f, fill = false),
+                            )
+                            if (viewModel.isSharedUid) {
+                                Spacer(Modifier.width(6.dp))
+                                SharedUidBadge()
+                            }
+                        }
                         Text(
                             text = packageName,
                             style = MiuixTheme.textStyles.body2,
@@ -111,6 +112,16 @@ fun SuRequestScreen(viewModel: SuRequestViewModel) {
 
                 Spacer(Modifier.height(16.dp))
 
+                Text(
+                    text = stringResource(CoreR.string.su_request_title),
+                    style = MiuixTheme.textStyles.body2,
+                    color = MiuixTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                )
+
+                Spacer(Modifier.height(8.dp))
+
                 SuperDropdown(
                     title = stringResource(CoreR.string.request_timeout),
                     items = timeoutEntries,
@@ -122,17 +133,7 @@ fun SuRequestScreen(viewModel: SuRequestViewModel) {
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                Spacer(Modifier.height(12.dp))
-
-                Text(
-                    text = stringResource(CoreR.string.su_warning),
-                    style = MiuixTheme.textStyles.body2,
-                    color = MiuixTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                )
-
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(8.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -141,13 +142,19 @@ fun SuRequestScreen(viewModel: SuRequestViewModel) {
                     TextButton(
                         text = denyText,
                         onClick = { viewModel.denyPressed() },
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        cornerRadius = 12.dp,
+                        minHeight = 40.dp,
+                        insideMargin = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                     )
                     TextButton(
                         text = stringResource(CoreR.string.grant),
                         enabled = grantEnabled,
                         colors = ButtonDefaults.textButtonColorsPrimary(),
                         onClick = { viewModel.grantPressed() },
+                        cornerRadius = 12.dp,
+                        minHeight = 40.dp,
+                        insideMargin = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                         modifier = Modifier
                             .weight(1f)
                             .then(

@@ -139,23 +139,22 @@ private fun PolicyCard(
                 )
                 Spacer(Modifier.width(12.dp))
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = item.title,
-                        style = MiuixTheme.textStyles.body1,
-                    )
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            text = item.packageName,
-                            style = MiuixTheme.textStyles.body2,
-                            color = MiuixTheme.colorScheme.onSurfaceVariantSummary
+                            text = item.title,
+                            style = MiuixTheme.textStyles.body1,
+                            modifier = Modifier.weight(1f, fill = false),
                         )
                         if (item.isSharedUid) {
                             Spacer(Modifier.width(6.dp))
                             SharedUidBadge()
                         }
                     }
+                    Text(
+                        text = item.packageName,
+                        style = MiuixTheme.textStyles.body2,
+                        color = MiuixTheme.colorScheme.onSurfaceVariantSummary
+                    )
                 }
             }
 
