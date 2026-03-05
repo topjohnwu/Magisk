@@ -1,16 +1,13 @@
 package com.topjohnwu.magisk.ui.module
 
 import androidx.lifecycle.viewModelScope
-import com.termux.terminal.TerminalSession
-import com.termux.view.TerminalView
 import com.topjohnwu.magisk.arch.BaseViewModel
-import com.topjohnwu.magisk.core.ktx.synchronized
 import com.topjohnwu.magisk.core.ktx.timeFormatStandard
 import com.topjohnwu.magisk.core.ktx.toTime
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
-import com.topjohnwu.magisk.ui.terminal.TerminalSessionCallback
-import com.topjohnwu.superuser.Shell
+import com.topjohnwu.magisk.terminal.TerminalEmulator
+import com.topjohnwu.magisk.terminal.runSuCommand
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,50 +25,26 @@ class ActionViewModel : BaseViewModel() {
     private val _actionState = MutableStateFlow(State.RUNNING)
     val actionState: StateFlow<State> = _actionState.asStateFlow()
 
-    private val _termSession = MutableStateFlow<TerminalSession?>(null)
-    val termSession: StateFlow<TerminalSession?> = _termSession.asStateFlow()
-
     var actionId: String = ""
     var actionName: String = ""
 
-    private val logItems = mutableListOf<String>().synchronized()
-    private val emulatorReady = CompletableDeferred<Unit>()
+    private var emulator: TerminalEmulator? = null
+    private val emulatorReady = CompletableDeferred<TerminalEmulator>()
 
-    val sessionCallback = TerminalSessionCallback()
-
-    fun setTerminalView(view: TerminalView) {
-        sessionCallback.terminalView = view
-    }
-
-    fun onEmulatorReady() {
-        if (!emulatorReady.isCompleted) {
-            emulatorReady.complete(Unit)
-        }
+    fun onEmulatorCreated(emu: TerminalEmulator) {
+        emulator = emu
+        emulatorReady.complete(emu)
     }
 
     fun startRunAction() {
         viewModelScope.launch {
-            val session = TerminalSession(
-                "/system/bin/sh", "/",
-                arrayOf("sh", "-c", "exec sleep 2147483647"),
-                arrayOf("TERM=xterm-256color"),
-                5000, sessionCallback
-            )
-            _termSession.value = session
-            emulatorReady.await()
-
-            val ptyPath = withContext(Dispatchers.IO) {
-                Shell.cmd("readlink /proc/${session.pid}/fd/0").exec().out.firstOrNull()
-            }
-            if (ptyPath == null) {
-                _actionState.value = State.FAILED
-                return@launch
-            }
+            val emu = emulatorReady.await()
 
             val success = withContext(Dispatchers.IO) {
-                Shell.cmd(
-                    "(export TERM=xterm-256color; run_action '$actionId') <>$ptyPath >&0 2>&0"
-                ).exec().isSuccess
+                runSuCommand(
+                    emu,
+                    "cd /data/adb/modules/$actionId && sh ./action.sh"
+                )
             }
 
             _actionState.value = if (success) State.SUCCESS else State.FAILED
@@ -86,24 +59,12 @@ class ActionViewModel : BaseViewModel() {
             )
             val file = MediaStoreUtils.getFile(name)
             file.uri.outputStream().bufferedWriter().use { writer ->
-                val transcript = _termSession.value?.emulator?.screen?.transcriptText
+                val transcript = emulator?.screen?.transcriptText
                 if (transcript != null) {
                     writer.write(transcript)
-                } else {
-                    synchronized(logItems) {
-                        logItems.forEach {
-                            writer.write(it)
-                            writer.newLine()
-                        }
-                    }
                 }
             }
             showSnackbar(file.toString())
         }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        _termSession.value?.finishIfRunning()
     }
 }

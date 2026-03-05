@@ -10,7 +10,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.ui.terminal.TerminalComposeView
+import com.topjohnwu.magisk.ui.terminal.TerminalScreen
 import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.IconButton
 import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
@@ -24,7 +24,6 @@ import com.topjohnwu.magisk.core.R as CoreR
 @Composable
 fun ActionScreen(viewModel: ActionViewModel, actionName: String, onBack: () -> Unit) {
     val actionState by viewModel.actionState.collectAsState()
-    val session by viewModel.termSession.collectAsState()
     val finished = actionState != ActionViewModel.State.RUNNING
 
     val scrollBehavior = MiuixScrollBehavior()
@@ -63,13 +62,11 @@ fun ActionScreen(viewModel: ActionViewModel, actionName: String, onBack: () -> U
         },
         popupHost = { }
     ) { padding ->
-        TerminalComposeView(
-            session = session,
+        TerminalScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
-            onViewCreated = { viewModel.setTerminalView(it) },
-            onEmulatorReady = { viewModel.onEmulatorReady() },
+            onEmulatorCreated = { viewModel.onEmulatorCreated(it) },
         )
     }
 }

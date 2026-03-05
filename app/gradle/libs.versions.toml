@@ -12,8 +12,6 @@ activity-compose = "1.12.4"
 miuix = "0.8.5"
 navigation3 = "1.1.0-alpha05"
 navigationevent = "1.0.2"
-termux-terminal = "0.118.0"
-
 [libraries]
 bcpkix = { module = "org.bouncycastle:bcpkix-jdk18on", version = "1.83" }
 commons-compress = { module = "org.apache.commons:commons-compress", version = "1.28.0" }
@@ -63,9 +61,6 @@ miuix-navigation3-ui = { module = "top.yukonga.miuix.kmp:miuix-navigation3-ui-an
 navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "navigation3" }
 navigationevent-compose = { module = "androidx.navigationevent:navigationevent-compose", version.ref = "navigationevent" }
 lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycle" }
-
-# Terminal
-termux-terminal-view = { module = "com.termux.termux-app:terminal-view", version.ref = "termux-terminal" }
 
 # Build plugins
 android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "android" }
