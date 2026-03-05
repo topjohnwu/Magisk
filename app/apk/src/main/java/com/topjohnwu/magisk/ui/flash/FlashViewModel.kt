@@ -58,8 +58,6 @@ class FlashViewModel : BaseViewModel() {
     private val emulatorReady = CompletableDeferred<Unit>()
     val sessionCallback = TerminalSessionCallback()
 
-    val useTerminal get() = flashAction == Const.Value.FLASH_ZIP
-
     fun setTerminalView(view: TerminalView) {
         sessionCallback.terminalView = view
     }
