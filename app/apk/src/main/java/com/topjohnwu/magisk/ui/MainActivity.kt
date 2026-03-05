@@ -183,7 +183,7 @@ class MainActivity : AppCompatActivity(), SplashScreenHost {
                                             vm.startFlashing()
                                         }
                                     }
-                                    FlashScreen(vm, onBack = { navigator.pop() })
+                                    FlashScreen(vm, action = key.action, onBack = { navigator.pop() })
                                 }
                                 entry<Route.SuperuserDetail> { key ->
                                     val vm: SuperuserViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
