@@ -74,16 +74,26 @@ enum class Tab(val titleRes: Int, val iconRes: Int) {
 @Composable
 fun MainScreen(initialTab: Int = Tab.HOME.ordinal) {
     val navigator = LocalNavigator.current
-    val pagerState = rememberPagerState(initialPage = initialTab, pageCount = { Tab.entries.size })
+    val visibleTabs = remember {
+        Tab.entries.filter { tab ->
+            when (tab) {
+                Tab.SUPERUSER -> Info.showSuperUser
+                Tab.MODULES -> Info.env.isActive && LocalModule.loaded()
+                else -> true
+            }
+        }
+    }
+    val initialPage = visibleTabs.indexOf(Tab.entries[initialTab]).coerceAtLeast(0)
+    val pagerState = rememberPagerState(initialPage = initialPage, pageCount = { visibleTabs.size })
 
     Box(modifier = Modifier.fillMaxSize()) {
         HorizontalPager(
             state = pagerState,
             modifier = Modifier.fillMaxSize(),
-            beyondViewportPageCount = Tab.entries.size - 1,
+            beyondViewportPageCount = visibleTabs.size - 1,
             userScrollEnabled = true,
         ) { page ->
-            when (Tab.entries[page]) {
+            when (visibleTabs[page]) {
                 Tab.HOME -> {
                     val vm: HomeViewModel = viewModel(factory = VMFactory)
                     val installVm: InstallViewModel = viewModel(factory = VMFactory)
@@ -130,6 +140,7 @@ fun MainScreen(initialTab: Int = Tab.HOME.ordinal) {
 
         FloatingNavigationBar(
             pagerState = pagerState,
+            visibleTabs = visibleTabs,
             modifier = Modifier.align(Alignment.BottomCenter)
         )
     }
@@ -138,6 +149,7 @@ fun MainScreen(initialTab: Int = Tab.HOME.ordinal) {
 @Composable
 private fun FloatingNavigationBar(
     pagerState: PagerState,
+    visibleTabs: List<Tab>,
     modifier: Modifier = Modifier
 ) {
     val scope = rememberCoroutineScope()
@@ -156,18 +168,12 @@ private fun FloatingNavigationBar(
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Tab.entries.forEachIndexed { index, tab ->
-            val selected = pagerState.currentPage == index
-            val enabled = when (tab) {
-                Tab.SUPERUSER -> Info.showSuperUser
-                Tab.MODULES -> Info.env.isActive && LocalModule.loaded()
-                else -> true
-            }
+        visibleTabs.forEachIndexed { index, tab ->
             FloatingNavItem(
                 icon = ImageVector.vectorResource(tab.iconRes),
                 label = stringResource(tab.titleRes),
-                selected = selected,
-                enabled = enabled,
+                selected = pagerState.currentPage == index,
+                enabled = true,
                 onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
                 modifier = Modifier.weight(1f)
             )
