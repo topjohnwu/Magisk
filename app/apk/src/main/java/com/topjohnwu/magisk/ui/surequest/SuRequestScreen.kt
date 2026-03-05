@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -37,7 +39,8 @@ import top.yukonga.miuix.kmp.basic.ButtonDefaults
 import top.yukonga.miuix.kmp.basic.Card
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.basic.TextButton
-import top.yukonga.miuix.kmp.extra.SuperDropdown
+import top.yukonga.miuix.kmp.basic.Slider
+import top.yukonga.miuix.kmp.basic.SliderDefaults
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -53,6 +56,17 @@ fun SuRequestScreen(viewModel: SuRequestViewModel) {
     val denyCountdown = viewModel.denyCountdown
     val selectedPosition = viewModel.selectedItemPosition
     val timeoutEntries = stringArrayResource(CoreR.array.allow_timeout).toList()
+    // Slider order: Once(1), 10min(2), 20min(3), 30min(4), 60min(5), Forever(0)
+    val sliderToIndex = intArrayOf(1, 2, 3, 4, 5, 0)
+    val indexToSlider = remember {
+        IntArray(sliderToIndex.size).also { arr ->
+            sliderToIndex.forEachIndexed { slider, orig -> arr[orig] = slider }
+        }
+    }
+    val sliderValue = indexToSlider[selectedPosition].toFloat()
+    val sliderLabel by remember(sliderValue) {
+        derivedStateOf { timeoutEntries[sliderToIndex[sliderValue.toInt()]] }
+    }
 
     val denyText = if (denyCountdown > 0) {
         "${stringResource(CoreR.string.deny)} ($denyCountdown)"
@@ -81,7 +95,7 @@ fun SuRequestScreen(viewModel: SuRequestViewModel) {
                         Image(
                             painter = rememberDrawablePainter(icon),
                             contentDescription = null,
-                            modifier = Modifier.size(48.dp)
+                            modifier = Modifier.size(40.dp)
                         )
                         Spacer(Modifier.width(12.dp))
                     }
@@ -120,20 +134,30 @@ fun SuRequestScreen(viewModel: SuRequestViewModel) {
                     textAlign = TextAlign.Center,
                 )
 
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(16.dp))
 
-                SuperDropdown(
-                    title = stringResource(CoreR.string.request_timeout),
-                    items = timeoutEntries,
-                    selectedIndex = selectedPosition,
-                    onSelectedIndexChange = { index ->
-                        viewModel.spinnerTouched()
-                        viewModel.selectedItemPosition = index
-                    },
-                    modifier = Modifier.fillMaxWidth()
+                Text(
+                    text = "Permission timeout: $sliderLabel",
+                    style = MiuixTheme.textStyles.body2,
+                    color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                    modifier = Modifier.fillMaxWidth().padding(start = 8.dp),
                 )
-
                 Spacer(Modifier.height(8.dp))
+                Slider(
+                    value = sliderValue,
+                    onValueChange = { value ->
+                        viewModel.spinnerTouched()
+                        val pos = value.toInt().coerceIn(0, sliderToIndex.lastIndex)
+                        viewModel.selectedItemPosition = sliderToIndex[pos]
+                    },
+                    valueRange = 0f..5f,
+                    steps = 4,
+                    showKeyPoints = true,
+                    height = 20.dp,
+                    hapticEffect = SliderDefaults.SliderHapticEffect.Step,
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp)
+                )
+                Spacer(Modifier.height(16.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
