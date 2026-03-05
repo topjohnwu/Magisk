@@ -12,7 +12,6 @@ import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.repository.NetworkService
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.ui.navigation.Route
-import io.noties.markwon.Markwon
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,7 +24,7 @@ import java.io.File
 import java.io.IOException
 import com.topjohnwu.magisk.core.R as CoreR
 
-class InstallViewModel(svc: NetworkService, markwon: Markwon) : BaseViewModel() {
+class InstallViewModel(svc: NetworkService) : BaseViewModel() {
 
     enum class Method { NONE, PATCH, DIRECT, INACTIVE_SLOT }
 
@@ -58,9 +57,8 @@ class InstallViewModel(svc: NetworkService, markwon: Markwon) : BaseViewModel() 
                         note
                     }
                 }
-                val spanned = markwon.toMarkdown(noteText)
                 withContext(Dispatchers.Main) {
-                    _uiState.update { it.copy(notes = spanned.toString()) }
+                    _uiState.update { it.copy(notes = noteText) }
                 }
             } catch (e: IOException) {
                 Timber.e(e)
