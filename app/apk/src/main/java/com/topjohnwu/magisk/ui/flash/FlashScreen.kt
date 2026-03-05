@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Const
-import com.topjohnwu.magisk.ui.terminal.TerminalComposeView
+import com.topjohnwu.magisk.ui.terminal.TerminalScreen
 import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.IconButton
 import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
@@ -94,14 +94,11 @@ fun FlashScreen(viewModel: FlashViewModel, action: String, onBack: () -> Unit) {
         popupHost = { }
     ) { padding ->
         if (useTerminal) {
-            val session by viewModel.termSession.collectAsState()
-            TerminalComposeView(
-                session = session,
+            TerminalScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding),
-                onViewCreated = { viewModel.setTerminalView(it) },
-                onEmulatorReady = { viewModel.onEmulatorReady() },
+                onEmulatorCreated = { viewModel.onEmulatorCreated(it) },
             )
         } else {
             val items = viewModel.consoleItems

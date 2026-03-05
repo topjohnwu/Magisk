@@ -4,8 +4,6 @@ import android.net.Uri
 import androidx.compose.runtime.mutableStateListOf
 import androidx.core.net.toFile
 import androidx.lifecycle.viewModelScope
-import com.termux.terminal.TerminalSession
-import com.termux.view.TerminalView
 import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.core.AppContext
 import com.topjohnwu.magisk.core.Const
@@ -20,7 +18,9 @@ import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.displayName
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.inputStream
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
-import com.topjohnwu.magisk.ui.terminal.TerminalSessionCallback
+import com.topjohnwu.magisk.terminal.TerminalEmulator
+import com.topjohnwu.magisk.terminal.appendLineOnMain
+import com.topjohnwu.magisk.terminal.runSuCommand
 import com.topjohnwu.superuser.CallbackList
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.CompletableDeferred
@@ -50,22 +50,14 @@ class FlashViewModel : BaseViewModel() {
     var flashAction: String = ""
     var flashUri: Uri? = null
 
-    // --- TerminalView mode (FLASH_ZIP) ---
+    // --- TerminalScreen mode (FLASH_ZIP) ---
 
-    private val _termSession = MutableStateFlow<TerminalSession?>(null)
-    val termSession: StateFlow<TerminalSession?> = _termSession.asStateFlow()
+    private var emulator: TerminalEmulator? = null
+    private val emulatorReady = CompletableDeferred<TerminalEmulator>()
 
-    private val emulatorReady = CompletableDeferred<Unit>()
-    val sessionCallback = TerminalSessionCallback()
-
-    fun setTerminalView(view: TerminalView) {
-        sessionCallback.terminalView = view
-    }
-
-    fun onEmulatorReady() {
-        if (!emulatorReady.isCompleted) {
-            emulatorReady.complete(Unit)
-        }
+    fun onEmulatorCreated(emu: TerminalEmulator) {
+        emulator = emu
+        emulatorReady.complete(emu)
     }
 
     // --- LazyColumn mode (MagiskInstaller) ---
@@ -90,7 +82,7 @@ class FlashViewModel : BaseViewModel() {
             when (action) {
                 Const.Value.FLASH_ZIP -> {
                     uri ?: return@launch
-                    flashZipWithPty(uri)
+                    flashZip(uri)
                 }
                 Const.Value.UNINSTALL -> {
                     _showReboot.value = false
@@ -127,15 +119,8 @@ class FlashViewModel : BaseViewModel() {
         _flashState.value = if (success) State.SUCCESS else State.FAILED
     }
 
-    private suspend fun flashZipWithPty(uri: Uri) {
-        val session = TerminalSession(
-            "/system/bin/sh", "/",
-            arrayOf("sh", "-c", "exec sleep 2147483647"),
-            arrayOf("TERM=xterm-256color"),
-            5000, sessionCallback
-        )
-        _termSession.value = session
-        emulatorReady.await()
+    private suspend fun flashZip(uri: Uri) {
+        val emu = emulatorReady.await()
 
         val installDir = File(AppContext.cacheDir, "flash")
         val result = withContext(Dispatchers.IO) {
@@ -169,44 +154,26 @@ class FlashViewModel : BaseViewModel() {
 
         val (error, prepResult) = result
         if (prepResult == null) {
-            writeToPty(session, "! ${error ?: "Installation failed"}")
+            emu.appendLineOnMain("! ${error ?: "Installation failed"}")
             _flashState.value = State.FAILED
             return
         }
 
         val (dir, zipFile, displayName) = prepResult
-        val ptyPath = getPtyPath(session)
-        if (ptyPath == null) {
-            _flashState.value = State.FAILED
-            return
-        }
 
         val success = withContext(Dispatchers.IO) {
-            Shell.cmd(
-                "(export TERM=xterm-256color; " +
+            runSuCommand(
+                emu,
                 "echo '- Installing $displayName'; " +
                 "sh $dir/update-binary dummy 1 '${zipFile.absolutePath}'; " +
                 "EXIT=\$?; " +
                 "if [ \$EXIT -ne 0 ]; then echo '! Installation failed'; fi; " +
-                "exit \$EXIT) <>$ptyPath >&0 2>&0"
-            ).exec().isSuccess
+                "exit \$EXIT"
+            )
         }
 
         Shell.cmd("cd /", "rm -rf $dir ${Const.TMPDIR}").submit()
         _flashState.value = if (success) State.SUCCESS else State.FAILED
-    }
-
-    private suspend fun getPtyPath(session: TerminalSession): String? {
-        return withContext(Dispatchers.IO) {
-            Shell.cmd("readlink /proc/${session.pid}/fd/0").exec().out.firstOrNull()
-        }
-    }
-
-    private suspend fun writeToPty(session: TerminalSession, message: String) {
-        val ptyPath = getPtyPath(session) ?: return
-        withContext(Dispatchers.IO) {
-            Shell.cmd("echo '$message' >$ptyPath").exec()
-        }
     }
 
     fun saveLog() {
@@ -216,7 +183,7 @@ class FlashViewModel : BaseViewModel() {
             )
             val file = MediaStoreUtils.getFile(name)
             file.uri.outputStream().bufferedWriter().use { writer ->
-                val transcript = _termSession.value?.emulator?.screen?.transcriptText
+                val transcript = emulator?.screen?.transcriptText
                 if (transcript != null) {
                     writer.write(transcript)
                 } else {
@@ -233,9 +200,4 @@ class FlashViewModel : BaseViewModel() {
     }
 
     fun restartPressed() = reboot()
-
-    override fun onCleared() {
-        super.onCleared()
-        _termSession.value?.finishIfRunning()
-    }
 }
