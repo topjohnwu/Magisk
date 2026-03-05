@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.ui.log
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -31,7 +30,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -256,6 +254,8 @@ private fun SuLogCard(log: SuLog) {
                         color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
                         maxLines = 1,
                     )
+                    Spacer(Modifier.height(4.dp))
+                    SuActionBadge(allowed)
                 }
             }
 
@@ -269,38 +269,24 @@ private fun SuLogCard(log: SuLog) {
                     color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
                 )
             }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                SuActionIcon(allowed)
-            }
         }
     }
 }
 
 @Composable
-private fun SuActionIcon(allowed: Boolean) {
-    val color = if (allowed) Color(0xFF4CAF50) else Color(0xFFF44336)
-    Canvas(modifier = Modifier.size(18.dp)) {
-        val stroke = androidx.compose.ui.graphics.drawscope.Stroke(
-            width = 2.dp.toPx(),
-            cap = androidx.compose.ui.graphics.StrokeCap.Round
-        )
-        if (allowed) {
-            val path = androidx.compose.ui.graphics.Path().apply {
-                moveTo(size.width * 0.2f, size.height * 0.5f)
-                lineTo(size.width * 0.42f, size.height * 0.72f)
-                lineTo(size.width * 0.8f, size.height * 0.28f)
-            }
-            drawPath(path, color, style = stroke)
-        } else {
-            drawLine(color, Offset(size.width * 0.25f, size.height * 0.25f), Offset(size.width * 0.75f, size.height * 0.75f), strokeWidth = 2.dp.toPx(), cap = androidx.compose.ui.graphics.StrokeCap.Round)
-            drawLine(color, Offset(size.width * 0.75f, size.height * 0.25f), Offset(size.width * 0.25f, size.height * 0.75f), strokeWidth = 2.dp.toPx(), cap = androidx.compose.ui.graphics.StrokeCap.Round)
-        }
-    }
+private fun SuActionBadge(allowed: Boolean) {
+    val bg = if (allowed) MiuixTheme.colorScheme.primary else MiuixTheme.colorScheme.error
+    val fg = if (allowed) MiuixTheme.colorScheme.onPrimary else MiuixTheme.colorScheme.onError
+    val text = if (allowed) "Approved" else "Rejected"
+    Text(
+        text = text,
+        color = fg,
+        fontSize = 10.sp,
+        maxLines = 1,
+        modifier = Modifier
+            .background(bg, RoundedCornerShape(6.dp))
+            .padding(horizontal = 6.dp, vertical = 2.dp)
+    )
 }
 
 @Composable
