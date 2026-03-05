@@ -9,7 +9,7 @@ room = "2.8.4"
 compose-bom = "2026.02.01"
 lifecycle = "2.10.0"
 activity-compose = "1.12.4"
-miuix = "0.8.5"
+miuix = "0.8.6"
 navigation3 = "1.1.0-alpha05"
 navigationevent = "1.0.2"
 [libraries]
