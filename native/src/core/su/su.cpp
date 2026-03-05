@@ -220,11 +220,11 @@ int su_client_main(int argc, char *argv[]) {
     }
 
     // Determine which one of our streams are attached to a TTY
-    interactive |= req.command.empty();
     int atty = 0;
-    if (isatty(STDIN_FILENO) && interactive)  atty |= ATTY_IN;
-    if (isatty(STDOUT_FILENO) && interactive) atty |= ATTY_OUT;
-    if (isatty(STDERR_FILENO) && interactive) atty |= ATTY_ERR;
+    if (isatty(STDIN_FILENO) && req.command.empty())  atty |= ATTY_IN;
+    if (isatty(STDOUT_FILENO) && req.command.empty()) atty |= ATTY_OUT;
+    if (isatty(STDERR_FILENO) && req.command.empty()) atty |= ATTY_ERR;
+    if (interactive) atty |= ATTY_IN | ATTY_OUT | ATTY_ERR;
 
     // Send stdin
     send_fd(fd, (atty & ATTY_IN) ? -1 : STDIN_FILENO);
