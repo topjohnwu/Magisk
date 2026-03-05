@@ -6,8 +6,11 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$ROOT_DIR"
 
 WITH_AVD=1
-WITH_CUTTLEFISH=0
+WITH_CUTTLEFISH=1
 SKIP_SETUP=0
+SKIP_BUILD=0
+QUICK_AVD=0
+
 AVD_64_API="${AVD_64_API:-34}"
 AVD_32_API="${AVD_32_API:-30}"
 CF_BRANCH="${CF_BRANCH:-aosp-android-latest-release}"
@@ -15,62 +18,64 @@ CF_DEVICE="${CF_DEVICE:-aosp_cf_x86_64_only_phone}"
 CF_HOME_DEFAULT="$HOME/aosp_cf_phone"
 CF_HOME="${CF_HOME:-$CF_HOME_DEFAULT}"
 
+PYTHON_BIN=
+SDKMANAGER=
+FAILURES=()
+
+log() {
+  echo "[run_all_linux] $*"
+}
+
+warn() {
+  echo "[run_all_linux] WARN: $*" >&2
+}
+
+die() {
+  echo "[run_all_linux] ERROR: $*" >&2
+  exit 1
+}
+
 usage() {
   cat <<'EOF'
 Usage: ./run_all_linux.sh [options]
 
 Options:
   --no-avd             Skip AVD tests
-  --with-cuttlefish    Run Cuttlefish tests too
+  --quick-avd          Run only AVD_64_API and AVD_32_API (not full CI matrix)
+  --no-cuttlefish      Skip Cuttlefish test
+  --with-cuttlefish    Force Cuttlefish test (default)
   --skip-setup         Skip SDK/NDK setup
+  --skip-build         Skip build steps, run only tests
   --help               Show this help
 
 Env overrides:
   AVD_64_API=34
   AVD_32_API=30
+  AVD_MEMORY_MB=4096
+  AVD_TEST_LOG=1
+  AVD_ALLOW_SOFT_ACCEL=1
   CF_HOME=$HOME/aosp_cf_phone
   CF_BRANCH=aosp-android-latest-release
   CF_DEVICE=aosp_cf_x86_64_only_phone
 EOF
 }
 
-while [[ $# -gt 0 ]]; do
-  case "$1" in
-    --no-avd)
-      WITH_AVD=0
-      shift
-      ;;
-    --with-cuttlefish)
-      WITH_CUTTLEFISH=1
-      shift
-      ;;
-    --skip-setup)
-      SKIP_SETUP=1
-      shift
-      ;;
-    --help|-h)
-      usage
-      exit 0
-      ;;
-    *)
-      echo "[ERROR] Unknown argument: $1" >&2
-      usage
-      exit 1
-      ;;
-  esac
-done
+require_command() {
+  local cmd="$1"
+  command -v "$cmd" >/dev/null 2>&1 || die "Required command not found: $cmd"
+}
 
-if [[ ! -f build.py ]]; then
-  echo "[ERROR] build.py not found. Run this script from Magisk repo root." >&2
-  exit 1
-fi
+prepare_python() {
+  if command -v python3 >/dev/null 2>&1; then
+    PYTHON_BIN=python3
+  elif command -v python >/dev/null 2>&1; then
+    PYTHON_BIN=python
+  else
+    die "Python 3.8+ is required"
+  fi
+}
 
-if ! command -v python3 >/dev/null 2>&1; then
-  echo "[ERROR] python3 not found in PATH." >&2
-  exit 1
-fi
-
-if [[ "$SKIP_SETUP" -eq 0 ]]; then
+prepare_android_env() {
   if [[ -z "${ANDROID_HOME:-}" && -n "${ANDROID_SDK_ROOT:-}" ]]; then
     export ANDROID_HOME="$ANDROID_SDK_ROOT"
   fi
@@ -80,62 +85,205 @@ if [[ "$SKIP_SETUP" -eq 0 ]]; then
   export ANDROID_SDK_ROOT="$ANDROID_HOME"
   export PATH="$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$ANDROID_HOME/cmdline-tools/latest/bin:$PATH"
 
-  if [[ -x "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" ]]; then
-    SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
-  elif command -v sdkmanager >/dev/null 2>&1; then
-    SDKMANAGER="$(command -v sdkmanager)"
+  SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+  [[ -x "$SDKMANAGER" ]] || die "sdkmanager not found at $SDKMANAGER"
+}
+
+record_failure() {
+  local job="$1"
+  FAILURES+=("$job")
+}
+
+run_optional_job() {
+  local label="$1"
+  shift
+
+  log "START: $label"
+  if "$@"; then
+    log "PASS:  $label"
   else
-    echo "[ERROR] sdkmanager not found. Install Android command-line tools (latest)." >&2
-    exit 1
+    warn "FAIL:  $label"
+    record_failure "$label"
+  fi
+}
+
+setup_environment() {
+  if [[ "$SKIP_SETUP" -eq 1 ]]; then
+    log "Setup skipped (--skip-setup)"
+    return
   fi
 
-  echo "[1/10] Setup Android SDK licenses"
+  log "Accepting Android SDK licenses"
   yes | "$SDKMANAGER" --licenses >/dev/null || true
 
-  echo "[2/10] Setup Android SDK packages"
-  "$SDKMANAGER" --channel=3 "platform-tools" "emulator" "cmdline-tools;latest"
+  log "Installing Android SDK packages"
+  "$SDKMANAGER" --channel=3 \
+    "platform-tools" \
+    "emulator" \
+    "cmdline-tools;latest" \
+    "platforms;android-36" \
+    "build-tools;36.1.0"
 
-  echo "[3/10] Setup NDK (CI: build.py -v ndk)"
-  python3 build.py -v ndk
-else
-  echo "[1/10] Setup skipped (--skip-setup)"
-  echo "[2/10] Setup skipped (--skip-setup)"
-  echo "[3/10] Setup skipped (--skip-setup)"
-fi
+  log "Syncing git submodules"
+  git submodule update --init --recursive
 
-echo "[4/10] Build release (CI: build.py -vr all)"
-python3 build.py -vr all
+  log "Setting up Magisk NDK"
+  "$PYTHON_BIN" build.py -v ndk
+}
 
-echo "[5/10] Build debug (CI: build.py -v all)"
-python3 build.py -v all
+run_builds() {
+  if [[ "$SKIP_BUILD" -eq 1 ]]; then
+    log "Build steps skipped (--skip-build)"
+    return
+  fi
 
-echo "[6/10] Stop Gradle daemon"
-./app/gradlew --stop || true
+  log "Build release (CI: ./build.py -vr all)"
+  "$PYTHON_BIN" build.py -vr all
 
-echo "[7/10] Test-build profile (CI: build.py -v -c .github/ci.prop all)"
-python3 build.py -v -c .github/ci.prop all
+  log "Build debug (CI: ./build.py -v all)"
+  "$PYTHON_BIN" build.py -v all
 
-echo "[8/10] Stop Gradle daemon"
-./app/gradlew --stop || true
+  log "Stop Gradle daemon"
+  bash ./app/gradlew --stop || true
 
-if [[ "$WITH_AVD" -eq 1 ]]; then
-  echo "[9/10] AVD test x86_64 API ${AVD_64_API}"
-  scripts/avd.sh test "$AVD_64_API"
+  log "Test build profile (CI: ./build.py -v -c .github/ci.prop all)"
+  "$PYTHON_BIN" build.py -v -c .github/ci.prop all
 
-  echo "[10/10] AVD test x86 API ${AVD_32_API}"
-  FORCE_32_BIT=1 scripts/avd.sh test "$AVD_32_API"
-else
-  echo "[9/10] AVD tests skipped (--no-avd)"
-  echo "[10/10] AVD tests skipped (--no-avd)"
-fi
+  log "Stop Gradle daemon"
+  bash ./app/gradlew --stop || true
+}
 
-if [[ "$WITH_CUTTLEFISH" -eq 1 ]]; then
-  echo "[CF] Running Cuttlefish setup + download + test"
+run_avd_job_x64() {
+  local version="$1"
+  local type="${2:-}"
+  if [[ -n "$type" ]]; then
+    bash scripts/avd.sh test "$version" "$type"
+  else
+    bash scripts/avd.sh test "$version"
+  fi
+}
+
+run_avd_job_x86() {
+  local version="$1"
+  FORCE_32_BIT=1 bash scripts/avd.sh test "$version"
+}
+
+run_avd_matrix() {
+  [[ "$WITH_AVD" -eq 1 ]] || {
+    log "AVD tests skipped (--no-avd)"
+    return
+  }
+
+  export AVD_TEST_LOG="${AVD_TEST_LOG:-1}"
+
+  if [[ -n "${AVD_ALLOW_SOFT_ACCEL:-}" ]]; then
+    warn "Software acceleration enabled (AVD_ALLOW_SOFT_ACCEL=1). Tests may be very slow."
+  fi
+
+  if [[ "$QUICK_AVD" -eq 1 ]]; then
+    run_optional_job "Test API ${AVD_64_API} (x86_64)" run_avd_job_x64 "$AVD_64_API"
+    run_optional_job "Test API ${AVD_32_API} (x86)" run_avd_job_x86 "$AVD_32_API"
+    return
+  fi
+
+  local x64_versions=(23 24 25 26 27 28 29 30 31 32 33 34 35 36 36.1 CANARY)
+  local x86_versions=(23 24 25 26 27 28 29 30)
+  local v
+
+  for v in "${x64_versions[@]}"; do
+    run_optional_job "Test API ${v} (x86_64)" run_avd_job_x64 "$v"
+  done
+  run_optional_job "Test API CinnamonBun (x86_64)" run_avd_job_x64 "CinnamonBun" "google_apis_ps16k"
+
+  for v in "${x86_versions[@]}"; do
+    run_optional_job "Test API ${v} (x86)" run_avd_job_x86 "$v"
+  done
+}
+
+run_cuttlefish_job() {
   export CF_HOME
-  scripts/cuttlefish.sh setup
-  scripts/cuttlefish.sh download "$CF_BRANCH" "$CF_DEVICE"
-  scripts/cuttlefish.sh test
-fi
+  bash scripts/cuttlefish.sh setup
+  bash scripts/cuttlefish.sh download "$CF_BRANCH" "$CF_DEVICE"
+  bash scripts/cuttlefish.sh test
+}
 
-echo
-echo "[OK] Local Linux pipeline completed."
+run_cuttlefish() {
+  [[ "$WITH_CUTTLEFISH" -eq 1 ]] || {
+    log "Cuttlefish test skipped (--no-cuttlefish)"
+    return
+  }
+
+  run_optional_job "Test ${CF_DEVICE}" run_cuttlefish_job
+}
+
+print_summary() {
+  if [[ "${#FAILURES[@]}" -eq 0 ]]; then
+    log "Pipeline completed successfully."
+    return
+  fi
+
+  warn "Pipeline completed with failures (${#FAILURES[@]}):"
+  local f
+  for f in "${FAILURES[@]}"; do
+    echo "  - $f" >&2
+  done
+  exit 1
+}
+
+parse_args() {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --no-avd)
+        WITH_AVD=0
+        ;;
+      --quick-avd)
+        QUICK_AVD=1
+        ;;
+      --no-cuttlefish)
+        WITH_CUTTLEFISH=0
+        ;;
+      --with-cuttlefish)
+        WITH_CUTTLEFISH=1
+        ;;
+      --skip-setup)
+        SKIP_SETUP=1
+        ;;
+      --skip-build)
+        SKIP_BUILD=1
+        ;;
+      --help|-h)
+        usage
+        exit 0
+        ;;
+      *)
+        die "Unknown argument: $1"
+        ;;
+    esac
+    shift
+  done
+}
+
+main() {
+  parse_args "$@"
+
+  [[ "$(uname -s)" == "Linux" ]] || die "This script is intended for Linux only."
+  [[ -f build.py ]] || die "build.py not found. Run this from Magisk repo root."
+
+  require_command git
+  prepare_python
+  prepare_android_env
+
+  if [[ "$WITH_AVD" -eq 1 || "$WITH_CUTTLEFISH" -eq 1 ]]; then
+    if [[ ! -e /dev/kvm ]]; then
+      warn "/dev/kvm not found. Emulator/Cuttlefish tests may fail."
+    fi
+  fi
+
+  setup_environment
+  run_builds
+  run_avd_matrix
+  run_cuttlefish
+  print_summary
+}
+
+main "$@"
