@@ -110,11 +110,19 @@ fun SuperuserDetailScreen(
                                 text = item.title,
                                 style = MiuixTheme.textStyles.headline2,
                             )
-                            Text(
-                                text = item.packageName,
-                                style = MiuixTheme.textStyles.body2,
-                                color = MiuixTheme.colorScheme.onSurfaceVariantSummary
-                            )
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = item.packageName,
+                                    style = MiuixTheme.textStyles.body2,
+                                    color = MiuixTheme.colorScheme.onSurfaceVariantSummary
+                                )
+                                if (item.isSharedUid) {
+                                    Spacer(Modifier.width(6.dp))
+                                    SharedUidBadge()
+                                }
+                            }
                             Text(
                                 text = "UID: ${item.policy.uid}",
                                 style = MiuixTheme.textStyles.body2,
