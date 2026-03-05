@@ -60,7 +60,10 @@ private class ReadOnlyTerminalViewClient(
     override fun readShiftKey() = false
     override fun readFnKey() = false
     override fun onCodePoint(codePoint: Int, ctrlDown: Boolean, session: TerminalSession) = false
-    override fun onEmulatorSet() { onEmulatorReady() }
+    override fun onEmulatorSet() {
+        onEmulatorReady()
+    }
+
     override fun logError(tag: String, message: String) {}
     override fun logWarn(tag: String, message: String) {}
     override fun logInfo(tag: String, message: String) {}

@@ -14,9 +14,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.toCollection
@@ -59,12 +59,12 @@ class DenyListViewModel : AsyncLoadViewModel() {
 
         val filtered = apps.filter { app ->
             val passFilter = app.isChecked ||
-                ((showSys || !app.info.isSystemApp()) &&
-                ((showSys && showOS) || app.info.isApp()))
+                    ((showSys || !app.info.isSystemApp()) &&
+                            ((showSys && showOS) || app.info.isApp()))
             val passQuery = q.isBlank() ||
-                app.info.label.contains(q, true) ||
-                app.info.packageName.contains(q, true) ||
-                app.processes.any { it.process.name.contains(q, true) }
+                    app.info.label.contains(q, true) ||
+                    app.info.packageName.contains(q, true) ||
+                    app.processes.any { it.process.name.contains(q, true) }
             passFilter && passQuery
         }
 
@@ -79,14 +79,26 @@ class DenyListViewModel : AsyncLoadViewModel() {
         filtered.sortedWith(comparator)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    fun setQuery(q: String) { _query.value = q }
+    fun setQuery(q: String) {
+        _query.value = q
+    }
+
     fun setShowSystem(v: Boolean) {
         _showSystem.value = v
         if (!v) _showOS.value = false
     }
-    fun setShowOS(v: Boolean) { _showOS.value = v }
-    fun setSortBy(s: SortBy) { _sortBy.value = s }
-    fun toggleSortReverse() { _sortReverse.value = !_sortReverse.value }
+
+    fun setShowOS(v: Boolean) {
+        _showOS.value = v
+    }
+
+    fun setSortBy(s: SortBy) {
+        _sortBy.value = s
+    }
+
+    fun toggleSortReverse() {
+        _sortReverse.value = !_sortReverse.value
+    }
 
     @SuppressLint("InlinedApi")
     override suspend fun doLoadWork() {
@@ -103,7 +115,8 @@ class DenyListViewModel : AsyncLoadViewModel() {
                     .concurrentMap { DenyAppState(it) }
                     .toCollection(ArrayList(size))
             }
-            apps.sortWith(compareBy(
+            apps.sortWith(
+                compareBy(
                 { it.processes.count { p -> p.isEnabled } == 0 },
                 { it.info }
             ))
@@ -153,8 +166,9 @@ class DenyAppState(val info: AppProcessInfo) : Comparable<DenyAppState> {
 class DenyProcessState(val process: ProcessInfo) {
     var isEnabled by mutableStateOf(process.isEnabled)
 
-    val defaultSelection get() =
-        process.isIsolated || process.isAppZygote || process.name == process.packageName
+    val defaultSelection
+        get() =
+            process.isIsolated || process.isAppZygote || process.name == process.packageName
 
     val displayName: String =
         if (process.isIsolated) "(isolated) ${process.name}" else process.name

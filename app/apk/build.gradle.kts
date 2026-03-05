@@ -52,9 +52,6 @@ dependencies {
     implementation(libs.coil.svg)
     implementation(libs.retrofit)
     implementation(libs.retrofit.moshi)
-    implementation(libs.miuix)
-    implementation(libs.miuix.icons)
-    implementation(libs.miuix.navigation3.ui)
 
     // Navigation3
     implementation(libs.navigation3.runtime)

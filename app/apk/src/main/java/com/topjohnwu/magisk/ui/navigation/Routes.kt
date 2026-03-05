@@ -1,10 +1,8 @@
 package com.topjohnwu.magisk.ui.navigation
 
-import android.net.Uri
 import android.os.Parcelable
 import androidx.navigation3.runtime.NavKey
 import kotlinx.parcelize.Parcelize
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 
 sealed interface Route : NavKey, Parcelable {

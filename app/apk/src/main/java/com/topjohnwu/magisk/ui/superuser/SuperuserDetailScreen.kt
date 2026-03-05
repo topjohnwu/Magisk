@@ -2,24 +2,50 @@ package com.topjohnwu.magisk.ui.superuser
 
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.graphics.Bitmap
-import androidx.compose.animation.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.DeleteSweep
 import androidx.compose.material.icons.rounded.History
 import androidx.compose.material.icons.rounded.SaveAlt
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
@@ -34,6 +60,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -47,24 +74,22 @@ import com.topjohnwu.magisk.core.ktx.toTime
 import com.topjohnwu.magisk.core.model.su.SuLog
 import com.topjohnwu.magisk.core.model.su.SuPolicy
 import com.topjohnwu.magisk.core.repository.LogRepository
-import com.topjohnwu.magisk.ui.RefreshOnResume
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
-import androidx.core.graphics.drawable.toBitmap
+import com.topjohnwu.magisk.ui.RefreshOnResume
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import com.topjohnwu.magisk.core.R as CoreR
 import kotlin.math.cos
 import kotlin.math.sin
+import com.topjohnwu.magisk.core.R as CoreR
 
 @Composable
 fun SuperuserLogsScreen(
@@ -97,6 +122,7 @@ fun SuperuserLogsScreen(
                             CircularProgressIndicator(strokeCap = StrokeCap.Round)
                         }
                     }
+
                     state.items.isEmpty() -> {
                         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -106,14 +132,25 @@ fun SuperuserLogsScreen(
                                     color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
                                 ) {
                                     Box(contentAlignment = Alignment.Center) {
-                                        Icon(Icons.Rounded.History, null, modifier = Modifier.size(56.dp), tint = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f))
+                                        Icon(
+                                            Icons.Rounded.History,
+                                            null,
+                                            modifier = Modifier.size(56.dp),
+                                            tint = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)
+                                        )
                                     }
                                 }
                                 Spacer(Modifier.height(24.dp))
-                                Text(stringResource(id = CoreR.string.log_data_none), color = MaterialTheme.colorScheme.outline, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                                Text(
+                                    stringResource(id = CoreR.string.log_data_none),
+                                    color = MaterialTheme.colorScheme.outline,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold
+                                )
                             }
                         }
                     }
+
                     else -> {
                         LazyColumn(
                             modifier = Modifier.fillMaxSize(),
@@ -145,7 +182,9 @@ fun SuperuserLogsScreen(
 
         SnackbarHost(
             hostState = snackbarHostState,
-            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 120.dp)
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 120.dp)
         )
     }
 }
@@ -186,7 +225,10 @@ private fun SuperuserLogActionButtons(
         ) {
             Icon(Icons.Rounded.SaveAlt, null, modifier = Modifier.size(20.dp))
             Spacer(Modifier.width(12.dp))
-            Text(stringResource(CoreR.string.menuSaveLog).uppercase(), fontWeight = FontWeight.Black)
+            Text(
+                stringResource(CoreR.string.menuSaveLog).uppercase(),
+                fontWeight = FontWeight.Black
+            )
         }
     }
 }
@@ -199,45 +241,69 @@ private fun TimelineLogItem(index: Int, total: Int, item: SuLogUiItem) {
         MaterialTheme.colorScheme.error
     }
 
-    Row(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .height(IntrinsicSize.Min)) {
         // Timeline aesthetics
         Column(
-            modifier = Modifier.width(48.dp).fillMaxHeight(),
+            modifier = Modifier
+                .width(48.dp)
+                .fillMaxHeight(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(
                 modifier = Modifier
                     .width(3.dp)
                     .weight(1f)
-                    .background(if (index == 0) Color.Transparent else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
+                    .background(
+                        if (index == 0) Color.Transparent else MaterialTheme.colorScheme.outlineVariant.copy(
+                            alpha = 0.4f
+                        )
+                    )
             )
-            
+
             HexagonNode(color = decisionColor)
-            
+
             Box(
                 modifier = Modifier
                     .width(3.dp)
                     .weight(1f)
-                    .background(if (index == total - 1) Color.Transparent else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
+                    .background(
+                        if (index == total - 1) Color.Transparent else MaterialTheme.colorScheme.outlineVariant.copy(
+                            alpha = 0.4f
+                        )
+                    )
             )
         }
 
         // Log Content Card
         ElevatedCard(
-            shape = RoundedCornerShape(topEnd = 32.dp, bottomStart = 32.dp, topStart = 8.dp, bottomEnd = 8.dp),
-            modifier = Modifier.padding(vertical = 8.dp, horizontal = 4.dp).weight(1f),
+            shape = RoundedCornerShape(
+                topEnd = 32.dp,
+                bottomStart = 32.dp,
+                topStart = 8.dp,
+                bottomEnd = 8.dp
+            ),
+            modifier = Modifier
+                .padding(vertical = 8.dp, horizontal = 4.dp)
+                .weight(1f),
             colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
         ) {
             Box {
                 Icon(
                     painter = painterResource(id = CoreR.drawable.ic_magisk_outline),
                     contentDescription = null,
-                    modifier = Modifier.size(100.dp).align(Alignment.TopEnd).offset(x = 20.dp, y = (-15).dp).alpha(0.04f),
+                    modifier = Modifier
+                        .size(100.dp)
+                        .align(Alignment.TopEnd)
+                        .offset(x = 20.dp, y = (-15).dp)
+                        .alpha(0.04f),
                     tint = MaterialTheme.colorScheme.primary
                 )
                 Column(modifier = Modifier.padding(20.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        val appIconPainter = remember(item.icon) { BitmapPainter(item.icon.asImageBitmap()) }
+                        val appIconPainter =
+                            remember(item.icon) { BitmapPainter(item.icon.asImageBitmap()) }
                         Surface(
                             modifier = Modifier.size(34.dp),
                             shape = RoundedCornerShape(10.dp),
@@ -251,13 +317,22 @@ private fun TimelineLogItem(index: Int, total: Int, item: SuLogUiItem) {
                             )
                         }
                         Spacer(Modifier.width(10.dp))
-                        Text(item.appName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Black, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text(
+                            item.appName,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Black,
+                            modifier = Modifier.weight(1f),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
                         Surface(
                             color = decisionColor.copy(alpha = 0.12f),
                             shape = RoundedCornerShape(8.dp)
                         ) {
                             Text(
-                                text = (if (item.allowed) AppContext.getString(CoreR.string.grant) else AppContext.getString(CoreR.string.deny)).uppercase(),
+                                text = (if (item.allowed) AppContext.getString(CoreR.string.grant) else AppContext.getString(
+                                    CoreR.string.deny
+                                )).uppercase(),
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = decisionColor,
@@ -267,7 +342,7 @@ private fun TimelineLogItem(index: Int, total: Int, item: SuLogUiItem) {
                         }
                     }
                     Spacer(modifier = Modifier.height(12.dp))
-                    
+
                     // FORMATTED INFO SECTION
                     Surface(
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f),
@@ -286,9 +361,12 @@ private fun TimelineLogItem(index: Int, total: Int, item: SuLogUiItem) {
                                     Spacer(Modifier.height(4.dp))
                                 }
                             }
-                            
+
                             if (item.command.isNotBlank()) {
-                                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f))
+                                HorizontalDivider(
+                                    modifier = Modifier.padding(vertical = 8.dp),
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
+                                )
                                 Text(
                                     text = item.command,
                                     style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace),
@@ -307,7 +385,9 @@ private fun TimelineLogItem(index: Int, total: Int, item: SuLogUiItem) {
 
 @Composable
 private fun HexagonNode(color: Color) {
-    Canvas(modifier = Modifier.size(28.dp).padding(4.dp)) {
+    Canvas(modifier = Modifier
+        .size(28.dp)
+        .padding(4.dp)) {
         val path = Path().apply {
             val radius = size.minDimension / 2
             val centerX = size.width / 2
@@ -326,15 +406,18 @@ private fun HexagonNode(color: Color) {
 }
 
 data class SuLogUiItem(
-    val id: Int, 
-    val appName: String, 
+    val id: Int,
+    val appName: String,
     val icon: Bitmap,
-    val allowed: Boolean, 
+    val allowed: Boolean,
     val infoLines: List<String>,
     val command: String
 )
 
-data class SuperuserLogsUiState(val loading: Boolean = true, val items: List<SuLogUiItem> = emptyList())
+data class SuperuserLogsUiState(
+    val loading: Boolean = true,
+    val items: List<SuLogUiItem> = emptyList()
+)
 
 class SuperuserLogsComposeViewModel(private val repo: LogRepository) : ViewModel() {
     private val _state = MutableStateFlow(SuperuserLogsUiState())
@@ -358,6 +441,7 @@ class SuperuserLogsComposeViewModel(private val repo: LogRepository) : ViewModel
             _state.update { it.copy(loading = false, items = items) }
         }
     }
+
     fun clearLogs() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) { repo.clearLogs() }
@@ -365,10 +449,13 @@ class SuperuserLogsComposeViewModel(private val repo: LogRepository) : ViewModel
             refresh()
         }
     }
+
     fun saveLogs() {
         viewModelScope.launch(Dispatchers.IO) {
             val result = runCatching {
-                val name = "superuser_log_%s.log".format(System.currentTimeMillis().toTime(timeFormatStandard))
+                val name = "superuser_log_%s.log".format(
+                    System.currentTimeMillis().toTime(timeFormatStandard)
+                )
                 val logFile = MediaStoreUtils.getFile(name)
                 logFile.uri.outputStream().bufferedWriter().use { writer ->
                     state.value.items.forEach { item ->
@@ -383,13 +470,23 @@ class SuperuserLogsComposeViewModel(private val repo: LogRepository) : ViewModel
                 logFile.uri.toString()
             }
             withContext(Dispatchers.Main) {
-                result.onSuccess { path -> _messages.emit(AppContext.getString(CoreR.string.saved_to_path, path)) }
-                      .onFailure { _messages.emit(AppContext.getString(CoreR.string.failure)) }
+                result.onSuccess { path ->
+                    _messages.emit(
+                        AppContext.getString(
+                            CoreR.string.saved_to_path,
+                            path
+                        )
+                    )
+                }
+                    .onFailure { _messages.emit(AppContext.getString(CoreR.string.failure)) }
             }
         }
     }
-    fun postExternalRwDenied() { _messages.tryEmit(AppContext.getString(CoreR.string.external_rw_permission_denied)) }
-    
+
+    fun postExternalRwDenied() {
+        _messages.tryEmit(AppContext.getString(CoreR.string.external_rw_permission_denied))
+    }
+
     private fun SuLog.toUiItem(): SuLogUiItem {
         val res = AppContext.resources
         val infoLines = mutableListOf<String>()
@@ -416,7 +513,7 @@ class SuperuserLogsComposeViewModel(private val repo: LogRepository) : ViewModel
                 .getOrDefault(pm.defaultActivityIcon)
                 .toBitmap()
         }
-        
+
         return SuLogUiItem(
             id = id,
             appName = appName,
@@ -427,5 +524,11 @@ class SuperuserLogsComposeViewModel(private val repo: LogRepository) : ViewModel
         )
     }
 
-    companion object { val Factory = object : ViewModelProvider.Factory { override fun <T : ViewModel> create(modelClass: Class<T>): T { @Suppress("UNCHECKED_CAST") return SuperuserLogsComposeViewModel(ServiceLocator.logRepo) as T } } }
+    companion object {
+        val Factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                @Suppress("UNCHECKED_CAST") return SuperuserLogsComposeViewModel(ServiceLocator.logRepo) as T
+            }
+        }
+    }
 }

@@ -63,7 +63,7 @@ class HomeViewModel(
 
     val managerInstalledVersion: String
         get() = "${BuildConfig.APP_VERSION_NAME} (${BuildConfig.APP_VERSION_CODE})" +
-            if (BuildConfig.DEBUG) " (D)" else ""
+                if (BuildConfig.DEBUG) " (D)" else ""
 
     companion object {
         private var checkedEnv = false

@@ -5,15 +5,28 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.BrightnessAuto
 import androidx.compose.material.icons.rounded.Brush
@@ -23,7 +36,21 @@ import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material.icons.rounded.DarkMode
 import androidx.compose.material.icons.rounded.LightMode
 import androidx.compose.material.icons.rounded.Palette
-import androidx.compose.material3.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.Button
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -37,10 +64,10 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -69,7 +96,12 @@ fun ThemeScreen(
     Box(modifier = Modifier.fillMaxSize()) {
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
-            contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 12.dp, bottom = 140.dp),
+            contentPadding = PaddingValues(
+                start = 20.dp,
+                end = 20.dp,
+                top = 12.dp,
+                bottom = 140.dp
+            ),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier.fillMaxSize()
@@ -166,7 +198,10 @@ fun ThemeScreen(
                                 .height(52.dp),
                             shape = RoundedCornerShape(16.dp)
                         ) {
-                            Text(stringResource(id = android.R.string.cancel), fontWeight = FontWeight.Bold)
+                            Text(
+                                stringResource(id = android.R.string.cancel),
+                                fontWeight = FontWeight.Bold
+                            )
                         }
                         Button(
                             onClick = {
@@ -182,7 +217,10 @@ fun ThemeScreen(
                                 .height(52.dp),
                             shape = RoundedCornerShape(16.dp)
                         ) {
-                            Text(stringResource(id = CoreR.string.apply), fontWeight = FontWeight.Black)
+                            Text(
+                                stringResource(id = CoreR.string.apply),
+                                fontWeight = FontWeight.Black
+                            )
                         }
                     }
                     Spacer(Modifier.height(8.dp))
@@ -344,7 +382,10 @@ private fun DarkModeSection(
                                 }
                             ) {
                                 Row(
-                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                                    modifier = Modifier.padding(
+                                        horizontal = 12.dp,
+                                        vertical = 10.dp
+                                    ),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Surface(
@@ -445,7 +486,7 @@ private fun ThemeHeader() {
                 color = MaterialTheme.colorScheme.outline
             )
         }
-        
+
         ElevatedCard(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(28.dp),
@@ -504,6 +545,7 @@ private fun ThemeCard(
             Color(0xFF62EB9A),
             Color(0xFFB6EF64)
         )
+
         Theme.Custom -> listOf(
             Color(customColors?.lightPrimary ?: Config.themeCustomLightPrimary),
             Color(customColors?.darkPrimary ?: Config.themeCustomDarkPrimary)
@@ -579,7 +621,7 @@ private fun ThemeCard(
                         .height(1.dp)
                         .background(MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f))
                 )
-                
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -620,7 +662,9 @@ private fun CustomThemeEditor(
     onColorChanged: (CustomColorSlot, Int) -> Unit
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth().padding(top = 4.dp, bottom = 8.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 4.dp, bottom = 8.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(
@@ -676,11 +720,23 @@ private fun CustomColorRow(
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Surface(shape = CircleShape, color = Color(colorInt), modifier = Modifier.size(18.dp)) {}
+            Surface(
+                shape = CircleShape,
+                color = Color(colorInt),
+                modifier = Modifier.size(18.dp)
+            ) {}
             Spacer(Modifier.width(10.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(label, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
-                Text(colorInt.toColorHex(), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(
+                    label,
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    colorInt.toColorHex(),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
             TextButton(
                 onClick = { showEditor = true },
@@ -715,9 +771,21 @@ private fun ColorHexDialog(
     onDismiss: () -> Unit,
     onConfirm: (Int) -> Unit
 ) {
-    var alpha by remember(initialColor) { mutableIntStateOf(android.graphics.Color.alpha(initialColor)) }
+    var alpha by remember(initialColor) {
+        mutableIntStateOf(
+            android.graphics.Color.alpha(
+                initialColor
+            )
+        )
+    }
     var red by remember(initialColor) { mutableIntStateOf(android.graphics.Color.red(initialColor)) }
-    var green by remember(initialColor) { mutableIntStateOf(android.graphics.Color.green(initialColor)) }
+    var green by remember(initialColor) {
+        mutableIntStateOf(
+            android.graphics.Color.green(
+                initialColor
+            )
+        )
+    }
     var blue by remember(initialColor) { mutableIntStateOf(android.graphics.Color.blue(initialColor)) }
     val currentColorInt = remember(alpha, red, green, blue) {
         android.graphics.Color.argb(alpha, red, green, blue)
@@ -728,7 +796,10 @@ private fun ColorHexDialog(
         title = { Text(title, fontWeight = FontWeight.Black) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
                     Surface(
                         shape = CircleShape,
                         color = Color(currentColorInt),
@@ -746,9 +817,21 @@ private fun ColorHexDialog(
                     activeColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     onValueChange = { alpha = it }
                 )
-                ColorChannelSlider(label = stringResource(id = CoreR.string.color_channel_red), value = red, activeColor = Color(0xFFEF5350), onValueChange = { red = it })
-                ColorChannelSlider(label = stringResource(id = CoreR.string.color_channel_green), value = green, activeColor = Color(0xFF66BB6A), onValueChange = { green = it })
-                ColorChannelSlider(label = stringResource(id = CoreR.string.color_channel_blue), value = blue, activeColor = Color(0xFF42A5F5), onValueChange = { blue = it })
+                ColorChannelSlider(
+                    label = stringResource(id = CoreR.string.color_channel_red),
+                    value = red,
+                    activeColor = Color(0xFFEF5350),
+                    onValueChange = { red = it })
+                ColorChannelSlider(
+                    label = stringResource(id = CoreR.string.color_channel_green),
+                    value = green,
+                    activeColor = Color(0xFF66BB6A),
+                    onValueChange = { green = it })
+                ColorChannelSlider(
+                    label = stringResource(id = CoreR.string.color_channel_blue),
+                    value = blue,
+                    activeColor = Color(0xFF42A5F5),
+                    onValueChange = { blue = it })
             }
         },
         confirmButton = {

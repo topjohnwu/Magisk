@@ -140,6 +140,7 @@ open class SuRequestActivity : AppCompatActivity(), UntrackedActivity {
                 val darkMode = when (Config.darkTheme) {
                     AppCompatDelegate.MODE_NIGHT_YES,
                     Config.Value.DARK_THEME_AMOLED -> true
+
                     AppCompatDelegate.MODE_NIGHT_NO -> false
                     else -> systemDark
                 }
@@ -152,12 +153,26 @@ open class SuRequestActivity : AppCompatActivity(), UntrackedActivity {
         override fun sendAccessibilityEvent(host: View, eventType: Int) {}
         override fun performAccessibilityAction(host: View, action: Int, args: Bundle?) = true
         override fun sendAccessibilityEventUnchecked(host: View, event: AccessibilityEvent) {}
-        override fun dispatchPopulateAccessibilityEvent(host: View, event: AccessibilityEvent) = true
+        override fun dispatchPopulateAccessibilityEvent(host: View, event: AccessibilityEvent) =
+            true
+
         override fun onPopulateAccessibilityEvent(host: View, event: AccessibilityEvent) {}
         override fun onInitializeAccessibilityEvent(host: View, event: AccessibilityEvent) {}
         override fun onInitializeAccessibilityNodeInfo(host: View, info: AccessibilityNodeInfo) {}
-        override fun addExtraDataToAccessibilityNodeInfo(host: View, info: AccessibilityNodeInfo, extraDataKey: String, arguments: Bundle?) {}
-        override fun onRequestSendAccessibilityEvent(host: ViewGroup, child: View, event: AccessibilityEvent): Boolean = false
+        override fun addExtraDataToAccessibilityNodeInfo(
+            host: View,
+            info: AccessibilityNodeInfo,
+            extraDataKey: String,
+            arguments: Bundle?
+        ) {
+        }
+
+        override fun onRequestSendAccessibilityEvent(
+            host: ViewGroup,
+            child: View,
+            event: AccessibilityEvent
+        ): Boolean = false
+
         override fun getAccessibilityNodeProvider(host: View): AccessibilityNodeProvider? = null
     }
 }

@@ -2,19 +2,78 @@ package com.topjohnwu.magisk.ui
 
 import android.net.Uri
 import android.os.Build
-import androidx.compose.animation.*
-import androidx.compose.animation.core.*
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
-import androidx.compose.material.icons.rounded.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.rounded.Block
+import androidx.compose.material.icons.rounded.CheckCircle
+import androidx.compose.material.icons.rounded.Download
+import androidx.compose.material.icons.rounded.Error
+import androidx.compose.material.icons.rounded.Extension
+import androidx.compose.material.icons.rounded.HistoryEdu
+import androidx.compose.material.icons.rounded.Home
+import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.Palette
+import androidx.compose.material.icons.rounded.PlayCircle
+import androidx.compose.material.icons.rounded.PowerSettingsNew
+import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material.icons.rounded.Shield
+import androidx.compose.material.icons.rounded.Terminal
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarData
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,21 +94,21 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.core.R as CoreR
+import com.topjohnwu.magisk.core.Const
+import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.ui.deny.DenyListScreen
 import com.topjohnwu.magisk.ui.flash.FlashScreen
 import com.topjohnwu.magisk.ui.home.HomeScreen
 import com.topjohnwu.magisk.ui.install.InstallScreen
 import com.topjohnwu.magisk.ui.log.LogsScreen
-import com.topjohnwu.magisk.ui.superuser.SuperuserLogsScreen
 import com.topjohnwu.magisk.ui.module.ModuleActionScreen
 import com.topjohnwu.magisk.ui.module.ModuleScreen
 import com.topjohnwu.magisk.ui.settings.SettingsScreen
 import com.topjohnwu.magisk.ui.settings.ThemeScreen
+import com.topjohnwu.magisk.ui.superuser.SuperuserLogsScreen
 import com.topjohnwu.magisk.ui.superuser.SuperuserScreen
 import com.topjohnwu.magisk.ui.theme.magiskComposeColorScheme
-import com.topjohnwu.magisk.core.Const
-import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.R as CoreR
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -81,7 +140,8 @@ fun MagiskAppContainer(
         val rootRoutes = remember(rootDestinations) { rootDestinations.map { it.route }.toSet() }
         val backStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = backStackEntry?.destination?.route ?: AppRoute.Home
-        val currentRoot = rootDestinations.firstOrNull { it.route == currentRoute } ?: AppDestination.Home
+        val currentRoot =
+            rootDestinations.firstOrNull { it.route == currentRoute } ?: AppDestination.Home
         val isRootRoute = currentRoute in rootRoutes
         val reserveBottomForLogs = isRootRoute && currentRoute == AppRoute.Logs
         val moduleActionNameArg = backStackEntry?.arguments?.getString("name")
@@ -105,7 +165,7 @@ fun MagiskAppContainer(
                 else -> null
             } ?: return@LaunchedEffect
             if (route == currentRoute) return@LaunchedEffect
-            
+
             navController.navigate(route) {
                 launchSingleTop = true
                 restoreState = true
@@ -149,71 +209,49 @@ fun MagiskAppContainer(
                 SnackbarHost(hostState = snackbarHostState) { data -> ExpressiveSnackbar(data) }
             }
         ) { paddingValues ->
-            Box(modifier = Modifier
-                .fillMaxSize()
-                .padding(top = paddingValues.calculateTopPadding())) {
-                
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = paddingValues.calculateTopPadding())
+            ) {
+
                 NavHost(
-                    navController = navController, 
-                    startDestination = AppRoute.Home, 
+                    navController = navController,
+                    startDestination = AppRoute.Home,
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(bottom = if (reserveBottomForLogs) LOGS_RESERVED_BOTTOM_SPACE else 0.dp),
                     enterTransition = {
-                        val isTopLevelNav = initialState.destination.route in listOf(AppRoute.Home, AppRoute.Superuser, AppRoute.Modules, AppRoute.Logs) &&
-                                targetState.destination.route in listOf(AppRoute.Home, AppRoute.Superuser, AppRoute.Modules, AppRoute.Logs)
-                        if (isTopLevelNav) {
-                            fadeIn(animationSpec = tween(300, easing = LinearOutSlowInEasing)) +
-                                    scaleIn(initialScale = 0.97f, animationSpec = tween(300, easing = FastOutSlowInEasing))
-                        } else {
-                            slideIntoContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Start,
-                                animationSpec = tween(400, easing = FastOutSlowInEasing)
-                            ) + fadeIn(animationSpec = tween(400, easing = LinearOutSlowInEasing)) +
-                                    scaleIn(initialScale = 0.95f, animationSpec = tween(400, easing = FastOutSlowInEasing))
-                        }
+                        unifiedScreenEnterTransition(
+                            getNavigationDirection(
+                                initialState.destination.route,
+                                targetState.destination.route
+                            )
+                        )
                     },
                     exitTransition = {
-                        val isTopLevelNav = initialState.destination.route in listOf(AppRoute.Home, AppRoute.Superuser, AppRoute.Modules, AppRoute.Logs) &&
-                                targetState.destination.route in listOf(AppRoute.Home, AppRoute.Superuser, AppRoute.Modules, AppRoute.Logs)
-                        if (isTopLevelNav) {
-                            fadeOut(animationSpec = tween(300, easing = LinearOutSlowInEasing)) +
-                                    scaleOut(targetScale = 1.03f, animationSpec = tween(300, easing = FastOutSlowInEasing))
-                        } else {
-                            slideOutOfContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Start,
-                                animationSpec = tween(400, easing = FastOutSlowInEasing)
-                            ) + fadeOut(animationSpec = tween(400, easing = LinearEasing)) +
-                                    scaleOut(targetScale = 1.05f, animationSpec = tween(400, easing = FastOutSlowInEasing))
-                        }
+                        unifiedScreenExitTransition(
+                            getNavigationDirection(
+                                initialState.destination.route,
+                                targetState.destination.route
+                            )
+                        )
                     },
                     popEnterTransition = {
-                        val isTopLevelNav = initialState.destination.route in listOf(AppRoute.Home, AppRoute.Superuser, AppRoute.Modules, AppRoute.Logs) &&
-                                targetState.destination.route in listOf(AppRoute.Home, AppRoute.Superuser, AppRoute.Modules, AppRoute.Logs)
-                        if (isTopLevelNav) {
-                            fadeIn(animationSpec = tween(300, easing = LinearOutSlowInEasing)) +
-                                    scaleIn(initialScale = 1.03f, animationSpec = tween(300, easing = FastOutSlowInEasing))
-                        } else {
-                            slideIntoContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.End,
-                                animationSpec = tween(400, easing = FastOutSlowInEasing)
-                            ) + fadeIn(animationSpec = tween(400, easing = LinearOutSlowInEasing)) +
-                                    scaleIn(initialScale = 1.05f, animationSpec = tween(400, easing = FastOutSlowInEasing))
-                        }
+                        unifiedScreenEnterTransition(
+                            getNavigationDirection(
+                                initialState.destination.route,
+                                targetState.destination.route
+                            )
+                        )
                     },
                     popExitTransition = {
-                        val isTopLevelNav = initialState.destination.route in listOf(AppRoute.Home, AppRoute.Superuser, AppRoute.Modules, AppRoute.Logs) &&
-                                targetState.destination.route in listOf(AppRoute.Home, AppRoute.Superuser, AppRoute.Modules, AppRoute.Logs)
-                        if (isTopLevelNav) {
-                            fadeOut(animationSpec = tween(300, easing = LinearOutSlowInEasing)) +
-                                    scaleOut(targetScale = 0.97f, animationSpec = tween(300, easing = FastOutSlowInEasing))
-                        } else {
-                            slideOutOfContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.End,
-                                animationSpec = tween(400, easing = FastOutSlowInEasing)
-                            ) + fadeOut(animationSpec = tween(400, easing = LinearEasing)) +
-                                    scaleOut(targetScale = 0.95f, animationSpec = tween(400, easing = FastOutSlowInEasing))
-                        }
+                        unifiedScreenExitTransition(
+                            getNavigationDirection(
+                                initialState.destination.route,
+                                targetState.destination.route
+                            )
+                        )
                     }
                 ) {
                     composable(AppRoute.Home) {
@@ -227,13 +265,41 @@ fun MagiskAppContainer(
                                 homeRebootConsumedToken = homeRebootRequestToken
                             },
                             onOpenInstall = { navController.navigate(AppRoute.Install) },
-                            onOpenUninstall = { navController.navigate(AppRoute.flash(Const.Value.UNINSTALL, null)) }
+                            onOpenUninstall = {
+                                navController.navigate(
+                                    AppRoute.flash(
+                                        Const.Value.UNINSTALL,
+                                        null
+                                    )
+                                )
+                            }
                         )
                     }
-                    composable(AppRoute.Modules) { ModuleScreen(onInstallZip = { uri -> navController.navigate(AppRoute.flash(Const.Value.FLASH_ZIP, uri.toString())) }, onRunAction = { id, name -> navController.navigate(AppRoute.moduleAction(id, name)) }) }
-                    composable(AppRoute.Superuser) { SuperuserScreen(onOpenLogs = { navController.navigate(AppRoute.History) }) }
+                    composable(AppRoute.Modules) {
+                        ModuleScreen(
+                            onInstallZip = { uri ->
+                                navController.navigate(
+                                    AppRoute.flash(Const.Value.FLASH_ZIP, uri.toString())
+                                )
+                            },
+                            onRunAction = { id, name ->
+                                navController.navigate(
+                                    AppRoute.moduleAction(
+                                        id,
+                                        name
+                                    )
+                                )
+                            })
+                    }
+                    composable(AppRoute.Superuser) {
+                        SuperuserScreen(onOpenLogs = {
+                            navController.navigate(
+                                AppRoute.History
+                            )
+                        })
+                    }
                     composable(AppRoute.Logs) { LogsScreen() }
-                    
+
                     composable(AppRoute.Settings) {
                         SettingsScreen(
                             onOpenDenyList = { navController.navigate(AppRoute.DenyList) },
@@ -247,8 +313,21 @@ fun MagiskAppContainer(
                     }
                     composable(AppRoute.History) { SuperuserLogsScreen() }
                     composable(AppRoute.DenyList) { DenyListScreen(onBack = { navController.popBackStack() }) }
-                    composable(AppRoute.Install) { InstallScreen(onStartFlash = { action, uri -> navController.navigate(AppRoute.flash(action, uri?.toString())) }) }
-                    composable(route = AppRoute.FlashPattern, arguments = listOf(navArgument("action") { type = NavType.StringType }, navArgument("uri") { type = NavType.StringType; nullable = true; defaultValue = null })) { entry ->
+                    composable(AppRoute.Install) {
+                        InstallScreen(onStartFlash = { action, uri ->
+                            navController.navigate(
+                                AppRoute.flash(action, uri?.toString())
+                            )
+                        })
+                    }
+                    composable(
+                        route = AppRoute.FlashPattern,
+                        arguments = listOf(
+                            navArgument("action") { type = NavType.StringType },
+                            navArgument("uri") {
+                                type = NavType.StringType; nullable = true; defaultValue = null
+                            })
+                    ) { entry ->
                         val action = entry.arguments?.getString("action").orEmpty()
                         val uriArg = entry.arguments?.getString("uri")
                         FlashScreen(
@@ -262,7 +341,12 @@ fun MagiskAppContainer(
                             onBack = { navController.popBackStack() }
                         )
                     }
-                    composable(route = AppRoute.ModuleActionPattern, arguments = listOf(navArgument("id") { type = NavType.StringType }, navArgument("name") { type = NavType.StringType; defaultValue = "" })) { entry ->
+                    composable(
+                        route = AppRoute.ModuleActionPattern,
+                        arguments = listOf(
+                            navArgument("id") { type = NavType.StringType },
+                            navArgument("name") { type = NavType.StringType; defaultValue = "" })
+                    ) { entry ->
                         val id = entry.arguments?.getString("id").orEmpty()
                         val name = entry.arguments?.getString("name").orEmpty()
                         val safeName = runCatching { Uri.decode(name) }.getOrDefault(name)
@@ -290,7 +374,7 @@ fun MagiskAppContainer(
                                     launchSingleTop = true
                                     restoreState = true
                                 }
-                        })
+                            })
                     }
                 }
             }
@@ -331,14 +415,20 @@ private fun MagiskFloatingTopBar(
         shadowElevation = 0.dp
     ) {
         Row(
-            modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (!isRootRoute) {
                 IconButton(
                     enabled = backEnabled,
                     onClick = onBack,
-                    modifier = Modifier.background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f), CircleShape)
+                    modifier = Modifier.background(
+                        MaterialTheme.colorScheme.surfaceVariant.copy(
+                            alpha = 0.3f
+                        ), CircleShape
+                    )
                 ) {
                     Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = null)
                 }
@@ -372,12 +462,24 @@ private fun MagiskFloatingTopBar(
                     targetState = processState,
                     transitionSpec = {
                         if (targetState.running != initialState.running || targetState.hasResult != initialState.hasResult) {
-                            (fadeIn(animationSpec = tween(120)) + scaleIn(initialScale = 0.96f, animationSpec = tween(120)) togetherWith
-                                fadeOut(animationSpec = tween(90)) + scaleOut(targetScale = 0.98f, animationSpec = tween(90)))
+                            (fadeIn(animationSpec = tween(120)) + scaleIn(
+                                initialScale = 0.96f,
+                                animationSpec = tween(120)
+                            ) togetherWith
+                                    fadeOut(animationSpec = tween(90)) + scaleOut(
+                                targetScale = 0.98f,
+                                animationSpec = tween(90)
+                            ))
                                 .using(SizeTransform(clip = false))
                         } else {
-                            (fadeIn(animationSpec = tween(110)) + scaleIn(initialScale = 0.98f, animationSpec = tween(110)) togetherWith
-                                fadeOut(animationSpec = tween(80)) + scaleOut(targetScale = 0.99f, animationSpec = tween(80)))
+                            (fadeIn(animationSpec = tween(110)) + scaleIn(
+                                initialScale = 0.98f,
+                                animationSpec = tween(110)
+                            ) togetherWith
+                                    fadeOut(animationSpec = tween(80)) + scaleOut(
+                                targetScale = 0.99f,
+                                animationSpec = tween(80)
+                            ))
                                 .using(SizeTransform(clip = false))
                         }
                     },
@@ -434,11 +536,12 @@ private fun MagiskFloatingTopBar(
                     AppRoute.ModuleActionPattern -> moduleRunTitleOverride ?: baseTitleText
                     else -> baseTitleText
                 }
-                val titleText = if (currentRoute == AppRoute.FlashPattern || currentRoute == AppRoute.ModuleActionPattern) {
-                    resolvedTitleText
-                } else {
-                    resolvedTitleText.uppercase()
-                }
+                val titleText =
+                    if (currentRoute == AppRoute.FlashPattern || currentRoute == AppRoute.ModuleActionPattern) {
+                        resolvedTitleText
+                    } else {
+                        resolvedTitleText.uppercase()
+                    }
                 val subtitleText = when (currentRoute) {
                     AppRoute.FlashPattern -> flashSubtitleOverride
                     AppRoute.ModuleActionPattern -> moduleRunSubtitleOverride ?: moduleActionName
@@ -449,12 +552,24 @@ private fun MagiskFloatingTopBar(
                     targetState = titleText,
                     transitionSpec = {
                         if (currentRoute == AppRoute.FlashPattern || currentRoute == AppRoute.ModuleActionPattern) {
-                            (fadeIn(animationSpec = tween(120)) + scaleIn(initialScale = 0.98f, animationSpec = tween(120)) togetherWith
-                                fadeOut(animationSpec = tween(90)) + scaleOut(targetScale = 0.99f, animationSpec = tween(90)))
+                            (fadeIn(animationSpec = tween(120)) + scaleIn(
+                                initialScale = 0.98f,
+                                animationSpec = tween(120)
+                            ) togetherWith
+                                    fadeOut(animationSpec = tween(90)) + scaleOut(
+                                targetScale = 0.99f,
+                                animationSpec = tween(90)
+                            ))
                                 .using(SizeTransform(clip = false))
                         } else {
-                            (fadeIn(animationSpec = tween(110)) + scaleIn(initialScale = 0.99f, animationSpec = tween(110)) togetherWith
-                                fadeOut(animationSpec = tween(80)) + scaleOut(targetScale = 0.995f, animationSpec = tween(80)))
+                            (fadeIn(animationSpec = tween(110)) + scaleIn(
+                                initialScale = 0.99f,
+                                animationSpec = tween(110)
+                            ) togetherWith
+                                    fadeOut(animationSpec = tween(80)) + scaleOut(
+                                targetScale = 0.995f,
+                                animationSpec = tween(80)
+                            ))
                                 .using(SizeTransform(clip = false))
                         }
                     },
@@ -491,7 +606,11 @@ private fun MagiskFloatingTopBar(
                 ) {
                     IconButton(
                         onClick = onHomePower,
-                        modifier = Modifier.background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f), CircleShape)
+                        modifier = Modifier.background(
+                            MaterialTheme.colorScheme.surfaceVariant.copy(
+                                alpha = 0.3f
+                            ), CircleShape
+                        )
                     ) {
                         Icon(
                             Icons.Rounded.PowerSettingsNew,
@@ -500,9 +619,16 @@ private fun MagiskFloatingTopBar(
                     }
                     IconButton(
                         onClick = onOpenSettings,
-                        modifier = Modifier.background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f), CircleShape)
+                        modifier = Modifier.background(
+                            MaterialTheme.colorScheme.surfaceVariant.copy(
+                                alpha = 0.3f
+                            ), CircleShape
+                        )
                     ) {
-                        Icon(Icons.Rounded.Settings, contentDescription = stringResource(id = CoreR.string.settings))
+                        Icon(
+                            Icons.Rounded.Settings,
+                            contentDescription = stringResource(id = CoreR.string.settings)
+                        )
                     }
                 }
             } else {
@@ -515,24 +641,49 @@ private fun MagiskFloatingTopBar(
 @Composable
 private fun ExpressiveSnackbar(snackbarData: SnackbarData) {
     Surface(
-        modifier = Modifier.padding(16.dp).padding(bottom = 120.dp),
+        modifier = Modifier
+            .padding(16.dp)
+            .padding(bottom = 120.dp),
         shape = RoundedCornerShape(24.dp),
         color = MaterialTheme.colorScheme.surfaceContainerHighest,
         tonalElevation = 6.dp,
         shadowElevation = 8.dp
     ) {
-        Row(modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            Surface(color = MaterialTheme.colorScheme.primaryContainer, shape = CircleShape, modifier = Modifier.size(32.dp)) {
-                Icon(Icons.Rounded.Info, null, tint = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.padding(6.dp))
+        Row(
+            modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Surface(
+                color = MaterialTheme.colorScheme.primaryContainer,
+                shape = CircleShape,
+                modifier = Modifier.size(32.dp)
+            ) {
+                Icon(
+                    Icons.Rounded.Info,
+                    null,
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier.padding(6.dp)
+                )
             }
-            Text(text = snackbarData.visuals.message, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.weight(1f))
+            Text(
+                text = snackbarData.visuals.message,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.weight(1f)
+            )
             if (snackbarData.visuals.actionLabel != null) {
                 Button(
                     onClick = { snackbarData.performAction() },
                     shape = RoundedCornerShape(12.dp),
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
-                ) { 
-                    Text(snackbarData.visuals.actionLabel!!, fontWeight = FontWeight.Black, fontSize = 12.sp) 
+                ) {
+                    Text(
+                        snackbarData.visuals.actionLabel!!,
+                        fontWeight = FontWeight.Black,
+                        fontSize = 12.sp
+                    )
                 }
             }
         }
@@ -560,7 +711,10 @@ private fun MagiskFloatingBottomBar(
 
     Surface(
         modifier = barModifier,
-        shape = if (floating) RoundedCornerShape(32.dp) else RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+        shape = if (floating) RoundedCornerShape(32.dp) else RoundedCornerShape(
+            topStart = 20.dp,
+            topEnd = 20.dp
+        ),
         color = if (floating) {
             MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.95f)
         } else {
@@ -570,7 +724,9 @@ private fun MagiskFloatingBottomBar(
         shadowElevation = if (floating) 16.dp else 0.dp
     ) {
         Row(
-            modifier = Modifier.fillMaxSize().padding(horizontal = if (floating) 8.dp else 12.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = if (floating) 8.dp else 12.dp),
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -581,7 +737,7 @@ private fun MagiskFloatingBottomBar(
                     animationSpec = tween(durationMillis = 180, easing = FastOutSlowInEasing),
                     label = "iconScale"
                 )
-                
+
                 val containerColor by animateColorAsState(
                     targetValue = if (selected) {
                         if (floating) MaterialTheme.colorScheme.primaryContainer
@@ -598,14 +754,18 @@ private fun MagiskFloatingBottomBar(
                         .padding(horizontal = 4.dp)
                         .clip(CircleShape)
                         .background(containerColor)
-                        .clickable(enabled = !selected) { onNavigate(dest.route) }, 
+                        .clickable(enabled = !selected) { onNavigate(dest.route) },
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        imageVector = if (selected) dest.selectedIcon else dest.icon, 
-                        contentDescription = stringResource(id = dest.labelRes), 
-                        modifier = Modifier.size(28.dp).scale(scale), 
-                        tint = if (selected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                        imageVector = if (selected) dest.selectedIcon else dest.icon,
+                        contentDescription = stringResource(id = dest.labelRes),
+                        modifier = Modifier
+                            .size(28.dp)
+                            .scale(scale),
+                        tint = if (selected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                            alpha = 0.7f
+                        )
                     )
                 }
             }
@@ -613,13 +773,36 @@ private fun MagiskFloatingBottomBar(
     }
 }
 
-private enum class AppDestination(val route: String, val icon: ImageVector, val selectedIcon: ImageVector, val labelRes: Int) {
+private enum class AppDestination(
+    val route: String,
+    val icon: ImageVector,
+    val selectedIcon: ImageVector,
+    val labelRes: Int
+) {
     Home(AppRoute.Home, Icons.Rounded.Home, Icons.Rounded.Home, CoreR.string.section_home),
-    Modules(AppRoute.Modules, Icons.Rounded.Extension, Icons.Rounded.Extension, CoreR.string.modules),
-    Superuser(AppRoute.Superuser, Icons.Rounded.Shield, Icons.Rounded.Shield, CoreR.string.superuser),
+    Modules(
+        AppRoute.Modules,
+        Icons.Rounded.Extension,
+        Icons.Rounded.Extension,
+        CoreR.string.modules
+    ),
+    Superuser(
+        AppRoute.Superuser,
+        Icons.Rounded.Shield,
+        Icons.Rounded.Shield,
+        CoreR.string.superuser
+    ),
     Logs(AppRoute.Logs, Icons.Rounded.Terminal, Icons.Rounded.Terminal, CoreR.string.logs),
-    Settings(AppRoute.Settings, Icons.Rounded.Settings, Icons.Rounded.Settings, CoreR.string.settings);
-    companion object { val entries = values().toList() }
+    Settings(
+        AppRoute.Settings,
+        Icons.Rounded.Settings,
+        Icons.Rounded.Settings,
+        CoreR.string.settings
+    );
+
+    companion object {
+        val entries = values().toList()
+    }
 }
 
 data class RouteProcessTopBarState(
@@ -629,9 +812,22 @@ data class RouteProcessTopBarState(
 )
 
 private object AppRoute {
-    const val Home = "home"; const val Modules = "modules"; const val Superuser = "superuser"; const val History = "history"; const val Logs = "logs"; const val Settings = "settings"; const val Theme = "theme"; const val DenyList = "denylist"; const val Install = "install"; const val FlashPattern = "flash/{action}?uri={uri}"; const val ModuleActionPattern = "module-action/{id}/{name}"
-    fun flash(a: String, u: String?): String = "flash/${Uri.encode(a)}?uri=${u?.let { Uri.encode(it) } ?: ""}"
-    fun moduleAction(i: String, n: String): String = "module-action/${Uri.encode(i)}/${Uri.encode(n)}"
+    const val Home = "home";
+    const val Modules = "modules";
+    const val Superuser = "superuser";
+    const val History = "history";
+    const val Logs = "logs";
+    const val Settings = "settings";
+    const val Theme = "theme";
+    const val DenyList = "denylist";
+    const val Install = "install";
+    const val FlashPattern = "flash/{action}?uri={uri}";
+    const val ModuleActionPattern = "module-action/{id}/{name}"
+    fun flash(a: String, u: String?): String =
+        "flash/${Uri.encode(a)}?uri=${u?.let { Uri.encode(it) } ?: ""}"
+
+    fun moduleAction(i: String, n: String): String =
+        "module-action/${Uri.encode(i)}/${Uri.encode(n)}"
 }
 
 private fun getRoutePriority(route: String?): Int = when (route) {
@@ -644,7 +840,10 @@ private fun getRoutePriority(route: String?): Int = when (route) {
     else -> 6
 }
 
-private fun getNavigationDirection(initial: String?, target: String?): AnimatedContentTransitionScope.SlideDirection {
+private fun getNavigationDirection(
+    initial: String?,
+    target: String?
+): AnimatedContentTransitionScope.SlideDirection {
     return if (getRoutePriority(target) >= getRoutePriority(initial)) {
         AnimatedContentTransitionScope.SlideDirection.Left
     } else {
@@ -652,11 +851,52 @@ private fun getNavigationDirection(initial: String?, target: String?): AnimatedC
     }
 }
 
+private const val SCREEN_NAV_SLIDE_MS = 320
+private const val SCREEN_NAV_FADE_IN_MS = 260
+private const val SCREEN_NAV_FADE_OUT_MS = 220
+private const val SCREEN_NAV_SCALE_MS = 300
+
+private fun AnimatedContentTransitionScope<*>.unifiedScreenEnterTransition(
+    direction: AnimatedContentTransitionScope.SlideDirection
+): EnterTransition {
+    return slideIntoContainer(
+        towards = direction,
+        animationSpec = tween(SCREEN_NAV_SLIDE_MS, easing = FastOutSlowInEasing)
+    ) + fadeIn(
+        animationSpec = tween(SCREEN_NAV_FADE_IN_MS, easing = LinearOutSlowInEasing)
+    ) + scaleIn(
+        initialScale = 0.98f,
+        animationSpec = tween(SCREEN_NAV_SCALE_MS, easing = FastOutSlowInEasing)
+    )
+}
+
+private fun AnimatedContentTransitionScope<*>.unifiedScreenExitTransition(
+    direction: AnimatedContentTransitionScope.SlideDirection
+): ExitTransition {
+    return slideOutOfContainer(
+        towards = direction,
+        animationSpec = tween(SCREEN_NAV_SLIDE_MS, easing = FastOutSlowInEasing)
+    ) + fadeOut(
+        animationSpec = tween(SCREEN_NAV_FADE_OUT_MS, easing = FastOutLinearInEasing)
+    ) + scaleOut(
+        targetScale = 0.98f,
+        animationSpec = tween(SCREEN_NAV_SCALE_MS, easing = FastOutSlowInEasing)
+    )
+}
+
 @Composable
 fun fallbackColorScheme(darkTheme: Boolean): ColorScheme {
     val color = @Composable { id: Int -> colorResource(id = id) }
-    return if (darkTheme) darkColorScheme(primary = color(R.color.theme_default_primary), surface = color(R.color.theme_default_surface), background = color(R.color.theme_default_surface_surface_variant))
-    else lightColorScheme(primary = color(R.color.theme_default_primary), surface = color(R.color.theme_default_surface), background = color(R.color.theme_default_surface_surface_variant))
+    return if (darkTheme) darkColorScheme(
+        primary = color(R.color.theme_default_primary),
+        surface = color(R.color.theme_default_surface),
+        background = color(R.color.theme_default_surface_surface_variant)
+    )
+    else lightColorScheme(
+        primary = color(R.color.theme_default_primary),
+        surface = color(R.color.theme_default_surface),
+        background = color(R.color.theme_default_surface_surface_variant)
+    )
 }
 
 private val LOGS_RESERVED_BOTTOM_SPACE = 120.dp

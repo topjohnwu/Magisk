@@ -6,11 +6,10 @@ import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.core.AppContext
 import com.topjohnwu.magisk.core.BuildConfig.APP_VERSION_CODE
-import com.topjohnwu.magisk.core.Config
+import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.repository.NetworkService
-import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.ui.navigation.Route
 import io.noties.markwon.Markwon
 import kotlinx.coroutines.Dispatchers
@@ -79,9 +78,11 @@ class InstallViewModel(svc: NetworkService, markwon: Markwon) : BaseViewModel() 
                 AppContext.toast(CoreR.string.patch_file_msg, Toast.LENGTH_LONG)
                 _uiState.update { it.copy(requestFilePicker = true) }
             }
+
             Method.INACTIVE_SLOT -> {
                 _uiState.update { it.copy(showSecondSlotWarning = true) }
             }
+
             else -> {}
         }
     }
@@ -103,16 +104,25 @@ class InstallViewModel(svc: NetworkService, markwon: Markwon) : BaseViewModel() 
 
     fun install() {
         when (_uiState.value.method) {
-            Method.PATCH -> navigateTo(Route.Flash(
-                action = Const.Value.PATCH_FILE,
-                additionalData = _uiState.value.patchUri!!.toString()
-            ))
-            Method.DIRECT -> navigateTo(Route.Flash(
-                action = Const.Value.FLASH_MAGISK
-            ))
-            Method.INACTIVE_SLOT -> navigateTo(Route.Flash(
-                action = Const.Value.FLASH_INACTIVE_SLOT
-            ))
+            Method.PATCH -> navigateTo(
+                Route.Flash(
+                    action = Const.Value.PATCH_FILE,
+                    additionalData = _uiState.value.patchUri!!.toString()
+                )
+            )
+
+            Method.DIRECT -> navigateTo(
+                Route.Flash(
+                    action = Const.Value.FLASH_MAGISK
+                )
+            )
+
+            Method.INACTIVE_SLOT -> navigateTo(
+                Route.Flash(
+                    action = Const.Value.FLASH_INACTIVE_SLOT
+                )
+            )
+
             else -> error("Unknown method")
         }
     }

@@ -8,26 +8,88 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.animation.*
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.rounded.AppShortcut
+import androidx.compose.material.icons.rounded.ArrowOutward
+import androidx.compose.material.icons.rounded.Bolt
+import androidx.compose.material.icons.rounded.BrowserUpdated
+import androidx.compose.material.icons.rounded.ChevronRight
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.DeleteForever
+import androidx.compose.material.icons.rounded.DeleteSweep
+import androidx.compose.material.icons.rounded.Download
+import androidx.compose.material.icons.rounded.DownloadDone
+import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.icons.rounded.GppMaybe
+import androidx.compose.material.icons.rounded.Groups
+import androidx.compose.material.icons.rounded.History
+import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.PowerSettingsNew
+import androidx.compose.material.icons.rounded.RestartAlt
+import androidx.compose.material.icons.rounded.SettingsBackupRestore
+import androidx.compose.material.icons.rounded.SystemUpdateAlt
+import androidx.compose.material.icons.rounded.Terminal
+import androidx.compose.material.icons.rounded.Verified
+import androidx.compose.material.icons.rounded.VerifiedUser
+import androidx.compose.material.icons.rounded.Visibility
+import androidx.compose.material.icons.rounded.VisibilityOff
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.toArgb
@@ -44,35 +106,33 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.topjohnwu.magisk.core.AppContext
 import com.topjohnwu.magisk.core.BuildConfig
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.download.DownloadEngine
 import com.topjohnwu.magisk.core.download.Subject
-import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.ktx.await
+import com.topjohnwu.magisk.core.ktx.reboot
 import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.repository.NetworkService
 import com.topjohnwu.magisk.core.tasks.AppMigration
 import com.topjohnwu.magisk.core.tasks.MagiskInstaller
-import com.topjohnwu.magisk.core.ktx.reboot
 import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.ui.RefreshOnResume
 import com.topjohnwu.magisk.ui.component.rememberLoadingDialog
-import com.topjohnwu.magisk.ui.home.HomeViewModel
-import com.topjohnwu.magisk.core.R as CoreR
+import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import retrofit2.Retrofit
@@ -80,8 +140,8 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.Query
-import com.topjohnwu.superuser.Shell
 import java.util.Locale
+import com.topjohnwu.magisk.core.R as CoreR
 
 @Composable
 fun HomeScreen(
@@ -173,7 +233,11 @@ fun HomeScreen(
                         updateChannelName = state.updateChannelName,
                         packageName = state.packageName,
                         isHidden = context.packageName != BuildConfig.APP_PACKAGE_NAME,
-                        onAction = { viewModel.onManagerPressed { showManagerInstallSheet = true } },
+                        onAction = {
+                            viewModel.onManagerPressed {
+                                showManagerInstallSheet = true
+                            }
+                        },
                         onHideRestore = viewModel::onHideRestorePressed
                     )
                 }
@@ -245,8 +309,8 @@ fun HomeScreen(
             onFix = {
                 showEnvFixDialog = false
                 val needsFullFix = envFixCode == 2 ||
-                    Info.env.versionCode != BuildConfig.APP_VERSION_CODE ||
-                    Info.env.versionString != BuildConfig.APP_VERSION_NAME
+                        Info.env.versionCode != BuildConfig.APP_VERSION_CODE ||
+                        Info.env.versionString != BuildConfig.APP_VERSION_NAME
                 if (needsFullFix) {
                     onOpenInstall()
                 } else {
@@ -1385,8 +1449,8 @@ private fun EnvFixExpressiveDialog(
     onFix: () -> Unit
 ) {
     val needsFullFix = code == 2 ||
-        Info.env.versionCode != BuildConfig.APP_VERSION_CODE ||
-        Info.env.versionString != BuildConfig.APP_VERSION_NAME
+            Info.env.versionCode != BuildConfig.APP_VERSION_CODE ||
+            Info.env.versionString != BuildConfig.APP_VERSION_NAME
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -1665,8 +1729,9 @@ class HomeComposeViewModel(private val svc: NetworkService) : ViewModel() {
                 Info.env.versionCode < BuildConfig.APP_VERSION_CODE -> HomeViewModel.State.OUTDATED
                 else -> HomeViewModel.State.UP_TO_DATE
             }
-            val managerInstalled = "${BuildConfig.APP_VERSION_NAME} (${BuildConfig.APP_VERSION_CODE})" +
-                if (BuildConfig.DEBUG) " (D)" else ""
+            val managerInstalled =
+                "${BuildConfig.APP_VERSION_NAME} (${BuildConfig.APP_VERSION_CODE})" +
+                        if (BuildConfig.DEBUG) " (D)" else ""
 
             _state.update {
                 it.copy(
@@ -1721,9 +1786,11 @@ class HomeComposeViewModel(private val svc: NetworkService) : ViewModel() {
             HomeViewModel.State.LOADING -> {
                 _messages.tryEmit(AppContext.getString(CoreR.string.loading))
             }
+
             HomeViewModel.State.INVALID -> {
                 _messages.tryEmit(AppContext.getString(CoreR.string.no_connection))
             }
+
             else -> onShowInstallSheet()
         }
     }

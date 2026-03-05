@@ -5,24 +5,57 @@ import android.os.Build
 import android.widget.TextView
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.GetContent
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.background
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
-import androidx.compose.material.icons.rounded.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.DynamicFeed
+import androidx.compose.material.icons.rounded.FileCopy
+import androidx.compose.material.icons.rounded.FlashOn
+import androidx.compose.material.icons.rounded.HistoryEdu
+import androidx.compose.material.icons.rounded.SettingsSuggest
+import androidx.compose.material.icons.rounded.Tune
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -42,7 +75,6 @@ import com.topjohnwu.magisk.core.utils.MediaStoreUtils.displayName
 import com.topjohnwu.magisk.ui.component.ConfirmResult
 import com.topjohnwu.magisk.ui.component.rememberConfirmDialog
 import com.topjohnwu.magisk.ui.navigation.Route
-import kotlinx.coroutines.flow.collect
 import com.topjohnwu.magisk.core.R as CoreR
 
 @Composable
@@ -69,7 +101,8 @@ fun InstallScreen(
 
     LaunchedEffect(state.showSecondSlotWarning) {
         if (state.showSecondSlotWarning) {
-            val result = secondSlotDialog.awaitConfirm(title = secondSlotTitle, content = secondSlotMsg)
+            val result =
+                secondSlotDialog.awaitConfirm(title = secondSlotTitle, content = secondSlotMsg)
             viewModel.onSecondSlotWarningConsumed()
             if (result == ConfirmResult.Confirmed) {
                 viewModel.install()
@@ -88,7 +121,12 @@ fun InstallScreen(
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(bottom = 140.dp, start = 20.dp, end = 20.dp, top = 12.dp),
+            contentPadding = PaddingValues(
+                bottom = 140.dp,
+                start = 20.dp,
+                end = 20.dp,
+                top = 12.dp
+            ),
             verticalArrangement = Arrangement.spacedBy(28.dp)
         ) {
             if (!viewModel.skipOptions) {
@@ -115,12 +153,14 @@ fun InstallScreen(
                             visible = !Info.ramdisk,
                             onToggle = { Config.recovery = it }
                         )
-                        
+
                         if (state.step == 0) {
                             Box(modifier = Modifier.padding(16.dp)) {
                                 Button(
                                     onClick = viewModel::nextStep,
-                                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(56.dp),
                                     shape = RoundedCornerShape(16.dp),
                                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                                 ) {
@@ -130,7 +170,11 @@ fun InstallScreen(
                                         fontWeight = FontWeight.ExtraBold
                                     )
                                     Spacer(Modifier.width(8.dp))
-                                    Icon(Icons.AutoMirrored.Rounded.ArrowForward, null, modifier = Modifier.size(20.dp))
+                                    Icon(
+                                        Icons.AutoMirrored.Rounded.ArrowForward,
+                                        null,
+                                        modifier = Modifier.size(20.dp)
+                                    )
                                 }
                             }
                         }
@@ -189,7 +233,12 @@ fun InstallScreen(
                                 }
                             }
                         } else {
-                            Box(modifier = Modifier.padding(24.dp).fillMaxWidth(), contentAlignment = Alignment.Center) {
+                            Box(
+                                modifier = Modifier
+                                    .padding(24.dp)
+                                    .fillMaxWidth(),
+                                contentAlignment = Alignment.Center
+                            ) {
                                 Text(
                                     stringResource(id = CoreR.string.install_complete_options_first),
                                     style = MaterialTheme.typography.bodyLarge,
@@ -250,7 +299,7 @@ private fun InstallSection(
                 color = MaterialTheme.colorScheme.outline
             )
         }
-        
+
         ElevatedCard(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(28.dp),
@@ -268,25 +317,33 @@ private fun InstallSection(
 }
 
 @Composable
-private fun ExpressiveToggleRow(title: String, checked: Boolean, visible: Boolean, onToggle: (Boolean) -> Unit) {
+private fun ExpressiveToggleRow(
+    title: String,
+    checked: Boolean,
+    visible: Boolean,
+    onToggle: (Boolean) -> Unit
+) {
     if (!visible) return
     Surface(
         color = Color.Transparent,
-        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).clickable { onToggle(!checked) }
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .clickable { onToggle(!checked) }
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 24.dp, vertical = 18.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                title, 
-                modifier = Modifier.weight(1f), 
-                style = MaterialTheme.typography.titleMedium, 
+                title,
+                modifier = Modifier.weight(1f),
+                style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
             )
             Switch(
-                checked = checked, 
+                checked = checked,
                 onCheckedChange = onToggle,
                 thumbContent = if (checked) {
                     { Icon(Icons.Rounded.Check, null, Modifier.size(16.dp)) }
@@ -298,10 +355,10 @@ private fun ExpressiveToggleRow(title: String, checked: Boolean, visible: Boolea
 
 @Composable
 private fun ExpressiveMethodRow(
-    title: String, 
-    subtitle: String, 
-    selected: Boolean, 
-    icon: ImageVector, 
+    title: String,
+    subtitle: String,
+    selected: Boolean,
+    icon: ImageVector,
     onClick: () -> Unit
 ) {
     val backgroundColor by animateColorAsState(
@@ -336,7 +393,10 @@ private fun ExpressiveMethodRow(
             }
             Spacer(Modifier.width(16.dp))
             Column(Modifier.weight(1f)) {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
                     Text(
                         title,
                         style = MaterialTheme.typography.titleMedium,

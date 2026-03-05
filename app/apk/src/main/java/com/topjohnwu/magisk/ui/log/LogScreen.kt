@@ -1,10 +1,28 @@
 package com.topjohnwu.magisk.ui.log
 
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-import androidx.compose.animation.*
-import androidx.compose.foundation.background
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -13,17 +31,49 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.rounded.ArrowDownward
+import androidx.compose.material.icons.rounded.Article
+import androidx.compose.material.icons.rounded.BugReport
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Dangerous
+import androidx.compose.material.icons.rounded.DeleteSweep
+import androidx.compose.material.icons.rounded.Error
+import androidx.compose.material.icons.rounded.HelpOutline
+import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.SaveAlt
+import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material.icons.rounded.Terminal
+import androidx.compose.material.icons.rounded.Warning
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -43,20 +93,20 @@ import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.ktx.timeFormatStandard
 import com.topjohnwu.magisk.core.ktx.toTime
 import com.topjohnwu.magisk.core.repository.LogRepository
-import com.topjohnwu.magisk.ui.RefreshOnResume
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
-import com.topjohnwu.magisk.core.R as CoreR
+import com.topjohnwu.magisk.ui.RefreshOnResume
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import com.topjohnwu.magisk.core.R as CoreR
 
 @Composable
 fun LogsScreen(
@@ -67,7 +117,7 @@ fun LogsScreen(
     val activity = LocalContext.current as? UIActivity<*>
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
-    
+
     var filter by remember { mutableStateOf(LogDisplayFilter.ALL) }
     var searchQuery by remember { mutableStateOf("") }
     var isSearchActive by remember { mutableStateOf(false) }
@@ -78,16 +128,26 @@ fun LogsScreen(
             LogDisplayFilter.ISSUES -> state.visibleLogs.filter {
                 it.level == MagiskLogLevel.WARN || it.level == MagiskLogLevel.ERROR || it.level == MagiskLogLevel.FATAL
             }
-            LogDisplayFilter.MAGISK -> state.visibleLogs.filter { it.tag.contains("magisk", ignoreCase = true) }
+
+            LogDisplayFilter.MAGISK -> state.visibleLogs.filter {
+                it.tag.contains(
+                    "magisk",
+                    ignoreCase = true
+                )
+            }
+
             LogDisplayFilter.SU -> state.visibleLogs.filter {
-                it.message.startsWith("su:", ignoreCase = true) || it.raw.startsWith("su:", ignoreCase = true)
+                it.message.startsWith("su:", ignoreCase = true) || it.raw.startsWith(
+                    "su:",
+                    ignoreCase = true
+                )
             }
         }
         if (searchQuery.isEmpty()) base
-        else base.filter { 
-            it.message.contains(searchQuery, ignoreCase = true) || 
-            it.tag.contains(searchQuery, ignoreCase = true) ||
-            it.raw.contains(searchQuery, ignoreCase = true)
+        else base.filter {
+            it.message.contains(searchQuery, ignoreCase = true) ||
+                    it.tag.contains(searchQuery, ignoreCase = true) ||
+                    it.raw.contains(searchQuery, ignoreCase = true)
         }
     }
 
@@ -120,14 +180,20 @@ fun LogsScreen(
                 val issueCount = state.visibleLogs.count {
                     it.level == MagiskLogLevel.WARN || it.level == MagiskLogLevel.ERROR || it.level == MagiskLogLevel.FATAL
                 }
-                val magiskCount = state.visibleLogs.count { it.tag.contains("magisk", ignoreCase = true) }
+                val magiskCount =
+                    state.visibleLogs.count { it.tag.contains("magisk", ignoreCase = true) }
                 val suCount = state.visibleLogs.count {
-                    it.message.startsWith("su:", ignoreCase = true) || it.raw.startsWith("su:", ignoreCase = true)
+                    it.message.startsWith("su:", ignoreCase = true) || it.raw.startsWith(
+                        "su:",
+                        ignoreCase = true
+                    )
                 }
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth().height(56.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
                 ) {
                     AnimatedContent(
                         targetState = isSearchActive,
@@ -143,9 +209,15 @@ fun LogsScreen(
                                 onValueChange = { searchQuery = it },
                                 modifier = Modifier.fillMaxWidth(),
                                 placeholder = { Text("Cerca nei log...", fontSize = 14.sp) },
-                                leadingIcon = { Icon(Icons.Rounded.Search, null, modifier = Modifier.size(20.dp)) },
+                                leadingIcon = {
+                                    Icon(
+                                        Icons.Rounded.Search,
+                                        null,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                },
                                 trailingIcon = {
-                                    IconButton(onClick = { 
+                                    IconButton(onClick = {
                                         isSearchActive = false
                                         searchQuery = ""
                                     }) {
@@ -173,7 +245,7 @@ fun LogsScreen(
                             )
                         }
                     }
-                    
+
                     if (!isSearchActive) {
                         Spacer(Modifier.width(8.dp))
                         Surface(
@@ -183,12 +255,16 @@ fun LogsScreen(
                             modifier = Modifier.size(48.dp)
                         ) {
                             Box(contentAlignment = Alignment.Center) {
-                                Icon(Icons.Rounded.Search, null, tint = MaterialTheme.colorScheme.onSecondaryContainer)
+                                Icon(
+                                    Icons.Rounded.Search,
+                                    null,
+                                    tint = MaterialTheme.colorScheme.onSecondaryContainer
+                                )
                             }
                         }
                     }
                 }
-                
+
                 Spacer(Modifier.height(12.dp))
 
                 LazyColumn(
@@ -248,7 +324,9 @@ fun LogsScreen(
 
         SnackbarHost(
             hostState = snackbarHostState,
-            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 120.dp)
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 120.dp)
         )
     }
 }
@@ -257,7 +335,7 @@ fun LogsScreen(
 private fun CutePrettyLogCard(item: MagiskLogUiItem) {
     val accentColor = item.level.color()
     val hasMeta = item.timestamp != null || item.pid != null || item.tid != null
-    
+
     Card(
         shape = RoundedCornerShape(32.dp),
         colors = CardDefaults.cardColors(
@@ -414,8 +492,10 @@ private fun LogFilterChip(
                 if (badge > 0) {
                     Spacer(Modifier.width(6.dp))
                     Surface(
-                        color = if (selected) MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.2f) 
-                                else MaterialTheme.colorScheme.secondaryContainer,
+                        color = if (selected) MaterialTheme.colorScheme.onSecondaryContainer.copy(
+                            alpha = 0.2f
+                        )
+                        else MaterialTheme.colorScheme.secondaryContainer,
                         shape = RoundedCornerShape(10.dp)
                     ) {
                         Text(
@@ -483,11 +563,21 @@ private fun EmptyLogState(message: String) {
                 color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Icon(Icons.Rounded.Terminal, null, modifier = Modifier.size(48.dp), tint = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f))
+                    Icon(
+                        Icons.Rounded.Terminal,
+                        null,
+                        modifier = Modifier.size(48.dp),
+                        tint = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)
+                    )
                 }
             }
             Spacer(Modifier.height(20.dp))
-            Text(message, color = MaterialTheme.colorScheme.outline, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Text(
+                message,
+                color = MaterialTheme.colorScheme.outline,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 }
@@ -579,8 +669,16 @@ class LogsComposeViewModel(private val repo: LogRepository) : ViewModel() {
                 } else {
                     visibleRaw
                         .split('\n')
-                        .let { list -> if (list.size > MAX_RENDER_LINES) list.takeLast(MAX_RENDER_LINES) else list }
-                        .map { line -> if (line.length > MAX_RENDER_LINE_CHARS) line.take(MAX_RENDER_LINE_CHARS) else line }
+                        .let { list ->
+                            if (list.size > MAX_RENDER_LINES) list.takeLast(
+                                MAX_RENDER_LINES
+                            ) else list
+                        }
+                        .map { line ->
+                            if (line.length > MAX_RENDER_LINE_CHARS) line.take(
+                                MAX_RENDER_LINE_CHARS
+                            ) else line
+                        }
                 }
                 parsedLines.mapIndexedNotNull { index, line -> parseLogLine(index, line) }
             }
@@ -599,7 +697,9 @@ class LogsComposeViewModel(private val repo: LogRepository) : ViewModel() {
     fun saveMagiskLog() {
         viewModelScope.launch(Dispatchers.IO) {
             val result = runCatching {
-                val filename = "magisk_log_%s.log".format(System.currentTimeMillis().toTime(timeFormatStandard))
+                val filename = "magisk_log_%s.log".format(
+                    System.currentTimeMillis().toTime(timeFormatStandard)
+                )
                 val logFile = MediaStoreUtils.getFile(filename)
                 val raw = repo.fetchMagiskLogs()
                 logFile.uri.outputStream().bufferedWriter().use {
@@ -608,13 +708,22 @@ class LogsComposeViewModel(private val repo: LogRepository) : ViewModel() {
                 logFile.toString()
             }
             withContext(Dispatchers.Main) {
-                result.onSuccess { _messages.emit(AppContext.getString(CoreR.string.saved_to_path, it)) }
+                result.onSuccess {
+                    _messages.emit(
+                        AppContext.getString(
+                            CoreR.string.saved_to_path,
+                            it
+                        )
+                    )
+                }
                     .onFailure { _messages.emit(AppContext.getString(CoreR.string.failure)) }
             }
         }
     }
 
-    fun postExternalRwDenied() { _messages.tryEmit(AppContext.getString(CoreR.string.external_rw_permission_denied)) }
+    fun postExternalRwDenied() {
+        _messages.tryEmit(AppContext.getString(CoreR.string.external_rw_permission_denied))
+    }
 
     private fun parseLogLine(index: Int, line: String): MagiskLogUiItem? {
         val raw = line.trimEnd()
@@ -685,9 +794,12 @@ class LogsComposeViewModel(private val repo: LogRepository) : ViewModel() {
         private const val MAX_RENDER_CHARS = 60_000
         private const val MAX_RENDER_LINES = 1_500
         private const val MAX_RENDER_LINE_CHARS = 2_000
-        private const val TIMESTAMP_REGEX = "(?:\\d{2}-\\d{2}|\\d{4}-\\d{2}-\\d{2})\\s+\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{3,6})?"
-        private val fullLogcatRegex = Regex("""^\s*($TIMESTAMP_REGEX)\s+(\d+)\s+(\d+)\s+([VDIWEAF])\s+([^:]+?)\s*:\s*(.*)$""")
-        private val simpleLogcatRegex = Regex("""^\s*(?:($TIMESTAMP_REGEX)\s+)?([VDIWEAF])\s+([^:]+?)\s*:\s*(.*)$""")
+        private const val TIMESTAMP_REGEX =
+            "(?:\\d{2}-\\d{2}|\\d{4}-\\d{2}-\\d{2})\\s+\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{3,6})?"
+        private val fullLogcatRegex =
+            Regex("""^\s*($TIMESTAMP_REGEX)\s+(\d+)\s+(\d+)\s+([VDIWEAF])\s+([^:]+?)\s*:\s*(.*)$""")
+        private val simpleLogcatRegex =
+            Regex("""^\s*(?:($TIMESTAMP_REGEX)\s+)?([VDIWEAF])\s+([^:]+?)\s*:\s*(.*)$""")
         val Factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 @Suppress("UNCHECKED_CAST")

@@ -12,16 +12,15 @@ import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.core.model.module.LocalModule
 import com.topjohnwu.magisk.core.model.module.OnlineModule
 import com.topjohnwu.magisk.ui.flash.FlashUtils
+import com.topjohnwu.magisk.ui.navigation.Route
 import com.topjohnwu.magisk.view.Notifications
 import kotlinx.coroutines.Dispatchers
-import kotlinx.parcelize.Parcelize
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
-import com.topjohnwu.magisk.ui.navigation.Route
-import com.topjohnwu.magisk.core.R as CoreR
+import kotlinx.parcelize.Parcelize
 
 class ModuleItem(val module: LocalModule) {
     val showNotice: Boolean
@@ -34,8 +33,8 @@ class ModuleItem(val module: LocalModule) {
         val zygiskUnloaded = isZygisk && module.zygiskUnloaded
 
         showNotice = zygiskUnloaded ||
-            (Info.isZygiskEnabled && isRiru) ||
-            (!Info.isZygiskEnabled && isZygisk)
+                (Info.isZygiskEnabled && isRiru) ||
+                (!Info.isZygiskEnabled && isZygisk)
         showAction = module.hasAction && !showNotice
         noticeText = when {
             zygiskUnloaded -> "Zygisk module not loaded due to incompatibility"
@@ -73,7 +72,7 @@ class ModuleViewModel : AsyncLoadViewModel() {
     override suspend fun doLoadWork() {
         _uiState.update { it.copy(loading = true) }
         val moduleLoaded = Info.env.isActive &&
-            withContext(Dispatchers.IO) { LocalModule.loaded() }
+                withContext(Dispatchers.IO) { LocalModule.loaded() }
         if (moduleLoaded) {
             val modules = withContext(Dispatchers.Default) {
                 LocalModule.installed().map { ModuleItem(it) }

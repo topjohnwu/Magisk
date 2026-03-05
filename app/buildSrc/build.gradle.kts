@@ -17,9 +17,9 @@ gradlePlugin {
 }
 
 dependencies {
-    implementation(kotlin("gradle-plugin", libs.versions.kotlin.get()))
-    implementation("org.jetbrains.kotlin:compose-compiler-gradle-plugin:${libs.versions.kotlin.get()}")
-    implementation("org.jetbrains.kotlin:kotlin-serialization:${libs.versions.kotlin.get()}")
+    implementation(libs.kotlin.gradle.plugin)
+    implementation(libs.kotlin.compose.compiler.gradle.plugin)
+    implementation(libs.kotlin.serialization.gradle.plugin)
     implementation(libs.android.gradle.plugin)
     implementation(libs.ksp.plugin)
     implementation(libs.lsparanoid.plugin)

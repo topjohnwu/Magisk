@@ -94,12 +94,14 @@ class FlashViewModel : BaseViewModel() {
                     uri ?: return@launch
                     flashZipWithPty(uri)
                 }
+
                 Const.Value.UNINSTALL -> {
                     _showReboot.value = false
                     onResult(withContext(Dispatchers.IO) {
                         MagiskInstaller.Uninstall(outItems, logItems).exec()
                     })
                 }
+
                 Const.Value.FLASH_MAGISK -> {
                     onResult(withContext(Dispatchers.IO) {
                         if (Info.isEmulator)
@@ -108,12 +110,14 @@ class FlashViewModel : BaseViewModel() {
                             MagiskInstaller.Direct(outItems, logItems).exec()
                     })
                 }
+
                 Const.Value.FLASH_INACTIVE_SLOT -> {
                     _showReboot.value = false
                     onResult(withContext(Dispatchers.IO) {
                         MagiskInstaller.SecondSlot(outItems, logItems).exec()
                     })
                 }
+
                 Const.Value.PATCH_FILE -> {
                     uri ?: return@launch
                     _showReboot.value = false
@@ -152,7 +156,8 @@ class FlashViewModel : BaseViewModel() {
                         try {
                             uri.inputStream().writeTo(it)
                         } catch (e: IOException) {
-                            val msg = if (e is FileNotFoundException) "Invalid Uri" else "Cannot copy to cache"
+                            val msg =
+                                if (e is FileNotFoundException) "Invalid Uri" else "Cannot copy to cache"
                             return@withContext msg to null
                         }
                     }
@@ -186,11 +191,11 @@ class FlashViewModel : BaseViewModel() {
         val success = withContext(Dispatchers.IO) {
             Shell.cmd(
                 "(export TERM=xterm-256color; " +
-                "echo '- Installing $displayName'; " +
-                "sh $dir/update-binary dummy 1 '${zipFile.absolutePath}'; " +
-                "EXIT=\$?; " +
-                "if [ \$EXIT -ne 0 ]; then echo '! Installation failed'; fi; " +
-                "exit \$EXIT) <>$ptyPath >&0 2>&0"
+                        "echo '- Installing $displayName'; " +
+                        "sh $dir/update-binary dummy 1 '${zipFile.absolutePath}'; " +
+                        "EXIT=\$?; " +
+                        "if [ \$EXIT -ne 0 ]; then echo '! Installation failed'; fi; " +
+                        "exit \$EXIT) <>$ptyPath >&0 2>&0"
             ).exec().isSuccess
         }
 

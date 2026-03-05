@@ -11,7 +11,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.LocalContext
 import com.topjohnwu.magisk.core.Config
-import com.topjohnwu.magisk.ui.theme.Theme
 
 @Composable
 fun magiskComposeColorScheme(
@@ -25,6 +24,7 @@ fun magiskComposeColorScheme(
                 if (darkTheme) dynamicDarkColorScheme(LocalContext.current)
                 else dynamicLightColorScheme(LocalContext.current)
             }
+
             else -> defaultFallbackScheme(darkTheme)
         }
     } else {
@@ -97,8 +97,10 @@ private fun ComposeThemeSeed.toColorScheme(darkTheme: Boolean): ColorScheme {
 
     val outline = blend(onSurface, surface, 0.58f)
     val outlineVariant = blend(onSurface, surface, 0.74f)
-    val inverseSurface = blend(surface, if (darkTheme) WHITE else BLACK, if (darkTheme) 0.86f else 0.80f)
-    val inversePrimary = blend(primary, if (darkTheme) WHITE else BLACK, if (darkTheme) 0.34f else 0.22f)
+    val inverseSurface =
+        blend(surface, if (darkTheme) WHITE else BLACK, if (darkTheme) 0.86f else 0.80f)
+    val inversePrimary =
+        blend(primary, if (darkTheme) WHITE else BLACK, if (darkTheme) 0.34f else 0.22f)
 
     return if (darkTheme) {
         darkColorScheme(

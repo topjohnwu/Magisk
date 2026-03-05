@@ -1,15 +1,26 @@
 package com.topjohnwu.magisk.ui.flash
 
 import android.net.Uri
-import android.os.Build
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.*
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
-import androidx.compose.foundation.background
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -17,16 +28,34 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.Notes
-import androidx.compose.material.icons.rounded.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.rounded.CheckCircle
+import androidx.compose.material.icons.rounded.Error
+import androidx.compose.material.icons.rounded.RestartAlt
+import androidx.compose.material.icons.rounded.Save
+import androidx.compose.material.icons.rounded.Terminal
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -43,20 +72,19 @@ import com.topjohnwu.magisk.core.ktx.timeFormatStandard
 import com.topjohnwu.magisk.core.ktx.toTime
 import com.topjohnwu.magisk.core.tasks.FlashZip
 import com.topjohnwu.magisk.core.tasks.MagiskInstaller
-import com.topjohnwu.magisk.ui.RouteProcessTopBarState
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
-import com.topjohnwu.superuser.Shell
+import com.topjohnwu.magisk.ui.RouteProcessTopBarState
 import com.topjohnwu.superuser.CallbackList
+import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -161,7 +189,9 @@ private fun FlashHeader(state: FlashUiState) {
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(20.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(20.dp)
         ) {
@@ -198,7 +228,7 @@ private fun FlashHeader(state: FlashUiState) {
                     },
                     transitionSpec = {
                         (slideInVertically { height -> height } + fadeIn() togetherWith
-                         slideOutVertically { height -> -height } + fadeOut()).using(
+                                slideOutVertically { height -> -height } + fadeOut()).using(
                             SizeTransform(clip = false)
                         )
                     },
@@ -231,10 +261,24 @@ private fun LogContainer(
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)) {
-            Icon(Icons.Rounded.Terminal, null, modifier = Modifier.size(20.dp), tint = MaterialTheme.colorScheme.primary)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)
+        ) {
+            Icon(
+                Icons.Rounded.Terminal,
+                null,
+                modifier = Modifier.size(20.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
             Spacer(Modifier.width(12.dp))
-            Text(text = AppContext.getString(CoreR.string.logs), style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Black, letterSpacing = 1.2.sp, color = MaterialTheme.colorScheme.outline)
+            Text(
+                text = AppContext.getString(CoreR.string.logs),
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Black,
+                letterSpacing = 1.2.sp,
+                color = MaterialTheme.colorScheme.outline
+            )
         }
 
         ElevatedCard(
@@ -242,13 +286,34 @@ private fun LogContainer(
             shape = RoundedCornerShape(24.dp),
             colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
         ) {
-            Box(modifier = Modifier.fillMaxSize().padding(16.dp).horizontalScroll(horizontalScroll)) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+                    .horizontalScroll(horizontalScroll)
+            ) {
                 if (lines.isEmpty()) {
-                    Text(text = AppContext.getString(CoreR.string.waiting_for_logs), color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f), style = MaterialTheme.typography.bodySmall, fontFamily = FontFamily.Monospace)
+                    Text(
+                        text = AppContext.getString(CoreR.string.waiting_for_logs),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                        style = MaterialTheme.typography.bodySmall,
+                        fontFamily = FontFamily.Monospace
+                    )
                 } else {
-                    LazyColumn(modifier = Modifier.fillMaxSize(), state = listState, verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        state = listState,
+                        verticalArrangement = Arrangement.spacedBy(2.dp)
+                    ) {
                         itemsIndexed(lines) { _, line ->
-                            Text(text = line, color = if (line.startsWith("!")) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant, fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodySmall, softWrap = false, fontSize = 11.sp)
+                            Text(
+                                text = line,
+                                color = if (line.startsWith("!")) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
+                                fontFamily = FontFamily.Monospace,
+                                style = MaterialTheme.typography.bodySmall,
+                                softWrap = false,
+                                fontSize = 11.sp
+                            )
                         }
                     }
                 }
@@ -265,11 +330,18 @@ private fun ActionButtons(
     onReboot: () -> Unit,
     onClose: () -> Unit
 ) {
-    Row(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
         OutlinedButton(
             onClick = onSaveLog,
             enabled = hasLogs,
-            modifier = Modifier.weight(1f).height(56.dp),
+            modifier = Modifier
+                .weight(1f)
+                .height(56.dp),
             shape = RoundedCornerShape(16.dp),
             border = ButtonDefaults.outlinedButtonBorder(hasLogs).copy(width = 1.dp)
         ) {
@@ -278,26 +350,51 @@ private fun ActionButtons(
             Text(AppContext.getString(CoreR.string.menuSaveLog), fontWeight = FontWeight.Bold)
         }
 
-        AnimatedContent(targetState = !state.running, modifier = Modifier.weight(1f), label = "actionBtn") { isFinished ->
+        AnimatedContent(
+            targetState = !state.running,
+            modifier = Modifier.weight(1f),
+            label = "actionBtn"
+        ) { isFinished ->
             if (isFinished) {
                 if (state.showReboot) {
                     Button(
                         onClick = onReboot,
-                        modifier = Modifier.fillMaxWidth().height(56.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp),
                         shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                     ) {
                         Icon(Icons.Rounded.RestartAlt, null)
                         Spacer(Modifier.width(8.dp))
-                        Text(AppContext.getString(CoreR.string.reboot), fontWeight = FontWeight.Black)
+                        Text(
+                            AppContext.getString(CoreR.string.reboot),
+                            fontWeight = FontWeight.Black
+                        )
                     }
                 } else {
-                    Button(onClick = onClose, modifier = Modifier.fillMaxWidth().height(56.dp), shape = RoundedCornerShape(16.dp)) {
-                        Text(AppContext.getString(CoreR.string.close), fontWeight = FontWeight.Black)
+                    Button(
+                        onClick = onClose,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp),
+                        shape = RoundedCornerShape(16.dp)
+                    ) {
+                        Text(
+                            AppContext.getString(CoreR.string.close),
+                            fontWeight = FontWeight.Black
+                        )
                     }
                 }
             } else {
-                Button(onClick = { }, enabled = false, modifier = Modifier.fillMaxWidth().height(56.dp), shape = RoundedCornerShape(16.dp)) {
+                Button(
+                    onClick = { },
+                    enabled = false,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
                     Text(AppContext.getString(CoreR.string.running), fontWeight = FontWeight.Bold)
                 }
             }
@@ -305,7 +402,11 @@ private fun ActionButtons(
     }
 }
 
-private data class FlashUiState(val running: Boolean = false, val success: Boolean = false, val showReboot: Boolean = Info.isRooted)
+private data class FlashUiState(
+    val running: Boolean = false,
+    val success: Boolean = false,
+    val showReboot: Boolean = Info.isRooted
+)
 
 private class FlashComposeViewModel : ViewModel() {
     private val _state = MutableStateFlow(FlashUiState())
@@ -318,7 +419,11 @@ private class FlashComposeViewModel : ViewModel() {
     private var started = false
 
     init {
-        viewModelScope.launch(Dispatchers.Main.immediate) { for (line in lineChannel) { lines.add(line) } }
+        viewModelScope.launch(Dispatchers.Main.immediate) {
+            for (line in lineChannel) {
+                lines.add(line)
+            }
+        }
     }
 
     private val outItems = object : CallbackList<String>() {
@@ -344,11 +449,39 @@ private class FlashComposeViewModel : ViewModel() {
                 }
             }
             val result = when (action) {
-                Const.Value.FLASH_ZIP -> if (uri == null) false else FlashZip(uri, outItems, logs).exec()
-                Const.Value.UNINSTALL -> { _state.update { it.copy(showReboot = false) }; MagiskInstaller.Uninstall(outItems, logs).exec() }
-                Const.Value.FLASH_MAGISK -> if (Info.isEmulator) MagiskInstaller.Emulator(outItems, logs).exec() else MagiskInstaller.Direct(outItems, logs).exec()
-                Const.Value.FLASH_INACTIVE_SLOT -> { _state.update { it.copy(showReboot = false) }; MagiskInstaller.SecondSlot(outItems, logs).exec() }
-                Const.Value.PATCH_FILE -> if (uri == null) false else { _state.update { it.copy(showReboot = false) }; MagiskInstaller.Patch(uri, outItems, logs).exec() }
+                Const.Value.FLASH_ZIP -> if (uri == null) false else FlashZip(
+                    uri,
+                    outItems,
+                    logs
+                ).exec()
+
+                Const.Value.UNINSTALL -> {
+                    _state.update { it.copy(showReboot = false) }; MagiskInstaller.Uninstall(
+                        outItems,
+                        logs
+                    ).exec()
+                }
+
+                Const.Value.FLASH_MAGISK -> if (Info.isEmulator) MagiskInstaller.Emulator(
+                    outItems,
+                    logs
+                ).exec() else MagiskInstaller.Direct(outItems, logs).exec()
+
+                Const.Value.FLASH_INACTIVE_SLOT -> {
+                    _state.update { it.copy(showReboot = false) }; MagiskInstaller.SecondSlot(
+                        outItems,
+                        logs
+                    ).exec()
+                }
+
+                Const.Value.PATCH_FILE -> if (uri == null) false else {
+                    _state.update { it.copy(showReboot = false) }; MagiskInstaller.Patch(
+                        uri,
+                        outItems,
+                        logs
+                    ).exec()
+                }
+
                 else -> false
             }
             _state.update { it.copy(running = false, success = result) }
@@ -358,18 +491,36 @@ private class FlashComposeViewModel : ViewModel() {
     fun saveLog() {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                val name = "magisk_install_log_%s.log".format(System.currentTimeMillis().toTime(timeFormatStandard))
+                val name = "magisk_install_log_%s.log".format(
+                    System.currentTimeMillis().toTime(timeFormatStandard)
+                )
                 val file = MediaStoreUtils.getFile(name)
-                file.uri.outputStream().bufferedWriter().use { writer -> synchronized(logs) { logs.forEach { writer.write(it); writer.newLine() } } }
+                file.uri.outputStream().bufferedWriter()
+                    .use { writer -> synchronized(logs) { logs.forEach { writer.write(it); writer.newLine() } } }
                 file.toString()
-            }.onSuccess { path -> _messages.emit(path) }.onFailure { _messages.emit(AppContext.getString(CoreR.string.failure)) }
+            }.onSuccess { path -> _messages.emit(path) }
+                .onFailure { _messages.emit(AppContext.getString(CoreR.string.failure)) }
         }
     }
 
-    fun rebootNow() { reboot() }
-    override fun onCleared() { lineChannel.close(); super.onCleared() }
-    private fun requiresRoot(action: String): Boolean = action == Const.Value.FLASH_ZIP || action == Const.Value.UNINSTALL || action == Const.Value.FLASH_MAGISK || action == Const.Value.FLASH_INACTIVE_SLOT
-    companion object { val Factory = object : ViewModelProvider.Factory { override fun <T : ViewModel> create(modelClass: Class<T>): T { @Suppress("UNCHECKED_CAST") return FlashComposeViewModel() as T } } }
+    fun rebootNow() {
+        reboot()
+    }
+
+    override fun onCleared() {
+        lineChannel.close(); super.onCleared()
+    }
+
+    private fun requiresRoot(action: String): Boolean =
+        action == Const.Value.FLASH_ZIP || action == Const.Value.UNINSTALL || action == Const.Value.FLASH_MAGISK || action == Const.Value.FLASH_INACTIVE_SLOT
+
+    companion object {
+        val Factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                @Suppress("UNCHECKED_CAST") return FlashComposeViewModel() as T
+            }
+        }
+    }
 }
 
 private fun parseNavigationUriArg(rawArg: String): Uri? {

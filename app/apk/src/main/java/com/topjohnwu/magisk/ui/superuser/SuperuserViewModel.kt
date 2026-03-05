@@ -110,11 +110,18 @@ class SuperuserViewModel(
                 }
                 policies.addAll(map)
             }
-            policies.sortWith(compareBy(
+            policies.sortWith(
+                compareBy(
                 { it.appName.lowercase(Locale.ROOT) },
                 { it.packageName }
             ))
-            _uiState.update { it.copy(loading = false, policies = policies, suRestrict = Config.suRestrict) }
+            _uiState.update {
+                it.copy(
+                    loading = false,
+                    policies = policies,
+                    suRestrict = Config.suRestrict
+                )
+            }
         }
     }
 
@@ -142,7 +149,8 @@ class SuperuserViewModel(
             _uiState.value.policies
                 .filter { it.policy.uid == item.policy.uid }
                 .forEach { it.notification = item.notification }
-            val res = if (item.notification) R.string.su_snack_notif_on else R.string.su_snack_notif_off
+            val res =
+                if (item.notification) R.string.su_snack_notif_on else R.string.su_snack_notif_off
             showSnackbar(AppContext.getString(res, item.appName))
         }
     }
@@ -169,7 +177,8 @@ class SuperuserViewModel(
                 _uiState.value.policies
                     .filter { it.policy.uid == item.policy.uid }
                     .forEach { it.policyValue = newPolicy }
-                val res = if (newPolicy >= SuPolicy.ALLOW) R.string.su_snack_grant else R.string.su_snack_deny
+                val res =
+                    if (newPolicy >= SuPolicy.ALLOW) R.string.su_snack_grant else R.string.su_snack_deny
                 showSnackbar(AppContext.getString(res, item.appName))
             }
         }

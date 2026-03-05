@@ -3,29 +3,77 @@ package com.topjohnwu.magisk.ui.superuser
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.os.Process
-import androidx.compose.animation.*
-import androidx.compose.animation.core.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColor
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.NavigateNext
-import androidx.compose.material.icons.rounded.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.rounded.BugReport
+import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.DeleteForever
+import androidx.compose.material.icons.rounded.HistoryEdu
+import androidx.compose.material.icons.rounded.Notifications
+import androidx.compose.material.icons.rounded.Security
+import androidx.compose.material.icons.rounded.Warning
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
@@ -40,29 +88,29 @@ import androidx.compose.ui.unit.sp
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.topjohnwu.magisk.arch.UIActivity
 import com.topjohnwu.magisk.core.AppContext
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.model.su.SuPolicy
+import com.topjohnwu.magisk.ui.animation.MotionTokens
 import com.topjohnwu.magisk.ui.RefreshOnResume
-import com.topjohnwu.magisk.core.R as CoreR
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
+import com.topjohnwu.magisk.core.R as CoreR
 
 @Composable
 fun SuperuserScreen(
@@ -70,9 +118,6 @@ fun SuperuserScreen(
     viewModel: SuperuserComposeViewModel = viewModel(factory = SuperuserComposeViewModel.Factory)
 ) {
     val state by viewModel.state.collectAsState()
-    val contentEnterState = remember {
-        MutableTransitionState(false).apply { targetState = true }
-    }
     val activity = LocalContext.current as? UIActivity<*>
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -90,81 +135,86 @@ fun SuperuserScreen(
                     CircularProgressIndicator(strokeCap = StrokeCap.Round)
                 }
             }
+
             !Info.showSuperUser -> {
-                AnimatedVisibility(
-                    visibleState = contentEnterState,
-                    enter = fadeIn(animationSpec = tween(durationMillis = 220)) +
-                        slideInVertically(
-                            initialOffsetY = { it / 8 },
-                            animationSpec = tween(durationMillis = 320, easing = FastOutSlowInEasing)
-                        ),
-                    exit = fadeOut(animationSpec = tween(durationMillis = 120)),
-                    label = "superuserDisabledEnter"
-                ) {
-                    DisabledState()
-                }
+                DisabledState()
             }
+
             else -> {
-                AnimatedVisibility(
-                    visibleState = contentEnterState,
-                    enter = fadeIn(animationSpec = tween(durationMillis = 220)) +
-                        slideInVertically(
-                            initialOffsetY = { it / 8 },
-                            animationSpec = tween(durationMillis = 320, easing = FastOutSlowInEasing)
-                        ),
-                    exit = fadeOut(animationSpec = tween(durationMillis = 120)),
-                    label = "superuserContentEnter"
-                ) {
-                    PolicyList(
-                        items = state.items,
-                        onOpenLogs = onOpenLogs,
-                        onToggleExpanded = viewModel::toggleExpanded,
-                        onToggleEnabled = { item, enabled ->
-                            ensureAuthThen(activity, scope) {
-                                viewModel.setPolicy(item.uid, if (enabled) SuPolicy.ALLOW else SuPolicy.DENY)
-                            }
-                        },
-                        onSliderFinished = { item, value ->
-                            ensureAuthThen(activity, scope) {
-                                viewModel.setPolicy(item.uid, sliderValueToPolicy(value))
-                            }
-                        },
-                        onToggleNotify = { item ->
-                            ensureAuthThen(activity, scope) { viewModel.toggleNotify(item) }
-                        },
-                        onToggleLog = { item ->
-                            ensureAuthThen(activity, scope) { viewModel.toggleLog(item) }
-                        },
-                        onRevoke = { item ->
-                            if (Config.suAuth) {
-                                ensureAuthThen(activity, scope) { viewModel.revoke(item) }
-                            } else {
-                                pendingRevoke = item
-                            }
+                PolicyList(
+                    items = state.items,
+                    onOpenLogs = onOpenLogs,
+                    onToggleExpanded = viewModel::toggleExpanded,
+                    onToggleEnabled = { item, enabled ->
+                        ensureAuthThen(activity, scope) {
+                            viewModel.setPolicy(
+                                item.uid,
+                                if (enabled) SuPolicy.ALLOW else SuPolicy.DENY
+                            )
                         }
-                    )
-                }
+                    },
+                    onSliderFinished = { item, value ->
+                        ensureAuthThen(activity, scope) {
+                            viewModel.setPolicy(item.uid, sliderValueToPolicy(value))
+                        }
+                    },
+                    onToggleNotify = { item ->
+                        ensureAuthThen(activity, scope) { viewModel.toggleNotify(item) }
+                    },
+                    onToggleLog = { item ->
+                        ensureAuthThen(activity, scope) { viewModel.toggleLog(item) }
+                    },
+                    onRevoke = { item ->
+                        if (Config.suAuth) {
+                            ensureAuthThen(activity, scope) { viewModel.revoke(item) }
+                        } else {
+                            pendingRevoke = item
+                        }
+                    }
+                )
             }
         }
 
         SnackbarHost(
             hostState = snackbarHostState,
-            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 110.dp)
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 110.dp)
         )
     }
 
     pendingRevoke?.let { item ->
         AlertDialog(
             onDismissRequest = { pendingRevoke = null },
-            title = { 
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Surface(color = MaterialTheme.colorScheme.errorContainer, shape = CircleShape, modifier = Modifier.size(32.dp)) {
-                        Icon(Icons.Rounded.Warning, null, modifier = Modifier.padding(6.dp), tint = MaterialTheme.colorScheme.onErrorContainer)
+            title = {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Surface(
+                        color = MaterialTheme.colorScheme.errorContainer,
+                        shape = CircleShape,
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Icon(
+                            Icons.Rounded.Warning,
+                            null,
+                            modifier = Modifier.padding(6.dp),
+                            tint = MaterialTheme.colorScheme.onErrorContainer
+                        )
                     }
-                    Text(text = stringResource(id = CoreR.string.su_revoke_title), fontWeight = FontWeight.Black) 
+                    Text(
+                        text = stringResource(id = CoreR.string.su_revoke_title),
+                        fontWeight = FontWeight.Black
+                    )
                 }
             },
-            text = { Text(text = stringResource(id = CoreR.string.su_revoke_msg, item.title), style = MaterialTheme.typography.bodyMedium) },
+            text = {
+                Text(
+                    text = stringResource(id = CoreR.string.su_revoke_msg, item.title),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            },
             shape = RoundedCornerShape(32.dp),
             confirmButton = {
                 Button(
@@ -174,7 +224,10 @@ fun SuperuserScreen(
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                 ) {
-                    Text(text = stringResource(id = android.R.string.ok), fontWeight = FontWeight.Black)
+                    Text(
+                        text = stringResource(id = android.R.string.ok),
+                        fontWeight = FontWeight.Black
+                    )
                 }
             },
             dismissButton = {
@@ -187,7 +240,11 @@ fun SuperuserScreen(
     }
 }
 
-private fun ensureAuthThen(activity: UIActivity<*>?, scope: CoroutineScope, block: suspend () -> Unit) {
+private fun ensureAuthThen(
+    activity: UIActivity<*>?,
+    scope: CoroutineScope,
+    block: suspend () -> Unit
+) {
     if (!Config.suAuth) {
         scope.launch { block() }
         return
@@ -200,7 +257,9 @@ private fun ensureAuthThen(activity: UIActivity<*>?, scope: CoroutineScope, bloc
 @Composable
 private fun EmptyStateContent() {
     Column(
-        modifier = Modifier.fillMaxWidth().padding(32.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -231,7 +290,9 @@ private fun EmptyStateContent() {
 
 @Composable
 private fun DisabledState() {
-    Box(modifier = Modifier.fillMaxSize().padding(32.dp), contentAlignment = Alignment.Center) {
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .padding(32.dp), contentAlignment = Alignment.Center) {
         Text(
             text = stringResource(id = CoreR.string.unsupport_nonroot_stub_msg),
             style = MaterialTheme.typography.bodyLarge,
@@ -293,19 +354,21 @@ private fun SuperuserLogsButton(onClick: () -> Unit) {
         shape = RoundedCornerShape(20.dp),
     ) {
         Row(
-            modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 20.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
             Icon(
-                Icons.Rounded.HistoryEdu, 
-                null, 
+                Icons.Rounded.HistoryEdu,
+                null,
                 modifier = Modifier.size(24.dp)
             )
             Spacer(Modifier.width(12.dp))
             Text(
-                stringResource(id = CoreR.string.superuser_logs).uppercase(), 
-                style = MaterialTheme.typography.titleMedium, 
+                stringResource(id = CoreR.string.superuser_logs).uppercase(),
+                style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Black,
                 letterSpacing = 1.sp
             )
@@ -324,19 +387,29 @@ private fun StylishMagiskPolicyCard(
     onRevoke: () -> Unit
 ) {
     val transition = updateTransition(targetState = item.expanded, label = "cardTransition")
-    
+
     val rotation by transition.animateFloat(
-        transitionSpec = { spring(stiffness = Spring.StiffnessLow) },
+        transitionSpec = {
+            spring(
+                dampingRatio = MotionTokens.DampingLowBouncy,
+                stiffness = MotionTokens.StiffnessMediumLow
+            )
+        },
         label = "rotation"
     ) { if (it) 90f else 0f }
 
     val elevation by transition.animateDp(
-        transitionSpec = { spring(stiffness = Spring.StiffnessMedium) },
+        transitionSpec = {
+            spring(
+                dampingRatio = MotionTokens.DampingNoBounce,
+                stiffness = MotionTokens.StiffnessMediumLow
+            )
+        },
         label = "elevation"
     ) { if (it) 8.dp else 2.dp }
 
     val containerColor by transition.animateColor(
-        transitionSpec = { tween(400) },
+        transitionSpec = { tween(MotionTokens.DurationEmphasized) },
         label = "color"
     ) { if (it) MaterialTheme.colorScheme.surfaceContainerHighest else MaterialTheme.colorScheme.surfaceContainerHigh }
 
@@ -353,8 +426,18 @@ private fun StylishMagiskPolicyCard(
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
-            .animateContentSize(spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessLow)),
-        shape = RoundedCornerShape(topEnd = 48.dp, bottomStart = 48.dp, topStart = 16.dp, bottomEnd = 16.dp),
+            .animateContentSize(
+                spring(
+                    dampingRatio = MotionTokens.DampingNoBounce,
+                    stiffness = MotionTokens.StiffnessMediumLow
+                )
+            ),
+        shape = RoundedCornerShape(
+            topEnd = 48.dp,
+            bottomStart = 48.dp,
+            topStart = 16.dp,
+            bottomEnd = 16.dp
+        ),
         onClick = onToggleExpanded,
         colors = CardDefaults.elevatedCardColors(containerColor = containerColor),
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = elevation)
@@ -398,8 +481,10 @@ private fun StylishMagiskPolicyCard(
                                 .border(3.dp, MaterialTheme.colorScheme.surface, CircleShape)
                         )
                     }
-                    
-                    Column(modifier = Modifier.weight(1f).padding(horizontal = 20.dp)) {
+
+                    Column(modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 20.dp)) {
                         Text(
                             text = item.title,
                             style = MaterialTheme.typography.titleLarge,
@@ -448,19 +533,32 @@ private fun StylishMagiskPolicyCard(
                             } else null
                         )
                     }
-                    
+
                     Icon(
                         imageVector = Icons.AutoMirrored.Rounded.NavigateNext,
                         contentDescription = null,
-                        modifier = Modifier.rotate(rotation).padding(start = 12.dp),
+                        modifier = Modifier
+                            .rotate(rotation)
+                            .padding(start = 12.dp),
                         tint = MaterialTheme.colorScheme.outline
                     )
                 }
 
                 AnimatedVisibility(
                     visible = item.expanded,
-                    enter = expandVertically(spring(stiffness = Spring.StiffnessLow)) + fadeIn(),
-                    exit = shrinkVertically(spring(stiffness = Spring.StiffnessLow)) + fadeOut()
+                    enter = expandVertically(
+                        spring(
+                            dampingRatio = MotionTokens.DampingNoBounce,
+                            stiffness = MotionTokens.StiffnessLow
+                        )
+                    ) + fadeIn(
+                        animationSpec = tween(MotionTokens.DurationStandard)
+                    ),
+                    exit = shrinkVertically(
+                        animationSpec = tween(MotionTokens.DurationCollapse)
+                    ) + fadeOut(
+                        animationSpec = tween(MotionTokens.DurationQuick)
+                    )
                 ) {
                     Column {
                         Spacer(Modifier.height(28.dp))
@@ -570,7 +668,7 @@ private fun StylishMagiskPolicyCard(
                                 )
                             }
                         }
-                        
+
                         Spacer(Modifier.height(20.dp))
                         Text(
                             text = item.packageName,
@@ -588,14 +686,34 @@ private fun StylishMagiskPolicyCard(
 }
 
 // Logic components remain identical
-data class PolicyUiItem(val uid: Int, val packageName: String, val appName: String, val icon: Bitmap, val isSharedUid: Boolean, val policy: Int, val notification: Boolean, val logging: Boolean, val expanded: Boolean = false) {
-    val title: String get() = if (isSharedUid) AppContext.getString(CoreR.string.shared_uid_label, appName) else appName
+data class PolicyUiItem(
+    val uid: Int,
+    val packageName: String,
+    val appName: String,
+    val icon: Bitmap,
+    val isSharedUid: Boolean,
+    val policy: Int,
+    val notification: Boolean,
+    val logging: Boolean,
+    val expanded: Boolean = false
+) {
+    val title: String
+        get() = if (isSharedUid) AppContext.getString(
+            CoreR.string.shared_uid_label,
+            appName
+        ) else appName
     val showSlider: Boolean get() = Config.suRestrict || policy == SuPolicy.RESTRICT
 }
 
-data class SuperuserUiState(val loading: Boolean = true, val items: List<PolicyUiItem> = emptyList())
+data class SuperuserUiState(
+    val loading: Boolean = true,
+    val items: List<PolicyUiItem> = emptyList()
+)
 
-class SuperuserComposeViewModel(private val policyDao: com.topjohnwu.magisk.core.data.magiskdb.PolicyDao, private val pm: PackageManager) : ViewModel() {
+class SuperuserComposeViewModel(
+    private val policyDao: com.topjohnwu.magisk.core.data.magiskdb.PolicyDao,
+    private val pm: PackageManager
+) : ViewModel() {
     private val _state = MutableStateFlow(SuperuserUiState())
     val state: StateFlow<SuperuserUiState> = _state
     private val _messages = MutableSharedFlow<String>(extraBufferCapacity = 1)
@@ -619,63 +737,115 @@ class SuperuserComposeViewModel(private val policyDao: com.topjohnwu.magisk.core
         }
     }
 
-    private suspend fun loadPolicies(previousByKey: Map<String, PolicyUiItem>): List<PolicyUiItem> = withContext(Dispatchers.IO) {
-        if (!Info.showSuperUser) return@withContext emptyList()
-        policyDao.deleteOutdated(); policyDao.delete(AppContext.applicationInfo.uid)
-        val policies = mutableListOf<PolicyUiItem>()
-        for (policy in policyDao.fetchAll()) {
-            val pkgs = if (policy.uid == Process.SYSTEM_UID) arrayOf("android") else pm.getPackagesForUid(policy.uid)
-            pkgs?.forEach { pkg ->
-                try {
-                    val info = pm.getPackageInfo(pkg, PackageManager.MATCH_UNINSTALLED_PACKAGES)
-                    val appInfo = info.applicationInfo
-                    val key = policyKey(policy.uid, info.packageName)
-                    val previous = previousByKey[key]
-                    policies.add(
-                        PolicyUiItem(
-                            uid = policy.uid,
-                            packageName = info.packageName,
-                            appName = appInfo?.loadLabel(pm)?.toString() ?: info.packageName,
-                            icon = previous?.icon ?: (appInfo?.loadIcon(pm) ?: pm.defaultActivityIcon).toBitmap(),
-                            isSharedUid = info.sharedUserId != null,
-                            policy = policy.policy,
-                            notification = policy.notification,
-                            logging = policy.logging,
-                            expanded = previous?.expanded ?: false
-                        )
+    private suspend fun loadPolicies(previousByKey: Map<String, PolicyUiItem>): List<PolicyUiItem> =
+        withContext(Dispatchers.IO) {
+            if (!Info.showSuperUser) return@withContext emptyList()
+            policyDao.deleteOutdated(); policyDao.delete(AppContext.applicationInfo.uid)
+            val policies = mutableListOf<PolicyUiItem>()
+            for (policy in policyDao.fetchAll()) {
+                val pkgs =
+                    if (policy.uid == Process.SYSTEM_UID) arrayOf("android") else pm.getPackagesForUid(
+                        policy.uid
                     )
-                } catch (_: Exception) {}
+                pkgs?.forEach { pkg ->
+                    try {
+                        val info = pm.getPackageInfo(pkg, PackageManager.MATCH_UNINSTALLED_PACKAGES)
+                        val appInfo = info.applicationInfo
+                        val key = policyKey(policy.uid, info.packageName)
+                        val previous = previousByKey[key]
+                        policies.add(
+                            PolicyUiItem(
+                                uid = policy.uid,
+                                packageName = info.packageName,
+                                appName = appInfo?.loadLabel(pm)?.toString() ?: info.packageName,
+                                icon = previous?.icon ?: (appInfo?.loadIcon(pm)
+                                    ?: pm.defaultActivityIcon).toBitmap(),
+                                isSharedUid = info.sharedUserId != null,
+                                policy = policy.policy,
+                                notification = policy.notification,
+                                logging = policy.logging,
+                                expanded = previous?.expanded ?: false
+                            )
+                        )
+                    } catch (_: Exception) {
+                    }
+                }
             }
+            policies.sortedBy { it.appName.lowercase(Locale.ROOT) }
         }
-        policies.sortedBy { it.appName.lowercase(Locale.ROOT) }
+
+    fun toggleExpanded(uid: Int, pkg: String) {
+        _state.update { st ->
+            st.copy(items = st.items.map {
+                if (it.uid == uid && it.packageName == pkg) it.copy(
+                    expanded = !it.expanded
+                ) else it
+            })
+        }
     }
-    fun toggleExpanded(uid: Int, pkg: String) { _state.update { st -> st.copy(items = st.items.map { if (it.uid == uid && it.packageName == pkg) it.copy(expanded = !it.expanded) else it }) } }
+
     fun setPolicy(uid: Int, p: Int) {
         viewModelScope.launch {
             val item = state.value.items.firstOrNull { it.uid == uid } ?: return@launch
-            withContext(Dispatchers.IO) { policyDao.update(SuPolicy(uid).apply { policy = p; notification = item.notification; logging = item.logging }) }
+            withContext(Dispatchers.IO) {
+                policyDao.update(SuPolicy(uid).apply {
+                    policy = p; notification = item.notification; logging = item.logging
+                })
+            }
             _state.update { st -> st.copy(items = st.items.map { if (it.uid == uid) it.copy(policy = p) else it }) }
-            _messages.emit(AppContext.getString(if (p >= SuPolicy.ALLOW) CoreR.string.su_snack_grant else CoreR.string.su_snack_deny, item.appName))
+            _messages.emit(
+                AppContext.getString(
+                    if (p >= SuPolicy.ALLOW) CoreR.string.su_snack_grant else CoreR.string.su_snack_deny,
+                    item.appName
+                )
+            )
         }
     }
+
     fun toggleNotify(item: PolicyUiItem) {
         viewModelScope.launch {
             val uid = item.uid
             val nv = !item.notification
-            withContext(Dispatchers.IO) { policyDao.update(SuPolicy(uid).apply { policy = item.policy; notification = nv; logging = item.logging }) }
-            _state.update { st -> st.copy(items = st.items.map { if (it.uid == uid) it.copy(notification = nv) else it }) }
-            _messages.emit(AppContext.getString(if (nv) CoreR.string.su_snack_notif_on else CoreR.string.su_snack_notif_off, item.appName))
+            withContext(Dispatchers.IO) {
+                policyDao.update(SuPolicy(uid).apply {
+                    policy = item.policy; notification = nv; logging = item.logging
+                })
+            }
+            _state.update { st ->
+                st.copy(items = st.items.map {
+                    if (it.uid == uid) it.copy(
+                        notification = nv
+                    ) else it
+                })
+            }
+            _messages.emit(
+                AppContext.getString(
+                    if (nv) CoreR.string.su_snack_notif_on else CoreR.string.su_snack_notif_off,
+                    item.appName
+                )
+            )
         }
     }
+
     fun toggleLog(item: PolicyUiItem) {
         viewModelScope.launch {
             val uid = item.uid
             val nv = !item.logging
-            withContext(Dispatchers.IO) { policyDao.update(SuPolicy(uid).apply { policy = item.policy; notification = item.notification; logging = nv }) }
+            withContext(Dispatchers.IO) {
+                policyDao.update(SuPolicy(uid).apply {
+                    policy = item.policy; notification = item.notification; logging = nv
+                })
+            }
             _state.update { st -> st.copy(items = st.items.map { if (it.uid == uid) it.copy(logging = nv) else it }) }
-            _messages.emit(AppContext.getString(if (nv) CoreR.string.su_snack_log_on else CoreR.string.su_snack_log_off, item.appName))
+            _messages.emit(
+                AppContext.getString(
+                    if (nv) CoreR.string.su_snack_log_on else CoreR.string.su_snack_log_off,
+                    item.appName
+                )
+            )
         }
     }
+
     fun revoke(item: PolicyUiItem) {
         viewModelScope.launch {
             val uid = item.uid
@@ -684,9 +854,23 @@ class SuperuserComposeViewModel(private val policyDao: com.topjohnwu.magisk.core
             _messages.emit(AppContext.getString(CoreR.string.su_snack_deny, item.appName))
         }
     }
+
     private fun policyKey(uid: Int, packageName: String): String = "$uid:$packageName"
-    object Factory : ViewModelProvider.Factory { override fun <T : ViewModel> create(modelClass: Class<T>): T { @Suppress("UNCHECKED_CAST") return SuperuserComposeViewModel(ServiceLocator.policyDB, AppContext.packageManager) as T } }
+
+    object Factory : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            @Suppress("UNCHECKED_CAST") return SuperuserComposeViewModel(
+                ServiceLocator.policyDB,
+                AppContext.packageManager
+            ) as T
+        }
+    }
 }
 
-private fun policyToSliderValue(p: Int): Float = when (p) { SuPolicy.DENY -> 1f; SuPolicy.RESTRICT -> 2f; SuPolicy.ALLOW -> 3f; else -> 1f }
-private fun sliderValueToPolicy(v: Float): Int = when (v.toInt()) { 1 -> SuPolicy.DENY; 2 -> SuPolicy.RESTRICT; 3 -> SuPolicy.ALLOW; else -> SuPolicy.DENY }
+private fun policyToSliderValue(p: Int): Float = when (p) {
+    SuPolicy.DENY -> 1f; SuPolicy.RESTRICT -> 2f; SuPolicy.ALLOW -> 3f; else -> 1f
+}
+
+private fun sliderValueToPolicy(v: Float): Int = when (v.toInt()) {
+    1 -> SuPolicy.DENY; 2 -> SuPolicy.RESTRICT; 3 -> SuPolicy.ALLOW; else -> SuPolicy.DENY
+}

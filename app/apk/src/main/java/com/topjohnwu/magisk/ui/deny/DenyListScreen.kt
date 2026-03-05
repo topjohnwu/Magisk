@@ -4,12 +4,44 @@ import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import androidx.annotation.StringRes
-import androidx.compose.animation.*
-import androidx.compose.animation.core.*
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -18,8 +50,32 @@ import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.SettingsSuggest
 import androidx.compose.material.icons.rounded.SwapVert
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TriStateCheckbox
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -43,21 +99,20 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.topjohnwu.magisk.core.AppContext
+import com.topjohnwu.magisk.ui.animation.MotionTokens
 import com.topjohnwu.magisk.ui.RefreshOnResume
-import com.topjohnwu.magisk.ui.deny.AppProcessInfo
-import com.topjohnwu.magisk.ui.deny.CmdlineListItem
 import com.topjohnwu.superuser.Shell
-import com.topjohnwu.magisk.core.R as CoreR
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import com.topjohnwu.magisk.core.R as CoreR
 
 @Composable
 fun DenyListScreen(
@@ -262,9 +317,33 @@ private fun StylishDenyListCard(
     val isAnyChecked = item.checkedCount > 0
     val transition = updateTransition(targetState = item.expanded, label = "cardTransition")
     
-    val elevation by transition.animateDp(label = "elevation") { if (it) 10.dp else 2.dp }
-    val rotation by transition.animateFloat(label = "rotation") { if (it) 90f else 0f }
-    val cardScale by transition.animateFloat(label = "cardScale") { if (it) 1f else 0.992f }
+    val elevation by transition.animateDp(
+        transitionSpec = {
+            spring(
+                dampingRatio = MotionTokens.DampingNoBounce,
+                stiffness = MotionTokens.StiffnessMediumLow
+            )
+        },
+        label = "elevation"
+    ) { if (it) 10.dp else 2.dp }
+    val rotation by transition.animateFloat(
+        transitionSpec = {
+            spring(
+                dampingRatio = MotionTokens.DampingLowBouncy,
+                stiffness = MotionTokens.StiffnessMediumLow
+            )
+        },
+        label = "rotation"
+    ) { if (it) 90f else 0f }
+    val cardScale by transition.animateFloat(
+        transitionSpec = {
+            spring(
+                dampingRatio = MotionTokens.DampingNoBounce,
+                stiffness = MotionTokens.StiffnessMediumLow
+            )
+        },
+        label = "cardScale"
+    ) { if (it) 1f else 0.992f }
     
     val containerColor by animateColorAsState(
         targetValue = when {
@@ -272,14 +351,22 @@ private fun StylishDenyListCard(
             isAnyChecked -> MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f)
             else -> MaterialTheme.colorScheme.surfaceContainerHigh
         },
-        animationSpec = tween(durationMillis = 280, easing = FastOutSlowInEasing),
+        animationSpec = tween(
+            durationMillis = MotionTokens.DurationEmphasized,
+            easing = FastOutSlowInEasing
+        ),
         label = "color"
     )
 
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
-            .animateContentSize(spring(stiffness = Spring.StiffnessMediumLow))
+            .animateContentSize(
+                spring(
+                    dampingRatio = MotionTokens.DampingNoBounce,
+                    stiffness = MotionTokens.StiffnessMediumLow
+                )
+            )
             .scale(cardScale),
         shape = RoundedCornerShape(topEnd = 48.dp, bottomStart = 48.dp, topStart = 16.dp, bottomEnd = 16.dp),
         onClick = onToggleExpanded,
@@ -358,8 +445,23 @@ private fun StylishDenyListCard(
                     
                     AnimatedVisibility(
                         visible = item.expanded,
-                        enter = fadeIn() + scaleIn(initialScale = 0.85f),
-                        exit = fadeOut() + scaleOut(targetScale = 0.85f)
+                        enter = fadeIn(
+                            animationSpec = tween(
+                                durationMillis = MotionTokens.DurationMedium,
+                                delayMillis = MotionTokens.DelaySm
+                            )
+                        ) + scaleIn(
+                            initialScale = 0.85f,
+                            animationSpec = spring(
+                                dampingRatio = MotionTokens.DampingNoBounce,
+                                stiffness = MotionTokens.StiffnessMediumLow
+                            )
+                        ),
+                        exit = fadeOut(animationSpec = tween(durationMillis = MotionTokens.DurationQuick)) +
+                                scaleOut(
+                                    targetScale = 0.85f,
+                                    animationSpec = tween(durationMillis = MotionTokens.DurationQuick)
+                                )
                     ) {
                         TriStateCheckbox(
                             state = item.selectionState, 
@@ -378,8 +480,31 @@ private fun StylishDenyListCard(
 
                 AnimatedVisibility(
                     visible = item.expanded,
-                    enter = expandVertically(expandFrom = Alignment.Top) + slideInVertically(initialOffsetY = { it / 10 }) + fadeIn(),
-                    exit = shrinkVertically(shrinkTowards = Alignment.Top) + fadeOut()
+                    enter = expandVertically(
+                        expandFrom = Alignment.Top,
+                        animationSpec = spring(
+                            dampingRatio = MotionTokens.DampingNoBounce,
+                            stiffness = MotionTokens.StiffnessLow
+                        )
+                    ) + slideInVertically(
+                        initialOffsetY = { it / 10 },
+                        animationSpec = tween(
+                            durationMillis = MotionTokens.DurationExpand,
+                            easing = FastOutSlowInEasing
+                        )
+                    ) + fadeIn(
+                        animationSpec = tween(
+                            durationMillis = MotionTokens.DurationStandard,
+                            delayMillis = MotionTokens.DelayXs
+                        )
+                    ),
+                    exit = shrinkVertically(
+                        shrinkTowards = Alignment.Top,
+                        animationSpec = tween(
+                            durationMillis = MotionTokens.DurationCollapse,
+                            easing = FastOutLinearInEasing
+                        )
+                    ) + fadeOut(animationSpec = tween(durationMillis = MotionTokens.DurationQuick))
                 ) {
                     Column {
                         Spacer(Modifier.height(24.dp))

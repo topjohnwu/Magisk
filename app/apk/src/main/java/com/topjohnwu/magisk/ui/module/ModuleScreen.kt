@@ -5,65 +5,125 @@ import android.os.SystemClock
 import android.provider.OpenableColumns
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.*
-import androidx.compose.animation.core.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.NavigateNext
-import androidx.compose.material.icons.rounded.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.DeleteForever
+import androidx.compose.material.icons.rounded.Extension
+import androidx.compose.material.icons.rounded.ExtensionOff
+import androidx.compose.material.icons.rounded.FileUpload
+import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material.icons.rounded.SettingsBackupRestore
+import androidx.compose.material.icons.rounded.SystemUpdateAlt
+import androidx.compose.material.icons.rounded.Warning
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.core.AppContext
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.download.DownloadEngine
 import com.topjohnwu.magisk.core.model.module.LocalModule
 import com.topjohnwu.magisk.core.model.module.OnlineModule
+import com.topjohnwu.magisk.ui.animation.MotionTokens
+import com.topjohnwu.magisk.ui.MainActivity
+import com.topjohnwu.magisk.ui.RefreshOnResume
 import com.topjohnwu.magisk.ui.component.ConfirmResult
 import com.topjohnwu.magisk.ui.component.rememberConfirmDialog
-import com.topjohnwu.magisk.ui.RefreshOnResume
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import java.util.Locale
 import com.topjohnwu.magisk.core.R as CoreR
 
@@ -77,9 +137,6 @@ fun ModuleScreen(
     val activity = context as? MainActivity
     val scope = rememberCoroutineScope()
     val state by viewModel.state.collectAsState()
-    val contentEnterState = remember {
-        MutableTransitionState(false).apply { targetState = true }
-    }
     var query by rememberSaveable { mutableStateOf("") }
     var showSearch by rememberSaveable { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
@@ -90,10 +147,11 @@ fun ModuleScreen(
 
     val zipPicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         if (uri != null) {
-            val displayName = context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
-                val idx = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-                if (cursor.moveToFirst() && idx >= 0) cursor.getString(idx) else null
-            } ?: uri.lastPathSegment ?: "module.zip"
+            val displayName =
+                context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+                    val idx = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                    if (cursor.moveToFirst() && idx >= 0) cursor.getString(idx) else null
+                } ?: uri.lastPathSegment ?: "module.zip"
             scope.launch {
                 val result = localInstallDialog.awaitConfirm(
                     title = confirmInstallTitle,
@@ -108,7 +166,7 @@ fun ModuleScreen(
 
     LaunchedEffect(Unit) { viewModel.refresh(force = true) }
     RefreshOnResume { viewModel.refresh(force = true) }
-    
+
     LaunchedEffect(viewModel) {
         viewModel.messages.collect { snackbarHostState.showSnackbar(it) }
     }
@@ -149,108 +207,134 @@ fun ModuleScreen(
                 CircularProgressIndicator(strokeCap = StrokeCap.Round)
             }
         } else {
-            AnimatedVisibility(
-                visibleState = contentEnterState,
-                enter = fadeIn(animationSpec = tween(durationMillis = 220)) +
-                    slideInVertically(
-                        initialOffsetY = { it / 8 },
-                        animationSpec = tween(durationMillis = 320, easing = FastOutSlowInEasing)
-                    ),
-                exit = fadeOut(animationSpec = tween(durationMillis = 120)),
-                label = "moduleContentEnter"
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(
+                    bottom = 140.dp,
+                    top = 16.dp,
+                    start = 20.dp,
+                    end = 20.dp
+                ),
+                verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(bottom = 140.dp, top = 16.dp, start = 20.dp, end = 20.dp),
-                    verticalArrangement = Arrangement.spacedBy(24.dp)
-                ) {
-                item {
-                    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                            Surface(
-                                onClick = { showSearch = !showSearch },
-                                modifier = Modifier.height(56.dp).weight(0.3f),
-                                shape = RoundedCornerShape(16.dp),
-                                color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.7f)
+                    item {
+                        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
-                                Box(contentAlignment = Alignment.Center) {
-                                    Icon(if (showSearch) Icons.Rounded.Close else Icons.Rounded.Search, null, tint = MaterialTheme.colorScheme.onSecondaryContainer)
+                                Surface(
+                                    onClick = { showSearch = !showSearch },
+                                    modifier = Modifier
+                                        .height(56.dp)
+                                        .weight(0.3f),
+                                    shape = RoundedCornerShape(16.dp),
+                                    color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.7f)
+                                ) {
+                                    Box(contentAlignment = Alignment.Center) {
+                                        Icon(
+                                            if (showSearch) Icons.Rounded.Close else Icons.Rounded.Search,
+                                            null,
+                                            tint = MaterialTheme.colorScheme.onSecondaryContainer
+                                        )
+                                    }
+                                }
+
+                                Button(
+                                    onClick = { zipPicker.launch("application/zip") },
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .height(56.dp),
+                                    shape = RoundedCornerShape(16.dp)
+                                ) {
+                                    Icon(
+                                        Icons.Rounded.FileUpload,
+                                        null,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Spacer(Modifier.width(12.dp))
+                                    Text(
+                                        text = stringResource(id = CoreR.string.module_action_install_external),
+                                        fontWeight = FontWeight.Black
+                                    )
                                 }
                             }
-                            
-                            Button(
-                                onClick = { zipPicker.launch("application/zip") },
-                                modifier = Modifier.weight(1f).height(56.dp),
-                                shape = RoundedCornerShape(16.dp)
+
+                            AnimatedVisibility(
+                                visible = showSearch,
+                                enter = expandVertically() + fadeIn(),
+                                exit = shrinkVertically() + fadeOut()
                             ) {
-                                Icon(Icons.Rounded.FileUpload, null, modifier = Modifier.size(20.dp))
-                                Spacer(Modifier.width(12.dp))
-                                Text(
-                                    text = stringResource(id = CoreR.string.module_action_install_external),
-                                    fontWeight = FontWeight.Black
+                                OutlinedTextField(
+                                    value = query,
+                                    onValueChange = { query = it },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    shape = RoundedCornerShape(16.dp),
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                        unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
+                                    ),
+                                    leadingIcon = { Icon(Icons.Rounded.Search, null) },
+                                    placeholder = { Text(stringResource(id = CoreR.string.modules_search_placeholder)) },
+                                    singleLine = true
                                 )
                             }
                         }
-                        
-                        AnimatedVisibility(
-                            visible = showSearch,
-                            enter = expandVertically() + fadeIn(),
-                            exit = shrinkVertically() + fadeOut()
-                        ) {
-                            OutlinedTextField(
-                                value = query,
-                                onValueChange = { query = it },
-                                modifier = Modifier.fillMaxWidth(),
-                                shape = RoundedCornerShape(16.dp),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                                    unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
-                                ),
-                                leadingIcon = { Icon(Icons.Rounded.Search, null) },
-                                placeholder = { Text(stringResource(id = CoreR.string.modules_search_placeholder)) },
-                                singleLine = true
+                    }
+
+                    if (state.modules.isEmpty()) {
+                        item {
+                            Box(
+                                Modifier.fillParentMaxHeight(0.7f),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                EmptyStateView()
+                            }
+                        }
+                    } else if (filteredModules.isEmpty()) {
+                        item {
+                            Box(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(32.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    stringResource(id = CoreR.string.modules_no_results),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                                )
+                            }
+                        }
+                    } else {
+                        itemsIndexed(filteredModules, key = { _, m -> m.id }) { _, module ->
+                            StylishMagiskModuleCard(
+                                module = module,
+                                onToggleExpanded = { viewModel.toggleExpanded(module.id) },
+                                onToggleEnabled = { viewModel.toggleEnabled(module.id) },
+                                onToggleRemove = { viewModel.toggleRemove(module.id) },
+                                onUpdate = { onlineModule ->
+                                    if (onlineModule == null) return@StylishMagiskModuleCard
+                                    if (Info.isConnected.value != true) {
+                                        viewModel.postMessageRes(CoreR.string.no_connection)
+                                        return@StylishMagiskModuleCard
+                                    }
+                                    pendingOnlineModule = onlineModule
+                                    showOnlineDialog.value = true
+                                },
+                                onAction = { onRunAction(module.id, module.name) }
                             )
                         }
                     }
-                }
-
-                if (state.modules.isEmpty()) {
-                    item { 
-                        Box(Modifier.fillParentMaxHeight(0.7f), contentAlignment = Alignment.Center) {
-                            EmptyStateView() 
-                        }
-                    }
-                } else if (filteredModules.isEmpty()) {
-                    item {
-                        Box(Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
-                            Text(stringResource(id = CoreR.string.modules_no_results), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f))
-                        }
-                    }
-                } else {
-                    itemsIndexed(filteredModules, key = { _, m -> m.id }) { _, module ->
-                        StylishMagiskModuleCard(
-                            module = module,
-                            onToggleExpanded = { viewModel.toggleExpanded(module.id) },
-                            onToggleEnabled = { viewModel.toggleEnabled(module.id) },
-                            onToggleRemove = { viewModel.toggleRemove(module.id) },
-                            onUpdate = { onlineModule ->
-                                if (onlineModule == null) return@StylishMagiskModuleCard
-                                if (Info.isConnected.value != true) {
-                                    viewModel.postMessageRes(CoreR.string.no_connection)
-                                    return@StylishMagiskModuleCard
-                                }
-                                pendingOnlineModule = onlineModule
-                                showOnlineDialog.value = true
-                            },
-                            onAction = { onRunAction(module.id, module.name) }
-                        )
-                    }
-                }
-                }
             }
         }
-        
-        SnackbarHost(hostState = snackbarHostState, modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 120.dp))
+
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 120.dp)
+        )
     }
 }
 
@@ -265,12 +349,12 @@ private fun StylishMagiskModuleCard(
 ) {
     val isEnabled = module.enabled && !module.removed
     val transition = updateTransition(targetState = module.expanded, label = "cardTransition")
-    
+
     val elevation by transition.animateDp(
         transitionSpec = {
             spring(
-                dampingRatio = Spring.DampingRatioNoBouncy,
-                stiffness = Spring.StiffnessMediumLow
+                dampingRatio = MotionTokens.DampingNoBounce,
+                stiffness = MotionTokens.StiffnessMediumLow
             )
         },
         label = "elevation"
@@ -278,8 +362,8 @@ private fun StylishMagiskModuleCard(
     val rotation by transition.animateFloat(
         transitionSpec = {
             spring(
-                dampingRatio = Spring.DampingRatioLowBouncy,
-                stiffness = Spring.StiffnessMediumLow
+                dampingRatio = MotionTokens.DampingLowBouncy,
+                stiffness = MotionTokens.StiffnessMediumLow
             )
         },
         label = "rotation"
@@ -287,8 +371,8 @@ private fun StylishMagiskModuleCard(
     val cardScale by transition.animateFloat(
         transitionSpec = {
             spring(
-                dampingRatio = Spring.DampingRatioNoBouncy,
-                stiffness = Spring.StiffnessMediumLow
+                dampingRatio = MotionTokens.DampingNoBounce,
+                stiffness = MotionTokens.StiffnessMediumLow
             )
         },
         label = "cardScale"
@@ -301,7 +385,10 @@ private fun StylishMagiskModuleCard(
             !isEnabled -> MaterialTheme.colorScheme.surfaceContainerLow
             else -> if (module.expanded) MaterialTheme.colorScheme.surfaceContainerHighest else MaterialTheme.colorScheme.surfaceContainerHigh
         },
-        animationSpec = tween(durationMillis = 280, easing = FastOutSlowInEasing),
+        animationSpec = tween(
+            durationMillis = MotionTokens.DurationEmphasized,
+            easing = FastOutSlowInEasing
+        ),
         label = "color"
     )
     val stateDotColor = if (module.updateReady) {
@@ -315,12 +402,17 @@ private fun StylishMagiskModuleCard(
             .fillMaxWidth()
             .animateContentSize(
                 animationSpec = spring(
-                    dampingRatio = Spring.DampingRatioNoBouncy,
-                    stiffness = Spring.StiffnessMediumLow
+                    dampingRatio = MotionTokens.DampingNoBounce,
+                    stiffness = MotionTokens.StiffnessMediumLow
                 )
             )
             .scale(cardScale),
-        shape = RoundedCornerShape(topEnd = 48.dp, bottomStart = 48.dp, topStart = 16.dp, bottomEnd = 16.dp),
+        shape = RoundedCornerShape(
+            topEnd = 48.dp,
+            bottomStart = 48.dp,
+            topStart = 16.dp,
+            bottomEnd = 16.dp
+        ),
         onClick = onToggleExpanded,
         colors = CardDefaults.elevatedCardColors(containerColor = containerColor),
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = elevation)
@@ -329,7 +421,11 @@ private fun StylishMagiskModuleCard(
             Icon(
                 painter = painterResource(id = CoreR.drawable.ic_magisk_outline),
                 contentDescription = null,
-                modifier = Modifier.size(140.dp).align(Alignment.TopEnd).offset(x = 40.dp, y = (-30).dp).alpha(0.04f),
+                modifier = Modifier
+                    .size(140.dp)
+                    .align(Alignment.TopEnd)
+                    .offset(x = 40.dp, y = (-30).dp)
+                    .alpha(0.04f),
                 tint = MaterialTheme.colorScheme.primary
             )
             if (module.removed || module.updated) {
@@ -346,7 +442,10 @@ private fun StylishMagiskModuleCard(
             }
 
             Column(modifier = Modifier.padding(24.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Box(contentAlignment = Alignment.BottomEnd) {
                         Surface(
                             modifier = Modifier.size(56.dp),
@@ -354,7 +453,12 @@ private fun StylishMagiskModuleCard(
                             color = MaterialTheme.colorScheme.surface,
                             tonalElevation = 4.dp
                         ) {
-                            Icon(Icons.Rounded.Extension, null, modifier = Modifier.padding(14.dp), tint = MaterialTheme.colorScheme.primary)
+                            Icon(
+                                Icons.Rounded.Extension,
+                                null,
+                                modifier = Modifier.padding(14.dp),
+                                tint = MaterialTheme.colorScheme.primary
+                            )
                         }
                         if (isEnabled) {
                             Box(
@@ -366,8 +470,10 @@ private fun StylishMagiskModuleCard(
                             )
                         }
                     }
-                    
-                    Column(modifier = Modifier.weight(1f).padding(horizontal = 16.dp)) {
+
+                    Column(modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 16.dp)) {
                         Text(
                             text = module.name,
                             style = MaterialTheme.typography.titleLarge,
@@ -375,7 +481,9 @@ private fun StylishMagiskModuleCard(
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             textDecoration = if (module.removed) TextDecoration.LineThrough else null,
-                            color = if (isEnabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                            color = if (isEnabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(
+                                alpha = 0.6f
+                            )
                         )
                         Spacer(Modifier.height(4.dp))
                         Surface(
@@ -388,7 +496,9 @@ private fun StylishMagiskModuleCard(
                                 color = MaterialTheme.colorScheme.primary,
                                 fontWeight = FontWeight.Black,
                                 textDecoration = if (module.removed) TextDecoration.LineThrough else null,
-                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp).alpha(if (isEnabled) 1f else 0.7f)
+                                modifier = Modifier
+                                    .padding(horizontal = 10.dp, vertical = 4.dp)
+                                    .alpha(if (isEnabled) 1f else 0.7f)
                             )
                         }
                         if (module.badges.isNotEmpty()) {
@@ -403,19 +513,27 @@ private fun StylishMagiskModuleCard(
                             )
                         }
                     }
-                    
+
                     AnimatedVisibility(
                         visible = module.expanded,
-                        enter = fadeIn(animationSpec = tween(durationMillis = 180, delayMillis = 50)) +
-                            scaleIn(
-                                initialScale = 0.85f,
-                                animationSpec = spring(
-                                    dampingRatio = Spring.DampingRatioNoBouncy,
-                                    stiffness = Spring.StiffnessMediumLow
+                        enter = fadeIn(
+                            animationSpec = tween(
+                                durationMillis = MotionTokens.DurationMedium,
+                                delayMillis = MotionTokens.DelaySm
+                            )
+                        ) +
+                                scaleIn(
+                                    initialScale = 0.85f,
+                                    animationSpec = spring(
+                                        dampingRatio = MotionTokens.DampingNoBounce,
+                                        stiffness = MotionTokens.StiffnessMediumLow
+                                    )
+                                ),
+                        exit = fadeOut(animationSpec = tween(durationMillis = MotionTokens.DurationQuick)) +
+                                scaleOut(
+                                    targetScale = 0.85f,
+                                    animationSpec = tween(durationMillis = MotionTokens.DurationQuick)
                                 )
-                            ),
-                        exit = fadeOut(animationSpec = tween(durationMillis = 120)) +
-                            scaleOut(targetScale = 0.85f, animationSpec = tween(durationMillis = 120))
                     ) {
                         Switch(
                             checked = isEnabled,
@@ -425,11 +543,13 @@ private fun StylishMagiskModuleCard(
                             } else null
                         )
                     }
-                    
+
                     Icon(
                         imageVector = Icons.AutoMirrored.Rounded.NavigateNext,
                         contentDescription = null,
-                        modifier = Modifier.rotate(rotation).padding(start = 12.dp),
+                        modifier = Modifier
+                            .rotate(rotation)
+                            .padding(start = 12.dp),
                         tint = MaterialTheme.colorScheme.outline
                     )
                 }
@@ -439,17 +559,28 @@ private fun StylishMagiskModuleCard(
                     enter = expandVertically(
                         expandFrom = Alignment.Top,
                         animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioNoBouncy,
-                            stiffness = Spring.StiffnessLow
+                            dampingRatio = MotionTokens.DampingNoBounce,
+                            stiffness = MotionTokens.StiffnessLow
                         )
                     ) + slideInVertically(
                         initialOffsetY = { it / 10 },
-                        animationSpec = tween(durationMillis = 260, easing = FastOutSlowInEasing)
-                    ) + fadeIn(animationSpec = tween(durationMillis = 200, delayMillis = 40)),
+                        animationSpec = tween(
+                            durationMillis = MotionTokens.DurationExpand,
+                            easing = FastOutSlowInEasing
+                        )
+                    ) + fadeIn(
+                        animationSpec = tween(
+                            durationMillis = MotionTokens.DurationStandard,
+                            delayMillis = MotionTokens.DelayXs
+                        )
+                    ),
                     exit = shrinkVertically(
                         shrinkTowards = Alignment.Top,
-                        animationSpec = tween(durationMillis = 210, easing = FastOutLinearInEasing)
-                    ) + fadeOut(animationSpec = tween(durationMillis = 120)),
+                        animationSpec = tween(
+                            durationMillis = MotionTokens.DurationCollapse,
+                            easing = FastOutLinearInEasing
+                        )
+                    ) + fadeOut(animationSpec = tween(durationMillis = MotionTokens.DurationQuick)),
                     label = "moduleCardDetails"
                 ) {
                     Column {
@@ -472,16 +603,29 @@ private fun StylishMagiskModuleCard(
                                 shape = RoundedCornerShape(16.dp),
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(Icons.Rounded.Warning, null, modifier = Modifier.size(20.dp), tint = MaterialTheme.colorScheme.error)
+                                Row(
+                                    modifier = Modifier.padding(16.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        Icons.Rounded.Warning,
+                                        null,
+                                        modifier = Modifier.size(20.dp),
+                                        tint = MaterialTheme.colorScheme.error
+                                    )
                                     Spacer(Modifier.width(12.dp))
-                                    Text(module.noticeText, color = MaterialTheme.colorScheme.onErrorContainer, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+                                    Text(
+                                        module.noticeText,
+                                        color = MaterialTheme.colorScheme.onErrorContainer,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.Bold
+                                    )
                                 }
                             }
                         }
 
                         Spacer(Modifier.height(32.dp))
-                        
+
                         // ALL BUTTONS ALWAYS AT RIGHT
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -496,15 +640,33 @@ private fun StylishMagiskModuleCard(
                                         .animateEnterExit(
                                             enter = slideInHorizontally(
                                                 initialOffsetX = { fullWidth -> fullWidth / 3 },
-                                                animationSpec = tween(durationMillis = 220, delayMillis = 60, easing = FastOutSlowInEasing)
-                                            ) + fadeIn(animationSpec = tween(durationMillis = 180, delayMillis = 60)),
+                                                animationSpec = tween(
+                                                    durationMillis = MotionTokens.DurationStandard,
+                                                    delayMillis = MotionTokens.Stagger1,
+                                                    easing = FastOutSlowInEasing
+                                                )
+                                            ) + fadeIn(
+                                                animationSpec = tween(
+                                                    durationMillis = MotionTokens.DurationMedium,
+                                                    delayMillis = MotionTokens.Stagger1
+                                                )
+                                            ),
                                             exit = slideOutHorizontally(
                                                 targetOffsetX = { fullWidth -> fullWidth / 3 },
-                                                animationSpec = tween(durationMillis = 120, easing = FastOutLinearInEasing)
-                                            ) + fadeOut(animationSpec = tween(durationMillis = 100))
+                                                animationSpec = tween(
+                                                    durationMillis = MotionTokens.DurationQuick,
+                                                    easing = FastOutLinearInEasing
+                                                )
+                                            ) + fadeOut(animationSpec = tween(durationMillis = MotionTokens.DurationTiny))
                                         ),
                                     shape = RoundedCornerShape(16.dp)
-                                ) { Icon(Icons.Rounded.Settings, null, modifier = Modifier.size(24.dp)) }
+                                ) {
+                                    Icon(
+                                        Icons.Rounded.Settings,
+                                        null,
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                }
                             }
 
                             if (module.showUpdate) {
@@ -517,17 +679,36 @@ private fun StylishMagiskModuleCard(
                                         .animateEnterExit(
                                             enter = slideInHorizontally(
                                                 initialOffsetX = { fullWidth -> fullWidth / 3 },
-                                                animationSpec = tween(durationMillis = 220, delayMillis = 110, easing = FastOutSlowInEasing)
-                                            ) + fadeIn(animationSpec = tween(durationMillis = 180, delayMillis = 110)),
+                                                animationSpec = tween(
+                                                    durationMillis = MotionTokens.DurationStandard,
+                                                    delayMillis = MotionTokens.Stagger2,
+                                                    easing = FastOutSlowInEasing
+                                                )
+                                            ) + fadeIn(
+                                                animationSpec = tween(
+                                                    durationMillis = MotionTokens.DurationMedium,
+                                                    delayMillis = MotionTokens.Stagger2
+                                                )
+                                            ),
                                             exit = slideOutHorizontally(
                                                 targetOffsetX = { fullWidth -> fullWidth / 3 },
-                                                animationSpec = tween(durationMillis = 120, easing = FastOutLinearInEasing)
-                                            ) + fadeOut(animationSpec = tween(durationMillis = 100))
+                                                animationSpec = tween(
+                                                    durationMillis = MotionTokens.DurationQuick,
+                                                    easing = FastOutLinearInEasing
+                                                )
+                                            ) + fadeOut(animationSpec = tween(durationMillis = MotionTokens.DurationTiny))
                                         )
                                 ) {
-                                    Icon(Icons.Rounded.SystemUpdateAlt, null, modifier = Modifier.size(20.dp))
+                                    Icon(
+                                        Icons.Rounded.SystemUpdateAlt,
+                                        null,
+                                        modifier = Modifier.size(20.dp)
+                                    )
                                     Spacer(Modifier.width(8.dp))
-                                    Text(stringResource(id = CoreR.string.update), fontWeight = FontWeight.Black)
+                                    Text(
+                                        stringResource(id = CoreR.string.update),
+                                        fontWeight = FontWeight.Black
+                                    )
                                 }
                             }
 
@@ -540,12 +721,24 @@ private fun StylishMagiskModuleCard(
                                     .animateEnterExit(
                                         enter = slideInHorizontally(
                                             initialOffsetX = { fullWidth -> fullWidth / 3 },
-                                            animationSpec = tween(durationMillis = 220, delayMillis = 150, easing = FastOutSlowInEasing)
-                                        ) + fadeIn(animationSpec = tween(durationMillis = 180, delayMillis = 150)),
+                                            animationSpec = tween(
+                                                durationMillis = MotionTokens.DurationStandard,
+                                                delayMillis = MotionTokens.Stagger3,
+                                                easing = FastOutSlowInEasing
+                                            )
+                                        ) + fadeIn(
+                                            animationSpec = tween(
+                                                durationMillis = MotionTokens.DurationMedium,
+                                                delayMillis = MotionTokens.Stagger3
+                                            )
+                                        ),
                                         exit = slideOutHorizontally(
                                             targetOffsetX = { fullWidth -> fullWidth / 3 },
-                                            animationSpec = tween(durationMillis = 120, easing = FastOutLinearInEasing)
-                                        ) + fadeOut(animationSpec = tween(durationMillis = 100))
+                                            animationSpec = tween(
+                                                durationMillis = MotionTokens.DurationQuick,
+                                                easing = FastOutLinearInEasing
+                                            )
+                                        ) + fadeOut(animationSpec = tween(durationMillis = MotionTokens.DurationTiny))
                                     ),
                                 shape = CircleShape,
                                 color = when {
@@ -584,13 +777,27 @@ private fun EmptyStateView() {
             color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
         ) {
             Box(contentAlignment = Alignment.Center) {
-                Icon(Icons.Rounded.ExtensionOff, null, modifier = Modifier.size(64.dp), tint = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f))
+                Icon(
+                    Icons.Rounded.ExtensionOff,
+                    null,
+                    modifier = Modifier.size(64.dp),
+                    tint = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)
+                )
             }
         }
         Spacer(Modifier.height(32.dp))
-        Text(stringResource(id = CoreR.string.module_empty), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.outline)
+        Text(
+            stringResource(id = CoreR.string.module_empty),
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Black,
+            color = MaterialTheme.colorScheme.outline
+        )
         Spacer(Modifier.height(8.dp))
-        Text(stringResource(id = CoreR.string.module_action_install_external), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.outline.copy(alpha = 0.6f))
+        Text(
+            stringResource(id = CoreR.string.module_action_install_external),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.6f)
+        )
     }
 }
 
@@ -606,7 +813,10 @@ private fun OnlineModuleDialog(
         CoreR.string.repo_install_title,
         item.name, item.version, item.versionCode
     )
-    val changelog by produceState(initialValue = AppContext.getString(CoreR.string.loading), item.changelog) {
+    val changelog by produceState(
+        initialValue = AppContext.getString(CoreR.string.loading),
+        item.changelog
+    ) {
         val text = runCatching {
             withContext(Dispatchers.IO) { svc.fetchString(item.changelog) }
         }.getOrDefault("")
@@ -615,7 +825,13 @@ private fun OnlineModuleDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Black) },
+        title = {
+            Text(
+                title,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Black
+            )
+        },
         text = {
             Text(
                 text = changelog,
@@ -658,9 +874,11 @@ data class ModuleUiItem(
     val searchKey: String,
     val expanded: Boolean = false
 )
+
 data class ModuleUiState(val loading: Boolean = true, val modules: List<ModuleUiItem> = emptyList())
 
-class ModuleComposeViewModel(private val moduleProvider: suspend () -> List<LocalModule>) : ViewModel() {
+class ModuleComposeViewModel(private val moduleProvider: suspend () -> List<LocalModule>) :
+    ViewModel() {
     private val _state = MutableStateFlow(ModuleUiState())
     val state: StateFlow<ModuleUiState> = _state
     private val _messages = MutableSharedFlow<String>(extraBufferCapacity = 1)
@@ -685,19 +903,26 @@ class ModuleComposeViewModel(private val moduleProvider: suspend () -> List<Loca
             if (!hadModules) {
                 _state.update { it.copy(loading = true) }
             }
-            val list = if (Info.env.isActive && isModuleRepoLoaded()) readInstalledModules() else emptyList()
+            val list =
+                if (Info.env.isActive && isModuleRepoLoaded()) readInstalledModules() else emptyList()
             synchronized(cacheLock) {
                 moduleCache.clear()
                 list.forEach { moduleCache[it.id] = it }
             }
             val currentExpanded = _state.value.modules.filter { it.expanded }.map { it.id }.toSet()
-            _state.update { it.copy(loading = false, modules = list.map { it.toUiItem(currentExpanded.contains(it.id)) }) }
+            _state.update {
+                it.copy(
+                    loading = false,
+                    modules = list.map { it.toUiItem(currentExpanded.contains(it.id)) })
+            }
             if (list.isNotEmpty() && now - lastMetadataRefreshAt >= MIN_METADATA_REFRESH_INTERVAL_MS) {
                 lastMetadataRefreshAt = now
                 metadataJob = launch(Dispatchers.IO) {
                     list.forEach { runCatching { it.fetch() } }
-                    val currentExpandedMetadata = _state.value.modules.filter { it.expanded }.map { it.id }.toSet()
-                    val updatedUi = list.map { it.toUiItem(currentExpandedMetadata.contains(it.id)) }
+                    val currentExpandedMetadata =
+                        _state.value.modules.filter { it.expanded }.map { it.id }.toSet()
+                    val updatedUi =
+                        list.map { it.toUiItem(currentExpandedMetadata.contains(it.id)) }
                     withContext(Dispatchers.Main) {
                         _state.update { st -> st.copy(modules = updatedUi) }
                     }
@@ -708,8 +933,8 @@ class ModuleComposeViewModel(private val moduleProvider: suspend () -> List<Loca
 
     fun toggleExpanded(id: String) {
         _state.update { st ->
-            st.copy(modules = st.modules.map { 
-                if (it.id == id) it.copy(expanded = !it.expanded) else it 
+            st.copy(modules = st.modules.map {
+                if (it.id == id) it.copy(expanded = !it.expanded) else it
             })
         }
     }
@@ -730,7 +955,15 @@ class ModuleComposeViewModel(private val moduleProvider: suspend () -> List<Loca
                 }
                 val currentExp = _state.value.modules.filter { it.expanded }.map { it.id }.toSet()
                 withContext(Dispatchers.Main) {
-                    _state.update { it.copy(modules = list.map { m -> m.toUiItem(currentExp.contains(m.id)) }) }
+                    _state.update {
+                        it.copy(modules = list.map { m ->
+                            m.toUiItem(
+                                currentExp.contains(
+                                    m.id
+                                )
+                            )
+                        })
+                    }
                 }
                 synchronized(cacheLock) { moduleCache[id] } ?: return@launch
             }
@@ -757,10 +990,17 @@ class ModuleComposeViewModel(private val moduleProvider: suspend () -> List<Loca
         }
     }
 
-    private suspend fun isModuleRepoLoaded(): Boolean = withTimeoutOrNull(3000) { withContext(Dispatchers.IO) { LocalModule.loaded() } } ?: false
-    private suspend fun readInstalledModules(): List<LocalModule> = withTimeoutOrNull(5000) { withContext(Dispatchers.IO) { moduleProvider() } } ?: emptyList()
+    private suspend fun isModuleRepoLoaded(): Boolean =
+        withTimeoutOrNull(3000) { withContext(Dispatchers.IO) { LocalModule.loaded() } } ?: false
 
-    object Factory : ViewModelProvider.Factory { override fun <T : ViewModel> create(modelClass: Class<T>): T { @Suppress("UNCHECKED_CAST") return ModuleComposeViewModel { LocalModule.installed() } as T } }
+    private suspend fun readInstalledModules(): List<LocalModule> =
+        withTimeoutOrNull(5000) { withContext(Dispatchers.IO) { moduleProvider() } } ?: emptyList()
+
+    object Factory : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            @Suppress("UNCHECKED_CAST") return ModuleComposeViewModel { LocalModule.installed() } as T
+        }
+    }
 
     companion object {
         private const val MIN_REFRESH_INTERVAL_MS = 1200L
@@ -774,8 +1014,16 @@ private fun LocalModule.toUiItem(expanded: Boolean = false): ModuleUiItem {
     val safeDescription = description
     val noticeText: String? = when {
         zygiskUnloaded -> AppContext.getString(CoreR.string.zygisk_module_unloaded)
-        Info.isZygiskEnabled && isRiru -> AppContext.getString(CoreR.string.suspend_text_riru, zygiskLabel)
-        !Info.isZygiskEnabled && isZygisk -> AppContext.getString(CoreR.string.suspend_text_zygisk, zygiskLabel)
+        Info.isZygiskEnabled && isRiru -> AppContext.getString(
+            CoreR.string.suspend_text_riru,
+            zygiskLabel
+        )
+
+        !Info.isZygiskEnabled && isZygisk -> AppContext.getString(
+            CoreR.string.suspend_text_zygisk,
+            zygiskLabel
+        )
+
         else -> null
     }
     return ModuleUiItem(

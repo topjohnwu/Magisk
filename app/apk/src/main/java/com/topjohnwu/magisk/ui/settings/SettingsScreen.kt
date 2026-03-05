@@ -4,22 +4,78 @@ import android.Manifest.permission.POST_NOTIFICATIONS
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.compose.animation.*
-import androidx.compose.foundation.background
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Reply
-import androidx.compose.material.icons.rounded.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.rounded.AddLink
+import androidx.compose.material.icons.rounded.Block
+import androidx.compose.material.icons.rounded.Bolt
+import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.ChevronRight
+import androidx.compose.material.icons.rounded.Dns
+import androidx.compose.material.icons.rounded.Fingerprint
+import androidx.compose.material.icons.rounded.FolderOpen
+import androidx.compose.material.icons.rounded.Key
+import androidx.compose.material.icons.rounded.Language
+import androidx.compose.material.icons.rounded.Layers
+import androidx.compose.material.icons.rounded.Link
+import androidx.compose.material.icons.rounded.Lock
+import androidx.compose.material.icons.rounded.Masks
+import androidx.compose.material.icons.rounded.NotificationAdd
+import androidx.compose.material.icons.rounded.NotificationsActive
+import androidx.compose.material.icons.rounded.Palette
+import androidx.compose.material.icons.rounded.People
+import androidx.compose.material.icons.rounded.Public
+import androidx.compose.material.icons.rounded.RestorePage
+import androidx.compose.material.icons.rounded.Security
+import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material.icons.rounded.Shield
+import androidx.compose.material.icons.rounded.Shuffle
+import androidx.compose.material.icons.rounded.Timer
+import androidx.compose.material.icons.rounded.TouchApp
+import androidx.compose.material.icons.rounded.Update
+import androidx.compose.material.icons.rounded.VerifiedUser
+import androidx.compose.material.icons.rounded.Warning
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -52,7 +108,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import com.topjohnwu.magisk.core.R as CoreR
@@ -84,14 +139,17 @@ fun SettingsScreen(
             verticalArrangement = Arrangement.spacedBy(28.dp)
         ) {
             item {
-                OrganicSettingsSection(stringResource(id = CoreR.string.settings_customization), Icons.Rounded.Palette) {
+                OrganicSettingsSection(
+                    stringResource(id = CoreR.string.settings_customization),
+                    Icons.Rounded.Palette
+                ) {
                     ExpressiveSettingItem(
                         title = stringResource(id = CoreR.string.section_theme),
                         subtitle = "${darkModeLabel(state.darkThemeMode)} | ${state.themeName}",
                         icon = Icons.Rounded.Palette,
                         onClick = onOpenTheme
                     )
-                    
+
                     ExpressiveSettingItem(
                         title = stringResource(id = CoreR.string.language),
                         subtitle = if (state.useLocaleManager) state.languageSystemName else state.languageName,
@@ -123,7 +181,10 @@ fun SettingsScreen(
             }
 
             item {
-                OrganicSettingsSection(stringResource(id = CoreR.string.home_app_title), Icons.Rounded.Settings) {
+                OrganicSettingsSection(
+                    stringResource(id = CoreR.string.home_app_title),
+                    Icons.Rounded.Settings
+                ) {
                     ExpressiveSettingItem(
                         title = stringResource(id = CoreR.string.settings_update_channel_title),
                         subtitle = state.updateChannelName,
@@ -132,7 +193,8 @@ fun SettingsScreen(
                             selector = SelectorSpec(
                                 title = AppContext.getString(CoreR.string.settings_update_channel_title),
                                 icon = Icons.Rounded.Update,
-                                options = context.resources.getStringArray(CoreR.array.update_channel).toList(),
+                                options = context.resources.getStringArray(CoreR.array.update_channel)
+                                    .toList(),
                                 selectedIndex = state.updateChannel.coerceAtLeast(0),
                                 onSelect = { index ->
                                     viewModel.setUpdateChannel(index)
@@ -226,7 +288,10 @@ fun SettingsScreen(
 
             if (state.showMagisk) {
                 item {
-                    OrganicSettingsSection(stringResource(id = CoreR.string.magisk), Icons.Rounded.Security) {
+                    OrganicSettingsSection(
+                        stringResource(id = CoreR.string.magisk),
+                        Icons.Rounded.Security
+                    ) {
                         ExpressiveSettingItem(
                             title = stringResource(id = CoreR.string.settings_hosts_title),
                             subtitle = stringResource(id = CoreR.string.settings_hosts_summary),
@@ -236,7 +301,9 @@ fun SettingsScreen(
                         if (state.showMagiskAdvanced) {
                             ExpressiveToggleItem(
                                 title = stringResource(id = CoreR.string.zygisk),
-                                subtitle = if (state.zygiskMismatch) stringResource(id = CoreR.string.reboot_apply_change) else stringResource(id = CoreR.string.settings_zygisk_summary),
+                                subtitle = if (state.zygiskMismatch) stringResource(id = CoreR.string.reboot_apply_change) else stringResource(
+                                    id = CoreR.string.settings_zygisk_summary
+                                ),
                                 checked = state.zygisk,
                                 icon = Icons.Rounded.Bolt,
                                 onChecked = viewModel::setZygisk
@@ -263,7 +330,10 @@ fun SettingsScreen(
 
             if (state.showSuperuser) {
                 item {
-                    OrganicSettingsSection(stringResource(id = CoreR.string.superuser), Icons.Rounded.Shield) {
+                    OrganicSettingsSection(
+                        stringResource(id = CoreR.string.superuser),
+                        Icons.Rounded.Shield
+                    ) {
                         if (!state.hideTapjackOnSPlus) {
                             ExpressiveToggleItem(
                                 title = stringResource(id = CoreR.string.settings_su_tapjack_title),
@@ -275,13 +345,19 @@ fun SettingsScreen(
                         }
                         ExpressiveToggleItem(
                             title = stringResource(id = CoreR.string.settings_su_auth_title),
-                            subtitle = if (state.deviceSecure) stringResource(id = CoreR.string.settings_su_auth_summary) else stringResource(id = CoreR.string.settings_su_auth_insecure),
+                            subtitle = if (state.deviceSecure) stringResource(id = CoreR.string.settings_su_auth_summary) else stringResource(
+                                id = CoreR.string.settings_su_auth_insecure
+                            ),
                             checked = state.suAuth,
                             enabled = state.deviceSecure,
                             icon = Icons.Rounded.Fingerprint,
                             onChecked = { checked ->
-                                activity?.withAuthentication { ok -> if (ok) viewModel.setSuAuth(checked) }
-                                ?: viewModel.setMessageRes(CoreR.string.app_not_found)
+                                activity?.withAuthentication { ok ->
+                                    if (ok) viewModel.setSuAuth(
+                                        checked
+                                    )
+                                }
+                                    ?: viewModel.setMessageRes(CoreR.string.app_not_found)
                             }
                         )
                         ExpressiveSettingItem(
@@ -292,7 +368,8 @@ fun SettingsScreen(
                                 selector = SelectorSpec(
                                     title = AppContext.getString(CoreR.string.superuser_access),
                                     icon = Icons.Rounded.Key,
-                                    options = context.resources.getStringArray(CoreR.array.su_access).toList(),
+                                    options = context.resources.getStringArray(CoreR.array.su_access)
+                                        .toList(),
                                     selectedIndex = state.rootMode.coerceAtLeast(0),
                                     onSelect = viewModel::setRootMode
                                 )
@@ -307,7 +384,8 @@ fun SettingsScreen(
                                 selector = SelectorSpec(
                                     title = AppContext.getString(CoreR.string.multiuser_mode),
                                     icon = Icons.Rounded.People,
-                                    options = context.resources.getStringArray(CoreR.array.multiuser_mode).toList(),
+                                    options = context.resources.getStringArray(CoreR.array.multiuser_mode)
+                                        .toList(),
                                     selectedIndex = state.suMultiuserMode.coerceAtLeast(0),
                                     onSelect = viewModel::setSuMultiuserMode
                                 )
@@ -321,7 +399,8 @@ fun SettingsScreen(
                                 selector = SelectorSpec(
                                     title = AppContext.getString(CoreR.string.mount_namespace_mode),
                                     icon = Icons.Rounded.Layers,
-                                    options = context.resources.getStringArray(CoreR.array.namespace).toList(),
+                                    options = context.resources.getStringArray(CoreR.array.namespace)
+                                        .toList(),
                                     selectedIndex = state.suMntNamespaceMode.coerceAtLeast(0),
                                     onSelect = viewModel::setSuMntNamespaceMode
                                 )
@@ -336,7 +415,8 @@ fun SettingsScreen(
                                     selector = SelectorSpec(
                                         title = AppContext.getString(CoreR.string.auto_response),
                                         icon = Icons.AutoMirrored.Rounded.Reply,
-                                        options = context.resources.getStringArray(CoreR.array.auto_response).toList(),
+                                        options = context.resources.getStringArray(CoreR.array.auto_response)
+                                            .toList(),
                                         selectedIndex = state.suAutoResponse.coerceAtLeast(0),
                                         onSelect = viewModel::setSuAutoResponse
                                     )
@@ -353,8 +433,12 @@ fun SettingsScreen(
                                 selector = SelectorSpec(
                                     title = AppContext.getString(CoreR.string.request_timeout),
                                     icon = Icons.Rounded.Timer,
-                                    options = context.resources.getStringArray(CoreR.array.request_timeout).toList(),
-                                    selectedIndex = state.suTimeoutIndex.coerceIn(0, SU_TIMEOUT_VALUES.lastIndex),
+                                    options = context.resources.getStringArray(CoreR.array.request_timeout)
+                                        .toList(),
+                                    selectedIndex = state.suTimeoutIndex.coerceIn(
+                                        0,
+                                        SU_TIMEOUT_VALUES.lastIndex
+                                    ),
                                     onSelect = viewModel::setSuTimeoutIndex
                                 )
                             }
@@ -367,7 +451,8 @@ fun SettingsScreen(
                                 selector = SelectorSpec(
                                     title = AppContext.getString(CoreR.string.superuser_notification),
                                     icon = Icons.Rounded.NotificationsActive,
-                                    options = context.resources.getStringArray(CoreR.array.su_notification).toList(),
+                                    options = context.resources.getStringArray(CoreR.array.su_notification)
+                                        .toList(),
                                     selectedIndex = state.suNotification.coerceAtLeast(0),
                                     onSelect = viewModel::setSuNotification
                                 )
@@ -396,18 +481,51 @@ fun SettingsScreen(
             }
         }
 
-        SnackbarHost(hostState = snackbarHostState, modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 110.dp))
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 110.dp)
+        )
     }
 
     selector?.let { spec ->
         AlertDialog(
             onDismissRequest = { selector = null },
-            title = { Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) { Icon(spec.icon, null, tint = MaterialTheme.colorScheme.primary); Text(spec.title, fontWeight = FontWeight.Black) } },
+            title = {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Icon(spec.icon, null, tint = MaterialTheme.colorScheme.primary); Text(
+                    spec.title,
+                    fontWeight = FontWeight.Black
+                )
+                }
+            },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     spec.options.forEachIndexed { index, label ->
-                        Surface(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp), color = if (index == spec.selectedIndex) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f) else Color.Transparent, onClick = { spec.onSelect(index); selector = null }) {
-                            Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) { RadioButton(selected = index == spec.selectedIndex, onClick = null); Spacer(Modifier.width(16.dp)); Text(label, style = MaterialTheme.typography.bodyLarge, fontWeight = if (index == spec.selectedIndex) FontWeight.Bold else FontWeight.Normal) }
+                        Surface(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(16.dp),
+                            color = if (index == spec.selectedIndex) MaterialTheme.colorScheme.primaryContainer.copy(
+                                alpha = 0.5f
+                            ) else Color.Transparent,
+                            onClick = { spec.onSelect(index); selector = null }) {
+                            Row(
+                                modifier = Modifier.padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                RadioButton(
+                                    selected = index == spec.selectedIndex,
+                                    onClick = null
+                                ); Spacer(Modifier.width(16.dp)); Text(
+                                label,
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = if (index == spec.selectedIndex) FontWeight.Bold else FontWeight.Normal
+                            )
+                            }
                         }
                     }
                 }
@@ -423,9 +541,29 @@ fun SettingsScreen(
         AlertDialog(
             onDismissRequest = { input = null },
             title = { Text(spec.title, fontWeight = FontWeight.Black) },
-            text = { OutlinedTextField(value = value, onValueChange = { value = it }, singleLine = true, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = MaterialTheme.colorScheme.primary, unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant)) },
-            confirmButton = { Button(onClick = { spec.onConfirm(value.trim()); input = null }) { Text(stringResource(id = android.R.string.ok), fontWeight = FontWeight.Bold) } },
-            dismissButton = { TextButton(onClick = { input = null }) { Text(stringResource(id = android.R.string.cancel)) } },
+            text = {
+                OutlinedTextField(
+                    value = value,
+                    onValueChange = { value = it },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
+                    )
+                )
+            },
+            confirmButton = {
+                Button(onClick = {
+                    spec.onConfirm(value.trim()); input = null
+                }) { Text(stringResource(id = android.R.string.ok), fontWeight = FontWeight.Bold) }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    input = null
+                }) { Text(stringResource(id = android.R.string.cancel)) }
+            },
             shape = RoundedCornerShape(32.dp),
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
         )
@@ -434,10 +572,33 @@ fun SettingsScreen(
     if (confirmRestore) {
         AlertDialog(
             onDismissRequest = { confirmRestore = false },
-            title = { Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) { Icon(Icons.Rounded.Warning, null, tint = MaterialTheme.colorScheme.error); Text(stringResource(id = CoreR.string.settings_restore_app_title), fontWeight = FontWeight.Black) } },
+            title = {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Icon(Icons.Rounded.Warning, null, tint = MaterialTheme.colorScheme.error); Text(
+                    stringResource(id = CoreR.string.settings_restore_app_title),
+                    fontWeight = FontWeight.Black
+                )
+                }
+            },
             text = { Text(stringResource(id = CoreR.string.restore_app_confirmation)) },
-            confirmButton = { Button(onClick = { confirmRestore = false; viewModel.restoreApp(activity) }, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)) { Text(stringResource(id = android.R.string.ok), fontWeight = FontWeight.Bold) } },
-            dismissButton = { TextButton(onClick = { confirmRestore = false }) { Text(stringResource(id = android.R.string.cancel)) } },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        confirmRestore = false; viewModel.restoreApp(
+                        activity
+                    )
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                ) { Text(stringResource(id = android.R.string.ok), fontWeight = FontWeight.Bold) }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    confirmRestore = false
+                }) { Text(stringResource(id = android.R.string.cancel)) }
+            },
             shape = RoundedCornerShape(32.dp),
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
         )
@@ -445,48 +606,159 @@ fun SettingsScreen(
 }
 
 @Composable
-private fun OrganicSettingsSection(title: String, icon: ImageVector, content: @Composable ColumnScope.() -> Unit) {
+private fun OrganicSettingsSection(
+    title: String,
+    icon: ImageVector,
+    content: @Composable ColumnScope.() -> Unit
+) {
     Column(modifier = Modifier.animateContentSize()) {
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 8.dp, vertical = 12.dp)) {
-            Surface(color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f), shape = RoundedCornerShape(12.dp), modifier = Modifier.size(32.dp)) { Icon(icon, null, modifier = Modifier.padding(6.dp), tint = MaterialTheme.colorScheme.onPrimaryContainer) }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 12.dp)
+        ) {
+            Surface(
+                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.size(32.dp)
+            ) {
+                Icon(
+                    icon,
+                    null,
+                    modifier = Modifier.padding(6.dp),
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            }
             Spacer(Modifier.width(16.dp))
-            Text(text = title.uppercase(), style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Black, letterSpacing = 1.2.sp, color = MaterialTheme.colorScheme.outline)
+            Text(
+                text = title.uppercase(),
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Black,
+                letterSpacing = 1.2.sp,
+                color = MaterialTheme.colorScheme.outline
+            )
         }
-        ElevatedCard(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(28.dp), colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh), elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)) { Column(modifier = Modifier.padding(vertical = 8.dp), content = content) }
+        ElevatedCard(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(28.dp),
+            colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+            elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
+        ) { Column(modifier = Modifier.padding(vertical = 8.dp), content = content) }
     }
 }
 
 @Composable
-private fun ExpressiveSettingItem(title: String, subtitle: String, icon: ImageVector? = null, enabled: Boolean = true, onClick: () -> Unit) {
-    Surface(color = Color.Transparent, modifier = Modifier.fillMaxWidth().clickable(enabled = enabled, onClick = onClick)) {
-        Row(modifier = Modifier.padding(horizontal = 24.dp, vertical = 20.dp), verticalAlignment = Alignment.CenterVertically) {
+private fun ExpressiveSettingItem(
+    title: String,
+    subtitle: String,
+    icon: ImageVector? = null,
+    enabled: Boolean = true,
+    onClick: () -> Unit
+) {
+    Surface(
+        color = Color.Transparent,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(enabled = enabled, onClick = onClick)
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 24.dp, vertical = 20.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             if (icon != null) {
-                Surface(color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f), shape = CircleShape, modifier = Modifier.size(44.dp)) { Icon(icon, null, modifier = Modifier.padding(11.dp), tint = MaterialTheme.colorScheme.primary) }
+                Surface(
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                    shape = CircleShape,
+                    modifier = Modifier.size(44.dp)
+                ) {
+                    Icon(
+                        icon,
+                        null,
+                        modifier = Modifier.padding(11.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
                 Spacer(Modifier.width(20.dp))
             }
             Column(Modifier.weight(1f)) {
-                Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.ExtraBold, color = if (enabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outline)
-                Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f))
+                Text(
+                    title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = if (enabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outline
+                )
+                Text(
+                    subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
+                )
             }
-            Icon(Icons.Rounded.ChevronRight, null, modifier = Modifier.size(20.dp), tint = if (enabled) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.outline.copy(alpha = 0.4f))
+            Icon(
+                Icons.Rounded.ChevronRight,
+                null,
+                modifier = Modifier.size(20.dp),
+                tint = if (enabled) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.outline.copy(
+                    alpha = 0.4f
+                )
+            )
         }
     }
 }
 
 @Composable
-private fun ExpressiveToggleItem(title: String, subtitle: String, checked: Boolean, icon: ImageVector? = null, enabled: Boolean = true, onChecked: (Boolean) -> Unit) {
-    Surface(color = Color.Transparent, modifier = Modifier.fillMaxWidth().clickable(enabled = enabled) { onChecked(!checked) }) {
-        Row(modifier = Modifier.padding(horizontal = 24.dp, vertical = 20.dp), verticalAlignment = Alignment.CenterVertically) {
+private fun ExpressiveToggleItem(
+    title: String,
+    subtitle: String,
+    checked: Boolean,
+    icon: ImageVector? = null,
+    enabled: Boolean = true,
+    onChecked: (Boolean) -> Unit
+) {
+    Surface(
+        color = Color.Transparent,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(enabled = enabled) { onChecked(!checked) }) {
+        Row(
+            modifier = Modifier.padding(horizontal = 24.dp, vertical = 20.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             if (icon != null) {
-                Surface(color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f), shape = CircleShape, modifier = Modifier.size(44.dp)) { Icon(icon, null, modifier = Modifier.padding(11.dp), tint = MaterialTheme.colorScheme.primary) }
+                Surface(
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                    shape = CircleShape,
+                    modifier = Modifier.size(44.dp)
+                ) {
+                    Icon(
+                        icon,
+                        null,
+                        modifier = Modifier.padding(11.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
                 Spacer(Modifier.width(20.dp))
             }
             Column(Modifier.weight(1f)) {
-                Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.ExtraBold, color = if (enabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outline)
-                Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f), lineHeight = 18.sp)
+                Text(
+                    title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = if (enabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outline
+                )
+                Text(
+                    subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
+                    lineHeight = 18.sp
+                )
             }
             Spacer(Modifier.width(16.dp))
-            Switch(checked = checked, onCheckedChange = onChecked, enabled = enabled, thumbContent = if (checked) { { Icon(Icons.Rounded.Check, null, Modifier.size(16.dp)) } } else null)
+            Switch(
+                checked = checked,
+                onCheckedChange = onChecked,
+                enabled = enabled,
+                thumbContent = if (checked) {
+                    { Icon(Icons.Rounded.Check, null, Modifier.size(16.dp)) }
+                } else null)
         }
     }
 }
@@ -498,7 +770,14 @@ private fun darkModeLabel(mode: Int): String = when (mode) {
     else -> AppContext.getString(CoreR.string.settings_dark_mode_system)
 }
 
-data class SelectorSpec(val title: String, val icon: ImageVector, val options: List<String>, val selectedIndex: Int, val onSelect: (Int) -> Unit)
+data class SelectorSpec(
+    val title: String,
+    val icon: ImageVector,
+    val options: List<String>,
+    val selectedIndex: Int,
+    val onSelect: (Int) -> Unit
+)
+
 data class InputSpec(val title: String, val initialValue: String, val onConfirm: (String) -> Unit)
 
 data class SettingsUiState(
@@ -507,16 +786,24 @@ data class SettingsUiState(
     val selectedThemeIndex: Int = Theme.values().indexOf(Theme.selected).coerceAtLeast(0),
     val themeName: String = Theme.selected.themeName,
     val useLocaleManager: Boolean = LocaleSetting.useLocaleManager,
-    val languageSystemName: String = LocaleSetting.instance.appLocale?.let { it.getDisplayName(it) } ?: AppContext.getString(CoreR.string.system_default),
-    val languageIndex: Int = LocaleSetting.available.tags.indexOf(Config.locale).let { if (it < 0) 0 else it },
-    val languageName: String = LocaleSetting.available.names.getOrElse(LocaleSetting.available.tags.indexOf(Config.locale).let { if (it < 0) 0 else it }) { AppContext.getString(CoreR.string.system_default) },
-    val canAddShortcut: Boolean = isRunningAsStub && ShortcutManagerCompat.isRequestPinShortcutSupported(AppContext),
+    val languageSystemName: String = LocaleSetting.instance.appLocale?.let { it.getDisplayName(it) }
+        ?: AppContext.getString(CoreR.string.system_default),
+    val languageIndex: Int = LocaleSetting.available.tags.indexOf(Config.locale)
+        .let { if (it < 0) 0 else it },
+    val languageName: String = LocaleSetting.available.names.getOrElse(
+        LocaleSetting.available.tags.indexOf(
+            Config.locale
+        ).let { if (it < 0) 0 else it }) { AppContext.getString(CoreR.string.system_default) },
+    val canAddShortcut: Boolean = isRunningAsStub && ShortcutManagerCompat.isRequestPinShortcutSupported(
+        AppContext
+    ),
     val canMigrateApp: Boolean = Info.env.isActive && Const.USER_ID == 0,
     val isHiddenApp: Boolean = AppContext.packageName != BuildConfig.APP_PACKAGE_NAME,
     val checkUpdate: Boolean = Config.checkUpdate,
     val updateChannel: Int = Config.updateChannel,
     val isCustomChannel: Boolean = Config.updateChannel == Config.Value.CUSTOM_CHANNEL,
-    val updateChannelName: String = AppContext.resources.getStringArray(CoreR.array.update_channel).getOrElse(Config.updateChannel) { "-" },
+    val updateChannelName: String = AppContext.resources.getStringArray(CoreR.array.update_channel)
+        .getOrElse(Config.updateChannel) { "-" },
     val customChannelUrl: String = Config.customChannelUrl,
     val doh: Boolean = Config.doh,
     val downloadDir: String = Config.downloadDir,
@@ -534,20 +821,31 @@ data class SettingsUiState(
     val suAuth: Boolean = Config.suAuth,
     val hideTapjackOnSPlus: Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S,
     val rootMode: Int = Config.rootMode,
-    val accessModeName: String = AppContext.resources.getStringArray(CoreR.array.su_access).getOrElse(Config.rootMode) { "-" },
+    val accessModeName: String = AppContext.resources.getStringArray(CoreR.array.su_access)
+        .getOrElse(Config.rootMode) { "-" },
     val suMultiuserMode: Int = Config.suMultiuserMode,
-    val multiuserModeName: String = AppContext.resources.getStringArray(CoreR.array.multiuser_mode).getOrElse(Config.suMultiuserMode) { "-" },
+    val multiuserModeName: String = AppContext.resources.getStringArray(CoreR.array.multiuser_mode)
+        .getOrElse(Config.suMultiuserMode) { "-" },
     val multiuserModeEnabled: Boolean = Const.USER_ID == 0,
-    val multiuserSummary: String = AppContext.resources.getStringArray(CoreR.array.multiuser_summary).getOrElse(Config.suMultiuserMode) { "-" },
+    val multiuserSummary: String = AppContext.resources.getStringArray(CoreR.array.multiuser_summary)
+        .getOrElse(Config.suMultiuserMode) { "-" },
     val suMntNamespaceMode: Int = Config.suMntNamespaceMode,
-    val mountNamespaceName: String = AppContext.resources.getStringArray(CoreR.array.namespace).getOrElse(Config.suMntNamespaceMode) { "-" },
-    val mountNamespaceSummary: String = AppContext.resources.getStringArray(CoreR.array.namespace_summary).getOrElse(Config.suMntNamespaceMode) { "-" },
+    val mountNamespaceName: String = AppContext.resources.getStringArray(CoreR.array.namespace)
+        .getOrElse(Config.suMntNamespaceMode) { "-" },
+    val mountNamespaceSummary: String = AppContext.resources.getStringArray(CoreR.array.namespace_summary)
+        .getOrElse(Config.suMntNamespaceMode) { "-" },
     val suAutoResponse: Int = Config.suAutoResponse,
-    val autoResponseName: String = AppContext.resources.getStringArray(CoreR.array.auto_response).getOrElse(Config.suAutoResponse) { "-" },
-    val suTimeoutIndex: Int = SU_TIMEOUT_VALUES.indexOf(Config.suDefaultTimeout).let { if (it < 0) 0 else it },
-    val requestTimeoutName: String = AppContext.resources.getStringArray(CoreR.array.request_timeout).getOrElse(SU_TIMEOUT_VALUES.indexOf(Config.suDefaultTimeout).let { if (it < 0) 0 else it }) { "-" },
+    val autoResponseName: String = AppContext.resources.getStringArray(CoreR.array.auto_response)
+        .getOrElse(Config.suAutoResponse) { "-" },
+    val suTimeoutIndex: Int = SU_TIMEOUT_VALUES.indexOf(Config.suDefaultTimeout)
+        .let { if (it < 0) 0 else it },
+    val requestTimeoutName: String = AppContext.resources.getStringArray(CoreR.array.request_timeout)
+        .getOrElse(
+            SU_TIMEOUT_VALUES.indexOf(Config.suDefaultTimeout)
+                .let { if (it < 0) 0 else it }) { "-" },
     val suNotification: Int = Config.suNotification,
-    val suNotificationName: String = AppContext.resources.getStringArray(CoreR.array.su_notification).getOrElse(Config.suNotification) { "-" },
+    val suNotificationName: String = AppContext.resources.getStringArray(CoreR.array.su_notification)
+        .getOrElse(Config.suNotification) { "-" },
     val suReAuth: Boolean = Config.suReAuth,
     val showReauthenticate: Boolean = Build.VERSION.SDK_INT < Build.VERSION_CODES.O,
     val suRestrict: Boolean = Config.suRestrict,
@@ -566,10 +864,28 @@ class SettingsComposeViewModel : ViewModel() {
         refreshJob = viewModelScope.launch { state = snapshotState() }
     }
 
-    fun setDarkMode(mode: Int) { Config.darkTheme = mode; state = snapshotState() }
-    fun setThemeOrdinal(index: Int) { val theme = Theme.values().getOrNull(index) ?: Theme.Default; Config.themeOrdinal = if (theme == Theme.Default) -1 else theme.ordinal; state = snapshotState() }
-    fun setLanguageByIndex(index: Int) { if (state.useLocaleManager) return; val tags = LocaleSetting.available.tags; if (tags.isEmpty()) return; val safe = index.coerceIn(0, tags.lastIndex); Config.locale = tags[safe]; state = snapshotState() }
-    fun addShortcut() { runCatching { Shortcuts.addHomeIcon(AppContext); state = snapshotState() }.onFailure { _messages.tryEmit(AppContext.getString(CoreR.string.failure)) } }
+    fun setDarkMode(mode: Int) {
+        Config.darkTheme = mode; state = snapshotState()
+    }
+
+    fun setThemeOrdinal(index: Int) {
+        val theme = Theme.values().getOrNull(index) ?: Theme.Default; Config.themeOrdinal =
+            if (theme == Theme.Default) -1 else theme.ordinal; state = snapshotState()
+    }
+
+    fun setLanguageByIndex(index: Int) {
+        if (state.useLocaleManager) return;
+        val tags = LocaleSetting.available.tags; if (tags.isEmpty()) return;
+        val safe = index.coerceIn(0, tags.lastIndex); Config.locale = tags[safe]; state =
+            snapshotState()
+    }
+
+    fun addShortcut() {
+        runCatching {
+            Shortcuts.addHomeIcon(AppContext); state = snapshotState()
+        }.onFailure { _messages.tryEmit(AppContext.getString(CoreR.string.failure)) }
+    }
+
     fun hideApp(activity: UIActivity<*>?, label: String) {
         val safeLabel = label.trim()
         if (activity == null || safeLabel.isBlank() || safeLabel.length > AppMigration.MAX_LABEL_LENGTH) {
@@ -602,28 +918,117 @@ class SettingsComposeViewModel : ViewModel() {
             state = snapshotState()
         }
     }
-    fun setCheckUpdate(v: Boolean) { Config.checkUpdate = v; state = snapshotState() }
-    fun setUpdateChannel(c: Int) { Config.updateChannel = c; Info.resetUpdate(); state = snapshotState() }
-    fun setCustomChannelUrl(u: String) { Config.customChannelUrl = u; Info.resetUpdate(); state = snapshotState() }
-    fun setDoH(v: Boolean) { Config.doh = v; state = snapshotState() }
-    fun setDownloadDir(v: String) { Config.downloadDir = v; state = snapshotState() }
-    fun setRandName(v: Boolean) { Config.randName = v; state = snapshotState() }
-    fun createSystemlessHosts() { viewModelScope.launch { val ok = RootUtils.addSystemlessHosts(); _messages.tryEmit(AppContext.getString(if (ok) CoreR.string.settings_hosts_toast else CoreR.string.failure)) } }
-    fun setZygisk(v: Boolean) { Config.zygisk = v; state = snapshotState(); if (v != Info.isZygiskEnabled) _messages.tryEmit(AppContext.getString(CoreR.string.reboot_apply_change)) }
-    fun setDenyList(v: Boolean) { viewModelScope.launch { val cmd = if (v) "enable" else "disable"; val ok = withContext(Dispatchers.IO) { Shell.cmd("magisk --denylist $cmd").exec().isSuccess }; state = if (ok) { Config.denyList = v; snapshotState() } else { _messages.emit(AppContext.getString(CoreR.string.failure)); snapshotState() } } }
-    fun setRootMode(v: Int) { Config.rootMode = v; state = snapshotState() }
-    fun setSuMultiuserMode(v: Int) { Config.suMultiuserMode = v; state = snapshotState() }
-    fun setSuMntNamespaceMode(v: Int) { Config.suMntNamespaceMode = v; state = snapshotState() }
-    fun setSuAuth(v: Boolean) { Config.suAuth = v; state = snapshotState() }
-    fun setSuAutoResponse(v: Int) { Config.suAutoResponse = v; state = snapshotState() }
-    fun setSuTimeoutIndex(index: Int) { val safe = index.coerceIn(0, SU_TIMEOUT_VALUES.lastIndex); Config.suDefaultTimeout = SU_TIMEOUT_VALUES[safe]; state = snapshotState() }
-    fun setSuNotification(v: Int) { Config.suNotification = v; state = snapshotState() }
-    fun setSuReAuth(v: Boolean) { Config.suReAuth = v; state = snapshotState() }
-    fun setSuTapjack(v: Boolean) { Config.suTapjack = v; state = snapshotState() }
-    fun setSuRestrict(v: Boolean) { Config.suRestrict = v; state = snapshotState() }
-    fun setMessageRes(res: Int) { _messages.tryEmit(AppContext.getString(res)) }
-    private fun snapshotState(): SettingsUiState { return SettingsUiState() }
-    companion object { val Factory = object : ViewModelProvider.Factory { override fun <T : ViewModel> create(modelClass: Class<T>): T { @Suppress("UNCHECKED_CAST") return SettingsComposeViewModel() as T } } }
+
+    fun setCheckUpdate(v: Boolean) {
+        Config.checkUpdate = v; state = snapshotState()
+    }
+
+    fun setUpdateChannel(c: Int) {
+        Config.updateChannel = c; Info.resetUpdate(); state = snapshotState()
+    }
+
+    fun setCustomChannelUrl(u: String) {
+        Config.customChannelUrl = u; Info.resetUpdate(); state = snapshotState()
+    }
+
+    fun setDoH(v: Boolean) {
+        Config.doh = v; state = snapshotState()
+    }
+
+    fun setDownloadDir(v: String) {
+        Config.downloadDir = v; state = snapshotState()
+    }
+
+    fun setRandName(v: Boolean) {
+        Config.randName = v; state = snapshotState()
+    }
+
+    fun createSystemlessHosts() {
+        viewModelScope.launch {
+            val ok = RootUtils.addSystemlessHosts(); _messages.tryEmit(
+            AppContext.getString(if (ok) CoreR.string.settings_hosts_toast else CoreR.string.failure)
+        )
+        }
+    }
+
+    fun setZygisk(v: Boolean) {
+        Config.zygisk = v; state =
+            snapshotState(); if (v != Info.isZygiskEnabled) _messages.tryEmit(
+            AppContext.getString(
+                CoreR.string.reboot_apply_change
+            )
+        )
+    }
+
+    fun setDenyList(v: Boolean) {
+        viewModelScope.launch {
+            val cmd = if (v) "enable" else "disable";
+            val ok = withContext(Dispatchers.IO) {
+                Shell.cmd("magisk --denylist $cmd").exec().isSuccess
+            }; state = if (ok) {
+            Config.denyList = v; snapshotState()
+        } else {
+            _messages.emit(AppContext.getString(CoreR.string.failure)); snapshotState()
+        }
+        }
+    }
+
+    fun setRootMode(v: Int) {
+        Config.rootMode = v; state = snapshotState()
+    }
+
+    fun setSuMultiuserMode(v: Int) {
+        Config.suMultiuserMode = v; state = snapshotState()
+    }
+
+    fun setSuMntNamespaceMode(v: Int) {
+        Config.suMntNamespaceMode = v; state = snapshotState()
+    }
+
+    fun setSuAuth(v: Boolean) {
+        Config.suAuth = v; state = snapshotState()
+    }
+
+    fun setSuAutoResponse(v: Int) {
+        Config.suAutoResponse = v; state = snapshotState()
+    }
+
+    fun setSuTimeoutIndex(index: Int) {
+        val safe = index.coerceIn(0, SU_TIMEOUT_VALUES.lastIndex); Config.suDefaultTimeout =
+            SU_TIMEOUT_VALUES[safe]; state = snapshotState()
+    }
+
+    fun setSuNotification(v: Int) {
+        Config.suNotification = v; state = snapshotState()
+    }
+
+    fun setSuReAuth(v: Boolean) {
+        Config.suReAuth = v; state = snapshotState()
+    }
+
+    fun setSuTapjack(v: Boolean) {
+        Config.suTapjack = v; state = snapshotState()
+    }
+
+    fun setSuRestrict(v: Boolean) {
+        Config.suRestrict = v; state = snapshotState()
+    }
+
+    fun setMessageRes(res: Int) {
+        _messages.tryEmit(AppContext.getString(res))
+    }
+
+    private fun snapshotState(): SettingsUiState {
+        return SettingsUiState()
+    }
+
+    companion object {
+        val Factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                @Suppress("UNCHECKED_CAST") return SettingsComposeViewModel() as T
+            }
+        }
+    }
 }
 
 private val SU_TIMEOUT_VALUES = listOf(10, 15, 20, 30, 45, 60)
