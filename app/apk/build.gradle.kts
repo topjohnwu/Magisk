@@ -16,6 +16,12 @@ android {
         isCoreLibraryDesugaringEnabled = true
     }
 
+    packaging {
+        jniLibs {
+            excludes += "lib/*/libandroidx.graphics.path.so"
+        }
+    }
+
     defaultConfig {
         proguardFile("proguard-rules.pro")
     }

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.height
@@ -100,7 +101,6 @@ import top.yukonga.miuix.kmp.extra.SuperListPopup
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import top.yukonga.miuix.kmp.basic.CardDefaults
 import top.yukonga.miuix.kmp.icon.MiuixIcons
@@ -446,69 +446,70 @@ private fun CoreCard(
     val uninstallEnabled = Info.env.isActive
 
     Card(modifier = modifier) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clipToBounds()
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Icon(
-                    painter = painterResource(CoreR.drawable.ic_magisk_outline),
-                    contentDescription = null,
-                    modifier = Modifier.size(24.dp),
-                    tint = MiuixTheme.colorScheme.primary
-                )
-                Spacer(Modifier.height(8.dp))
-                Text(
-                    text = stringResource(CoreR.string.home_core_title),
-                    style = MiuixTheme.textStyles.headline2,
-                )
-                Text(
-                    text = version.ifEmpty { stringResource(CoreR.string.not_available) },
-                    style = MiuixTheme.textStyles.body2,
-                    color = MiuixTheme.colorScheme.onSurfaceVariantSummary
-                )
-            }
-
-            Column(
-                modifier = Modifier.align(Alignment.TopEnd).padding(4.dp),
-                verticalArrangement = Arrangement.spacedBy(0.dp),
-            ) {
-                IconButton(
-                    onClick = onUninstallClicked,
-                    enabled = uninstallEnabled,
-                ) {
-                    Icon(
-                        imageVector = MiuixIcons.Delete,
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp),
-                        tint = if (uninstallEnabled) MiuixTheme.colorScheme.error
-                            else MiuixTheme.colorScheme.onSurfaceVariantActions,
-                    )
-                }
-                if (remoteVersion != null) {
-                    UpdateBadge(
-                        version = remoteVersion,
-                        modifier = Modifier.align(Alignment.End).padding(end = 4.dp)
-                    )
-                }
-            }
-
-        }
-
-        if (actionLabel != null) {
-            HorizontalDivider(thickness = 0.75.dp)
-            Text(
-                text = actionLabel,
-                style = MiuixTheme.textStyles.body2,
-                color = actionColor,
-                textAlign = TextAlign.Center,
-                maxLines = 1,
+        Column(modifier = Modifier.fillMaxSize()) {
+            Box(
                 modifier = Modifier
+                    .weight(1f)
                     .fillMaxWidth()
-                    .clickable(onClick = onInstallClicked)
-                    .padding(horizontal = 12.dp, vertical = 12.dp)
-            )
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Icon(
+                        painter = painterResource(CoreR.drawable.ic_magisk_outline),
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp),
+                        tint = MiuixTheme.colorScheme.primary
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        text = stringResource(CoreR.string.home_core_title),
+                        style = MiuixTheme.textStyles.headline2,
+                    )
+                    Text(
+                        text = version.ifEmpty { stringResource(CoreR.string.not_available) },
+                        style = MiuixTheme.textStyles.body2,
+                        color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                    )
+                }
+                Column(
+                    modifier = Modifier.align(Alignment.TopEnd).padding(4.dp),
+                    verticalArrangement = Arrangement.spacedBy(0.dp),
+                ) {
+                    IconButton(
+                        onClick = onUninstallClicked,
+                        enabled = uninstallEnabled,
+                    ) {
+                        Icon(
+                            imageVector = MiuixIcons.Delete,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                            tint = if (uninstallEnabled) MiuixTheme.colorScheme.error
+                                else MiuixTheme.colorScheme.onSurfaceVariantActions,
+                        )
+                    }
+                    if (remoteVersion != null) {
+                        UpdateBadge(
+                            version = remoteVersion,
+                            modifier = Modifier.align(Alignment.End).padding(end = 4.dp)
+                        )
+                    }
+                }
+            }
+
+            if (actionLabel != null) {
+                HorizontalDivider(thickness = 0.75.dp)
+                Text(
+                    text = actionLabel,
+                    style = MiuixTheme.textStyles.body2,
+                    color = actionColor,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(44.dp)
+                        .clickable(onClick = onInstallClicked)
+                        .padding(horizontal = 12.dp, vertical = 12.dp)
+                )
+            }
         }
     }
 }
@@ -536,69 +537,75 @@ private fun AppCard(
     val hideRestoreIcon = if (isHidden) MiuixIcons.Show else MiuixIcons.Hide
 
     Card(modifier = modifier) {
-        Box(modifier = Modifier.fillMaxWidth()) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_manager),
-                    contentDescription = null,
-                    modifier = Modifier.size(24.dp),
-                    tint = MiuixTheme.colorScheme.primary
-                )
-                Spacer(Modifier.height(8.dp))
-                Text(
-                    text = stringResource(CoreR.string.home_app_title),
-                    style = MiuixTheme.textStyles.headline2,
-                )
-                Text(
-                    text = version,
-                    style = MiuixTheme.textStyles.body2,
-                    color = MiuixTheme.colorScheme.onSurfaceVariantSummary
-                )
-                if (progress in 1..99) {
-                    Spacer(Modifier.height(8.dp))
-                    LinearProgressIndicator(
-                        progress = progress / 100f,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            }
-
-            Column(
-                modifier = Modifier.align(Alignment.TopEnd).padding(4.dp),
-                verticalArrangement = Arrangement.spacedBy(0.dp),
+        Column(modifier = Modifier.fillMaxSize()) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
             ) {
-                if (Info.env.isActive) {
-                    IconButton(onClick = onHideRestorePressed) {
-                        Icon(
-                            imageVector = hideRestoreIcon,
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp),
-                            tint = MiuixTheme.colorScheme.primary,
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_manager),
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp),
+                        tint = MiuixTheme.colorScheme.primary
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        text = stringResource(CoreR.string.home_app_title),
+                        style = MiuixTheme.textStyles.headline2,
+                    )
+                    Text(
+                        text = version,
+                        style = MiuixTheme.textStyles.body2,
+                        color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                    )
+                    if (progress in 1..99) {
+                        Spacer(Modifier.height(8.dp))
+                        LinearProgressIndicator(
+                            progress = progress / 100f,
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
                 }
-                if (remoteVersion != null) {
-                    UpdateBadge(
-                        version = remoteVersion,
-                        modifier = Modifier.align(Alignment.End).padding(end = 4.dp)
-                    )
+                Column(
+                    modifier = Modifier.align(Alignment.TopEnd).padding(4.dp),
+                    verticalArrangement = Arrangement.spacedBy(0.dp),
+                ) {
+                    if (Info.env.isActive) {
+                        IconButton(onClick = onHideRestorePressed) {
+                            Icon(
+                                imageVector = hideRestoreIcon,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp),
+                                tint = MiuixTheme.colorScheme.primary,
+                            )
+                        }
+                    }
+                    if (remoteVersion != null) {
+                        UpdateBadge(
+                            version = remoteVersion,
+                            modifier = Modifier.align(Alignment.End).padding(end = 4.dp)
+                        )
+                    }
                 }
             }
-        }
 
-        if (actionLabel != null) {
-            HorizontalDivider(thickness = 0.75.dp)
-            Text(
-                text = actionLabel,
-                style = MiuixTheme.textStyles.body2,
-                color = actionColor,
-                textAlign = TextAlign.Center,
-                maxLines = 1,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable(onClick = onManagerPressed)
-                    .padding(horizontal = 12.dp, vertical = 12.dp)
-            )
+            if (actionLabel != null) {
+                HorizontalDivider(thickness = 0.75.dp)
+                Text(
+                    text = actionLabel,
+                    style = MiuixTheme.textStyles.body2,
+                    color = actionColor,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(44.dp)
+                        .clickable(onClick = onManagerPressed)
+                        .padding(horizontal = 12.dp, vertical = 12.dp)
+                )
+            }
         }
     }
 }
