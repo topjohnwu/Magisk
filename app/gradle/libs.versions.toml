@@ -13,7 +13,6 @@ lifecycle = "2.10.0"
 activity-compose = "1.12.4"
 navigation3 = "1.0.1"
 navigationevent = "1.0.2"
-termux-terminal = "0.118.0"
 ui-graphics = "1.10.4"
 
 [libraries]
@@ -68,9 +67,6 @@ lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel
 navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "navigation3" }
 navigationevent-compose = { module = "androidx.navigationevent:navigationevent-compose", version.ref = "navigationevent" }
 lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycle" }
-
-# Terminal
-termux-terminal-view = { module = "com.termux.termux-app:terminal-view", version.ref = "termux-terminal" }
 
 # Build plugins
 android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "android" }

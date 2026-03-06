@@ -58,6 +58,4 @@ dependencies {
     implementation(libs.navigationevent.compose)
     implementation(libs.lifecycle.viewmodel.navigation3)
 
-    // Terminal
-    implementation(libs.termux.terminal.view)
 }
