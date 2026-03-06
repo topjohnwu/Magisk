@@ -9,13 +9,13 @@ import android.content.pm.PackageManager.GET_PROVIDERS
 import android.content.pm.PackageManager.GET_RECEIVERS
 import android.content.pm.PackageManager.GET_SERVICES
 import android.content.pm.PackageManager.MATCH_DISABLED_COMPONENTS
-import android.content.pm.PackageManager.MATCH_UNINSTALLED_PACKAGES
 import android.content.pm.ServiceInfo
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import androidx.core.os.ProcessCompat
 import com.topjohnwu.magisk.core.ktx.getLabel
+import com.topjohnwu.magisk.ui.MATCH_UNINSTALLED_PACKAGES_COMPAT
 import java.util.Locale
 import java.util.TreeSet
 
@@ -87,12 +87,11 @@ class AppProcessInfo(
     }
 
     private fun fetchProcesses(pm: PackageManager): Collection<ProcessInfo> {
-        val flag = MATCH_DISABLED_COMPONENTS or MATCH_UNINSTALLED_PACKAGES or
+        val flag = MATCH_DISABLED_COMPONENTS or MATCH_UNINSTALLED_PACKAGES_COMPAT or
             GET_ACTIVITIES or GET_SERVICES or GET_RECEIVERS or GET_PROVIDERS
         val packageInfo = try {
             pm.getPackageInfo(info.packageName, flag)
         } catch (e: Exception) {
-            // Exceed binder data transfer limit, parse the package locally
             pm.getPackageArchiveInfo(info.sourceDir, flag) ?: return emptyList()
         }
 

@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.ui.deny
 
 import android.annotation.SuppressLint
-import android.content.pm.PackageManager.MATCH_UNINSTALLED_PACKAGES
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -9,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.arch.AsyncLoadViewModel
 import com.topjohnwu.magisk.core.AppContext
 import com.topjohnwu.magisk.core.ktx.concurrentMap
+import com.topjohnwu.magisk.ui.MATCH_UNINSTALLED_PACKAGES_COMPAT
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -107,7 +107,7 @@ class DenyListViewModel : AsyncLoadViewModel() {
             val pm = AppContext.packageManager
             val denyList = Shell.cmd("magisk --denylist ls").exec().out
                 .map { CmdlineListItem(it) }
-            val apps = pm.getInstalledApplications(MATCH_UNINSTALLED_PACKAGES).run {
+            val apps = pm.getInstalledApplications(MATCH_UNINSTALLED_PACKAGES_COMPAT).run {
                 asFlow()
                     .filter { AppContext.packageName != it.packageName }
                     .concurrentMap { AppProcessInfo(it, pm, denyList) }

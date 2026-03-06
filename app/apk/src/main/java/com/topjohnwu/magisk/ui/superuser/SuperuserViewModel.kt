@@ -2,8 +2,6 @@ package com.topjohnwu.magisk.ui.superuser
 
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
-import android.content.pm.PackageManager.MATCH_UNINSTALLED_PACKAGES
-import android.graphics.drawable.Drawable
 import android.os.Process
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -19,6 +17,7 @@ import com.topjohnwu.magisk.core.data.magiskdb.PolicyDao
 import com.topjohnwu.magisk.core.ktx.getLabel
 import com.topjohnwu.magisk.core.model.su.SuPolicy
 import com.topjohnwu.magisk.core.su.SuEvents
+import com.topjohnwu.magisk.ui.MATCH_UNINSTALLED_PACKAGES_COMPAT
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -33,7 +32,6 @@ class PolicyItem(
     val policy: SuPolicy,
     val packageName: String,
     val isSharedUid: Boolean,
-    val icon: Drawable,
     val appName: String,
 ) {
     val title get() = if (isSharedUid) "[SharedUID] $appName" else appName
@@ -92,12 +90,11 @@ class SuperuserViewModel(
                 }
                 val map = pkgs.mapNotNull { pkg ->
                     try {
-                        val info = pm.getPackageInfo(pkg, MATCH_UNINSTALLED_PACKAGES)
+                        val info = pm.getPackageInfo(pkg, MATCH_UNINSTALLED_PACKAGES_COMPAT)
                         PolicyItem(
                             policy = policy,
                             packageName = info.packageName,
                             isSharedUid = info.sharedUserId != null,
-                            icon = info.applicationInfo?.loadIcon(pm) ?: pm.defaultActivityIcon,
                             appName = info.applicationInfo?.getLabel(pm) ?: info.packageName
                         )
                     } catch (_: PackageManager.NameNotFoundException) {
@@ -112,9 +109,9 @@ class SuperuserViewModel(
             }
             policies.sortWith(
                 compareBy(
-                { it.appName.lowercase(Locale.ROOT) },
-                { it.packageName }
-            ))
+                    { it.appName.lowercase(Locale.ROOT) },
+                    { it.packageName }
+                ))
             _uiState.update {
                 it.copy(
                     loading = false,

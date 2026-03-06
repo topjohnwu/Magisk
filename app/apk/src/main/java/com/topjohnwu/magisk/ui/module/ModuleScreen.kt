@@ -108,9 +108,9 @@ import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.download.DownloadEngine
 import com.topjohnwu.magisk.core.model.module.LocalModule
 import com.topjohnwu.magisk.core.model.module.OnlineModule
-import com.topjohnwu.magisk.ui.animation.MotionTokens
 import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.ui.RefreshOnResume
+import com.topjohnwu.magisk.ui.animation.MotionTokens
 import com.topjohnwu.magisk.ui.component.ConfirmResult
 import com.topjohnwu.magisk.ui.component.rememberConfirmDialog
 import kotlinx.coroutines.Dispatchers
@@ -223,115 +223,115 @@ fun ModuleScreen(
                 ),
                 verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
-                    item {
-                        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                item {
+                    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Surface(
+                                onClick = { showSearch = !showSearch },
+                                modifier = Modifier
+                                    .height(56.dp)
+                                    .weight(0.3f),
+                                shape = RoundedCornerShape(16.dp),
+                                color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.7f)
                             ) {
-                                Surface(
-                                    onClick = { showSearch = !showSearch },
-                                    modifier = Modifier
-                                        .height(56.dp)
-                                        .weight(0.3f),
-                                    shape = RoundedCornerShape(16.dp),
-                                    color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.7f)
-                                ) {
-                                    Box(contentAlignment = Alignment.Center) {
-                                        Icon(
-                                            if (showSearch) Icons.Rounded.Close else Icons.Rounded.Search,
-                                            null,
-                                            tint = MaterialTheme.colorScheme.onSecondaryContainer
-                                        )
-                                    }
-                                }
-
-                                Button(
-                                    onClick = { zipPicker.launch("application/zip") },
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .height(56.dp),
-                                    shape = RoundedCornerShape(16.dp)
-                                ) {
+                                Box(contentAlignment = Alignment.Center) {
                                     Icon(
-                                        Icons.Rounded.FileUpload,
+                                        if (showSearch) Icons.Rounded.Close else Icons.Rounded.Search,
                                         null,
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                    Spacer(Modifier.width(12.dp))
-                                    Text(
-                                        text = stringResource(id = CoreR.string.module_action_install_external),
-                                        fontWeight = FontWeight.Black
+                                        tint = MaterialTheme.colorScheme.onSecondaryContainer
                                     )
                                 }
                             }
 
-                            AnimatedVisibility(
-                                visible = showSearch,
-                                enter = expandVertically() + fadeIn(),
-                                exit = shrinkVertically() + fadeOut()
+                            Button(
+                                onClick = { zipPicker.launch("application/zip") },
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(56.dp),
+                                shape = RoundedCornerShape(16.dp)
                             ) {
-                                OutlinedTextField(
-                                    value = query,
-                                    onValueChange = { query = it },
-                                    modifier = Modifier.fillMaxWidth(),
-                                    shape = RoundedCornerShape(16.dp),
-                                    colors = OutlinedTextFieldDefaults.colors(
-                                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-                                        unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
-                                    ),
-                                    leadingIcon = { Icon(Icons.Rounded.Search, null) },
-                                    placeholder = { Text(stringResource(id = CoreR.string.modules_search_placeholder)) },
-                                    singleLine = true
+                                Icon(
+                                    Icons.Rounded.FileUpload,
+                                    null,
+                                    modifier = Modifier.size(20.dp)
                                 )
-                            }
-                        }
-                    }
-
-                    if (state.modules.isEmpty()) {
-                        item {
-                            Box(
-                                Modifier.fillParentMaxHeight(0.7f),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                EmptyStateView()
-                            }
-                        }
-                    } else if (filteredModules.isEmpty()) {
-                        item {
-                            Box(
-                                Modifier
-                                    .fillMaxWidth()
-                                    .padding(32.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
+                                Spacer(Modifier.width(12.dp))
                                 Text(
-                                    stringResource(id = CoreR.string.modules_no_results),
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                                    text = stringResource(id = CoreR.string.module_action_install_external),
+                                    fontWeight = FontWeight.Black
                                 )
                             }
                         }
-                    } else {
-                        itemsIndexed(filteredModules, key = { _, m -> m.id }) { _, module ->
-                            StylishMagiskModuleCard(
-                                module = module,
-                                onToggleExpanded = { viewModel.toggleExpanded(module.id) },
-                                onToggleEnabled = { viewModel.toggleEnabled(module.id) },
-                                onToggleRemove = { viewModel.toggleRemove(module.id) },
-                                onUpdate = { onlineModule ->
-                                    if (onlineModule == null) return@StylishMagiskModuleCard
-                                    if (Info.isConnected.value != true) {
-                                        viewModel.postMessageRes(CoreR.string.no_connection)
-                                        return@StylishMagiskModuleCard
-                                    }
-                                    pendingOnlineModule = onlineModule
-                                    showOnlineDialog.value = true
-                                },
-                                onAction = { onRunAction(module.id, module.name) }
+
+                        AnimatedVisibility(
+                            visible = showSearch,
+                            enter = expandVertically() + fadeIn(),
+                            exit = shrinkVertically() + fadeOut()
+                        ) {
+                            OutlinedTextField(
+                                value = query,
+                                onValueChange = { query = it },
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(16.dp),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                    unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
+                                ),
+                                leadingIcon = { Icon(Icons.Rounded.Search, null) },
+                                placeholder = { Text(stringResource(id = CoreR.string.modules_search_placeholder)) },
+                                singleLine = true
                             )
                         }
                     }
+                }
+
+                if (state.modules.isEmpty()) {
+                    item {
+                        Box(
+                            Modifier.fillParentMaxHeight(0.7f),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            EmptyStateView()
+                        }
+                    }
+                } else if (filteredModules.isEmpty()) {
+                    item {
+                        Box(
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(32.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                stringResource(id = CoreR.string.modules_no_results),
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                            )
+                        }
+                    }
+                } else {
+                    itemsIndexed(filteredModules, key = { _, m -> m.id }) { _, module ->
+                        StylishMagiskModuleCard(
+                            module = module,
+                            onToggleExpanded = { viewModel.toggleExpanded(module.id) },
+                            onToggleEnabled = { viewModel.toggleEnabled(module.id) },
+                            onToggleRemove = { viewModel.toggleRemove(module.id) },
+                            onUpdate = { onlineModule ->
+                                if (onlineModule == null) return@StylishMagiskModuleCard
+                                if (Info.isConnected.value != true) {
+                                    viewModel.postMessageRes(CoreR.string.no_connection)
+                                    return@StylishMagiskModuleCard
+                                }
+                                pendingOnlineModule = onlineModule
+                                showOnlineDialog.value = true
+                            },
+                            onAction = { onRunAction(module.id, module.name) }
+                        )
+                    }
+                }
             }
         }
 
@@ -477,9 +477,11 @@ private fun StylishMagiskModuleCard(
                         }
                     }
 
-                    Column(modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 16.dp)) {
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 16.dp)
+                    ) {
                         Text(
                             text = module.name,
                             style = MaterialTheme.typography.titleLarge,

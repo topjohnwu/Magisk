@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.ui.surequest
 
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.view.MotionEvent
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -86,8 +87,13 @@ fun SuRequestScreen(
 
     val grantTouchFilter: (MotionEvent) -> Boolean = remember {
         { event ->
+            val partiallyObscured = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                event.flags and MotionEvent.FLAG_WINDOW_IS_PARTIALLY_OBSCURED != 0
+            } else {
+                false
+            }
             val obscured = (event.flags and MotionEvent.FLAG_WINDOW_IS_OBSCURED != 0) ||
-                    (event.flags and MotionEvent.FLAG_WINDOW_IS_PARTIALLY_OBSCURED != 0)
+                partiallyObscured
             if (obscured && event.action == MotionEvent.ACTION_UP) {
                 Toast.makeText(context, CoreR.string.touch_filtered_warning, Toast.LENGTH_SHORT)
                     .show()

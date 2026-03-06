@@ -96,8 +96,9 @@ import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.model.su.SuPolicy
-import com.topjohnwu.magisk.ui.animation.MotionTokens
+import com.topjohnwu.magisk.ui.MATCH_UNINSTALLED_PACKAGES_COMPAT
 import com.topjohnwu.magisk.ui.RefreshOnResume
+import com.topjohnwu.magisk.ui.animation.MotionTokens
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -290,9 +291,11 @@ private fun EmptyStateContent() {
 
 @Composable
 private fun DisabledState() {
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .padding(32.dp), contentAlignment = Alignment.Center) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(32.dp), contentAlignment = Alignment.Center
+    ) {
         Text(
             text = stringResource(id = CoreR.string.unsupport_nonroot_stub_msg),
             style = MaterialTheme.typography.bodyLarge,
@@ -482,9 +485,11 @@ private fun StylishMagiskPolicyCard(
                         )
                     }
 
-                    Column(modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 20.dp)) {
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 20.dp)
+                    ) {
                         Text(
                             text = item.title,
                             style = MaterialTheme.typography.titleLarge,
@@ -749,7 +754,7 @@ class SuperuserComposeViewModel(
                     )
                 pkgs?.forEach { pkg ->
                     try {
-                        val info = pm.getPackageInfo(pkg, PackageManager.MATCH_UNINSTALLED_PACKAGES)
+                        val info = pm.getPackageInfo(pkg, MATCH_UNINSTALLED_PACKAGES_COMPAT)
                         val appInfo = info.applicationInfo
                         val key = policyKey(policy.uid, info.packageName)
                         val previous = previousByKey[key]

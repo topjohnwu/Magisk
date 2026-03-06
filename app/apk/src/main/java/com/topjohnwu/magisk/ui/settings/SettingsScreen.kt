@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.ui.settings
 
-import android.Manifest.permission.POST_NOTIFICATIONS
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
@@ -99,6 +98,7 @@ import com.topjohnwu.magisk.core.tasks.AppMigration
 import com.topjohnwu.magisk.core.utils.LocaleSetting
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.RootUtils
+import com.topjohnwu.magisk.ui.POST_NOTIFICATIONS_PERMISSION
 import com.topjohnwu.magisk.ui.RefreshOnResume
 import com.topjohnwu.magisk.ui.theme.Theme
 import com.topjohnwu.magisk.view.Shortcuts
@@ -235,7 +235,7 @@ fun SettingsScreen(
                         checked = state.checkUpdate,
                         icon = Icons.Rounded.NotificationAdd,
                         onChecked = { checked ->
-                            activity?.withPermission(POST_NOTIFICATIONS) { granted ->
+                            activity?.withPermission(POST_NOTIFICATIONS_PERMISSION) { granted ->
                                 if (granted) viewModel.setCheckUpdate(checked)
                                 else viewModel.setMessageRes(CoreR.string.post_notifications_denied)
                             } ?: viewModel.setMessageRes(CoreR.string.app_not_found)

@@ -211,7 +211,8 @@ private fun SuperuserLogActionButtons(
                 Icon(
                     imageVector = Icons.Rounded.DeleteSweep,
                     contentDescription = stringResource(CoreR.string.menuClearLog),
-                    tint = MaterialTheme.colorScheme.onErrorContainer
+                    modifier = Modifier.size(22.dp),
+                    tint = MaterialTheme.colorScheme.error
                 )
             }
         }
@@ -241,9 +242,11 @@ private fun TimelineLogItem(index: Int, total: Int, item: SuLogUiItem) {
         MaterialTheme.colorScheme.error
     }
 
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .height(IntrinsicSize.Min)) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min)
+    ) {
         // Timeline aesthetics
         Column(
             modifier = Modifier
@@ -385,9 +388,11 @@ private fun TimelineLogItem(index: Int, total: Int, item: SuLogUiItem) {
 
 @Composable
 private fun HexagonNode(color: Color) {
-    Canvas(modifier = Modifier
-        .size(28.dp)
-        .padding(4.dp)) {
+    Canvas(
+        modifier = Modifier
+            .size(28.dp)
+            .padding(4.dp)
+    ) {
         val path = Path().apply {
             val radius = size.minDimension / 2
             val centerX = size.width / 2

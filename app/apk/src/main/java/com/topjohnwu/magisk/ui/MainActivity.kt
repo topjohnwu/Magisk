@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.ui
 
-import android.Manifest
 import android.Manifest.permission.REQUEST_INSTALL_PACKAGES
 import android.annotation.SuppressLint
 import android.content.Context
@@ -22,6 +21,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.content.res.use
 import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.topjohnwu.magisk.arch.UIActivity
 import com.topjohnwu.magisk.core.Config
@@ -102,17 +102,23 @@ class MainActivity : UIActivity<Any>(), SplashScreenHost {
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            window?.decorView?.post {
-                if ((window.decorView.rootWindowInsets?.systemWindowInsetBottom
-                        ?: 0) < Resources.getSystem().displayMetrics.density * 40
-                ) {
-                    window.navigationBarColor = Color.TRANSPARENT
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                        window.navigationBarDividerColor = Color.TRANSPARENT
-                    }
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                        window.isNavigationBarContrastEnforced = false
-                        window.isStatusBarContrastEnforced = false
+            window.decorView.post {
+                val bottomInset = WindowInsetsCompat.toWindowInsetsCompat(
+                    window.decorView.rootWindowInsets,
+                    window.decorView
+                ).getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
+
+                if (bottomInset < Resources.getSystem().displayMetrics.density * 40) {
+                    @Suppress("DEPRECATION")
+                    run {
+                        window.navigationBarColor = Color.TRANSPARENT
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                            window.navigationBarDividerColor = Color.TRANSPARENT
+                        }
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                            window.isNavigationBarContrastEnforced = false
+                            window.isStatusBarContrastEnforced = false
+                        }
                     }
                 }
             }
@@ -120,12 +126,13 @@ class MainActivity : UIActivity<Any>(), SplashScreenHost {
     }
 
     @SuppressLint("InlinedApi")
+    @Suppress("DEPRECATION")
     override fun onCreateUi(savedInstanceState: Bundle?) {
         showUnsupportedMessage()
         askForHomeShortcut()
 
         if (Config.checkUpdate) {
-            extension.withPermission(Manifest.permission.POST_NOTIFICATIONS) {
+            extension.withPermission(POST_NOTIFICATIONS_PERMISSION) {
                 Config.checkUpdate = it
             }
         }

@@ -100,6 +100,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.topjohnwu.magisk.core.AppContext
 import com.topjohnwu.magisk.ui.animation.MotionTokens
+import com.topjohnwu.magisk.ui.MATCH_UNINSTALLED_PACKAGES_COMPAT
 import com.topjohnwu.magisk.ui.RefreshOnResume
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
@@ -160,11 +161,13 @@ fun DenyListScreen(
                         }
                     }
                 }
+
                 state.items.isEmpty() -> {
                     item {
                         EmptyDenyListState()
                     }
                 }
+
                 else -> {
                     items(state.items, key = { it.packageName }) { item ->
                         StylishDenyListCard(
@@ -191,7 +194,9 @@ fun DenyListScreen(
 
         SnackbarHost(
             hostState = snackbarHostState,
-            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 110.dp)
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 110.dp)
         )
     }
 }
@@ -283,15 +288,22 @@ private fun DenyListSearchSection(
                 unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
             )
         )
-        
+
         Row(
-            modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             FilterChip(
                 selected = showSystem,
                 onClick = onToggleSystem,
-                label = { Text(stringResource(id = CoreR.string.show_system_app), fontWeight = FontWeight.Black) },
+                label = {
+                    Text(
+                        stringResource(id = CoreR.string.show_system_app),
+                        fontWeight = FontWeight.Black
+                    )
+                },
                 shape = RoundedCornerShape(12.dp),
                 colors = chipColors
             )
@@ -299,7 +311,12 @@ private fun DenyListSearchSection(
                 selected = showOs,
                 enabled = showSystem,
                 onClick = onToggleOs,
-                label = { Text(stringResource(id = CoreR.string.show_os_app), fontWeight = FontWeight.Black) },
+                label = {
+                    Text(
+                        stringResource(id = CoreR.string.show_os_app),
+                        fontWeight = FontWeight.Black
+                    )
+                },
                 shape = RoundedCornerShape(12.dp),
                 colors = chipColors
             )
@@ -316,7 +333,7 @@ private fun StylishDenyListCard(
 ) {
     val isAnyChecked = item.checkedCount > 0
     val transition = updateTransition(targetState = item.expanded, label = "cardTransition")
-    
+
     val elevation by transition.animateDp(
         transitionSpec = {
             spring(
@@ -344,7 +361,7 @@ private fun StylishDenyListCard(
         },
         label = "cardScale"
     ) { if (it) 1f else 0.992f }
-    
+
     val containerColor by animateColorAsState(
         targetValue = when {
             item.expanded -> MaterialTheme.colorScheme.surfaceContainerHighest
@@ -368,7 +385,12 @@ private fun StylishDenyListCard(
                 )
             )
             .scale(cardScale),
-        shape = RoundedCornerShape(topEnd = 48.dp, bottomStart = 48.dp, topStart = 16.dp, bottomEnd = 16.dp),
+        shape = RoundedCornerShape(
+            topEnd = 48.dp,
+            bottomStart = 48.dp,
+            topStart = 16.dp,
+            bottomEnd = 16.dp
+        ),
         onClick = onToggleExpanded,
         colors = CardDefaults.elevatedCardColors(containerColor = containerColor),
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = elevation)
@@ -377,12 +399,19 @@ private fun StylishDenyListCard(
             Icon(
                 painter = painterResource(id = CoreR.drawable.ic_magisk_outline),
                 contentDescription = null,
-                modifier = Modifier.size(140.dp).align(Alignment.TopEnd).offset(x = 40.dp, y = (-30).dp).alpha(0.04f),
+                modifier = Modifier
+                    .size(140.dp)
+                    .align(Alignment.TopEnd)
+                    .offset(x = 40.dp, y = (-30).dp)
+                    .alpha(0.04f),
                 tint = MaterialTheme.colorScheme.primary
             )
 
             Column(modifier = Modifier.padding(24.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Box(contentAlignment = Alignment.BottomEnd) {
                         Surface(
                             modifier = Modifier.size(56.dp),
@@ -409,8 +438,10 @@ private fun StylishDenyListCard(
                             )
                         }
                     }
-                    
-                    Column(modifier = Modifier.weight(1f).padding(horizontal = 16.dp)) {
+
+                    Column(modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 16.dp)) {
                         Text(
                             text = item.label,
                             style = MaterialTheme.typography.titleLarge,
@@ -433,7 +464,7 @@ private fun StylishDenyListCard(
                                 overflow = TextOverflow.Ellipsis
                             )
                         }
-                        
+
                         if (isAnyChecked) {
                             Spacer(Modifier.height(8.dp))
                             Text(
@@ -445,7 +476,7 @@ private fun StylishDenyListCard(
                             )
                         }
                     }
-                    
+
                     AnimatedVisibility(
                         visible = item.expanded,
                         enter = fadeIn(
@@ -467,16 +498,18 @@ private fun StylishDenyListCard(
                                 )
                     ) {
                         TriStateCheckbox(
-                            state = item.selectionState, 
+                            state = item.selectionState,
                             onClick = onToggleApp,
                             colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.primary)
                         )
                     }
-                    
+
                     Icon(
                         imageVector = Icons.AutoMirrored.Rounded.NavigateNext,
                         contentDescription = null,
-                        modifier = Modifier.rotate(rotation).padding(start = 12.dp),
+                        modifier = Modifier
+                            .rotate(rotation)
+                            .padding(start = 12.dp),
                         tint = MaterialTheme.colorScheme.outline
                     )
                 }
@@ -518,8 +551,10 @@ private fun StylishDenyListCard(
                                     .padding(vertical = 4.dp)
                                     .clip(RoundedCornerShape(16.dp))
                                     .clickable { onToggleProcess(process) },
-                                color = if (process.enabled) MaterialTheme.colorScheme.primary.copy(alpha = 0.08f) 
-                                        else Color.Transparent,
+                                color = if (process.enabled) MaterialTheme.colorScheme.primary.copy(
+                                    alpha = 0.08f
+                                )
+                                else Color.Transparent,
                                 shape = RoundedCornerShape(16.dp)
                             ) {
                                 Row(
@@ -527,22 +562,24 @@ private fun StylishDenyListCard(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Checkbox(
-                                        checked = process.enabled, 
+                                        checked = process.enabled,
                                         onCheckedChange = { onToggleProcess(process) }
                                     )
                                     Spacer(modifier = Modifier.width(12.dp))
                                     Column {
                                         Text(
-                                            text = process.displayName, 
-                                            style = MaterialTheme.typography.bodyLarge, 
+                                            text = process.displayName,
+                                            style = MaterialTheme.typography.bodyLarge,
                                             fontWeight = if (process.enabled) FontWeight.Black else FontWeight.Medium,
                                             color = if (process.enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                                         )
                                         if (process.packageName != item.packageName) {
                                             Text(
-                                                text = process.packageName, 
-                                                style = MaterialTheme.typography.labelSmall, 
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                                                text = process.packageName,
+                                                style = MaterialTheme.typography.labelSmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                                                    alpha = 0.6f
+                                                )
                                             )
                                         }
                                     }
@@ -558,24 +595,50 @@ private fun StylishDenyListCard(
 
 @Composable
 private fun EmptyDenyListState() {
-    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth().padding(top = 64.dp)) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 64.dp)
+    ) {
         Surface(
             modifier = Modifier.size(140.dp),
             shape = RoundedCornerShape(48.dp),
             color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
         ) {
             Box(contentAlignment = Alignment.Center) {
-                Icon(Icons.Rounded.SettingsSuggest, null, modifier = Modifier.size(64.dp), tint = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f))
+                Icon(
+                    Icons.Rounded.SettingsSuggest,
+                    null,
+                    modifier = Modifier.size(64.dp),
+                    tint = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)
+                )
             }
         }
         Spacer(Modifier.height(32.dp))
-        Text(AppContext.getString(CoreR.string.log_data_none), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.outline)
+        Text(
+            AppContext.getString(CoreR.string.log_data_none),
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Black,
+            color = MaterialTheme.colorScheme.outline
+        )
     }
 }
 
 // Logic components remain identical
-data class DenyListProcessUi(val name: String, val packageName: String, val isIsolated: Boolean, val isAppZygote: Boolean, val defaultSelection: Boolean, val enabled: Boolean) {
-    val displayName: String get() = if (isIsolated) AppContext.getString(CoreR.string.isolated_process_label, name) else name
+data class DenyListProcessUi(
+    val name: String,
+    val packageName: String,
+    val isIsolated: Boolean,
+    val isAppZygote: Boolean,
+    val defaultSelection: Boolean,
+    val enabled: Boolean
+) {
+    val displayName: String
+        get() = if (isIsolated) AppContext.getString(
+            CoreR.string.isolated_process_label,
+            name
+        ) else name
 }
 
 data class DenyListAppUi(
@@ -601,15 +664,18 @@ data class DenyListAppUi(
             }
         }
     }
-    
+
     companion object {
-        fun deriveSelectionState(processes: List<DenyListProcessUi>, expanded: Boolean): ToggleableState {
+        fun deriveSelectionState(
+            processes: List<DenyListProcessUi>,
+            expanded: Boolean
+        ): ToggleableState {
             val targets = if (expanded) processes else processes.filter { it.defaultSelection }
             if (targets.isEmpty()) return ToggleableState.Off
             val enabled = targets.count { it.enabled }
-            return when {
-                enabled == 0 -> ToggleableState.Off
-                enabled == targets.size -> ToggleableState.On
+            return when (enabled) {
+                0 -> ToggleableState.Off
+                targets.size -> ToggleableState.On
                 else -> ToggleableState.Indeterminate
             }
         }
@@ -671,7 +737,7 @@ class DenyListComposeViewModel : ViewModel() {
                 allApps = loaded
                 _state.update { it.copy(loading = false) }
                 applyFilters()
-            }.onFailure {
+            }.onFailure { it ->
                 _state.update { it.copy(loading = false) }
                 _messages.tryEmit(it.message ?: AppContext.getString(CoreR.string.failure))
             }
@@ -686,9 +752,24 @@ class DenyListComposeViewModel : ViewModel() {
             applyFilters()
         }
     }
-    fun setShowSystem(v: Boolean) { _state.update { it.copy(showSystem = v, showOs = if (v) it.showOs else false) }; applyFilters() }
-    fun setShowOs(v: Boolean) { _state.update { it.copy(showOs = v) }; applyFilters() }
-    fun setSortMethod(v: DenyListSortMethod) { _state.update { it.copy(sortMethod = v) }; applyFilters() }
+
+    fun setShowSystem(v: Boolean) {
+        _state.update {
+            it.copy(
+                showSystem = v,
+                showOs = if (v) it.showOs else false
+            )
+        }; applyFilters()
+    }
+
+    fun setShowOs(v: Boolean) {
+        _state.update { it.copy(showOs = v) }; applyFilters()
+    }
+
+    fun setSortMethod(v: DenyListSortMethod) {
+        _state.update { it.copy(sortMethod = v) }; applyFilters()
+    }
+
     fun toggleExpanded(pkg: String) {
         allApps = allApps.map { app ->
             if (app.packageName == pkg) rebuildAppState(app, expanded = !app.expanded) else app
@@ -699,7 +780,8 @@ class DenyListComposeViewModel : ViewModel() {
     fun toggleProcess(pkg: String, name: String, pPkg: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val app = allApps.firstOrNull { it.packageName == pkg } ?: return@launch
-            val process = app.processes.firstOrNull { it.name == name && it.packageName == pPkg } ?: return@launch
+            val process = app.processes.firstOrNull { it.name == name && it.packageName == pPkg }
+                ?: return@launch
             val enabled = !process.enabled
             val cmd = if (enabled) "add" else "rm"
             val result = Shell.cmd("magisk --denylist $cmd $pPkg ${shellQuote(name)}").exec()
@@ -716,7 +798,9 @@ class DenyListComposeViewModel : ViewModel() {
                         }
                     }
                     applyFilters()
-                } else { postFailure() }
+                } else {
+                    postFailure()
+                }
             }
         }
     }
@@ -733,8 +817,9 @@ class DenyListComposeViewModel : ViewModel() {
 
             if (enabled) {
                 affected.filter { !it.enabled }.forEach { p ->
-                    success = Shell.cmd("magisk --denylist add ${p.packageName} ${shellQuote(p.name)}")
-                        .exec().isSuccess && success
+                    success =
+                        Shell.cmd("magisk --denylist add ${p.packageName} ${shellQuote(p.name)}")
+                            .exec().isSuccess && success
                 }
             } else {
                 // Match legacy behavior: clear package-level denylist first.
@@ -742,8 +827,9 @@ class DenyListComposeViewModel : ViewModel() {
                 if (success) {
                     // Keep explicit cleanup for isolated processes.
                     affected.filter { it.enabled && it.isIsolated }.forEach { p ->
-                        success = Shell.cmd("magisk --denylist rm ${p.packageName} ${shellQuote(p.name)}")
-                            .exec().isSuccess && success
+                        success =
+                            Shell.cmd("magisk --denylist rm ${p.packageName} ${shellQuote(p.name)}")
+                                .exec().isSuccess && success
                     }
                 }
             }
@@ -765,12 +851,16 @@ class DenyListComposeViewModel : ViewModel() {
                         }
                     }
                     applyFilters()
-                } else { postFailure() }
+                } else {
+                    postFailure()
+                }
             }
         }
     }
 
-    private fun postFailure() { _messages.tryEmit(AppContext.getString(CoreR.string.failure)) }
+    private fun postFailure() {
+        _messages.tryEmit(AppContext.getString(CoreR.string.failure))
+    }
 
     private fun rebuildAppState(
         app: DenyListAppUi,
@@ -791,13 +881,25 @@ class DenyListComposeViewModel : ViewModel() {
         val queryLower = st.query.trim().lowercase()
         val filtered = allApps.asSequence().filter { app ->
             // Keep expanded cards visible while interacting, so they do not disappear/jump mid-toggle.
-            val passesVisibility = app.expanded || app.checkedCount > 0 || (st.showSystem || !app.isSystem) && (app.isAppUid || st.showSystem && st.showOs)
+            val passesVisibility =
+                app.expanded || app.checkedCount > 0 || (st.showSystem || !app.isSystem) && (app.isAppUid || st.showSystem && st.showOs)
             passesVisibility && (queryLower.isBlank() || app.searchKey.contains(queryLower))
         }.toList()
 
         val sorted = when (st.sortMethod) {
-            DenyListSortMethod.ActiveFirst -> filtered.sortedWith(compareBy({ it.checkedCount == 0 }, { it.sortKey }, { it.packageName }))
-            DenyListSortMethod.NameAsc -> filtered.sortedWith(compareBy({ it.sortKey }, { it.packageName }))
+            DenyListSortMethod.ActiveFirst -> filtered.sortedWith(
+                compareBy(
+                    { it.checkedCount == 0 },
+                    { it.sortKey },
+                    { it.packageName })
+            )
+
+            DenyListSortMethod.NameAsc -> filtered.sortedWith(
+                compareBy(
+                    { it.sortKey },
+                    { it.packageName })
+            )
+
             DenyListSortMethod.NameDesc -> filtered.sortedWith(compareByDescending<DenyListAppUi> { it.sortKey }.thenByDescending { it.packageName })
         }
 
@@ -808,33 +910,35 @@ class DenyListComposeViewModel : ViewModel() {
     private suspend fun loadApps(): List<DenyListAppUi> = withContext(Dispatchers.Default) {
         val pm = AppContext.packageManager
         val denyList = Shell.cmd("magisk --denylist ls").exec().out.map { CmdlineListItem(it) }
-        pm.getInstalledApplications(PackageManager.MATCH_UNINSTALLED_PACKAGES).asSequence()
+        pm.getInstalledApplications(MATCH_UNINSTALLED_PACKAGES_COMPAT).asSequence()
             .filter { it.packageName != AppContext.packageName }
-            .mapNotNull { app -> runCatching {
-                val proc = AppProcessInfo(app, pm, denyList)
-                if (proc.processes.isEmpty()) {
-                    null
-                } else {
-                    DenyListAppUi.create(
-                        packageName = app.packageName,
-                        label = proc.label,
-                        icon = proc.iconImage,
-                        isSystem = proc.isSystemApp(),
-                        isAppUid = proc.isApp(),
-                        expanded = false,
-                        processes = proc.processes.map {
-                            DenyListProcessUi(
-                                it.name,
-                                it.packageName,
-                                it.isIsolated,
-                                it.isAppZygote,
-                                it.isIsolated || it.isAppZygote || it.name == it.packageName,
-                                it.isEnabled
-                            )
-                        }
-                    )
-                }
-            }.getOrNull() }.toList()
+            .mapNotNull { app ->
+                runCatching {
+                    val proc = AppProcessInfo(app, pm, denyList)
+                    if (proc.processes.isEmpty()) {
+                        null
+                    } else {
+                        DenyListAppUi.create(
+                            packageName = app.packageName,
+                            label = proc.label,
+                            icon = proc.iconImage,
+                            isSystem = proc.isSystemApp(),
+                            isAppUid = proc.isApp(),
+                            expanded = false,
+                            processes = proc.processes.map {
+                                DenyListProcessUi(
+                                    it.name,
+                                    it.packageName,
+                                    it.isIsolated,
+                                    it.isAppZygote,
+                                    it.isIsolated || it.isAppZygote || it.name == it.packageName,
+                                    it.isEnabled
+                                )
+                            }
+                        )
+                    }
+                }.getOrNull()
+            }.toList()
     }
 
     override fun onCleared() {

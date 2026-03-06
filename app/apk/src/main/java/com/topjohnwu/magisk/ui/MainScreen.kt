@@ -17,6 +17,10 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -88,6 +92,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavType
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -108,6 +113,7 @@ import com.topjohnwu.magisk.ui.settings.ThemeScreen
 import com.topjohnwu.magisk.ui.superuser.SuperuserLogsScreen
 import com.topjohnwu.magisk.ui.superuser.SuperuserScreen
 import com.topjohnwu.magisk.ui.theme.magiskComposeColorScheme
+import kotlin.math.abs
 import com.topjohnwu.magisk.core.R as CoreR
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -138,6 +144,9 @@ fun MagiskAppContainer(
             }
         }
         val rootRoutes = remember(rootDestinations) { rootDestinations.map { it.route }.toSet() }
+        val rootRouteOrder = remember(rootDestinations) {
+            rootDestinations.mapIndexed { index, destination -> destination.route to index }.toMap()
+        }
         val backStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = backStackEntry?.destination?.route ?: AppRoute.Home
         val currentRoot =
@@ -222,43 +231,67 @@ fun MagiskAppContainer(
                         .fillMaxSize()
                         .padding(bottom = if (reserveBottomForLogs) LOGS_RESERVED_BOTTOM_SPACE else 0.dp),
                     enterTransition = {
-                        unifiedScreenEnterTransition(
-                            direction = getNavigationDirection(
-                                initialState.destination.route,
-                                targetState.destination.route
+                        val initialRoute = initialState.destination.route
+                        val targetRoute = targetState.destination.route
+                        routeEnterTransition(
+                            direction = routeDirection(
+                                initialRoute,
+                                targetRoute,
+                                rootRouteOrder
                             ),
-                            initialRoute = initialState.destination.route,
-                            targetRoute = targetState.destination.route
+                            rootTabDistance = rootRouteDistance(
+                                initialRoute,
+                                targetRoute,
+                                rootRouteOrder
+                            )
                         )
                     },
                     exitTransition = {
-                        unifiedScreenExitTransition(
-                            direction = getNavigationDirection(
-                                initialState.destination.route,
-                                targetState.destination.route
+                        val initialRoute = initialState.destination.route
+                        val targetRoute = targetState.destination.route
+                        routeExitTransition(
+                            direction = routeDirection(
+                                initialRoute,
+                                targetRoute,
+                                rootRouteOrder
                             ),
-                            initialRoute = initialState.destination.route,
-                            targetRoute = targetState.destination.route
+                            rootTabDistance = rootRouteDistance(
+                                initialRoute,
+                                targetRoute,
+                                rootRouteOrder
+                            )
                         )
                     },
                     popEnterTransition = {
-                        unifiedScreenEnterTransition(
-                            direction = getNavigationDirection(
-                                initialState.destination.route,
-                                targetState.destination.route
+                        val initialRoute = initialState.destination.route
+                        val targetRoute = targetState.destination.route
+                        routeEnterTransition(
+                            direction = routeDirection(
+                                initialRoute,
+                                targetRoute,
+                                rootRouteOrder
                             ),
-                            initialRoute = initialState.destination.route,
-                            targetRoute = targetState.destination.route
+                            rootTabDistance = rootRouteDistance(
+                                initialRoute,
+                                targetRoute,
+                                rootRouteOrder
+                            )
                         )
                     },
                     popExitTransition = {
-                        unifiedScreenExitTransition(
-                            direction = getNavigationDirection(
-                                initialState.destination.route,
-                                targetState.destination.route
+                        val initialRoute = initialState.destination.route
+                        val targetRoute = targetState.destination.route
+                        routeExitTransition(
+                            direction = routeDirection(
+                                initialRoute,
+                                targetRoute,
+                                rootRouteOrder
                             ),
-                            initialRoute = initialState.destination.route,
-                            targetRoute = targetState.destination.route
+                            rootTabDistance = rootRouteDistance(
+                                initialRoute,
+                                targetRoute,
+                                rootRouteOrder
+                            )
                         )
                     }
                 ) {
@@ -379,6 +412,9 @@ fun MagiskAppContainer(
                             floating = true,
                             onNavigate = { route ->
                                 navController.navigate(route) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
                                     launchSingleTop = true
                                     restoreState = true
                                 }
@@ -469,29 +505,35 @@ private fun MagiskFloatingTopBar(
                 AnimatedContent(
                     targetState = processState,
                     transitionSpec = {
-                        if (targetState.running != initialState.running || targetState.hasResult != initialState.hasResult) {
-                            (fadeIn(animationSpec = tween(120)) + scaleIn(
-                                initialScale = 0.96f,
-                                animationSpec = tween(120)
-                            ) togetherWith
-                                    fadeOut(animationSpec = tween(90)) + scaleOut(
-                                targetScale = 0.98f,
-                                animationSpec = tween(90)
-                            ))
-                                .using(SizeTransform(clip = false))
-                        } else {
-                            (fadeIn(animationSpec = tween(110)) + scaleIn(
-                                initialScale = 0.98f,
-                                animationSpec = tween(110)
-                            ) togetherWith
-                                    fadeOut(animationSpec = tween(80)) + scaleOut(
-                                targetScale = 0.99f,
-                                animationSpec = tween(80)
-                            ))
-                                .using(SizeTransform(clip = false))
-                        }
+                        (
+                            (fadeIn(
+                                animationSpec = tween(
+                                    durationMillis = 160,
+                                    delayMillis = 60,
+                                    easing = LinearOutSlowInEasing
+                                )
+                            ) + scaleIn(
+                                initialScale = 0.9f,
+                                animationSpec = tween(
+                                    durationMillis = 260,
+                                    easing = FastOutSlowInEasing
+                                )
+                            )) togetherWith
+                                (fadeOut(
+                                    animationSpec = tween(
+                                        durationMillis = 100,
+                                        easing = FastOutLinearInEasing
+                                    )
+                                ) + scaleOut(
+                                    targetScale = 0.96f,
+                                    animationSpec = tween(
+                                        durationMillis = 120,
+                                        easing = FastOutLinearInEasing
+                                    )
+                                ))
+                            ).using(SizeTransform(clip = false))
                     },
-                    label = "topBarIconAnimation"
+                    label = "topBarStatus"
                 ) { status ->
                     if (status.running) {
                         CircularProgressIndicator(
@@ -557,46 +599,55 @@ private fun MagiskFloatingTopBar(
                 }
 
                 AnimatedContent(
-                    targetState = titleText,
+                    targetState = TopBarLabelState(
+                        title = titleText,
+                        subtitle = subtitleText
+                    ),
                     transitionSpec = {
-                        if (currentRoute == AppRoute.FlashPattern || currentRoute == AppRoute.ModuleActionPattern) {
-                            (fadeIn(animationSpec = tween(120)) + scaleIn(
-                                initialScale = 0.98f,
-                                animationSpec = tween(120)
-                            ) togetherWith
-                                    fadeOut(animationSpec = tween(90)) + scaleOut(
-                                targetScale = 0.99f,
-                                animationSpec = tween(90)
-                            ))
-                                .using(SizeTransform(clip = false))
-                        } else {
-                            (fadeIn(animationSpec = tween(110)) + scaleIn(
-                                initialScale = 0.99f,
-                                animationSpec = tween(110)
-                            ) togetherWith
-                                    fadeOut(animationSpec = tween(80)) + scaleOut(
-                                targetScale = 0.995f,
-                                animationSpec = tween(80)
-                            ))
-                                .using(SizeTransform(clip = false))
-                        }
+                        (
+                            (fadeIn(
+                                animationSpec = tween(
+                                    durationMillis = 170,
+                                    delayMillis = 40,
+                                    easing = LinearOutSlowInEasing
+                                )
+                            ) + slideInVertically(
+                                initialOffsetY = { it / 6 },
+                                animationSpec = tween(
+                                    durationMillis = 220,
+                                    easing = FastOutSlowInEasing
+                                )
+                            )) togetherWith
+                                (fadeOut(
+                                    animationSpec = tween(
+                                        durationMillis = 110,
+                                        easing = FastOutLinearInEasing
+                                    )
+                                ) + slideOutVertically(
+                                    targetOffsetY = { -it / 8 },
+                                    animationSpec = tween(
+                                        durationMillis = 140,
+                                        easing = FastOutLinearInEasing
+                                    )
+                                ))
+                            ).using(SizeTransform(clip = false))
                     },
-                    label = "topBarTitleAnimation"
-                ) { text ->
+                    label = "topBarLabel"
+                ) { label ->
                     Column(
                         verticalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = text,
-                            style = if (subtitleText != null) MaterialTheme.typography.titleMedium else MaterialTheme.typography.titleLarge,
+                            text = label.title,
+                            style = if (label.subtitle != null) MaterialTheme.typography.titleMedium else MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Black,
                             letterSpacing = 1.sp,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
-                        if (subtitleText != null) {
+                        if (label.subtitle != null) {
                             Text(
-                                text = subtitleText,
+                                text = label.subtitle,
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 maxLines = 1,
@@ -741,18 +792,30 @@ private fun MagiskFloatingBottomBar(
             destinations.forEach { dest ->
                 val selected = currentRoute == dest.route
                 val scale by animateFloatAsState(
-                    targetValue = if (selected) if (floating) 1.07f else 1.04f else 1f,
-                    animationSpec = tween(durationMillis = 180, easing = FastOutSlowInEasing),
-                    label = "iconScale"
+                    targetValue = if (selected) {
+                        if (floating) 1.07f else 1.04f
+                    } else {
+                        1f
+                    },
+                    animationSpec = tween(
+                        durationMillis = 220,
+                        easing = FastOutSlowInEasing
+                    ),
+                    label = "bottomBarScale"
                 )
 
                 val containerColor by animateColorAsState(
                     targetValue = if (selected) {
                         if (floating) MaterialTheme.colorScheme.primaryContainer
                         else MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.55f)
-                    } else Color.Transparent,
-                    animationSpec = tween(durationMillis = 180, easing = FastOutSlowInEasing),
-                    label = "containerColor"
+                    } else {
+                        Color.Transparent
+                    },
+                    animationSpec = tween(
+                        durationMillis = 240,
+                        easing = FastOutSlowInEasing
+                    ),
+                    label = "bottomBarContainerColor"
                 )
 
                 Box(
@@ -819,6 +882,11 @@ data class RouteProcessTopBarState(
     val hasResult: Boolean = false
 )
 
+private data class TopBarLabelState(
+    val title: String,
+    val subtitle: String?
+)
+
 private object AppRoute {
     const val Home = "home";
     const val Modules = "modules";
@@ -838,7 +906,7 @@ private object AppRoute {
         "module-action/${Uri.encode(i)}/${Uri.encode(n)}"
 }
 
-private fun getRoutePriority(route: String?): Int = when (route) {
+private fun routePriority(route: String?): Int = when (route) {
     AppRoute.Home -> 0
     AppRoute.Modules -> 1
     AppRoute.Superuser -> 2
@@ -848,59 +916,138 @@ private fun getRoutePriority(route: String?): Int = when (route) {
     else -> 6
 }
 
-private fun getNavigationDirection(
+private fun routeDirection(
     initial: String?,
-    target: String?
+    target: String?,
+    rootRouteOrder: Map<String, Int>
 ): AnimatedContentTransitionScope.SlideDirection {
-    return if (getRoutePriority(target) >= getRoutePriority(initial)) {
+    val initialRootIndex = rootRouteOrder[initial]
+    val targetRootIndex = rootRouteOrder[target]
+    if (initialRootIndex != null && targetRootIndex != null) {
+        return if (targetRootIndex >= initialRootIndex) {
+            AnimatedContentTransitionScope.SlideDirection.Left
+        } else {
+            AnimatedContentTransitionScope.SlideDirection.Right
+        }
+    }
+
+    return if (routePriority(target) >= routePriority(initial)) {
         AnimatedContentTransitionScope.SlideDirection.Left
     } else {
         AnimatedContentTransitionScope.SlideDirection.Right
     }
 }
 
-private const val ROOT_NAV_FADE_MS = 120
+private fun rootRouteDistance(
+    initial: String?,
+    target: String?,
+    rootRouteOrder: Map<String, Int>
+): Int? {
+    val initialRootIndex = rootRouteOrder[initial] ?: return null
+    val targetRootIndex = rootRouteOrder[target] ?: return null
+    return abs(targetRootIndex - initialRootIndex)
+}
 
-private val ROOT_ROUTES = setOf(
-    AppRoute.Home,
-    AppRoute.Modules,
-    AppRoute.Superuser,
-    AppRoute.Logs
-)
-
-private fun isRootRoute(route: String?): Boolean = route in ROOT_ROUTES
-
-private fun AnimatedContentTransitionScope<*>.unifiedScreenEnterTransition(
+private fun AnimatedContentTransitionScope<*>.routeEnterTransition(
     direction: AnimatedContentTransitionScope.SlideDirection,
-    initialRoute: String?,
-    targetRoute: String?
+    rootTabDistance: Int?
 ): EnterTransition {
-    val rootToRoot = isRootRoute(initialRoute) && isRootRoute(targetRoute)
-    if (rootToRoot) {
-        return fadeIn(animationSpec = tween(ROOT_NAV_FADE_MS, easing = LinearOutSlowInEasing))
+    if (rootTabDistance != null) {
+        if (rootTabDistance == 0) return EnterTransition.None
+        val distance = rootTabDistance.coerceAtLeast(1)
+        val offsetDivisor = when (distance) {
+            1 -> ROOT_TAB_SLIDE_OFFSET_DIVISOR_NEAR
+            2 -> ROOT_TAB_SLIDE_OFFSET_DIVISOR_MID
+            else -> ROOT_TAB_SLIDE_OFFSET_DIVISOR_FAR
+        }
+        val duration = ROOT_ENTER_BASE_DURATION_MS + (distance - 1) * ROOT_ENTER_DISTANCE_STEP_MS
+        val distanceOffsetMultiplier = 1f + (distance - 1) * ROOT_TAB_OFFSET_DISTANCE_MULTIPLIER_STEP
+        return slideInHorizontally(
+            initialOffsetX = {
+                val baseOffset = it / offsetDivisor
+                val offset = (baseOffset * distanceOffsetMultiplier).toInt().coerceAtLeast(1)
+                if (direction == AnimatedContentTransitionScope.SlideDirection.Left) offset else -offset
+            },
+            animationSpec = tween(
+                durationMillis = duration,
+                easing = FastOutSlowInEasing
+            )
+        ) + fadeIn(
+            animationSpec = tween(
+                durationMillis = ROOT_FADE_IN_DURATION_MS,
+                delayMillis = ROOT_FADE_IN_DELAY_MS + (distance - 1) * ROOT_FADE_IN_DISTANCE_STEP_MS,
+                easing = LinearOutSlowInEasing
+            )
+        ) + scaleIn(
+            initialScale = ROOT_SCALE_IN_START,
+            animationSpec = tween(
+                durationMillis = duration,
+                easing = FastOutSlowInEasing
+            )
+        )
     }
     return slideIntoContainer(
         towards = direction,
-        animationSpec = tween(220, easing = FastOutSlowInEasing)
+        animationSpec = tween(
+            durationMillis = SCREEN_TRANSITION_DURATION_MS,
+            easing = FastOutSlowInEasing
+        )
     ) + fadeIn(
-        animationSpec = tween(170, easing = LinearOutSlowInEasing)
+        animationSpec = tween(
+            durationMillis = 190,
+            easing = LinearOutSlowInEasing
+        )
     )
 }
 
-private fun AnimatedContentTransitionScope<*>.unifiedScreenExitTransition(
+private fun AnimatedContentTransitionScope<*>.routeExitTransition(
     direction: AnimatedContentTransitionScope.SlideDirection,
-    initialRoute: String?,
-    targetRoute: String?
+    rootTabDistance: Int?
 ): ExitTransition {
-    val rootToRoot = isRootRoute(initialRoute) && isRootRoute(targetRoute)
-    if (rootToRoot) {
-        return fadeOut(animationSpec = tween(ROOT_NAV_FADE_MS, easing = FastOutLinearInEasing))
+    if (rootTabDistance != null) {
+        if (rootTabDistance == 0) return ExitTransition.None
+        val distance = rootTabDistance.coerceAtLeast(1)
+        val offsetDivisor = when (distance) {
+            1 -> ROOT_TAB_SLIDE_OFFSET_DIVISOR_NEAR
+            2 -> ROOT_TAB_SLIDE_OFFSET_DIVISOR_MID
+            else -> ROOT_TAB_SLIDE_OFFSET_DIVISOR_FAR
+        }
+        val duration = ROOT_EXIT_BASE_DURATION_MS + (distance - 1) * ROOT_EXIT_DISTANCE_STEP_MS
+        val distanceOffsetMultiplier = 1f + (distance - 1) * ROOT_TAB_OFFSET_DISTANCE_MULTIPLIER_STEP
+        return slideOutHorizontally(
+            targetOffsetX = {
+                val baseOffset = it / offsetDivisor
+                val offset = (baseOffset * distanceOffsetMultiplier).toInt().coerceAtLeast(1)
+                if (direction == AnimatedContentTransitionScope.SlideDirection.Left) -offset else offset
+            },
+            animationSpec = tween(
+                durationMillis = duration,
+                easing = FastOutLinearInEasing
+            )
+        ) + fadeOut(
+            animationSpec = tween(
+                durationMillis = ROOT_FADE_OUT_DURATION_MS + (distance - 1) * ROOT_FADE_OUT_DISTANCE_STEP_MS,
+                easing = FastOutLinearInEasing
+            )
+        ) + scaleOut(
+            targetScale = ROOT_SCALE_OUT_TARGET,
+            animationSpec = tween(
+                durationMillis = duration,
+                easing = FastOutLinearInEasing
+            )
+        )
     }
     return slideOutOfContainer(
         towards = direction,
-        animationSpec = tween(220, easing = FastOutSlowInEasing)
+        animationSpec = tween(
+            durationMillis = SCREEN_TRANSITION_DURATION_MS,
+            easing = FastOutSlowInEasing
+        )
     ) + fadeOut(
-        animationSpec = tween(140, easing = FastOutLinearInEasing)
+        animationSpec = tween(
+            durationMillis = 150,
+            easing = FastOutLinearInEasing
+        )
     )
 }
 
@@ -920,3 +1067,19 @@ fun fallbackColorScheme(darkTheme: Boolean): ColorScheme {
 }
 
 private val LOGS_RESERVED_BOTTOM_SPACE = 120.dp
+private const val SCREEN_TRANSITION_DURATION_MS = 280
+private const val ROOT_ENTER_BASE_DURATION_MS = 250
+private const val ROOT_ENTER_DISTANCE_STEP_MS = 45
+private const val ROOT_EXIT_BASE_DURATION_MS = 230
+private const val ROOT_EXIT_DISTANCE_STEP_MS = 35
+private const val ROOT_TAB_SLIDE_OFFSET_DIVISOR_NEAR = 8
+private const val ROOT_TAB_SLIDE_OFFSET_DIVISOR_MID = 6
+private const val ROOT_TAB_SLIDE_OFFSET_DIVISOR_FAR = 5
+private const val ROOT_TAB_OFFSET_DISTANCE_MULTIPLIER_STEP = 0.12f
+private const val ROOT_FADE_IN_DURATION_MS = 210
+private const val ROOT_FADE_IN_DELAY_MS = 10
+private const val ROOT_FADE_IN_DISTANCE_STEP_MS = 10
+private const val ROOT_FADE_OUT_DURATION_MS = 170
+private const val ROOT_FADE_OUT_DISTANCE_STEP_MS = 10
+private const val ROOT_SCALE_IN_START = 0.992f
+private const val ROOT_SCALE_OUT_TARGET = 0.998f
