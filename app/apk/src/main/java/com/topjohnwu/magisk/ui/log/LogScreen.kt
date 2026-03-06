@@ -52,7 +52,6 @@ import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
 import top.yukonga.miuix.kmp.basic.Scaffold
 import top.yukonga.miuix.kmp.basic.TabRow
 import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.basic.TextButton
 import top.yukonga.miuix.kmp.basic.TopAppBar
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import top.yukonga.miuix.kmp.icon.MiuixIcons
@@ -125,13 +124,10 @@ fun LogScreen(viewModel: LogViewModel) {
                 when (selectedTab) {
                     0 -> SuLogTab(
                         logs = uiState.suLogs,
-                        onClear = { viewModel.clearLog() },
                         nestedScrollConnection = scrollBehavior.nestedScrollConnection
                     )
                     1 -> MagiskLogTab(
                         entries = uiState.magiskLogEntries,
-                        onSave = { viewModel.saveMagiskLog() },
-                        onClear = { viewModel.clearMagiskLog() },
                         nestedScrollConnection = scrollBehavior.nestedScrollConnection
                     )
                 }
@@ -141,7 +137,7 @@ fun LogScreen(viewModel: LogViewModel) {
 }
 
 @Composable
-private fun SuLogTab(logs: List<SuLog>, onClear: () -> Unit, nestedScrollConnection: NestedScrollConnection) {
+private fun SuLogTab(logs: List<SuLog>, nestedScrollConnection: NestedScrollConnection) {
     Column(modifier = Modifier.fillMaxSize()) {
         if (logs.isEmpty()) {
             Box(
@@ -169,18 +165,6 @@ private fun SuLogTab(logs: List<SuLog>, onClear: () -> Unit, nestedScrollConnect
                     SuLogCard(log)
                 }
             }
-        }
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
-            horizontalArrangement = Arrangement.End
-        ) {
-            TextButton(
-                text = stringResource(CoreR.string.menuClearLog),
-                onClick = onClear
-            )
         }
     }
 }
@@ -292,8 +276,6 @@ private fun SuActionBadge(allowed: Boolean) {
 @Composable
 private fun MagiskLogTab(
     entries: List<MagiskLogEntry>,
-    onSave: () -> Unit,
-    onClear: () -> Unit,
     nestedScrollConnection: NestedScrollConnection
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
@@ -325,22 +307,6 @@ private fun MagiskLogTab(
                     MagiskLogCard(entries[index])
                 }
             }
-        }
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)
-        ) {
-            TextButton(
-                text = stringResource(CoreR.string.menuSaveLog),
-                onClick = onSave
-            )
-            TextButton(
-                text = stringResource(CoreR.string.menuClearLog),
-                onClick = onClear
-            )
         }
     }
 }
