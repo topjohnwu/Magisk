@@ -61,12 +61,12 @@ unwrap_used = "deny"
 [profile.dev]
 opt-level = "z"
 lto = "thin"
-panic = "immediate-abort"
+panic = "abort"
 debug = "none"
 
 [profile.release]
 opt-level = "z"
 lto = "fat"
 codegen-units = 1
-panic = "immediate-abort"
+panic = "abort"
 strip = true
