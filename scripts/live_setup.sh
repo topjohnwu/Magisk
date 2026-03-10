@@ -99,7 +99,7 @@ if mount | grep -q rootfs; then
   mount -o ro,remount /
   mount_sbin
   ln -s /root/* /sbin
-elif [ -e /sbin ]; then
+elif [ -e /sbin -a ! -L /sbin ]; then
   # Legacy SAR
   mount_sbin
   mkdir -p /dev/sysroot
