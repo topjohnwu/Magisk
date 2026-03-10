@@ -841,7 +841,7 @@ def parse_args():
     ndk_parser = subparsers.add_parser("ndk", help="setup Magisk NDK")
 
     emu_parser = subparsers.add_parser("emulator", help="setup AVD for development")
-    emu_parser.add_argument("apk", help="a Magisk APK to use", nargs="?")
+    emu_parser.add_argument("--apk", help="a Magisk APK to use")
     emu_parser.add_argument(
         "-b", "--build", action="store_true", help="build before patching"
     )
