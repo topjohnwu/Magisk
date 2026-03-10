@@ -239,7 +239,7 @@ def build_cpp_src(targets: set[str]):
 def run_cargo(cmds: list[str]):
     ensure_paths()
     env = os.environ.copy()
-    env["PATH"] = f"{rust_sysroot / "bin"}{os.pathsep}{env["PATH"]}"
+    env["PATH"] = f'{rust_sysroot / "bin"}{os.pathsep}{env["PATH"]}'
     env["CARGO_BUILD_RUSTFLAGS"] = f"-Z threads={min(8, cpu_count)}"
     # Cargo calls executables in $RUSTROOT/lib/rustlib/$TRIPLE/bin, we need
     # to make sure the runtime linker also search $RUSTROOT/lib for libraries.
