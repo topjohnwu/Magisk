@@ -239,15 +239,19 @@ def build_cpp_src(targets: set[str]):
 def run_cargo(cmds: list[str]):
     ensure_paths()
     env = os.environ.copy()
-    env["PATH"] = f"{rust_sysroot / "bin"}{os.pathsep}{env["PATH"]}"
     env["CARGO_BUILD_RUSTFLAGS"] = f"-Z threads={min(8, cpu_count)}"
-    # Cargo calls executables in $RUSTROOT/lib/rustlib/$TRIPLE/bin, we need
-    # to make sure the runtime linker also search $RUSTROOT/lib for libraries.
-    # This is only required on Unix, as Windows search dlls from PATH.
-    if os_name == "darwin":
-        env["DYLD_FALLBACK_LIBRARY_PATH"] = str(rust_sysroot / "lib")
-    elif os_name == "linux":
-        env["LD_LIBRARY_PATH"] = str(rust_sysroot / "lib")
+    if shutil.which("rustup"):
+        # Go through rustup proxies by default if available
+        env["RUSTUP_TOOLCHAIN"] = str(rust_sysroot)
+    else:
+        env["PATH"] = f"{rust_sysroot / "bin"}{os.pathsep}{env["PATH"]}"
+        # Cargo calls executables in $RUSTROOT/lib/rustlib/$TRIPLE/bin, we need
+        # to make sure the runtime linker also search $RUSTROOT/lib for libraries.
+        # This is only required on Unix, as Windows search dlls from PATH.
+        if os_name == "darwin":
+            env["DYLD_FALLBACK_LIBRARY_PATH"] = str(rust_sysroot / "lib")
+        elif os_name == "linux":
+            env["LD_LIBRARY_PATH"] = str(rust_sysroot / "lib")
     return execv(["cargo", *cmds], env)
 
 
