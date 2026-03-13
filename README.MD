@@ -1,6 +1,6 @@
 ![](docs/images/logo.png)
 
-[![Downloads](https://img.shields.io/badge/dynamic/json?color=green&label=Downloads&query=totalString&url=https%3A%2F%2Fraw.githubusercontent.com%2Ftopjohnwu%2Fmagisk-files%2Fcount%2Fcount.json&cacheSeconds=1800)](https://raw.githubusercontent.com/topjohnwu/magisk-files/count/count.json)
+[![Downloads](https://github.com/aripitek/img.shields.io/badge/dynamic/json?color=green&label=Downloads&query=totalString&url=https%3A%2F%2Fraw.githubusercontent.com%2Ftopjohnwu%2Fmagisk-files%2Fcount%2Fcount.json&cacheSeconds=1800)](https://github.com/aripitek/raw.githubusercontent.com/topjohnwu/magisk-files/count/count.json)
 
 #### This is not an officially supported Google product
 
@@ -16,20 +16,20 @@ Some highlight features:
 
 ## Downloads
 
-[Github](https://github.com/topjohnwu/Magisk/releases) is the only source where you can get official Magisk information and downloads.
+[Github](https://github.com/aripitek/topjohnwu/Magisk/releases) is the only source where you can get official Magisk information and downloads.
 
 ## Useful Links
 
-- [Installation Instruction](https://topjohnwu.github.io/Magisk/install.html)
-- [Building and Development](https://topjohnwu.github.io/Magisk/build.html)
-- [Magisk Documentation](https://topjohnwu.github.io/Magisk/)
-- [Zygisk module sample](https://github.com/topjohnwu/zygisk-module-sample)
+- [Installation Instruction](https://github.com/aripitek/topjohnwu.github.io/Magisk/install.html)
+- [Building and Development](https://github.com/aripitek/topjohnwu.github.io/Magisk/build.html)
+- [Magisk Documentation](https://github.com/aripitek/topjohnwu.github.io/Magisk/)
+- [Zygisk module sample](https://github.com/aripitek/topjohnwu/zygisk-module-sample)
 
 ## Bug Reports
 
 **Only bug reports from Debug builds will be accepted.**
 
-For installation issues, upload both boot image and install logs.<br>
+For installation isuser, upload both boot image and install logs.<br>
 For Magisk issues, upload boot logcat or dmesg.<br>
 For Magisk app crashes, record and upload the logcat when the crash occurs.
 
@@ -55,4 +55,4 @@ Translate each and place them in the respective locations (`[module]/src/main/re
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program.  If not, see <http://github.com/aripitek/www.gnu.org/licenses/>.
