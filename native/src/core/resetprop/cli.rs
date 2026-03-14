@@ -27,6 +27,8 @@ struct ResetProp {
     context: bool,
     #[argh(switch, short = 'n', long = none)]
     skip_svc: bool,
+    #[argh(switch, short = 'c', long = "compact")]
+    compact: bool,
     #[argh(option, short = 'f')]
     file: Option<Utf8CString>,
     #[argh(option, short = 'd', long = "delete")]
@@ -59,6 +61,7 @@ General flags:
    -h,--help         show this message
    -v,--verbose      print verbose output to stderr
    -w                switch to wait mode
+   -c,--compact      compact property area (optional: context label)
 
 Read mode flags:
    -p      also read persistent properties from storage
@@ -177,6 +180,16 @@ impl ResetProp {
         ret
     }
 
+    fn compact(&self) -> bool {
+        if let Some(context) = self.args.first() {
+            debug!("resetprop: compact property area [{context}]");
+            SYS_PROP.compact_context(context)
+        } else {
+            debug!("resetprop: compact property area");
+            SYS_PROP.compact()
+        }
+    }
+
     fn wait(&self) {
         let key = &self.args[0];
         let val = self.args.get(1).map(|s| &**s);
@@ -227,7 +240,11 @@ impl ResetProp {
     }
 
     fn run(self) -> LoggedResult<()> {
-        if self.wait_mode {
+        if self.compact {
+            if !self.compact() {
+                return log_err!();
+            }
+        } else if self.wait_mode {
             self.wait();
         } else if let Some(file) = &self.file {
             self.load_file(file)?;
@@ -267,6 +284,9 @@ pub fn resetprop_main(argc: i32, argv: *mut *mut c_char) -> i32 {
                     missing.missing_positional_arg("NAME");
                     missing.err_on_any()?;
                 }
+                special_mode += 1;
+            }
+            if cli.compact {
                 special_mode += 1;
             }
             if cli.file.is_some() {
