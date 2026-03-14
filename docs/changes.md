@@ -1,7 +1,7 @@
 # Magisk Changelog
 
 ### v30.7 (2026.2.23)
-
+v
 - [MagiskInit] Support Android 16 QPR2 sepolicy format
 - [MagiskInit] Support using klogdump partition as pre-init storage
 - [Zygisk] Support Android 16 QPR2 and higher
