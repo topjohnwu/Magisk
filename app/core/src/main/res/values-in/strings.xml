@@ -46,7 +46,7 @@
     <string name="select_patch_file">Pilih dan tambal berkas</string>
     <string name="patch_file_msg">Pilih mentahan image (*.img) atau berkas tar ODIN (*.tar) atau payload.bin (*.bin)</string>
     <string name="reboot_delay_toast">Memulai ulang dalam 5 detik…</string>
-    <string name="flash_screen_title">Memasang</string>
+    <string name="flash_screen_title">Pemasangan</string>
 
     <!--Superuser-->
     <string name="su_request_title">Permintaan Superuser</string>
@@ -66,8 +66,8 @@
     <string name="su_deny_toast">%1$s ditolak izin superuser</string>
     <string name="su_snack_grant">Izin superuser %1$s diberikan</string>
     <string name="su_snack_deny">Izin superuser %1$s ditolak</string>
-    <string name="su_snack_notif_on">Notifikasi %1$ diaktifkan</string>
-    <string name="su_snack_notif_off">Notifikasi %1$ dinonaktifkan</string>
+    <string name="su_snack_notif_on">Notifikasi %1$s diaktifkan</string>
+    <string name="su_snack_notif_off">Notifikasi %1$s dinonaktifkan</string>
     <string name="su_snack_log_on">Pencatatan log %1$s diaktifkan</string>
     <string name="su_snack_log_off">Pencatatan log %1$s dinonaktifkan</string>
     <string name="su_revoke_title">Cabut?</string>
@@ -106,7 +106,7 @@
     <string name="reboot_safe_mode">Mode aman</string>
     <string name="module_version_author">%1$s oleh %2$s</string>
     <string name="module_state_remove">Hapus</string>
-    <string name="module_action">Tindakan</string>
+    <string name="module_action">Aksi</string>
     <string name="module_state_restore">Pulihkan</string>
     <string name="module_action_install_external">Pasang dari penyimpanan</string>
     <string name="update_available">Pembaruan tersedia</string>
@@ -144,9 +144,9 @@
     <string name="settings_denylist_summary">Proses pada denylist akan mengembalikan semua modifikasi Magisk</string>
     <string name="settings_denylist_config_title">Konfigurasi DenyList</string>
     <string name="settings_denylist_config_summary">Pilih proses yang akan disertakan ke dalam denylist</string>
-    <string name="settings_hosts_title">Host systemless</string>
-    <string name="settings_hosts_summary">Dukungan host systemless untuk aplikasi pemblokir iklan</string>
-    <string name="settings_hosts_toast">Menambahkan modul host systemless</string>
+    <string name="settings_hosts_title">Hosts systemless</string>
+    <string name="settings_hosts_summary">Dukungan hosts systemless untuk aplikasi pemblokir iklan</string>
+    <string name="settings_hosts_toast">Menambahkan modul hosts systemless</string>
     <string name="settings_app_name_hint">Nama baru</string>
     <string name="settings_app_name_helper">Aplikasi akan dikemas ulang dengan nama tersebut</string>
     <string name="settings_app_name_error">Format tidak valid</string>
@@ -164,7 +164,7 @@
     <string name="auto_response">Respons otomatis</string>
     <string name="request_timeout">Batas waktu permintaan</string>
     <string name="superuser_notification">Notifikasi superuser</string>
-    <string name="settings_su_reauth_title">Autentikasikan setelah pembaruan</string>
+    <string name="settings_su_reauth_title">Autentikasikan ulang setelah pembaruan</string>
     <string name="settings_su_reauth_summary">Minta izin akses superuser lagi setelah memperbarui aplikasi</string>
     <string name="settings_su_tapjack_title">Perlindungan tapjacking</string>
     <string name="settings_su_tapjack_summary">Dialog permintaan superuser tidak akan merespons input saat tertutup oleh jendela atau overlay lain</string>
@@ -186,13 +186,13 @@
     <string name="owner_only_summary">Hanya pemilik yang memiliki akses root</string>
     <string name="owner_manage_summary">Hanya pemilik yang dapat mengelola akses root dan menerima permintaan</string>
     <string name="user_independent_summary">Setiap pengguna memiliki aturan root terpisah</string>
-    <string name="mount_namespace_mode">Ruang-nama mount</string>
+    <string name="mount_namespace_mode">Ruang nama mount</string>
     <string name="settings_ns_global">Global</string>
     <string name="settings_ns_requester">Diwariskan</string>
     <string name="settings_ns_isolate">Terpisah</string>
-    <string name="global_summary">Semua sesi root menggunakan ruang-nama mount global</string>
-    <string name="requester_summary">Sesi root akan mewarisi ruang-nama dari pemintanya</string>
-    <string name="isolate_summary">Setiap sesi root akan memiliki ruang-nama tersendiri</string>
+    <string name="global_summary">Semua sesi root menggunakan ruang nama mount global</string>
+    <string name="requester_summary">Sesi root akan mewarisi ruang nama dari pemintanya</string>
+    <string name="isolate_summary">Setiap sesi root akan memiliki ruang nama tersendiri</string>
 
     <!--Notifications-->
     <string name="update_channel">Pembaruan Magisk</string>
@@ -215,7 +215,7 @@
     <string name="flashing">Memasang…</string>
     <string name="running">Memproses…</string>
     <string name="done">Selesai!</string>
-    <string name="done_action">Tindakan %1$s telah selesai</string>
+    <string name="done_action">Aksi %1$s selesai</string>
     <string name="failure">Gagal!</string>
     <string name="hide_app_title">Menyembunyikan aplikasi Magisk…</string>
     <string name="open_link_failed_toast">Tidak ditemukan aplikasi untuk membuka tautan</string>
@@ -239,7 +239,7 @@
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Berikan izin penyimpanan untuk mengaktifkan fungsi ini</string>
     <string name="post_notifications_denied">Berikan izin notifikasi untuk mengaktifkan fungsi ini</string>
-    <string name="install_unknown_denied">Izinkan \"Sumber tidak dikenal\" untuk mengaktifkan fungsi ini</string>
+    <string name="install_unknown_denied">Izinkan \"Instal aplikasi tidak dikenal\" untuk mengaktifkan fungsi ini</string>
     <string name="add_shortcut_title">Tambahkan pintasan ke layar utama</string>
     <string name="add_shortcut_msg">Setelah menyembunyikan aplikasi ini, nama dan ikonnya mungkin sulit dikenali. Apakah Anda ingin menambahkan pintasan ke layar utama?</string>
     <string name="app_not_found">Tidak ditemukan aplikasi untuk menangani tindakan ini</string>
