@@ -1,8 +1,8 @@
 plugins {
     id("com.android.library")
     kotlin("plugin.parcelize")
-    id("dev.zacsweers.moshix")
-    id("com.google.devtools.ksp")
+    alias(libs.plugins.moshix)
+    alias(libs.plugins.ksp)
 }
 
 setupCoreLib()

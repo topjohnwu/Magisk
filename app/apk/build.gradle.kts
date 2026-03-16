@@ -1,8 +1,8 @@
 plugins {
     id("com.android.application")
     kotlin("plugin.parcelize")
-    id("com.android.legacy-kapt")
-    id("androidx.navigation.safeargs.kotlin")
+    alias(libs.plugins.legacy.kapt)
+    alias(libs.plugins.navigation.safeargs)
 }
 
 setupMainApk()

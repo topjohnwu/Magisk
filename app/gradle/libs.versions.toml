@@ -59,10 +59,10 @@ rikka-insets = { module = "dev.rikka.rikkax.insets:insets", version.ref = "rikka
 
 # Build plugins
 android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "android" }
-android-kapt-plugin = { module = "com.android.legacy-kapt:com.android.legacy-kapt.gradle.plugin", version.ref = "android" }
-ksp-plugin = { module = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
-navigation-safe-args-plugin = { module = "androidx.navigation:navigation-safe-args-gradle-plugin", version.ref = "navigation" }
-lsparanoid-plugin = { module = "org.lsposed.lsparanoid:gradle-plugin", version = "0.6.0" }
-moshi-plugin = { module = "dev.zacsweers.moshix:dev.zacsweers.moshix.gradle.plugin", version = "0.34.4" }
 
 [plugins]
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+lsparanoid = { id = "org.lsposed.lsparanoid", version = "0.6.0" }
+moshix = { id = "dev.zacsweers.moshix", version = "0.34.4" }
+legacy-kapt = { id = "com.android.legacy-kapt", version.ref = "android" }
+navigation-safeargs = { id = "androidx.navigation.safeargs.kotlin", version.ref = "navigation" }
