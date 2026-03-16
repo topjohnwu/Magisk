@@ -11,8 +11,8 @@ import com.topjohnwu.magisk.core.R
 import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.tasks.AppMigration
 import com.topjohnwu.magisk.core.utils.RootUtils
-import com.topjohnwu.magisk.view.Shortcuts
 import com.topjohnwu.magisk.ui.navigation.Route
+import com.topjohnwu.magisk.view.Shortcuts
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

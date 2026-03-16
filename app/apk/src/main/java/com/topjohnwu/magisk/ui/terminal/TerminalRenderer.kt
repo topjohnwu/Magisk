@@ -4,9 +4,7 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.graphics.Typeface
-import com.topjohnwu.magisk.terminal.TerminalBuffer
 import com.topjohnwu.magisk.terminal.TerminalEmulator
-import com.topjohnwu.magisk.terminal.TerminalRow
 import com.topjohnwu.magisk.terminal.TextStyle
 import com.topjohnwu.magisk.terminal.WcWidth
 

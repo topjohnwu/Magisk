@@ -1,8 +1,8 @@
 package com.topjohnwu.magisk.terminal
 
 import android.util.Base64
-import java.util.Stack
 import timber.log.Timber
+import java.util.Stack
 
 /**
  * Renders text into a screen. Contains all the terminal-specific knowledge and state. Emulates a subset of the X Window
