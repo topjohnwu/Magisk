@@ -19,7 +19,7 @@ import com.topjohnwu.magisk.core.AppContext
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.JobService
 import com.topjohnwu.magisk.core.R
-import com.topjohnwu.magisk.core.base.ActivityExtension
+import com.topjohnwu.magisk.core.base.IActivityExtension
 import com.topjohnwu.magisk.core.cmp
 import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.intent
@@ -105,12 +105,12 @@ class DownloadEngine(session: DownloadSession) : DownloadSession by session, Dow
         }
 
         @SuppressLint("InlinedApi")
-        fun startWithActivity(
-            activity: ComponentActivity,
-            extension: ActivityExtension,
+        fun <T> startWithActivity(
+            activity: T,
             subject: Subject
-        ) {
-            extension.withPermission(Manifest.permission.POST_NOTIFICATIONS) {
+        ) where T : ComponentActivity, T : IActivityExtension {
+            activity.withPermission(Manifest.permission.POST_NOTIFICATIONS) {
+                // Always download regardless of notification permission status
                 start(activity.applicationContext, subject)
             }
         }

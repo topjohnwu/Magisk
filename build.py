@@ -448,6 +448,12 @@ def build_app():
     cp(source, target)
 
 
+def build_app_ng():
+    header("* Building the next generation Magisk app")
+    apk = build_apk(":apk-ng")
+    header(f"Output: {apk}")
+
+
 def build_stub():
     header("* Building the stub app")
     apk = build_apk(":stub")
@@ -833,6 +839,10 @@ def parse_args():
 
     app_parser = subparsers.add_parser("app", help="build the Magisk app")
 
+    app_ng_parser = subparsers.add_parser(
+        "app-ng", help="build the next generation Magisk app"
+    )
+
     stub_parser = subparsers.add_parser("stub", help="build the stub app")
 
     test_parser = subparsers.add_parser("test", help="build the test app")
@@ -892,6 +902,7 @@ def parse_args():
     rustup_parser.set_defaults(func=setup_rustup)
     gen_parser.set_defaults(func=gen_ide)
     app_parser.set_defaults(func=build_app)
+    app_ng_parser.set_defaults(func=build_app_ng)
     stub_parser.set_defaults(func=build_stub)
     test_parser.set_defaults(func=build_test)
     emu_parser.set_defaults(func=setup_avd)

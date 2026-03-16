@@ -6,12 +6,15 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import android.widget.Toast
 import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.AppApkPath
 import com.topjohnwu.magisk.core.BuildConfig.APP_PACKAGE_NAME
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
+import com.topjohnwu.magisk.core.R
 import com.topjohnwu.magisk.core.ktx.await
+import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.ktx.writeTo
 import com.topjohnwu.magisk.core.signing.JarMap
 import com.topjohnwu.magisk.core.signing.SignApk
@@ -234,6 +237,23 @@ object AppMigration {
         }
     }
 
+    @Suppress("DEPRECATION")
+    suspend fun hide(activity: Activity, label: String) {
+        val dialog = android.app.ProgressDialog(activity).apply {
+            setTitle(activity.getString(R.string.hide_app_title))
+            isIndeterminate = true
+            setCancelable(false)
+            show()
+        }
+        val success = withContext(Dispatchers.IO) {
+            patchAndHide(activity, label)
+        }
+        if (!success) {
+            dialog.dismiss()
+            activity.toast(R.string.failure, Toast.LENGTH_LONG)
+        }
+    }
+
     suspend fun restoreApp(context: Context): Boolean {
         val apk = StubApk.current(context)
         val cmd = "adb_pm_install $apk $APP_PACKAGE_NAME"
@@ -244,6 +264,20 @@ object AppMigration {
             return true
         }
         return false
+    }
+
+    @Suppress("DEPRECATION")
+    suspend fun restore(activity: Activity) {
+        val dialog = android.app.ProgressDialog(activity).apply {
+            setTitle(activity.getString(R.string.restore_img_msg))
+            isIndeterminate = true
+            setCancelable(false)
+            show()
+        }
+        if (!restoreApp(activity)) {
+            activity.toast(R.string.failure, Toast.LENGTH_LONG)
+        }
+        dialog.dismiss()
     }
 
     suspend fun upgradeStub(context: Context, apk: File): Intent? {

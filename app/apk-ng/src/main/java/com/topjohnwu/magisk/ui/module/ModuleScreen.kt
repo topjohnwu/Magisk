@@ -119,7 +119,7 @@ fun ModuleScreen(viewModel: ModuleViewModel) {
             onDownload = { install ->
                 showOnlineDialog.value = false
                 DownloadEngine.startWithActivity(
-                    activity, activity.extension,
+                    activity,
                     OnlineModuleSubject(pendingOnlineModule!!, install)
                 )
                 pendingOnlineModule = null

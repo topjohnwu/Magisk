@@ -29,6 +29,19 @@ interface ContentResultCallback: ActivityResultCallback<Uri>, Parcelable {
 
 interface UntrackedActivity
 
+interface IActivityExtension {
+    val extension: ActivityExtension
+    fun withPermission(permission: String, callback: (Boolean) -> Unit) {
+        extension.withPermission(permission, callback)
+    }
+    fun withAuthentication(callback: (Boolean) -> Unit) {
+        extension.withAuthentication(callback)
+    }
+    fun getContent(type: String, callback: ContentResultCallback) {
+        extension.getContent(type, callback)
+    }
+}
+
 class ActivityExtension(private val activity: ComponentActivity) {
 
     private var permissionCallback: ((Boolean) -> Unit)? = null

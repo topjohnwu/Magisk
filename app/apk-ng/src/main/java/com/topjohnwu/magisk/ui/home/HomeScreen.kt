@@ -1014,7 +1014,7 @@ private fun ManagerInstallComposableDialog(
                 text = stringResource(CoreR.string.install),
                 onClick = {
                     showDialog.value = false
-                    DownloadEngine.startWithActivity(activity, activity.extension, Subject.App())
+                    DownloadEngine.startWithActivity(activity, Subject.App())
                 },
                 modifier = Modifier.weight(1f),
                 colors = ButtonDefaults.textButtonColorsPrimary()
