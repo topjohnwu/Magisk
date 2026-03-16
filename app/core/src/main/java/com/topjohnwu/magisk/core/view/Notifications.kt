@@ -28,6 +28,7 @@ object Notifications {
     private const val UPDATE_CHANNEL = "update"
     private const val PROGRESS_CHANNEL = "progress"
     private const val UPDATED_CHANNEL = "updated"
+    private const val SU_CHANNEL = "su_notification"
 
     private val nextId = AtomicInteger(APP_UPDATE_AVAILABLE_ID)
 
@@ -40,7 +41,9 @@ object Notifications {
                     getString(R.string.progress_channel), NotificationManager.IMPORTANCE_LOW)
                 val channel3 = NotificationChannel(UPDATED_CHANNEL,
                     getString(R.string.updated_channel), NotificationManager.IMPORTANCE_HIGH)
-                mgr.createNotificationChannels(listOf(channel, channel2, channel3))
+                val channel4 = NotificationChannel(SU_CHANNEL,
+                    getString(R.string.su_notification_channel), NotificationManager.IMPORTANCE_HIGH)
+                mgr.createNotificationChannels(listOf(channel, channel2, channel3, channel4))
             }
         }
     }
@@ -99,6 +102,38 @@ object Notifications {
         if (SDK_INT >= Build.VERSION_CODES.S)
             builder.setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE)
         return builder
+    }
+
+    private const val SU_NOTIFICATION_TIMEOUT_MS = 3_000L
+
+    @SuppressLint("InlinedApi")
+    fun suNotification(granted: Boolean, appName: String) {
+        AppContext.apply {
+            val flag = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            val pending = PendingIntent.getActivity(this, 0, selfLaunchIntent(), flag)
+            val title = getString(
+                if (granted) R.string.su_notification_granted_title
+                else R.string.su_notification_denied_title
+            )
+            val text = getString(
+                if (granted) R.string.su_allow_toast
+                else R.string.su_deny_toast,
+                appName
+            )
+            val builder = if (SDK_INT >= Build.VERSION_CODES.O) {
+                Notification.Builder(this, SU_CHANNEL)
+                    .setSmallIcon(getBitmap(R.drawable.ic_magisk_outline).toIcon())
+            } else {
+                Notification.Builder(this).setPriority(Notification.PRIORITY_HIGH)
+                    .setSmallIcon(R.drawable.ic_magisk_outline)
+            }
+                .setContentIntent(pending)
+                .setContentTitle(title)
+                .setContentText(text)
+                .setAutoCancel(true)
+                .setTimeoutAfter(SU_NOTIFICATION_TIMEOUT_MS)
+            mgr.notify(nextId(), builder.build())
+        }
     }
 
     fun nextId() = nextId.incrementAndGet()

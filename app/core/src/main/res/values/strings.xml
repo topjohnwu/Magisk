@@ -17,16 +17,24 @@
     <string name="update">Update</string>
     <string name="not_available">N/A</string>
     <string name="hide">Hide</string>
+    <string name="restore">Restore</string>
     <string name="home_package">Package</string>
     <string name="home_app_title">App</string>
+    <string name="home_core_title">Core</string>
+    <string name="reinstall">Reinstall</string>
     <string name="home_notice_content">Download Magisk ONLY from the official GitHub page. Files from unknown sources can be malicious!</string>
     <string name="home_support_title">Support Us</string>
     <string name="home_follow_title">Follow Us</string>
     <string name="home_item_source">Source</string>
     <string name="home_support_content">Magisk is, and always will be, free, and open source. However, you can show us that you care by making a donation.</string>
+    <string name="donate">Donate</string>
+    <string name="documents">Documents</string>
+    <string name="report_bugs">Report Bugs</string>
+    <string name="home_status_title">Status</string>
     <string name="home_installed_version">Installed</string>
     <string name="home_latest_version">Latest</string>
     <string name="invalid_update_channel">Invalid update channel</string>
+    <string name="uninstall">Uninstall</string>
     <string name="uninstall_magisk_title">Uninstall Magisk</string>
     <string name="uninstall_magisk_msg">All modules will be disabled/removed!\nRoot will be removed!\nAny internal storage unencrypted through the use of Magisk will be re-encrypted!</string>
 
@@ -40,7 +48,10 @@
     <string name="install_start">Let\'s go</string>
     <string name="manager_download_install">Press to download and install</string>
     <string name="direct_install">Direct install (Recommended)</string>
+    <string name="direct_install_summary">Directly install Magisk to the boot partition</string>
     <string name="install_inactive_slot">Install to inactive slot (After OTA)</string>
+    <string name="install_inactive_slot_summary">Install to the inactive slot after an OTA update</string>
+    <string name="select_patch_file_summary">Patch a raw image, ODIN tar, or payload.bin file</string>
     <string name="install_inactive_slot_msg">Your device will be FORCED to boot to the current inactive slot after a reboot!\nOnly use this option after OTA is done.\nContinue?</string>
     <string name="setup_title">Additional setup</string>
     <string name="select_patch_file">Select and patch a file</string>
@@ -49,7 +60,7 @@
     <string name="flash_screen_title">Installation</string>
 
     <!--Superuser-->
-    <string name="su_request_title">Superuser request</string>
+    <string name="su_request_title">This app is requesting root permission. Grants full access to your device. Deny if you\'re not sure!</string>
     <string name="touch_filtered_warning">Because an app is obscuring a Superuser request, Magisk can\'t verify your response.</string>
     <string name="deny">Deny</string>
     <string name="prompt">Prompt</string>
@@ -73,7 +84,11 @@
     <string name="su_revoke_title">Revoke?</string>
     <string name="su_revoke_msg">Confirm to revoke %1$s Superuser rights</string>
     <string name="toast">Toast</string>
+    <string name="notification">Notification</string>
     <string name="none">None</string>
+    <string name="su_notification_channel">Superuser Notifications</string>
+    <string name="su_notification_granted_title">Superuser Granted</string>
+    <string name="su_notification_denied_title">Superuser Denied</string>
     <string name="superuser_toggle_notification">Notifications</string>
     <string name="superuser_toggle_revoke">Revoke</string>
     <string name="superuser_policy_none">No apps have asked for Superuser permission yet.</string>
@@ -84,6 +99,12 @@
     <string name="menuSaveLog">Save log</string>
     <string name="menuClearLog">Clear log now</string>
     <string name="logs_cleared">Log successfully cleared</string>
+    <string name="save_log">Save log</string>
+    <string name="clear_log">Clear log</string>
+    <string name="back">Back</string>
+    <string name="superuser_setting">Superuser Setting</string>
+    <string name="enabled">Enabled</string>
+    <string name="disabled">Disabled</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Target UID: %1$d</string>
     <string name="target_pid">Target PID: %s</string>
@@ -94,6 +115,12 @@
     <string name="show_system_app">Show system apps</string>
     <string name="show_os_app">Show OS apps</string>
     <string name="hide_filter_hint">Filter by name</string>
+    <string name="sort_by_name">Sort by name</string>
+    <string name="sort_by_package_name">Sort by package name</string>
+    <string name="sort_by_install_time">Sort by install time</string>
+    <string name="sort_by_update_time">Sort by update time</string>
+    <string name="sort_reverse">Reverse order</string>
+    <string name="menu_sort">Sort</string>
     <string name="hide_search">Search</string>
 
     <!--Module-->
@@ -174,6 +201,13 @@
     <string name="settings_su_restrict_title">Restrict root capabilities</string>
     <string name="settings_su_restrict_summary">Will restrict new Superuser apps by default. Warning: this will break most apps. Don\'t enable it unless you know what you\'re doing.</string>
     <string name="settings_customization">Customization</string>
+    <string name="settings_color_mode">Color mode</string>
+    <string name="color_mode_system">System</string>
+    <string name="color_mode_light">Light</string>
+    <string name="color_mode_dark">Dark</string>
+    <string name="color_mode_monet_system">Monet (System)</string>
+    <string name="color_mode_monet_light">Monet (Light)</string>
+    <string name="color_mode_monet_dark">Monet (Dark)</string>
     <string name="setting_add_shortcut_summary">Add a pretty shortcut to the home screen in case the name and icon are difficult to recognize after hiding the app</string>
     <string name="settings_doh_title">DNS over HTTPS</string>
     <string name="settings_doh_description">Workaround DNS poisoning in some nations</string>
