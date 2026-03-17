@@ -64,6 +64,7 @@
     <string name="thirtymin">30 分钟</string>
     <string name="sixtymin">60 分钟</string>
     <string name="su_allow_toast">%1$s 已被授予超级用户权限</string>
+    <string name="su_legacy_cmd">警告：检测到不支持的命令行</string>
     <string name="su_deny_toast">%1$s 已被拒绝超级用户权限</string>
     <string name="su_snack_grant">已授予 %1$s 超级用户权限</string>
     <string name="su_snack_deny">已拒绝 %1$s 超级用户权限</string>
