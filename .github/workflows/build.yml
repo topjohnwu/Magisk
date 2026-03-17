@@ -102,10 +102,8 @@ jobs:
         run: .github/kvm.sh
 
       - name: Run AVD test
-        timeout-minutes: 15
-        env:
-          AVD_TEST_LOG: 1
-        run: scripts/avd.sh test ${{ matrix.version }} ${{ matrix.type }}
+        timeout-minutes: 25
+        run: scripts/avd.sh test -l -v ${{ matrix.version }} -t ${{ matrix.type }}
 
       - name: Upload logs on error
         if: ${{ failure() }}
@@ -140,11 +138,10 @@ jobs:
         run: .github/kvm.sh
 
       - name: Run AVD test
-        timeout-minutes: 15
+        timeout-minutes: 25
         env:
           FORCE_32_BIT: 1
-          AVD_TEST_LOG: 1
-        run: scripts/avd.sh test ${{ matrix.version }}
+        run: scripts/avd.sh test -l -v ${{ matrix.version }}
 
       - name: Upload logs on error
         if: ${{ failure() }}
@@ -188,7 +185,7 @@ jobs:
           scripts/cuttlefish.sh download ${{ matrix.branch }} ${{ matrix.device }}
 
       - name: Run Cuttlefish test
-        timeout-minutes: 15
+        timeout-minutes: 25
         run: sudo -E -u $USER scripts/cuttlefish.sh test
 
       - name: Upload logs on error

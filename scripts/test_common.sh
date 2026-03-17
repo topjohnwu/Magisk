@@ -49,11 +49,11 @@ wait_for_pm() {
 }
 
 run_setup() {
-  local variant=$1
+  local apk=$1
   adb shell 'PATH=$PATH:/debug_ramdisk magisk -v'
 
   # Install the Magisk app
-  adb install -r -g out/app-${variant}.apk
+  adb install -r -g $apk
 
   # Install the test app
   adb install -r -g out/test.apk
@@ -62,6 +62,14 @@ run_setup() {
 
   # Run setup through the test app
   am_instrument '.Environment#setupEnvironment' $app
+}
+
+print_apks() {
+  if [ "$#" -eq 0 ]; then
+    find out -maxdepth 1 -type f -name "app-*.apk" -or -name "apk-*.apk"
+  else
+    echo "$@"
+  fi
 }
 
 run_tests() {
