@@ -1,16 +1,18 @@
 package com.topjohnwu.magisk.ui.theme
 
+import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import com.topjohnwu.magisk.core.Config
-import top.yukonga.miuix.kmp.theme.ColorSchemeMode
-import top.yukonga.miuix.kmp.theme.LocalContentColor
-import top.yukonga.miuix.kmp.theme.MiuixTheme
-import top.yukonga.miuix.kmp.theme.ThemeController
 
 object ThemeState {
     var colorMode by mutableIntStateOf(Config.colorMode)
@@ -22,18 +24,28 @@ fun MagiskTheme(
 ) {
     val isDark = isSystemInDarkTheme()
     val mode = ThemeState.colorMode
-    val controller = when (mode) {
-        1 -> ThemeController(ColorSchemeMode.Light)
-        2 -> ThemeController(ColorSchemeMode.Dark)
-        3 -> ThemeController(ColorSchemeMode.MonetSystem, isDark = isDark)
-        4 -> ThemeController(ColorSchemeMode.MonetLight)
-        5 -> ThemeController(ColorSchemeMode.MonetDark)
-        else -> ThemeController(ColorSchemeMode.System)
+    val context = LocalContext.current
+
+    val isDarkTheme = when (mode) {
+        1 -> false
+        2 -> true
+        3 -> isDark
+        4 -> false
+        5 -> true
+        else -> isDark
     }
-    MiuixTheme(controller = controller) {
-        CompositionLocalProvider(
-            LocalContentColor provides MiuixTheme.colorScheme.onBackground,
-            content = content
-        )
+
+    val useDynamicColor = mode in listOf(3, 4, 5) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+
+    val colorScheme = when {
+        useDynamicColor && isDarkTheme -> dynamicDarkColorScheme(context)
+        useDynamicColor && !isDarkTheme -> dynamicLightColorScheme(context)
+        isDarkTheme -> darkColorScheme()
+        else -> lightColorScheme()
     }
+
+    MaterialTheme(
+        colorScheme = colorScheme,
+        content = content
+    )
 }

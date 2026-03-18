@@ -9,6 +9,7 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -51,34 +52,36 @@ import com.topjohnwu.magisk.ui.component.ConfirmResult
 import com.topjohnwu.magisk.ui.component.MarkdownTextAsync
 import com.topjohnwu.magisk.ui.component.rememberConfirmDialog
 import kotlinx.coroutines.launch
-import top.yukonga.miuix.kmp.basic.ButtonDefaults
-import top.yukonga.miuix.kmp.basic.Card
-import top.yukonga.miuix.kmp.basic.CircularProgressIndicator
-import top.yukonga.miuix.kmp.basic.FloatingActionButton
-import top.yukonga.miuix.kmp.basic.HorizontalDivider
-import top.yukonga.miuix.kmp.basic.Icon
-import top.yukonga.miuix.kmp.basic.IconButton
-import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
-import top.yukonga.miuix.kmp.basic.Scaffold
-import top.yukonga.miuix.kmp.basic.Switch
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.basic.TextButton
-import top.yukonga.miuix.kmp.basic.TopAppBar
-import top.yukonga.miuix.kmp.extra.SuperDialog
-import top.yukonga.miuix.kmp.icon.MiuixIcons
-import top.yukonga.miuix.kmp.icon.extended.Add
-import top.yukonga.miuix.kmp.icon.extended.Delete
-import top.yukonga.miuix.kmp.icon.extended.Play
-import top.yukonga.miuix.kmp.icon.extended.Undo
-import top.yukonga.miuix.kmp.icon.extended.UploadCloud
-import top.yukonga.miuix.kmp.theme.MiuixTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CloudUpload
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Undo
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import com.topjohnwu.magisk.core.R as CoreR
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ModuleScreen(viewModel: ModuleViewModel) {
     val uiState by viewModel.uiState.collectAsState()
-    val scrollBehavior = MiuixScrollBehavior()
-    val colorScheme = MiuixTheme.colorScheme
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    val colorScheme = MaterialTheme.colorScheme
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val activity = context as MainActivity
@@ -134,28 +137,27 @@ fun ModuleScreen(viewModel: ModuleViewModel) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = stringResource(CoreR.string.modules),
+                title = { Text(stringResource(CoreR.string.modules)) },
                 scrollBehavior = scrollBehavior
             )
         },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { filePicker.launch("application/zip") },
-                shadowElevation = 0.dp,
+                shape = CircleShape,
                 modifier = Modifier
                     .padding(bottom = 88.dp, end = 20.dp)
                     .border(0.05.dp, colorScheme.outline.copy(alpha = 0.5f), CircleShape),
                 content = {
                     Icon(
-                        imageVector = MiuixIcons.Add,
+                        imageVector = Icons.Default.Add,
                         contentDescription = stringResource(CoreR.string.module_action_install_external),
                         modifier = Modifier.size(28.dp),
-                        tint = colorScheme.onPrimary
+                        tint = colorScheme.onPrimaryContainer
                     )
                 },
             )
-        },
-        popupHost = { }
+        }
     ) { padding ->
         if (uiState.loading) {
             Box(
@@ -178,8 +180,8 @@ fun ModuleScreen(viewModel: ModuleViewModel) {
             ) {
                 Text(
                     text = stringResource(CoreR.string.module_empty),
-                    style = MiuixTheme.textStyles.body1,
-                    color = colorScheme.onSurfaceVariantSummary
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = colorScheme.onSurfaceVariant
                 )
             }
             return@Scaffold
@@ -216,7 +218,7 @@ fun ModuleScreen(viewModel: ModuleViewModel) {
 private fun ModuleCard(item: ModuleItem, viewModel: ModuleViewModel, onUpdateClick: (OnlineModule?) -> Unit) {
     val infoAlpha = if (!item.isRemoved && item.isEnabled && !item.showNotice) 1f else 0.5f
     val strikeThrough = if (item.isRemoved) TextDecoration.LineThrough else TextDecoration.None
-    val colorScheme = MiuixTheme.colorScheme
+    val colorScheme = MaterialTheme.colorScheme
     val actionIconTint = colorScheme.onSurface.copy(alpha = 0.8f)
     val actionBg = colorScheme.secondaryContainer.copy(alpha = 0.8f)
     val updateBg = colorScheme.tertiaryContainer.copy(alpha = 0.6f)
@@ -227,16 +229,15 @@ private fun ModuleCard(item: ModuleItem, viewModel: ModuleViewModel, onUpdateCli
     val hasDescription = item.module.description.isNotBlank()
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        insideMargin = PaddingValues(16.dp),
-        onClick = { if (hasDescription) expanded = !expanded }
+        modifier = Modifier.fillMaxWidth().clickable(enabled = hasDescription) { expanded = !expanded },
     ) {
-        Column(modifier = Modifier.alpha(infoAlpha)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Column(modifier = Modifier.alpha(infoAlpha)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                 Column(
                     modifier = Modifier
                         .weight(1f)
@@ -244,7 +245,7 @@ private fun ModuleCard(item: ModuleItem, viewModel: ModuleViewModel, onUpdateCli
                 ) {
                     Text(
                         text = item.module.name,
-                        style = MiuixTheme.textStyles.body1,
+                        style = MaterialTheme.typography.bodyLarge,
                         textDecoration = strikeThrough,
                     )
                     Text(
@@ -253,8 +254,8 @@ private fun ModuleCard(item: ModuleItem, viewModel: ModuleViewModel, onUpdateCli
                             item.module.version,
                             item.module.author
                         ),
-                        style = MiuixTheme.textStyles.body2,
-                        color = colorScheme.onSurfaceVariantSummary,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = colorScheme.onSurfaceVariant,
                         textDecoration = strikeThrough,
                     )
                 }
@@ -272,8 +273,8 @@ private fun ModuleCard(item: ModuleItem, viewModel: ModuleViewModel, onUpdateCli
                 ) {
                     Text(
                         text = item.module.description,
-                        style = MiuixTheme.textStyles.body2,
-                        color = colorScheme.onSurfaceVariantSummary,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = colorScheme.onSurfaceVariant,
                         textDecoration = strikeThrough,
                         overflow = if (expanded) TextOverflow.Clip else TextOverflow.Ellipsis,
                         maxLines = if (expanded) Int.MAX_VALUE else 4,
@@ -285,7 +286,7 @@ private fun ModuleCard(item: ModuleItem, viewModel: ModuleViewModel, onUpdateCli
                 Spacer(Modifier.height(4.dp))
                 Text(
                     text = item.noticeText,
-                    style = MiuixTheme.textStyles.body2,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = colorScheme.primary,
                 )
             }
@@ -305,27 +306,25 @@ private fun ModuleCard(item: ModuleItem, viewModel: ModuleViewModel, onUpdateCli
             ) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     if (item.showAction) {
-                        IconButton(
-                            backgroundColor = actionBg,
-                            minHeight = 35.dp,
-                            minWidth = 35.dp,
+                        Button(
+                            colors = ButtonDefaults.buttonColors(containerColor = actionBg),
+                            contentPadding = PaddingValues(horizontal = 10.dp),
                             onClick = { viewModel.runAction(item.module.id, item.module.name) },
                         ) {
                             Row(
-                                modifier = Modifier.padding(horizontal = 10.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                             ) {
                                 Icon(
                                     modifier = Modifier.size(20.dp),
-                                    imageVector = MiuixIcons.Play,
+                                    imageVector = Icons.Default.PlayArrow,
                                     tint = actionIconTint,
                                     contentDescription = stringResource(CoreR.string.module_action)
                                 )
                                 Text(
                                     text = stringResource(CoreR.string.module_action),
                                     color = actionIconTint,
-                                    style = MiuixTheme.textStyles.body2,
+                                    style = MaterialTheme.typography.bodyMedium,
                                 )
                             }
                         }
@@ -340,49 +339,45 @@ private fun ModuleCard(item: ModuleItem, viewModel: ModuleViewModel, onUpdateCli
                 enter = fadeIn(),
                 exit = fadeOut()
             ) {
-                IconButton(
+                Button(
                     modifier = Modifier.padding(end = 8.dp),
-                    backgroundColor = updateBg,
-                    minHeight = 35.dp,
-                    minWidth = 35.dp,
+                    colors = ButtonDefaults.buttonColors(containerColor = updateBg),
+                    contentPadding = PaddingValues(horizontal = 10.dp),
                     onClick = { onUpdateClick(item.module.updateInfo) },
                 ) {
                     Row(
-                        modifier = Modifier.padding(horizontal = 10.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
                         Icon(
                             modifier = Modifier.size(20.dp),
-                            imageVector = MiuixIcons.UploadCloud,
+                            imageVector = Icons.Default.CloudUpload,
                             tint = updateTint,
                             contentDescription = stringResource(CoreR.string.update),
                         )
                         Text(
                             text = stringResource(CoreR.string.update),
                             color = updateTint,
-                            style = MiuixTheme.textStyles.body2,
+                            style = MaterialTheme.typography.bodyMedium,
                         )
                     }
                 }
             }
 
-            IconButton(
-                backgroundColor = if (item.isRemoved) actionBg else removeBg,
-                minHeight = 35.dp,
-                minWidth = 35.dp,
+            Button(
+                colors = ButtonDefaults.buttonColors(containerColor = if (item.isRemoved) actionBg else removeBg),
+                contentPadding = PaddingValues(horizontal = 10.dp),
                 onClick = { viewModel.toggleRemove(item) },
                 enabled = !item.isUpdated
             ) {
                 val tint = if (item.isRemoved) actionIconTint else removeTint
                 Row(
-                    modifier = Modifier.padding(horizontal = 10.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
                     Icon(
                         modifier = Modifier.size(20.dp),
-                        imageVector = if (item.isRemoved) MiuixIcons.Undo else MiuixIcons.Delete,
+                        imageVector = if (item.isRemoved) Icons.Default.Undo else Icons.Default.Delete,
                         tint = tint,
                         contentDescription = null
                     )
@@ -392,9 +387,10 @@ private fun ModuleCard(item: ModuleItem, viewModel: ModuleViewModel, onUpdateCli
                             else CoreR.string.module_state_remove
                         ),
                         color = tint,
-                        style = MiuixTheme.textStyles.body2,
+                        style = MaterialTheme.typography.bodyMedium,
                     )
                 }
+            }
             }
         }
     }
@@ -413,36 +409,34 @@ private fun OnlineModuleDialog(
         item.name, item.version, item.versionCode
     )
 
-    SuperDialog(
-        show = showDialog,
-        title = title,
-        onDismissRequest = onDismiss,
-    ) {
-        MarkdownTextAsync {
-            val str = svc.fetchString(item.changelog)
-            if (str.length > 1000) str.substring(0, 1000) else str
-        }
-        Spacer(Modifier.height(16.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            TextButton(
-                text = stringResource(android.R.string.cancel),
-                onClick = onDismiss,
-            )
-            Spacer(Modifier.weight(1f))
-            TextButton(
-                text = stringResource(CoreR.string.download),
-                onClick = { onDownload(false) },
-            )
-            Spacer(Modifier.width(8.dp))
-            TextButton(
-                text = stringResource(CoreR.string.install),
-                onClick = { onDownload(true) },
-                colors = ButtonDefaults.textButtonColorsPrimary()
-            )
-        }
+    if (showDialog.value) {
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            title = { Text(title) },
+            text = {
+                MarkdownTextAsync {
+                    val str = svc.fetchString(item.changelog)
+                    if (str.length > 1000) str.substring(0, 1000) else str
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = { onDownload(true) }
+                ) {
+                    Text(stringResource(CoreR.string.install))
+                }
+            },
+            dismissButton = {
+                Row {
+                    TextButton(onClick = onDismiss) {
+                        Text(stringResource(android.R.string.cancel))
+                    }
+                    Spacer(Modifier.weight(1f))
+                    TextButton(onClick = { onDownload(false) }) {
+                        Text(stringResource(CoreR.string.download))
+                    }
+                }
+            }
+        )
     }
 }

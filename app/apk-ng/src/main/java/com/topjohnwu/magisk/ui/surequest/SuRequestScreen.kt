@@ -34,13 +34,12 @@ import androidx.compose.ui.unit.dp
 import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.ui.superuser.SharedUidBadge
 import com.topjohnwu.magisk.ui.util.rememberDrawablePainter
-import top.yukonga.miuix.kmp.basic.ButtonDefaults
-import top.yukonga.miuix.kmp.basic.Card
-import top.yukonga.miuix.kmp.basic.Slider
-import top.yukonga.miuix.kmp.basic.SliderDefaults
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.basic.TextButton
-import top.yukonga.miuix.kmp.theme.MiuixTheme
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Slider
+import androidx.compose.material3.Text
 import com.topjohnwu.magisk.core.R as CoreR
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -103,7 +102,7 @@ fun SuRequestScreen(viewModel: SuRequestViewModel) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
                                 text = title,
-                                style = MiuixTheme.textStyles.body1,
+                                style = MaterialTheme.typography.bodyLarge,
                                 fontWeight = FontWeight.Bold,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
@@ -116,8 +115,8 @@ fun SuRequestScreen(viewModel: SuRequestViewModel) {
                         }
                         Text(
                             text = packageName,
-                            style = MiuixTheme.textStyles.body2,
-                            color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )
@@ -128,8 +127,8 @@ fun SuRequestScreen(viewModel: SuRequestViewModel) {
 
                 Text(
                     text = stringResource(CoreR.string.su_request_title),
-                    style = MiuixTheme.textStyles.body2,
-                    color = MiuixTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                 )
@@ -138,8 +137,8 @@ fun SuRequestScreen(viewModel: SuRequestViewModel) {
 
                 Text(
                     text = "Permission timeout: $sliderLabel",
-                    style = MiuixTheme.textStyles.body2,
-                    color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.fillMaxWidth().padding(start = 8.dp),
                 )
                 Spacer(Modifier.height(8.dp))
@@ -152,9 +151,6 @@ fun SuRequestScreen(viewModel: SuRequestViewModel) {
                     },
                     valueRange = 0f..5f,
                     steps = 4,
-                    showKeyPoints = true,
-                    height = 20.dp,
-                    hapticEffect = SliderDefaults.SliderHapticEffect.Step,
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp)
                 )
                 Spacer(Modifier.height(16.dp))
@@ -163,22 +159,15 @@ fun SuRequestScreen(viewModel: SuRequestViewModel) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    TextButton(
-                        text = denyText,
+                    OutlinedButton(
                         onClick = { viewModel.denyPressed() },
                         modifier = Modifier.weight(1f),
-                        cornerRadius = 12.dp,
-                        minHeight = 40.dp,
-                        insideMargin = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                    )
-                    TextButton(
-                        text = stringResource(CoreR.string.grant),
+                    ) {
+                        Text(denyText)
+                    }
+                    Button(
                         enabled = grantEnabled,
-                        colors = ButtonDefaults.textButtonColorsPrimary(),
                         onClick = { viewModel.grantPressed() },
-                        cornerRadius = 12.dp,
-                        minHeight = 40.dp,
-                        insideMargin = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                         modifier = Modifier
                             .weight(1f)
                             .then(
@@ -200,7 +189,9 @@ fun SuRequestScreen(viewModel: SuRequestViewModel) {
                                     }
                                 } else Modifier
                             )
-                    )
+                    ) {
+                        Text(stringResource(CoreR.string.grant))
+                    }
                 }
             }
         }

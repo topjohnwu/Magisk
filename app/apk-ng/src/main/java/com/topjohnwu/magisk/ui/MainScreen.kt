@@ -57,9 +57,9 @@ import com.topjohnwu.magisk.ui.settings.SettingsViewModel
 import com.topjohnwu.magisk.ui.superuser.SuperuserScreen
 import com.topjohnwu.magisk.ui.superuser.SuperuserViewModel
 import kotlinx.coroutines.launch
-import top.yukonga.miuix.kmp.basic.Icon
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.theme.MiuixTheme
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import com.topjohnwu.magisk.core.R as CoreR
 
 enum class Tab(val titleRes: Int, val iconRes: Int) {
@@ -160,7 +160,7 @@ private fun FloatingNavigationBar(
             .padding(bottom = navBarInset + 12.dp, start = 24.dp, end = 24.dp)
             .shadow(elevation = 6.dp, shape = shape)
             .clip(shape)
-            .background(MiuixTheme.colorScheme.surfaceContainer)
+            .background(MaterialTheme.colorScheme.surfaceContainer)
             .fillMaxWidth()
             .height(64.dp)
             .padding(horizontal = 4.dp),
@@ -191,9 +191,9 @@ private fun FloatingNavItem(
 ) {
     val contentColor by animateColorAsState(
         targetValue = when {
-            !enabled -> MiuixTheme.colorScheme.disabledOnSecondaryVariant
-            selected -> MiuixTheme.colorScheme.primary
-            else -> MiuixTheme.colorScheme.onSurfaceVariantActions
+            !enabled -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+            selected -> MaterialTheme.colorScheme.primary
+            else -> MaterialTheme.colorScheme.onSurfaceVariant
         },
         animationSpec = tween(200),
         label = "navItemColor"

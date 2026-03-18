@@ -33,30 +33,31 @@ import androidx.compose.ui.unit.sp
 import com.topjohnwu.magisk.ui.navigation.LocalNavigator
 import com.topjohnwu.magisk.ui.navigation.Route
 import com.topjohnwu.magisk.ui.util.rememberDrawablePainter
-import top.yukonga.miuix.kmp.basic.Card
-import top.yukonga.miuix.kmp.basic.CircularProgressIndicator
-import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
-import top.yukonga.miuix.kmp.basic.Scaffold
-import top.yukonga.miuix.kmp.basic.Switch
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.basic.TopAppBar
-import top.yukonga.miuix.kmp.theme.MiuixTheme
+import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import com.topjohnwu.magisk.core.R as CoreR
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SuperuserScreen(viewModel: SuperuserViewModel) {
     val uiState by viewModel.uiState.collectAsState()
-    val scrollBehavior = MiuixScrollBehavior()
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val navigator = LocalNavigator.current
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = stringResource(CoreR.string.superuser),
+                title = { Text(stringResource(CoreR.string.superuser)) },
                 scrollBehavior = scrollBehavior
             )
-        },
-        popupHost = { }
+        }
     ) { padding ->
         if (uiState.loading) {
             Box(
@@ -79,8 +80,8 @@ fun SuperuserScreen(viewModel: SuperuserViewModel) {
             ) {
                 Text(
                     text = stringResource(CoreR.string.superuser_policy_none),
-                    style = MiuixTheme.textStyles.body1,
-                    color = MiuixTheme.colorScheme.onSurfaceVariantSummary
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             return@Scaffold
@@ -142,7 +143,7 @@ private fun PolicyCard(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             text = item.title,
-                            style = MiuixTheme.textStyles.body1,
+                            style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier.weight(1f, fill = false),
                         )
                         if (item.isSharedUid) {
@@ -152,8 +153,8 @@ private fun PolicyCard(
                     }
                     Text(
                         text = item.packageName,
-                        style = MiuixTheme.textStyles.body2,
-                        color = MiuixTheme.colorScheme.onSurfaceVariantSummary
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
@@ -163,7 +164,7 @@ private fun PolicyCard(
                     .fillMaxHeight()
                     .padding(vertical = 12.dp)
                     .width(0.5.dp)
-                    .background(MiuixTheme.colorScheme.dividerLine)
+                    .background(MaterialTheme.colorScheme.outlineVariant)
             )
 
             Box(
@@ -185,11 +186,11 @@ private fun PolicyCard(
 internal fun SharedUidBadge(modifier: Modifier = Modifier) {
     Text(
         text = "SharedUID",
-        color = MiuixTheme.colorScheme.onPrimary,
+        color = MaterialTheme.colorScheme.onPrimary,
         fontSize = 10.sp,
         maxLines = 1,
         modifier = modifier
-            .background(MiuixTheme.colorScheme.primary, RoundedCornerShape(6.dp))
+            .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(6.dp))
             .padding(horizontal = 6.dp, vertical = 2.dp)
     )
 }

@@ -11,35 +11,37 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.ui.terminal.TerminalScreen
-import top.yukonga.miuix.kmp.basic.Icon
-import top.yukonga.miuix.kmp.basic.IconButton
-import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
-import top.yukonga.miuix.kmp.basic.Scaffold
-import top.yukonga.miuix.kmp.basic.SmallTopAppBar
-import top.yukonga.miuix.kmp.icon.MiuixIcons
-import top.yukonga.miuix.kmp.icon.extended.Back
-import top.yukonga.miuix.kmp.theme.MiuixTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import com.topjohnwu.magisk.core.R as CoreR
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActionScreen(viewModel: ActionViewModel, actionName: String, onBack: () -> Unit) {
     val actionState by viewModel.actionState.collectAsState()
     val finished = actionState != ActionViewModel.State.RUNNING
 
-    val scrollBehavior = MiuixScrollBehavior()
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
         topBar = {
-            SmallTopAppBar(
-                title = actionName,
+            TopAppBar(
+                title = { androidx.compose.material3.Text(actionName) },
                 navigationIcon = {
                     IconButton(
                         modifier = Modifier.padding(start = 16.dp),
                         onClick = onBack
                     ) {
                         Icon(
-                            imageVector = MiuixIcons.Back,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = null,
-                            tint = MiuixTheme.colorScheme.onBackground
+                            tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
                 },
@@ -52,15 +54,14 @@ fun ActionScreen(viewModel: ActionViewModel, actionName: String, onBack: () -> U
                             Icon(
                                 painter = painterResource(R.drawable.ic_save_md2),
                                 contentDescription = stringResource(CoreR.string.menuSaveLog),
-                                tint = MiuixTheme.colorScheme.onBackground
+                                tint = MaterialTheme.colorScheme.onBackground
                             )
                         }
                     }
                 },
                 scrollBehavior = scrollBehavior
             )
-        },
-        popupHost = { }
+        }
     ) { padding ->
         TerminalScreen(
             modifier = Modifier

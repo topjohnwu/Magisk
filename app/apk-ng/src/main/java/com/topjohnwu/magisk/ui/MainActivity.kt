@@ -63,7 +63,7 @@ import com.topjohnwu.magisk.ui.theme.Theme
 import com.topjohnwu.magisk.view.Shortcuts
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import top.yukonga.miuix.kmp.utils.MiuixPopupUtils.Companion.MiuixPopupHost
+
 import com.topjohnwu.magisk.core.R as CoreR
 
 class MainActivity : AppCompatActivity(), SplashScreenHost {
@@ -162,7 +162,7 @@ class MainActivity : AppCompatActivity(), SplashScreenHost {
                             onBack = { navigator.pop() },
                             entryDecorators = listOf(
                                 rememberSaveableStateHolderNavEntryDecorator(),
-                                rememberViewModelStoreNavEntryDecorator()
+                                rememberViewModelStoreNavEntryDecorator<Any>()
                             ),
                             entryProvider = entryProvider {
                                 entry<Route.Main> {
@@ -210,7 +210,6 @@ class MainActivity : AppCompatActivity(), SplashScreenHost {
                         )
                     }
                     MainActivityDialogs(activity = this@MainActivity)
-                    MiuixPopupHost()
                 }
             }
         }

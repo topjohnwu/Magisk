@@ -28,19 +28,21 @@ import com.topjohnwu.magisk.ui.component.ConfirmResult
 import com.topjohnwu.magisk.ui.component.rememberConfirmDialog
 import com.topjohnwu.magisk.ui.util.rememberDrawablePainter
 import kotlinx.coroutines.launch
-import top.yukonga.miuix.kmp.basic.Card
-import top.yukonga.miuix.kmp.basic.Icon
-import top.yukonga.miuix.kmp.basic.IconButton
-import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
-import top.yukonga.miuix.kmp.basic.Scaffold
-import top.yukonga.miuix.kmp.basic.Switch
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.basic.TopAppBar
-import top.yukonga.miuix.kmp.icon.MiuixIcons
-import top.yukonga.miuix.kmp.icon.extended.Back
-import top.yukonga.miuix.kmp.theme.MiuixTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import com.topjohnwu.magisk.core.R as CoreR
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SuperuserDetailScreen(
     uid: Int,
@@ -50,7 +52,7 @@ fun SuperuserDetailScreen(
     val uiState by viewModel.uiState.collectAsState()
     val items = uiState.policies.filter { it.policy.uid == uid }
     val item = items.firstOrNull()
-    val scrollBehavior = MiuixScrollBehavior()
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val scope = rememberCoroutineScope()
     val revokeDialog = rememberConfirmDialog()
     val revokeTitle = stringResource(CoreR.string.su_revoke_title)
@@ -61,22 +63,21 @@ fun SuperuserDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = stringResource(CoreR.string.superuser_setting),
+                title = { Text(stringResource(CoreR.string.superuser_setting)) },
                 navigationIcon = {
                     IconButton(
                         modifier = Modifier.padding(start = 16.dp),
                         onClick = onBack
                     ) {
                         Icon(
-                            imageVector = MiuixIcons.Back,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(CoreR.string.back),
                         )
                     }
                 },
                 scrollBehavior = scrollBehavior
             )
-        },
-        popupHost = { }
+        }
     ) { padding ->
         if (item == null) return@Scaffold
 
@@ -109,7 +110,7 @@ fun SuperuserDetailScreen(
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
                                     text = item.title,
-                                    style = MiuixTheme.textStyles.headline2,
+                                    style = MaterialTheme.typography.headlineMedium,
                                     modifier = Modifier.weight(1f, fill = false),
                                 )
                                 if (item.isSharedUid) {
@@ -119,13 +120,13 @@ fun SuperuserDetailScreen(
                             }
                             Text(
                                 text = item.packageName,
-                                style = MiuixTheme.textStyles.body2,
-                                color = MiuixTheme.colorScheme.onSurfaceVariantSummary
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Text(
                                 text = "UID: ${item.policy.uid}",
-                                style = MiuixTheme.textStyles.body2,
-                                color = MiuixTheme.colorScheme.onSurfaceVariantSummary
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
@@ -197,7 +198,7 @@ private fun SwitchRow(
     ) {
         Text(
             text = title,
-            style = MiuixTheme.textStyles.body1,
+            style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.weight(1f),
         )
         Spacer(Modifier.width(16.dp))
@@ -212,8 +213,8 @@ private fun SwitchRow(
 private fun RevokeRow() {
     Text(
         text = stringResource(CoreR.string.superuser_toggle_revoke),
-        style = MiuixTheme.textStyles.body1,
-        color = MiuixTheme.colorScheme.error,
+        style = MaterialTheme.typography.bodyLarge,
+        color = MaterialTheme.colorScheme.error,
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 16.dp)
