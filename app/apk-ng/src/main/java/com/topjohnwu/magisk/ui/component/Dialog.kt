@@ -43,12 +43,15 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import top.yukonga.miuix.kmp.basic.ButtonDefaults
-import top.yukonga.miuix.kmp.basic.InfiniteProgressIndicator
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.basic.TextButton
-import top.yukonga.miuix.kmp.extra.SuperDialog
-import top.yukonga.miuix.kmp.theme.MiuixTheme
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import java.io.IOException
 import kotlin.coroutines.resume
 
@@ -227,29 +230,36 @@ fun rememberConfirmDialog(callback: ConfirmCallback): ConfirmDialogHandle {
 
 @Composable
 private fun LoadingDialog(showDialog: MutableState<Boolean>) {
-    SuperDialog(
-        show = showDialog,
-        onDismissRequest = {},
-        content = {
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.CenterStart
+    if (showDialog.value) {
+        Dialog(
+            onDismissRequest = {},
+            properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false)
+        ) {
+            Surface(
+                shape = MaterialTheme.shapes.extraLarge,
+                tonalElevation = 6.dp,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start,
+                Box(
+                    modifier = Modifier.padding(24.dp).fillMaxWidth(),
+                    contentAlignment = Alignment.CenterStart
                 ) {
-                    InfiniteProgressIndicator(
-                        color = MiuixTheme.colorScheme.onBackground
-                    )
-                    Text(
-                        modifier = Modifier.padding(start = 12.dp),
-                        text = stringResource(com.topjohnwu.magisk.core.R.string.loading),
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Start,
+                    ) {
+                        CircularProgressIndicator(
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            modifier = Modifier.padding(start = 16.dp),
+                            text = stringResource(com.topjohnwu.magisk.core.R.string.loading),
+                        )
+                    }
                 }
             }
         }
-    )
+    }
 }
 
 @Composable
@@ -259,77 +269,59 @@ private fun ConfirmDialogContent(
     dismiss: () -> Unit,
     showDialog: MutableState<Boolean>
 ) {
-    SuperDialog(
-        modifier = Modifier.windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top)),
-        show = showDialog,
-        title = visuals.title,
-        onDismissRequest = {
-            dismiss()
-            showDialog.value = false
-        },
-        content = {
-            Layout(
-                content = {
-                    visuals.content?.let { content ->
-                        if (visuals.markdown) {
-                            MarkdownText(content)
-                        } else {
-                            Text(
-                                text = content,
-                                color = MiuixTheme.colorScheme.onSurface,
-                            )
-                        }
-                    }
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier.padding(top = 12.dp)
-                    ) {
-                        TextButton(
-                            text = visuals.dismiss
-                                ?: stringResource(android.R.string.cancel),
-                            onClick = {
-                                dismiss()
-                                showDialog.value = false
-                            },
-                            modifier = Modifier.weight(1f)
-                        )
-                        Spacer(Modifier.width(20.dp))
-                        TextButton(
-                            text = visuals.confirm
-                                ?: stringResource(android.R.string.ok),
-                            onClick = {
-                                confirm()
-                                showDialog.value = false
-                            },
-                            modifier = Modifier.weight(1f),
-                            colors = ButtonDefaults.textButtonColorsPrimary()
+    if (showDialog.value) {
+        AlertDialog(
+            modifier = Modifier.windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top)),
+            onDismissRequest = {
+                dismiss()
+                showDialog.value = false
+            },
+            title = if (visuals.title.isNotEmpty()) {
+                { Text(text = visuals.title) }
+            } else null,
+            text = {
+                visuals.content?.let { content ->
+                    if (visuals.markdown) {
+                        MarkdownText(content)
+                    } else {
+                        Text(
+                            text = content,
+                            color = MaterialTheme.colorScheme.onSurface,
                         )
                     }
                 }
-            ) { measurables, constraints ->
-                if (measurables.size != 2) {
-                    val button = measurables[0].measure(constraints)
-                    layout(constraints.maxWidth, button.height) {
-                        button.place(0, 0)
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        confirm()
+                        showDialog.value = false
                     }
-                } else {
-                    val button = measurables[1].measure(constraints)
-                    val content = measurables[0].measure(
-                        constraints.copy(maxHeight = constraints.maxHeight - button.height)
+                ) {
+                    Text(
+                        text = visuals.confirm ?: stringResource(android.R.string.ok)
                     )
-                    layout(constraints.maxWidth, content.height + button.height) {
-                        content.place(0, 0)
-                        button.place(0, content.height)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        dismiss()
+                        showDialog.value = false
                     }
+                ) {
+                    Text(
+                        text = visuals.dismiss ?: stringResource(android.R.string.cancel)
+                    )
                 }
             }
-        }
-    )
+        )
+    }
 }
 
 @Composable
 fun MarkdownText(text: String) {
-    val contentColor = MiuixTheme.colorScheme.onBackground.toArgb()
+    val contentColor = MaterialTheme.colorScheme.onBackground.toArgb()
     AndroidView(
         factory = { context ->
             TextView(context).apply {
@@ -368,7 +360,7 @@ fun MarkdownTextAsync(getMarkdownText: suspend () -> String) {
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
-            InfiniteProgressIndicator(color = MiuixTheme.colorScheme.onBackground)
+            CircularProgressIndicator(color = MaterialTheme.colorScheme.onBackground)
         }
     }
 }

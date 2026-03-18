@@ -34,7 +34,6 @@ import com.topjohnwu.magisk.ui.theme.Theme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import top.yukonga.miuix.kmp.utils.MiuixPopupUtils.Companion.MiuixPopupHost
 
 open class SuRequestActivity : AppCompatActivity(), UntrackedActivity {
 
@@ -92,7 +91,6 @@ open class SuRequestActivity : AppCompatActivity(), UntrackedActivity {
             MagiskTheme {
                 Box(modifier = Modifier.fillMaxSize()) {
                     SuRequestScreen(viewModel = viewModel)
-                    MiuixPopupHost()
                 }
             }
         }

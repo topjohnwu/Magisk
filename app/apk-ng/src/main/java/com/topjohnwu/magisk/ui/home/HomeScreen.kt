@@ -62,7 +62,6 @@ import com.topjohnwu.magisk.core.tasks.AppMigration
 import com.topjohnwu.magisk.core.tasks.MagiskInstaller
 import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.ui.component.ConfirmResult
-import com.topjohnwu.magisk.ui.component.ListPopupDefaults.MenuPositionProvider
 import com.topjohnwu.magisk.ui.component.LoadingDialogHandle
 import com.topjohnwu.magisk.ui.component.MarkdownText
 import com.topjohnwu.magisk.ui.component.MarkdownTextAsync
@@ -71,41 +70,45 @@ import com.topjohnwu.magisk.ui.component.rememberLoadingDialog
 import com.topjohnwu.magisk.ui.flash.FlashUtils
 import com.topjohnwu.magisk.ui.install.InstallViewModel
 import kotlinx.coroutines.launch
-import top.yukonga.miuix.kmp.basic.ButtonDefaults
-import top.yukonga.miuix.kmp.basic.Card
-import top.yukonga.miuix.kmp.basic.Checkbox
-import top.yukonga.miuix.kmp.basic.DropdownImpl
-import top.yukonga.miuix.kmp.basic.HorizontalDivider
-import top.yukonga.miuix.kmp.basic.Icon
-import top.yukonga.miuix.kmp.basic.IconButton
-import top.yukonga.miuix.kmp.basic.LinearProgressIndicator
-import top.yukonga.miuix.kmp.basic.ListPopupColumn
-import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
-import top.yukonga.miuix.kmp.basic.PopupPositionProvider
-import top.yukonga.miuix.kmp.basic.Scaffold
-import top.yukonga.miuix.kmp.basic.SmallTitle
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.basic.TextButton
-import top.yukonga.miuix.kmp.basic.TopAppBar
-import top.yukonga.miuix.kmp.basic.VerticalDivider
-import top.yukonga.miuix.kmp.extra.SuperArrow
-import top.yukonga.miuix.kmp.extra.SuperBottomSheet
-import top.yukonga.miuix.kmp.extra.SuperListPopup
-import top.yukonga.miuix.kmp.icon.MiuixIcons
-import top.yukonga.miuix.kmp.icon.extended.Close
-import top.yukonga.miuix.kmp.icon.extended.Delete
-import top.yukonga.miuix.kmp.icon.extended.Hide
-import top.yukonga.miuix.kmp.icon.extended.Show
-import top.yukonga.miuix.kmp.theme.MiuixTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.VerticalDivider
+import com.topjohnwu.magisk.ui.component.SettingsArrow
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import com.topjohnwu.magisk.core.R as CoreR
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(viewModel: HomeViewModel, installVm: InstallViewModel) {
     val uiState by viewModel.uiState.collectAsState()
     val installUiState by installVm.uiState.collectAsState()
     val context = LocalContext.current
     val activity = context as MainActivity
-    val scrollBehavior = MiuixScrollBehavior()
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val scope = rememberCoroutineScope()
     val loadingDialog = rememberLoadingDialog()
     val navigator = com.topjohnwu.magisk.ui.navigation.LocalNavigator.current
@@ -226,7 +229,7 @@ fun HomeScreen(viewModel: HomeViewModel, installVm: InstallViewModel) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = stringResource(CoreR.string.section_home),
+                title = { Text(stringResource(CoreR.string.section_home)) },
                 scrollBehavior = scrollBehavior,
                 actions = {
                     if (Info.isRooted) {
@@ -234,8 +237,7 @@ fun HomeScreen(viewModel: HomeViewModel, installVm: InstallViewModel) {
                     }
                 }
             )
-        },
-        popupHost = { }
+        }
     ) { padding ->
         Column(
             modifier = Modifier
@@ -276,22 +278,32 @@ fun HomeScreen(viewModel: HomeViewModel, installVm: InstallViewModel) {
                 )
             }
 
-            SmallTitle(text = stringResource(CoreR.string.home_status_title))
+            Text(
+                text = stringResource(CoreR.string.home_status_title),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 4.dp)
+            )
             StatusCard()
 
             val showDonateSheet = rememberSaveable { mutableStateOf(false) }
 
-            SmallTitle(text = stringResource(CoreR.string.home_support_title))
+            Text(
+                text = stringResource(CoreR.string.home_support_title),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 4.dp)
+            )
             Card(modifier = Modifier.fillMaxWidth()) {
-                SuperArrow(
+                SettingsArrow(
                     title = stringResource(CoreR.string.documents),
                     onClick = { openLink(context, "https://topjohnwu.github.io/Magisk/") }
                 )
-                SuperArrow(
+                SettingsArrow(
                     title = stringResource(CoreR.string.report_bugs),
                     onClick = { openLink(context, "${Const.Url.SOURCE_CODE_URL}/issues") }
                 )
-                SuperArrow(
+                SettingsArrow(
                     title = stringResource(CoreR.string.donate),
                     onClick = { showDonateSheet.value = true }
                 )
@@ -302,7 +314,12 @@ fun HomeScreen(viewModel: HomeViewModel, installVm: InstallViewModel) {
                 onLinkClicked = { viewModel.onLinkPressed(it) }
             )
 
-            SmallTitle(text = stringResource(CoreR.string.home_follow_title))
+            Text(
+                text = stringResource(CoreR.string.home_follow_title),
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(start = 24.dp, top = 24.dp, bottom = 8.dp)
+            )
             DevelopersCard(onLinkClicked = { openLink(context, it) })
         }
     }
@@ -346,33 +363,28 @@ private fun RebootButton() {
         IconButton(
             modifier = Modifier.padding(end = 16.dp),
             onClick = { showMenu.value = true },
-            holdDownState = showMenu.value,
         ) {
             Icon(
                 painter = painterResource(R.drawable.ic_restart),
                 contentDescription = stringResource(CoreR.string.reboot),
             )
         }
-        SuperListPopup(
-            show = showMenu,
-            popupPositionProvider = MenuPositionProvider,
-            alignment = PopupPositionProvider.Align.End,
+        DropdownMenu(
+            expanded = showMenu.value,
             onDismissRequest = { showMenu.value = false }
         ) {
-            ListPopupColumn {
-                items.forEachIndexed { index, item ->
-                    val isSafeMode = item.labelRes == CoreR.string.reboot_safe_mode
-                    DropdownImpl(
-                        text = stringResource(item.labelRes),
-                        optionSize = items.size,
-                        isSelected = isSafeMode && safeModeEnabled >= 2,
-                        index = index,
-                        onSelectedIndexChange = {
-                            item.action()
-                            if (!isSafeMode) showMenu.value = false
-                        }
-                    )
-                }
+            items.forEachIndexed { index, item ->
+                val isSafeMode = item.labelRes == CoreR.string.reboot_safe_mode
+                DropdownMenuItem(
+                    text = { Text(stringResource(item.labelRes)) },
+                    trailingIcon = if (isSafeMode && safeModeEnabled >= 2) {
+                        { Icon(Icons.Default.Check, contentDescription = null) }
+                    } else null,
+                    onClick = {
+                        item.action()
+                        if (!isSafeMode) showMenu.value = false
+                    }
+                )
             }
         }
     }
@@ -386,7 +398,7 @@ private fun NoticeCard(onHide: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .background(
-                MiuixTheme.colorScheme.tertiaryContainer,
+                MaterialTheme.colorScheme.tertiaryContainer,
                 RoundedCornerShape(16.dp)
             )
             .padding(start = 16.dp, top = 4.dp, bottom = 4.dp, end = 4.dp)
@@ -396,16 +408,16 @@ private fun NoticeCard(onHide: () -> Unit) {
         ) {
             Text(
                 text = stringResource(CoreR.string.home_notice_content),
-                style = MiuixTheme.textStyles.body2,
-                color = MiuixTheme.colorScheme.onTertiaryContainer,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onTertiaryContainer,
                 modifier = Modifier.weight(1f).padding(vertical = 8.dp)
             )
             IconButton(onClick = onHide) {
                 Icon(
-                    imageVector = MiuixIcons.Close,
+                    imageVector = Icons.Default.Close,
                     contentDescription = stringResource(CoreR.string.hide),
                     modifier = Modifier.size(15.dp),
-                    tint = MiuixTheme.colorScheme.onTertiaryContainer,
+                    tint = MaterialTheme.colorScheme.onTertiaryContainer,
                 )
             }
         }
@@ -428,8 +440,8 @@ private fun CoreCard(
         HomeViewModel.State.LOADING -> null
     }
     val actionColor = when (state) {
-        HomeViewModel.State.OUTDATED, HomeViewModel.State.INVALID -> MiuixTheme.colorScheme.primary
-        else -> MiuixTheme.colorScheme.onSurfaceVariantActions
+        HomeViewModel.State.OUTDATED, HomeViewModel.State.INVALID -> MaterialTheme.colorScheme.primary
+        else -> MaterialTheme.colorScheme.onSurfaceVariant
     }
     val uninstallEnabled = Info.env.isActive
 
@@ -445,17 +457,17 @@ private fun CoreCard(
                         painter = painterResource(CoreR.drawable.ic_magisk_outline),
                         contentDescription = null,
                         modifier = Modifier.size(24.dp),
-                        tint = MiuixTheme.colorScheme.primary
+                        tint = MaterialTheme.colorScheme.primary
                     )
                     Spacer(Modifier.height(8.dp))
                     Text(
                         text = stringResource(CoreR.string.home_core_title),
-                        style = MiuixTheme.textStyles.headline2,
+                        style = MaterialTheme.typography.titleLarge,
                     )
                     Text(
                         text = version.ifEmpty { stringResource(CoreR.string.not_available) },
-                        style = MiuixTheme.textStyles.body2,
-                        color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
                 Column(
@@ -467,11 +479,11 @@ private fun CoreCard(
                         enabled = uninstallEnabled,
                     ) {
                         Icon(
-                            imageVector = MiuixIcons.Delete,
+                            imageVector = Icons.Default.Delete,
                             contentDescription = null,
                             modifier = Modifier.size(18.dp),
-                            tint = if (uninstallEnabled) MiuixTheme.colorScheme.error
-                                else MiuixTheme.colorScheme.onSurfaceVariantActions,
+                            tint = if (uninstallEnabled) MaterialTheme.colorScheme.error
+                                else MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                     if (remoteVersion != null) {
@@ -487,7 +499,7 @@ private fun CoreCard(
                 HorizontalDivider(thickness = 0.75.dp)
                 Text(
                     text = actionLabel,
-                    style = MiuixTheme.textStyles.body2,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = actionColor,
                     textAlign = TextAlign.Center,
                     maxLines = 1,
@@ -519,10 +531,10 @@ private fun AppCard(
         else -> null
     }
     val actionColor = when (state) {
-        HomeViewModel.State.OUTDATED -> MiuixTheme.colorScheme.primary
-        else -> MiuixTheme.colorScheme.onSurfaceVariantActions
+        HomeViewModel.State.OUTDATED -> MaterialTheme.colorScheme.primary
+        else -> MaterialTheme.colorScheme.onSurfaceVariant
     }
-    val hideRestoreIcon = if (isHidden) MiuixIcons.Show else MiuixIcons.Hide
+    val hideRestoreIcon = if (isHidden) Icons.Default.Visibility else Icons.Default.VisibilityOff
 
     Card(modifier = modifier) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -536,17 +548,17 @@ private fun AppCard(
                         painter = painterResource(R.drawable.ic_manager),
                         contentDescription = null,
                         modifier = Modifier.size(24.dp),
-                        tint = MiuixTheme.colorScheme.primary
+                        tint = MaterialTheme.colorScheme.primary
                     )
                     Spacer(Modifier.height(8.dp))
                     Text(
                         text = stringResource(CoreR.string.home_app_title),
-                        style = MiuixTheme.textStyles.headline2,
+                        style = MaterialTheme.typography.titleLarge,
                     )
                     Text(
                         text = version,
-                        style = MiuixTheme.textStyles.body2,
-                        color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     if (progress in 1..99) {
                         Spacer(Modifier.height(8.dp))
@@ -566,7 +578,7 @@ private fun AppCard(
                                 imageVector = hideRestoreIcon,
                                 contentDescription = null,
                                 modifier = Modifier.size(18.dp),
-                                tint = MiuixTheme.colorScheme.primary,
+                                tint = MaterialTheme.colorScheme.primary,
                             )
                         }
                     }
@@ -583,7 +595,7 @@ private fun AppCard(
                 HorizontalDivider(thickness = 0.75.dp)
                 Text(
                     text = actionLabel,
-                    style = MiuixTheme.textStyles.body2,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = actionColor,
                     textAlign = TextAlign.Center,
                     maxLines = 1,
@@ -602,11 +614,11 @@ private fun AppCard(
 private fun UpdateBadge(version: String, modifier: Modifier = Modifier) {
     Text(
         text = version,
-        color = MiuixTheme.colorScheme.onPrimary,
+        color = MaterialTheme.colorScheme.onPrimary,
         fontSize = 10.sp,
         maxLines = 1,
         modifier = modifier
-            .background(MiuixTheme.colorScheme.primary, RoundedCornerShape(6.dp))
+            .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(6.dp))
             .padding(horizontal = 6.dp, vertical = 2.dp)
     )
 }
@@ -623,12 +635,12 @@ private fun StatusCard() {
             ) {
                 Text(
                     text = stringResource(CoreR.string.ramdisk),
-                    style = MiuixTheme.textStyles.headline2,
+                    style = MaterialTheme.typography.titleLarge,
                 )
                 Text(
                     text = stringResource(if (Info.ramdisk) CoreR.string.yes else CoreR.string.no),
-                    style = MiuixTheme.textStyles.body2,
-                    color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             VerticalDivider(thickness = 0.75.dp)
@@ -638,12 +650,12 @@ private fun StatusCard() {
             ) {
                 Text(
                     text = stringResource(CoreR.string.zygisk),
-                    style = MiuixTheme.textStyles.headline2,
+                    style = MaterialTheme.typography.titleLarge,
                 )
                 Text(
                     text = stringResource(if (Info.isZygiskEnabled) CoreR.string.yes else CoreR.string.no),
-                    style = MiuixTheme.textStyles.body2,
-                    color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             VerticalDivider(thickness = 0.75.dp)
@@ -653,65 +665,71 @@ private fun StatusCard() {
             ) {
                 Text(
                     text = stringResource(CoreR.string.denylist),
-                    style = MiuixTheme.textStyles.headline2,
+                    style = MaterialTheme.typography.titleLarge,
                 )
                 Text(
                     text = stringResource(if (Config.denyList) CoreR.string.enabled else CoreR.string.disabled),
-                    style = MiuixTheme.textStyles.body2,
-                    color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SupportBottomSheet(
     show: MutableState<Boolean>,
     onLinkClicked: (String) -> Unit,
 ) {
-    SuperBottomSheet(
-        show = show,
-        onDismissRequest = { show.value = false },
-        title = stringResource(CoreR.string.home_support_title),
-    ) {
-        Column(modifier = Modifier.padding(bottom = 16.dp)) {
+    if (show.value) {
+        ModalBottomSheet(
+            onDismissRequest = { show.value = false },
+        ) {
             Text(
-                text = stringResource(CoreR.string.home_support_content),
-                style = MiuixTheme.textStyles.body2,
-                color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                text = stringResource(CoreR.string.home_support_title),
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(16.dp)
             )
-            SuperArrow(
-                title = stringResource(CoreR.string.patreon),
-                onClick = {
-                    show.value = false
-                    onLinkClicked(Const.Url.PATREON_URL)
-                },
-                startAction = {
-                    Icon(
-                        painter = painterResource(CoreR.drawable.ic_patreon),
-                        contentDescription = null,
-                        modifier = Modifier.size(24.dp),
-                        tint = MiuixTheme.colorScheme.onSurfaceVariantActions
-                    )
-                }
-            )
-            SuperArrow(
-                title = stringResource(CoreR.string.paypal),
-                onClick = {
-                    show.value = false
-                    onLinkClicked("https://paypal.me/magiskdonate")
-                },
-                startAction = {
-                    Icon(
-                        painter = painterResource(CoreR.drawable.ic_paypal),
-                        contentDescription = null,
-                        modifier = Modifier.size(24.dp),
-                        tint = MiuixTheme.colorScheme.onSurfaceVariantActions
-                    )
-                }
-            )
+            Column(modifier = Modifier.padding(bottom = 16.dp)) {
+                Text(
+                    text = stringResource(CoreR.string.home_support_content),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+                SettingsArrow(
+                    title = stringResource(CoreR.string.patreon),
+                    onClick = {
+                        show.value = false
+                        onLinkClicked(Const.Url.PATREON_URL)
+                    },
+                    leadingContent = {
+                        Icon(
+                            painter = painterResource(CoreR.drawable.ic_patreon),
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                )
+                SettingsArrow(
+                    title = stringResource(CoreR.string.paypal),
+                    onClick = {
+                        show.value = false
+                        onLinkClicked("https://paypal.me/magiskdonate")
+                    },
+                    leadingContent = {
+                        Icon(
+                            painter = painterResource(CoreR.drawable.ic_paypal),
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                )
+            }
         }
     }
 }
@@ -743,6 +761,7 @@ private val developers = listOf(
     )),
 )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DevelopersCard(onLinkClicked: (String) -> Unit) {
     var selectedDev by remember { mutableStateOf<DeveloperInfo?>(null) }
@@ -750,7 +769,7 @@ private fun DevelopersCard(onLinkClicked: (String) -> Unit) {
 
     Card(modifier = Modifier.fillMaxWidth()) {
         developers.forEach { dev ->
-            SuperArrow(
+            SettingsArrow(
                 title = "@${dev.name}",
                 onClick = {
                     selectedDev = dev
@@ -762,33 +781,38 @@ private fun DevelopersCard(onLinkClicked: (String) -> Unit) {
 
     val currentDev = selectedDev
     if (currentDev != null) {
-        SuperBottomSheet(
-            show = showSheet,
-            onDismissRequest = {
-                showSheet.value = false
-                selectedDev = null
-            },
-            title = "@${currentDev.name}",
-        ) {
+        if (showSheet.value) {
+            ModalBottomSheet(
+                onDismissRequest = {
+                    showSheet.value = false
+                    selectedDev = null
+                },
+            ) {
+                Text(
+                    text = "@${currentDev.name}",
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.padding(16.dp)
+                )
             Column(modifier = Modifier.padding(bottom = 16.dp)) {
                 currentDev.links.forEach { link ->
-                    SuperArrow(
+                    SettingsArrow(
                         title = link.label,
                         onClick = {
                             showSheet.value = false
                             onLinkClicked(link.url)
                             selectedDev = null
                         },
-                        startAction = {
+                        leadingContent = {
                             Icon(
                                 painter = painterResource(link.icon),
                                 contentDescription = null,
                                 modifier = Modifier.size(24.dp),
-                                tint = MiuixTheme.colorScheme.onSurfaceVariantActions
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     )
                 }
+            }
             }
         }
     }
@@ -802,17 +826,22 @@ private fun openLink(context: Context, url: String) {
     } catch (_: ActivityNotFoundException) { }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun InstallBottomSheet(
     show: MutableState<Boolean>,
     installVm: InstallViewModel,
     installUiState: InstallViewModel.UiState,
 ) {
-    SuperBottomSheet(
-        show = show,
-        onDismissRequest = { show.value = false },
-        title = stringResource(CoreR.string.install),
-    ) {
+    if (show.value) {
+        ModalBottomSheet(
+            onDismissRequest = { show.value = false },
+        ) {
+            Text(
+                text = stringResource(CoreR.string.install),
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(16.dp)
+            )
         Column(modifier = Modifier.padding(bottom = 16.dp)) {
             if (installUiState.notes.isNotEmpty()) {
                 Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
@@ -825,18 +854,18 @@ private fun InstallBottomSheet(
                 InstallOptionsSection(installUiState, installVm)
             }
 
-            SuperArrow(
+            SettingsArrow(
                 title = stringResource(CoreR.string.select_patch_file),
                 summary = stringResource(CoreR.string.select_patch_file_summary),
                 onClick = {
                     show.value = false
                     installVm.selectMethod(InstallViewModel.Method.PATCH)
                 },
-                enabled = installUiState.step >= 1 || installVm.skipOptions
+                // enabled = installUiState.step >= 1 || installVm.skipOptions
             )
 
             if (installVm.isRooted) {
-                SuperArrow(
+                SettingsArrow(
                     title = stringResource(CoreR.string.direct_install),
                     summary = stringResource(CoreR.string.direct_install_summary),
                     onClick = {
@@ -844,21 +873,22 @@ private fun InstallBottomSheet(
                         installVm.selectMethod(InstallViewModel.Method.DIRECT)
                         installVm.install()
                     },
-                    enabled = installUiState.step >= 1 || installVm.skipOptions
+                    // enabled = installUiState.step >= 1 || installVm.skipOptions
                 )
             }
 
             if (!installVm.noSecondSlot) {
-                SuperArrow(
+                SettingsArrow(
                     title = stringResource(CoreR.string.install_inactive_slot),
                     summary = stringResource(CoreR.string.install_inactive_slot_summary),
                     onClick = {
                         show.value = false
                         installVm.selectMethod(InstallViewModel.Method.INACTIVE_SLOT)
                     },
-                    enabled = installUiState.step >= 1 || installVm.skipOptions
+                    // enabled = installUiState.step >= 1 || installVm.skipOptions
                 )
             }
+        }
         }
     }
 }
@@ -876,13 +906,14 @@ private fun InstallOptionsSection(
         ) {
             Text(
                 text = stringResource(CoreR.string.install_options_title),
-                style = MiuixTheme.textStyles.headline2,
+                style = MaterialTheme.typography.titleLarge,
             )
             if (uiState.step == 0) {
                 TextButton(
-                    text = stringResource(CoreR.string.install_next),
                     onClick = { viewModel.nextStep() }
-                )
+                ) {
+                    Text(stringResource(CoreR.string.install_next))
+                }
             }
         }
 
@@ -928,7 +959,7 @@ private fun CheckboxRow(label: String, checked: Boolean, onCheckedChange: (Boole
         )
         Text(
             text = label,
-            style = MiuixTheme.textStyles.body1,
+            style = MaterialTheme.typography.bodyLarge,
         )
     }
 }
@@ -940,50 +971,51 @@ private fun UninstallComposableDialog(
     loadingDialog: LoadingDialogHandle,
 ) {
     val scope = rememberCoroutineScope()
-    top.yukonga.miuix.kmp.extra.SuperDialog(
-        show = showDialog,
-        title = stringResource(CoreR.string.uninstall_magisk_title),
-        onDismissRequest = { showDialog.value = false },
-    ) {
-        Text(
-            text = stringResource(CoreR.string.uninstall_magisk_msg),
-            style = MiuixTheme.textStyles.body1,
-            color = MiuixTheme.colorScheme.onSurface,
-        )
-        Spacer(Modifier.height(16.dp))
-        Row(modifier = Modifier.fillMaxWidth()) {
-            TextButton(
-                text = stringResource(CoreR.string.restore_img),
-                onClick = {
-                    showDialog.value = false
-                    scope.launch {
-                        val success = loadingDialog.withLoading {
-                            MagiskInstaller.Restore().exec()
+    if (showDialog.value) {
+        AlertDialog(
+            onDismissRequest = { showDialog.value = false },
+            title = { Text(stringResource(CoreR.string.uninstall_magisk_title)) },
+            text = {
+                Text(
+                    text = stringResource(CoreR.string.uninstall_magisk_msg),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDialog.value = false
+                        val intent = Intent(activity, activity.javaClass).apply {
+                            action = FlashUtils.INTENT_FLASH
+                            putExtra(FlashUtils.EXTRA_FLASH_ACTION, Const.Value.UNINSTALL)
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
                         }
-                        activity.toast(
-                            if (success) CoreR.string.restore_done else CoreR.string.restore_fail,
-                            Toast.LENGTH_SHORT
-                        )
+                        activity.startActivity(intent)
                     }
-                },
-                modifier = Modifier.weight(1f)
-            )
-            Spacer(Modifier.width(20.dp))
-            TextButton(
-                text = stringResource(CoreR.string.complete_uninstall),
-                onClick = {
-                    showDialog.value = false
-                    val intent = Intent(activity, activity.javaClass).apply {
-                        action = FlashUtils.INTENT_FLASH
-                        putExtra(FlashUtils.EXTRA_FLASH_ACTION, Const.Value.UNINSTALL)
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                ) {
+                    Text(stringResource(CoreR.string.complete_uninstall))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showDialog.value = false
+                        scope.launch {
+                            val success = loadingDialog.withLoading {
+                                MagiskInstaller.Restore().exec()
+                            }
+                            activity.toast(
+                                if (success) CoreR.string.restore_done else CoreR.string.restore_fail,
+                                Toast.LENGTH_SHORT
+                            )
+                        }
                     }
-                    activity.startActivity(intent)
-                },
-                modifier = Modifier.weight(1f),
-                colors = ButtonDefaults.textButtonColorsPrimary()
-            )
-        }
+                ) {
+                    Text(stringResource(CoreR.string.restore_img))
+                }
+            }
+        )
     }
 }
 
@@ -992,34 +1024,33 @@ private fun ManagerInstallComposableDialog(
     showDialog: MutableState<Boolean>,
     activity: MainActivity,
 ) {
-    top.yukonga.miuix.kmp.extra.SuperDialog(
-        show = showDialog,
-        title = stringResource(CoreR.string.install),
-        onDismissRequest = { showDialog.value = false },
-    ) {
-        MarkdownTextAsync {
-            val text = Info.update.note
-            java.io.File(activity.cacheDir, "${Info.update.versionCode}.md").writeText(text)
-            text
-        }
-        Spacer(Modifier.height(16.dp))
-        Row(modifier = Modifier.fillMaxWidth()) {
-            TextButton(
-                text = stringResource(android.R.string.cancel),
-                onClick = { showDialog.value = false },
-                modifier = Modifier.weight(1f)
-            )
-            Spacer(Modifier.width(20.dp))
-            TextButton(
-                text = stringResource(CoreR.string.install),
-                onClick = {
-                    showDialog.value = false
-                    DownloadEngine.startWithActivity(activity, Subject.App())
-                },
-                modifier = Modifier.weight(1f),
-                colors = ButtonDefaults.textButtonColorsPrimary()
-            )
-        }
+    if (showDialog.value) {
+        AlertDialog(
+            onDismissRequest = { showDialog.value = false },
+            title = { Text(stringResource(CoreR.string.install)) },
+            text = {
+                MarkdownTextAsync {
+                    val text = Info.update.note
+                    java.io.File(activity.cacheDir, "${Info.update.versionCode}.md").writeText(text)
+                    text
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDialog.value = false
+                        DownloadEngine.startWithActivity(activity, Subject.App())
+                    }
+                ) {
+                    Text(stringResource(CoreR.string.install))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDialog.value = false }) {
+                    Text(stringResource(android.R.string.cancel))
+                }
+            }
+        )
     }
 }
 
@@ -1036,53 +1067,52 @@ private fun EnvFixComposableDialog(
         Info.env.versionCode != com.topjohnwu.magisk.core.BuildConfig.APP_VERSION_CODE ||
         Info.env.versionString != com.topjohnwu.magisk.core.BuildConfig.APP_VERSION_NAME
 
-    top.yukonga.miuix.kmp.extra.SuperDialog(
-        show = showDialog,
-        title = stringResource(CoreR.string.env_fix_title),
-        onDismissRequest = { showDialog.value = false },
-    ) {
-        Text(
-            text = stringResource(
-                if (needsFullFix) CoreR.string.env_full_fix_msg else CoreR.string.env_fix_msg
-            ),
-            style = MiuixTheme.textStyles.body1,
-            color = MiuixTheme.colorScheme.onSurface,
-        )
-        Spacer(Modifier.height(16.dp))
-        Row(modifier = Modifier.fillMaxWidth()) {
-            TextButton(
-                text = stringResource(android.R.string.cancel),
-                onClick = { showDialog.value = false },
-                modifier = Modifier.weight(1f)
-            )
-            Spacer(Modifier.width(20.dp))
-            TextButton(
-                text = stringResource(android.R.string.ok),
-                onClick = {
-                    showDialog.value = false
-                    if (needsFullFix) {
-                        onNavigateInstall()
-                    } else {
-                        scope.launch {
-                            val success = loadingDialog.withLoading {
-                                MagiskInstaller.FixEnv().exec()
-                            }
-                            activity.toast(
-                                if (success) CoreR.string.reboot_delay_toast else CoreR.string.setup_fail,
-                                Toast.LENGTH_LONG
-                            )
-                            if (success) {
-                                @Suppress("DEPRECATION")
-                                android.os.Handler(android.os.Looper.getMainLooper())
-                                    .postDelayed({ reboot() }, 5000)
+    if (showDialog.value) {
+        AlertDialog(
+            onDismissRequest = { showDialog.value = false },
+            title = { Text(stringResource(CoreR.string.env_fix_title)) },
+            text = {
+                Text(
+                    text = stringResource(
+                        if (needsFullFix) CoreR.string.env_full_fix_msg else CoreR.string.env_fix_msg
+                    ),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDialog.value = false
+                        if (needsFullFix) {
+                            onNavigateInstall()
+                        } else {
+                            scope.launch {
+                                val success = loadingDialog.withLoading {
+                                    MagiskInstaller.FixEnv().exec()
+                                }
+                                activity.toast(
+                                    if (success) CoreR.string.reboot_delay_toast else CoreR.string.setup_fail,
+                                    Toast.LENGTH_LONG
+                                )
+                                if (success) {
+                                    @Suppress("DEPRECATION")
+                                    android.os.Handler(android.os.Looper.getMainLooper())
+                                        .postDelayed({ reboot() }, 5000)
+                                }
                             }
                         }
                     }
-                },
-                modifier = Modifier.weight(1f),
-                colors = ButtonDefaults.textButtonColorsPrimary()
-            )
-        }
+                ) {
+                    Text(stringResource(android.R.string.ok))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDialog.value = false }) {
+                    Text(stringResource(android.R.string.cancel))
+                }
+            }
+        )
     }
 }
 
@@ -1092,69 +1122,59 @@ private fun HideAppDialog(onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
     var appName by rememberSaveable { mutableStateOf("Settings") }
     val isError = appName.length > AppMigration.MAX_LABEL_LENGTH || appName.isBlank()
 
-    top.yukonga.miuix.kmp.extra.SuperDialog(
-        show = showState,
-        title = stringResource(CoreR.string.settings_hide_app_title),
+    AlertDialog(
         onDismissRequest = onDismiss,
-        insideMargin = DpSize(24.dp, 24.dp)
-    ) {
-        Column(modifier = Modifier.padding(top = 8.dp)) {
-            top.yukonga.miuix.kmp.basic.TextField(
-                value = appName,
-                onValueChange = { appName = it },
-                modifier = Modifier.fillMaxWidth(),
-                label = stringResource(CoreR.string.settings_app_name_hint),
-            )
-            Spacer(Modifier.height(16.dp))
-            Row(horizontalArrangement = Arrangement.SpaceBetween) {
-                TextButton(
-                    text = stringResource(android.R.string.cancel),
-                    onClick = onDismiss,
-                    modifier = Modifier.weight(1f)
-                )
-                Spacer(Modifier.width(20.dp))
-                TextButton(
-                    text = stringResource(android.R.string.ok),
-                    onClick = { if (!isError) onConfirm(appName) },
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.textButtonColorsPrimary()
+        title = { Text(stringResource(CoreR.string.settings_hide_app_title)) },
+        text = {
+            Column(modifier = Modifier.padding(top = 8.dp)) {
+                OutlinedTextField(
+                    value = appName,
+                    onValueChange = { appName = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text(stringResource(CoreR.string.settings_app_name_hint)) },
+                    isError = isError
                 )
             }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = { if (!isError) onConfirm(appName) },
+                enabled = !isError
+            ) {
+                Text(stringResource(android.R.string.ok))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(android.R.string.cancel))
+            }
         }
-    }
+    )
 }
 
 @Composable
 private fun RestoreAppDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
     val showState = rememberSaveable { mutableStateOf(true) }
 
-    top.yukonga.miuix.kmp.extra.SuperDialog(
-        show = showState,
-        title = stringResource(CoreR.string.settings_restore_app_title),
+    AlertDialog(
         onDismissRequest = onDismiss,
-        insideMargin = DpSize(24.dp, 24.dp)
-    ) {
-        Column(modifier = Modifier.padding(top = 8.dp)) {
+        title = { Text(stringResource(CoreR.string.settings_restore_app_title)) },
+        text = {
             Text(
                 text = stringResource(CoreR.string.restore_app_confirmation),
-                style = MiuixTheme.textStyles.body1,
-                color = MiuixTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface,
             )
-            Spacer(Modifier.height(16.dp))
-            Row(horizontalArrangement = Arrangement.SpaceBetween) {
-                TextButton(
-                    text = stringResource(android.R.string.cancel),
-                    onClick = onDismiss,
-                    modifier = Modifier.weight(1f)
-                )
-                Spacer(Modifier.width(20.dp))
-                TextButton(
-                    text = stringResource(android.R.string.ok),
-                    onClick = onConfirm,
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.textButtonColorsPrimary()
-                )
+        },
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text(stringResource(android.R.string.ok))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(android.R.string.cancel))
             }
         }
-    }
+    )
 }

@@ -45,21 +45,24 @@ import com.topjohnwu.magisk.core.ktx.timeDateFormat
 import com.topjohnwu.magisk.core.ktx.toTime
 import com.topjohnwu.magisk.core.model.su.SuLog
 import com.topjohnwu.magisk.ui.util.rememberDrawablePainter
-import top.yukonga.miuix.kmp.basic.Card
-import top.yukonga.miuix.kmp.basic.CircularProgressIndicator
-import top.yukonga.miuix.kmp.basic.Icon
-import top.yukonga.miuix.kmp.basic.IconButton
-import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
-import top.yukonga.miuix.kmp.basic.Scaffold
-import top.yukonga.miuix.kmp.basic.TabRow
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.basic.TopAppBar
-import top.yukonga.miuix.kmp.icon.MiuixIcons
-import top.yukonga.miuix.kmp.icon.extended.Delete
-import top.yukonga.miuix.kmp.icon.extended.Download
-import top.yukonga.miuix.kmp.theme.MiuixTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import com.topjohnwu.magisk.core.R as CoreR
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LogScreen(viewModel: LogViewModel) {
     val uiState by viewModel.uiState.collectAsState()
@@ -68,17 +71,17 @@ fun LogScreen(viewModel: LogViewModel) {
         stringResource(CoreR.string.superuser),
         stringResource(CoreR.string.magisk)
     )
-    val scrollBehavior = MiuixScrollBehavior()
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = stringResource(CoreR.string.logs),
+                title = { Text(stringResource(CoreR.string.logs)) },
                 actions = {
                     if (selectedTab == 1) {
                         IconButton(onClick = { viewModel.saveMagiskLog() }) {
                             Icon(
-                                imageVector = MiuixIcons.Download,
+                                imageVector = Icons.Default.Download,
                                 contentDescription = stringResource(CoreR.string.save_log),
                             )
                         }
@@ -91,28 +94,33 @@ fun LogScreen(viewModel: LogViewModel) {
                         }
                     ) {
                         Icon(
-                            imageVector = MiuixIcons.Delete,
+                            imageVector = Icons.Default.Delete,
                             contentDescription = stringResource(CoreR.string.clear_log),
                         )
                     }
                 },
                 scrollBehavior = scrollBehavior
             )
-        },
-        popupHost = { }
+        }
     ) { padding ->
         Column(modifier = Modifier
             .fillMaxSize()
             .padding(padding)
         ) {
             TabRow(
-                tabs = tabTitles,
                 selectedTabIndex = selectedTab,
-                onTabSelected = { selectedTab = it },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 12.dp, vertical = 8.dp)
-            )
+            ) {
+                tabTitles.forEachIndexed { index, title ->
+                    Tab(
+                        selected = selectedTab == index,
+                        onClick = { selectedTab = index },
+                        text = { Text(title) }
+                    )
+                }
+            }
 
             if (uiState.loading) {
                 Box(
@@ -150,8 +158,8 @@ private fun SuLogTab(logs: List<SuLog>, nestedScrollConnection: NestedScrollConn
             ) {
                 Text(
                     text = stringResource(CoreR.string.log_data_none),
-                    style = MiuixTheme.textStyles.body1,
-                    color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
                 )
             }
@@ -220,14 +228,14 @@ private fun SuLogCard(log: SuLog) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = log.appName,
-                        style = MiuixTheme.textStyles.body1,
+                        style = MaterialTheme.typography.bodyLarge,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
                     Text(
                         text = uidPidText,
-                        style = MiuixTheme.textStyles.body2,
-                        color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
@@ -238,7 +246,7 @@ private fun SuLogCard(log: SuLog) {
                         text = log.time.toTime(timeDateFormat),
                         fontSize = 11.sp,
                         fontFamily = FontFamily.Monospace,
-                        color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
                     )
                     Spacer(Modifier.height(4.dp))
@@ -253,7 +261,7 @@ private fun SuLogCard(log: SuLog) {
                     fontFamily = FontFamily.Monospace,
                     fontSize = 12.sp,
                     lineHeight = 16.sp,
-                    color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }
@@ -262,8 +270,8 @@ private fun SuLogCard(log: SuLog) {
 
 @Composable
 private fun SuActionBadge(allowed: Boolean) {
-    val bg = if (allowed) MiuixTheme.colorScheme.primary else MiuixTheme.colorScheme.error
-    val fg = if (allowed) MiuixTheme.colorScheme.onPrimary else MiuixTheme.colorScheme.onError
+    val bg = if (allowed) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+    val fg = if (allowed) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onError
     val text = if (allowed) "Approved" else "Rejected"
     Text(
         text = text,
@@ -292,8 +300,8 @@ private fun MagiskLogTab(
             ) {
                 Text(
                     text = stringResource(CoreR.string.log_data_magisk_none),
-                    style = MiuixTheme.textStyles.body1,
-                    color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
                 )
             }
@@ -340,7 +348,7 @@ private fun MagiskLogCard(entry: MagiskLogEntry) {
                         LogLevelBadge(entry.level)
                         Text(
                             text = entry.tag,
-                            style = MiuixTheme.textStyles.body1,
+                            style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Normal,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -351,7 +359,7 @@ private fun MagiskLogCard(entry: MagiskLogEntry) {
                         text = entry.timestamp,
                         fontSize = 11.sp,
                         fontFamily = FontFamily.Monospace,
-                        color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
                     )
                 }
@@ -363,7 +371,7 @@ private fun MagiskLogCard(entry: MagiskLogEntry) {
                 fontFamily = FontFamily.Monospace,
                 fontSize = 12.sp,
                 lineHeight = 16.sp,
-                color = MiuixTheme.colorScheme.onSurface,
+                color = MaterialTheme.colorScheme.onSurface,
                 maxLines = if (expanded) Int.MAX_VALUE else 3,
                 overflow = TextOverflow.Ellipsis,
             )

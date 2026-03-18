@@ -1,5 +1,5 @@
 package com.topjohnwu.magisk.ui.deny
-
+import com.topjohnwu.magisk.ui.util.rememberDrawablePainter
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -28,29 +28,30 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.unit.dp
-import com.topjohnwu.magisk.ui.component.ListPopupDefaults.MenuPositionProvider
-import com.topjohnwu.magisk.ui.util.rememberDrawablePainter
-import top.yukonga.miuix.kmp.basic.Card
-import top.yukonga.miuix.kmp.basic.Checkbox
-import top.yukonga.miuix.kmp.basic.CircularProgressIndicator
-import top.yukonga.miuix.kmp.basic.DropdownImpl
-import top.yukonga.miuix.kmp.basic.Icon
-import top.yukonga.miuix.kmp.basic.IconButton
-import top.yukonga.miuix.kmp.basic.LinearProgressIndicator
-import top.yukonga.miuix.kmp.basic.ListPopupColumn
-import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
-import top.yukonga.miuix.kmp.basic.PopupPositionProvider
-import top.yukonga.miuix.kmp.basic.Scaffold
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.basic.TopAppBar
-import top.yukonga.miuix.kmp.extra.SuperListPopup
-import top.yukonga.miuix.kmp.icon.MiuixIcons
-import top.yukonga.miuix.kmp.icon.extended.Back
-import top.yukonga.miuix.kmp.icon.extended.Sort
-import top.yukonga.miuix.kmp.icon.extended.Tune
-import top.yukonga.miuix.kmp.theme.MiuixTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Sort
+import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.Card
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TriStateCheckbox
 import com.topjohnwu.magisk.core.R as CoreR
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DenyListScreen(viewModel: DenyListViewModel, onBack: () -> Unit) {
     val loading by viewModel.loading.collectAsState()
@@ -64,20 +65,20 @@ fun DenyListScreen(viewModel: DenyListViewModel, onBack: () -> Unit) {
     val showSortMenu = remember { mutableStateOf(false) }
     val showFilterMenu = remember { mutableStateOf(false) }
 
-    val scrollBehavior = MiuixScrollBehavior()
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
         topBar = {
             TopAppBar(
-                title = stringResource(CoreR.string.denylist),
+                title = { Text(stringResource(CoreR.string.denylist)) },
                 navigationIcon = {
                     IconButton(
                         modifier = Modifier.padding(start = 16.dp),
                         onClick = onBack
                     ) {
                         Icon(
-                            imageVector = MiuixIcons.Back,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = null,
-                            tint = MiuixTheme.colorScheme.onBackground
+                            tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
                 },
@@ -85,50 +86,44 @@ fun DenyListScreen(viewModel: DenyListViewModel, onBack: () -> Unit) {
                     Box {
                         IconButton(
                             onClick = { showSortMenu.value = true },
-                            holdDownState = showSortMenu.value,
                         ) {
                             Icon(
-                                imageVector = MiuixIcons.Sort,
+                                imageVector = Icons.AutoMirrored.Filled.Sort,
                                 contentDescription = stringResource(CoreR.string.menu_sort),
                             )
                         }
-                        SuperListPopup(
-                            show = showSortMenu,
-                            popupPositionProvider = MenuPositionProvider,
-                            alignment = PopupPositionProvider.Align.End,
+                        DropdownMenu(
+                            expanded = showSortMenu.value,
                             onDismissRequest = { showSortMenu.value = false }
                         ) {
-                            ListPopupColumn {
-                                val sortOptions = listOf(
-                                    CoreR.string.sort_by_name to SortBy.NAME,
-                                    CoreR.string.sort_by_package_name to SortBy.PACKAGE_NAME,
-                                    CoreR.string.sort_by_install_time to SortBy.INSTALL_TIME,
-                                    CoreR.string.sort_by_update_time to SortBy.UPDATE_TIME,
-                                )
-                                val totalSize = sortOptions.size + 1
-                                sortOptions.forEachIndexed { index, (resId, sort) ->
-                                    DropdownImpl(
-                                        text = stringResource(resId),
-                                        optionSize = totalSize,
-                                        isSelected = sortBy == sort,
-                                        index = index,
-                                        onSelectedIndexChange = {
-                                            viewModel.setSortBy(sort)
-                                            showSortMenu.value = false
-                                        }
-                                    )
-                                }
-                                DropdownImpl(
-                                    text = stringResource(CoreR.string.sort_reverse),
-                                    optionSize = totalSize,
-                                    isSelected = sortReverse,
-                                    index = sortOptions.size,
-                                    onSelectedIndexChange = {
-                                        viewModel.toggleSortReverse()
+                            val sortOptions = listOf(
+                                CoreR.string.sort_by_name to SortBy.NAME,
+                                CoreR.string.sort_by_package_name to SortBy.PACKAGE_NAME,
+                                CoreR.string.sort_by_install_time to SortBy.INSTALL_TIME,
+                                CoreR.string.sort_by_update_time to SortBy.UPDATE_TIME,
+                            )
+                            sortOptions.forEach { (resId, sort) ->
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(resId)) },
+                                    trailingIcon = if (sortBy == sort) {
+                                        { Icon(androidx.compose.material.icons.Icons.Default.Check, contentDescription = null) }
+                                    } else null,
+                                    onClick = {
+                                        viewModel.setSortBy(sort)
                                         showSortMenu.value = false
                                     }
                                 )
                             }
+                            DropdownMenuItem(
+                                text = { Text(stringResource(CoreR.string.sort_reverse)) },
+                                trailingIcon = if (sortReverse) {
+                                    { Icon(Icons.Default.Check, contentDescription = null) }
+                                } else null,
+                                onClick = {
+                                    viewModel.toggleSortReverse()
+                                    showSortMenu.value = false
+                                }
+                            )
                         }
                     }
 
@@ -136,51 +131,45 @@ fun DenyListScreen(viewModel: DenyListViewModel, onBack: () -> Unit) {
                         IconButton(
                             modifier = Modifier.padding(end = 16.dp),
                             onClick = { showFilterMenu.value = true },
-                            holdDownState = showFilterMenu.value,
                         ) {
                             Icon(
-                                imageVector = MiuixIcons.Tune,
+                                imageVector = Icons.Default.Tune,
                                 contentDescription = stringResource(CoreR.string.hide_filter_hint),
                             )
                         }
-                        SuperListPopup(
-                            show = showFilterMenu,
-                            popupPositionProvider = MenuPositionProvider,
-                            alignment = PopupPositionProvider.Align.End,
+                        DropdownMenu(
+                            expanded = showFilterMenu.value,
                             onDismissRequest = { showFilterMenu.value = false }
                         ) {
-                            ListPopupColumn {
-                                DropdownImpl(
-                                    text = stringResource(CoreR.string.show_system_app),
-                                    optionSize = 2,
-                                    isSelected = showSystem,
-                                    index = 0,
-                                    onSelectedIndexChange = {
-                                        viewModel.setShowSystem(!showSystem)
-                                        showFilterMenu.value = false
+                            DropdownMenuItem(
+                                text = { Text(stringResource(CoreR.string.show_system_app)) },
+                                trailingIcon = if (showSystem) {
+                                    { Icon(Icons.Default.Check, contentDescription = null) }
+                                } else null,
+                                onClick = {
+                                    viewModel.setShowSystem(!showSystem)
+                                    showFilterMenu.value = false
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(CoreR.string.show_os_app)) },
+                                trailingIcon = if (showOS) {
+                                    { Icon(Icons.Default.Check, contentDescription = null) }
+                                } else null,
+                                onClick = {
+                                    if (!showOS && !showSystem) {
+                                        viewModel.setShowSystem(true)
                                     }
-                                )
-                                DropdownImpl(
-                                    text = stringResource(CoreR.string.show_os_app),
-                                    optionSize = 2,
-                                    isSelected = showOS,
-                                    index = 1,
-                                    onSelectedIndexChange = {
-                                        if (!showOS && !showSystem) {
-                                            viewModel.setShowSystem(true)
-                                        }
-                                        viewModel.setShowOS(!showOS)
-                                        showFilterMenu.value = false
-                                    }
-                                )
-                            }
+                                    viewModel.setShowOS(!showOS)
+                                    showFilterMenu.value = false
+                                }
+                            )
                         }
                     }
                 },
                 scrollBehavior = scrollBehavior
             )
-        },
-        popupHost = { }
+        }
     ) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding)) {
             SearchInput(
@@ -199,7 +188,7 @@ fun DenyListScreen(viewModel: DenyListViewModel, onBack: () -> Unit) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
                             text = stringResource(CoreR.string.loading),
-                            style = MiuixTheme.textStyles.headline2
+                            style = MaterialTheme.typography.titleLarge
                         )
                         Spacer(Modifier.height(16.dp))
                         CircularProgressIndicator()
@@ -228,11 +217,11 @@ fun DenyListScreen(viewModel: DenyListViewModel, onBack: () -> Unit) {
 
 @Composable
 private fun SearchInput(query: String, onQueryChange: (String) -> Unit, modifier: Modifier = Modifier) {
-    top.yukonga.miuix.kmp.basic.TextField(
+    OutlinedTextField(
         value = query,
         onValueChange = onQueryChange,
         modifier = modifier,
-        label = stringResource(CoreR.string.hide_filter_hint)
+        label = { Text(stringResource(CoreR.string.hide_filter_hint)) }
     )
 }
 
@@ -263,16 +252,16 @@ private fun DenyAppCard(app: DenyAppState) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = app.info.label,
-                        style = MiuixTheme.textStyles.body1,
+                        style = MaterialTheme.typography.bodyLarge,
                     )
                     Text(
                         text = app.info.packageName,
-                        style = MiuixTheme.textStyles.body2,
-                        color = MiuixTheme.colorScheme.onSurfaceVariantSummary
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
                 Spacer(Modifier.width(8.dp))
-                Checkbox(
+                TriStateCheckbox(
                     state = when {
                         app.itemsChecked == 0 -> ToggleableState.Off
                         app.checkedPercent < 1f -> ToggleableState.Indeterminate
@@ -308,15 +297,15 @@ private fun ProcessRow(proc: DenyProcessState) {
     ) {
         Text(
             text = proc.displayName,
-            style = MiuixTheme.textStyles.body2,
-            color = if (proc.isEnabled) MiuixTheme.colorScheme.onSurface
-                else MiuixTheme.colorScheme.onSurfaceVariantSummary,
+            style = MaterialTheme.typography.bodyMedium,
+            color = if (proc.isEnabled) MaterialTheme.colorScheme.onSurface
+                else MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.weight(1f)
         )
         Spacer(Modifier.width(8.dp))
         Checkbox(
-            state = ToggleableState(proc.isEnabled),
-            onClick = { proc.toggle() }
+            checked = proc.isEnabled,
+            onCheckedChange = { proc.toggle() }
         )
     }
 }

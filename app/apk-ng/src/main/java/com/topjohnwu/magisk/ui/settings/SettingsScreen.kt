@@ -36,32 +36,34 @@ import com.topjohnwu.magisk.core.tasks.AppMigration
 import com.topjohnwu.magisk.core.utils.LocaleSetting
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.ui.theme.ThemeState
-import top.yukonga.miuix.kmp.basic.ButtonDefaults
-import top.yukonga.miuix.kmp.basic.Card
-import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
-import top.yukonga.miuix.kmp.basic.Scaffold
-import top.yukonga.miuix.kmp.basic.SmallTitle
-import top.yukonga.miuix.kmp.basic.TextButton
-import top.yukonga.miuix.kmp.basic.TextField
-import top.yukonga.miuix.kmp.basic.TopAppBar
-import top.yukonga.miuix.kmp.extra.SuperArrow
-import top.yukonga.miuix.kmp.extra.SuperDialog
-import top.yukonga.miuix.kmp.extra.SuperDropdown
-import top.yukonga.miuix.kmp.extra.SuperSwitch
-import top.yukonga.miuix.kmp.theme.MiuixTheme
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.MaterialTheme
+import com.topjohnwu.magisk.ui.component.SettingsArrow
+import com.topjohnwu.magisk.ui.component.SettingsDropdown
+import com.topjohnwu.magisk.ui.component.SettingsSwitch
+import com.topjohnwu.magisk.ui.component.SmallTitle
 import com.topjohnwu.magisk.core.R as CoreR
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(viewModel: SettingsViewModel) {
-    val scrollBehavior = MiuixScrollBehavior()
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
         topBar = {
             TopAppBar(
-                title = stringResource(CoreR.string.settings),
+                title = { Text(stringResource(CoreR.string.settings)) },
                 scrollBehavior = scrollBehavior
             )
-        },
-        popupHost = { }
+        }
     ) { padding ->
         Column(
             modifier = Modifier
@@ -98,7 +100,7 @@ private fun CustomizationSection(viewModel: SettingsViewModel) {
         if (LocaleSetting.useLocaleManager) {
             val locale = LocaleSetting.instance.appLocale
             val summary = locale?.getDisplayName(locale) ?: stringResource(CoreR.string.system_default)
-            SuperArrow(
+            SettingsArrow(
                 title = stringResource(CoreR.string.language),
                 summary = summary,
                 onClick = {
@@ -111,7 +113,7 @@ private fun CustomizationSection(viewModel: SettingsViewModel) {
             var selectedIndex by remember {
                 mutableIntStateOf(tags.indexOf(Config.locale).coerceAtLeast(0))
             }
-            SuperDropdown(
+            SettingsDropdown(
                 title = stringResource(CoreR.string.language),
                 items = names.toList(),
                 selectedIndex = selectedIndex,
@@ -128,7 +130,7 @@ private fun CustomizationSection(viewModel: SettingsViewModel) {
             resources.getStringArray(CoreR.array.color_mode).toList()
         }
         var colorMode by remember { mutableIntStateOf(Config.colorMode) }
-        SuperDropdown(
+        SettingsDropdown(
             title = stringResource(CoreR.string.settings_color_mode),
             items = colorModeEntries,
             selectedIndex = colorMode,
@@ -140,7 +142,7 @@ private fun CustomizationSection(viewModel: SettingsViewModel) {
         )
 
         if (isRunningAsStub && ShortcutManagerCompat.isRequestPinShortcutSupported(context)) {
-            SuperArrow(
+            SettingsArrow(
                 title = stringResource(CoreR.string.add_shortcut_title),
                 summary = stringResource(CoreR.string.setting_add_shortcut_summary),
                 onClick = { viewModel.requestAddShortcut() }
@@ -168,7 +170,7 @@ private fun AppSettingsSection(viewModel: SettingsViewModel) {
         }
         var showUrlDialog by remember { mutableStateOf(false) }
 
-        SuperDropdown(
+        SettingsDropdown(
             title = stringResource(CoreR.string.settings_update_channel_title),
             items = updateChannelEntries,
             selectedIndex = updateChannel,
@@ -188,7 +190,7 @@ private fun AppSettingsSection(viewModel: SettingsViewModel) {
                 show = showUrlDialog,
                 onDismiss = { showUrlDialog = false }
             )
-            SuperArrow(
+            SettingsArrow(
                 title = stringResource(CoreR.string.settings_update_custom),
                 summary = Config.customChannelUrl.ifBlank { null },
                 onClick = { showUrlDialog = true }
@@ -197,7 +199,7 @@ private fun AppSettingsSection(viewModel: SettingsViewModel) {
 
         // DoH Toggle
         var doh by remember { mutableStateOf(Config.doh) }
-        SuperSwitch(
+        SettingsSwitch(
             title = stringResource(CoreR.string.settings_doh_title),
             summary = stringResource(CoreR.string.settings_doh_description),
             checked = doh,
@@ -209,7 +211,7 @@ private fun AppSettingsSection(viewModel: SettingsViewModel) {
 
         // Update Checker
         var checkUpdate by remember { mutableStateOf(Config.checkUpdate) }
-        SuperSwitch(
+        SettingsSwitch(
             title = stringResource(CoreR.string.settings_check_update_title),
             summary = stringResource(CoreR.string.settings_check_update_summary),
             checked = checkUpdate,
@@ -225,7 +227,7 @@ private fun AppSettingsSection(viewModel: SettingsViewModel) {
             show = showDownloadDialog,
             onDismiss = { showDownloadDialog = false }
         )
-        SuperArrow(
+        SettingsArrow(
             title = stringResource(CoreR.string.settings_download_path_title),
             summary = MediaStoreUtils.fullPath(Config.downloadDir),
             onClick = {
@@ -235,7 +237,7 @@ private fun AppSettingsSection(viewModel: SettingsViewModel) {
 
         // Random Package Name
         var randName by remember { mutableStateOf(Config.randName) }
-        SuperSwitch(
+        SettingsSwitch(
             title = stringResource(CoreR.string.settings_random_name_title),
             summary = stringResource(CoreR.string.settings_random_name_description),
             checked = randName,
@@ -255,7 +257,7 @@ private fun MagiskSection(viewModel: SettingsViewModel) {
     SmallTitle(text = stringResource(CoreR.string.magisk))
     Card(modifier = Modifier.fillMaxWidth()) {
         // Systemless Hosts
-        SuperArrow(
+        SettingsArrow(
             title = stringResource(CoreR.string.settings_hosts_title),
             summary = stringResource(CoreR.string.settings_hosts_summary),
             onClick = { viewModel.createHosts() }
@@ -264,7 +266,7 @@ private fun MagiskSection(viewModel: SettingsViewModel) {
         if (Const.Version.atLeast_24_0()) {
             // Zygisk
             var zygisk by remember { mutableStateOf(Config.zygisk) }
-            SuperSwitch(
+            SettingsSwitch(
                 title = stringResource(CoreR.string.zygisk),
                 summary = stringResource(
                     if (zygisk != Info.isZygiskEnabled) CoreR.string.reboot_apply_change
@@ -280,7 +282,7 @@ private fun MagiskSection(viewModel: SettingsViewModel) {
 
             // DenyList
             val denyListEnabled by viewModel.denyListEnabled.collectAsState()
-            SuperSwitch(
+            SettingsSwitch(
                 title = stringResource(CoreR.string.settings_denylist_title),
                 summary = stringResource(CoreR.string.settings_denylist_summary),
                 checked = denyListEnabled,
@@ -288,7 +290,7 @@ private fun MagiskSection(viewModel: SettingsViewModel) {
             )
 
             // DenyList Config
-            SuperArrow(
+            SettingsArrow(
                 title = stringResource(CoreR.string.settings_denylist_config_title),
                 summary = stringResource(CoreR.string.settings_denylist_config_summary),
                 onClick = { viewModel.navigateToDenyList() }
@@ -309,7 +311,7 @@ private fun SuperuserSection(viewModel: SettingsViewModel) {
         // Tapjack (SDK < S)
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
             var tapjack by remember { mutableStateOf(Config.suTapjack) }
-            SuperSwitch(
+            SettingsSwitch(
                 title = stringResource(CoreR.string.settings_su_tapjack_title),
                 summary = stringResource(CoreR.string.settings_su_tapjack_summary),
                 checked = tapjack,
@@ -322,7 +324,7 @@ private fun SuperuserSection(viewModel: SettingsViewModel) {
 
         // Authentication
         var suAuth by remember { mutableStateOf(Config.suAuth) }
-        SuperSwitch(
+        SettingsSwitch(
             title = stringResource(CoreR.string.settings_su_auth_title),
             summary = stringResource(
                 if (Info.isDeviceSecure) CoreR.string.settings_su_auth_summary
@@ -343,7 +345,7 @@ private fun SuperuserSection(viewModel: SettingsViewModel) {
             resources.getStringArray(CoreR.array.su_access).toList()
         }
         var accessMode by remember { mutableIntStateOf(Config.rootMode) }
-        SuperDropdown(
+        SettingsDropdown(
             title = stringResource(CoreR.string.superuser_access),
             items = accessEntries,
             selectedIndex = accessMode,
@@ -361,7 +363,7 @@ private fun SuperuserSection(viewModel: SettingsViewModel) {
             resources.getStringArray(CoreR.array.multiuser_summary).toList()
         }
         var multiuserMode by remember { mutableIntStateOf(Config.suMultiuserMode) }
-        SuperDropdown(
+        SettingsDropdown(
             title = stringResource(CoreR.string.multiuser_mode),
             summary = multiuserDescriptions.getOrElse(multiuserMode) { "" },
             items = multiuserEntries,
@@ -381,7 +383,7 @@ private fun SuperuserSection(viewModel: SettingsViewModel) {
             resources.getStringArray(CoreR.array.namespace_summary).toList()
         }
         var mntNamespaceMode by remember { mutableIntStateOf(Config.suMntNamespaceMode) }
-        SuperDropdown(
+        SettingsDropdown(
             title = stringResource(CoreR.string.mount_namespace_mode),
             summary = namespaceDescriptions.getOrElse(mntNamespaceMode) { "" },
             items = namespaceEntries,
@@ -397,7 +399,7 @@ private fun SuperuserSection(viewModel: SettingsViewModel) {
             resources.getStringArray(CoreR.array.auto_response).toList()
         }
         var autoResponse by remember { mutableIntStateOf(Config.suAutoResponse) }
-        SuperDropdown(
+        SettingsDropdown(
             title = stringResource(CoreR.string.auto_response),
             items = autoResponseEntries,
             selectedIndex = autoResponse,
@@ -418,7 +420,7 @@ private fun SuperuserSection(viewModel: SettingsViewModel) {
         var timeoutIndex by remember {
             mutableIntStateOf(timeoutValues.indexOf(Config.suDefaultTimeout).coerceAtLeast(0))
         }
-        SuperDropdown(
+        SettingsDropdown(
             title = stringResource(CoreR.string.request_timeout),
             items = timeoutEntries,
             selectedIndex = timeoutIndex,
@@ -433,7 +435,7 @@ private fun SuperuserSection(viewModel: SettingsViewModel) {
             resources.getStringArray(CoreR.array.su_notification).toList()
         }
         var suNotification by remember { mutableIntStateOf(Config.suNotification) }
-        SuperDropdown(
+        SettingsDropdown(
             title = stringResource(CoreR.string.superuser_notification),
             items = notifEntries,
             selectedIndex = suNotification,
@@ -446,7 +448,7 @@ private fun SuperuserSection(viewModel: SettingsViewModel) {
         // Reauthenticate (SDK < O)
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             var reAuth by remember { mutableStateOf(Config.suReAuth) }
-            SuperSwitch(
+            SettingsSwitch(
                 title = stringResource(CoreR.string.settings_su_reauth_title),
                 summary = stringResource(CoreR.string.settings_su_reauth_summary),
                 checked = reAuth,
@@ -460,7 +462,7 @@ private fun SuperuserSection(viewModel: SettingsViewModel) {
         // Restrict (version >= 30.1)
         if (Const.Version.atLeast_30_1()) {
             var restrict by remember { mutableStateOf(Config.suRestrict) }
-            SuperSwitch(
+            SettingsSwitch(
                 title = stringResource(CoreR.string.settings_su_restrict_title),
                 summary = stringResource(CoreR.string.settings_su_restrict_summary),
                 checked = restrict,
@@ -481,29 +483,29 @@ private fun UpdateChannelUrlDialog(show: Boolean, onDismiss: () -> Unit) {
     showState.value = show
     var url by rememberSaveable { mutableStateOf(Config.customChannelUrl) }
 
-    SuperDialog(
-        show = showState,
-        onDismissRequest = onDismiss,
-        insideMargin = DpSize(24.dp, 24.dp)
-    ) {
-        Column(modifier = Modifier.padding(top = 8.dp)) {
-            TextField(
-                value = url,
-                onValueChange = { url = it },
-                modifier = Modifier.fillMaxWidth(),
-                label = stringResource(CoreR.string.settings_update_custom_msg)
-            )
-            Spacer(Modifier.height(16.dp))
-            TextButton(
-                text = stringResource(android.R.string.ok),
-                onClick = {
-                    Config.customChannelUrl = url
-                    Info.resetUpdate()
-                    onDismiss()
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
+    if (showState.value) {
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            title = { Text(stringResource(CoreR.string.settings_update_custom_msg)) },
+            text = {
+                OutlinedTextField(
+                    value = url,
+                    onValueChange = { url = it },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        Config.customChannelUrl = url
+                        Info.resetUpdate()
+                        onDismiss()
+                    }
+                ) {
+                    Text(stringResource(android.R.string.ok))
+                }
+            }
+        )
     }
 }
 
@@ -513,32 +515,34 @@ private fun DownloadPathDialog(show: Boolean, onDismiss: () -> Unit) {
     showState.value = show
     var path by rememberSaveable { mutableStateOf(Config.downloadDir) }
 
-    SuperDialog(
-        show = showState,
-        onDismissRequest = onDismiss,
-        insideMargin = DpSize(24.dp, 24.dp)
-    ) {
-        Column(modifier = Modifier.padding(top = 8.dp)) {
-            top.yukonga.miuix.kmp.basic.Text(
-                text = stringResource(CoreR.string.settings_download_path_message, MediaStoreUtils.fullPath(path)),
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-            TextField(
-                value = path,
-                onValueChange = { path = it },
-                modifier = Modifier.fillMaxWidth(),
-                label = stringResource(CoreR.string.settings_download_path_title)
-            )
-            Spacer(Modifier.height(16.dp))
-            TextButton(
-                text = stringResource(android.R.string.ok),
-                onClick = {
-                    Config.downloadDir = path
-                    onDismiss()
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
+    if (showState.value) {
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            title = { Text(stringResource(CoreR.string.settings_download_path_title)) },
+            text = {
+                Column {
+                    Text(
+                        text = stringResource(CoreR.string.settings_download_path_message, MediaStoreUtils.fullPath(path)),
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    OutlinedTextField(
+                        value = path,
+                        onValueChange = { path = it },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        Config.downloadDir = path
+                        onDismiss()
+                    }
+                ) {
+                    Text(stringResource(android.R.string.ok))
+                }
+            }
+        )
     }
 }
 
@@ -549,37 +553,31 @@ private fun HideAppDialog(show: Boolean, onDismiss: () -> Unit, onConfirm: (Stri
     var appName by rememberSaveable { mutableStateOf("Settings") }
     val isError = appName.length > AppMigration.MAX_LABEL_LENGTH || appName.isBlank()
 
-    SuperDialog(
-        show = showState,
-        title = stringResource(CoreR.string.settings_hide_app_title),
-        onDismissRequest = onDismiss,
-        insideMargin = DpSize(24.dp, 24.dp)
-    ) {
-        Column(modifier = Modifier.padding(top = 8.dp)) {
-            TextField(
-                value = appName,
-                onValueChange = { appName = it },
-                modifier = Modifier.fillMaxWidth(),
-                label = stringResource(CoreR.string.settings_app_name_hint),
-            )
-            Spacer(Modifier.height(16.dp))
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                TextButton(
-                    text = stringResource(android.R.string.cancel),
-                    onClick = onDismiss,
-                    modifier = Modifier.weight(1f)
+    if (showState.value) {
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            title = { Text(stringResource(CoreR.string.settings_hide_app_title)) },
+            text = {
+                OutlinedTextField(
+                    value = appName,
+                    onValueChange = { appName = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text(stringResource(CoreR.string.settings_app_name_hint)) }
                 )
-                Spacer(Modifier.width(20.dp))
+            },
+            confirmButton = {
                 TextButton(
-                    text = stringResource(android.R.string.ok),
-                    onClick = { if (!isError) onConfirm(appName) },
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.textButtonColorsPrimary()
-                )
+                    onClick = { if (!isError) onConfirm(appName) }
+                ) {
+                    Text(stringResource(android.R.string.ok))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = onDismiss) {
+                    Text(stringResource(android.R.string.cancel))
+                }
             }
-        }
+        )
     }
 }
 
@@ -588,34 +586,26 @@ private fun RestoreDialog(show: Boolean, onDismiss: () -> Unit, onConfirm: () ->
     val showState = rememberSaveable { mutableStateOf(show) }
     showState.value = show
 
-    SuperDialog(
-        show = showState,
-        title = stringResource(CoreR.string.settings_restore_app_title),
-        onDismissRequest = onDismiss,
-        insideMargin = DpSize(24.dp, 24.dp)
-    ) {
-        Column(modifier = Modifier.padding(top = 8.dp)) {
-            top.yukonga.miuix.kmp.basic.Text(
-                text = stringResource(CoreR.string.restore_app_confirmation),
-                color = MiuixTheme.colorScheme.onSurface,
-            )
-            Spacer(Modifier.height(16.dp))
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                TextButton(
-                    text = stringResource(android.R.string.cancel),
-                    onClick = onDismiss,
-                    modifier = Modifier.weight(1f)
+    if (showState.value) {
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            title = { Text(stringResource(CoreR.string.settings_restore_app_title)) },
+            text = {
+                Text(
+                    text = stringResource(CoreR.string.restore_app_confirmation),
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
-                Spacer(Modifier.width(20.dp))
-                TextButton(
-                    text = stringResource(android.R.string.ok),
-                    onClick = onConfirm,
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.textButtonColorsPrimary()
-                )
+            },
+            confirmButton = {
+                TextButton(onClick = onConfirm) {
+                    Text(stringResource(android.R.string.ok))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = onDismiss) {
+                    Text(stringResource(android.R.string.cancel))
+                }
             }
-        }
+        )
     }
 }

@@ -21,16 +21,19 @@ import androidx.compose.ui.unit.sp
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.ui.terminal.TerminalScreen
-import top.yukonga.miuix.kmp.basic.Icon
-import top.yukonga.miuix.kmp.basic.IconButton
-import top.yukonga.miuix.kmp.basic.MiuixScrollBehavior
-import top.yukonga.miuix.kmp.basic.Scaffold
-import top.yukonga.miuix.kmp.basic.SmallTopAppBar
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.icon.MiuixIcons
-import top.yukonga.miuix.kmp.icon.extended.Back
-import top.yukonga.miuix.kmp.theme.MiuixTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import com.topjohnwu.magisk.core.R as CoreR
+
+@OptIn(ExperimentalMaterial3Api::class)
 
 @Composable
 fun FlashScreen(viewModel: FlashViewModel, action: String, onBack: () -> Unit) {
@@ -45,20 +48,20 @@ fun FlashScreen(viewModel: FlashViewModel, action: String, onBack: () -> Unit) {
         FlashViewModel.State.FAILED -> stringResource(CoreR.string.failure)
     }
 
-    val scrollBehavior = MiuixScrollBehavior()
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
         topBar = {
-            SmallTopAppBar(
-                title = "${stringResource(CoreR.string.flash_screen_title)} - $statusText",
+            TopAppBar(
+                title = { Text("${stringResource(CoreR.string.flash_screen_title)} - $statusText") },
                 navigationIcon = {
                     IconButton(
                         modifier = Modifier.padding(start = 16.dp),
                         onClick = onBack
                     ) {
                         Icon(
-                            imageVector = MiuixIcons.Back,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = null,
-                            tint = MiuixTheme.colorScheme.onBackground
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 },
@@ -71,7 +74,7 @@ fun FlashScreen(viewModel: FlashViewModel, action: String, onBack: () -> Unit) {
                             Icon(
                                 painter = painterResource(R.drawable.ic_save_md2),
                                 contentDescription = stringResource(CoreR.string.menuSaveLog),
-                                tint = MiuixTheme.colorScheme.onBackground
+                                tint = MaterialTheme.colorScheme.onSurface
                             )
                         }
                     }
@@ -83,15 +86,14 @@ fun FlashScreen(viewModel: FlashViewModel, action: String, onBack: () -> Unit) {
                             Icon(
                                 painter = painterResource(R.drawable.ic_restart),
                                 contentDescription = stringResource(CoreR.string.reboot),
-                                tint = MiuixTheme.colorScheme.onBackground
+                                tint = MaterialTheme.colorScheme.onSurface
                             )
                         }
                     }
                 },
                 scrollBehavior = scrollBehavior
             )
-        },
-        popupHost = { }
+        }
     ) { padding ->
         if (useTerminal) {
             TerminalScreen(
@@ -124,7 +126,7 @@ fun FlashScreen(viewModel: FlashViewModel, action: String, onBack: () -> Unit) {
                         fontFamily = FontFamily.Monospace,
                         fontSize = 12.sp,
                         lineHeight = 16.sp,
-                        color = MiuixTheme.colorScheme.onSurface,
+                        color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
