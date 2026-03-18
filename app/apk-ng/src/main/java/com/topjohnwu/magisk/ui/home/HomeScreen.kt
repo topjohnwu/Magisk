@@ -10,9 +10,11 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -39,6 +41,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -74,10 +77,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.PushPin
+import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -100,6 +106,7 @@ import com.topjohnwu.magisk.ui.component.SettingsArrow
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import com.topjohnwu.magisk.core.R as CoreR
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -252,39 +259,34 @@ fun HomeScreen(viewModel: HomeViewModel, installVm: InstallViewModel) {
                 NoticeCard(onHide = viewModel::hideNotice)
             }
 
-            Row(
-                modifier = Modifier.height(IntrinsicSize.Max),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                CoreCard(
-                    modifier = Modifier.weight(1f).fillMaxHeight(),
-                    state = viewModel.magiskState,
-                    version = viewModel.magiskInstalledVersion,
-                    remoteVersion = if (viewModel.magiskState == HomeViewModel.State.OUTDATED)
-                        "${BuildConfig.APP_VERSION_NAME} (${BuildConfig.APP_VERSION_CODE})" else null,
-                    onInstallClicked = { showInstallSheet.value = true },
-                    onUninstallClicked = { viewModel.onDeletePressed() },
-                )
-                AppCard(
-                    modifier = Modifier.weight(1f).fillMaxHeight(),
-                    state = uiState.appState,
-                    version = viewModel.managerInstalledVersion,
-                    remoteVersion = if (uiState.appState == HomeViewModel.State.OUTDATED)
-                        uiState.managerRemoteVersion else null,
-                    progress = uiState.managerProgress,
-                    isHidden = context.packageName != BuildConfig.APP_PACKAGE_NAME,
-                    onManagerPressed = { viewModel.onManagerPressed() },
-                    onHideRestorePressed = viewModel::onHideRestorePressed,
-                )
-            }
-
-            Text(
-                text = stringResource(CoreR.string.home_status_title),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 4.dp)
+            CoreCard(
+                modifier = Modifier.fillMaxWidth(),
+                state = viewModel.magiskState,
+                version = viewModel.magiskInstalledVersion,
+                remoteVersion = if (viewModel.magiskState == HomeViewModel.State.OUTDATED)
+                    "${BuildConfig.APP_VERSION_NAME} (${BuildConfig.APP_VERSION_CODE})" else null,
+                onInstallClicked = { showInstallSheet.value = true },
+                onUninstallClicked = { viewModel.onDeletePressed() },
             )
+
+            UninstallButton(
+                onClick = { viewModel.onDeletePressed() },
+                enabled = Info.env.isActive
+            )
+
             StatusCard()
+
+            AppCard(
+                modifier = Modifier.fillMaxWidth(),
+                state = uiState.appState,
+                version = viewModel.managerInstalledVersion,
+                remoteVersion = if (uiState.appState == HomeViewModel.State.OUTDATED)
+                    uiState.managerRemoteVersion else null,
+                progress = uiState.managerProgress,
+                isHidden = context.packageName != BuildConfig.APP_PACKAGE_NAME,
+                onManagerPressed = { viewModel.onManagerPressed() },
+                onHideRestorePressed = viewModel::onHideRestorePressed,
+            )
 
             val showDonateSheet = rememberSaveable { mutableStateOf(false) }
 
@@ -294,25 +296,38 @@ fun HomeScreen(viewModel: HomeViewModel, installVm: InstallViewModel) {
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 4.dp)
             )
-            Card(modifier = Modifier.fillMaxWidth()) {
-                SettingsArrow(
-                    title = stringResource(CoreR.string.documents),
-                    onClick = { openLink(context, "https://topjohnwu.github.io/Magisk/") }
-                )
-                SettingsArrow(
-                    title = stringResource(CoreR.string.report_bugs),
-                    onClick = { openLink(context, "${Const.Url.SOURCE_CODE_URL}/issues") }
-                )
-                SettingsArrow(
-                    title = stringResource(CoreR.string.donate),
-                    onClick = { showDonateSheet.value = true }
-                )
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(24.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = stringResource(CoreR.string.home_support_content),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        IconButton(onClick = { viewModel.onLinkPressed(Const.Url.PATREON_URL) }) {
+                            Icon(
+                                painter = painterResource(CoreR.drawable.ic_patreon),
+                                contentDescription = "Patreon",
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
+                        IconButton(onClick = { viewModel.onLinkPressed("https://paypal.me/magiskdonate") }) {
+                            Icon(
+                                painter = painterResource(CoreR.drawable.ic_paypal),
+                                contentDescription = "PayPal",
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
+                    }
+                }
             }
-
-            SupportBottomSheet(
-                show = showDonateSheet,
-                onLinkClicked = { viewModel.onLinkPressed(it) }
-            )
 
             Text(
                 text = stringResource(CoreR.string.home_follow_title),
@@ -439,78 +454,91 @@ private fun CoreCard(
         HomeViewModel.State.UP_TO_DATE -> stringResource(CoreR.string.reinstall)
         HomeViewModel.State.LOADING -> null
     }
-    val actionColor = when (state) {
-        HomeViewModel.State.OUTDATED, HomeViewModel.State.INVALID -> MaterialTheme.colorScheme.primary
-        else -> MaterialTheme.colorScheme.onSurfaceVariant
-    }
-    val uninstallEnabled = Info.env.isActive
 
-    Card(modifier = modifier) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
+    Card(
+        modifier = modifier,
+        shape = RoundedCornerShape(24.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.weight(1f)
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Icon(
-                        painter = painterResource(CoreR.drawable.ic_magisk_outline),
-                        contentDescription = null,
-                        modifier = Modifier.size(24.dp),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(Modifier.height(8.dp))
+                Icon(
+                    painter = painterResource(CoreR.drawable.ic_magisk_outline),
+                    contentDescription = null,
+                    modifier = Modifier.size(48.dp)
+                )
+                Spacer(Modifier.width(16.dp))
+                Column {
                     Text(
                         text = stringResource(CoreR.string.home_core_title),
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.titleLarge
                     )
                     Text(
                         text = version.ifEmpty { stringResource(CoreR.string.not_available) },
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                }
-                Column(
-                    modifier = Modifier.align(Alignment.TopEnd).padding(4.dp),
-                    verticalArrangement = Arrangement.spacedBy(0.dp),
-                ) {
-                    IconButton(
-                        onClick = onUninstallClicked,
-                        enabled = uninstallEnabled,
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp),
-                            tint = if (uninstallEnabled) MaterialTheme.colorScheme.error
-                                else MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                    if (remoteVersion != null) {
-                        UpdateBadge(
-                            version = remoteVersion,
-                            modifier = Modifier.align(Alignment.End).padding(end = 4.dp)
-                        )
-                    }
                 }
             }
 
             if (actionLabel != null) {
-                HorizontalDivider(thickness = 0.75.dp)
-                Text(
-                    text = actionLabel,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = actionColor,
-                    textAlign = TextAlign.Center,
-                    maxLines = 1,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(44.dp)
-                        .clickable(onClick = onInstallClicked)
-                        .padding(horizontal = 12.dp, vertical = 12.dp)
-                )
+                Button(
+                    onClick = onInstallClicked,
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                    shape = RoundedCornerShape(16.dp),
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_download_md2),
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp),
+                        tint = Color.White
+                    )
+                    Spacer(Modifier.width(4.dp))
+                    Text(
+                        text = actionLabel,
+                        color = Color.White,
+                        fontSize = 14.sp
+                    )
+                }
             }
         }
+    }
+}
+
+@Composable
+private fun UninstallButton(
+    onClick: () -> Unit,
+    enabled: Boolean
+) {
+    Button(
+        onClick = onClick,
+        enabled = enabled,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.errorContainer,
+            contentColor = MaterialTheme.colorScheme.onErrorContainer
+        ),
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Icon(
+            imageVector = Icons.Default.Delete,
+            contentDescription = null,
+            modifier = Modifier.size(18.dp)
+        )
+        Spacer(Modifier.width(8.dp))
+        Text(
+            text = stringResource(CoreR.string.uninstall_magisk_title),
+            fontSize = 16.sp
+        )
     }
 }
 
@@ -530,83 +558,97 @@ private fun AppCard(
         HomeViewModel.State.UP_TO_DATE -> stringResource(CoreR.string.reinstall)
         else -> null
     }
-    val actionColor = when (state) {
-        HomeViewModel.State.OUTDATED -> MaterialTheme.colorScheme.primary
-        else -> MaterialTheme.colorScheme.onSurfaceVariant
-    }
-    val hideRestoreIcon = if (isHidden) Icons.Default.Visibility else Icons.Default.VisibilityOff
 
-    Card(modifier = modifier) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
+    Card(
+        modifier = modifier,
+        shape = RoundedCornerShape(24.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         painter = painterResource(R.drawable.ic_manager),
                         contentDescription = null,
-                        modifier = Modifier.size(24.dp),
-                        tint = MaterialTheme.colorScheme.primary
+                        modifier = Modifier.size(36.dp)
                     )
-                    Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.width(12.dp))
                     Text(
                         text = stringResource(CoreR.string.home_app_title),
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.titleLarge
                     )
-                    Text(
-                        text = version,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    if (progress in 1..99) {
-                        Spacer(Modifier.height(8.dp))
-                        LinearProgressIndicator(
-                            progress = progress / 100f,
-                            modifier = Modifier.fillMaxWidth()
+                }
+
+                if (Info.env.isActive) {
+                    val hideRestoreIcon = if (isHidden) Icons.Default.Visibility else Icons.Default.VisibilityOff
+                    Spacer(modifier = Modifier.weight(1f))
+                    IconButton(onClick = onHideRestorePressed) {
+                        Icon(
+                            imageVector = hideRestoreIcon,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                            tint = Color.White
                         )
                     }
                 }
-                Column(
-                    modifier = Modifier.align(Alignment.TopEnd).padding(4.dp),
-                    verticalArrangement = Arrangement.spacedBy(0.dp),
-                ) {
-                    if (Info.env.isActive) {
-                        IconButton(onClick = onHideRestorePressed) {
-                            Icon(
-                                imageVector = hideRestoreIcon,
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp),
-                                tint = MaterialTheme.colorScheme.primary,
-                            )
-                        }
-                    }
-                    if (remoteVersion != null) {
-                        UpdateBadge(
-                            version = remoteVersion,
-                            modifier = Modifier.align(Alignment.End).padding(end = 4.dp)
+
+                if (actionLabel != null) {
+                    Button(
+                        onClick = onManagerPressed,
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                        shape = RoundedCornerShape(16.dp),
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_update_md2),
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                            tint = Color.White
+                        )
+                        Spacer(Modifier.width(4.dp))
+                        Text(
+                            text = actionLabel,
+                            color = Color.White,
+                            fontSize = 14.sp
                         )
                     }
                 }
             }
 
-            if (actionLabel != null) {
-                HorizontalDivider(thickness = 0.75.dp)
-                Text(
-                    text = actionLabel,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = actionColor,
-                    textAlign = TextAlign.Center,
-                    maxLines = 1,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(44.dp)
-                        .clickable(onClick = onManagerPressed)
-                        .padding(horizontal = 12.dp, vertical = 12.dp)
+            Spacer(Modifier.height(16.dp))
+
+            AppDetailRow(label = stringResource(CoreR.string.home_latest_version), value = remoteVersion ?: version)
+            AppDetailRow(label = stringResource(CoreR.string.home_installed_version), value = version)
+            AppDetailRow(label = stringResource(CoreR.string.home_package), value = LocalContext.current.packageName)
+
+            if (progress in 1..99) {
+                Spacer(Modifier.height(8.dp))
+                LinearProgressIndicator(
+                    progress = progress / 100f,
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun AppDetailRow(label: String, value: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(text = label, style = MaterialTheme.typography.bodyMedium)
+        Text(text = value, style = MaterialTheme.typography.bodyMedium)
     }
 }
 
@@ -625,54 +667,58 @@ private fun UpdateBadge(version: String, modifier: Modifier = Modifier) {
 
 @Composable
 private fun StatusCard() {
-    Card(modifier = Modifier.fillMaxWidth()) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        val ZygiskEnabled = Info.isZygiskEnabled
+        val ZygiskLabel = stringResource(CoreR.string.zygisk)
+        val ZygiskStatus = stringResource(if (ZygiskEnabled) CoreR.string.yes else CoreR.string.no)
+
+        val ramdiskEnabled = Info.ramdisk
+        val ramdiskLabel = stringResource(CoreR.string.ramdisk)
+        val ramdiskStatus = stringResource(if (ramdiskEnabled) CoreR.string.yes else CoreR.string.no)
+
+        StatusItemCard(
+            modifier = Modifier.weight(1f),
+            icon = Icons.Filled.PushPin,
+            text = "$ZygiskLabel $ZygiskStatus"
+        )
+        StatusItemCard(
+            modifier = Modifier.weight(1f),
+            icon = Icons.Filled.Layers,
+            text = "$ramdiskLabel $ramdiskStatus"
+        )
+    }
+}
+
+@Composable
+private fun StatusItemCard(
+    modifier: Modifier = Modifier,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    text: String
+) {
+    Card(
+        modifier = modifier,
+        shape = RoundedCornerShape(20.dp)
+    ) {
         Row(
-            modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
         ) {
-            Column(
-                modifier = Modifier.weight(1f).padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Text(
-                    text = stringResource(CoreR.string.ramdisk),
-                    style = MaterialTheme.typography.titleLarge,
-                )
-                Text(
-                    text = stringResource(if (Info.ramdisk) CoreR.string.yes else CoreR.string.no),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-            VerticalDivider(thickness = 0.75.dp)
-            Column(
-                modifier = Modifier.weight(1f).padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Text(
-                    text = stringResource(CoreR.string.zygisk),
-                    style = MaterialTheme.typography.titleLarge,
-                )
-                Text(
-                    text = stringResource(if (Info.isZygiskEnabled) CoreR.string.yes else CoreR.string.no),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-            VerticalDivider(thickness = 0.75.dp)
-            Column(
-                modifier = Modifier.weight(1f).padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Text(
-                    text = stringResource(CoreR.string.denylist),
-                    style = MaterialTheme.typography.titleLarge,
-                )
-                Text(
-                    text = stringResource(if (Config.denyList) CoreR.string.enabled else CoreR.string.disabled),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                modifier = Modifier.size(24.dp).rotate(if (icon == Icons.Filled.PushPin) 45f else 0f)
+            )
+            Spacer(Modifier.width(8.dp))
+            Text(
+                text = text,
+                style = MaterialTheme.typography.bodyLarge
+            )
         }
     }
 }
@@ -747,9 +793,9 @@ private val developers = listOf(
         LinkInfo("GitHub", CoreR.drawable.ic_github, "https://github.com/vvb2060"),
     )),
     DeveloperInfo("yujincheng08", listOf(
+        LinkInfo("Sponsor", CoreR.drawable.ic_favorite, "https://github.com/sponsors/yujincheng08"),
         LinkInfo("Twitter", CoreR.drawable.ic_twitter, "https://twitter.com/shanasaimoe"),
         LinkInfo("GitHub", CoreR.drawable.ic_github, "https://github.com/yujincheng08"),
-        LinkInfo("Sponsor", CoreR.drawable.ic_favorite, "https://github.com/sponsors/yujincheng08"),
     )),
     DeveloperInfo("rikkawww", listOf(
         LinkInfo("Twitter", CoreR.drawable.ic_twitter, "https://twitter.com/rikkawww"),
@@ -761,58 +807,45 @@ private val developers = listOf(
     )),
 )
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DevelopersCard(onLinkClicked: (String) -> Unit) {
-    var selectedDev by remember { mutableStateOf<DeveloperInfo?>(null) }
-    val showSheet = rememberSaveable { mutableStateOf(false) }
-
-    Card(modifier = Modifier.fillMaxWidth()) {
-        developers.forEach { dev ->
-            SettingsArrow(
-                title = "@${dev.name}",
-                onClick = {
-                    selectedDev = dev
-                    showSheet.value = true
-                }
-            )
-        }
-    }
-
-    val currentDev = selectedDev
-    if (currentDev != null) {
-        if (showSheet.value) {
-            ModalBottomSheet(
-                onDismissRequest = {
-                    showSheet.value = false
-                    selectedDev = null
-                },
-            ) {
-                Text(
-                    text = "@${currentDev.name}",
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(16.dp)
-                )
-            Column(modifier = Modifier.padding(bottom = 16.dp)) {
-                currentDev.links.forEach { link ->
-                    SettingsArrow(
-                        title = link.label,
-                        onClick = {
-                            showSheet.value = false
-                            onLinkClicked(link.url)
-                            selectedDev = null
-                        },
-                        leadingContent = {
-                            Icon(
-                                painter = painterResource(link.icon),
-                                contentDescription = null,
-                                modifier = Modifier.size(24.dp),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(24.dp)
+    ) {
+        Column {
+            developers.forEachIndexed { index, dev ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "@${dev.name}",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        dev.links.forEach { link ->
+                            IconButton(onClick = { onLinkClicked(link.url) }) {
+                                Icon(
+                                    painter = painterResource(link.icon),
+                                    contentDescription = link.label,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            }
                         }
+                    }
+                }
+                if (index < developers.lastIndex) {
+                    HorizontalDivider(
+                        thickness = 0.5.dp,
+                        modifier = Modifier.padding(horizontal = 16.dp)
                     )
                 }
-            }
             }
         }
     }
