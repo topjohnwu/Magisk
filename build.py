@@ -63,10 +63,10 @@ cpu_count = multiprocessing.cpu_count()
 
 # Common constants
 support_abis = {
-    "armeabi-v7a": "thumbv7neon-linux-androideabi",
-    "x86": "i686-linux-android",
     "arm64-v8a": "aarch64-linux-android",
+    "armeabi-v7a": "thumbv7neon-linux-androideabi",
     "x86_64": "x86_64-linux-android",
+    "x86": "i686-linux-android",
     "riscv64": "riscv64-linux-android",
 }
 abi_alias = {
@@ -311,7 +311,7 @@ def write_if_diff(file_name: Path, text: str):
             f.write(text)
 
 
-def dump_flag_header():
+def dump_flags_native():
     flag_txt = "#pragma once\n"
     flag_txt += f'#define MAGISK_VERSION      "{config["version"]}"\n'
     flag_txt += f'#define MAGISK_VER_CODE     {config["versionCode"]}\n'
@@ -356,7 +356,7 @@ def build_native():
 
     header("* Building: " + " ".join(targets))
 
-    dump_flag_header()
+    dump_flags_native()
     build_rust_src(targets)
     build_cpp_src(targets)
 
@@ -398,10 +398,21 @@ def find_jdk():
     return env
 
 
+def dump_flags_app():
+    flag_txt = f"abiList={','.join(build_abis.keys())}\n"
+    flag_txt += f"version={config['version']}\n"
+    flag_txt += f"versionCode={config['versionCode']}\n"
+
+    app_build_dir = Path("app", "build")
+    app_build_dir.mkdir(parents=True, exist_ok=True)
+    write_if_diff(app_build_dir / "flags.prop", flag_txt)
+
+
 def build_apk(module: str):
     ensure_paths()
+    dump_flags_app()
     env = find_jdk()
-    props = args.config.resolve()
+    config_path = args.config.resolve()
 
     os.chdir("app")
     build_type = "Release" if args.release else "Debug"
@@ -409,8 +420,7 @@ def build_apk(module: str):
         [
             gradlew,
             f"{module}:assemble{build_type}",
-            f"-PconfigPath={props}",
-            f"-PabiList={','.join(build_abis.keys())}",
+            f"-PconfigPath={config_path}",
         ],
         env=env,
     )
@@ -528,14 +538,25 @@ def build_all():
 
 def gen_ide():
     ensure_paths()
-    set_build_abis({args.abi})
 
-    # Dump flags for both C++ and Rust code
-    dump_flag_header()
+    # Dump flags for both native and app
+    dump_flags_native()
+    dump_flags_app()
+
+    if not args.abi:
+        # Find the first 64-bit abi in build_abis
+        for abi in build_abis.keys():
+            if "64" in abi:
+                args.abi = abi
+                break
+        # If no 64-bit abi is found, use the first abi
+        args.abi = next(iter(build_abis.keys()))
+
+    set_build_abis({args.abi})
 
     # Run build.rs to generate Rust/C++ FFI bindings
     os.chdir(Path("native", "src"))
-    run_cargo(["check"])
+    run_cargo(["check", "--target", build_abis[args.abi]])
     os.chdir(Path("..", ".."))
 
     # Generate compilation database
@@ -785,15 +806,14 @@ def load_config():
     config["versionCode"] = 1000000
     config["outdir"] = "out"
 
-    # Load prop files
+    # Load config.prop
     if args.config.exists():
         config.update(parse_props(args.config))
 
     gradle_props = Path("app", "gradle.properties")
-    if gradle_props.exists():
-        for key, value in parse_props(gradle_props).items():
-            if key.startswith("magisk."):
-                config[key[7:]] = value
+    for key, value in parse_props(gradle_props).items():
+        if key.startswith("magisk."):
+            config[key[7:]] = value
 
     try:
         config["versionCode"] = int(config["versionCode"])
@@ -893,7 +913,7 @@ def parse_args():
     )
 
     gen_parser = subparsers.add_parser("gen", help="generate files for IDE")
-    gen_parser.add_argument("--abi", default="arm64-v8a", help="target ABI to generate")
+    gen_parser.add_argument("--abi", help="target ABI to generate")
 
     # Set callbacks
     all_parser.set_defaults(func=build_all)
