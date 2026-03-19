@@ -19,20 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.topjohnwu.magisk.ui.navigation.LocalNavigator
-import com.topjohnwu.magisk.ui.navigation.Route
-import com.topjohnwu.magisk.ui.util.rememberDrawablePainter
+import androidx.compose.material3.Badge
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -42,6 +29,18 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import com.topjohnwu.magisk.ui.navigation.LocalNavigator
+import com.topjohnwu.magisk.ui.navigation.Route
+import com.topjohnwu.magisk.ui.util.rememberDrawablePainter
 import com.topjohnwu.magisk.core.R as CoreR
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -184,13 +183,10 @@ private fun PolicyCard(
 
 @Composable
 internal fun SharedUidBadge(modifier: Modifier = Modifier) {
-    Text(
-        text = "SharedUID",
-        color = MaterialTheme.colorScheme.onPrimary,
-        fontSize = 10.sp,
-        maxLines = 1,
-        modifier = modifier
-            .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(6.dp))
-            .padding(horizontal = 6.dp, vertical = 2.dp)
-    )
+    Badge(
+        modifier = modifier,
+        containerColor = MaterialTheme.colorScheme.primary,
+    ) {
+        Text("SharedUID")
+    }
 }

@@ -1,7 +1,5 @@
 package com.topjohnwu.magisk.ui.home
 
-import android.content.ActivityNotFoundException
-import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.PowerManager
@@ -9,17 +7,12 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -28,6 +21,35 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Layers
+import androidx.compose.material.icons.filled.PowerSettingsNew
+import androidx.compose.material.icons.filled.PushPin
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -42,16 +64,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.getSystemService
-import androidx.core.net.toUri
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.BuildConfig
 import com.topjohnwu.magisk.core.Config
@@ -68,43 +88,12 @@ import com.topjohnwu.magisk.ui.component.ConfirmResult
 import com.topjohnwu.magisk.ui.component.LoadingDialogHandle
 import com.topjohnwu.magisk.ui.component.MarkdownText
 import com.topjohnwu.magisk.ui.component.MarkdownTextAsync
+import com.topjohnwu.magisk.ui.component.SettingsArrow
 import com.topjohnwu.magisk.ui.component.rememberConfirmDialog
 import com.topjohnwu.magisk.ui.component.rememberLoadingDialog
 import com.topjohnwu.magisk.ui.flash.FlashUtils
 import com.topjohnwu.magisk.ui.install.InstallViewModel
 import kotlinx.coroutines.launch
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.PushPin
-import androidx.compose.material.icons.filled.Layers
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.VerticalDivider
-import com.topjohnwu.magisk.ui.component.SettingsArrow
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import com.topjohnwu.magisk.core.R as CoreR
 
 
@@ -118,7 +107,6 @@ fun HomeScreen(viewModel: HomeViewModel, installVm: InstallViewModel) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val scope = rememberCoroutineScope()
     val loadingDialog = rememberLoadingDialog()
-    val navigator = com.topjohnwu.magisk.ui.navigation.LocalNavigator.current
 
     val showUninstallDialog = rememberSaveable { mutableStateOf(false) }
     val showManagerDialog = rememberSaveable { mutableStateOf(false) }
@@ -263,16 +251,7 @@ fun HomeScreen(viewModel: HomeViewModel, installVm: InstallViewModel) {
                 modifier = Modifier.fillMaxWidth(),
                 state = viewModel.magiskState,
                 version = viewModel.magiskInstalledVersion,
-                remoteVersion = if (viewModel.magiskState == HomeViewModel.State.OUTDATED)
-                    "${BuildConfig.APP_VERSION_NAME} (${BuildConfig.APP_VERSION_CODE})" else null,
-                onInstallClicked = { showInstallSheet.value = true },
-                onUninstallClicked = { viewModel.onDeletePressed() },
-            )
-
-            UninstallButton(
-                onClick = { viewModel.onDeletePressed() },
-                enabled = Info.env.isActive
-            )
+            ) { showInstallSheet.value = true }
 
             StatusCard()
 
@@ -280,15 +259,17 @@ fun HomeScreen(viewModel: HomeViewModel, installVm: InstallViewModel) {
                 modifier = Modifier.fillMaxWidth(),
                 state = uiState.appState,
                 version = viewModel.managerInstalledVersion,
-                remoteVersion = if (uiState.appState == HomeViewModel.State.OUTDATED)
-                    uiState.managerRemoteVersion else null,
+                remoteVersion = uiState.managerRemoteVersion,
                 progress = uiState.managerProgress,
                 isHidden = context.packageName != BuildConfig.APP_PACKAGE_NAME,
-                onManagerPressed = { viewModel.onManagerPressed() },
+                onManagerPressed = viewModel::onManagerPressed,
                 onHideRestorePressed = viewModel::onHideRestorePressed,
             )
 
-            val showDonateSheet = rememberSaveable { mutableStateOf(false) }
+            UninstallButton(
+                onClick = { viewModel.onDeletePressed() },
+                enabled = Info.env.isActive
+            )
 
             Text(
                 text = stringResource(CoreR.string.home_support_title),
@@ -296,46 +277,15 @@ fun HomeScreen(viewModel: HomeViewModel, installVm: InstallViewModel) {
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 4.dp)
             )
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(24.dp)
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = stringResource(CoreR.string.home_support_content),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Spacer(Modifier.height(16.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        IconButton(onClick = { viewModel.onLinkPressed(Const.Url.PATREON_URL) }) {
-                            Icon(
-                                painter = painterResource(CoreR.drawable.ic_patreon),
-                                contentDescription = "Patreon",
-                                modifier = Modifier.size(32.dp)
-                            )
-                        }
-                        IconButton(onClick = { viewModel.onLinkPressed("https://paypal.me/magiskdonate") }) {
-                            Icon(
-                                painter = painterResource(CoreR.drawable.ic_paypal),
-                                contentDescription = "PayPal",
-                                modifier = Modifier.size(32.dp)
-                            )
-                        }
-                    }
-                }
-            }
+            SupportCard(onLinkClicked = viewModel::onLinkPressed)
 
             Text(
                 text = stringResource(CoreR.string.home_follow_title),
-                style = MaterialTheme.typography.titleSmall,
+                style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(start = 24.dp, top = 24.dp, bottom = 8.dp)
+                modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 4.dp)
             )
-            DevelopersCard(onLinkClicked = { openLink(context, it) })
+            DevelopersCard(onLinkClicked = viewModel::onLinkPressed)
         }
     }
 
@@ -380,7 +330,7 @@ private fun RebootButton() {
             onClick = { showMenu.value = true },
         ) {
             Icon(
-                painter = painterResource(R.drawable.ic_restart),
+                imageVector = Icons.Default.PowerSettingsNew,
                 contentDescription = stringResource(CoreR.string.reboot),
             )
         }
@@ -425,7 +375,9 @@ private fun NoticeCard(onHide: () -> Unit) {
                 text = stringResource(CoreR.string.home_notice_content),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onTertiaryContainer,
-                modifier = Modifier.weight(1f).padding(vertical = 8.dp)
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(vertical = 8.dp)
             )
             IconButton(onClick = onHide) {
                 Icon(
@@ -440,13 +392,35 @@ private fun NoticeCard(onHide: () -> Unit) {
 }
 
 @Composable
+private fun InstallButton(
+    label: String,
+    onClick: () -> Unit,
+) {
+    Button(
+        onClick = onClick,
+        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+        shape = RoundedCornerShape(16.dp),
+        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.ic_download_md2),
+            contentDescription = null,
+            modifier = Modifier.size(18.dp),
+        )
+        Spacer(Modifier.width(4.dp))
+        Text(
+            text = label,
+            fontSize = 14.sp
+        )
+    }
+}
+
+@Composable
 private fun CoreCard(
     modifier: Modifier = Modifier,
     state: HomeViewModel.State,
     version: String,
-    remoteVersion: String? = null,
     onInstallClicked: () -> Unit,
-    onUninstallClicked: () -> Unit,
 ) {
     val actionLabel = when (state) {
         HomeViewModel.State.OUTDATED -> stringResource(CoreR.string.update)
@@ -478,37 +452,21 @@ private fun CoreCard(
                 Spacer(Modifier.width(16.dp))
                 Column {
                     Text(
-                        text = stringResource(CoreR.string.home_core_title),
+                        text = stringResource(CoreR.string.magisk),
                         style = MaterialTheme.typography.titleLarge
                     )
                     Text(
                         text = version.ifEmpty { stringResource(CoreR.string.not_available) },
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
 
             if (actionLabel != null) {
-                Button(
+                InstallButton(
+                    label = actionLabel,
                     onClick = onInstallClicked,
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-                    shape = RoundedCornerShape(16.dp),
-                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_download_md2),
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp),
-                        tint = Color.White
-                    )
-                    Spacer(Modifier.width(4.dp))
-                    Text(
-                        text = actionLabel,
-                        color = Color.White,
-                        fontSize = 14.sp
-                    )
-                }
+                )
             }
         }
     }
@@ -547,7 +505,7 @@ private fun AppCard(
     modifier: Modifier = Modifier,
     state: HomeViewModel.State,
     version: String,
-    remoteVersion: String? = null,
+    remoteVersion: String,
     progress: Int,
     isHidden: Boolean,
     onManagerPressed: () -> Unit,
@@ -594,44 +552,30 @@ private fun AppCard(
                             imageVector = hideRestoreIcon,
                             contentDescription = null,
                             modifier = Modifier.size(18.dp),
-                            tint = Color.White
                         )
                     }
                 }
 
                 if (actionLabel != null) {
-                    Button(
+                    InstallButton(
+                        label = actionLabel,
                         onClick = onManagerPressed,
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-                        shape = RoundedCornerShape(16.dp),
-                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_update_md2),
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp),
-                            tint = Color.White
-                        )
-                        Spacer(Modifier.width(4.dp))
-                        Text(
-                            text = actionLabel,
-                            color = Color.White,
-                            fontSize = 14.sp
-                        )
-                    }
+                    )
                 }
             }
 
             Spacer(Modifier.height(16.dp))
 
-            AppDetailRow(label = stringResource(CoreR.string.home_latest_version), value = remoteVersion ?: version)
+            if (state != HomeViewModel.State.LOADING) {
+                AppDetailRow(label = stringResource(CoreR.string.home_latest_version), value = remoteVersion)
+            }
             AppDetailRow(label = stringResource(CoreR.string.home_installed_version), value = version)
             AppDetailRow(label = stringResource(CoreR.string.home_package), value = LocalContext.current.packageName)
 
             if (progress in 1..99) {
                 Spacer(Modifier.height(8.dp))
                 LinearProgressIndicator(
-                    progress = progress / 100f,
+                    progress = { progress / 100f },
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -650,19 +594,6 @@ private fun AppDetailRow(label: String, value: String) {
         Text(text = label, style = MaterialTheme.typography.bodyMedium)
         Text(text = value, style = MaterialTheme.typography.bodyMedium)
     }
-}
-
-@Composable
-private fun UpdateBadge(version: String, modifier: Modifier = Modifier) {
-    Text(
-        text = version,
-        color = MaterialTheme.colorScheme.onPrimary,
-        fontSize = 10.sp,
-        maxLines = 1,
-        modifier = modifier
-            .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(6.dp))
-            .padding(horizontal = 6.dp, vertical = 2.dp)
-    )
 }
 
 @Composable
@@ -712,7 +643,9 @@ private fun StatusItemCard(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                modifier = Modifier.size(24.dp).rotate(if (icon == Icons.Filled.PushPin) 45f else 0f)
+                modifier = Modifier
+                    .size(24.dp)
+                    .rotate(if (icon == Icons.Filled.PushPin) 45f else 0f)
             )
             Spacer(Modifier.width(8.dp))
             Text(
@@ -723,58 +656,37 @@ private fun StatusItemCard(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SupportBottomSheet(
-    show: MutableState<Boolean>,
-    onLinkClicked: (String) -> Unit,
-) {
-    if (show.value) {
-        ModalBottomSheet(
-            onDismissRequest = { show.value = false },
-        ) {
+private fun SupportCard(onLinkClicked: (String) -> Unit) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(24.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = stringResource(CoreR.string.home_support_title),
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(16.dp)
+                text = stringResource(CoreR.string.home_support_content),
+                style = MaterialTheme.typography.bodyMedium
             )
-            Column(modifier = Modifier.padding(bottom = 16.dp)) {
-                Text(
-                    text = stringResource(CoreR.string.home_support_content),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                )
-                SettingsArrow(
-                    title = stringResource(CoreR.string.patreon),
-                    onClick = {
-                        show.value = false
-                        onLinkClicked(Const.Url.PATREON_URL)
-                    },
-                    leadingContent = {
-                        Icon(
-                            painter = painterResource(CoreR.drawable.ic_patreon),
-                            contentDescription = null,
-                            modifier = Modifier.size(24.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                )
-                SettingsArrow(
-                    title = stringResource(CoreR.string.paypal),
-                    onClick = {
-                        show.value = false
-                        onLinkClicked("https://paypal.me/magiskdonate")
-                    },
-                    leadingContent = {
-                        Icon(
-                            painter = painterResource(CoreR.drawable.ic_paypal),
-                            contentDescription = null,
-                            modifier = Modifier.size(24.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                )
+            Spacer(Modifier.height(16.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = { onLinkClicked(Const.Url.PATREON_URL) }) {
+                    Icon(
+                        painter = painterResource(CoreR.drawable.ic_patreon),
+                        contentDescription = "Patreon",
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
+                IconButton(onClick = { onLinkClicked("https://paypal.me/magiskdonate") }) {
+                    Icon(
+                        painter = painterResource(CoreR.drawable.ic_paypal),
+                        contentDescription = "PayPal",
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
             }
         }
     }
@@ -849,14 +761,6 @@ private fun DevelopersCard(onLinkClicked: (String) -> Unit) {
             }
         }
     }
-}
-
-private fun openLink(context: Context, url: String) {
-    try {
-        context.startActivity(Intent(Intent.ACTION_VIEW, url.toUri()).apply {
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        })
-    } catch (_: ActivityNotFoundException) { }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
