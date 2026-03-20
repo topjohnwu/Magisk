@@ -6,16 +6,12 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
-import android.content.res.Resources
-import android.graphics.Color
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -26,13 +22,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.core.content.pm.ShortcutManagerCompat
-import androidx.core.content.res.use
-import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.VMFactory
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
@@ -41,7 +37,6 @@ import com.topjohnwu.magisk.core.base.ActivityExtension
 import com.topjohnwu.magisk.core.base.SplashController
 import com.topjohnwu.magisk.core.base.SplashScreenHost
 import com.topjohnwu.magisk.core.isRunningAsStub
-import com.topjohnwu.magisk.core.ktx.reflectField
 import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.tasks.AppMigration
 import com.topjohnwu.magisk.core.wrap
@@ -58,15 +53,12 @@ import com.topjohnwu.magisk.ui.navigation.Route
 import com.topjohnwu.magisk.ui.navigation.rememberNavigator
 import com.topjohnwu.magisk.ui.superuser.SuperuserDetailScreen
 import com.topjohnwu.magisk.ui.superuser.SuperuserViewModel
-import com.topjohnwu.magisk.ui.theme.MagiskTheme
-import com.topjohnwu.magisk.ui.theme.Theme
 import com.topjohnwu.magisk.view.Shortcuts
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-
 import com.topjohnwu.magisk.core.R as CoreR
 
-class MainActivity : AppCompatActivity(), SplashScreenHost {
+class MainActivity : ComponentActivity(), SplashScreenHost {
 
     override val extension = ActivityExtension(this)
     override val splashController = SplashController(this)
@@ -76,29 +68,16 @@ class MainActivity : AppCompatActivity(), SplashScreenHost {
     internal val showUnsupported = MutableStateFlow<List<Pair<Int, Int>>>(emptyList())
     internal val showShortcutPrompt = MutableStateFlow(false)
 
-    init {
-        AppCompatDelegate.setDefaultNightMode(Config.darkTheme)
-    }
-
     override fun attachBaseContext(base: Context) {
         super.attachBaseContext(base.wrap())
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         extension.onCreate(savedInstanceState)
-        if (isRunningAsStub) {
-            val delegate = delegate
-            val clz = delegate.javaClass
-            clz.reflectField("mActivityHandlesConfigFlagsChecked").set(delegate, true)
-            clz.reflectField("mActivityHandlesConfigFlags").set(delegate, 0)
-        }
-
-        setTheme(Theme.selected.themeRes)
         splashController.preOnCreate()
+        theme.applyStyle(R.style.Main, true)
         super.onCreate(savedInstanceState)
         splashController.onCreate(savedInstanceState)
-
-        setupWindow()
     }
 
     override fun onResume() {
@@ -109,30 +88,6 @@ class MainActivity : AppCompatActivity(), SplashScreenHost {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         extension.onSaveInstanceState(outState)
-    }
-
-    private fun setupWindow() {
-        obtainStyledAttributes(intArrayOf(android.R.attr.windowBackground))
-            .use { it.getDrawable(0) }
-            .also { window.setBackgroundDrawable(it) }
-
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            window?.decorView?.post {
-                if ((window.decorView.rootWindowInsets?.systemWindowInsetBottom
-                        ?: 0) < Resources.getSystem().displayMetrics.density * 40) {
-                    window.navigationBarColor = Color.TRANSPARENT
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                        window.navigationBarDividerColor = Color.TRANSPARENT
-                    }
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                        window.isNavigationBarContrastEnforced = false
-                        window.isStatusBarContrastEnforced = false
-                    }
-                }
-            }
-        }
     }
 
     @SuppressLint("InlinedApi")
@@ -169,12 +124,12 @@ class MainActivity : AppCompatActivity(), SplashScreenHost {
                                     MainScreen(initialTab = initialTab)
                                 }
                                 entry<Route.DenyList> { _ ->
-                                    val vm: DenyListViewModel = androidx.lifecycle.viewmodel.compose.viewModel(factory = VMFactory)
+                                    val vm: DenyListViewModel = viewModel(factory = VMFactory)
                                     LaunchedEffect(Unit) { vm.startLoading() }
                                     DenyListScreen(vm, onBack = { navigator.pop() })
                                 }
                                 entry<Route.Flash> { key ->
-                                    val vm: FlashViewModel = androidx.lifecycle.viewmodel.compose.viewModel(factory = VMFactory)
+                                    val vm: FlashViewModel = viewModel(factory = VMFactory)
                                     LaunchedEffect(key) {
                                         if (vm.flashAction.isEmpty()) {
                                             vm.flashAction = key.action
@@ -185,7 +140,7 @@ class MainActivity : AppCompatActivity(), SplashScreenHost {
                                     FlashScreen(vm, action = key.action, onBack = { navigator.pop() })
                                 }
                                 entry<Route.SuperuserDetail> { key ->
-                                    val vm: SuperuserViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
+                                    val vm: SuperuserViewModel = viewModel(
                                         viewModelStoreOwner = this@MainActivity, factory = VMFactory
                                     )
                                     LaunchedEffect(Unit) {
@@ -196,7 +151,7 @@ class MainActivity : AppCompatActivity(), SplashScreenHost {
                                     SuperuserDetailScreen(uid = key.uid, viewModel = vm, onBack = { navigator.pop() })
                                 }
                                 entry<Route.Action> { key ->
-                                    val vm: ActionViewModel = androidx.lifecycle.viewmodel.compose.viewModel(factory = VMFactory)
+                                    val vm: ActionViewModel = viewModel(factory = VMFactory)
                                     LaunchedEffect(key) {
                                         if (vm.actionId.isEmpty()) {
                                             vm.actionId = key.id

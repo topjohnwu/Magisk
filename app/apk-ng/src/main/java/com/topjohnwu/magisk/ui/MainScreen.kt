@@ -22,6 +22,9 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -57,17 +60,14 @@ import com.topjohnwu.magisk.ui.settings.SettingsViewModel
 import com.topjohnwu.magisk.ui.superuser.SuperuserScreen
 import com.topjohnwu.magisk.ui.superuser.SuperuserViewModel
 import kotlinx.coroutines.launch
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import com.topjohnwu.magisk.core.R as CoreR
 
 enum class Tab(val titleRes: Int, val iconRes: Int) {
-    MODULES(CoreR.string.modules, R.drawable.ic_module_outlined_md2),
-    SUPERUSER(CoreR.string.superuser, R.drawable.ic_superuser_outlined_md2),
-    HOME(CoreR.string.section_home, R.drawable.ic_home_outlined_md2),
-    LOG(CoreR.string.logs, R.drawable.ic_bug_outlined_md2),
-    SETTINGS(CoreR.string.settings, R.drawable.ic_settings_outlined_md2);
+    MODULES(CoreR.string.modules, R.drawable.ic_module),
+    SUPERUSER(CoreR.string.superuser, CoreR.drawable.ic_superuser),
+    HOME(CoreR.string.section_home, R.drawable.ic_home),
+    LOG(CoreR.string.logs, R.drawable.ic_bug),
+    SETTINGS(CoreR.string.settings, R.drawable.ic_settings);
 }
 
 @Composable

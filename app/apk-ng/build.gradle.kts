@@ -38,9 +38,6 @@ dependencies {
     implementation(project(":core"))
     coreLibraryDesugaring(libs.jdk.libs)
 
-    implementation(libs.appcompat)
-    implementation(libs.material)
-
     // Compose
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.ui)
@@ -57,5 +54,4 @@ dependencies {
     implementation(libs.navigationevent.compose)
     implementation(libs.lifecycle.viewmodel.navigation3)
     implementation(libs.navigation3.ui)
-
 }
