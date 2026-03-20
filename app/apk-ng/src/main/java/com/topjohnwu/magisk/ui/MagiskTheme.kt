@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.ui.theme
+package com.topjohnwu.magisk.ui
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
