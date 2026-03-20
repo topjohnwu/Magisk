@@ -10,6 +10,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -50,6 +51,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -64,6 +66,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -595,62 +598,55 @@ private fun AppDetailRow(label: String, value: String) {
     }
 }
 
+private data class StatusInfo(val label: String, val status: String)
+
 @Composable
 private fun StatusCard() {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        val ZygiskEnabled = Info.isZygiskEnabled
-        val ZygiskLabel = stringResource(CoreR.string.zygisk)
-        val ZygiskStatus = stringResource(if (ZygiskEnabled) CoreR.string.yes else CoreR.string.no)
-
-        val ramdiskEnabled = Info.ramdisk
-        val ramdiskLabel = stringResource(CoreR.string.ramdisk)
-        val ramdiskStatus = stringResource(if (ramdiskEnabled) CoreR.string.yes else CoreR.string.no)
-
-        StatusItemCard(
-            modifier = Modifier.weight(1f),
-            icon = Icons.Filled.PushPin,
-            text = "$ZygiskLabel $ZygiskStatus"
+    val statuses = listOf(
+        StatusInfo(
+            label = stringResource(CoreR.string.zygisk),
+            status = stringResource(if (Info.isZygiskEnabled) CoreR.string.enabled else CoreR.string.disabled)
+        ),
+        StatusInfo(
+            label = stringResource(CoreR.string.ramdisk),
+            status = stringResource(if (Info.ramdisk) CoreR.string.yes else CoreR.string.no)
         )
-        StatusItemCard(
-            modifier = Modifier.weight(1f),
-            icon = Icons.Filled.Layers,
-            text = "$ramdiskLabel $ramdiskStatus"
-        )
-    }
-}
+    )
 
-@Composable
-private fun StatusItemCard(
-    modifier: Modifier = Modifier,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    text: String
-) {
     Card(
-        modifier = modifier,
-        shape = RoundedCornerShape(20.dp)
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(24.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
+                .height(IntrinsicSize.Min),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                modifier = Modifier
-                    .size(24.dp)
-                    .rotate(if (icon == Icons.Filled.PushPin) 45f else 0f)
-            )
-            Spacer(Modifier.width(8.dp))
-            Text(
-                text = text,
-                style = MaterialTheme.typography.bodyLarge
-            )
+            statuses.forEachIndexed { index, info ->
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = info.label,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    Text(
+                        text = info.status,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+                if (index < statuses.lastIndex) {
+                    VerticalDivider(
+                        thickness = 0.5.dp,
+                        modifier = Modifier.padding(vertical = 12.dp)
+                    )
+                }
+            }
         }
     }
 }
