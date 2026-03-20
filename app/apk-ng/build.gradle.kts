@@ -1,8 +1,7 @@
 plugins {
     id("com.android.application")
     kotlin("plugin.parcelize")
-    kotlin("plugin.compose")
-    kotlin("plugin.serialization")
+    alias(libs.plugins.compose.compiler)
 }
 
 setupMainApk()
@@ -39,7 +38,6 @@ dependencies {
     coreLibraryDesugaring(libs.jdk.libs)
 
     // Compose
-    implementation(platform(libs.compose.bom))
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)
     debugImplementation(libs.compose.ui.tooling)
