@@ -13,6 +13,7 @@ object Config : PreferenceConfig, DBConfig {
     override val stringDB get() = ServiceLocator.stringDB
     override val settingsDB get() = ServiceLocator.settingsDB
     override val context get() = ServiceLocator.deContext
+    @OptIn(kotlinx.coroutines.DelicateCoroutinesApi::class)
     override val coroutineScope get() = GlobalScope
 
     object Key {

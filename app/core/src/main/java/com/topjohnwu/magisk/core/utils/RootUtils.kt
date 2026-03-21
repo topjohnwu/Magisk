@@ -76,7 +76,7 @@ class RootUtils(stub: Any?) : RootService() {
         val module = File(Const.MODULE_PATH, "hosts")
         if (module.exists()) return true
         val hosts = File(module, "system/etc/hosts")
-        if (!hosts.parentFile.mkdirs()) return false
+        if (hosts.parentFile?.mkdirs() != true) return false
         File(module, "module.prop").outputStream().writer().use {
             it.write("""
                 id=hosts

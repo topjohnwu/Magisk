@@ -231,7 +231,7 @@ private fun DenyAppCard(app: DenyAppState) {
         Column {
             if (app.checkedPercent > 0f) {
                 LinearProgressIndicator(
-                    progress = app.checkedPercent,
+                    progress = { app.checkedPercent },
                     modifier = Modifier.fillMaxWidth()
                 )
             }
