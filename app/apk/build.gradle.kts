@@ -1,5 +1,5 @@
 plugins {
-    id("com.android.application")
+    alias(libs.plugins.android.application)
     kotlin("plugin.parcelize")
     alias(libs.plugins.legacy.kapt)
     alias(libs.plugins.navigation.safeargs)
