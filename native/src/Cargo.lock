@@ -636,19 +636,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5e5032e24019045c762d3c0f28f5b6b8bbf38563a65908389bf7978758920897"
 
 [[package]]
-name = "lz4"
-version = "1.28.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a20b523e860d03443e98350ceaac5e71c6ba89aea7d960769ec3ce37f4de5af4"
+name = "lz4_flex"
+version = "0.11.5"
+source = "git+https://github.com/PSeitz/lz4_flex.git?rev=e3e5138cff0cad6ca87d09b9d03b1f6017bbc370#e3e5138cff0cad6ca87d09b9d03b1f6017bbc370"
 dependencies = [
- "lz4-sys",
-]
-
-[[package]]
-name = "lz4-sys"
-version = "1.11.1+lz4-1.10.0"
-dependencies = [
- "libc",
+ "twox-hash",
 ]
 
 [[package]]
@@ -692,7 +684,7 @@ dependencies = [
  "digest 0.11.0",
  "fdt",
  "flate2",
- "lz4",
+ "lz4_flex",
  "lzma-rust2",
  "num-traits",
  "p256",
@@ -1220,6 +1212,12 @@ dependencies = [
  "quote",
  "syn",
 ]
+
+[[package]]
+name = "twox-hash"
+version = "2.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9ea3136b675547379c4bd395ca6b938e5ad3c3d20fad76e7fe85f9e0d011419c"
 
 [[package]]
 name = "typenum"
