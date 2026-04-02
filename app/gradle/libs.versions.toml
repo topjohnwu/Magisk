@@ -1,6 +1,7 @@
 [versions]
 kotlin = "2.3.20"
 android = "9.1.0"
+android-tools = "32.1.0"
 ksp = "2.3.4"
 rikka = "1.3.0"
 navigation = "2.9.7"
@@ -75,8 +76,9 @@ navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", ver
 navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "navigation3" }
 navigationevent-compose = { module = "androidx.navigationevent:navigationevent-compose", version.ref = "navigationevent" }
 
-# Build plugins
+# For build-logic
 android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "android" }
+android-build-sdk-common = { module = "com.android.tools:sdk-common", version.ref = "android-tools" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "android" }
