@@ -48,36 +48,18 @@ interface PreferenceConfig {
     ) = StringProperty(name, default, commit)
 }
 
-abstract class PreferenceProperty {
-
-    fun SharedPreferences.Editor.put(name: String, value: Boolean) = putBoolean(name, value)
-    fun SharedPreferences.Editor.put(name: String, value: Float) = putFloat(name, value)
-    fun SharedPreferences.Editor.put(name: String, value: Int) = putInt(name, value)
-    fun SharedPreferences.Editor.put(name: String, value: Long) = putLong(name, value)
-    fun SharedPreferences.Editor.put(name: String, value: String) = putString(name, value)
-    fun SharedPreferences.Editor.put(name: String, value: Set<String>) = putStringSet(name, value)
-
-    fun SharedPreferences.get(name: String, value: Boolean) = getBoolean(name, value)
-    fun SharedPreferences.get(name: String, value: Float) = getFloat(name, value)
-    fun SharedPreferences.get(name: String, value: Int) = getInt(name, value)
-    fun SharedPreferences.get(name: String, value: Long) = getLong(name, value)
-    fun SharedPreferences.get(name: String, value: String) = getString(name, value) ?: value
-    fun SharedPreferences.get(name: String, value: Set<String>) = getStringSet(name, value) ?: value
-
-}
-
 class BooleanProperty(
     private val name: String,
     private val default: Boolean,
     private val commit: Boolean
-) : PreferenceProperty(), ReadWriteProperty<PreferenceConfig, Boolean> {
+) : ReadWriteProperty<PreferenceConfig, Boolean> {
 
     override operator fun getValue(
         thisRef: PreferenceConfig,
         property: KProperty<*>
     ): Boolean {
         val prefName = name.ifBlank { property.name }
-        return thisRef.prefs.get(prefName, default)
+        return thisRef.prefs.getBoolean(prefName, default)
     }
 
     override operator fun setValue(
@@ -86,7 +68,7 @@ class BooleanProperty(
         value: Boolean
     ) {
         val prefName = name.ifBlank { property.name }
-        thisRef.prefs.edit(commit) { put(prefName, value) }
+        thisRef.prefs.edit(commit) { putBoolean(prefName, value) }
     }
 }
 
@@ -94,14 +76,14 @@ class IntProperty(
     private val name: String,
     private val default: Int,
     private val commit: Boolean
-) : PreferenceProperty(), ReadWriteProperty<PreferenceConfig, Int> {
+) : ReadWriteProperty<PreferenceConfig, Int> {
 
     override operator fun getValue(
         thisRef: PreferenceConfig,
         property: KProperty<*>
     ): Int {
         val prefName = name.ifBlank { property.name }
-        return thisRef.prefs.get(prefName, default)
+        return thisRef.prefs.getInt(prefName, default)
     }
 
     override operator fun setValue(
@@ -110,7 +92,7 @@ class IntProperty(
         value: Int
     ) {
         val prefName = name.ifBlank { property.name }
-        thisRef.prefs.edit(commit) { put(prefName, value) }
+        thisRef.prefs.edit(commit) { putInt(prefName, value) }
     }
 }
 
@@ -118,14 +100,14 @@ class StringProperty(
     private val name: String,
     private val default: String,
     private val commit: Boolean
-) : PreferenceProperty(), ReadWriteProperty<PreferenceConfig, String> {
+) : ReadWriteProperty<PreferenceConfig, String> {
 
     override operator fun getValue(
         thisRef: PreferenceConfig,
         property: KProperty<*>
     ): String {
         val prefName = name.ifBlank { property.name }
-        return thisRef.prefs.get(prefName, default)
+        return thisRef.prefs.getString(prefName, default) ?: default
     }
 
     override operator fun setValue(
@@ -134,6 +116,6 @@ class StringProperty(
         value: String
     ) {
         val prefName = name.ifBlank { property.name }
-        thisRef.prefs.edit(commit) { put(prefName, value) }
+        thisRef.prefs.edit(commit) { putString(prefName, value) }
     }
 }
