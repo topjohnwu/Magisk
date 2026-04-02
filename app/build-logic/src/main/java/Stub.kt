@@ -274,6 +274,7 @@ fun Project.setupStubApk() {
 
             val componentJavaOutDir = layout.buildDirectory
                 .dir("generated/${variantLowered}/components").get().asFile
+            componentJavaOutDir.deleteRecursively()
 
             val (factory, app) = genStubClasses(componentJavaOutDir)
 
