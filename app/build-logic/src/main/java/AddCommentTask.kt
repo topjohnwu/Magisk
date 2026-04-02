@@ -1,6 +1,7 @@
 import com.android.build.api.artifact.ArtifactTransformationRequest
 import com.android.build.api.dsl.ApkSigningConfig
 import com.android.builder.internal.packaging.IncrementalPackager
+import com.android.ide.common.signing.KeystoreHelper
 import com.android.tools.build.apkzlib.sign.SigningExtension
 import com.android.tools.build.apkzlib.sign.SigningOptions
 import com.android.tools.build.apkzlib.zfile.ZFiles
@@ -14,8 +15,6 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import java.io.File
-import java.security.KeyStore
-import java.security.cert.X509Certificate
 import java.util.jar.JarFile
 
 abstract class AddCommentTask: DefaultTask() {
@@ -39,13 +38,21 @@ abstract class AddCommentTask: DefaultTask() {
         val inFile = File(artifact.outputFile)
         val outFile = outFolder.file(inFile.name).get().asFile
 
-        val privateKey = signingConfig.get().getPrivateKey()
+        val config = signingConfig.get()
+        val info = KeystoreHelper.getCertificateInfo(
+            config.storeType,
+            config.storeFile,
+            config.storePassword,
+            config.keyPassword,
+            config.keyAlias
+        )
+
         val signingOptions = SigningOptions.builder()
             .setMinSdkVersion(0)
             .setV1SigningEnabled(true)
             .setV2SigningEnabled(true)
-            .setKey(privateKey.privateKey)
-            .setCertificates(privateKey.certificate as X509Certificate)
+            .setKey(info.key)
+            .setCertificates(info.certificate)
             .setValidation(SigningOptions.Validation.ASSUME_INVALID)
             .build()
         val options = ZFileOptions().apply {
@@ -63,15 +70,5 @@ abstract class AddCommentTask: DefaultTask() {
         }
 
         outFile
-    }
-
-    private fun ApkSigningConfig.getPrivateKey(): KeyStore.PrivateKeyEntry {
-        val keyStore = KeyStore.getInstance(storeType ?: KeyStore.getDefaultType())
-        storeFile!!.inputStream().use {
-            keyStore.load(it, storePassword!!.toCharArray())
-        }
-        val keyPwdArray = keyPassword!!.toCharArray()
-        val entry = keyStore.getEntry(keyAlias!!, KeyStore.PasswordProtection(keyPwdArray))
-        return entry as KeyStore.PrivateKeyEntry
     }
 }
