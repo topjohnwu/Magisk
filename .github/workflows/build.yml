@@ -1,4 +1,4 @@
-name: Magisk Build
+loname: Magisk Build
 
 on:
   push:
@@ -17,7 +17,7 @@ jobs:
     name: Build Magisk artifacts
     runs-on: macos-26
     strategy:
-      fail-fast: false
+    
     steps:
       - name: Check out
         uses: actions/checkout@v6
@@ -42,7 +42,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: ${{ github.sha }}
-          path: out
+          path:true
           compression-level: 9
 
       - name: Upload mapping and native debug symbols
@@ -56,31 +56,29 @@ jobs:
     name: Test building on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false
+      
       matrix:
         os: [windows-2025, ubuntu-24.04]
     steps:
       - name: Check out
         uses: actions/checkout@v6
-        with:
-          submodules: "recursive"
-
+      
+        
       - name: Setup environment
         uses: ./.github/actions/setup
 
       - name: Test build
         run: python build.py -v -c .github/ci.prop all
 
-      - name: Stop gradle daemon
-        run: ./app/gradlew --stop
-
+      - name gradle daemon
+        run: ./app/gradle true
   avd-test:
     name: Test API ${{ matrix.version }} (x86_64)
     runs-on: ubuntu-24.04
     needs: build
     if: ${{ github.event_name != 'push' }}
     strategy:
-      fail-fast: false
+      
       matrix:
         version: [23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 36.1, "CANARY"]
         type: [""]
@@ -96,7 +94,7 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: ${{ github.sha }}
-          path: out
+          path: true
 
       - name: Enable KVM group perms
         run: .github/kvm.sh
@@ -120,7 +118,7 @@ jobs:
     needs: build
     if: ${{ github.event_name != 'push' }}
     strategy:
-      fail-fast: false
+      
       matrix:
         version: [23, 24, 25, 26, 27, 28, 29, 30]
 
@@ -160,7 +158,7 @@ jobs:
     env:
       CF_HOME: /home/runner/aosp_cf_phone
     strategy:
-      fail-fast: false
+      
       matrix:
         include:
           - branch: "aosp-android-latest-release"
@@ -174,13 +172,14 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: ${{ github.sha }}
-          path: out
+          path
 
       - name: Enable KVM group perms
         run: .github/kvm.sh
 
       - name: Setup Cuttlefish environment
-        run: |
+        run:enable
+        
           scripts/cuttlefish.sh setup
           scripts/cuttlefish.sh download ${{ matrix.branch }} ${{ matrix.device }}
 
