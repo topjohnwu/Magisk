@@ -170,7 +170,7 @@ fun Project.setupCoreLib() {
                 it.addGeneratedSourceDirectory(syncResources, SyncWithDir::outputFolder)
             }
 
-            val stubTask = tasks.getByPath(":stub:comment$variantCapped")
+            val stubTask = tasks.getByPath(":stub:transform${variantCapped}Apk")
             val syncAssets = tasks.register("sync${variantCapped}Assets", SyncWithDir::class) {
                 outputFolder.set(layout.buildDirectory.dir("$variantName/assets"))
                 into(outputFolder)
@@ -261,20 +261,23 @@ fun Project.setupAppCommon() {
     androidAppComponents {
         onVariants { variant ->
             val commentTask = tasks.register(
-                "comment${variant.name.replaceFirstChar { it.uppercase() }}",
-                AddCommentTask::class.java
+                "transform${variant.name.replaceFirstChar { it.uppercase() }}Apk",
+                TransformApkTask::class.java
             )
             val transformationRequest = variant.artifacts.use(commentTask)
-                .wiredWithDirectories(AddCommentTask::apkFolder, AddCommentTask::outFolder)
+                .wiredWithDirectories(TransformApkTask::apkFolder, TransformApkTask::outFolder)
                 .toTransformMany(SingleArtifact.APK)
             val signingConfig = androidApp.buildTypes.getByName(variant.buildType!!).signingConfig
             commentTask.configure {
                 this.transformationRequest = transformationRequest
                 this.signingConfig = signingConfig
-                this.comment = "version=${Config.version}\n" +
-                        "versionCode=${Config.versionCode}\n" +
-                        "stubVersion=${Config.stubVersion}\n"
                 this.outFolder.set(layout.buildDirectory.dir("outputs/apk/${variant.name}"))
+                // Always add a transformation to set comments on the APK
+                this.transformations.add {
+                    it.eocdComment = ("version=${Config.version}\n" +
+                            "versionCode=${Config.versionCode}\n" +
+                            "stubVersion=${Config.stubVersion}\n").toByteArray()
+                }
             }
 
         }
