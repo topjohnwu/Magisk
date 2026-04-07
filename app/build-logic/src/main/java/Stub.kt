@@ -5,7 +5,6 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
-import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputDirectory
@@ -14,8 +13,8 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.assign
-import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
+import org.gradle.kotlin.dsl.withType
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -24,9 +23,7 @@ import java.security.SecureRandom
 import java.util.Random
 import java.util.zip.Deflater
 import java.util.zip.DeflaterOutputStream
-import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
-import java.util.zip.ZipOutputStream
 import javax.crypto.Cipher
 import javax.crypto.CipherOutputStream
 import javax.crypto.spec.IvParameterSpec
@@ -290,35 +287,30 @@ fun Project.setupStubApk() {
                     ManifestUpdater::outputManifest)
                 .toTransform(SingleArtifact.MERGED_MANIFEST)
 
-            val aapt = sdkComponents.aapt2.get().executable.get().asFile
-            val apk = layout.buildDirectory.file("intermediates/linked_resources_binary_format/" +
-                    "${variantLowered}/process${variantCapped}Resources/" +
-                    "linked-resources-binary-format-${variantLowered}.ap_").get().asFile
-
+            val resTask = tasks.getByPath(":stub-res:package$variantCapped")
             val genResourcesTask = tasks.register("generate${variantCapped}BundledResources", TaskWithDir::class) {
-                dependsOn("process${variantCapped}Resources")
+                dependsOn(resTask)
                 outputFolder.set(layout.buildDirectory.dir("generated/${variantLowered}/resources"))
 
                 doLast {
-                    val apkTmp = File("${apk}.tmp")
-                    providers.exec {
-                        commandLine(aapt, "optimize", "-o", apkTmp, "--collapse-resource-names", apk)
-                    }.result.get()
+                    val apk = resTask.outputs.files.asFileTree
+                        .filter { it.name.endsWith(".apk") }.files.first()
 
                     val bos = ByteArrayOutputStream()
-                    ZipFile(apkTmp).use { src ->
-                        ZipOutputStream(apk.outputStream()).use {
-                            it.setLevel(Deflater.BEST_COMPRESSION)
-                            it.putNextEntry(ZipEntry("AndroidManifest.xml"))
-                            src.getInputStream(src.getEntry("AndroidManifest.xml")).transferTo(it)
-                            it.closeEntry()
-                        }
+                    ZipFile(apk).use { src ->
                         DeflaterOutputStream(bos, Deflater(Deflater.BEST_COMPRESSION)).use {
                             src.getInputStream(src.getEntry("resources.arsc")).transferTo(it)
                         }
                     }
-                    apkTmp.delete()
                     genEncryptedResources(bos.toByteArray(), outputFolder.get().asFile)
+                }
+            }
+
+            tasks.withType(TransformApkTask::class) {
+                transformations.add {
+                    // Always delete resources.arsc from the APK
+                    // to ensure that external resources can be loaded
+                    it.get("resources.arsc")?.delete()
                 }
             }
 
@@ -327,19 +319,5 @@ fun Project.setupStubApk() {
                 it.addGeneratedSourceDirectory(genResourcesTask, TaskWithDir::outputFolder)
             }
         }
-    }
-
-    // Override optimizeReleaseResources task
-    val apk = layout.buildDirectory.file("intermediates/linked_resources_binary_format/" +
-            "release/processReleaseResources/linked-resources-binary-format-release.ap_").get().asFile
-    val optRes = layout.buildDirectory.file("intermediates/optimized_processed_res/" +
-            "release/optimizeReleaseResources/resources-release-optimize.ap_").get().asFile
-    afterEvaluate {
-        tasks.named("optimizeReleaseResources") {
-            doLast { apk.copyTo(optRes, true) }
-        }
-    }
-    tasks.named<Delete>("clean") {
-        delete.addAll(listOf("src/debug/AndroidManifest.xml", "src/release/AndroidManifest.xml"))
     }
 }
