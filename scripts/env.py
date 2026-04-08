@@ -46,7 +46,8 @@ class Paths:
         self.ndk_build = self.ndk / "ndk-build"
         self.rust_sysroot = self.ndk / "toolchains" / "rust"
         self.adb = self.sdk / "platform-tools" / "adb"
-        self.gradlew = Path.cwd() / "app" / "gradlew"
+        project_root = Path(__file__).resolve().parent.parent
+        self.gradlew = project_root / "app" / "gradlew"
 
 
 @functools.cache
