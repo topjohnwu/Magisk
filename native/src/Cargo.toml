@@ -15,7 +15,7 @@ derive = { path = "base/derive" }
 magiskpolicy = { path = "sepolicy" }
 cxx = { path = "external/cxx-rs" }
 cxx-gen = { path = "external/cxx-rs/gen/lib" }
-libc = "0.2.182"
+libc = "0.2.184"
 cfg-if = "1.0.4"
 num-traits = "0.2.19"
 num-derive = "0.4.2"
@@ -25,28 +25,28 @@ size = "0.5.0"
 bytemuck = "1.25.0"
 fdt = "0.1.5"
 const_format = "0.2.35"
-bit-set = "0.8.0"
+bit-set = "0.10.0"
 syn = "2.0.117"
-quote = "1.0.44"
+quote = "1.0.45"
 proc-macro2 = "1.0.106"
 pb-rs = { version = "0.10.0", default-features = false }
 quick-protobuf = "0.8.1"
 flate2 = { version = "1.1.9", default-features = false }
 bzip2 = "0.6.1"
-zopfli = "0.8.3"
+zopfli = { version = "0.8.3", default-features = false}
 lz4 = "1.28.1"
 lzma-rust2 = { version = "0.16.2", default-features = false }
-nix = "0.30.1"
+nix = "0.31.2"
 bitflags = "2.11.0"
 
 # Rust crypto crates are tied together
-sha1 = "0.11.0-rc.5"
-sha2 = "0.11.0-rc.5"
-digest = "0.11.0"
-p256 = "0.14.0-rc.7"
-p384 = "0.14.0-rc.7"
-p521 = "0.14.0-rc.7"
-rsa = "0.10.0-rc.15"
+sha1 = "0.11.0"
+sha2 = "0.11.0"
+digest = "0.11.2"
+p256 = "0.14.0-rc.8"
+p384 = "0.14.0-rc.8"
+p521 = "0.14.0-rc.8"
+rsa = "0.10.0-rc.17"
 x509-cert = "0.3.0-rc.4"
 der = "0.8.0"
 
