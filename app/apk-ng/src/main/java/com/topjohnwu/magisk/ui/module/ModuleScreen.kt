@@ -72,6 +72,7 @@ import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.ui.component.ConfirmResult
 import com.topjohnwu.magisk.ui.component.MarkdownTextAsync
 import com.topjohnwu.magisk.ui.component.rememberConfirmDialog
+import com.topjohnwu.magisk.utils.textHolder
 import kotlinx.coroutines.launch
 import com.topjohnwu.magisk.core.R as CoreR
 
@@ -284,7 +285,7 @@ private fun ModuleCard(item: ModuleItem, viewModel: ModuleViewModel, onUpdateCli
             if (item.showNotice) {
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    text = item.noticeText,
+                    text = textHolder(item.noticeText),
                     style = MaterialTheme.typography.bodyMedium,
                     color = colorScheme.primary,
                 )

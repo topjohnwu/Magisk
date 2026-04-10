@@ -64,6 +64,7 @@ rikka-insets = { module = "dev.rikka.rikkax.insets:insets", version.ref = "rikka
 
 # Compose
 activity-compose = { module = "androidx.activity:activity-compose", version = "1.13.0" }
+accompanist-drawablepainter = { module = "com.google.accompanist:accompanist-drawablepainter", version = "0.37.3" }
 compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose-ui" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose-ui" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose-ui" }

@@ -37,10 +37,10 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.topjohnwu.magisk.ui.component.ConfirmResult
 import com.topjohnwu.magisk.ui.component.SettingsSwitch
 import com.topjohnwu.magisk.ui.component.rememberConfirmDialog
-import com.topjohnwu.magisk.ui.util.rememberDrawablePainter
 import kotlinx.coroutines.launch
 import com.topjohnwu.magisk.core.R as CoreR
 

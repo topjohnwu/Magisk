@@ -671,14 +671,14 @@ private fun SupportCard(onLinkClicked: (String) -> Unit) {
                 IconButton(onClick = { onLinkClicked(Const.Url.PATREON_URL) }) {
                     Icon(
                         painter = painterResource(CoreR.drawable.ic_patreon),
-                        contentDescription = "Patreon",
+                        contentDescription = stringResource(CoreR.string.patreon),
                         modifier = Modifier.size(32.dp)
                     )
                 }
                 IconButton(onClick = { onLinkClicked("https://paypal.me/magiskdonate") }) {
                     Icon(
                         painter = painterResource(CoreR.drawable.ic_paypal),
-                        contentDescription = "PayPal",
+                        contentDescription = stringResource(CoreR.string.paypal),
                         modifier = Modifier.size(32.dp)
                     )
                 }
@@ -687,30 +687,30 @@ private fun SupportCard(onLinkClicked: (String) -> Unit) {
     }
 }
 
-private data class LinkInfo(val label: String, val icon: Int, val url: String)
+private data class LinkInfo(val label: Int, val icon: Int, val url: String)
 private data class DeveloperInfo(val name: String, val links: List<LinkInfo>)
 
 private val developers = listOf(
     DeveloperInfo("topjohnwu", listOf(
-        LinkInfo("Twitter", CoreR.drawable.ic_twitter, "https://twitter.com/topjohnwu"),
-        LinkInfo("GitHub", CoreR.drawable.ic_github, Const.Url.SOURCE_CODE_URL),
+        LinkInfo(CoreR.string.twitter, CoreR.drawable.ic_twitter, "https://twitter.com/topjohnwu"),
+        LinkInfo(CoreR.string.github, CoreR.drawable.ic_github, Const.Url.SOURCE_CODE_URL),
     )),
     DeveloperInfo("vvb2060", listOf(
-        LinkInfo("Twitter", CoreR.drawable.ic_twitter, "https://twitter.com/vvb2060"),
-        LinkInfo("GitHub", CoreR.drawable.ic_github, "https://github.com/vvb2060"),
+        LinkInfo(CoreR.string.twitter, CoreR.drawable.ic_twitter, "https://twitter.com/vvb2060"),
+        LinkInfo(CoreR.string.github, CoreR.drawable.ic_github, "https://github.com/vvb2060"),
     )),
     DeveloperInfo("yujincheng08", listOf(
-        LinkInfo("Sponsor", CoreR.drawable.ic_favorite, "https://github.com/sponsors/yujincheng08"),
-        LinkInfo("Twitter", CoreR.drawable.ic_twitter, "https://twitter.com/shanasaimoe"),
-        LinkInfo("GitHub", CoreR.drawable.ic_github, "https://github.com/yujincheng08"),
+        LinkInfo(CoreR.string.sponsor, CoreR.drawable.ic_favorite, "https://github.com/sponsors/yujincheng08"),
+        LinkInfo(CoreR.string.twitter, CoreR.drawable.ic_twitter, "https://twitter.com/shanasaimoe"),
+        LinkInfo(CoreR.string.github, CoreR.drawable.ic_github, "https://github.com/yujincheng08"),
     )),
     DeveloperInfo("rikkawww", listOf(
-        LinkInfo("Twitter", CoreR.drawable.ic_twitter, "https://twitter.com/rikkawww"),
-        LinkInfo("GitHub", CoreR.drawable.ic_github, "https://github.com/rikkawww"),
+        LinkInfo(CoreR.string.twitter, CoreR.drawable.ic_twitter, "https://twitter.com/rikkawww"),
+        LinkInfo(CoreR.string.github, CoreR.drawable.ic_github, "https://github.com/rikkawww"),
     )),
     DeveloperInfo("canyie", listOf(
-        LinkInfo("Twitter", CoreR.drawable.ic_twitter, "https://twitter.com/canyie2977"),
-        LinkInfo("GitHub", CoreR.drawable.ic_github, "https://github.com/canyie"),
+        LinkInfo(CoreR.string.twitter, CoreR.drawable.ic_twitter, "https://twitter.com/canyie2977"),
+        LinkInfo(CoreR.string.github, CoreR.drawable.ic_github, "https://github.com/canyie"),
     )),
 )
 
@@ -740,7 +740,7 @@ private fun DevelopersCard(onLinkClicked: (String) -> Unit) {
                             IconButton(onClick = { onLinkClicked(link.url) }) {
                                 Icon(
                                     painter = painterResource(link.icon),
-                                    contentDescription = link.label,
+                                    contentDescription = stringResource(link.label),
                                     modifier = Modifier.size(24.dp)
                                 )
                             }
@@ -1051,7 +1051,8 @@ private fun EnvFixComposableDialog(
 @Composable
 private fun HideAppDialog(onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
     val showState = rememberSaveable { mutableStateOf(true) }
-    var appName by rememberSaveable { mutableStateOf("Settings") }
+    val defaultName = stringResource(CoreR.string.settings)
+    var appName by rememberSaveable { mutableStateOf(defaultName) }
     val isError = appName.length > AppMigration.MAX_LABEL_LENGTH || appName.isBlank()
 
     AlertDialog(
