@@ -9,8 +9,6 @@ import com.topjohnwu.magisk.core.AppContext
 import com.topjohnwu.magisk.core.BuildConfig
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.core.download.Subject
-import com.topjohnwu.magisk.core.download.Subject.App
 import com.topjohnwu.magisk.core.ktx.await
 import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.repository.NetworkService
@@ -19,7 +17,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlin.math.roundToInt
 import com.topjohnwu.magisk.core.R as CoreR
 
 class HomeViewModel(
@@ -93,15 +90,6 @@ class HomeViewModel(
     override fun onCleared() {
         super.onCleared()
         Info.isConnected.removeObserver(networkObserver)
-    }
-
-    fun onProgressUpdate(progress: Float, subject: Subject) {
-        if (subject is App)
-            _uiState.update { it.copy(managerProgress = progress.times(100f).roundToInt()) }
-    }
-
-    fun resetProgress() {
-        _uiState.update { it.copy(managerProgress = 0) }
     }
 
     fun onLinkPressed(link: String) {

@@ -130,5 +130,4 @@ data class ProcessInfo(
     var isEnabled: Boolean
 ) {
     val isIsolated = packageName == ISOLATED_MAGIC
-    val isAppZygote = name.endsWith("_zygote")
 }

@@ -16,35 +16,11 @@ class Navigator(initialKey: NavKey) {
         backStack.add(key)
     }
 
-    fun replace(key: NavKey) {
-        if (backStack.isNotEmpty()) {
-            backStack[backStack.lastIndex] = key
-        } else {
-            backStack.add(key)
-        }
-    }
-
-    fun replaceAll(keys: List<NavKey>) {
-        if (keys.isEmpty()) return
-        if (backStack.isNotEmpty()) {
-            backStack.clear()
-            backStack.addAll(keys)
-        }
-    }
-
     fun pop() {
         backStack.removeLastOrNull()
     }
 
-    fun popUntil(predicate: (NavKey) -> Boolean) {
-        while (backStack.isNotEmpty() && !predicate(backStack.last())) {
-            backStack.removeAt(backStack.lastIndex)
-        }
-    }
-
     fun current(): NavKey? = backStack.lastOrNull()
-
-    fun backStackSize(): Int = backStack.size
 
     companion object {
         val Saver: Saver<Navigator, Any> = listSaver(

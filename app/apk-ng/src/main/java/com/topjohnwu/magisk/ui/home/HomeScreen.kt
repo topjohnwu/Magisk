@@ -26,9 +26,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material.icons.filled.PowerSettingsNew
-import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.AlertDialog
@@ -65,8 +63,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -97,7 +93,6 @@ import com.topjohnwu.magisk.ui.flash.FlashUtils
 import com.topjohnwu.magisk.ui.install.InstallViewModel
 import kotlinx.coroutines.launch
 import com.topjohnwu.magisk.core.R as CoreR
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -1050,7 +1045,6 @@ private fun EnvFixComposableDialog(
 
 @Composable
 private fun HideAppDialog(onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
-    val showState = rememberSaveable { mutableStateOf(true) }
     val defaultName = stringResource(CoreR.string.settings)
     var appName by rememberSaveable { mutableStateOf(defaultName) }
     val isError = appName.length > AppMigration.MAX_LABEL_LENGTH || appName.isBlank()
@@ -1087,8 +1081,6 @@ private fun HideAppDialog(onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
 
 @Composable
 private fun RestoreAppDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
-    val showState = rememberSaveable { mutableStateOf(true) }
-
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(CoreR.string.settings_restore_app_title)) },
