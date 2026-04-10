@@ -237,7 +237,6 @@ class TerminalEmulator(
         cursorRow = cursor[1]
     }
 
-
     fun setCursorStyle() {
         cursorStyle = DEFAULT_TERMINAL_CURSOR_STYLE
     }
@@ -1509,11 +1508,9 @@ class TerminalEmulator(
         mAboutToAutoWrap = false
     }
 
-
     fun clearScrollCounter() {
         scrollCounter = 0
     }
-
 
     fun toggleAutoScrollDisabled() {
         isAutoScrollDisabled = !isAutoScrollDisabled
@@ -1565,7 +1562,6 @@ class TerminalEmulator(
 
     fun getSelectedText(x1: Int, y1: Int, x2: Int, y2: Int): String =
         screen.getSelectedText(x1, y1, x2, y2)
-
 
     private fun setTitle(newTitle: String?) {
         title = newTitle
