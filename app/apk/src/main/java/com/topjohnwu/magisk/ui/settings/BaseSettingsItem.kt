@@ -7,9 +7,9 @@ import androidx.databinding.Bindable
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.ktx.activity
+import com.topjohnwu.magisk.core.utils.TextHolder
 import com.topjohnwu.magisk.databinding.ObservableRvItem
 import com.topjohnwu.magisk.databinding.set
-import com.topjohnwu.magisk.utils.TextHolder
 import com.topjohnwu.magisk.view.MagiskDialog
 
 sealed class BaseSettingsItem : ObservableRvItem() {
@@ -110,7 +110,7 @@ sealed class BaseSettingsItem : ObservableRvItem() {
         open fun descriptions(res: Resources) = res.getArrayOrEmpty(descriptionRes)
 
         override val description = object : TextHolder() {
-            override fun getText(resources: Resources): CharSequence {
+            override fun getText(resources: Resources): String {
                 return descriptions(resources).getOrElse(value) { "" }
             }
         }

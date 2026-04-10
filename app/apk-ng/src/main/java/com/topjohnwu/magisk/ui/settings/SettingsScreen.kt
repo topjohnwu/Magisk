@@ -545,7 +545,8 @@ private fun DownloadPathDialog(show: Boolean, onDismiss: () -> Unit) {
 private fun HideAppDialog(show: Boolean, onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
     val showState = rememberSaveable { mutableStateOf(show) }
     showState.value = show
-    var appName by rememberSaveable { mutableStateOf("Settings") }
+    val defaultName = stringResource(CoreR.string.settings)
+    var appName by rememberSaveable { mutableStateOf(defaultName) }
     val isError = appName.length > AppMigration.MAX_LABEL_LENGTH || appName.isBlank()
 
     if (showState.value) {

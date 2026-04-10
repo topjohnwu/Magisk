@@ -8,9 +8,12 @@ import androidx.compose.runtime.setValue
 import com.topjohnwu.magisk.arch.AsyncLoadViewModel
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.R as CoreR
 import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.core.model.module.LocalModule
 import com.topjohnwu.magisk.core.model.module.OnlineModule
+import com.topjohnwu.magisk.core.utils.TextHolder
+import com.topjohnwu.magisk.core.utils.asText
 import com.topjohnwu.magisk.ui.flash.FlashUtils
 import com.topjohnwu.magisk.ui.navigation.Route
 import com.topjohnwu.magisk.view.Notifications
@@ -25,7 +28,7 @@ import kotlinx.parcelize.Parcelize
 class ModuleItem(val module: LocalModule) {
     val showNotice: Boolean
     val showAction: Boolean
-    val noticeText: String
+    val noticeText: TextHolder
 
     init {
         val isZygisk = module.isZygisk
@@ -36,11 +39,12 @@ class ModuleItem(val module: LocalModule) {
             (Info.isZygiskEnabled && isRiru) ||
             (!Info.isZygiskEnabled && isZygisk)
         showAction = module.hasAction && !showNotice
-        noticeText = when {
-            zygiskUnloaded -> "Zygisk module not loaded due to incompatibility"
-            isRiru -> "Module suspended because Zygisk is enabled"
-            else -> "Module suspended because Zygisk isn't enabled"
-        }
+        noticeText =
+            when {
+                zygiskUnloaded -> CoreR.string.zygisk_module_unloaded.asText()
+                isRiru -> CoreR.string.suspend_text_riru.asText(CoreR.string.zygisk.asText())
+                else -> CoreR.string.suspend_text_zygisk.asText(CoreR.string.zygisk.asText())
+            }
     }
 
     var isEnabled by mutableStateOf(module.enable)
