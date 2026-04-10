@@ -5,15 +5,16 @@
     <string name="magisk" translatable="false">Magisk</string>
     <string name="zygisk" translatable="false">Zygisk</string>
     <string name="ramdisk" translatable="false">Ramdisk</string>
+    <string name="shared_uid" translatable="false">SharedUID</string>
     <string name="empty" translatable="false"/>
 
     <string name="paypal" translatable="false">PayPal</string>
     <string name="patreon" translatable="false">Patreon</string>
     <string name="twitter" translatable="false">Twitter</string>
     <string name="github" translatable="false">GitHub</string>
+    <string name="sponsor" translatable="false">Sponsor</string>
 
     <drawable name="ic_launcher">@drawable/ic_logo</drawable>
 
     <bool name="enable_fg_service">true</bool>
-
 </resources>
