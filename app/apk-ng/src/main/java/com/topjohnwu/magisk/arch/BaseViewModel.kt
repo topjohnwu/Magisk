@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.arch
 
-import android.os.Bundle
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
@@ -14,9 +13,6 @@ abstract class BaseViewModel : ViewModel() {
 
     private val _navEvents = MutableSharedFlow<Route>(extraBufferCapacity = 1)
     val navEvents: SharedFlow<Route> = _navEvents
-
-    open fun onSaveState(state: Bundle) {}
-    open fun onRestoreState(state: Bundle) {}
 
     fun showSnackbar(@StringRes resId: Int) {
         AppContext.toast(resId, Toast.LENGTH_SHORT)

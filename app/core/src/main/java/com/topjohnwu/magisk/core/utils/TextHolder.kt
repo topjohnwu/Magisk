@@ -1,16 +1,16 @@
-package com.topjohnwu.magisk.utils
+package com.topjohnwu.magisk.core.utils
 
 import android.content.res.Resources
 
 abstract class TextHolder {
 
     open val isEmpty: Boolean get() = false
-    abstract fun getText(resources: Resources): CharSequence
+    abstract fun getText(resources: Resources): kotlin.String
 
     // ---
 
     class String(
-        private val value: CharSequence
+        private val value: kotlin.String
     ) : TextHolder() {
         override val isEmpty get() = value.isEmpty()
         override fun getText(resources: Resources) = value
@@ -43,4 +43,4 @@ abstract class TextHolder {
 
 fun Int.asText(): TextHolder = TextHolder.Resource(this)
 fun Int.asText(vararg params: Any): TextHolder = TextHolder.ResourceArgs(this, *params)
-fun CharSequence.asText(): TextHolder = TextHolder.String(this)
+fun CharSequence.asText(): TextHolder = TextHolder.String(this.toString())

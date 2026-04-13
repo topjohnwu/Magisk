@@ -12,8 +12,8 @@ import com.topjohnwu.magisk.arch.UIActivity
 import com.topjohnwu.magisk.arch.ViewEvent
 import com.topjohnwu.magisk.core.base.ContentResultCallback
 import com.topjohnwu.magisk.core.base.relaunch
-import com.topjohnwu.magisk.utils.TextHolder
-import com.topjohnwu.magisk.utils.asText
+import com.topjohnwu.magisk.core.utils.TextHolder
+import com.topjohnwu.magisk.core.utils.asText
 import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.magisk.view.Shortcuts
 

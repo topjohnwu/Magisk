@@ -113,15 +113,4 @@ class InstallViewModel(svc: NetworkService) : BaseViewModel() {
             else -> error("Unknown method")
         }
     }
-
-    val canInstall: Boolean
-        get() {
-            val state = _uiState.value
-            return when (state.method) {
-                Method.PATCH -> state.patchUri != null
-                Method.DIRECT, Method.INACTIVE_SLOT -> true
-                Method.NONE -> false
-            }
-        }
-
 }

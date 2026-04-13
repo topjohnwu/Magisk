@@ -48,7 +48,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.unit.dp
-import com.topjohnwu.magisk.ui.util.rememberDrawablePainter
+import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.topjohnwu.magisk.core.R as CoreR
 
 @OptIn(ExperimentalMaterial3Api::class)

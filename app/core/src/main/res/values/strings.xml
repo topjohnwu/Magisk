@@ -110,6 +110,8 @@
     <string name="target_pid">Target PID: %s</string>
     <string name="selinux_context">SELinux context: %s</string>
     <string name="supp_group">Supplementary group: %s</string>
+    <string name="granted">Granted</string>
+    <string name="denied">Denied</string>
 
     <!--MagiskHide-->
     <string name="show_system_app">Show system apps</string>
@@ -279,5 +281,4 @@
     <string name="app_not_found">No app found to handle this action</string>
     <string name="reboot_apply_change">Reboot to apply changes</string>
     <string name="restore_app_confirmation">This will restore the hidden app back to the original app. Do you really want to do this?</string>
-
 </resources>

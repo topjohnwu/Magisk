@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.ui.module
 
-import android.net.Uri
 import android.provider.OpenableColumns
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -25,11 +24,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -72,6 +71,7 @@ import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.ui.component.ConfirmResult
 import com.topjohnwu.magisk.ui.component.MarkdownTextAsync
 import com.topjohnwu.magisk.ui.component.rememberConfirmDialog
+import com.topjohnwu.magisk.utils.textHolder
 import kotlinx.coroutines.launch
 import com.topjohnwu.magisk.core.R as CoreR
 
@@ -85,8 +85,6 @@ fun ModuleScreen(viewModel: ModuleViewModel) {
     val scope = rememberCoroutineScope()
     val activity = context as MainActivity
 
-    var pendingZipUri by remember { mutableStateOf<Uri?>(null) }
-    var pendingZipName by remember { mutableStateOf("") }
     val localInstallDialog = rememberConfirmDialog()
     val confirmInstallTitle = stringResource(CoreR.string.confirm_install_title)
 
@@ -99,8 +97,6 @@ fun ModuleScreen(viewModel: ModuleViewModel) {
                 val idx = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
                 if (cursor.moveToFirst() && idx >= 0) cursor.getString(idx) else null
             } ?: uri.lastPathSegment ?: "module.zip"
-            pendingZipUri = uri
-            pendingZipName = displayName
             scope.launch {
                 val result = localInstallDialog.awaitConfirm(
                     title = confirmInstallTitle,
@@ -109,7 +105,6 @@ fun ModuleScreen(viewModel: ModuleViewModel) {
                 if (result == ConfirmResult.Confirmed) {
                     viewModel.confirmLocalInstall(uri)
                 }
-                pendingZipUri = null
             }
         }
     }
@@ -284,7 +279,7 @@ private fun ModuleCard(item: ModuleItem, viewModel: ModuleViewModel, onUpdateCli
             if (item.showNotice) {
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    text = item.noticeText,
+                    text = textHolder(item.noticeText),
                     style = MaterialTheme.typography.bodyMedium,
                     color = colorScheme.primary,
                 )
