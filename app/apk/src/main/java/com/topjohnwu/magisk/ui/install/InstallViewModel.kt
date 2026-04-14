@@ -21,6 +21,7 @@ import com.topjohnwu.magisk.core.base.ContentResultCallback
 import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.repository.NetworkService
 import com.topjohnwu.magisk.databinding.set
+import com.topjohnwu.magisk.dialog.DownloadDialog
 import com.topjohnwu.magisk.dialog.SecondSlotWarningDialog
 import com.topjohnwu.magisk.events.GetContentEvent
 import com.topjohnwu.magisk.ui.flash.FlashFragment
@@ -53,6 +54,9 @@ class InstallViewModel(svc: NetworkService, markwon: Markwon) : BaseViewModel() 
             when (it) {
                 R.id.method_patch -> {
                     GetContentEvent("*/*", UriCallback()).publish()
+                }
+                R.id.method_download -> {
+                    DownloadDialog { url -> uri.value = url }.show()
                 }
                 R.id.method_inactive_slot -> {
                     SecondSlotWarningDialog().show()
@@ -92,6 +96,7 @@ class InstallViewModel(svc: NetworkService, markwon: Markwon) : BaseViewModel() 
     fun install() {
         when (method) {
             R.id.method_patch -> FlashFragment.patch(data.value!!).navigate(true)
+            R.id.method_download -> FlashFragment.download(data.value!!).navigate(true)
             R.id.method_direct -> FlashFragment.flash(false).navigate(true)
             R.id.method_inactive_slot -> FlashFragment.flash(true).navigate(true)
             else -> error("Unknown value")

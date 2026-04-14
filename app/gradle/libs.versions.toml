@@ -14,6 +14,7 @@ compose-ui = "1.10.6"
 compose-m3 = "1.4.0"
 navigation3 = "1.1.0-rc01"
 navigationevent = "1.0.2"
+protobuf = "4.31.1"
 
 [libraries]
 bcpkix = { module = "org.bouncycastle:bcpkix-jdk18on", version = "1.83" }
@@ -26,6 +27,9 @@ okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 okhttp-dnsoverhttps = { module = "com.squareup.okhttp3:okhttp-dnsoverhttps", version.ref = "okhttp" }
 okhttp-logging = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp" }
 timber = { module = "com.jakewharton.timber:timber", version = "5.0.1" }
+protobuf-javalite = { module = "com.google.protobuf:protobuf-javalite", version.ref = "protobuf" }
+protobuf-protoc = { module = "com.google.protobuf:protoc", version.ref = "protobuf" }
+xz = { module = "org.tukaani:xz", version = "1.10" }
 
 # AndroidX
 activity = { module = "androidx.activity:activity", version = "1.13.0" }
@@ -90,3 +94,4 @@ compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "
 lsparanoid = { id = "org.lsposed.lsparanoid", version = "0.6.0" }
 moshix = { id = "dev.zacsweers.moshix", version = "0.35.0" }
 navigation-safeargs = { id = "androidx.navigation.safeargs.kotlin", version.ref = "navigation" }
+protobuf = { id = "com.google.protobuf", version = "0.9.6" }
