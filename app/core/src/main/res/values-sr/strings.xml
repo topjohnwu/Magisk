@@ -18,16 +18,24 @@
     <string name="update">Ажурирање</string>
     <string name="not_available">N/A</string>
     <string name="hide">Сакриј</string>
+    <string name="restore">Поврати</string>
     <string name="home_package">Пакет</string>
     <string name="home_app_title">Апл.</string>
+    <string name="home_core_title">Core</string>
+    <string name="reinstall">Поново инсталирај</string>
     <string name="home_notice_content">Преузмите Magisk САМО са званичне GitHub странице. Фајлови из непознатих извора могу бити малициозни!</string>
     <string name="home_support_title">Подржите нас</string>
     <string name="home_follow_title">Запратите нас</string>
     <string name="home_item_source">Извор</string>
-    <string name="home_support_content">Magisk јесте и увек ће бити бесплатан и open source. Међутим, можете показати да вам је стало својом донацијом.</string>
+    <string name="home_support_content">Magisk јесте и увек ће бити бесплатан и open source. Међутим, можете показати да Вам је стало својом донацијом.</string>
+    <string name="donate">Донирај</string>
+    <string name="documents">Документи</string>
+    <string name="report_bugs">Пријави bug-ове</string>
+    <string name="home_status_title">Статус</string>
     <string name="home_installed_version">Инсталирано</string>
     <string name="home_latest_version">Најновије</string>
     <string name="invalid_update_channel">Невалидан канал ажурирања</string>
+    <string name="uninstall">Деинсталирај</string>
     <string name="uninstall_magisk_title">Деинсталирај Magisk</string>
     <string name="uninstall_magisk_msg">Сви модули ће бити онемогућени/уклоњени!\nКорен ће бити уклоњен!\nСвако неенкриптовано интерно складиште ће употребом Magisk-а бити поново енкриптовано!</string>
 
@@ -41,22 +49,28 @@
     <string name="install_start">Почнимо</string>
     <string name="manager_download_install">Притисни да преузмеш и инсталираш</string>
     <string name="direct_install">Директна инсталација (Препоручено)</string>
+    <string name="direct_install_summary">Директно инсталирај Magisk на boot партицију</string>
     <string name="install_inactive_slot">Инсталација на неактиван слот (Након OTA)</string>
+    <string name="install_inactive_slot_summary">Инсталација на неактиван слот након OTA ажурирања</string>
+    <string name="select_patch_file_summary">Patch-уј слику, ODIN tar или payload.bin фајл</string>
     <string name="install_inactive_slot_msg">Ваш уређај ће бити ФОРСИРАН да се покрене на тренутно неактивном слоту након поновног покретања!\nКористите опцију само кад се OTA заврши.\nНастави?</string>
     <string name="setup_title">Додатне поставке</string>
-    <string name="select_patch_file">Изаберите фајл</string>
-    <string name="patch_file_msg">Изаберите слику (*.img) или ODIN tarfile (*.tar) или payload.bin (*.bin)</string>
+    <string name="select_patch_file">Изабери фајл</string>
+    <string name="patch_file_msg">Изабери слику (*.img) или ODIN tarfile (*.tar) или payload.bin (*.bin)</string>
+    <string name="download_patch_file">Преузми и patch-уј фајл</string>
+    <string name="download_dialog_title">Унеси URL слике</string>
+    <string name="download_dialog_msg">Потпуна OTA слика или фабричка слика</string>
     <string name="reboot_delay_toast">Поново покретање за 5 секунди…</string>
     <string name="flash_screen_title">Инсталација</string>
 
     <!--Superuser-->
-    <string name="su_request_title">Супер-кориснички захтев</string>
-    <string name="touch_filtered_warning">Magisk не може да верификује ваш одговор, јер апликација прикрива супер-кориснички захтев.</string>
+    <string name="su_request_title">Ова апликација захтева коренску пермисију. Пружа потпун приступ Вашем уређају. Забраните ако нисте сигурни!</string>
+    <string name="touch_filtered_warning">Magisk не може да верификује Ваш одговор, јер апликација прикрива супер-кориснички захтев.</string>
     <string name="deny">Забрани</string>
     <string name="prompt">Захтев</string>
     <string name="restrict">Ограничи</string>
     <string name="grant">Дозволи</string>
-    <string name="su_warning">Пружа потпун приступ вашем уређају.\nЗабраните ако нисте сигурни!</string>
+    <string name="su_warning">Пружа потпун приступ Вашем уређају.\nЗабраните ако нисте сигурни!</string>
     <string name="forever">Заувек</string>
     <string name="once">Једном</string>
     <string name="tenmin">10 мин</string>
@@ -74,7 +88,11 @@
     <string name="su_revoke_title">Опозови?</string>
     <string name="su_revoke_msg">Потврди да опозовеш права на супер-корисника од %1$s?</string>
     <string name="toast">Toast</string>
+    <string name="notification">Нотификација</string>
     <string name="none">Ништа</string>
+    <string name="su_notification_channel">Супер-корисничке нотификације</string>
+    <string name="su_notification_granted_title">Супер-корисник одобрен</string>
+    <string name="su_notification_denied_title">Супер-корисник одбијен</string>
     <string name="superuser_toggle_notification">Нотификације</string>
     <string name="superuser_toggle_revoke">Опозови</string>
     <string name="superuser_policy_none">Ниједна апликација није тражила пермисије за супер-корисника још увек.</string>
@@ -85,16 +103,30 @@
     <string name="menuSaveLog">Сачувај лог</string>
     <string name="menuClearLog">Уклони лог</string>
     <string name="logs_cleared">Лог успешно уклоњен</string>
+    <string name="save_log">Сачувај лог</string>
+    <string name="clear_log">Уклони лог</string>
+    <string name="back">Назад</string>
+    <string name="superuser_setting">Супер-корисничко подешавање</string>
+    <string name="enabled">Омогућено</string>
+    <string name="disabled">Онемогућено</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Циљани UID: %1$d</string>
     <string name="target_pid">Циљани PID: %s</string>
     <string name="selinux_context">SELinux контекст: %s</string>
     <string name="supp_group">Допунска група: %s</string>
+    <string name="granted">Одобрено</string>
+    <string name="denied">Одбијено</string>
 
     <!--MagiskHide-->
     <string name="show_system_app">Прикажи системске апл.</string>
     <string name="show_os_app">Прикажи апл. ОС-а</string>
     <string name="hide_filter_hint">Филтрирај по имену</string>
+    <string name="sort_by_name">Сортирај по имену</string>
+    <string name="sort_by_package_name">Сортирај по имену пакета</string>
+    <string name="sort_by_install_time">Сортирај по времену инсталације</string>
+    <string name="sort_by_update_time">Сортирај по времену ажурирања</string>
+    <string name="sort_reverse">Обрнути редослед</string>
+    <string name="menu_sort">Сортирање</string>
     <string name="hide_search">Претрага</string>
 
     <!--Module-->
@@ -120,7 +152,7 @@
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Тема</string>
-    <string name="settings_dark_mode_message">Изаберите тему која вам највише одговара!</string>
+    <string name="settings_dark_mode_message">Изаберите тему која Вам највише одговара!</string>
     <string name="settings_dark_mode_light">Увек светло</string>
     <string name="settings_dark_mode_system">Прати систем</string>
     <string name="settings_dark_mode_dark">Увек тамно</string>
@@ -175,6 +207,13 @@
     <string name="settings_su_restrict_title">Ограничи коренске способности</string>
     <string name="settings_su_restrict_summary">Подразумевано ограничава апл. супер-корисника. Упозорење: ово ће већину апликација скршити. Не омогућавај, осим ако знаш шта радиш.</string>
     <string name="settings_customization">Прилагођавање</string>
+    <string name="settings_color_mode">Режим боје</string>
+    <string name="color_mode_system">Системско</string>
+    <string name="color_mode_light">Светло</string>
+    <string name="color_mode_dark">Тамно</string>
+    <string name="color_mode_monet_system">Monet (Системско)</string>
+    <string name="color_mode_monet_light">Monet (Светло)</string>
+    <string name="color_mode_monet_dark">Monet (Тамно)</string>
     <string name="setting_add_shortcut_summary">Додај лепу пречицу на почетни екран у случају да се име и иконица не препознају лако након скривања апликације</string>
     <string name="settings_doh_title">DNS преко HTTPS-а</string>
     <string name="settings_doh_description">Заобилазно решење DNS тровања у неким нацијама</string>
@@ -246,5 +285,4 @@
     <string name="app_not_found">Није пронађена апликација за ову акцију</string>
     <string name="reboot_apply_change">Поново покрени да примениш измене</string>
     <string name="restore_app_confirmation">Ово ће вратити скривену апликацију на оригиналну. Да ли стварно то желите?</string>
-
 </resources>
