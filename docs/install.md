@@ -86,7 +86,7 @@ Before proceeding, please acknowledge that:
 
 ### Requirements
 
-To verify whether or not Magisk can be installed in your Samsung device, you first must check the OEM Lock and KnoxGuard (RMM) status. To do so, boot your device in Download mode with its key combo.
+To verify whether or not Magisk can be installed in your Samsung device, you first must check the OEM Lock and KnoxGuard (RMM) status. To do so, go to `Settings` -> `Device Care` -> `Maintenance Mode` and enable it, then boot your device in Download mode with its key combo.
 
 Possible OEM Lock values are the following:
 - **ON (L)**: fully locked.
