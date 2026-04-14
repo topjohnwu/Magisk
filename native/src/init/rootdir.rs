@@ -184,13 +184,15 @@ impl MagiskInit {
         if let Ok(mut fissiond) = base::MappedFile::open(cstr!("/system/bin/fissiond")) {
             let from = b"ro.build.system.fission_single_os";
             let to = b"ro.build.system.xxxxxxxxxxxxxxxxx";
-            for idx in 0..=fissiond.as_ref().len().saturating_sub(from.len()) {
-                if &fissiond.as_ref()[idx..idx + from.len()] == from {
-                    fissiond.as_mut()[idx..idx + to.len()].copy_from_slice(to);
-                    debug!(
-                        "Patch @ {:08X} [ro.build.system.fission_single_os] -> [ro.build.system.xxxxxxxxxxxxxxxxx]",
-                        idx
-                    );
+            if fissiond.as_ref().len() >= from.len() {
+                for idx in 0..=fissiond.as_ref().len() - from.len() {
+                    if &fissiond.as_ref()[idx..idx + from.len()] == from {
+                        fissiond.as_mut()[idx..idx + to.len()].copy_from_slice(to);
+                        debug!(
+                            "Patch @ {:08X} [ro.build.system.fission_single_os] -> [ro.build.system.xxxxxxxxxxxxxxxxx]",
+                            idx
+                        );
+                    }
                 }
             }
 
