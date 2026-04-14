@@ -1,8 +1,8 @@
 package com.topjohnwu.magisk.core.tasks
 
-import chromeos_update_engine.UpdateMetadata.DeltaArchiveManifest
-import chromeos_update_engine.UpdateMetadata.InstallOperation
-import chromeos_update_engine.UpdateMetadata.PartitionUpdate
+import chromeos_update_engine.DeltaArchiveManifest
+import chromeos_update_engine.InstallOperation
+import chromeos_update_engine.PartitionUpdate
 import com.topjohnwu.magisk.core.utils.DataSourceChannel
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream
 import org.apache.commons.compress.compressors.xz.XZCompressorInputStream
@@ -25,18 +25,19 @@ class Payload(private val channel: DataSourceChannel) {
     @Throws(IOException::class)
     fun extract(outputFile: File, console: (String) -> Unit, logger: (String) -> Unit) {
         val partition = findPartition()
-        console("- Found partition ${partition.partitionName}")
+        console("- Found partition ${partition.partition_name}")
 
         val actualHash = extractPartition(outputFile, partition, console)
 
-        if (!partition.newPartitionInfo.hasHash()) {
+        val newPartitionInfo = partition.new_partition_info
+        if (newPartitionInfo?.hash == null) {
             logger("Hash verification skipped")
             return
         }
 
         fun toHex(bytes: ByteArray) = bytes.joinToString("") { "%02x".format(it) }
 
-        val expectedHash = partition.newPartitionInfo.hash.toByteArray()
+        val expectedHash = newPartitionInfo.hash.toByteArray()
         if (!expectedHash.contentEquals(actualHash)) {
             throw IOException(
                 "Hash mismatch, expected ${toHex(expectedHash)}, but got ${toHex(actualHash)}"
@@ -87,7 +88,7 @@ class Payload(private val channel: DataSourceChannel) {
         val manifestBuffer = ByteBuffer.allocate(manifestLen)
         channel.read(manifestBuffer)
         manifestBuffer.flip()
-        val manifest = DeltaArchiveManifest.parseFrom(manifestBuffer.array())
+        val manifest = DeltaArchiveManifest.ADAPTER.decode(manifestBuffer.array())
 
         // Skip manifest signature
         channel.position(channel.position() + manifestSigLen)
@@ -99,8 +100,8 @@ class Payload(private val channel: DataSourceChannel) {
 
     @Throws(IOException::class)
     private fun findPartition(): PartitionUpdate {
-        return manifest.partitionsList.find { it.partitionName == "init_boot" }
-            ?: manifest.partitionsList.find { it.partitionName == "boot" }
+        return manifest.partitions.find { it.partition_name == "init_boot" }
+            ?: manifest.partitions.find { it.partition_name == "boot" }
             ?: throw IOException("boot partition not found in payload")
     }
 
@@ -117,11 +118,11 @@ class Payload(private val channel: DataSourceChannel) {
             StandardOpenOption.READ,
             StandardOpenOption.TRUNCATE_EXISTING
         ).use { outChannel ->
-            val size = partition.newPartitionInfo.size
+            val size = partition.new_partition_info?.size ?: 0L
             outChannel.write(ByteBuffer.allocate(1), size - 1)
 
-            val count = partition.operationsCount
-            partition.operationsList.forEachIndexed { index, operation ->
+            val count = partition.operations.size
+            partition.operations.forEachIndexed { index, operation ->
                 if (index % 5 == 0 || index == count - 1) {
                     console("- Downloading ${index + 1}/$count")
                 }
@@ -137,17 +138,17 @@ class Payload(private val channel: DataSourceChannel) {
 
     @Throws(IOException::class)
     private fun processOperation(outChannel: FileChannel, operation: InstallOperation) {
-        val dataType = operation.getType()
+        val dataType = operation.type
         if (dataType == InstallOperation.Type.ZERO) {
             return
         }
 
-        val dataBuffer = ByteBuffer.allocate(operation.getDataLength().toInt())
-        channel.read(dataBuffer, dataBase + operation.getDataOffset())
+        val dataBuffer = ByteBuffer.allocate(operation.data_length?.toInt() ?: 0)
+        channel.read(dataBuffer, dataBase + (operation.data_offset ?: 0L))
         dataBuffer.flip()
 
-        val dstExtent = operation.getDstExtents(0)
-        val outOffset = dstExtent.getStartBlock() * manifest.getBlockSize()
+        val dstExtent = operation.dst_extents[0]
+        val outOffset = (dstExtent.start_block ?: 0L) * (manifest.block_size ?: 4096)
 
         when (dataType) {
             InstallOperation.Type.REPLACE -> {
