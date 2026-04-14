@@ -8,6 +8,7 @@ import androidx.test.uiautomator.Until
 import com.topjohnwu.magisk.core.model.module.LocalModule
 import com.topjohnwu.magisk.core.utils.RootUtils
 import com.topjohnwu.magisk.test.Environment.Companion.EMPTY_ZYGISK
+import com.topjohnwu.magisk.test.Environment.Companion.INIT_RC
 import com.topjohnwu.magisk.test.Environment.Companion.INVALID_ZYGISK
 import com.topjohnwu.magisk.test.Environment.Companion.MOUNT_TEST
 import com.topjohnwu.magisk.test.Environment.Companion.REMOVE_TEST
@@ -115,6 +116,21 @@ class AdditionalTest : BaseTest {
         assertTrue(
             "Module sepolicy.rule is not applied",
             Shell.cmd("magiskpolicy --print-rules | grep -q magisk_test").exec().isSuccess
+        )
+    }
+
+    @Test
+    fun testInitRc() {
+        assumeTrue(Environment.preinit())
+
+        assertNotNull("$INIT_RC is not installed", modules.find { it.id == INIT_RC })
+        assertTrue(
+            "Module init.rc is not applied",
+            Shell.cmd("getprop magisk.init.rc").exec().out.equals("1")
+        )
+        assertTrue(
+            "Module product init.rc is not applied",
+            Shell.cmd("getprop magisk.product.init.rc").exec().out.equals("1")
         )
     }
 
