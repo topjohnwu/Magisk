@@ -162,7 +162,7 @@ class Environment : BaseTest {
         // Add init.rc patch
         PrintStream(initDir.getChildFile("init_new.rc").newOutputStream()).use {
             it.println("on post-fs")
-            it.println("    setpropd ro.debug.magisk.rc 1")
+            it.println("    setprop ro.debug.magisk.rc 1")
             it.println()
         }
 
