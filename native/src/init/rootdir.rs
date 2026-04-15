@@ -11,7 +11,7 @@ use std::fs::File;
 use std::io::{BufReader, Read, Write};
 use std::os::fd::AsRawFd;
 
-const ISOLATED_PATH: &str = concatcp!("/", INTERNAL_DIR, "/isolated");
+const ISOLATED_PATH: &str = concatcp!(INTERNAL_DIR, "/isolated");
 
 fn inject_magisk_rc(file: &mut File, tmp_dir: &Utf8CStr) {
     debug!("Injecting magisk rc");
@@ -62,7 +62,9 @@ impl MagiskInit {
         let dest_path = if writable {
             cstr::buf::dynamic(256).join_path(src_path)
         } else {
-            let path = cstr::buf::dynamic(256).join_path(ROOTOVL).join_path(src_path);
+            let path = cstr::buf::dynamic(256)
+                .join_path(ROOTOVL)
+                .join_path(src_path.as_str().trim_start_matches('/'));
             if path.mkdirs(0o755).is_err() {
                 return false;
             }
@@ -196,11 +198,11 @@ impl MagiskInit {
                 }
             }
 
-            let dir = cstr::buf::dynamic(256).join_path(ROOTOVL).join_path("/system/bin");
+            let dir = cstr::buf::dynamic(256).join_path(ROOTOVL).join_path("system/bin");
             dir.mkdirs(0o755).log_ok();
             let out = cstr::buf::dynamic(256)
                 .join_path(ROOTOVL)
-                .join_path("/system/bin/fissiond");
+                .join_path("system/bin/fissiond");
             if let Ok(mut target) = out.create(
                 OFlag::O_WRONLY | OFlag::O_CREAT | OFlag::O_TRUNC | OFlag::O_CLOEXEC,
                 0,
@@ -234,7 +236,7 @@ impl MagiskInit {
 
                 let target = cstr::buf::dynamic(256)
                     .join_path("/dev/cells/cell2")
-                    .join_path(tmp_path);
+                    .join_path(tmp_path.as_str().trim_start_matches('/'));
                 target.mkdirs(0).log_ok();
                 tmp_path.bind_mount_to(&target, true).log_ok();
                 self.mount_overlay(cstr!("/dev/cells/cell2"));
