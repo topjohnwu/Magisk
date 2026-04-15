@@ -29,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.pm.ShortcutManagerCompat
@@ -117,7 +118,7 @@ private fun CustomizationSection(viewModel: SettingsViewModel) {
         }
 
         // Color Mode
-        val resources = context.resources
+        val resources = LocalResources.current
         val colorModeEntries = remember {
             resources.getStringArray(CoreR.array.color_mode).toList()
         }
@@ -148,7 +149,7 @@ private fun CustomizationSection(viewModel: SettingsViewModel) {
 @Composable
 private fun AppSettingsSection() {
     val context = LocalContext.current
-    val resources = context.resources
+    val resources = LocalResources.current
 
     SmallTitle(text = stringResource(CoreR.string.home_app_title))
     Card(modifier = Modifier.fillMaxWidth()) {
@@ -294,7 +295,7 @@ private fun MagiskSection(viewModel: SettingsViewModel) {
 @Composable
 private fun SuperuserSection(viewModel: SettingsViewModel) {
     val context = LocalContext.current
-    val resources = context.resources
+    val resources = LocalResources.current
 
     SmallTitle(text = stringResource(CoreR.string.superuser))
     Card(modifier = Modifier.fillMaxWidth()) {
