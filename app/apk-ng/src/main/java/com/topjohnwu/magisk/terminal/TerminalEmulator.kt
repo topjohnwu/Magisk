@@ -1130,7 +1130,7 @@ class TerminalEmulator(
                 code in 100..107 -> mBackColor = code - 100 + 8
                 else -> {
                     if (LOG_ESCAPE_SEQUENCES)
-                        Timber.tag(LOG_TAG).w(String.format("SGR unknown code %d", code))
+                        Timber.tag(LOG_TAG).w("SGR unknown code %d", code)
                 }
             }
             i++

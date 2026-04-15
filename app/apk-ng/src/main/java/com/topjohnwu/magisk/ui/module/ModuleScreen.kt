@@ -59,6 +59,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
@@ -82,6 +83,7 @@ fun ModuleScreen(viewModel: ModuleViewModel) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val colorScheme = MaterialTheme.colorScheme
     val context = LocalContext.current
+    val resources = LocalResources.current
     val scope = rememberCoroutineScope()
     val activity = context as MainActivity
 
@@ -100,7 +102,7 @@ fun ModuleScreen(viewModel: ModuleViewModel) {
             scope.launch {
                 val result = localInstallDialog.awaitConfirm(
                     title = confirmInstallTitle,
-                    content = context.getString(CoreR.string.confirm_install, displayName),
+                    content = resources.getString(CoreR.string.confirm_install, displayName),
                 )
                 if (result == ConfirmResult.Confirmed) {
                     viewModel.confirmLocalInstall(uri)
