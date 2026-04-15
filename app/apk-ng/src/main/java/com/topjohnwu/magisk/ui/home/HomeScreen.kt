@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.ui.home
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.PowerManager
 import android.widget.Toast
@@ -21,6 +22,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -67,9 +70,12 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.getSystemService
+import androidx.core.net.toUri
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.BuildConfig
 import com.topjohnwu.magisk.core.Config
@@ -111,6 +117,7 @@ fun HomeScreen(viewModel: HomeViewModel, installVm: InstallViewModel) {
     var showHideDialog by rememberSaveable { mutableStateOf(false) }
     var showRestoreDialog by rememberSaveable { mutableStateOf(false) }
     val showInstallSheet = rememberSaveable { mutableStateOf(false) }
+    val showDownloadDialog = rememberSaveable { mutableStateOf(false) }
     var envFixCode by remember { mutableIntStateOf(0) }
 
     val filePicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
@@ -135,6 +142,13 @@ fun HomeScreen(viewModel: HomeViewModel, installVm: InstallViewModel) {
             if (result == ConfirmResult.Confirmed) {
                 installVm.install()
             }
+        }
+    }
+
+    LaunchedEffect(installUiState.showDownloadDialog) {
+        if (installUiState.showDownloadDialog) {
+            showDownloadDialog.value = true
+            installVm.onDownloadDialogConsumed()
         }
     }
 
@@ -215,6 +229,13 @@ fun HomeScreen(viewModel: HomeViewModel, installVm: InstallViewModel) {
                     }
                 }
             }
+        )
+    }
+
+    if (showDownloadDialog.value) {
+        DownloadComposableDialog(
+            showDialog = showDownloadDialog,
+            onConfirm = { url -> installVm.onDownloadUrlSelected(url) }
         )
     }
 
@@ -788,7 +809,14 @@ private fun InstallBottomSheet(
                     show.value = false
                     installVm.selectMethod(InstallViewModel.Method.PATCH)
                 },
-                // enabled = installUiState.step >= 1 || installVm.skipOptions
+            )
+
+            SettingsArrow(
+                title = stringResource(CoreR.string.download_patch_file),
+                onClick = {
+                    show.value = false
+                    installVm.selectMethod(InstallViewModel.Method.DOWNLOAD)
+                },
             )
 
             if (installVm.isRooted) {
@@ -800,7 +828,6 @@ private fun InstallBottomSheet(
                         installVm.selectMethod(InstallViewModel.Method.DIRECT)
                         installVm.install()
                     },
-                    // enabled = installUiState.step >= 1 || installVm.skipOptions
                 )
             }
 
@@ -812,7 +839,6 @@ private fun InstallBottomSheet(
                         show.value = false
                         installVm.selectMethod(InstallViewModel.Method.INACTIVE_SLOT)
                     },
-                    // enabled = installUiState.step >= 1 || installVm.skipOptions
                 )
             }
         }
@@ -889,6 +915,87 @@ private fun CheckboxRow(label: String, checked: Boolean, onCheckedChange: (Boole
             style = MaterialTheme.typography.bodyLarge,
         )
     }
+}
+
+@Composable
+private fun DownloadComposableDialog(
+    showDialog: MutableState<Boolean>,
+    onConfirm: (Uri) -> Unit
+) {
+    if (!showDialog.value) return
+
+    var url by rememberSaveable { mutableStateOf("") }
+    var isError by rememberSaveable { mutableStateOf(false) }
+
+    fun isValidUrl(url: String): Uri? {
+        if (url.isEmpty()) return null
+        val uri = url.toUri()
+        if (!uri.scheme.equals("https", ignoreCase = true)) return null
+        if (uri.host.isNullOrEmpty()) return null
+        if (uri.path.isNullOrEmpty()) return null
+        return uri
+    }
+
+    AlertDialog(
+        onDismissRequest = { showDialog.value = false },
+        title = { Text(stringResource(CoreR.string.download_dialog_title)) },
+        text = {
+            Column(modifier = Modifier.padding(top = 8.dp)) {
+                OutlinedTextField(
+                    value = url,
+                    onValueChange = {
+                        url = it
+                        isError = false
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text(stringResource(CoreR.string.download_dialog_msg)) },
+                    isError = isError,
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Uri,
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            isValidUrl(url.trim())?.let {
+                                showDialog.value = false
+                                onConfirm(it)
+                            } ?: run {
+                                isError = true
+                            }
+                        }
+                    )
+                )
+                if (isError) {
+                    Text(
+                        text = stringResource(CoreR.string.download_dialog_title),
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    isValidUrl(url.trim())?.let {
+                        showDialog.value = false
+                        onConfirm(it)
+                    } ?: run {
+                        isError = true
+                    }
+                }
+            ) {
+                Text(stringResource(android.R.string.ok))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = { showDialog.value = false }) {
+                Text(stringResource(android.R.string.cancel))
+            }
+        }
+    )
 }
 
 @Composable
