@@ -4,8 +4,6 @@ import android.content.Intent
 import android.os.Build
 import android.os.PowerManager
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -33,7 +31,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -42,7 +39,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -82,14 +78,11 @@ import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.tasks.AppMigration
 import com.topjohnwu.magisk.core.tasks.MagiskInstaller
 import com.topjohnwu.magisk.ui.MainActivity
-import com.topjohnwu.magisk.ui.component.ConfirmResult
 import com.topjohnwu.magisk.ui.component.LoadingDialogHandle
-import com.topjohnwu.magisk.ui.component.MarkdownText
 import com.topjohnwu.magisk.ui.component.MarkdownTextAsync
-import com.topjohnwu.magisk.ui.component.SettingsArrow
-import com.topjohnwu.magisk.ui.component.rememberConfirmDialog
 import com.topjohnwu.magisk.ui.component.rememberLoadingDialog
 import com.topjohnwu.magisk.ui.flash.FlashUtils
+import com.topjohnwu.magisk.ui.install.InstallBottomSheet
 import com.topjohnwu.magisk.ui.install.InstallViewModel
 import kotlinx.coroutines.launch
 import com.topjohnwu.magisk.core.R as CoreR
@@ -98,7 +91,6 @@ import com.topjohnwu.magisk.core.R as CoreR
 @Composable
 fun HomeScreen(viewModel: HomeViewModel, installVm: InstallViewModel) {
     val uiState by viewModel.uiState.collectAsState()
-    val installUiState by installVm.uiState.collectAsState()
     val context = LocalContext.current
     val activity = context as MainActivity
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -112,31 +104,6 @@ fun HomeScreen(viewModel: HomeViewModel, installVm: InstallViewModel) {
     var showRestoreDialog by rememberSaveable { mutableStateOf(false) }
     val showInstallSheet = rememberSaveable { mutableStateOf(false) }
     var envFixCode by remember { mutableIntStateOf(0) }
-
-    val filePicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        uri?.let { installVm.onPatchFileSelected(it) }
-    }
-
-    val secondSlotDialog = rememberConfirmDialog()
-    val secondSlotTitle = stringResource(android.R.string.dialog_alert_title)
-    val secondSlotMsg = stringResource(CoreR.string.install_inactive_slot_msg)
-
-    LaunchedEffect(installUiState.requestFilePicker) {
-        if (installUiState.requestFilePicker) {
-            filePicker.launch("*/*")
-            installVm.onFilePickerConsumed()
-        }
-    }
-
-    LaunchedEffect(installUiState.showSecondSlotWarning) {
-        if (installUiState.showSecondSlotWarning) {
-            val result = secondSlotDialog.awaitConfirm(title = secondSlotTitle, content = secondSlotMsg)
-            installVm.onSecondSlotWarningConsumed()
-            if (result == ConfirmResult.Confirmed) {
-                installVm.install()
-            }
-        }
-    }
 
     LaunchedEffect(uiState.showUninstall) {
         if (uiState.showUninstall) {
@@ -289,7 +256,6 @@ fun HomeScreen(viewModel: HomeViewModel, installVm: InstallViewModel) {
     InstallBottomSheet(
         show = showInstallSheet,
         installVm = installVm,
-        installUiState = installUiState,
     )
 }
 
@@ -750,144 +716,6 @@ private fun DevelopersCard(onLinkClicked: (String) -> Unit) {
                 }
             }
         }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun InstallBottomSheet(
-    show: MutableState<Boolean>,
-    installVm: InstallViewModel,
-    installUiState: InstallViewModel.UiState,
-) {
-    if (show.value) {
-        ModalBottomSheet(
-            onDismissRequest = { show.value = false },
-        ) {
-            Text(
-                text = stringResource(CoreR.string.install),
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(16.dp)
-            )
-        Column(modifier = Modifier.padding(bottom = 16.dp)) {
-            if (installUiState.notes.isNotEmpty()) {
-                Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-                    MarkdownText(installUiState.notes)
-                }
-                HorizontalDivider(thickness = 0.75.dp)
-            }
-
-            if (!installVm.skipOptions) {
-                InstallOptionsSection(installUiState, installVm)
-            }
-
-            SettingsArrow(
-                title = stringResource(CoreR.string.select_patch_file),
-                summary = stringResource(CoreR.string.select_patch_file_summary),
-                onClick = {
-                    show.value = false
-                    installVm.selectMethod(InstallViewModel.Method.PATCH)
-                },
-                // enabled = installUiState.step >= 1 || installVm.skipOptions
-            )
-
-            if (installVm.isRooted) {
-                SettingsArrow(
-                    title = stringResource(CoreR.string.direct_install),
-                    summary = stringResource(CoreR.string.direct_install_summary),
-                    onClick = {
-                        show.value = false
-                        installVm.selectMethod(InstallViewModel.Method.DIRECT)
-                        installVm.install()
-                    },
-                    // enabled = installUiState.step >= 1 || installVm.skipOptions
-                )
-            }
-
-            if (!installVm.noSecondSlot) {
-                SettingsArrow(
-                    title = stringResource(CoreR.string.install_inactive_slot),
-                    summary = stringResource(CoreR.string.install_inactive_slot_summary),
-                    onClick = {
-                        show.value = false
-                        installVm.selectMethod(InstallViewModel.Method.INACTIVE_SLOT)
-                    },
-                    // enabled = installUiState.step >= 1 || installVm.skipOptions
-                )
-            }
-        }
-        }
-    }
-}
-
-@Composable
-private fun InstallOptionsSection(
-    uiState: InstallViewModel.UiState,
-    viewModel: InstallViewModel
-) {
-    Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = stringResource(CoreR.string.install_options_title),
-                style = MaterialTheme.typography.titleLarge,
-            )
-            if (uiState.step == 0) {
-                TextButton(
-                    onClick = { viewModel.nextStep() }
-                ) {
-                    Text(stringResource(CoreR.string.install_next))
-                }
-            }
-        }
-
-        if (uiState.step == 0) {
-            Spacer(Modifier.height(8.dp))
-            if (!Info.isSAR) {
-                CheckboxRow(
-                    label = stringResource(CoreR.string.keep_dm_verity),
-                    checked = Config.keepVerity,
-                    onCheckedChange = { Config.keepVerity = it }
-                )
-            }
-            if (Info.isFDE) {
-                CheckboxRow(
-                    label = stringResource(CoreR.string.keep_force_encryption),
-                    checked = Config.keepEnc,
-                    onCheckedChange = { Config.keepEnc = it }
-                )
-            }
-            if (!Info.ramdisk) {
-                CheckboxRow(
-                    label = stringResource(CoreR.string.recovery_mode),
-                    checked = Config.recovery,
-                    onCheckedChange = { Config.recovery = it }
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun CheckboxRow(label: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Checkbox(
-            checked = checked,
-            onCheckedChange = { onCheckedChange(it) }
-        )
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyLarge,
-        )
     }
 }
 

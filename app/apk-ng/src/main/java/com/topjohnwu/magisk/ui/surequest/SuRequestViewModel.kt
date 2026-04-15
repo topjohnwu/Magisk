@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.ui.surequest
 
 import android.content.Intent
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import android.graphics.drawable.Drawable
 import android.os.CountDownTimer
 import androidx.compose.runtime.getValue
@@ -100,7 +101,7 @@ class SuRequestViewModel(
         timer.cancel()
 
         val pos = selectedItemPosition
-        timeoutPrefs.edit().putInt(packageName, pos).apply()
+        timeoutPrefs.edit { putInt(packageName, pos) }
 
         viewModelScope.launch {
             handler.respond(action, Config.Value.TIMEOUT_LIST[pos])
