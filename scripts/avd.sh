@@ -85,6 +85,7 @@ parse_args() {
 
   local ver=
   local type=
+  local avd_test_log=
 
   while getopts ":v:t:l" opt; do
     case $opt in
@@ -95,7 +96,7 @@ parse_args() {
         type="$OPTARG"
         ;;
       l )
-        export AVD_TEST_LOG=1
+        avd_test_log=1
         ;;
       \? )
         echo "Error: Invalid option: -$OPTARG" 1>&2
@@ -158,6 +159,7 @@ parse_args() {
 
   # Dump global variables
   echo emu_args=\"$emu_args\"
+  echo AVD_TEST_LOG=\"$avd_test_log\"
   echo OPTIND=$OPTIND
 
   # Dump local variables
