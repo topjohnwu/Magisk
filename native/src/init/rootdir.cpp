@@ -190,16 +190,17 @@ void MagiskInit::patch_rw_root() noexcept {
     rm_rf("/data/overlay.d");
     rm_rf("/.backup");
 
+    xmkdir(PRE_TMPSRC, 0);
+    xmount("tmpfs", PRE_TMPSRC, "tmpfs", 0, "mode=755");
+    xmkdir(PRE_TMPDIR, 0);
+    setup_tmp(PRE_TMPDIR);
+
     handle_modules_rc("/");
 
     // Patch init.rc
     if (patch_rc_scripts("/", "/sbin", true))
         patch_fissiond("/sbin");
 
-    xmkdir(PRE_TMPSRC, 0);
-    xmount("tmpfs", PRE_TMPSRC, "tmpfs", 0, "mode=755");
-    xmkdir(PRE_TMPDIR, 0);
-    setup_tmp(PRE_TMPDIR);
     chdir(PRE_TMPDIR);
 
     // Extract overlay archives
