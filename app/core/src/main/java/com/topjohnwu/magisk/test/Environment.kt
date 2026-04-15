@@ -157,13 +157,12 @@ class Environment : BaseTest {
             assertTrue(error, initDir.mkdirs())
         }
 
-        assertTrue(error, initDir.getChildFile("init.rc").createNewFile())
+        assertTrue(error, initDir.getChildFile("init_new.rc").createNewFile())
 
         // Add init.rc patch
-        PrintStream(initDir.getChildFile("init.rc").newOutputStream()).use {
-            it.println()
+        PrintStream(initDir.getChildFile("init_new.rc").newOutputStream()).use {
             it.println("on post-fs")
-            it.println("    setprop magisk.init.rc 1")
+            it.println("    setpropd ro.debug.magisk.rc 1")
             it.println()
         }
 
@@ -172,9 +171,8 @@ class Environment : BaseTest {
         assertTrue(error, productInitDir.mkdirs())
         assertTrue(error, productInitDir.getChildFile("init_new_p.rc").createNewFile())
         PrintStream(productInitDir.getChildFile("init_new_p.rc").newOutputStream()).use {
-            it.println()
-            it.println("on post-fs-data")
-            it.println("    setprop magisk.product.init.rc 1")
+            it.println("on post-fs")
+            it.println("    setprop ro.debug.magisk.product.rc 1")
             it.println()
         }
 

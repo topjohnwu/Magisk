@@ -748,11 +748,8 @@ install_module() {
 
   find "$MODPATH" -mindepth 1 -type f -name "init.rc" -exec rm -f {} \;
   find "$MODPATH" -mindepth 1 -type f -name "*.rc" | while read -r file; do
-        local path="${file/$MODPATH/}"
-        if [ ! -f "$path" ]; then
-          mv "$file" "$MODPATH"
-        fi
         rc=true
+        break
   done
   # Copy over custom sepolicy rules and rc
   if [ -f $MODPATH/sepolicy.rule ] || "$rc"; then
