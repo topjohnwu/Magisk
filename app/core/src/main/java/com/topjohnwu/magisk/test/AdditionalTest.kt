@@ -60,7 +60,7 @@ class AdditionalTest : BaseTest {
     fun testModuleCount() {
         var expected = 4
         if (Environment.mount()) expected++
-        if (Environment.preinit()) expected++
+        if (Environment.preinit()) expected += 2
         if (Environment.lsposed()) expected++
         if (Environment.shamiko()) expected++
         assertEquals("Module count incorrect", expected, modules.size)
