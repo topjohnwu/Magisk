@@ -126,11 +126,11 @@ class AdditionalTest : BaseTest {
         assertNotNull("$INIT_RC is not installed", modules.find { it.id == INIT_RC })
         assertEquals(
             "Module init.rc is not applied",
-            "1", Shell.cmd("getprop magisk.init.rc").exec().out.first()
+            "1", Shell.cmd("getprop ro.debug.magisk.rc").exec().out.first()
         )
         assertEquals(
             "Module product init.rc is not applied",
-            "1", Shell.cmd("getprop magisk.product.init.rc").exec().out.first()
+            "1", Shell.cmd("getprop ro.debug.magisk.product.rc").exec().out.first()
         )
     }
 
