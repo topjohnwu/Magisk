@@ -14,5 +14,3 @@ native/out
 .idea
 .cursor
 ramdisk.img
-app/core/src/debug
-app/core/src/release
