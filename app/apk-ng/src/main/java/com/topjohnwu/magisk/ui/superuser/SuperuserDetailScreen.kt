@@ -65,7 +65,7 @@ fun SuperuserDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(CoreR.string.superuser_setting)) },
+                title = { Text(stringResource(CoreR.string.settings)) },
                 navigationIcon = {
                     IconButton(
                         modifier = Modifier.padding(start = 16.dp),
