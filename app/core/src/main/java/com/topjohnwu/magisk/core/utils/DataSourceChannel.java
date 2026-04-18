@@ -50,20 +50,23 @@ public class DataSourceChannel implements SeekableByteChannel {
     }
 
     private static long fetchTotalSize(OkHttpClient client, String url) throws IOException {
-        var request = new Request.Builder().url(url).head().build();
+        var request = new Request.Builder()
+                .url(url)
+                .header("Range", "bytes=" + "-" + RANDOM_READ_CACHE_SIZE)
+                .build();
         try (var response = client.newCall(request).execute()) {
-            if (!response.isSuccessful()) {
-                throw new IOException("Failed to connect to URL: " + response);
+            if (response.code() != 206) {
+                throw new IOException("Unexpected response code " + response.code());
             }
-            var contentLength = response.header("Content-Length");
-            if (contentLength == null) {
+            var contentRange = response.header("Content-Range");
+            if (contentRange == null) {
                 throw new IOException("Could not determine file size.");
             }
-            var acceptRanges = response.header("Accept-Ranges");
-            if (acceptRanges == null || !acceptRanges.equalsIgnoreCase("bytes")) {
-                throw new IOException("Server does not support byte ranges: " + response);
-            }
-            return Long.parseLong(contentLength);
+            var contentLength = contentRange.substring(contentRange.lastIndexOf('/') + 1);
+            var size = Long.parseLong(contentLength);
+            cache = response.body().bytes();
+            cacheStart = size - cache.length;
+            return size;
         }
     }
 
