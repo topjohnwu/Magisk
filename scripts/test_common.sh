@@ -9,8 +9,9 @@ export ANDROID_AVD_HOME="$ANDROID_EMULATOR_HOME/avd"
 export PATH="$PATH:$ANDROID_HOME/platform-tools"
 
 emu="$ANDROID_HOME/emulator/emulator"
-sdk="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
-avd="$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager"
+cli_tools="$ANDROID_HOME/cmdline-tools/latest"
+sdk="$cli_tools/bin/sdkmanager"
+avd="$cli_tools/bin/avdmanager"
 
 boot_timeout=100
 
@@ -40,12 +41,6 @@ am_instrument() {
     set -x
     return 1
   fi
-}
-
-# $1 = pkg
-wait_for_pm() {
-  sleep 5
-  adb shell pm uninstall $1 || true
 }
 
 run_setup() {
