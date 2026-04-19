@@ -14,7 +14,6 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.StopExecutionException
 import org.gradle.api.tasks.Sync
 import org.gradle.kotlin.dsl.assign
-import org.gradle.kotlin.dsl.exclude
 import org.gradle.kotlin.dsl.filter
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.register
@@ -44,11 +43,9 @@ internal fun Project.androidAppComponents(configure: Action<ApplicationAndroidCo
 fun Project.setupCommon() {
     android {
         compileSdk {
-            version = release(36) {
-                minorApiLevel = 1
-            }
+            version = release(37)
         }
-        buildToolsVersion = "36.1.0"
+        buildToolsVersion = "37.0.0"
         ndkPath = "${androidComponents.sdkComponents.sdkDirectory.get().asFile}/ndk/magisk"
         ndkVersion = "29.0.14206865"
 
@@ -142,10 +139,8 @@ fun Project.setupCoreLib() {
                     true
                 }
             }
-
-            variant.sources.jniLibs?.let {
-                it.addGeneratedSourceDirectory(syncLibs, SyncWithDir::outputFolder)
-            }
+            variant.sources.jniLibs
+                ?.addGeneratedSourceDirectory(syncLibs, SyncWithDir::outputFolder)
 
             val syncResources = tasks.register("sync${variantCapped}Resources", SyncWithDir::class) {
                 outputFolder.set(layout.buildDirectory.dir("$variantName/resources"))
@@ -160,10 +155,8 @@ fun Project.setupCoreLib() {
                     }
                 }
             }
-
-            variant.sources.resources?.let {
-                it.addGeneratedSourceDirectory(syncResources, SyncWithDir::outputFolder)
-            }
+            variant.sources.resources
+                ?.addGeneratedSourceDirectory(syncResources, SyncWithDir::outputFolder)
 
             val stubTask = tasks.getByPath(":stub:transform${variantCapped}Apk")
             val syncAssets = tasks.register("sync${variantCapped}Assets", SyncWithDir::class) {
@@ -197,10 +190,8 @@ fun Project.setupCoreLib() {
                     filter<FixCrLfFilter>("eol" to FixCrLfFilter.CrLf.newInstance("lf"))
                 }
             }
-
-            variant.sources.assets?.let {
-                it.addGeneratedSourceDirectory(syncAssets, SyncWithDir::outputFolder)
-            }
+            variant.sources.assets
+                ?.addGeneratedSourceDirectory(syncAssets, SyncWithDir::outputFolder)
         }
     }
 }
@@ -221,7 +212,7 @@ fun Project.setupAppCommon() {
         }
 
         defaultConfig {
-            targetSdk = 36
+            targetSdk = 37
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt")
             )
@@ -337,10 +328,7 @@ fun Project.setupTestApk() {
                     rename { "shamiko.zip" }
                 }
             }
-
-            variant.sources.assets?.let {
-                it.addGeneratedSourceDirectory(dlTask, SyncWithDir::outputFolder)
-            }
+            variant.sources.assets?.addGeneratedSourceDirectory(dlTask, SyncWithDir::outputFolder)
         }
     }
 }
