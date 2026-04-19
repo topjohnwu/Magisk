@@ -368,7 +368,7 @@ abstract class MagiskInstallImpl protected constructor(
                     try {
                         if (magic.contentEquals("CrAU".toByteArray())) {
                             DataSourceChannel(channel).use { source ->
-                                Payload(source).extract(boot, { console.add(it) }, { logs.add(it) })
+                                Payload(source).extract(boot, console, logs)
                             }
                         } else if (magic.contentEquals("PK\u0003\u0004".toByteArray())) {
                             ExtractImage(boot, console, logs).consume(DataSourceChannel(channel))
