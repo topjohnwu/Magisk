@@ -23,15 +23,15 @@ class Payload(private val channel: DataSourceChannel) {
     }
 
     @Throws(IOException::class)
-    fun extract(outputFile: File, console: (String) -> Unit, logger: (String) -> Unit) {
+    fun extract(outputFile: File, console: MutableList<String>, logger: MutableList<String>) {
         val partition = findPartition()
-        console("- Found partition ${partition.partition_name}")
+        console.add("- Found partition ${partition.partition_name}")
 
         val actualHash = extractPartition(outputFile, partition, console)
 
         val newPartitionInfo = partition.new_partition_info
         if (newPartitionInfo?.hash == null) {
-            logger("Hash verification skipped")
+            logger.add("Hash verification skipped")
             return
         }
 
@@ -43,7 +43,7 @@ class Payload(private val channel: DataSourceChannel) {
                 "Hash mismatch, expected ${toHex(expectedHash)}, but got ${toHex(actualHash)}"
             )
         }
-        logger("Hash verification passed")
+        logger.add("Hash verification passed")
     }
 
     @Throws(IOException::class)
@@ -109,7 +109,7 @@ class Payload(private val channel: DataSourceChannel) {
     private fun extractPartition(
         outputFile: File,
         partition: PartitionUpdate,
-        console: (String) -> Unit,
+        console: MutableList<String>,
     ): ByteArray {
         FileChannel.open(
             outputFile.toPath(),
@@ -124,7 +124,7 @@ class Payload(private val channel: DataSourceChannel) {
             val count = partition.operations.size
             partition.operations.forEachIndexed { index, operation ->
                 if (index % 5 == 0 || index == count - 1) {
-                    console("- Downloading ${index + 1}/$count")
+                    console.add("- Downloading ${index + 1}/$count")
                 }
                 processOperation(outChannel, operation)
             }
