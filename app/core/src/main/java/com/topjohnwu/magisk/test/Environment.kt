@@ -62,6 +62,7 @@ class Environment : BaseTest {
         private const val MODULE_ERROR = "Module zip processing incorrect"
         const val MOUNT_TEST = "mount_test"
         const val SEPOLICY_RULE = "sepolicy_rule"
+        const val INIT_RC = "init_rc"
         const val INVALID_ZYGISK = "invalid_zygisk"
         const val REMOVE_TEST = "remove_test"
         const val REMOVE_TEST_MARKER = "/dev/.remove_test_removed"
@@ -136,6 +137,43 @@ class Environment : BaseTest {
         // Add sepolicy patch
         PrintStream(path.getChildFile("sepolicy.rule").newOutputStream()).use {
             it.println("type magisk_test domain")
+        }
+
+        assertTrue(error, Shell.cmd(
+            "set_default_perm $path",
+            "copy_preinit_files"
+        ).exec().isSuccess)
+    }
+
+    private fun setupInitRcModule(root: ExtendedFile) {
+        val error = "$INIT_RC setup failed"
+        val path = root.getChildFile(INIT_RC)
+        assertTrue(error, path.mkdirs())
+        var initDir = path
+        val initRcOnR = RootUtils.fs.getFile("/system").getChildFile("etc").getChildFile("init").getChildFile("hw").getChildFile("init.rc")
+        if (initRcOnR.exists() && initRcOnR.isFile) {
+            // Android R+ /system/etc/init/hw
+            initDir = path.getChildFile("system").getChildFile("etc").getChildFile("init").getChildFile("hw")
+            assertTrue(error, initDir.mkdirs())
+        }
+
+        assertTrue(error, initDir.getChildFile("init_new.rc").createNewFile())
+
+        // Add init.rc patch
+        PrintStream(initDir.getChildFile("init_new.rc").newOutputStream()).use {
+            it.println("on post-fs")
+            it.println("    setprop ro.debug.magisk.rc 1")
+            it.println()
+        }
+
+        // rc in product
+        val productInitDir = path.getChildFile("system").getChildFile("product").getChildFile("etc").getChildFile("init")
+        assertTrue(error, productInitDir.mkdirs())
+        assertTrue(error, productInitDir.getChildFile("init_new_p.rc").createNewFile())
+        PrintStream(productInitDir.getChildFile("init_new_p.rc").newOutputStream()).use {
+            it.println("on post-fs")
+            it.println("    setprop ro.debug.magisk.product.rc 1")
+            it.println()
         }
 
         assertTrue(error, Shell.cmd(
@@ -254,7 +292,10 @@ class Environment : BaseTest {
         val root = RootUtils.fs.getFile(Const.MODULE_PATH)
         val update = RootUtils.fs.getFile(MODULE_UPDATE_PATH)
         if (mount()) { setupMountTest(update) }
-        if (preinit()) { setupSepolicyRuleModule(update) }
+        if (preinit()) {
+            setupSepolicyRuleModule(update)
+            setupInitRcModule(update)
+        }
         setupSystemlessHost()
         setupEmptyZygiskModule(update)
         setupInvalidZygiskModule(update)
