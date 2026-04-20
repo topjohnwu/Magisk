@@ -115,7 +115,6 @@ fun InstallBottomSheet(
 
                 SettingsArrow(
                     title = stringResource(CoreR.string.select_patch_file),
-                    summary = stringResource(CoreR.string.select_patch_file_summary),
                     onClick = {
                         show.value = false
                         installVm.selectMethod(InstallViewModel.Method.PATCH)
@@ -133,7 +132,6 @@ fun InstallBottomSheet(
                 if (installVm.isRooted) {
                     SettingsArrow(
                         title = stringResource(CoreR.string.direct_install),
-                        summary = stringResource(CoreR.string.direct_install_summary),
                         onClick = {
                             show.value = false
                             installVm.selectMethod(InstallViewModel.Method.DIRECT)
@@ -145,7 +143,6 @@ fun InstallBottomSheet(
                 if (!installVm.noSecondSlot) {
                     SettingsArrow(
                         title = stringResource(CoreR.string.install_inactive_slot),
-                        summary = stringResource(CoreR.string.install_inactive_slot_summary),
                         onClick = {
                             show.value = false
                             installVm.selectMethod(InstallViewModel.Method.INACTIVE_SLOT)
