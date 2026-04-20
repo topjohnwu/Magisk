@@ -19,7 +19,6 @@
     <string name="hide">不再显示</string>
     <string name="home_package">包名</string>
     <string name="home_app_title">App</string>
-
     <string name="home_notice_content">仅从官方 GitHub 页面下载 Magisk。未知来源的文件可能具有恶意行为！</string>
     <string name="home_support_title">支持开发</string>
     <string name="home_follow_title">关注我们</string>
@@ -44,8 +43,11 @@
     <string name="install_inactive_slot">安装到未使用的槽位（OTA 后）</string>
     <string name="install_inactive_slot_msg">将在重启后强制切换到另一个槽位！注意只能在 OTA 更新完成后的重启之前使用。</string>
     <string name="setup_title">修复安装</string>
-    <string name="select_patch_file">选择并修补一个文件</string>
+    <string name="select_patch_file">选择并修补文件</string>
     <string name="patch_file_msg">选择一个原始映像文件（*.img）、Odin 包（*.tar）或 payload.bin（*.bin）</string>
+    <string name="download_patch_file">下载并修补映像</string>
+    <string name="download_dialog_title">输入映像链接</string>
+    <string name="download_dialog_msg">完整 OTA 映像或者出厂映像</string>
     <string name="reboot_delay_toast">设备将在 5 秒后重启</string>
     <string name="flash_screen_title">安装</string>
 
@@ -75,7 +77,6 @@
     <string name="su_revoke_msg">确认撤销授予 %1$s 的权限？</string>
     <string name="toast">消息提示</string>
     <string name="none">无</string>
-
     <string name="superuser_toggle_notification">通知</string>
     <string name="superuser_toggle_revoke">撤销</string>
     <string name="superuser_policy_none">尚无应用请求超级用户权限</string>
@@ -91,8 +92,6 @@
     <string name="target_pid">挂载命名空间目标 PID: %s</string>
     <string name="selinux_context">SELinux 上下文: %s</string>
     <string name="supp_group">补充组: %s</string>
-
-    <!--SafetyNet-->
 
     <!--MagiskHide-->
     <string name="show_system_app">显示系统应用</string>
@@ -140,6 +139,7 @@
     <string name="settings_update_channel_title">更新通道</string>
     <string name="settings_update_stable">稳定版</string>
     <string name="settings_update_beta">测试版</string>
+    <string name="settings_update_debug">调试版</string>
     <string name="settings_update_custom">自定义通道</string>
     <string name="settings_update_custom_msg">自定义通道网址</string>
     <string name="settings_zygisk_summary">在 Zygote 中运行 Magisk</string>
@@ -181,8 +181,7 @@
     <string name="settings_doh_title">安全 DNS（DoH）</string>
     <string name="settings_doh_description">解决某些地区的 DNS 污染问题</string>
     <string name="settings_random_name_title">随机文件名</string>
-    <string name="settings_random_name_description">随机修补镜像和 tar 文件的文件名以防止检测</string>
-
+    <string name="settings_random_name_description">随机修补映像和 tar 文件的文件名以防止检测</string>
     <string name="multiuser_mode">多用户模式</string>
     <string name="settings_owner_only">仅设备所有者</string>
     <string name="settings_owner_manage">由设备所有者管理</string>
@@ -190,7 +189,6 @@
     <string name="owner_only_summary">仅设备所有者有超级用户权限</string>
     <string name="owner_manage_summary">仅设备所有者能管理超级用户并接收权限请求提示</string>
     <string name="user_independent_summary">每个用户有独立的超级用户规则</string>
-
     <string name="mount_namespace_mode">挂载命名空间模式</string>
     <string name="settings_ns_global">全局命名空间</string>
     <string name="settings_ns_requester">继承命名空间</string>

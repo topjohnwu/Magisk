@@ -3,9 +3,6 @@ package com.topjohnwu.magisk;
 import static android.R.string.no;
 import static android.R.string.ok;
 import static android.R.string.yes;
-import static com.topjohnwu.magisk.R.string.dling;
-import static com.topjohnwu.magisk.R.string.no_internet_msg;
-import static com.topjohnwu.magisk.R.string.upgrade_msg;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -46,14 +43,18 @@ import javax.crypto.spec.SecretKeySpec;
 public class DownloadActivity extends Activity {
 
     private static final String APP_NAME = "Magisk";
+    private static final String RES_PKG_NAME = "com.topjohnwu.magisk";
 
-    private Context themed;
     private boolean dynLoad;
+
+    private int dling;
+    private int no_internet_msg;
+    private int upgrade_msg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        themed = new ContextThemeWrapper(this, android.R.style.Theme_DeviceDefault);
+        getTheme().applyStyle(android.R.style.Theme_DeviceDefault_Dialog_NoActionBar, true);
 
         // Only download and dynamic load full APK if hidden
         dynLoad = !getPackageName().equals(BuildConfig.APPLICATION_ID);
@@ -63,6 +64,7 @@ public class DownloadActivity extends Activity {
             loadResources();
         } catch (Exception e) {
             error(e);
+            return;
         }
 
         ProviderInstaller.install(this);
@@ -70,7 +72,7 @@ public class DownloadActivity extends Activity {
         if (Networking.checkNetworkStatus(this)) {
             showDialog();
         } else {
-            new AlertDialog.Builder(themed)
+            new AlertDialog.Builder(this)
                     .setCancelable(false)
                     .setTitle(APP_NAME)
                     .setMessage(getString(no_internet_msg))
@@ -95,7 +97,7 @@ public class DownloadActivity extends Activity {
     }
 
     private void showDialog() {
-        new AlertDialog.Builder(themed)
+        new AlertDialog.Builder(this)
                 .setCancelable(false)
                 .setTitle(APP_NAME)
                 .setMessage(getString(upgrade_msg))
@@ -105,7 +107,7 @@ public class DownloadActivity extends Activity {
     }
 
     private void dlAPK() {
-        ProgressDialog.show(themed, getString(dling), getString(dling) + " " + APP_NAME, true);
+        ProgressDialog.show(this, getString(dling), getString(dling) + " " + APP_NAME, true);
         // Download and upgrade the app
         var request = request(BuildConfig.APK_URL).setExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         if (dynLoad) {
@@ -139,6 +141,7 @@ public class DownloadActivity extends Activity {
     }
 
     private void loadResources() throws Exception {
+        var res = getResources();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             var fd = Os.memfd_create("res", 0);
             try {
@@ -147,14 +150,14 @@ public class DownloadActivity extends Activity {
                 var loader = new ResourcesLoader();
                 try (var pfd = ParcelFileDescriptor.dup(fd)) {
                     loader.addProvider(ResourcesProvider.loadFromTable(pfd, null));
-                    getResources().addLoaders(loader);
+                    res.addLoaders(loader);
                 }
             } finally {
                 Os.close(fd);
             }
         } else {
-            File res = new File(getCodeCacheDir(), "res.apk");
-            try (var out = new ZipOutputStream(new FileOutputStream(res))) {
+            File apk = new File(getCodeCacheDir(), "res.apk");
+            try (var out = new ZipOutputStream(new FileOutputStream(apk))) {
                 // AndroidManifest.xml is required on Android 6-, and directory support is broken on Android 9-10
                 out.putNextEntry(new ZipEntry("AndroidManifest.xml"));
                 try (var stubApk = new ZipFile(getPackageCodePath())) {
@@ -163,7 +166,10 @@ public class DownloadActivity extends Activity {
                 out.putNextEntry(new ZipEntry("resources.arsc"));
                 decryptResources(out);
             }
-            StubApk.addAssetPath(getResources(), res.getPath());
+            StubApk.addAssetPath(res, apk.getPath());
         }
+        dling = res.getIdentifier("dling", "string", RES_PKG_NAME);
+        no_internet_msg = res.getIdentifier("no_internet_msg", "string", RES_PKG_NAME);
+        upgrade_msg = res.getIdentifier("upgrade_msg", "string", RES_PKG_NAME);
     }
 }

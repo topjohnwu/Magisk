@@ -78,6 +78,7 @@ fun <K, V> MutableMap<K, V>.synchronized(): MutableMap<K, V> = Collections.synch
 fun Class<*>.reflectField(name: String): Field =
     getDeclaredField(name).apply { isAccessible = true }
 
+@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 inline fun <T, R> Flow<T>.concurrentMap(crossinline transform: suspend (T) -> R): Flow<R> {
     return flatMapMerge { value ->
         flow { emit(transform(value)) }

@@ -9,8 +9,9 @@ export ANDROID_AVD_HOME="$ANDROID_EMULATOR_HOME/avd"
 export PATH="$PATH:$ANDROID_HOME/platform-tools"
 
 emu="$ANDROID_HOME/emulator/emulator"
-sdk="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
-avd="$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager"
+cli_tools="$ANDROID_HOME/cmdline-tools/latest"
+sdk="$cli_tools/bin/sdkmanager"
+avd="$cli_tools/bin/avdmanager"
 
 boot_timeout=100
 
@@ -42,18 +43,12 @@ am_instrument() {
   fi
 }
 
-# $1 = pkg
-wait_for_pm() {
-  sleep 5
-  adb shell pm uninstall $1 || true
-}
-
 run_setup() {
-  local variant=$1
+  local apk=$1
   adb shell 'PATH=$PATH:/debug_ramdisk magisk -v'
 
   # Install the Magisk app
-  adb install -r -g out/app-${variant}.apk
+  adb install -r -g $apk
 
   # Install the test app
   adb install -r -g out/test.apk
@@ -62,6 +57,14 @@ run_setup() {
 
   # Run setup through the test app
   am_instrument '.Environment#setupEnvironment' $app
+}
+
+print_apks() {
+  if [ "$#" -eq 0 ]; then
+    find out -maxdepth 1 -type f -name "app-*.apk" -or -name "apk-*.apk"
+  else
+    echo "$@"
+  fi
 }
 
 run_tests() {

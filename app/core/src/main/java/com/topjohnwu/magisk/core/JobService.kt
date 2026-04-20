@@ -73,6 +73,7 @@ class JobService : BaseJobService() {
         return true
     }
 
+    @OptIn(kotlinx.coroutines.DelicateCoroutinesApi::class)
     private fun checkUpdate(params: JobParameters): Boolean {
         GlobalScope.launch(Dispatchers.IO) {
             Info.fetchUpdate(ServiceLocator.networkService)?.let {

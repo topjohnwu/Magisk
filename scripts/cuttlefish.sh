@@ -4,12 +4,11 @@ set -xe
 . scripts/test_common.sh
 
 cvd_args="-daemon -enable_sandbox=false -memory_mb=8192 -report_anonymous_usage_stats=n -cpus=$core_count"
-magisk_args='-init_boot_image=magisk_patched.img'
 
 cleanup() {
   print_error "! An error occurred"
   run_cvd_bin stop_cvd || true
-  rm -f magisk_patched.img*
+  rm -f magisk-*.img
 }
 
 run_cvd_bin() {
@@ -58,14 +57,16 @@ download_cf() {
 }
 
 test_cf() {
-  local variant=$1
+  local apk=$1
+  local image=$2
 
   run_cvd_bin stop_cvd || true
 
-  print_title "* Testing $variant builds"
+  local magisk_args="-init_boot_image=$image"
+
   timeout $boot_timeout bash -c "run_cvd_bin launch_cvd $cvd_args $magisk_args -resume=false"
   adb wait-for-device
-  run_setup $variant
+  run_setup $apk
 
   adb reboot
   sleep 5
@@ -81,17 +82,22 @@ test_main() {
   run_cvd_bin launch_cvd $cvd_args -resume=false
   adb wait-for-device
 
-  # Patch and test debug build
-  ./build.py -v avd_patch "$CF_HOME/init_boot.img" magisk_patched.img
-  test_cf debug
+  # Patch images
+  local apks=($(print_apks))
+  local images=()
+  for apk in "${apks[@]}"; do
+    images+=("magisk-$(basename $apk .apk).img")
+    ./build.py -v avd_patch --apk "$apk" "$CF_HOME/init_boot.img" "${images[-1]}"
+  done
 
-  # Patch and test release build
-  ./build.py -vr avd_patch "$CF_HOME/init_boot.img" magisk_patched.img
-  test_cf release
+  for i in "${!apks[@]}"; do
+    print_title "* Testing $(basename ${apks[i]})"
+    test_cf ${apks[i]} ${images[i]}
+  done
 
   # Cleanup
   run_cvd_bin stop_cvd || true
-  rm -f magisk_patched.img*
+  rm -f magisk-*.img
 }
 
 if [ -z $CF_HOME ]; then

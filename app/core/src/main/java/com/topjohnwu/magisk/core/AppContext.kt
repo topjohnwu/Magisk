@@ -108,6 +108,7 @@ object AppContext : ContextWrapper(null),
         }
         networkObserver = NetworkObserver.init(this)
         if (!BuildConfig.DEBUG && !isRunningAsStub) {
+            @OptIn(kotlinx.coroutines.DelicateCoroutinesApi::class)
             GlobalScope.launch(Dispatchers.IO) {
                 ProfileInstaller.writeProfile(this@AppContext)
             }

@@ -1,4 +1,5 @@
 name: Magisk Setup
+description: Set up the build environment for Magisk
 inputs:
   is-asset-build:
     required: false
@@ -7,13 +8,13 @@ runs:
   using: "composite"
   steps:
     - name: Set up JDK 21
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@v5
       with:
         distribution: "temurin"
         java-version: "21"
 
     - name: Set up Python 3
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: "3.x"
 
@@ -25,7 +26,7 @@ runs:
         echo 'GNUMAKE=gmake' >> "$GITHUB_ENV"
 
     - name: Cache sccache
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       if: ${{ github.event_name != 'pull_request' }}
       with:
         path: .sccache
@@ -33,7 +34,7 @@ runs:
         restore-keys: sccache-${{ runner.os }}-
 
     - name: Restore sccache
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       if: ${{ github.event_name == 'pull_request' }}
       with:
         path: .sccache
@@ -63,7 +64,7 @@ runs:
       run: echo "GRADLE_USER_HOME=$GITHUB_WORKSPACE/.gradle" >> "$GITHUB_ENV"
 
     - name: Cache Gradle dependencies
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       if: ${{ inputs.is-asset-build == 'true' && github.event_name != 'pull_request' }}
       with:
         path: |
@@ -74,19 +75,19 @@ runs:
         restore-keys: gradle-cache-
 
     - name: Restore Gradle dependencies
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       if: ${{ inputs.is-asset-build == 'false' || github.event_name == 'pull_request' }}
       with:
         path: |
           .gradle/caches
           .gradle/wrapper
           !.gradle/caches/build-cache-*
-        key: gradle-cache-${{ hashFiles('gradle/**') }}
+        key: gradle-cache-${{ hashFiles('app/gradle/**') }}
         restore-keys: gradle-cache-
         enableCrossOsArchive: true
 
     - name: Cache Gradle build cache
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       if: ${{ inputs.is-asset-build == 'true' && github.event_name != 'pull_request' }}
       with:
         path: .gradle/caches/build-cache-*
@@ -94,7 +95,7 @@ runs:
         restore-keys: gradle-build-cache-
 
     - name: Restore Gradle build cache
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       if: ${{ inputs.is-asset-build == 'false' || github.event_name == 'pull_request' }}
       with:
         path: .gradle/caches/build-cache-*

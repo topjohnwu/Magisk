@@ -7,5 +7,14 @@ dependencyResolutionManagement {
         maven("https://jitpack.io")
     }
 }
+
+pluginManagement {
+    includeBuild("build-logic")
+    repositories {
+        gradlePluginPortal()
+        google()
+    }
+}
+
 rootProject.name = "Magisk"
-include(":apk", ":core", ":shared", ":stub", ":test")
+include(":apk", ":apk-ng", ":core", ":shared", ":stub", ":stub-res", ":test")
