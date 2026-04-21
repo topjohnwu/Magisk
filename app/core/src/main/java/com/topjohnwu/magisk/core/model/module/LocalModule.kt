@@ -20,7 +20,7 @@ data class LocalModule(
     override var id: String = ""
     override var name: String = ""
     override var version: String = ""
-    override var versionCode: Int = -1
+    override var versionCode: Long = -1L
     var author: String = ""
     var description: String = ""
     var updateInfo: OnlineModule? = null
@@ -79,7 +79,7 @@ data class LocalModule(
                 "id" -> id = value
                 "name" -> name = value
                 "version" -> version = value
-                "versionCode" -> versionCode = value.toInt()
+                "versionCode" -> versionCode = value.toLong()
                 "author" -> author = value
                 "description" -> description = value
                 "updateJson" -> updateUrl = value

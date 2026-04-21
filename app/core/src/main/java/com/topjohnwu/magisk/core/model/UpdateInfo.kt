@@ -26,7 +26,7 @@ data class UpdateInfo(
 @JsonClass(generateAdapter = true)
 data class ModuleJson(
     val version: String,
-    val versionCode: Int,
+    val versionCode: Long,
     val zipUrl: String,
     val changelog: String,
 )

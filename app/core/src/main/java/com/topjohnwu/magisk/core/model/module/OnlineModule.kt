@@ -9,7 +9,7 @@ data class OnlineModule(
     override var id: String,
     override var name: String,
     override var version: String,
-    override var versionCode: Int,
+    override var versionCode: Long,
     val zipUrl: String,
     val changelog: String,
 ) : Module(), Parcelable {

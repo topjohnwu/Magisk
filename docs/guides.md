@@ -84,7 +84,7 @@ This is the **strict** format of `module.prop`
 id=<string>
 name=<string>
 version=<string>
-versionCode=<int>
+versionCode=<long>
 author=<string>
 description=<string>
 updateJson=<url> (optional)
@@ -103,7 +103,7 @@ Update JSON format:
 ```
 {
     "version": string,
-    "versionCode": int,
+    "versionCode": long,
     "zipUrl": url,
     "changelog": url
 }

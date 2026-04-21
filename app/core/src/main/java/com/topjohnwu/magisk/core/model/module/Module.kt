@@ -7,7 +7,7 @@ abstract class Module : Comparable<Module> {
         protected set
     abstract var version: String
         protected set
-    abstract var versionCode: Int
+    abstract var versionCode: Long
         protected set
 
     override operator fun compareTo(other: Module) = id.compareTo(other.id)
