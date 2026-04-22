@@ -47,10 +47,6 @@ class InstallViewModel(svc: NetworkService, markwon: Markwon) : BaseViewModel() 
         set(value) = set(value, field, { field = it }, BR.step)
 
     private var methodId = -1
-    // RadioGroup fires its OnCheckedChangeListener with the previously-checked id
-    // right before firing it with -1 when we clear the selection programmatically.
-    // Track the id we expect to see in that spurious callback so the setter's
-    // side-effect lambda can ignore it.
     private var spuriousMethodId = -1
 
     @get:Bindable
@@ -85,19 +81,12 @@ class InstallViewModel(svc: NetworkService, markwon: Markwon) : BaseViewModel() 
     private val _uri = MutableLiveData<Uri?>()
     val data: LiveData<Uri?> get() = _uri
 
-    // UriCallback is @Parcelize'd and may outlive any single ViewModel instance
-    // (it's restored from saved state after process death), so we route its
-    // results through the static `patchSource` and observe it here. This keeps
-    // the cross-instance coupling behind a single LiveData instead of a raw
-    // companion-object lambda.
     private val sourceObserver = Observer<PatchSource?> { source ->
         when (source) {
             is PatchSource.File -> _uri.value = source.uri
             PatchSource.Cancelled -> resetMethod()
             null -> return@Observer
         }
-        // Consume the result so a later VM instance doesn't replay a stale
-        // selection/cancel from a previous session.
         patchSource.value = null
     }
 
