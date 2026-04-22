@@ -27,11 +27,11 @@ import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.model.su.SuPolicy.Companion.ALLOW
 import com.topjohnwu.magisk.core.model.su.SuPolicy.Companion.DENY
 import com.topjohnwu.magisk.core.su.SuRequestHandler
+import com.topjohnwu.magisk.core.utils.TextHolder
 import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.events.AuthEvent
 import com.topjohnwu.magisk.events.DieEvent
 import com.topjohnwu.magisk.events.ShowUIEvent
-import com.topjohnwu.magisk.utils.TextHolder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit.SECONDS
@@ -175,7 +175,7 @@ class SuRequestViewModel(
         var seconds = 0
             set(value) = set(value, field, { field = it }, BR.denyText)
 
-        override fun getText(resources: Resources): CharSequence {
+        override fun getText(resources: Resources): String {
             return if (seconds != 0)
                 "${resources.getString(R.string.deny)} ($seconds)"
             else

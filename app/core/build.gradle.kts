@@ -3,12 +3,17 @@ plugins {
     kotlin("plugin.parcelize")
     alias(libs.plugins.moshix)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.wire)
 }
 
 setupCoreLib()
 
 ksp {
     arg("room.generateKotlin", "true")
+}
+
+wire {
+    kotlin {}
 }
 
 android {
@@ -40,6 +45,8 @@ dependencies {
     api(libs.markwon.core)
     implementation(libs.bcpkix)
     implementation(libs.commons.compress)
+    implementation(libs.xz)
+    implementation(libs.wire.runtime)
 
     api(libs.libsu.core)
     api(libs.libsu.service)

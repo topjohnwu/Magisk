@@ -98,6 +98,8 @@ object MediaStoreUtils {
 
     fun Uri.outputStream() = cr.openOutputStream(this, "rwt") ?: throw FileNotFoundException()
 
+    fun Uri.openFd() = cr.openFileDescriptor(this, "r") ?: throw FileNotFoundException()
+
     val Uri.displayName: String get() {
         if (scheme == "file") {
             // Simple uri wrapper over file, directly get file name

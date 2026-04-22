@@ -35,7 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
+import androidx.activity.compose.LocalActivity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.Role
@@ -102,7 +102,7 @@ fun MainScreen(initialTab: Int = Tab.HOME.ordinal) {
                     HomeScreen(vm, installVm)
                 }
                 Tab.SUPERUSER -> {
-                    val activity = LocalContext.current as MainActivity
+                    val activity = LocalActivity.current as MainActivity
                     val vm: SuperuserViewModel = viewModel(viewModelStoreOwner = activity, factory = VMFactory)
                     LaunchedEffect(Unit) {
                         vm.authenticate = { onSuccess ->
@@ -124,7 +124,7 @@ fun MainScreen(initialTab: Int = Tab.HOME.ordinal) {
                     ModuleScreen(vm)
                 }
                 Tab.SETTINGS -> {
-                    val activity = LocalContext.current as MainActivity
+                    val activity = LocalActivity.current as MainActivity
                     val vm: SettingsViewModel = viewModel(factory = VMFactory)
                     LaunchedEffect(Unit) {
                         vm.authenticate = { onSuccess ->

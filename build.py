@@ -431,6 +431,10 @@ def build_all():
 def gen_ide():
     ensure_cargo()
 
+    # Do not dump compilation database with ccache
+    if "NDK_CCACHE" in os.environ:
+        os.environ.pop("NDK_CCACHE")
+
     # Dump flags for both native and app
     dump_flags_native()
     dump_flags_app()

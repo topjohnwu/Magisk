@@ -29,9 +29,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
-import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -58,10 +58,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.topjohnwu.magisk.core.ktx.timeDateFormat
 import com.topjohnwu.magisk.core.ktx.toTime
 import com.topjohnwu.magisk.core.model.su.SuLog
-import com.topjohnwu.magisk.ui.util.rememberDrawablePainter
 import com.topjohnwu.magisk.core.R as CoreR
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -273,7 +273,7 @@ private fun SuLogCard(log: SuLog) {
 @Composable
 private fun SuActionBadge(allowed: Boolean) {
     val bg = if (allowed) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
-    val text = if (allowed) "Approved" else "Rejected"
+    val text = if (allowed) stringResource(CoreR.string.granted) else stringResource(CoreR.string.denied)
     Badge(
         containerColor = bg,
     ) { Text(text = text) }

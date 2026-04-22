@@ -56,6 +56,9 @@
     <string name="setup_title">Additional setup</string>
     <string name="select_patch_file">Select and patch a file</string>
     <string name="patch_file_msg">Select a raw image (*.img) or an ODIN tarfile (*.tar) or a payload.bin (*.bin)</string>
+    <string name="download_patch_file">Download and patch a file</string>
+    <string name="download_dialog_title">Enter image URL</string>
+    <string name="download_dialog_msg">Full OTA image or factory image</string>
     <string name="reboot_delay_toast">Rebooting in 5 seconds…</string>
     <string name="flash_screen_title">Installation</string>
 
@@ -110,6 +113,8 @@
     <string name="target_pid">Target PID: %s</string>
     <string name="selinux_context">SELinux context: %s</string>
     <string name="supp_group">Supplementary group: %s</string>
+    <string name="granted">Granted</string>
+    <string name="denied">Denied</string>
 
     <!--MagiskHide-->
     <string name="show_system_app">Show system apps</string>
@@ -279,5 +284,4 @@
     <string name="app_not_found">No app found to handle this action</string>
     <string name="reboot_apply_change">Reboot to apply changes</string>
     <string name="restore_app_confirmation">This will restore the hidden app back to the original app. Do you really want to do this?</string>
-
 </resources>

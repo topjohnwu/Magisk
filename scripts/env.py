@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import NoReturn
 
 
-ondk_version = "r29.5"
+ondk_version = "r30.0"
 
 
 def color_print(code, str):

@@ -21,13 +21,13 @@ import com.topjohnwu.magisk.core.download.Subject.App
 import com.topjohnwu.magisk.core.ktx.await
 import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.repository.NetworkService
+import com.topjohnwu.magisk.core.utils.asText
 import com.topjohnwu.magisk.databinding.bindExtra
 import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.dialog.EnvFixDialog
 import com.topjohnwu.magisk.dialog.ManagerInstallDialog
 import com.topjohnwu.magisk.dialog.UninstallDialog
 import com.topjohnwu.magisk.events.SnackbarEvent
-import com.topjohnwu.magisk.utils.asText
 import com.topjohnwu.superuser.Shell
 import kotlin.math.roundToInt
 import com.topjohnwu.magisk.core.R as CoreR

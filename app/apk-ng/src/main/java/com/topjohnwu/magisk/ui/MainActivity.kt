@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.net.Uri
 import android.os.Bundle
+import androidx.core.net.toUri
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -133,7 +134,7 @@ class MainActivity : ComponentActivity(), SplashScreenHost {
                                     LaunchedEffect(key) {
                                         if (vm.flashAction.isEmpty()) {
                                             vm.flashAction = key.action
-                                            vm.flashUri = key.additionalData?.let { Uri.parse(it) }
+                                            vm.flashUri = key.additionalData?.toUri()
                                             vm.startFlashing()
                                         }
                                     }

@@ -12,7 +12,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -30,15 +29,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.pm.ShortcutManagerCompat
-import com.topjohnwu.magisk.core.BuildConfig
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.isRunningAsStub
-import com.topjohnwu.magisk.core.tasks.AppMigration
 import com.topjohnwu.magisk.core.utils.LocaleSetting
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.ui.ThemeState
@@ -71,7 +69,7 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
         ) {
             CustomizationSection(viewModel)
             Spacer(Modifier.height(12.dp))
-            AppSettingsSection(viewModel)
+            AppSettingsSection()
             if (Info.env.isActive) {
                 Spacer(Modifier.height(12.dp))
                 MagiskSection(viewModel)
@@ -120,7 +118,7 @@ private fun CustomizationSection(viewModel: SettingsViewModel) {
         }
 
         // Color Mode
-        val resources = context.resources
+        val resources = LocalResources.current
         val colorModeEntries = remember {
             resources.getStringArray(CoreR.array.color_mode).toList()
         }
@@ -149,10 +147,9 @@ private fun CustomizationSection(viewModel: SettingsViewModel) {
 // --- App Settings ---
 
 @Composable
-private fun AppSettingsSection(viewModel: SettingsViewModel) {
+private fun AppSettingsSection() {
     val context = LocalContext.current
-    val resources = context.resources
-    val hidden = context.packageName != BuildConfig.APP_PACKAGE_NAME
+    val resources = LocalResources.current
 
     SmallTitle(text = stringResource(CoreR.string.home_app_title))
     Card(modifier = Modifier.fillMaxWidth()) {
@@ -241,7 +238,6 @@ private fun AppSettingsSection(viewModel: SettingsViewModel) {
                 Config.randName = it
             }
         )
-
     }
 }
 
@@ -299,7 +295,7 @@ private fun MagiskSection(viewModel: SettingsViewModel) {
 @Composable
 private fun SuperuserSection(viewModel: SettingsViewModel) {
     val context = LocalContext.current
-    val resources = context.resources
+    val resources = LocalResources.current
 
     SmallTitle(text = stringResource(CoreR.string.superuser))
     Card(modifier = Modifier.fillMaxWidth()) {
@@ -535,70 +531,6 @@ private fun DownloadPathDialog(show: Boolean, onDismiss: () -> Unit) {
                     }
                 ) {
                     Text(stringResource(android.R.string.ok))
-                }
-            }
-        )
-    }
-}
-
-@Composable
-private fun HideAppDialog(show: Boolean, onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
-    val showState = rememberSaveable { mutableStateOf(show) }
-    showState.value = show
-    var appName by rememberSaveable { mutableStateOf("Settings") }
-    val isError = appName.length > AppMigration.MAX_LABEL_LENGTH || appName.isBlank()
-
-    if (showState.value) {
-        AlertDialog(
-            onDismissRequest = onDismiss,
-            title = { Text(stringResource(CoreR.string.settings_hide_app_title)) },
-            text = {
-                OutlinedTextField(
-                    value = appName,
-                    onValueChange = { appName = it },
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text(stringResource(CoreR.string.settings_app_name_hint)) }
-                )
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = { if (!isError) onConfirm(appName) }
-                ) {
-                    Text(stringResource(android.R.string.ok))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = onDismiss) {
-                    Text(stringResource(android.R.string.cancel))
-                }
-            }
-        )
-    }
-}
-
-@Composable
-private fun RestoreDialog(show: Boolean, onDismiss: () -> Unit, onConfirm: () -> Unit) {
-    val showState = rememberSaveable { mutableStateOf(show) }
-    showState.value = show
-
-    if (showState.value) {
-        AlertDialog(
-            onDismissRequest = onDismiss,
-            title = { Text(stringResource(CoreR.string.settings_restore_app_title)) },
-            text = {
-                Text(
-                    text = stringResource(CoreR.string.restore_app_confirmation),
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-            },
-            confirmButton = {
-                TextButton(onClick = onConfirm) {
-                    Text(stringResource(android.R.string.ok))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = onDismiss) {
-                    Text(stringResource(android.R.string.cancel))
                 }
             }
         )

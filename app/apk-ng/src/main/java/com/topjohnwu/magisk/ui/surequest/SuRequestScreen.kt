@@ -36,9 +36,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.ui.superuser.SharedUidBadge
-import com.topjohnwu.magisk.ui.util.rememberDrawablePainter
 import com.topjohnwu.magisk.core.R as CoreR
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -135,7 +135,7 @@ fun SuRequestScreen(viewModel: SuRequestViewModel) {
                 Spacer(Modifier.height(16.dp))
 
                 Text(
-                    text = "Permission timeout: $sliderLabel",
+                    text = "${stringResource(CoreR.string.request_timeout)}: $sliderLabel",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.fillMaxWidth().padding(start = 8.dp),

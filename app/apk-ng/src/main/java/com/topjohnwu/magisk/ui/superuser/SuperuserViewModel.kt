@@ -37,9 +37,7 @@ class PolicyItem(
     val appName: String,
 ) {
     val title get() = appName
-    val showSlider = Config.suRestrict || policy.policy == SuPolicy.RESTRICT
 
-    var isExpanded by mutableStateOf(false)
     var policyValue by mutableIntStateOf(policy.policy)
     var notification by mutableStateOf(policy.notification)
     var logging by mutableStateOf(policy.logging)

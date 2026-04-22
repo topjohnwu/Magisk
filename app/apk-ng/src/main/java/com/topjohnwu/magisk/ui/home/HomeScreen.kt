@@ -4,8 +4,6 @@ import android.content.Intent
 import android.os.Build
 import android.os.PowerManager
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,16 +24,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material.icons.filled.PowerSettingsNew
-import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -44,7 +39,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -65,8 +59,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -86,24 +78,19 @@ import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.tasks.AppMigration
 import com.topjohnwu.magisk.core.tasks.MagiskInstaller
 import com.topjohnwu.magisk.ui.MainActivity
-import com.topjohnwu.magisk.ui.component.ConfirmResult
 import com.topjohnwu.magisk.ui.component.LoadingDialogHandle
-import com.topjohnwu.magisk.ui.component.MarkdownText
 import com.topjohnwu.magisk.ui.component.MarkdownTextAsync
-import com.topjohnwu.magisk.ui.component.SettingsArrow
-import com.topjohnwu.magisk.ui.component.rememberConfirmDialog
 import com.topjohnwu.magisk.ui.component.rememberLoadingDialog
 import com.topjohnwu.magisk.ui.flash.FlashUtils
+import com.topjohnwu.magisk.ui.install.InstallBottomSheet
 import com.topjohnwu.magisk.ui.install.InstallViewModel
 import kotlinx.coroutines.launch
 import com.topjohnwu.magisk.core.R as CoreR
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(viewModel: HomeViewModel, installVm: InstallViewModel) {
     val uiState by viewModel.uiState.collectAsState()
-    val installUiState by installVm.uiState.collectAsState()
     val context = LocalContext.current
     val activity = context as MainActivity
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -117,31 +104,6 @@ fun HomeScreen(viewModel: HomeViewModel, installVm: InstallViewModel) {
     var showRestoreDialog by rememberSaveable { mutableStateOf(false) }
     val showInstallSheet = rememberSaveable { mutableStateOf(false) }
     var envFixCode by remember { mutableIntStateOf(0) }
-
-    val filePicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        uri?.let { installVm.onPatchFileSelected(it) }
-    }
-
-    val secondSlotDialog = rememberConfirmDialog()
-    val secondSlotTitle = stringResource(android.R.string.dialog_alert_title)
-    val secondSlotMsg = stringResource(CoreR.string.install_inactive_slot_msg)
-
-    LaunchedEffect(installUiState.requestFilePicker) {
-        if (installUiState.requestFilePicker) {
-            filePicker.launch("*/*")
-            installVm.onFilePickerConsumed()
-        }
-    }
-
-    LaunchedEffect(installUiState.showSecondSlotWarning) {
-        if (installUiState.showSecondSlotWarning) {
-            val result = secondSlotDialog.awaitConfirm(title = secondSlotTitle, content = secondSlotMsg)
-            installVm.onSecondSlotWarningConsumed()
-            if (result == ConfirmResult.Confirmed) {
-                installVm.install()
-            }
-        }
-    }
 
     LaunchedEffect(uiState.showUninstall) {
         if (uiState.showUninstall) {
@@ -294,7 +256,6 @@ fun HomeScreen(viewModel: HomeViewModel, installVm: InstallViewModel) {
     InstallBottomSheet(
         show = showInstallSheet,
         installVm = installVm,
-        installUiState = installUiState,
     )
 }
 
@@ -671,14 +632,14 @@ private fun SupportCard(onLinkClicked: (String) -> Unit) {
                 IconButton(onClick = { onLinkClicked(Const.Url.PATREON_URL) }) {
                     Icon(
                         painter = painterResource(CoreR.drawable.ic_patreon),
-                        contentDescription = "Patreon",
+                        contentDescription = stringResource(CoreR.string.patreon),
                         modifier = Modifier.size(32.dp)
                     )
                 }
                 IconButton(onClick = { onLinkClicked("https://paypal.me/magiskdonate") }) {
                     Icon(
                         painter = painterResource(CoreR.drawable.ic_paypal),
-                        contentDescription = "PayPal",
+                        contentDescription = stringResource(CoreR.string.paypal),
                         modifier = Modifier.size(32.dp)
                     )
                 }
@@ -687,30 +648,30 @@ private fun SupportCard(onLinkClicked: (String) -> Unit) {
     }
 }
 
-private data class LinkInfo(val label: String, val icon: Int, val url: String)
+private data class LinkInfo(val label: Int, val icon: Int, val url: String)
 private data class DeveloperInfo(val name: String, val links: List<LinkInfo>)
 
 private val developers = listOf(
     DeveloperInfo("topjohnwu", listOf(
-        LinkInfo("Twitter", CoreR.drawable.ic_twitter, "https://twitter.com/topjohnwu"),
-        LinkInfo("GitHub", CoreR.drawable.ic_github, Const.Url.SOURCE_CODE_URL),
+        LinkInfo(CoreR.string.twitter, CoreR.drawable.ic_twitter, "https://twitter.com/topjohnwu"),
+        LinkInfo(CoreR.string.github, CoreR.drawable.ic_github, Const.Url.SOURCE_CODE_URL),
     )),
     DeveloperInfo("vvb2060", listOf(
-        LinkInfo("Twitter", CoreR.drawable.ic_twitter, "https://twitter.com/vvb2060"),
-        LinkInfo("GitHub", CoreR.drawable.ic_github, "https://github.com/vvb2060"),
+        LinkInfo(CoreR.string.twitter, CoreR.drawable.ic_twitter, "https://twitter.com/vvb2060"),
+        LinkInfo(CoreR.string.github, CoreR.drawable.ic_github, "https://github.com/vvb2060"),
     )),
     DeveloperInfo("yujincheng08", listOf(
-        LinkInfo("Sponsor", CoreR.drawable.ic_favorite, "https://github.com/sponsors/yujincheng08"),
-        LinkInfo("Twitter", CoreR.drawable.ic_twitter, "https://twitter.com/shanasaimoe"),
-        LinkInfo("GitHub", CoreR.drawable.ic_github, "https://github.com/yujincheng08"),
+        LinkInfo(CoreR.string.sponsor, CoreR.drawable.ic_favorite, "https://github.com/sponsors/yujincheng08"),
+        LinkInfo(CoreR.string.twitter, CoreR.drawable.ic_twitter, "https://twitter.com/shanasaimoe"),
+        LinkInfo(CoreR.string.github, CoreR.drawable.ic_github, "https://github.com/yujincheng08"),
     )),
     DeveloperInfo("rikkawww", listOf(
-        LinkInfo("Twitter", CoreR.drawable.ic_twitter, "https://twitter.com/rikkawww"),
-        LinkInfo("GitHub", CoreR.drawable.ic_github, "https://github.com/rikkawww"),
+        LinkInfo(CoreR.string.twitter, CoreR.drawable.ic_twitter, "https://twitter.com/rikkawww"),
+        LinkInfo(CoreR.string.github, CoreR.drawable.ic_github, "https://github.com/rikkawww"),
     )),
     DeveloperInfo("canyie", listOf(
-        LinkInfo("Twitter", CoreR.drawable.ic_twitter, "https://twitter.com/canyie2977"),
-        LinkInfo("GitHub", CoreR.drawable.ic_github, "https://github.com/canyie"),
+        LinkInfo(CoreR.string.twitter, CoreR.drawable.ic_twitter, "https://twitter.com/canyie2977"),
+        LinkInfo(CoreR.string.github, CoreR.drawable.ic_github, "https://github.com/canyie"),
     )),
 )
 
@@ -740,7 +701,7 @@ private fun DevelopersCard(onLinkClicked: (String) -> Unit) {
                             IconButton(onClick = { onLinkClicked(link.url) }) {
                                 Icon(
                                     painter = painterResource(link.icon),
-                                    contentDescription = link.label,
+                                    contentDescription = stringResource(link.label),
                                     modifier = Modifier.size(24.dp)
                                 )
                             }
@@ -755,144 +716,6 @@ private fun DevelopersCard(onLinkClicked: (String) -> Unit) {
                 }
             }
         }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun InstallBottomSheet(
-    show: MutableState<Boolean>,
-    installVm: InstallViewModel,
-    installUiState: InstallViewModel.UiState,
-) {
-    if (show.value) {
-        ModalBottomSheet(
-            onDismissRequest = { show.value = false },
-        ) {
-            Text(
-                text = stringResource(CoreR.string.install),
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(16.dp)
-            )
-        Column(modifier = Modifier.padding(bottom = 16.dp)) {
-            if (installUiState.notes.isNotEmpty()) {
-                Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-                    MarkdownText(installUiState.notes)
-                }
-                HorizontalDivider(thickness = 0.75.dp)
-            }
-
-            if (!installVm.skipOptions) {
-                InstallOptionsSection(installUiState, installVm)
-            }
-
-            SettingsArrow(
-                title = stringResource(CoreR.string.select_patch_file),
-                summary = stringResource(CoreR.string.select_patch_file_summary),
-                onClick = {
-                    show.value = false
-                    installVm.selectMethod(InstallViewModel.Method.PATCH)
-                },
-                // enabled = installUiState.step >= 1 || installVm.skipOptions
-            )
-
-            if (installVm.isRooted) {
-                SettingsArrow(
-                    title = stringResource(CoreR.string.direct_install),
-                    summary = stringResource(CoreR.string.direct_install_summary),
-                    onClick = {
-                        show.value = false
-                        installVm.selectMethod(InstallViewModel.Method.DIRECT)
-                        installVm.install()
-                    },
-                    // enabled = installUiState.step >= 1 || installVm.skipOptions
-                )
-            }
-
-            if (!installVm.noSecondSlot) {
-                SettingsArrow(
-                    title = stringResource(CoreR.string.install_inactive_slot),
-                    summary = stringResource(CoreR.string.install_inactive_slot_summary),
-                    onClick = {
-                        show.value = false
-                        installVm.selectMethod(InstallViewModel.Method.INACTIVE_SLOT)
-                    },
-                    // enabled = installUiState.step >= 1 || installVm.skipOptions
-                )
-            }
-        }
-        }
-    }
-}
-
-@Composable
-private fun InstallOptionsSection(
-    uiState: InstallViewModel.UiState,
-    viewModel: InstallViewModel
-) {
-    Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = stringResource(CoreR.string.install_options_title),
-                style = MaterialTheme.typography.titleLarge,
-            )
-            if (uiState.step == 0) {
-                TextButton(
-                    onClick = { viewModel.nextStep() }
-                ) {
-                    Text(stringResource(CoreR.string.install_next))
-                }
-            }
-        }
-
-        if (uiState.step == 0) {
-            Spacer(Modifier.height(8.dp))
-            if (!Info.isSAR) {
-                CheckboxRow(
-                    label = stringResource(CoreR.string.keep_dm_verity),
-                    checked = Config.keepVerity,
-                    onCheckedChange = { Config.keepVerity = it }
-                )
-            }
-            if (Info.isFDE) {
-                CheckboxRow(
-                    label = stringResource(CoreR.string.keep_force_encryption),
-                    checked = Config.keepEnc,
-                    onCheckedChange = { Config.keepEnc = it }
-                )
-            }
-            if (!Info.ramdisk) {
-                CheckboxRow(
-                    label = stringResource(CoreR.string.recovery_mode),
-                    checked = Config.recovery,
-                    onCheckedChange = { Config.recovery = it }
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun CheckboxRow(label: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Checkbox(
-            checked = checked,
-            onCheckedChange = { onCheckedChange(it) }
-        )
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyLarge,
-        )
     }
 }
 
@@ -1050,8 +873,8 @@ private fun EnvFixComposableDialog(
 
 @Composable
 private fun HideAppDialog(onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
-    val showState = rememberSaveable { mutableStateOf(true) }
-    var appName by rememberSaveable { mutableStateOf("Settings") }
+    val defaultName = stringResource(CoreR.string.settings)
+    var appName by rememberSaveable { mutableStateOf(defaultName) }
     val isError = appName.length > AppMigration.MAX_LABEL_LENGTH || appName.isBlank()
 
     AlertDialog(
@@ -1086,8 +909,6 @@ private fun HideAppDialog(onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
 
 @Composable
 private fun RestoreAppDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
-    val showState = rememberSaveable { mutableStateOf(true) }
-
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(CoreR.string.settings_restore_app_title)) },
