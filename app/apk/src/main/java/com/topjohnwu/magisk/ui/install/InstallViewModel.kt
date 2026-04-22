@@ -94,8 +94,11 @@ class InstallViewModel(svc: NetworkService, markwon: Markwon) : BaseViewModel() 
         when (source) {
             is PatchSource.File -> _uri.value = source.uri
             PatchSource.Cancelled -> resetMethod()
-            null -> Unit
+            null -> return@Observer
         }
+        // Consume the result so a later VM instance doesn't replay a stale
+        // selection/cancel from a previous session.
+        patchSource.value = null
     }
 
     @get:Bindable
