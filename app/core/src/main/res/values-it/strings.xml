@@ -51,7 +51,7 @@
     <string name="direct_install_summary">Installa Magisk direttamente nella partizione di boot</string>
     <string name="install_inactive_slot">Installa nello slot inattivo (dopo un aggiornamento OTA)</string>
     <string name="install_inactive_slot_summary">Installa nello slot inattivo dopo un aggiornamento OTA</string>
-    <string name="select_patch_file_summary">Applica una patch a un\'immagine grezza, un file tar di ODIN o un file payload.bin</string>
+    <string name="select_patch_file_summary">Applica una patch a un\'immagine raw, un file tar di ODIN o un file payload.bin</string>
     <string name="install_inactive_slot_msg">Questo dispositivo verrà FORZATO ad avviarsi usando lo slot inattivo!\nUsa questo metodo solo dopo che un aggiornamento OTA è stato installato.\nVuoi continuare?</string>
     <string name="setup_title">Configurazione aggiuntiva</string>
     <string name="select_patch_file">Seleziona e aggiorna un file</string>
@@ -216,7 +216,7 @@
     <string name="setting_add_shortcut_summary">Aggiungi un collegamento alla schermata iniziale se il nome e l\'icona sono difficili da riconoscere dopo aver nascosto l\'app</string>
     <string name="settings_doh_title">DNS over HTTPS</string>
     <string name="settings_doh_description">Aggira il DNS poisoning in alcune nazioni</string>
-    <string name="settings_random_name_title">Nome di output casuale</string>
+    <string name="settings_random_name_title">Genera un nome casuale per l\’output</string>
     <string name="settings_random_name_description">Rendi casuale il nome del file di output delle immagini con patch e dei file tar per evitarne il rilevamento</string>
 
     <string name="multiuser_mode">Modalità multiutente</string>
