@@ -1019,9 +1019,35 @@ void repack(Utf8CStr src_img, Utf8CStr out_img, bool skip_comp) {
         memcpy(footer, boot.avb_footer, sizeof(AvbFooter));
         footer->original_image_size = __builtin_bswap64(aosp_img_size);
         footer->vbmeta_offset = __builtin_bswap64(off.vbmeta);
+
+        auto vbmeta = reinterpret_cast<AvbVBMetaImageHeader*>(out.data() + off.vbmeta);
+
         if (check_env("PATCHVBMETAFLAG")) {
-            auto vbmeta = reinterpret_cast<AvbVBMetaImageHeader*>(out.data() + off.vbmeta);
             vbmeta->flags = __builtin_bswap32(3);
+        }
+
+        // Sync hash descriptor image_size with the new AOSP portion size.
+        // Without this, some bootloaders (e.g. Motorola) reject images.
+        for (auto &desc : vbmeta->descriptors()) {
+            if (__builtin_bswap64(desc.tag) != AVB_DESCRIPTOR_TAG_HASH)
+                continue;
+
+            // enforce size limits; protect against adversarial input.
+            size_t buf_remaining = out.data() + out.size() - reinterpret_cast<uint8_t *>(&desc);
+            if (buf_remaining < __builtin_bswap64(desc.num_bytes_following) || buf_remaining - __builtin_bswap64(desc.num_bytes_following) < sizeof(AvbDescriptor)) {
+                // beware: both conditions are necessary because underflow in the subtraction could wrap
+                fprintf(stderr, "AVB hash descriptor num_bytes_following overflows buffer\n");
+                break;
+            }
+
+            if (__builtin_bswap64(desc.num_bytes_following) < sizeof(AvbHashDescriptor) - sizeof(AvbDescriptor)) {
+                fprintf(stderr, "AvbDescriptor too small to hold AvbHashDescriptor\n");
+                break;
+            }
+
+            auto &hd = reinterpret_cast<AvbHashDescriptor &>(desc);
+            hd.image_size = __builtin_bswap64(aosp_img_size);
+            break;
         }
     }
 
