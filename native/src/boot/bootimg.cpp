@@ -1026,8 +1026,7 @@ void repack(Utf8CStr src_img, Utf8CStr out_img, bool skip_comp) {
             vbmeta->flags = __builtin_bswap32(3);
         }
 
-        // Sync hash descriptor image_size with the new AOSP portion size.
-        // Without this, some bootloaders (e.g. Motorola) reject images.
+        // Patch hash descriptor
         for (auto &desc : vbmeta->descriptors()) {
             if (__builtin_bswap64(desc.tag) != AVB_DESCRIPTOR_TAG_HASH)
                 continue;
@@ -1046,7 +1045,56 @@ void repack(Utf8CStr src_img, Utf8CStr out_img, bool skip_comp) {
             }
 
             auto &hd = reinterpret_cast<AvbHashDescriptor &>(desc);
+
+            // Update image_size
             hd.image_size = __builtin_bswap64(aosp_img_size);
+
+            // Recompute hash
+            auto *algo   = reinterpret_cast<char *>(hd.hash_algorithm);
+            bool is_sha1   = memcmp(hd.hash_algorithm, "sha1",   5) == 0;
+            bool is_sha256 = memcmp(hd.hash_algorithm, "sha256", 7) == 0;
+
+            uint32_t name_len   = __builtin_bswap32(hd.partition_name_len);
+            uint32_t salt_len   = __builtin_bswap32(hd.salt_len);
+            uint32_t digest_len = __builtin_bswap32(hd.digest_len);
+
+            // Get pointers to the (flexibly sized) payloads, checking each against desc_end
+            uint8_t *desc_end = reinterpret_cast<uint8_t *>(&desc) + sizeof(AvbDescriptor) + __builtin_bswap64(desc.num_bytes);
+
+            uint8_t *name = reinterpret_cast<uint8_t *>(&hd + 1);
+            if (name > desc_end) {
+                fprintf(stderr, "AVB hash descriptor overflows bounds\n");
+                break;
+            }
+            if ((size_t)(desc_end - name) < name_len) {
+                fprintf(stderr, "AVB hash descriptor name of %u bytes overflows bounds\n", name_len);
+                break;
+            }
+
+            uint8_t *salt = name + name_len;
+            if ((size_t)(desc_end - salt) < salt_len) {
+                fprintf(stderr, "AVB hash descriptor salt of %u bytes overflows bounds\n", salt_len);
+                break;
+            }
+
+            uint8_t *digest = salt + salt_len;
+            if ((size_t)(desc_end - digest) < digest_len) {
+                fprintf(stderr, "AVB hash descriptor digest of %u bytes overflows bounds\n", digest_len);
+                break;
+            }
+
+            if (is_sha1 || is_sha256) {
+                digest_len = is_sha1 ? 20 : 32;
+                hd.digest_len = __builtin_bswap32(digest_len);
+
+                auto ctx = get_sha(is_sha1);
+                ctx->update(byte_view(salt, salt_len));
+                ctx->update(byte_view(out.data(), aosp_img_size));
+                ctx->finalize_into(byte_data(digest, digest_len));
+            } else {
+                fprintf(stderr, "Unsupported AVB hash algorithm: %.32s — zeroing digest\n", algo);
+                memset(digest, 0, desc_end - digest);
+            }
             break;
         }
     }
