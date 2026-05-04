@@ -84,7 +84,7 @@ fun LogScreen(viewModel: LogViewModel) {
                         IconButton(onClick = { viewModel.saveMagiskLog() }) {
                             Icon(
                                 imageVector = Icons.Default.Download,
-                                contentDescription = stringResource(CoreR.string.save_log),
+                                contentDescription = stringResource(CoreR.string.menuSaveLog),
                             )
                         }
                     }
@@ -97,7 +97,7 @@ fun LogScreen(viewModel: LogViewModel) {
                     ) {
                         Icon(
                             imageVector = Icons.Default.Delete,
-                            contentDescription = stringResource(CoreR.string.clear_log),
+                            contentDescription = stringResource(CoreR.string.menuClearLog),
                         )
                     }
                 },

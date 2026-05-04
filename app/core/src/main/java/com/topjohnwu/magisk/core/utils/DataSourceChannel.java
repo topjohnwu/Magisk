@@ -23,8 +23,9 @@ public class DataSourceChannel implements SeekableByteChannel {
     private final OkHttpClient client;
     private final String url;
     private final FileChannel fileChannel;
+    private final boolean ownership;
     private final long startOffset;
-    private final long size;
+    private long size;
 
     private long position = 0;
     private boolean open = true;
@@ -33,54 +34,54 @@ public class DataSourceChannel implements SeekableByteChannel {
     private long cacheStart = -1;
 
     private DataSourceChannel(OkHttpClient client, String url, FileChannel fileChannel,
-                              long startOffset, long size) {
+                              boolean ownership, long startOffset, long size) {
         this.client = client;
         this.url = url;
         this.fileChannel = fileChannel;
+        this.ownership = ownership;
         this.startOffset = startOffset;
         this.size = size;
     }
 
     public DataSourceChannel(FileChannel fileChannel) throws IOException {
-        this(null, null, fileChannel, 0, fileChannel.size());
+        this(null, null, fileChannel, true, 0, fileChannel.size());
     }
 
     public DataSourceChannel(OkHttpClient client, String url) throws IOException {
-        this(client, url, null, 0, fetchTotalSize(client, url));
-    }
-
-    private static long fetchTotalSize(OkHttpClient client, String url) throws IOException {
-        var request = new Request.Builder().url(url).head().build();
+        this(client, url, null, false, 0, 0);
+        var request = new Request.Builder()
+                .url(url)
+                .header("Range", "bytes=" + "-" + RANDOM_READ_CACHE_SIZE)
+                .build();
         try (var response = client.newCall(request).execute()) {
-            if (!response.isSuccessful()) {
-                throw new IOException("Failed to connect to URL: " + response);
+            if (response.code() != 206) {
+                throw new IOException("Unexpected response code " + response.code());
             }
-            var contentLength = response.header("Content-Length");
-            if (contentLength == null) {
+            var contentRange = response.header("Content-Range");
+            if (contentRange == null) {
                 throw new IOException("Could not determine file size.");
             }
-            var acceptRanges = response.header("Accept-Ranges");
-            if (acceptRanges == null || !acceptRanges.equalsIgnoreCase("bytes")) {
-                throw new IOException("Server does not support byte ranges: " + response);
-            }
-            return Long.parseLong(contentLength);
+            var contentLength = contentRange.substring(contentRange.lastIndexOf('/') + 1);
+            size = Long.parseLong(contentLength);
+            cache = response.body().bytes();
+            cacheStart = size - cache.length;
         }
     }
 
     public DataSourceChannel slice(long offset, long sliceSize) {
-        if (offset == 0 && sliceSize == size) {
-            return this;
-        }
-        if (offset < 0 || sliceSize <= 0 || offset + sliceSize >= size) {
+        if (offset < 0 || sliceSize <= 0 || offset + sliceSize > size) {
             throw new IllegalArgumentException("Invalid slice parameters");
         }
-        return new DataSourceChannel(client, url, fileChannel, startOffset + offset, sliceSize);
+        return new DataSourceChannel(client, url, fileChannel, false,
+                startOffset + offset, sliceSize);
     }
 
     @Override
     public int read(ByteBuffer dst) throws IOException {
         var bytesRead = read(dst, position);
-        position += bytesRead;
+        if (bytesRead > 0) {
+            position += bytesRead;
+        }
         return bytesRead;
     }
 
@@ -250,7 +251,7 @@ public class DataSourceChannel implements SeekableByteChannel {
     public void close() throws IOException {
         open = false;
         cache = null;
-        if (fileChannel != null) {
+        if (ownership) {
             fileChannel.close();
         }
     }

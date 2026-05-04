@@ -125,7 +125,7 @@ fun SuRequestScreen(viewModel: SuRequestViewModel) {
                 Spacer(Modifier.height(16.dp))
 
                 Text(
-                    text = stringResource(CoreR.string.su_request_title),
+                    text = stringResource(CoreR.string.su_warning),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold,

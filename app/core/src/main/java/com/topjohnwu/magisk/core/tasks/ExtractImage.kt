@@ -41,9 +41,9 @@ class ExtractImage(
                         }
                     }
                     zipFile.getRawInputStream(payload)
-                    extractFromOTAPackage(payload, channel, outFile)
+                    extractFromOTAPackage(payload, channel)
                 } else {
-                    extractFromFactoryImage(zipFile, channel, outFile)
+                    extractFromFactoryImage(zipFile, channel)
                 }
             }
     }
@@ -52,14 +52,13 @@ class ExtractImage(
     private fun extractFromOTAPackage(
         payload: ZipArchiveEntry,
         channel: DataSourceChannel,
-        outFile: File,
     ) {
         if (payload.method != ZipMethod.STORED.code) {
             throw IOException("payload.bin is compressed, expected STORED method")
         }
 
         channel.slice(payload.dataOffset, payload.size).use { payloadChannel ->
-            Payload(payloadChannel).extract(outFile, { console.add(it) }, { logs.add(it) })
+            Payload(payloadChannel).extract(outFile, console, logs)
         }
     }
 
@@ -67,12 +66,11 @@ class ExtractImage(
     private fun extractFromFactoryImage(
         zipFile: ZipFile,
         channel: DataSourceChannel,
-        outFile: File
     ) {
         console.add("- Processing as factory image package")
 
         findBootImageZipEntry(zipFile)?.let { entry ->
-            return extractImageFile(zipFile, entry, channel, outFile)
+            return extractImageFile(zipFile, entry, channel)
         }
 
         val imageZipEntry = zipFile.entries.asSequence().find { entry ->
@@ -81,7 +79,7 @@ class ExtractImage(
         }
         if (imageZipEntry != null) {
             zipFile.getRawInputStream(imageZipEntry)
-            return extractFromInnerImageZip(imageZipEntry, channel, outFile)
+            return extractFromInnerImageZip(imageZipEntry, channel)
         }
 
         throw IOException("inner image ZIP not found in factory image package")
@@ -99,7 +97,6 @@ class ExtractImage(
     private fun extractFromInnerImageZip(
         entry: ZipArchiveEntry,
         channel: DataSourceChannel,
-        outFile: File
     ) {
         logs.add("Found inner image ZIP: ${entry.name}")
 
@@ -114,7 +111,7 @@ class ExtractImage(
                 .get().use { innerZipFile ->
                     val targetEntry = findBootImageZipEntry(innerZipFile)
                         ?: throw IOException("boot image not found in inner image ZIP")
-                    return extractImageFile(innerZipFile, targetEntry, innerZipChannel, outFile)
+                    return extractImageFile(innerZipFile, targetEntry, innerZipChannel)
                 }
         }
     }
@@ -124,7 +121,6 @@ class ExtractImage(
         zipFile: ZipFile,
         entry: ZipArchiveEntry,
         channel: DataSourceChannel,
-        outFile: File,
     ) {
         console.add("- Found boot image entry: ${entry.name} (${entry.size} bytes)")
         console.add("- Downloading")
