@@ -46,13 +46,19 @@
     <string name="install_method_title">Metode</string>
     <string name="install_next">Berikutnya</string>
     <string name="install_start">Mulai</string>
-    <string name="manager_download_install">Sentuh untuk mengunduh dan memasang</string>
-    <string name="direct_install">Langsung pasang (Disarankan)</string>
-    <string name="install_inactive_slot">Pasang ke slot nonaktif (Setelah OTA)</string>
-    <string name="install_inactive_slot_msg">Perangkat Anda akan DIPAKSA untuk boot ke slot nonaktif saat ini setelah dimulai ulang!\nGunakan opsi ini hanya setelah OTA selesai.\nLanjutkan?</string>
+    <string name="manager_download_install">Ketuk untuk mengunduh dan memasang</string>
+    <string name="direct_install">Pasang langsung (Disarankan)</string>
+    <string name="direct_install_summary">Memasang Magisk langsung ke partisi boot</string>
+    <string name="install_inactive_slot">Pasang ke slot tidak aktif (Setelah OTA)</string>
+    <string name="install_inactive_slot_summary">Memasang ke slot yang tidak aktif setelah pembaruan OTA</string>
+    <string name="install_inactive_slot_msg">Perangkat Anda akan DIPAKSA untuk boot ke slot tidak aktif saat ini setelah dimulai ulang!\nGunakan opsi ini hanya setelah OTA selesai.\nLanjutkan?</string>
     <string name="setup_title">Penyiapan tambahan</string>
     <string name="select_patch_file">Pilih dan tambal berkas</string>
-    <string name="patch_file_msg">Pilih mentahan image (*.img) atau berkas tar ODIN (*.tar) atau payload.bin (*.bin)</string>
+    <string name="select_patch_file_summary">Tambal berkas image mentah, tar ODIN, atau payload.bin</string>
+    <string name="patch_file_msg">Pilih berkas image mentah (*.img) atau tar ODIN (*.tar) atau payload.bin (*.bin)</string>
+    <string name="download_patch_file">Unduh dan tambal berkas</string>
+    <string name="download_dialog_title">Masukkan URL image</string>
+    <string name="download_dialog_msg">Image OTA penuh atau image pabrik</string>
     <string name="reboot_delay_toast">Memulai ulang dalam 5 detik…</string>
     <string name="flash_screen_title">Pemasangan</string>
 
@@ -74,10 +80,10 @@
     <string name="su_deny_toast">%1$s ditolak izin superuser</string>
     <string name="su_snack_grant">Izin superuser %1$s diberikan</string>
     <string name="su_snack_deny">Izin superuser %1$s ditolak</string>
-    <string name="su_snack_notif_on">Notifikasi %1$s aktif</string>
-    <string name="su_snack_notif_off">Notifikasi %1$s nonaktif</string>
-    <string name="su_snack_log_on">Pencatatan log %1$s aktif</string>
-    <string name="su_snack_log_off">Pencatatan log %1$s nonaktif</string>
+    <string name="su_snack_notif_on">Notifikasi %1$s diaktifkan</string>
+    <string name="su_snack_notif_off">Notifikasi %1$s dinonaktifkan</string>
+    <string name="su_snack_log_on">Pencatatan log %1$s diaktifkan</string>
+    <string name="su_snack_log_off">Pencatatan log %1$s dinonaktifkan</string>
     <string name="su_revoke_title">Cabut?</string>
     <string name="su_revoke_msg">Konfirmasi untuk mencabut izin %1$s</string>
     <string name="toast">Pesan singkat</string>
@@ -104,6 +110,8 @@
     <string name="target_pid">PID Target: %s</string>
     <string name="selinux_context">Konteks SELinux: %s</string>
     <string name="supp_group">Grup tambahan: %s</string>
+    <string name="granted">Diizinkan</string>
+    <string name="denied">Ditolak</string>
 
     <!--MagiskHide-->
     <string name="show_system_app">Tampilkan aplikasi sistem</string>
@@ -140,9 +148,9 @@
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Mode tema</string>
-    <string name="settings_dark_mode_message">Pilih mode yang paling sesuai dengan gaya Anda!</string>
+    <string name="settings_dark_mode_message">Pilih mode tema yang paling sesuai dengan gaya Anda!</string>
     <string name="settings_dark_mode_light">Selalu terang</string>
-    <string name="settings_dark_mode_system">Ikuti sistem</string>
+    <string name="settings_dark_mode_system">Sistem</string>
     <string name="settings_dark_mode_dark">Selalu gelap</string>
     <string name="settings_download_path_title">Lokasi unduhan</string>
     <string name="settings_download_path_message">Berkas akan disimpan ke %1$s</string>
@@ -174,7 +182,7 @@
     <string name="settings_su_app_adb">Aplikasi dan ADB</string>
     <string name="settings_su_app">Hanya Aplikasi</string>
     <string name="settings_su_adb">Hanya ADB</string>
-    <string name="settings_su_disable">Dinonaktifkan</string>
+    <string name="settings_su_disable">Nonaktif</string>
     <string name="settings_su_request_10">10 detik</string>
     <string name="settings_su_request_15">15 detik</string>
     <string name="settings_su_request_20">20 detik</string>
@@ -230,7 +238,7 @@
     <string name="download_file_error">Kesalahan saat mengunduh berkas</string>
     <string name="magisk_update_title">Pembaruan Magisk tersedia!</string>
     <string name="updated_title">Magisk diperbarui</string>
-    <string name="updated_text">Ketuk untuk buka aplikasi</string>
+    <string name="updated_text">Ketuk untuk membuka aplikasi</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">Ya</string>
