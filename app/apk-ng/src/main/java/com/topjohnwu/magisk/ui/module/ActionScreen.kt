@@ -19,6 +19,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.ui.component.rememberExternalStoragePermissionLauncher
 import com.topjohnwu.magisk.ui.terminal.TerminalScreen
 import com.topjohnwu.magisk.core.R as CoreR
 
@@ -27,6 +28,9 @@ import com.topjohnwu.magisk.core.R as CoreR
 fun ActionScreen(viewModel: ActionViewModel, actionName: String, onBack: () -> Unit) {
     val actionState by viewModel.actionState.collectAsState()
     val finished = actionState != ActionViewModel.State.RUNNING
+    val saveLog = rememberExternalStoragePermissionLauncher {
+        viewModel.saveLog()
+    }
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
@@ -49,7 +53,7 @@ fun ActionScreen(viewModel: ActionViewModel, actionName: String, onBack: () -> U
                     if (finished) {
                         IconButton(
                             modifier = Modifier.padding(end = 16.dp),
-                            onClick = { viewModel.saveLog() }
+                            onClick = saveLog
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.ic_save),

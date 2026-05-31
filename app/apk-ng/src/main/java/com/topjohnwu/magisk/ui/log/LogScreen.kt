@@ -62,6 +62,7 @@ import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.topjohnwu.magisk.core.ktx.timeDateFormat
 import com.topjohnwu.magisk.core.ktx.toTime
 import com.topjohnwu.magisk.core.model.su.SuLog
+import com.topjohnwu.magisk.ui.component.rememberExternalStoragePermissionLauncher
 import com.topjohnwu.magisk.core.R as CoreR
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -74,6 +75,9 @@ fun LogScreen(viewModel: LogViewModel) {
         stringResource(CoreR.string.magisk)
     )
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    val saveMagiskLog = rememberExternalStoragePermissionLauncher {
+        viewModel.saveMagiskLog()
+    }
 
     Scaffold(
         topBar = {
@@ -81,7 +85,7 @@ fun LogScreen(viewModel: LogViewModel) {
                 title = { Text(stringResource(CoreR.string.logs)) },
                 actions = {
                     if (selectedTab == 1) {
-                        IconButton(onClick = { viewModel.saveMagiskLog() }) {
+                        IconButton(onClick = saveMagiskLog) {
                             Icon(
                                 imageVector = Icons.Default.Download,
                                 contentDescription = stringResource(CoreR.string.menuSaveLog),

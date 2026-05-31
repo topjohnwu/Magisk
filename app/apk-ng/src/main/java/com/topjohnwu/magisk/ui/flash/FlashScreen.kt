@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Const
+import com.topjohnwu.magisk.ui.component.rememberExternalStoragePermissionLauncher
 import com.topjohnwu.magisk.ui.terminal.TerminalScreen
 import com.topjohnwu.magisk.core.R as CoreR
 
@@ -41,6 +42,9 @@ fun FlashScreen(viewModel: FlashViewModel, action: String, onBack: () -> Unit) {
     val showReboot by viewModel.showReboot.collectAsState()
     val finished = flashState != FlashViewModel.State.FLASHING
     val useTerminal = action == Const.Value.FLASH_ZIP
+    val saveLog = rememberExternalStoragePermissionLauncher {
+        viewModel.saveLog()
+    }
 
     val statusText = when (flashState) {
         FlashViewModel.State.FLASHING -> stringResource(CoreR.string.flashing)
@@ -69,7 +73,7 @@ fun FlashScreen(viewModel: FlashViewModel, action: String, onBack: () -> Unit) {
                     if (finished) {
                         IconButton(
                             modifier = Modifier.padding(end = 4.dp),
-                            onClick = { viewModel.saveLog() }
+                            onClick = saveLog
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.ic_save),
