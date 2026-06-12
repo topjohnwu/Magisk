@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="upgrade_msg">Setup complete karne ke liye full Magisk install karna hoga. Abhi download aur install karein?</string>
+    <string name="no_internet_msg">Full Magisk upgrade ke liye Internet se connect hona zaroori hai!</string>
+    <string name="dling">Download ho raha hai…</string>
+    <string name="relaunch_app">App ko reopen karo</string>
+</resources>

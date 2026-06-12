@@ -1,15 +1,10 @@
 plugins {
-    id("com.android.library")
+    alias(libs.plugins.android.library)
 }
 
 setupCommon()
 
 android {
-    defaultConfig {
-        consumerProguardFiles("proguard-rules.pro")
-    }
-}
-
-dependencies {
-    api("io.michaelrocks:paranoid-core:0.3.5")
+    namespace = "com.topjohnwu.shared"
+    enableKotlin = false
 }

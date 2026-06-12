@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="item"
+            type="com.topjohnwu.magisk.ui.module.InstallModule" />
+
+        <variable
+            name="viewModel"
+            type="com.topjohnwu.magisk.ui.module.ModuleViewModel" />
+
+    </data>
+
+    <Button
+        style="@style/WidgetFoundation.Button.Outlined"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/l_50"
+        android:onClick="@{() -> viewModel.installPressed()}"
+        android:text="@string/module_action_install_external"
+        android:textAllCaps="false"
+        android:textSize="12sp"
+        app:cornerRadius="@dimen/r1"
+        app:icon="@drawable/ic_module_storage_md2" />
+
+</layout>

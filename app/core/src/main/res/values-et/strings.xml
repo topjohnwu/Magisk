@@ -1,0 +1,228 @@
+<resources>
+
+    <!--Sections-->
+    <string name="modules">Moodulid</string>
+    <string name="superuser">Superkasutaja</string>
+    <string name="logs">Logid</string>
+    <string name="settings">Seaded</string>
+    <string name="install">Installi</string>
+    <string name="section_home">Kodu</string>
+    <string name="section_theme">Teemad</string>
+    <string name="denylist">Keeluloend</string>
+
+    <!--Home-->
+    <string name="no_connection">Ühendus puudub</string>
+    <string name="app_changelog">Muudatuste logi</string>
+    <string name="loading">Laadimine…</string>
+    <string name="update">Uuenda</string>
+    <string name="not_available">teadmata</string>
+    <string name="hide">Peida</string>
+    <string name="home_package">Pakett</string>
+    <string name="home_app_title">Rakendus</string>
+
+    <string name="home_notice_content">Laadi Magisk alla vaid ametlikult GitHubi lehelt. Tundmatutest allikatest laaditud failid võivad olla pahatahtlikud!</string>
+    <string name="home_support_title">Toeta meid</string>
+    <string name="home_item_source">Lähtekood</string>
+    <string name="home_support_content">Magisk on ja jääb alati tasuta ning avatud lähtekoodiga kättesaadavaks. Siiski, sa võid meile väikese annetuse näol toetust üles näidata.</string>
+    <string name="home_installed_version">Installitud</string>
+    <string name="home_latest_version">Viimatine</string>
+    <string name="invalid_update_channel">Sobimatu uuenduste kanal</string>
+    <string name="uninstall_magisk_title">Eemalda Magisk</string>
+    <string name="uninstall_magisk_msg">Kõik moodulid keelatakse/eemaldatakse!\nJuurkasutaja eemaldatakse!\nMistahes sisemälu failid, millelt eemaldati Magiski tarbeks krüpteering, krüpteeritakse taas!</string>
+
+    <!--Install-->
+    <string name="keep_force_encryption">Säilita sunnitud krüpteering</string>
+    <string name="keep_dm_verity">Säilita AVB 2.0/dm-verity</string>
+    <string name="recovery_mode">Taastusrežiim</string>
+    <string name="install_options_title">Valikud</string>
+    <string name="install_method_title">Meetod</string>
+    <string name="install_next">Edasi</string>
+    <string name="install_start">Läksime</string>
+    <string name="manager_download_install">Vajuta allalaadimiseks ja installimiseks</string>
+    <string name="direct_install">Otsene install (soovitatud)</string>
+    <string name="install_inactive_slot">Installi ebaaktiivsesse lahtrisse (pärast üle-õhu uuendust)</string>
+    <string name="install_inactive_slot_msg">Pärast taaskäivitust SUNNITAKSE sinu seade käivituma praegusesse ebaaktiivsesse lahtrisse!\nKasuta seda valikut vaid peale üle-õhu uuenduse teostamist.\nJätkad?</string>
+    <string name="setup_title">Lisaseadistus</string>
+    <string name="select_patch_file">Vali ja paika fail</string>
+    <string name="patch_file_msg">Vali toortõmmis (*.img) või ODIN tar-fail (*.tar)</string>
+    <string name="reboot_delay_toast">Taaskäivitamine 5 sekundi pärast…</string>
+    <string name="flash_screen_title">Installimine</string>
+
+    <!--Superuser-->
+    <string name="su_request_title">Superkasutaja taotlus</string>
+    <string name="touch_filtered_warning">Kuna rakendus varjab superkasutaja päringut, ei saa Magisk sinu vastust kinnitada</string>
+    <string name="deny">Keela</string>
+    <string name="prompt">Küsi</string>
+    <string name="grant">Luba</string>
+    <string name="su_warning">Annab täieliku ligipääsu sinu seadmele.\nKui sa pole kindel, keela!</string>
+    <string name="forever">Igavesti</string>
+    <string name="once">Üks kord</string>
+    <string name="tenmin">10 min</string>
+    <string name="twentymin">20 min</string>
+    <string name="thirtymin">30 min</string>
+    <string name="sixtymin">60 min</string>
+    <string name="su_allow_toast">Rakendusele %1$s anti superkasutaja õigused</string>
+    <string name="su_deny_toast">Rakendusel %1$s keelati superkasutaja õigused</string>
+    <string name="su_snack_grant">Superkasutaja õigused antud rakendusele %1$s</string>
+    <string name="su_snack_deny">Superkasutaja õigused keelatud rakendusele %1$s</string>
+    <string name="su_snack_notif_on">Teavitused lubatud rakendusele %1$s</string>
+    <string name="su_snack_notif_off">Teavitused keelatud rakendusele %1$s</string>
+    <string name="su_snack_log_on">Logimine lubatud rakendusele %1$s</string>
+    <string name="su_snack_log_off">Logimine keelatud rakendusele %1$s</string>
+    <string name="su_revoke_title">Eemaldad?</string>
+    <string name="su_revoke_msg">Kinnitad rakenduse %1$s õiguste eemaldamise?</string>
+    <string name="toast">Hüpik</string>
+    <string name="none">Puudub</string>
+
+    <string name="superuser_toggle_notification">Teavitused</string>
+    <string name="superuser_toggle_revoke">Eemalda</string>
+    <string name="superuser_policy_none">Ükski rakendus ei ole veel superkasutaja õigusi küsinud.</string>
+
+    <!--Logs-->
+    <string name="log_data_none">Sa oled logivaba, proovi oma superkasutaja õigustega rakendusi rohkem kasutada</string>
+    <string name="log_data_magisk_none">Magiski logid on tühjad, see on imelik</string>
+    <string name="menuSaveLog">Salvesta logi</string>
+    <string name="menuClearLog">Tühjenda logi nüüd</string>
+    <string name="logs_cleared">Logi edukalt tühjendatud.</string>
+    <string name="pid">PID: %1$d</string>
+    <string name="target_uid">Siht-UID: %1$d</string>
+
+    <!--SafetyNet-->
+
+    <!--MagiskHide-->
+    <string name="show_system_app">Kuva uuendatavad süsteemirakendused</string>
+    <string name="show_os_app">Kuva fikseeritud süsteemirakendused</string>
+    <string name="hide_filter_hint">Filtreeri nime järgi</string>
+    <string name="hide_search">Otsing</string>
+
+    <!--Module-->
+    <string name="no_info_provided">(Info puudub)</string>
+    <string name="reboot_userspace">Pehme taaskäivitus</string>
+    <string name="reboot_recovery">Taaskäivita taastusesse</string>
+    <string name="reboot_bootloader">Taaskäivita käivitushaldurisse</string>
+    <string name="reboot_download">Taaskäivita allalaadimisrežiimi</string>
+    <string name="reboot_edl">Taaskäivita EDLi</string>
+    <string name="module_version_author">%1$s autorilt %2$s</string>
+    <string name="module_state_remove">Eemalda</string>
+    <string name="module_state_restore">Taasta</string>
+    <string name="module_action_install_external">Installi sisemälust</string>
+    <string name="update_available">Uuendus saadaval</string>
+    <string name="suspend_text_riru">Moodul keelatud %1$s lubamise tõttu</string>
+    <string name="suspend_text_zygisk">Moodul keelatud %1$s mittelubamise tõttu</string>
+    <string name="zygisk_module_unloaded">Zygisk-moodulit ei laaditud ühildumatuse tõttu</string>
+
+    <!--Settings-->
+    <string name="settings_dark_mode_title">Teema režiim</string>
+    <string name="settings_dark_mode_message">Vali režiim, mis ühtib sinu stiiliga!</string>
+    <string name="settings_dark_mode_light">Alati hele</string>
+    <string name="settings_dark_mode_system">Järgi süsteemi</string>
+    <string name="settings_dark_mode_dark">Alati tume</string>
+    <string name="settings_download_path_title">Allalaadimise failitee</string>
+    <string name="settings_download_path_message">Failid salvestatakse kausta %1$s</string>
+    <string name="settings_hide_app_title">Peida Magiski rakendus</string>
+    <string name="settings_hide_app_summary">Paigalda juhusliku paketi-ID ja kohandatud nimega puhverrakendus</string>
+    <string name="settings_restore_app_title">Taasta Magiski rakendus</string>
+    <string name="settings_restore_app_summary">Too rakendus peidust välja, taastades originaalse APK</string>
+    <string name="language">Keel</string>
+    <string name="system_default">(Süsteemi vaikesäte)</string>
+    <string name="settings_check_update_title">Kontrolli uuendusi</string>
+    <string name="settings_check_update_summary">Kontrolli taustal perioodiliselt uuendusi</string>
+    <string name="settings_update_channel_title">Uuenduste kanal</string>
+    <string name="settings_update_stable">Stabiilne</string>
+    <string name="settings_update_beta">Beeta</string>
+    <string name="settings_update_custom">Kohandatud</string>
+    <string name="settings_update_custom_msg">Sisesta kohandatud kanali URL</string>
+    <string name="settings_zygisk_summary">Käivita teatud Magiski osi zygote-protsessis</string>
+    <string name="settings_denylist_title">Jõusta keeluloend</string>
+    <string name="settings_denylist_summary">Keeluloendis olevatel protsessidel tühistatakse kõik Magiski muudatused</string>
+    <string name="settings_denylist_config_title">Seadista keeluloendit</string>
+    <string name="settings_denylist_config_summary">Vali keeluloendisse lisatavad protsessid</string>
+    <string name="settings_hosts_title">Süsteemivaba hosts</string>
+    <string name="settings_hosts_summary">Süsteemivaba hosts-tugi reklaamiblokeerijatest rakendustele</string>
+    <string name="settings_hosts_toast">Süsteemivaba hostsi moodul lisatud</string>
+    <string name="settings_app_name_hint">Uus nimi</string>
+    <string name="settings_app_name_helper">Rakendus taaspakitakse selle nimega</string>
+    <string name="settings_app_name_error">Sobimatu vorming</string>
+    <string name="settings_su_app_adb">Rakendused ja ADB</string>
+    <string name="settings_su_app">Ainult rakendused</string>
+    <string name="settings_su_adb">Ainult ADB</string>
+    <string name="settings_su_disable">Keelatud</string>
+    <string name="settings_su_request_10">10 sekundit</string>
+    <string name="settings_su_request_15">15 sekundit</string>
+    <string name="settings_su_request_20">20 sekundit</string>
+    <string name="settings_su_request_30">30 sekundit</string>
+    <string name="settings_su_request_45">45 sekundit</string>
+    <string name="settings_su_request_60">60 sekundit</string>
+    <string name="superuser_access">Superkasutaja ligipääs</string>
+    <string name="auto_response">Automaatne vastus</string>
+    <string name="request_timeout">Taotluse ajalõpp</string>
+    <string name="superuser_notification">Superkasutaja teavitus</string>
+    <string name="settings_su_reauth_title">Taas-autendi peale uuendust</string>
+    <string name="settings_su_reauth_summary">Pärast rakenduste uuendamist küsi superkasutaja luba uuesti</string>
+    <string name="settings_su_tapjack_title">Nupu varjamise kaitse</string>
+    <string name="settings_su_tapjack_summary">Superkasutaja taotluse hüpik ei reageeri vajutusele, kui seda katab mõni teine aken või ülekate</string>
+    <string name="settings_customization">Kohandamine</string>
+    <string name="setting_add_shortcut_summary">Lisa avakuvale ilus otsetee juhuks, kui nime ja ikooni on pärast rakenduse peitmist raske tuvastada</string>
+    <string name="settings_doh_title">DNS üle HTTPSi</string>
+    <string name="settings_doh_description">Väldi mõnes riigis DNSi mürgitamist</string>
+
+    <string name="multiuser_mode">Mitmikkasutaja režiim</string>
+    <string name="settings_owner_only">Ainult seadme omanik</string>
+    <string name="settings_owner_manage">Seadme omaniku hallatud</string>
+    <string name="settings_user_independent">Kasutajast sõltumatu</string>
+    <string name="owner_only_summary">Ainult omanikul on juurkasutaja õigused</string>
+    <string name="owner_manage_summary">Ainult omanik saab hallata juurkasutaja ligipääsu ja saada taotlusküsimusi</string>
+    <string name="user_independent_summary">Igal kasutajal on oma isiklikud juurkasutaja reeglid.</string>
+
+    <string name="mount_namespace_mode">Nimeruumi monteerimisrežiim</string>
+    <string name="settings_ns_global">Globaalne nimeruum</string>
+    <string name="settings_ns_requester">Võta nimeruum üle</string>
+    <string name="settings_ns_isolate">Isoleeritud nimeruum</string>
+    <string name="global_summary">Kõik juurkasutaja sessioonid kasutavad globaalset monteerimise nimeruumi</string>
+    <string name="requester_summary">Juurkasutaja sessioonid võtavad üle selle taotleja nimeruumi</string>
+    <string name="isolate_summary">Iga juurkasutaja sessioon saab oma isoleeritud nimeruumi</string>
+
+    <!--Notifications-->
+    <string name="update_channel">Magiski uuendused</string>
+    <string name="progress_channel">Edenemise teated</string>
+    <string name="download_complete">Allalaadimine valmis</string>
+    <string name="download_file_error">Faili allalaadimisel esines viga</string>
+    <string name="magisk_update_title">Magiski uuendus on saadaval!</string>
+
+    <!--Toasts, Dialogs-->
+    <string name="yes">Jah</string>
+    <string name="no">Ei</string>
+    <string name="repo_install_title">Installi %1$s %2$s(%3$d)</string>
+    <string name="download">Allalaadimine</string>
+    <string name="reboot">Taaskäivita</string>
+    <string name="release_notes">Väljalaskemärkmed</string>
+    <string name="flashing">Välgutamine…</string>
+    <string name="done">Valmis!</string>
+    <string name="failure">Ebaõnnestus</string>
+    <string name="hide_app_title">Magiski rakenduse peitmine…</string>
+    <string name="open_link_failed_toast">Lingi avamiseks sobivat rakendust ei leitud.</string>
+    <string name="complete_uninstall">Täielik eemaldus</string>
+    <string name="restore_img">Taasta tõmmised</string>
+    <string name="restore_img_msg">Taastamine…</string>
+    <string name="restore_done">Taastamine valmis!</string>
+    <string name="restore_fail">Originaalne varundus puudub!</string>
+    <string name="setup_fail">Seadistus ebaõnnnestus</string>
+    <string name="env_fix_title">Vajab lisaseadistust</string>
+    <string name="env_fix_msg">Sinu seade vajab Magiski korralikuks toimimiseks lisaseadistust. Kas soovid jätkata ning seadme taaskäivitada?</string>
+    <string name="setup_msg">Käivitan keskkonnaseadistust…</string>
+    <string name="unsupport_magisk_title">Mittetoetatud Magiski versioon</string>
+    <string name="unsupport_magisk_msg">See rakenduse versioon ei toeta Magiski versioone, mis on vanemad kui %1$s.\n\nRakendus käitub nii, nagu Magisk ei olekski installitud, palun täienda Magiskit esimesel võimalusel.</string>
+    <string name="unsupport_general_title">Ebanormaalne seisund</string>
+    <string name="unsupport_system_app_msg">Selle rakenduse käitamine süsteemirakendusena ei ole toetatud. Palun taasta see kasutajarakenduseks.</string>
+    <string name="unsupport_other_su_msg">Tuvastati \"su\"-binaar, mida ei installinud Magisk. Palun eemalda mistahes konkureeriv juurkasutaja paigaldus ja/või taasinstalli Magisk.</string>
+    <string name="unsupport_external_storage_msg">Magisk on paigaldatud välismällu. Palun liiguta rakendus sisemällu.</string>
+    <string name="unsupport_nonroot_stub_msg">Peidetud Magiski rakendus ei saa enam töötada, kuna juurkasutaja on kadunud. Palun taasta originaalne APK.</string>
+    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
+    <string name="external_rw_permission_denied">Selle funktsionaalsuse lubamiseks anna mäluruumi haldamise luba</string>
+    <string name="add_shortcut_title">Lisa avakuvale otsetee</string>
+    <string name="add_shortcut_msg">Pärast selle rakenduse peitmist võib selle nimi ja ikoon olla raskesti tuvastatav. Kas soovid avakuvale lisada ilusa otsetee?</string>
+    <string name="app_not_found">Selle tegevuse teostamiseks ei leitud ühtegi rakendust</string>
+    <string name="reboot_apply_change">Muudatuste rakendamiseks taaskäivita</string>
+    <string name="restore_app_confirmation">See taastab peidetud rakenduse uuesti originaalseks rakenduseks. Kas soovid tõesti seda teha?</string>
+
+</resources>

@@ -2,17 +2,17 @@ out
 *.zip
 *.jks
 *.apk
+*.log
 /config.prop
-/update.sh
-/dict.txt
+/notes.md
 
 # Built binaries
 native/out
 
-# Android Studio / Gradle
+# Android Studio
 *.iml
-.gradle
-/local.properties
-/.idea
-/build
-/captures
+.idea
+.cursor
+ramdisk.img
+app/core/src/debug
+app/core/src/release

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="WidgetFoundation.Appbar" parent="Widget.MaterialComponents.AppBarLayout.Surface" />
+
+    <style name="WidgetFoundation.Toolbar" parent="Widget.MaterialComponents.Toolbar.Surface">
+        <item name="titleTextAppearance">@style/AppearanceFoundation.Title</item>
+        <item name="titleTextColor">?colorOnSurface</item>
+        <item name="subtitleTextAppearance">@style/AppearanceFoundation.Caption</item>
+        <item name="subtitleTextColor">?colorOnSurfaceVariant</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="contentInsetStartWithNavigation">0dp</item>
+        <item name="android:layout_height">?actionBarSize</item>
+        <item name="android:theme">@style/ThemeOverlay.MaterialComponents.ActionBar</item>
+    </style>
+
+
+    <style name="WidgetFoundation.Card" parent="Widget.MaterialComponents.CardView">
+        <item name="android:focusable">auto</item>
+        <item name="cardBackgroundColor">?colorSurfaceVariant</item>
+        <item name="cardCornerRadius">@dimen/l_50</item>
+        <item name="cardElevation">0dp</item>
+        <item name="cardPreventCornerOverlap">false</item>
+    </style>
+
+    <style name="WidgetFoundation.Card.Primary">
+        <item name="cardBackgroundColor">?colorPrimary</item>
+    </style>
+
+    <style name="WidgetFoundation.Card.Elevated">
+        <item name="cardBackgroundColor">?colorSurfaceSurfaceVariant</item>
+        <item name="cardCornerRadius">@dimen/l_50</item>
+        <item name="cardElevation">@dimen/l_125</item>
+    </style>
+
+
+    <style name="WidgetFoundation.Button" parent="Widget.MaterialComponents.Button">
+        <item name="android:textStyle">bold</item>
+        <item name="iconGravity">textStart</item>
+        <item name="iconPadding">@dimen/l_50</item>
+    </style>
+
+    <style name="WidgetFoundation.Button.Outlined" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:textStyle">bold</item>
+        <item name="iconGravity">textStart</item>
+        <item name="iconPadding">@dimen/l_50</item>
+        <item name="strokeColor">?colorPrimary</item>
+        <item name="android:textColor">?colorPrimary</item>
+    </style>
+
+    <style name="WidgetFoundation.Button.Outlined.Error">
+        <item name="strokeColor">@color/color_error_transient</item>
+        <item name="rippleColor">@color/color_error_transient</item>
+        <item name="android:textColor">@color/color_error_transient</item>
+        <item name="iconTint">@color/color_error_transient</item>
+    </style>
+
+    <style name="WidgetFoundation.Button.Text" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textStyle">bold</item>
+        <item name="iconGravity">textStart</item>
+        <item name="iconPadding">@dimen/l_50</item>
+    </style>
+
+    <style name="WidgetFoundation.Button.Text.OnPrimary">
+        <item name="rippleColor">?colorOnPrimary</item>
+        <item name="android:textColor">?colorOnPrimary</item>
+        <item name="iconTint">?colorOnPrimary</item>
+    </style>
+
+
+    <style name="WidgetFoundation.Image">
+        <item name="android:layout_width">32dp</item>
+        <item name="android:layout_height">32dp</item>
+    </style>
+
+    <style name="WidgetFoundation.Image.Big">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+    </style>
+
+    <style name="WidgetFoundation.Image.Small">
+        <item name="android:layout_width">24dp</item>
+        <item name="android:layout_height">24dp</item>
+    </style>
+
+
+    <style name="WidgetFoundation.Icon" parent="WidgetFoundation.Image.Big">
+        <item name="android:padding">@dimen/l_75</item>
+        <item name="android:background">?selectableItemBackgroundBorderless</item>
+        <item name="tint">@color/color_text_transient</item>
+    </style>
+
+    <style name="WidgetFoundation.Icon.Primary">
+        <item name="tint">@color/color_primary_transient</item>
+    </style>
+
+    <style name="WidgetFoundation.Icon.OnPrimary">
+        <item name="tint">@color/color_on_primary_transient</item>
+    </style>
+
+    <style name="WidgetFoundation.Checkbox" parent="Widget.AppCompat.CompoundButton.CheckBox">
+        <item name="android:paddingStart">@dimen/l1</item>
+        <item name="android:paddingEnd">@dimen/l1</item>
+    </style>
+
+    <style name="WidgetFoundation.RadioButton" parent="Widget.AppCompat.CompoundButton.RadioButton">
+        <item name="android:paddingStart">@dimen/l1</item>
+        <item name="android:paddingEnd">@dimen/l1</item>
+    </style>
+
+    <style name="WidgetFoundation.ProgressBar" parent="Widget.AppCompat.ProgressBar.Horizontal">
+        <item name="android:indeterminate">false</item>
+        <item name="android:layout_height">4dp</item>
+    </style>
+
+    <style name="WidgetFoundation.ProgressBar.Indeterminate" parent="Widget.AppCompat.ProgressBar.Horizontal">
+        <item name="android:indeterminate">true</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">100dp</item>
+        <item name="android:indeterminateTint">?colorPrimary</item>
+    </style>
+
+</resources>

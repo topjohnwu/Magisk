@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.topjohnwu.magisk.ui.module.ModuleViewModel" />
+
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/module_list"
+            gone="@{viewModel.loading}"
+            app:items="@{viewModel.items}"
+            app:extraBindings="@{viewModel.extraBindings}"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:orientation="vertical"
+            android:paddingTop="@dimen/internal_action_bar_size"
+            android:paddingBottom="@dimen/internal_action_bar_size"
+            app:fitsSystemWindowsInsets="top|bottom"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/item_module_md2" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                goneUnless="@{viewModel.loading}"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/loading"
+                android:textAppearance="@style/AppearanceFoundation.Title"
+                android:textStyle="bold" />
+
+            <ProgressBar
+                style="@style/WidgetFoundation.ProgressBar.Indeterminate"
+                goneUnless="@{viewModel.loading}"
+                android:layout_marginTop="@dimen/l1" />
+
+            <TextView
+                gone="@{viewModel.loading || viewModel.items.size() != 1 }"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/module_empty"
+                android:textAppearance="@style/AppearanceFoundation.Title"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+    </FrameLayout>
+
+
+</layout>

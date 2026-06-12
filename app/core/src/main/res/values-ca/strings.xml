@@ -1,0 +1,211 @@
+<resources>
+
+    <!--Sections-->
+    <string name="modules">Mòduls</string>
+    <string name="superuser">Superusuari</string>
+    <string name="logs">Registre</string>
+    <string name="settings">Configuració</string>
+    <string name="install">Instal·lar</string>
+    <string name="section_home">Inici</string>
+    <string name="section_theme">Temes</string>
+
+    <!--Home-->
+    <string name="no_connection">Connexió no disponible</string>
+    <string name="app_changelog">Registre de canvis</string>
+    <string name="loading">Carregant…</string>
+    <string name="update">Actualització</string>
+    <string name="not_available">N/A</string>
+    <string name="hide">Amagar</string>
+    <string name="home_package">Paquet</string>
+    <string name="home_app_title">App</string>
+
+    <string name="home_notice_content">Descarregui Magisk NOMÉS des de la pàgina oficial de GitHub. Fitxers d\'altres fonts desconegudes poden ser maliciosos!</string>
+    <string name="home_support_title">Doni suport</string>
+    <string name="home_item_source">Codi font</string>
+    <string name="home_support_content">Magisk és, i sempre serà, gratis i codi lliure. De totes maneres, pot mostrar el seu interès fent una petita donació.</string>
+    <string name="home_installed_version">Instal·lat</string>
+    <string name="home_latest_version">Última</string>
+    <string name="invalid_update_channel">Canal d\'actualització invàlid</string>
+    <string name="uninstall_magisk_title">Desinstal·lar Magisk</string>
+    <string name="uninstall_magisk_msg">Tots els mòduls seran desactivats i eliminats! L\'accés d\'arrel s\'eliminarà i, possiblement, xifrarà totes les dades (si no estan ja xifrades).</string>
+
+    <!--Install-->
+    <string name="keep_force_encryption">Mantenir el xifrat forçat</string>
+    <string name="keep_dm_verity">Mantenir AVB 2.0/dm-verity</string>
+    <string name="recovery_mode">Mode de Recuperació</string>
+    <string name="install_options_title">Opcions</string>
+    <string name="install_method_title">Mètode</string>
+    <string name="install_next">Següent</string>
+    <string name="install_start">Endavant</string>
+    <string name="manager_download_install">Premi per baixar i instal·lar</string>
+    <string name="direct_install">Instal·lació directa (Recomanat)</string>
+    <string name="install_inactive_slot">Instal·la a la ranura inactiva (Després d\'una OTA)</string>
+    <string name="install_inactive_slot_msg">El teu dispositiu serà FORÇAT a arrancar en l\'actual ranura inactiva després del reinici!\nUtilitza aquesta opció NOMÉS quan l\'OTA s\'hagi fet.\nContinuar?</string>
+    <string name="setup_title">Instal·lació addicional</string>
+    <string name="select_patch_file">Selecciona i arranja un arxiu</string>
+    <string name="patch_file_msg">Selecciona una imatge crua (*.img) o un ODIN tarfile (*.tar)</string>
+    <string name="reboot_delay_toast">Reinici en 5 segons…</string>
+    <string name="flash_screen_title">Instal·lació</string>
+
+    <!--Superuser-->
+    <string name="su_request_title">Petició de superusuari</string>
+    <string name="touch_filtered_warning">Com que una aplicació està ofuscant la petició de superusuari, Magisk no pot verificar la seva resposta</string>
+    <string name="deny">Denegar</string>
+    <string name="prompt">Preguntar</string>
+    <string name="grant">Permetre</string>
+    <string name="su_warning">Permet accés total al seu dispositiu.\nDenegui si no n\'està segur!</string>
+    <string name="forever">Sempre</string>
+    <string name="once">Un cop </string>
+    <string name="tenmin">10 mins</string>
+    <string name="twentymin">20 mins</string>
+    <string name="thirtymin">30 mins</string>
+    <string name="sixtymin">60 mins</string>
+    <string name="su_allow_toast">Permesos els drets de superusuari de %1$s</string>
+    <string name="su_deny_toast">Denegats els drets de superusuari de %1$s</string>
+    <string name="su_snack_grant">Drets de superusuari de %1$s permesos</string>
+    <string name="su_snack_deny">Drets de superusuari de %1$s denegats</string>
+    <string name="su_snack_notif_on">Notificacions de %1$s habilitades</string>
+    <string name="su_snack_notif_off">Notificacions de %1$s deshabilitades</string>
+    <string name="su_snack_log_on">Registres de %1$s habilitats</string>
+    <string name="su_snack_log_off">Registres de %1$s deshabilitats</string>
+    <string name="su_revoke_title">Revocar?</string>
+    <string name="su_revoke_msg">Confirmi per revocar drets de %1$s</string>
+    <string name="toast">Avís</string>
+    <string name="none">Cap</string>
+
+    <string name="superuser_toggle_notification">Notificacions</string>
+    <string name="superuser_toggle_revoke">Revocar</string>
+    <string name="superuser_policy_none">Cap aplicació ha demanat permisos de superusuari.</string>
+
+    <!--Logs-->
+    <string name="log_data_none">No hi ha cap registre. Provi d\'utilitzar aplicacions que requereixen permisos de superusuari.</string>
+    <string name="log_data_magisk_none">Els registres de Magisk estan buits. Això és estrany.</string>
+    <string name="menuSaveLog">Desar registre</string>
+    <string name="menuClearLog">Netejar registre ara</string>
+    <string name="logs_cleared">Registre netejat correctament.</string>
+    <string name="pid">PID: %1$d</string>
+    <string name="target_uid">UID de l\'objectiu: %1$d</string>
+
+    <!--SafetyNet-->
+
+    <!-- MagiskHide -->
+    <string name="show_system_app">Mostra aplicacions del sistema</string>
+    <string name="show_os_app">Mostra aplicacions del SO</string>
+    <string name="hide_filter_hint">Filtra per nom</string>
+    <string name="hide_search">Cerca</string>
+
+    <!--Module-->
+    <string name="no_info_provided">(No hi ha informació)</string>
+    <string name="reboot_userspace">Reinici suau</string>
+    <string name="reboot_recovery">Reiniciar en Mode Recuperació</string>
+    <string name="reboot_bootloader">Reiniciar en Mode Bootloader</string>
+    <string name="reboot_download">Reiniciar en Mode Download</string>
+    <string name="reboot_edl">Reiniciar a EDL</string>
+    <string name="module_version_author">%1$s per %2$s</string>
+    <string name="module_state_remove">Eliminar</string>
+    <string name="module_state_restore">Recuperar</string>
+    <string name="module_action_install_external">Instal·lar des de l\'emmagatzematge</string>
+    <string name="update_available">Actualització Disponible</string>
+
+    <!--Settings-->
+    <string name="settings_dark_mode_title">Mode del tema</string>
+    <string name="settings_dark_mode_message">Seleccioni el mode que més s\'adeqüi al seu estil!</string>
+    <string name="settings_dark_mode_light">Sempre clar</string>
+    <string name="settings_dark_mode_system">Seguir al sistema</string>
+    <string name="settings_dark_mode_dark">Sempre fosc</string>
+    <string name="settings_download_path_title">Directori de baixades</string>
+    <string name="settings_download_path_message">Els arxius es desaran a %1$s</string>
+    <string name="settings_hide_app_title">Amagar Magisk Manager</string>
+    <string name="settings_hide_app_summary">Torna a empaquetar Magisk Manager amb un nom de paquet a l\'atzar</string>
+    <string name="settings_restore_app_title">Restaurar Magisk Manager</string>
+    <string name="settings_restore_app_summary">Restaura Magisk Manager amb el nom de paquet original</string>
+    <string name="language">Idioma</string>
+    <string name="system_default">(Idioma del sistema)</string>
+    <string name="settings_check_update_title">Comprovar Actualitzacions</string>
+    <string name="settings_check_update_summary">Comprovar periòdicament en segon pla si existeixen actualitzacions</string>
+    <string name="settings_update_channel_title">Canal d\'Actualitzacions</string>
+    <string name="settings_update_stable">Estable</string>
+    <string name="settings_update_beta">Beta</string>
+    <string name="settings_update_custom">Canal personalitzat</string>
+    <string name="settings_update_custom_msg">Inserta un URL personalitzada</string>
+    <string name="settings_hosts_title">Systemless Hosts</string>
+    <string name="settings_hosts_summary">Suport per aplicacions tipus Adblock fora de la partició del sistema</string>
+    <string name="settings_hosts_toast">Agregat el mòdul Systemless Hosts</string>
+    <string name="settings_app_name_hint">Nou nom</string>
+    <string name="settings_app_name_helper">Es refarà l\'aplicació amb aquest nom</string>
+    <string name="settings_app_name_error">Format invàlid</string>
+    <string name="settings_su_app_adb">Aplicacions i ADB</string>
+    <string name="settings_su_app">Només aplicacions</string>
+    <string name="settings_su_adb">Només ADB</string>
+    <string name="settings_su_disable">Deshabilitat</string>
+    <string name="settings_su_request_10">10 segons</string>
+    <string name="settings_su_request_15">15 segons</string>
+    <string name="settings_su_request_20">20 segons</string>
+    <string name="settings_su_request_30">30 segons</string>
+    <string name="settings_su_request_45">45 segons</string>
+    <string name="settings_su_request_60">60 segons</string>
+    <string name="superuser_access">Accés de superusuari</string>
+    <string name="auto_response">Resposta automàtica</string>
+    <string name="request_timeout">Temps de petició</string>
+    <string name="superuser_notification">Notificació de superusuari</string>
+    <string name="settings_su_reauth_title">Demanar després d\'una actualització</string>
+    <string name="settings_su_reauth_summary">Demanar permisos de superusuari novament si una aplicació és actualitzada o reinstal·lada</string>
+    <string name="settings_su_tapjack_title">Activa la protecció contra \'TapJacking\'</string>
+    <string name="settings_su_tapjack_summary">El diàleg per donar permisos de superusuari no respondrà mentre estigui ofuscat per alguna altra finestra o superposició</string>
+    <string name="settings_customization">Personalització</string>
+    <string name="setting_add_shortcut_summary">Afegeix una bonica drecera a la pantalla d\'inici en cas que el nom i la icona siguin difícils de reconèixer després d\'amagar l\'aplicació.</string>
+    <string name="settings_doh_title">DNS sobre HTTPS</string>
+    <string name="settings_doh_description">Solució per enverinament de DNS en algunes nacions</string>
+
+    <string name="multiuser_mode">Mode Multiusuari</string>
+    <string name="settings_owner_only">Només Administrador del Dispositiu</string>
+    <string name="settings_owner_manage">Administrador del Dispositiu</string>
+    <string name="settings_user_independent">Usuari Independent</string>
+    <string name="owner_only_summary">Només l\'administrador té accés d\'arrel</string>
+    <string name="owner_manage_summary">Només l\'administrador pot supervisar l\'accés d\'arrel i rebre sol·licituds d\'altres usuaris</string>
+    <string name="user_independent_summary">Tots els usuaris tenen separades les seves pròpies regles d\'arrel</string>
+
+    <string name="mount_namespace_mode">Muntar Namespace </string>
+    <string name="settings_ns_global">Namespace Global</string>
+    <string name="settings_ns_requester">Heretar Namespace</string>
+    <string name="settings_ns_isolate">Aïllar Namespace</string>
+    <string name="global_summary">Totes les sessions d\'arrel utilitzen el suport Namespace Global</string>
+    <string name="requester_summary">Les sessions d\'arrel heretaran les peticions Namespace</string>
+    <string name="isolate_summary">Totes les sessions d\'arrel tindran la seva pròpia Namespace</string>
+
+    <!--Notifications-->
+    <string name="update_channel">Actualització de Magisk</string>
+    <string name="progress_channel">Notificacions de progrés</string>
+    <string name="download_complete">Baixada completada</string>
+    <string name="download_file_error">Error en baixar l\'arxiu</string>
+    <string name="magisk_update_title">Actualització de Magisk disponible!</string>
+
+    <!--Toasts, Dialogs-->
+    <string name="yes">Sí</string>
+    <string name="no">No</string>
+    <string name="repo_install_title">Instal·lar %1$s %2$s(%3$d)</string>
+    <string name="download">Baixar</string>
+    <string name="reboot">Reiniciar</string>
+    <string name="release_notes">Notes de llançament</string>
+    <string name="flashing">Arranjament…</string>
+    <string name="done">Fet!</string>
+    <string name="failure">Fallit</string>
+    <string name="hide_app_title">Amagant Magisk Manager…</string>
+    <string name="open_link_failed_toast">No s\'ha trobat una aplicació per obrir l\'enllaç</string>
+    <string name="complete_uninstall">Desinstal·lació completa</string>
+    <string name="restore_img">Restaura imatges</string>
+    <string name="restore_img_msg">Restaurant…</string>
+    <string name="restore_done">Restauració feta!</string>
+    <string name="restore_fail">La còpia de seguretat de Estock no existeix!</string>
+    <string name="setup_fail">Instal·lació fallida</string>
+    <string name="env_fix_title">Es requereix instal·lació addicional</string>
+    <string name="env_fix_msg">El teu dispositiu necessita instal·lació addicional per Magisk per funcionar correctament. Es baixarà el ZIP d\'instal·lació de Magisk, vol procedir a la instal·lació ara?</string>
+    <string name="setup_msg">S\'està executant la configuració de l\'entorn…</string>
+    <string name="unsupport_magisk_title">Versió de Magisk incompatible</string>
+    <string name="unsupport_magisk_msg">Aquesta versió de Magisk Manager no suporta versions de Magisk més petites que la %1$s.\n\nL\'aplicació es comportarà com si Magisk no estigués instal·lat, si us plau actualitzi Magisk com més aviat millor.</string>
+    <string name="external_rw_permission_denied">Ha de donar permís d\'emmagatzematge per activar aquesta funcionalitat</string>
+    <string name="add_shortcut_title">Afegeix una drecera a la pantalla d\'inici</string>
+    <string name="add_shortcut_msg">Després d\'amagar Magisk Manager, el seu nom i icona poden ser difícils de reconèixer. Vols afegir una bonica drecera a la teva pantalla d\'inici?</string>
+    <string name="app_not_found">No s\'ha trobat una aplicació per emprar aquesta acció</string>
+
+</resources>

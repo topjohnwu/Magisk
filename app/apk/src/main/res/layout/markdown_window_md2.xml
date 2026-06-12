@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/md_txt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:breakStrategy="simple"
+        android:hyphenationFrequency="none"
+        android:paddingTop="10dp"
+        android:textAppearance="@style/AppearanceFoundation.Caption"
+        tools:ignore="UnusedAttribute" />
+
+</ScrollView>

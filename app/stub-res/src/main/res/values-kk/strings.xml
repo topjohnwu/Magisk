@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="upgrade_msg">Орнатуды аяқтау үшін Magisk қолданбасының толық нұсқасын жүктеп алу керек. Жалғастырасыз ба?</string>
+    <string name="no_internet_msg">Интернетке қосылыңызшы! Magisk қолданбасын жаңарту керек.</string>
+    <string name="dling">Жүктеп алуда</string>
+    <string name="relaunch_app">Қолданбаны қайта қосыңыз</string>
+</resources>

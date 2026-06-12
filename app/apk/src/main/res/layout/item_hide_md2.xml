@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="com.topjohnwu.magisk.R" />
+
+        <variable
+            name="item"
+            type="com.topjohnwu.magisk.ui.deny.DenyListRvItem" />
+
+        <variable
+            name="viewModel"
+            type="com.topjohnwu.magisk.ui.deny.DenyListViewModel" />
+
+    </data>
+
+    <com.google.android.material.card.MaterialCardView
+        style="@style/WidgetFoundation.Card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:focusable="false"
+        tools:layout_gravity="center"
+        tools:layout_marginBottom="@dimen/l1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/hide_expand"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:nextFocusRight="@id/hide_expand_icon"
+                android:onClick="@{item::toggleExpand}">
+
+                <ImageView
+                    android:id="@+id/hide_icon"
+                    style="@style/WidgetFoundation.Image"
+                    android:layout_margin="@dimen/l1"
+                    android:src="@{item.info.iconImage}"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0"
+                    tools:src="@drawable/ic_launcher" />
+
+                <TextView
+                    android:id="@+id/hide_name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/l1"
+                    android:ellipsize="middle"
+                    android:singleLine="true"
+                    android:text="@{item.info.label}"
+                    android:textAppearance="@style/AppearanceFoundation.Body"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toTopOf="@+id/hide_package"
+                    app:layout_constraintEnd_toStartOf="@+id/hide_expand_icon"
+                    app:layout_constraintStart_toEndOf="@+id/hide_icon"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_chainStyle="packed"
+                    tools:text="@string/magisk" />
+
+                <TextView
+                    android:id="@+id/hide_package"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@{item.info.packageName}"
+                    android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@+id/hide_name"
+                    app:layout_constraintStart_toStartOf="@+id/hide_name"
+                    app:layout_constraintTop_toBottomOf="@+id/hide_name"
+                    tools:text="com.topjohnwu.magisk" />
+
+                <com.topjohnwu.widget.IndeterminateCheckBox
+                    android:id="@+id/hide_expand_icon"
+                    state="@={item.state}"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/l1"
+                    android:minWidth="0dp"
+                    android:minHeight="0dp"
+                    android:nextFocusLeft="@id/hide_expand"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                goneUnless="@{item.isExpanded}"
+                app:items="@{item.processes}"
+                app:extraBindings="@{viewModel.extraBindings}"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?colorSurfaceVariant"
+                android:orientation="vertical"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:itemCount="2"
+                tools:listitem="@layout/item_hide_process_md2" />
+
+        </LinearLayout>
+
+        <ProgressBar
+            style="@style/WidgetFoundation.ProgressBar"
+            gone="@{item.checkedPercent == 0}"
+            android:layout_width="match_parent"
+            android:layout_gravity="top"
+            android:progress="@{item.checkedPercent}" />
+
+    </com.google.android.material.card.MaterialCardView>
+
+</layout>

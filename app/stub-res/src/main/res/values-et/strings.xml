@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="upgrade_msg">Täienda seadistuse lõpetamiseks Magiski täisversioonile. Kas laadid alla ja installid?</string>
+    <string name="no_internet_msg">Palun ühendu Internetti! Nõutud on Magiski täisversioonile täiendamine.</string>
+    <string name="dling">Allalaadimine</string>
+    <string name="relaunch_app">Palun käivita rakendus käsitsi uuesti</string>
+</resources>

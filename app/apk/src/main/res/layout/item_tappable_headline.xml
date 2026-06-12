@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="item"
+            type="com.topjohnwu.magisk.view.TappableHeadlineItem" />
+
+        <variable
+            name="listener"
+            type="com.topjohnwu.magisk.view.TappableHeadlineItem.Listener" />
+
+    </data>
+
+    <com.google.android.material.card.MaterialCardView
+        style="@style/WidgetFoundation.Card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="@{() -> listener.onItemPressed(item)}"
+        tools:layout_gravity="center">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/tappable_icon"
+                style="@style/WidgetFoundation.Icon"
+                android:background="@null"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@{item.icon}"
+                tools:srcCompat="@drawable/ic_day_night" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:requiresFadingEdge="horizontal"
+                android:singleLine="true"
+                android:text="@{item.title}"
+                android:textAppearance="@style/AppearanceFoundation.Body"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/headline_icon_pointer"
+                app:layout_constraintStart_toEndOf="@+id/tappable_icon"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="@string/settings_dark_mode_title" />
+
+            <ImageView
+                android:id="@+id/headline_icon_pointer"
+                style="@style/WidgetFoundation.Icon"
+                android:background="@null"
+                android:rotation="180"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_back_md2" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</layout>

@@ -1,0 +1,247 @@
+<resources>
+
+    <!--Sections-->
+    <string name="modules">מודולים</string>
+    <string name="superuser">משתמש על</string>
+    <string name="logs">Log</string>
+    <string name="settings">הגדרות</string>
+    <string name="install">התקנה</string>
+    <string name="section_home">בית</string>
+    <string name="section_theme">עיצוב</string>
+    <string name="denylist">רשימת דחייה</string>
+
+    <!--Home-->
+    <string name="no_connection">אין חיבור זמין</string>
+    <string name="app_changelog">רשימת שינויים</string>
+    <string name="loading">טוען…</string>
+    <string name="update">עדכון</string>
+    <string name="not_available">לא זמין</string>
+    <string name="hide">הסתרה</string>
+    <string name="home_package">חבילה</string>
+    <string name="home_app_title">יישום</string>
+    <string name="home_notice_content">יש להוריד את Magisk רק מהדף הרשמי של GitHub. קבצים ממקורות לא ידועים יכולים להיות זדוניים!</string>
+    <string name="home_support_title">תמיכה בנו</string>
+    <string name="home_follow_title">עקבו אחרינו</string>
+    <string name="home_item_source">מקור</string>
+    <string name="home_support_content">Magisk היה ותמיד יהיה בקוד פתוח. עם זאת באפשרותך להראות לנו שאכפת לך על ידי שליחת תרומה קטנה.</string>
+    <string name="home_installed_version">מותקנת</string>
+    <string name="home_latest_version">אחרונה</string>
+    <string name="invalid_update_channel">ערוץ עדכון לא חוקי</string>
+    <string name="uninstall_magisk_title">הסרת Magisk</string>
+    <string name="uninstall_magisk_msg">כל המודולים יושבתו/יוסרו!\nגישת Root תושבת!\nהנתונים שלך עשויים להיות מוצפנים אם לא הוצפנו כבר!</string>
+
+    <!--Install-->
+    <string name="keep_force_encryption">שמירה על הצפנה בכח</string>
+    <string name="keep_dm_verity">שמירה על AVB 2.0/dm-verity</string>
+    <string name="recovery_mode">מצב Recovery</string>
+    <string name="install_options_title">אפשרויות</string>
+    <string name="install_method_title">שיטה</string>
+    <string name="install_next">הבא</string>
+    <string name="install_start">צא לדרך</string>
+    <string name="manager_download_install">לחיצה להורדה והתקנה</string>
+    <string name="direct_install">התקנה ישירה (מומלץ)</string>
+    <string name="install_inactive_slot">התקנה לסלוט לא פעיל (לאחר OTA)</string>
+    <string name="install_inactive_slot_msg">ההתקן שלך ייאלץ אתחול לסלוט הלא פעיל הנוכחי שלך לאחר הפעלה מחדש!\nיש להשתמש באפשרות זו רק לאחר ביצוע OTA בלבד.\nלהמשיך?</string>
+    <string name="setup_title">התקנה נוספת</string>
+    <string name="select_patch_file">בחירה והתקנת קובץ</string>
+    <string name="patch_file_msg">בחירת קובץ גולמי (*.img) או ODIN tarfile (*.tar) או payload.bin (*.bin)</string>
+    <string name="reboot_delay_toast">מאתחל בעוד 5 שניות…</string>
+    <string name="flash_screen_title">התקנה</string>
+
+    <!--Superuser-->
+    <string name="su_request_title">בקשות משתמש על</string>
+    <string name="touch_filtered_warning">מכיוון שיישום מסתיר בקשה של משתמש על, Magisk לא יכול לאמת את תגובתך</string>
+    <string name="deny">דחייה</string>
+    <string name="prompt">מיידי</string>
+    <string name="grant">הענקה</string>
+    <string name="su_warning">מעניק גישה מלאה להתקן שלך.\nיש לדחות באי וודאות!</string>
+    <string name="forever">לצמיתות</string>
+    <string name="once">פעם אחת</string>
+    <string name="tenmin">10 דקות</string>
+    <string name="twentymin">20 דקות</string>
+    <string name="thirtymin">חצי שעה</string>
+    <string name="sixtymin">שעה</string>
+    <string name="su_allow_toast">%1$s קיבל הרשאות משתמש על</string>
+    <string name="su_deny_toast">%1$s נשללו הרשאות משתמש על</string>
+    <string name="su_snack_grant">הרשאות משתמש על עבור %1$s הוענקו</string>
+    <string name="su_snack_deny">הרשאות משתמש על עבור %1$s נשללו</string>
+    <string name="su_snack_notif_on">התראות של %1$s מופעלות</string>
+    <string name="su_snack_notif_off">התראות של %1$s מושבתות</string>
+    <string name="su_snack_log_on">Log עבור %1$s מופעל</string>
+    <string name="su_snack_log_off">Log עבור %1$s מושבת</string>
+    <string name="su_revoke_title">להסיר?</string>
+    <string name="su_revoke_msg">נא לאשר שלילת הרשאות עבור %1$s?</string>
+    <string name="toast">התראה</string>
+    <string name="none">ללא</string>
+    <string name="superuser_toggle_notification">התראות</string>
+    <string name="superuser_toggle_revoke">הסרה</string>
+    <string name="superuser_policy_none">טרם נתבקשו הרשאות משתמש על על ידי יישומים</string>
+
+    <!--Logs-->
+    <string name="log_data_none">אין Log, יש לנסות להשתמש יותר ביישומי הRoot שלך</string>
+    <string name="log_data_magisk_none">Log Magisk ריק, זה מוזר</string>
+    <string name="menuSaveLog">שמירת Log</string>
+    <string name="menuClearLog">ניקוי Log כעת</string>
+    <string name="logs_cleared">Log נוקה בהצלחה</string>
+    <string name="pid">PID: %1$d</string>
+    <string name="target_uid">יעד UID: %1$d</string>
+    <string name="target_pid">מציב ns יעד PID: %s</string>
+    <string name="selinux_context">הקשר SELinux: %s</string>
+    <string name="supp_group">קבוצה משלימה: %s</string>
+
+    <!--SafetyNet-->
+
+    <!--MagiskHide-->
+    <string name="show_system_app">הצגת יישומי מערכת</string>
+    <string name="show_os_app">הצגת יישומי מערכת הפעלה</string>
+    <string name="hide_filter_hint">סינון לפי שם</string>
+    <string name="hide_search">חיפוש</string>
+
+    <!--Module-->
+    <string name="no_info_provided">(לא סופק מידע)</string>
+    <string name="reboot_userspace">אתחול רך</string>
+    <string name="reboot_recovery">אתחול למצב Recovery</string>
+    <string name="reboot_bootloader">אתחול לBootloader</string>
+    <string name="reboot_download">אתחול למצב הורדה</string>
+    <string name="reboot_edl">אתחול למצב EDL</string>
+    <string name="reboot_safe_mode">מצב בטוח</string>
+    <string name="module_version_author">%1$s מאת %2$s</string>
+    <string name="module_state_remove">הסרה</string>
+    <string name="module_action">פעולה</string>
+    <string name="module_state_restore">שיחזור</string>
+    <string name="module_action_install_external">התקנה מהאחסון</string>
+    <string name="update_available">עדכונים זמינים</string>
+    <string name="suspend_text_riru">מודול מושעה כי %1$s מופעל</string>
+    <string name="suspend_text_zygisk">המודול הושעה כי %1$s אינו מופעל</string>
+    <string name="zygisk_module_unloaded">מודול Zygisk לא נטען עקב חוסר תאימות</string>
+    <string name="module_empty">לא מותקן מודול</string>
+    <string name="confirm_install">להתקין מודול %1$s?</string>
+    <string name="confirm_install_title">אישור התקנה</string>
+
+    <!--Settings-->
+    <string name="settings_dark_mode_title">מצב עיצוב</string>
+    <string name="settings_dark_mode_message">נא לבחור מצב המתאים ביותר לסגנון שלך!</string>
+    <string name="settings_dark_mode_light">תמיד בהיר</string>
+    <string name="settings_dark_mode_system">בהתאם למערכת</string>
+    <string name="settings_dark_mode_dark">תמיד כהה</string>
+    <string name="settings_download_path_title">נתיב הורדה</string>
+    <string name="settings_download_path_message">הקבצים ישמרו אל %1$s</string>
+    <string name="settings_hide_app_title">הסתרת היישום Magisk</string>
+    <string name="settings_hide_app_summary">התקנת יישום מתווך עם מזהה חבילה אקראי ותווית שם מותאמת אישית</string>
+    <string name="settings_restore_app_title">שיחזור היישום Magisk</string>
+    <string name="settings_restore_app_summary">ביטול הסתרת היישום ושיחזור אל ה-APK המקורי</string>
+    <string name="language">שפה</string>
+    <string name="system_default">(ברירת מחדל מערכת)</string>
+    <string name="settings_check_update_title">בדיקת עדכונים</string>
+    <string name="settings_check_update_summary">בדיקה מעת לעת ברקע אם יש עדכונים</string>
+    <string name="settings_update_channel_title">ערוץ עדכון</string>
+    <string name="settings_update_stable">יציב</string>
+    <string name="settings_update_beta">בטא</string>
+    <string name="settings_update_custom">מותאם אישית</string>
+    <string name="settings_update_custom_msg">הזנת כתובת מותאמת אישית</string>
+    <string name="settings_zygisk_summary">הפעל חלקים של Magisk בדמון zygote</string>
+    <string name="settings_denylist_title">אכיפת רשימת דחייה</string>
+    <string name="settings_denylist_summary">כל השינויים של Magisk יוחזרו לתהליכים ברשימת הדחייה</string>
+    <string name="settings_denylist_config_title">הגדרת רשימת הדחייה</string>
+    <string name="settings_denylist_config_summary">בחירת התהליכים שייכללו ברשימת הדחייה</string>
+    <string name="settings_hosts_title">hosts חסרי מערכת</string>
+    <string name="settings_hosts_summary">hosts חסרי מערכת תומכים ביישומים חוסמי פרסומות</string>
+    <string name="settings_hosts_toast">הוספת מודול hosts חסרי מערכת</string>
+    <string name="settings_app_name_hint">שם חדש</string>
+    <string name="settings_app_name_helper">היישום יארז מחדש בשם זה</string>
+    <string name="settings_app_name_error">פורמט לא חוקי</string>
+    <string name="settings_su_app_adb">יישומים ו-ADB</string>
+    <string name="settings_su_app">יישומים בלבד</string>
+    <string name="settings_su_adb">ADB בלבד</string>
+    <string name="settings_su_disable">מושבת</string>
+    <string name="settings_su_request_10">10 שניות</string>
+    <string name="settings_su_request_15">15 שניות</string>
+    <string name="settings_su_request_20">20 שניות</string>
+    <string name="settings_su_request_30">30 שניות</string>
+    <string name="settings_su_request_45">45 שניות</string>
+    <string name="settings_su_request_60">60 שניות</string>
+    <string name="superuser_access">גישת משתמש על</string>
+    <string name="auto_response">תגובה אוטומטית</string>
+    <string name="request_timeout">בקשת פסק זמן</string>
+    <string name="superuser_notification">התראות משתמש על</string>
+    <string name="settings_su_reauth_title">אימות מחדש לאחר שדרוג</string>
+    <string name="settings_su_reauth_summary">אימות מחדש הרשאות של משתמש על לאחר שדרוג יישום</string>
+    <string name="settings_su_tapjack_title">הגנת Tapjacking</string>
+    <string name="settings_su_tapjack_summary">תיבת הדו שיח של משתמש העל לא תגיב לקלט כשהיא מוסתרת על ידי חלון או שכבת על אחרת</string>
+    <string name="settings_su_auth_title">אימות משתמש</string>
+    <string name="settings_su_auth_summary">בקשת אימות משתמש במהלך בקשות משתמש על</string>
+    <string name="settings_su_auth_insecure">לא מוגדרת שיטת אימות בהתקן</string>
+    <string name="settings_customization">התאמה אישית</string>
+    <string name="setting_add_shortcut_summary">הוספת קיצור דרך יפה במסך הבית למקרה שקשה לזהות את השם ואת הסמל לאחר הסתרת היישום</string>
+    <string name="settings_doh_title">DNS על HTTPS</string>
+    <string name="settings_doh_description">עקיפת DNS מורעל במדינות מסוימות</string>
+    <string name="settings_random_name_title">שם פלט אקראי</string>
+    <string name="settings_random_name_description">שם אקראי לקובץ הפלט של תמונות מתוקנות וקבצי tar כדי למנוע זיהוי</string>
+    <string name="multiuser_mode">מצב מרובה משתמשים</string>
+    <string name="settings_owner_only">בעל ההתקן בלבד</string>
+    <string name="settings_owner_manage">אחראי ניהול ההתקן</string>
+    <string name="settings_user_independent">משתמש עצמאי</string>
+    <string name="owner_only_summary">לבעלים בלבד ישנה גישת Root</string>
+    <string name="owner_manage_summary">הבעלים בלבד יכול לנהל גישת Root ולקבל הנחיות לבקשה</string>
+    <string name="user_independent_summary">לכל משתמש יש כללי Root נפרדים משלו</string>
+    <string name="mount_namespace_mode">מצב הצבת מרחב שם</string>
+    <string name="settings_ns_global">מרחב שם גלובלי</string>
+    <string name="settings_ns_requester">מרחב שם מורש</string>
+    <string name="settings_ns_isolate">מרחב שם מבודד</string>
+    <string name="global_summary">כלל חיבורי הRoot משתמשים במרחב שם הגלובלי</string>
+    <string name="requester_summary">חיבורי הRoot יירשו את מרחב השם של המבקש</string>
+    <string name="isolate_summary">לכל חיבור Root יהיה מרחב שם מבודד</string>
+
+    <!--Notifications-->
+    <string name="update_channel">עדכוני Magisk</string>
+    <string name="progress_channel">התראות התקדמות</string>
+    <string name="updated_channel">העדכון הושלם</string>
+    <string name="download_complete">ההורדה הושלמה</string>
+    <string name="download_file_error">שגיאה בהורדת קובץ</string>
+    <string name="magisk_update_title">עדכון Magisk זמין!</string>
+    <string name="updated_title">עדכון Magisk</string>
+    <string name="updated_text">הקשה כדי לפתוח יישום</string>
+
+    <!--Toasts, Dialogs-->
+    <string name="yes">כן</string>
+    <string name="no">לא</string>
+    <string name="repo_install_title">מתקין %1$s %2$s(%3$d)</string>
+    <string name="download">הורדה</string>
+    <string name="reboot">הפעלה מחדש</string>
+    <string name="close">סגירה</string>
+    <string name="release_notes">הערות שחרור</string>
+    <string name="flashing">צורב…</string>
+    <string name="running">רץ…</string>
+    <string name="done">בוצע!</string>
+    <string name="done_action">בוצעה ריצת פעולה של %1$s</string>
+    <string name="failure">נכשל!</string>
+    <string name="hide_app_title">מסתיר את יישום Magisk…</string>
+    <string name="open_link_failed_toast">לא נמצאו יישומים לפתיחת קישור זה</string>
+    <string name="complete_uninstall">הסרה מלאה</string>
+    <string name="restore_img">שיחזור תמונות</string>
+    <string name="restore_img_msg">משחזר…</string>
+    <string name="restore_done">השיחזור בוצע!</string>
+    <string name="restore_fail">גיבוי מקורי אינו קיים!</string>
+    <string name="setup_fail">ההתקנה כשלה</string>
+    <string name="env_fix_title">דורש התקנה נוספת</string>
+    <string name="env_fix_msg">ההתקן שלך זקוק להתקנה נוספת כדי ש-Magisk יפעל כראוי. האם ברצונך להמשיך ולהפעיל מחדש?</string>
+    <string name="env_full_fix_msg">ההתקן שלך זקוק לצריבה מחדש של Magisk כדי לעבוד כראוי. נא להתקין מחדש את Magisk בתוך היישום, מצב הRecovery אינו יכול לקבל מידע נכון על ההתקן.</string>
+    <string name="setup_msg">הגדרת סביבת ריצה…</string>
+    <string name="unsupport_magisk_title">גרסת Magisk אינה נתמכת</string>
+    <string name="unsupport_magisk_msg">גרסה זו של היישום אינה תומכת ביישום  Magisk הנמוך מ- %1$s.\n\nהיישום יתנהג כאילו Magisk אינו מותקן,יש לשדרג את Magisk במהירות האפשריות.</string>
+    <string name="unsupport_general_title">מצב לא תקין</string>
+    <string name="unsupport_system_app_msg">הפעלת יישום זה כיישום מערכת אינה נתמך. נא להשיב את היישום כיישום משתמש.</string>
+    <string name="unsupport_other_su_msg">התגלתה פקודת \"su\" שאינה שייכת ליישום Magisk נא להסיר את הפקודה שאינה נתמכת.</string>
+    <string name="unsupport_external_storage_msg">Magisk מותקן באחסון החיצוני. נא להעביר את היישום לאחסון הפנימי.</string>
+    <string name="unsupport_nonroot_stub_msg">היישום אינו יכול להמשיך לעבוד במצב הנסתר מכיוון שגישת הRoot אבדה. נא לשחזר אותו חזרה ל-APK המקורי.</string>
+    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
+    <string name="external_rw_permission_denied">הענת הרשאת אחסון להפעלת פונקציה זו</string>
+    <string name="post_notifications_denied">הענקת הרשאה להתראות כדי להפעיל פונקציה זו</string>
+    <string name="install_unknown_denied">יש לאפשר "התקנה ממקורות לא ידועים" בכדי להפעיל פונקציה זו</string>
+    <string name="add_shortcut_title">הוספת קיצור דרך למסך הבית</string>
+    <string name="add_shortcut_msg">לאחר הסתרת היישום הזה, השם והסמליל שלה עשויים להיות קשים לזיהוי. האם ברצונך להוסיף קיצור דרך יפה למסך הבית?</string>
+    <string name="app_not_found">לא נמצא יישום לטיפול בפעולה זו</string>
+    <string name="reboot_apply_change">ייש להפעיל מחדש כדי להחיל שינויים</string>
+    <string name="restore_app_confirmation">פעולה זו תשחזר את היישום המוסתר חזרה ליישום המקורי. האם בוודאות ברצונך לעשות את זה?</string>
+
+</resources>

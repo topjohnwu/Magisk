@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission
+        android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
+
+    <queries tools:node="removeAll" />
+
+    <application tools:node="replace">
+        <uses-library android:name="android.test.runner" />
+    </application>
+
+    <instrumentation
+        android:name="com.topjohnwu.magisk.test.AppTestRunner"
+        android:targetPackage="com.topjohnwu.magisk" />
+
+    <instrumentation
+        android:name="com.topjohnwu.magisk.test.TestRunner"
+        android:targetPackage="com.topjohnwu.magisk.test" />
+
+</manifest>

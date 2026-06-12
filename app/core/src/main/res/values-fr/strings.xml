@@ -1,0 +1,247 @@
+<resources>
+
+    <!--Sections-->
+    <string name="modules">Modules</string>
+    <string name="superuser">Super‑utilisateur</string>
+    <string name="logs">Journaux</string>
+    <string name="settings">Paramètres</string>
+    <string name="install">Installer</string>
+    <string name="section_home">Accueil</string>
+    <string name="section_theme">Thèmes</string>
+    <string name="denylist">Liste Refus</string>
+
+    <!--Home-->
+    <string name="no_connection">Aucune connexion disponible</string>
+    <string name="app_changelog">Journal des modifications</string>
+    <string name="loading">Chargement…</string>
+    <string name="update">Mettre à jour</string>
+    <string name="not_available">Non disponible</string>
+    <string name="hide">Masquer</string>
+    <string name="home_package">Paquet</string>
+    <string name="home_app_title">Application</string>
+
+    <string name="home_notice_content">Ne téléchargez Magisk qu’uniquement depuis la page GitHub officielle. Les fichiers provenant de sources inconnues peuvent être malveillants !</string>
+    <string name="home_support_title">Soutenez‑nous</string>
+    <string name="home_follow_title">Suivez-nous</string>
+    <string name="home_item_source">Sources</string>
+    <string name="home_support_content">Magisk est, et sera toujours, libre et open source. Vous pouvez cependant nous témoigner de votre soutien en envoyant un petit don.</string>
+    <string name="home_installed_version">Version installée</string>
+    <string name="home_latest_version">Dernière version</string>
+    <string name="invalid_update_channel">Canal de mise à jour invalide</string>
+    <string name="uninstall_magisk_title">Désinstaller Magisk</string>
+    <string name="uninstall_magisk_msg">Tous les modules seront désactivés ou supprimés !\nL’accès super‑utiliateur sera perdu !\nVos données seront potentiellement chiffrées si elles ne le sont pas déjà.</string>
+
+    <!--Install-->
+    <string name="keep_force_encryption">Conserver le chiffrement forcé</string>
+    <string name="keep_dm_verity">Conserver AVB 2.0/dm-verity</string>
+    <string name="recovery_mode">Mode récupération</string>
+    <string name="install_options_title">Options</string>
+    <string name="install_method_title">Méthode</string>
+    <string name="install_next">Suivant</string>
+    <string name="install_start">C’est parti</string>
+    <string name="manager_download_install">Appuyez pour le télécharger et l’installer</string>
+    <string name="direct_install">Installation directe (recommandée)</string>
+    <string name="install_inactive_slot">Installer dans l’espace inactif (après mise à jour OTA)</string>
+    <string name="install_inactive_slot_msg">Votre appareil sera obligatoirement réamorcé à partir de l’espace (slot) actuellement inactif après son redémarrage !\nN’utilisez uniquement cette option qu’après que la mise à jour OTA a été effectuée.\nVoulez‑vous continuer ?</string>
+    <string name="setup_title">Configuration supplémentaire</string>
+    <string name="select_patch_file">Sélectionnez le fichier cible du correctif</string>
+    <string name="patch_file_msg">Sélectionnez une image brute (*.img) ou une archive TAR ODIN (*.tar) ou un fichier payload.bin (*.bin)</string>
+    <string name="reboot_delay_toast">Redémarrage dans 5 secondes…</string>
+    <string name="flash_screen_title">Installation</string>
+
+    <!--Superuser-->
+    <string name="su_request_title">Demande d’accès super‑utilisateur</string>
+    <string name="touch_filtered_warning">Magisk ne peut vérifier votre réponse parce qu’une application masque une requête de super‑utilisateur</string>
+    <string name="deny">Refuser</string>
+    <string name="prompt">Demander</string>
+    <string name="grant">Accorder</string>
+    <string name="su_warning">Autoriser l’accès complet à votre appareil.\nRefusez en cas de doute !</string>
+    <string name="forever">Toujours</string>
+    <string name="once">Une fois</string>
+    <string name="tenmin">10 min</string>
+    <string name="twentymin">20 min</string>
+    <string name="thirtymin">30 min</string>
+    <string name="sixtymin">60 min</string>
+    <string name="su_allow_toast">%1$s a obtenu les droits de super‑utilisateur</string>
+    <string name="su_deny_toast">%1$s s’est vu refuser les droits de super‑utilisateur</string>
+    <string name="su_snack_grant">Les droits de super‑utilisateur sont accordés à %1$s</string>
+    <string name="su_snack_deny">Les droits de super‑utilisateur sont refusés à %1$s</string>
+    <string name="su_snack_notif_on">Les notifications sont activées pour %1$s</string>
+    <string name="su_snack_notif_off">Les notifications sont désactivées pour %1$s</string>
+    <string name="su_snack_log_on">La journalisation est activée pour %1$s</string>
+    <string name="su_snack_log_off">La journalisation est désactivée pour %1$s</string>
+    <string name="su_revoke_title">Révoquer ?</string>
+    <string name="su_revoke_msg">Confirmez‑vous la révocation des droits accordés à %1$s ?</string>
+    <string name="toast">Bulle de notification</string>
+    <string name="none">Aucune</string>
+
+    <string name="superuser_toggle_notification">Notifications</string>
+    <string name="superuser_toggle_revoke">Révoquer</string>
+    <string name="superuser_policy_none">Aucune application n’a encore demandé de droits super‑utilisateur.</string>
+
+    <!--Logs-->
+    <string name="log_data_none">Aucune information n’est journalisée, essayez d’utiliser davantage vos applications sollicitant des droits de super‑utilisateur.</string>
+    <string name="log_data_magisk_none">Les journaux de Magisk sont vides, c’est étrange.</string>
+    <string name="menuSaveLog">Enregistrer le journal</string>
+    <string name="menuClearLog">Effacer le journal maintenant</string>
+    <string name="logs_cleared">Le journal a été effacé.</string>
+    <string name="pid">PID : %1$d</string>
+    <string name="target_uid">UID cible : %1$d</string>
+    <string name="target_pid">Montage ns PID cible: %s</string>
+    <string name="selinux_context">Contexte SELinux: %s</string>
+    <string name="supp_group">Groupe supplémentaire: %s</string>
+
+    <!--SafetyNet-->
+
+    <!-- MagiskHide -->
+    <string name="show_system_app">Afficher les applications système</string>
+    <string name="show_os_app">Afficher les applications intégrées au système</string>
+    <string name="hide_filter_hint">Filtrer par nom</string>
+    <string name="hide_search">Rechercher</string>
+
+    <!--Module -->
+    <string name="no_info_provided">(aucune info transmise)</string>
+    <string name="reboot_userspace">Redémarrage à chaud</string>
+    <string name="reboot_recovery">Redémarrer en mode récupération</string>
+    <string name="reboot_bootloader">Redémarrer en mode amorçage</string>
+    <string name="reboot_download">Redémarrer en mode téléchargement</string>
+    <string name="reboot_edl">Redémarrer en mode secours (EDL)</string>
+    <string name="reboot_safe_mode">Mode sans échec</string>
+    <string name="module_version_author">%1$s, par %2$s</string>
+    <string name="module_state_remove">Supprimer</string>
+    <string name="module_state_restore">Restaurer</string>
+    <string name="module_action_install_external">Installer depuis le stockage</string>
+    <string name="update_available">Mise à jour disponible</string>
+    <string name="suspend_text_riru">Module suspendu car %1$s est actif</string>
+    <string name="suspend_text_zygisk">Module suspendu car %1$s n’est pas actif</string>
+    <string name="zygisk_module_unloaded">Module Zygisk non chargé en raison d’une incompatibilité</string>
+    <string name="module_empty">Aucun module installé</string>
+    <string name="confirm_install">Installer le module %1$s?</string>
+    <string name="confirm_install_title">Confirmer l’installation</string>
+
+    <!--Settings -->
+    <string name="settings_dark_mode_title">Mode du thème</string>
+    <string name="settings_dark_mode_message">Choisissez le mode qui correspond le mieux à votre style !</string>
+    <string name="settings_dark_mode_light">Toujours clair</string>
+    <string name="settings_dark_mode_system">Identique au système</string>
+    <string name="settings_dark_mode_dark">Toujours sombre</string>
+    <string name="settings_download_path_title">Répertoire de téléchargement</string>
+    <string name="settings_download_path_message">Les fichiers seront enregistrés sous %1$s</string>
+    <string name="settings_hide_app_title">Masquer l’application Magisk</string>
+    <string name="settings_hide_app_summary">Installer une application intermédiaire avec un identifiant de paquet aléatoire et un nom personnalisé</string>
+    <string name="settings_restore_app_title">Restaurer l’application Magisk</string>
+    <string name="settings_restore_app_summary">Démasquer l’application et la restaurer comme son APK d’origine.</string>
+    <string name="language">Langue</string>
+    <string name="system_default">(langue par défaut du système)</string>
+    <string name="settings_check_update_title">Vérifier les mises à jour</string>
+    <string name="settings_check_update_summary">Vérifier périodiquement en tâche de fond l’existence d’une mise à jour.</string>
+    <string name="settings_update_channel_title">Canal de mise à jour</string>
+    <string name="settings_update_stable">Stable</string>
+    <string name="settings_update_beta">Bêta</string>
+    <string name="settings_update_custom">Canal personnalisé</string>
+    <string name="settings_update_custom_msg">Saisissez une URL personnalisée</string>
+    <string name="settings_zygisk_summary">Exécuter des parties de Magisk dans le service zygote</string>
+    <string name="settings_denylist_title">Imposer Liste Exclusion</string>
+    <string name="settings_denylist_summary">Les processus figurant sur la liste des exclusions verront toutes les modifications de Magisk annulées.</string>
+    <string name="settings_denylist_config_title">Configurer Liste Exclusion</string>
+    <string name="settings_denylist_config_summary">Sélectionner le processus à inclure dans la liste d’exclusion</string>
+    <string name="settings_hosts_title">Fichier d’hôtes hors partition système</string>
+    <string name="settings_hosts_summary">Utilisation d’un fichier d’hôtes hors de la partition système pour les applications de blocage de publicité.</string>
+    <string name="settings_hosts_toast">Ajout d’un module pour fichier hosts hors système</string>
+    <string name="settings_app_name_hint">Nouveau nom</string>
+    <string name="settings_app_name_helper">L’application sera réempaquetée sous ce nom</string>
+    <string name="settings_app_name_error">Format incorrect</string>
+    <string name="settings_su_app_adb">Applications et ADB</string>
+    <string name="settings_su_app">Applications uniquement</string>
+    <string name="settings_su_adb">ADB uniquement</string>
+    <string name="settings_su_disable">Désactivé</string>
+    <string name="settings_su_request_10">10 secondes</string>
+    <string name="settings_su_request_15">15 secondes</string>
+    <string name="settings_su_request_20">20 secondes</string>
+    <string name="settings_su_request_30">30 secondes</string>
+    <string name="settings_su_request_45">45 secondes</string>
+    <string name="settings_su_request_60">60 secondes</string>
+    <string name="superuser_access">Accès super‑utilisateur</string>
+    <string name="auto_response">Réponse automatique</string>
+    <string name="request_timeout">Délai d’expiration de la demande</string>
+    <string name="superuser_notification">Notification super‑utilisateur</string>
+    <string name="settings_su_reauth_title">S’authentifier à nouveau après la mise à niveau</string>
+    <string name="settings_su_reauth_summary">Redemander une authentification pour autoriser l’accès en super‑utilisateur après une mise à jour de l’application</string>
+    <string name="settings_su_tapjack_title">Activer la protection contre le détournement du tapotement</string>
+    <string name="settings_su_tapjack_summary">Le dialogue d’invite du super‑utilisateur ne répondra pas à la saisie lorsqu’il est masqué par une autre fenêtre ou une surcouche</string>
+    <string name="settings_su_auth_title">Authentification utilisateur</string>
+    <string name="settings_su_auth_summary">Demander l’authentification utilisateur lors de la requête super-utilisateur</string>
+    <string name="settings_su_auth_insecure">Aucun méthode d’authentification utilisateur n’est configurée sur le périphérique</string>
+    <string name="settings_customization">Personnalisation</string>
+    <string name="setting_add_shortcut_summary">Ajouter un joli raccourci dans l’écran d’accueil au cas où le nom et l’icône seraient difficiles à reconnaître après avoir masqué l’application</string>
+    <string name="settings_doh_title">DNS sur HTTPS</string>
+    <string name="settings_doh_description">Contournement de la censure du DNS dans certains pays</string>
+    <string name="settings_random_name_title">Nom de sortie aléatoire</string>
+    <string name="settings_random_name_description">Randomiser le nom du fichier de sortie des images modifiées et des fichiers tar afin d’éviter la détection.</string>
+
+    <string name="multiuser_mode">Mode multi‑utilisateur</string>
+    <string name="settings_owner_only">Propriétaire de l’appareil uniquement</string>
+    <string name="settings_owner_manage">Géré par le propriétaire de l’appareil</string>
+    <string name="settings_user_independent">Indépendant de l’utilisateur</string>
+    <string name="owner_only_summary">Seul le propriétaire possède un accès super‑utilisateur.</string>
+    <string name="owner_manage_summary">Seul le propriétaire peut gérer l’accès super‑utilisateur et recevoir les demandes d’accès.</string>
+    <string name="user_independent_summary">Chaque utilisateur a ses propres règles d’accès super‑utilisateur distinctes.</string>
+
+    <string name="mount_namespace_mode">Mode d’espace de noms du montage</string>
+    <string name="settings_ns_global">Espace de noms global</string>
+    <string name="settings_ns_requester">Hériter de l’espace de noms</string>
+    <string name="settings_ns_isolate">Espace de noms isolé</string>
+    <string name="global_summary">Toutes les sessions super‑utilisateur utilisent l’espace de noms global du montage.</string>
+    <string name="requester_summary">Les sessions super‑utilisateur hériteront de l’espace de noms de leur demandeur.</string>
+    <string name="isolate_summary">Chaque session super‑utilisateur aura son propre espace de noms isolé.</string>
+
+    <!--Notifications-->
+    <string name="update_channel">Mises à jour de Magisk</string>
+    <string name="progress_channel">Notifications de progression</string>
+    <string name="updated_channel">Mise à jour Terminée</string>
+    <string name="download_complete">Téléchargement terminé</string>
+    <string name="download_file_error">Erreur lors du téléchargement du fichier</string>
+    <string name="magisk_update_title">Une mise à jour de Magisk est disponible !</string>
+    <string name="updated_title">Magisk Mis à jour</string>
+    <string name="updated_text">Appuyer pour ouvrir l’application</string>
+
+    <!--Toasts, Dialogs-->
+    <string name="yes">Oui</string>
+    <string name="no">Non</string>
+    <string name="repo_install_title">Installer %1$s %2$s(%3$d)</string>
+    <string name="download">Télécharger</string>
+    <string name="reboot">Redémarrer</string>
+    <string name="release_notes">Notes de version</string>
+    <string name="flashing">Écriture en mémoire Flash…</string>
+    <string name="done">Terminé !</string>
+    <string name="failure">Erreur</string>
+    <string name="hide_app_title">Masquage de l’application Magisk…</string>
+    <string name="open_link_failed_toast">Aucune application permettant d’ouvrir le lien n’a été trouvée</string>
+    <string name="complete_uninstall">Désinstallation complète</string>
+    <string name="restore_img">Restauration des images</string>
+    <string name="restore_img_msg">Restauration…</string>
+    <string name="restore_done">Restauration effectuée !</string>
+    <string name="restore_fail">La sauvegarde par défaut n’existe pas !</string>
+    <string name="setup_fail">Échec de l’installation</string>
+    <string name="env_full_fix_msg">Votre périphérique nécessite de réinstaller Magisk pour fonctionner correctement. Merci de réinstaller Magisk par l’application, le mode de récupération ne pouvant pas récupérer les informations correctement.</string>
+    <string name="env_fix_title">Installation supplémentaire requise</string>
+    <string name="env_fix_msg">Votre appareil a besoin d’une installation supplémentaire afin que Magisk fonctionne correctement. Voulez‑vous effectuer cette installation maintenant puis redémarrer ?</string>
+    <string name="setup_msg">Configuration de l’environnement en cours…</string>
+    <string name="unsupport_magisk_title">Version de Magisk non prise en charge</string>
+    <string name="unsupport_magisk_msg">Cette version de Magisk Manager ne prend pas en charge les versions de Magisk inférieures à %1$s.\n\nL’application se comportera comme si Magisk n’était pas installé. Veuillez mettre à jour Magisk aussi vite que possible.</string>
+    <string name="unsupport_general_title">État anormal</string>
+    <string name="unsupport_system_app_msg">Cette application ne peut être installée en tant qu’application système. Veuillez la restaurer en tant qu’application utilisateur.</string>
+    <string name="unsupport_other_su_msg">Une commande « su » n’appartenant pas à Magisk a été détectée. Merci de supprimer cet autre « su » qui n’est pas pris en charge.</string>
+    <string name="unsupport_external_storage_msg">Magisk Manager est installé sur le stockage externe. Veuillez déplacer l’application sur le stockage interne.</string>
+    <string name="unsupport_nonroot_stub_msg">Cette application ne peut continuer à fonctionner en étant masquée car l’accès en tant que super‑utilisateur a été perdu. Merci de restaurer l’APK originel.</string>
+    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
+    <string name="external_rw_permission_denied">Permettre l’accès au stockage pour activer cette fonctionnalité</string>
+    <string name="post_notifications_denied">Permettre l’accès aux notifications pour activer cette fonctionnalité</string>
+    <string name="install_unknown_denied">Autoriser "installation d’applications inconnues" pour activer cette fonctionnalité</string>
+    <string name="add_shortcut_title">Ajouter un raccourci à l’écran d’accueil</string>
+    <string name="add_shortcut_msg">Après avoir masqué Magisk, son nom et son icône peuvent devenir difficiles à reconnaître. Voulez‑vous ajouter un joli raccourci vers l’écran d’accueil ?</string>
+    <string name="app_not_found">Aucune application n’a été trouvée pour gérer cette action</string>
+    <string name="reboot_apply_change">Redémarrer pour appliquer les changements</string>
+    <string name="restore_app_confirmation">Cela restaurera l’application cachée en application originale. Vous voulez vraiment faire ça ?</string>
+
+</resources>

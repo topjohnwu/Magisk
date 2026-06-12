@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="upgrade_msg">عليك بتحديث ماجيسك لإكمال تهيئة التطبيق. هل تريد التنزيل والتثبيت؟</string>
+    <string name="no_internet_msg">يرجى الإتصال بالإنترنت! تحديث ماجيسك مطلوب.</string>
+    <string name="dling">جارٍ التنزيل</string>
+    <string name="relaunch_app">يرجى إعادة تشغيل التطبيق يدوياً</string>
+</resources>

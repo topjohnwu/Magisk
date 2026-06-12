@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:consumeSystemWindowsInsets="start|end"
+        app:edgeToEdge="true"
+        app:fitsSystemWindowsInsets="start|end"
+        tools:ignore="RtlHardcoded">
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/main_nav_host"
+            android:name="androidx.navigation.fragment.NavHostFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:defaultNavHost="true"
+            app:navGraph="@navigation/main" />
+
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/main_toolbar_wrapper"
+            style="@style/WidgetFoundation.Appbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:fitsSystemWindowsInsets="top">
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/main_toolbar"
+                style="@style/WidgetFoundation.Toolbar"
+                android:layout_width="match_parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_scrollFlags="noScroll"
+                tools:layout_marginTop="24dp"
+                tools:title="Home" />
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <com.topjohnwu.magisk.widget.ConcealableBottomNavigationView
+            android:id="@+id/main_navigation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:fitsSystemWindows="false"
+            android:paddingBottom="0dp"
+            app:fitsSystemWindowsInsets="start|end|bottom"
+            app:itemHorizontalTranslationEnabled="false"
+            app:itemIconTint="@color/color_menu_tint"
+            app:itemRippleColor="?colorPrimary"
+            app:itemTextAppearanceActive="@style/AppearanceFoundation.Tiny.Bold"
+            app:itemTextAppearanceInactive="@style/AppearanceFoundation.Tiny.Bold"
+            app:itemTextColor="@color/color_menu_tint"
+            app:labelVisibilityMode="labeled"
+            app:menu="@menu/menu_bottom_nav" />
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+</layout>

@@ -1,0 +1,217 @@
+<resources>
+
+    <!--Sections-->
+    <string name="modules">Moduler</string>
+    <string name="superuser">Superbruker</string>
+    <string name="logs">Logg</string>
+    <string name="settings">Innstillinger</string>
+    <string name="install">Install</string>
+    <string name="section_home">Hjem</string>
+    <string name="section_theme">Drakter</string>
+
+    <!--Home-->
+    <string name="no_connection">Mangler tilkobling</string>
+    <string name="app_changelog">Endringslogg</string>
+    <string name="loading">Laster inn…</string>
+    <string name="update">Oppgrader</string>
+    <string name="not_available">I/T</string>
+    <string name="hide">Skjul</string>
+    <string name="home_package">Pakke</string>
+    <string name="home_app_title">Program</string>
+
+    <string name="home_notice_content">Kun last ned Magisk fra den offisielle GitHub siden. Filer fra ukjente kilder kan være skadelige!</string>
+    <string name="home_support_title">Kronerulling</string>
+    <string name="home_item_source">Kildekode</string>
+    <string name="home_support_content">Magisk er og vil alltid forbli fritt.\nDu kan vise at du setter pris på programmet ved å sende en slant.</string>
+    <string name="home_installed_version">Installert</string>
+    <string name="home_latest_version">Seneste</string>
+    <string name="invalid_update_channel">Ugyldig installasjonskanal</string>
+    <string name="uninstall_magisk_title">Avinstaller Magisk</string>
+    <string name="uninstall_magisk_msg">Alle moduler vil bli avskrudd/fjernet.\nRot-tigang vil bli fjernet!\nKrypter din data hvis den ikke er det allerede.</string>
+
+    <!--Install-->
+    <string name="keep_force_encryption">Bevar påvunget kryptering</string>
+    <string name="keep_dm_verity">Bevar AVB 2.0/dm-verity</string>
+    <string name="recovery_mode">Gjenopprettingsmodus</string>
+    <string name="install_options_title">Innstillinger</string>
+    <string name="install_method_title">Metode</string>
+    <string name="install_next">Neste</string>
+    <string name="install_start">Start</string>
+    <string name="manager_download_install">Trykk for å laste ned og installere</string>
+    <string name="direct_install">Direkte installasjon (anbefalt)</string>
+    <string name="install_inactive_slot">Installer til inaktiv plass (etter OTA)</string>
+    <string name="install_inactive_slot_msg">Din enhet vil bli tvunget til å starte opp i inaktiv plass etter omstart!\nKun bruk dette etter at OTA er ferdig.\Fortsett?</string>
+    <string name="setup_title">Ytterligere oppsett</string>
+    <string name="select_patch_file">Velg og utfør programfiks av en fil</string>
+    <string name="patch_file_msg">Velg et rå-avtrykk (*.img) eller en ODIN-tjæreballfil (*.tar)</string>
+    <string name="reboot_delay_toast">Starter på ny om 5 sek …</string>
+    <string name="flash_screen_title">Installasjon</string>
+
+    <!--Superuser-->
+    <string name="su_request_title">Superbrukerforespørsel</string>
+    <string name="touch_filtered_warning">Fordi et program tilslører en superbrukerforespørsel kan ikke Magisk bekrefte</string>
+    <string name="deny">Avslå</string>
+    <string name="prompt">Spør</string>
+    <string name="grant">Innvilg</string>
+    <string name="su_warning">Gir full tilgang til enheten din.\nAvslå hvis du ikke er sikker!</string>
+    <string name="forever">Permanent</string>
+    <string name="once">Én gang</string>
+    <string name="tenmin">10 min</string>
+    <string name="twentymin">20 min</string>
+    <string name="thirtymin">30 min</string>
+    <string name="sixtymin">60 min</string>
+    <string name="su_allow_toast">%1$s ble innvilget superbruker-rettigheter</string>
+    <string name="su_deny_toast">%1$s ble nektet superbruker-rettigheter</string>
+    <string name="su_snack_grant">Superbruker-rettigheter for %1$s ble innvilget</string>
+    <string name="su_snack_deny">Superbruker-rettigheter for %1$s ble nektet</string>
+    <string name="su_snack_notif_on">Merknader for %1$s er påskrudd</string>
+    <string name="su_snack_notif_off">Merknader for %1$s er avskrudd</string>
+    <string name="su_snack_log_on">Logging av %1$s er påskrudd</string>
+    <string name="su_snack_log_off">Logging av %1$s er avskrudd</string>
+    <string name="su_revoke_title">Trekk tilbake?</string>
+    <string name="su_revoke_msg">Bekreft tilbaketrekking av %1$s-rettigheter?</string>
+    <string name="toast">Oppsprettsmerknad</string>
+    <string name="none">Ingen</string>
+
+    <string name="superuser_toggle_notification">Merknader</string>
+    <string name="superuser_toggle_revoke">Tilbakekall</string>
+    <string name="superuser_policy_none">Ingen programmer har forespurt superbrukertilgang enda.</string>
+
+    <!--Logs-->
+    <string name="log_data_none">Ingen loggføring. Prøv å bruke superbrukerprogrammene dine oftere.</string>
+    <string name="log_data_magisk_none">Magisk-loggene er tomme, det er rart</string>
+    <string name="menuSaveLog">Lagre logg</string>
+    <string name="menuClearLog">Tøm logg nå</string>
+    <string name="logs_cleared">Loggføring tømt</string>
+    <string name="pid">PID: %1$d</string>
+    <string name="target_uid">Mål-UID: %1$d</string>
+
+    <!--SafetyNet-->
+
+    <!--MagiskHide-->
+    <string name="show_system_app">Vis systemprogrammer</string>
+    <string name="show_os_app">Vis systemprogrammer</string>
+    <string name="hide_filter_hint">Filtrer etter navn</string>
+    <string name="hide_search">Søk</string>
+
+    <!--Module-->
+    <string name="no_info_provided">(Ingen info angitt)</string>
+    <string name="reboot_userspace">Myk omstart</string>
+    <string name="reboot_recovery">Omstart til gjenoppretting</string>
+    <string name="reboot_bootloader">Omstart til oppstartslaster</string>
+    <string name="reboot_download">Omstart til nedlasting</string>
+    <string name="reboot_edl">Omstart til EDL</string>
+    <string name="module_version_author">%1$s av %2$s</string>
+    <string name="module_state_remove">Fjern</string>
+    <string name="module_state_restore">Gjenopprett</string>
+    <string name="module_action_install_external">Installer fra lagring</string>
+    <string name="update_available">Oppgradering tilgjengelig</string>
+
+    <!--Settings-->
+    <string name="settings_dark_mode_title">Draktmodus</string>
+    <string name="settings_dark_mode_message">Velg det snittet som kler deg best.</string>
+    <string name="settings_dark_mode_light">Alltid lys</string>
+    <string name="settings_dark_mode_system">Følg systemet</string>
+    <string name="settings_dark_mode_dark">Alltid mørk</string>
+    <string name="settings_download_path_title">Nedlastingssti</string>
+    <string name="settings_download_path_message">Filer vil lagres i %1$s</string>
+    <string name="settings_hide_app_title">Skjul Magisk-programmet</string>
+    <string name="settings_hide_app_summary">Installer et mellomtjenerprogram med tilfeldig pakke-ID og egendefinert program-etikett</string>
+    <string name="settings_restore_app_title">Gjenopprett Magisk-programmet</string>
+    <string name="settings_restore_app_summary">Opphev skjuling av programmet og gjenopprett det tilbake til opprinnelig APK</string>
+    <string name="language">Språk</string>
+    <string name="system_default">(Systemforvalg)</string>
+    <string name="settings_check_update_title">Finn nye versjoner</string>
+    <string name="settings_check_update_summary">Periodisk søken etter nye oppgraderinger i bakgrunnen</string>
+    <string name="settings_update_channel_title">Oppgraderingskanal</string>
+    <string name="settings_update_stable">Stabil</string>
+    <string name="settings_update_beta">Beta</string>
+    <string name="settings_update_custom">Egendefinert kanal</string>
+    <string name="settings_update_custom_msg">Sett inn en egendefinert nettadresse</string>
+    <string name="settings_hosts_title">Systemløs vertsfil</string>
+    <string name="settings_hosts_summary">Systemløs vertsfilstøtte for reklameblokkeringsprogrammer</string>
+    <string name="settings_hosts_toast">La til modul for systemløs vertsfil</string>
+    <string name="settings_app_name_hint">Nytt navn</string>
+    <string name="settings_app_name_helper">Programmet vil bli ompakket til dette navnet</string>
+    <string name="settings_app_name_error">Ugyldig format</string>
+    <string name="settings_su_app_adb">Programmer og ADB</string>
+    <string name="settings_su_app">Kun programmer</string>
+    <string name="settings_su_adb">Kun ADB</string>
+    <string name="settings_su_disable">Avskrudd</string>
+    <string name="settings_su_request_10">10 sekunder</string>
+    <string name="settings_su_request_15">15 sekunder</string>
+    <string name="settings_su_request_20">20 sekunder</string>
+    <string name="settings_su_request_30">30 sekunder</string>
+    <string name="settings_su_request_45">45 sekunder</string>
+    <string name="settings_su_request_60">60 sekunder</string>
+    <string name="superuser_access">Superbruker-tilgang</string>
+    <string name="auto_response">Automatisk svar</string>
+    <string name="request_timeout">Tidsavbrudd for forespørsel</string>
+    <string name="superuser_notification">Superbruker-merknad</string>
+    <string name="settings_su_reauth_title">Ny identitetsbekreftelse etter oppgradering</string>
+    <string name="settings_su_reauth_summary">Identitetsbekreft superbrukertilganger etter programoppgraderinger</string>
+    <string name="settings_su_tapjack_title">Trykkstjelingsbeskyttelse</string>
+    <string name="settings_su_tapjack_summary">Superbrukings-forespørselsdialogen vil ikke svare på inndata mens den dekkes av et annet vindu eller lag</string>
+    <string name="settings_customization">Tilpasning</string>
+    <string name="setting_add_shortcut_summary">Legg til fin snarvei på hjemmeskjermen i fall navnet og ikonet er vanskelig å gjenkjenne etter skjuling av programmet</string>
+    <string name="settings_doh_title">DNS over HTTPS</string>
+    <string name="settings_doh_description">Unngåelse av DNS-forgiftelse i noen land</string>
+
+    <string name="multiuser_mode">Multibrukermodus</string>
+    <string name="settings_owner_only">Kun for enhetseier</string>
+    <string name="settings_owner_manage">Enhetseier, håndtert</string>
+    <string name="settings_user_independent">Brukeruavhengig</string>
+    <string name="owner_only_summary">Rot-tilgang kun for eier</string>
+    <string name="owner_manage_summary">Kun eier kan håndtere rot-tilgang og motta forespørsler</string>
+    <string name="user_independent_summary">Hver bruker har egne rot-regler</string>
+
+    <string name="mount_namespace_mode">Modus for montering av navnerom</string>
+    <string name="settings_ns_global">Omspennede navnerom</string>
+    <string name="settings_ns_requester">Nedarv navnerom</string>
+    <string name="settings_ns_isolate">Isolert navnerom</string>
+    <string name="global_summary">Alle rot-økter bruker det omspennende monteringsnavnerommet</string>
+    <string name="requester_summary">Rot-økter nedarver forespørrers navnerom</string>
+    <string name="isolate_summary">Hver rot-økt får eget isolert navnerom</string>
+
+    <!--Notifications-->
+    <string name="update_channel">Magisk-oppgraderinger</string>
+    <string name="progress_channel">Framdriftsmerknader</string>
+    <string name="download_complete">Nedlasting fullført</string>
+    <string name="download_file_error">Kunne ikke laste ned fil</string>
+    <string name="magisk_update_title">Ny versjon av Magisk tilgjengelig.</string>
+
+    <!--Toasts, Dialogs-->
+    <string name="yes">Ja</string>
+    <string name="no">Nei</string>
+    <string name="repo_install_title">Installer %1$s %2$s(%3$d)</string>
+    <string name="download">Last ned</string>
+    <string name="reboot">Omstart</string>
+    <string name="release_notes">Utgivelsesnotater</string>
+    <string name="flashing">Innbrenner …</string>
+    <string name="done">Ferdig!</string>
+    <string name="failure">Mislykket!</string>
+    <string name="hide_app_title">Skjuler Magisk-programmet …</string>
+    <string name="open_link_failed_toast">Ingen programmer kunne åpne lenken</string>
+    <string name="complete_uninstall">Fullfør avinstallasjon</string>
+    <string name="restore_img">Gjenopprett avtrykk</string>
+    <string name="restore_img_msg">Gjenoppretter …</string>
+    <string name="restore_done">Gjenoppretting fullført.</string>
+    <string name="restore_fail">Fabrikk-sikkerhetskopi finnes ikke!</string>
+    <string name="setup_fail">Oppsett mislyktes</string>
+    <string name="env_fix_title">Krever ytterligere oppsett</string>
+    <string name="env_fix_msg">Enheten din krever ytterligere oppsett for at Magisk skal fungere rett. Fortsett med omstart?</string>
+    <string name="setup_msg">Kjører oppsett av miljø…</string>
+    <string name="unsupport_magisk_title">Ustøttet Magisk-versjon</string>
+    <string name="unsupport_magisk_msg">Denne versjonen av programmet støtter ikke Magisk før versjon %1$s.\n\nProgrammet vil oppføre seg som om Magisk ikke er installert. Oppgrader Magisk så snart som mulig.</string>
+    <string name="unsupport_general_title">Unormal tilstand</string>
+    <string name="unsupport_system_app_msg">Kjøring av dette programmet som systemprogram støttes ikke. Gjør om programmet til et brukerprogram igjen.</string>
+    <string name="unsupport_other_su_msg">En \"su\"-kommando som ikke tilhører Magisk ble oppdaget. Fjern dette andre ustøttede opphavet.</string>
+    <string name="unsupport_external_storage_msg">Magisk er installert på eksternlagring. Flytt det til internlagring.</string>
+    <string name="unsupport_nonroot_stub_msg">Programmet kan ikke fortsette å fungere i skjult tilstand siden rot-tilgang gikk tapt. Gjenopprett det tilbake til opprinnelig APK.</string>
+    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
+    <string name="external_rw_permission_denied">Innvilg lagringstilgang for å skru på denne funksjonaliteten</string>
+    <string name="add_shortcut_title">Legg til snarvei på hjemmeskjermen</string>
+    <string name="add_shortcut_msg">Etter å ha skjult programmet kan det vli vanskelig å gjenkjenne navn og ikon. Legg til fin snarvei på hjemmeskjermen?</string>
+    <string name="app_not_found">Ingen programmer kan håndtere denne forespørselen</string>
+
+</resources>

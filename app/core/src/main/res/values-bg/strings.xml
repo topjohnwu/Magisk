@@ -1,0 +1,238 @@
+<resources>
+
+    <!--Sections-->
+    <string name="modules">Модули</string>
+    <string name="superuser">Superuser</string>
+    <string name="logs">Дневник</string>
+    <string name="settings">Настройки</string>
+    <string name="install">Инсталиране</string>
+    <string name="section_home">Начало</string>
+    <string name="section_theme">Теми</string>
+    <string name="denylist">Черен списък</string>
+
+    <!--Home-->
+    <string name="no_connection">Няма връзка</string>
+    <string name="app_changelog">Списък с промени</string>
+    <string name="loading">Зареждане…</string>
+    <string name="update">Обновяване</string>
+    <string name="not_available">Липсва</string>
+    <string name="hide">Скриване</string>
+    <string name="home_package">Пакет</string>
+    <string name="home_app_title">Приложение</string>
+
+    <string name="home_notice_content">Изтегляйте Magisk САМО от официалната страница в GitHub. Файловете от неизвестни източници могат да бъдат зловредни!</string>
+    <string name="home_support_title">Подкрепете ни</string>
+    <string name="home_follow_title">Последвайте ни</string>
+    <string name="home_item_source">Изходен код</string>
+    <string name="home_support_content">Magisk е, и винаги ще бъде, безплатен и с отворен изходен код. Въпреки това можете да покажете подкрапата си чрез дарение.</string>
+    <string name="home_installed_version">Инсталиранo</string>
+    <string name="home_latest_version">Последно</string>
+    <string name="invalid_update_channel">Каналът за обновяване е недействителен</string>
+    <string name="uninstall_magisk_title">Премахване на Magisk</string>
+    <string name="uninstall_magisk_msg">Всички модули ще бъдат изключени/премахнати. Достъпът до правата на суперпотребителя ще бъде премахнат!\nАко вътрешното хранилище е разшифровано с Magisk, то ще бъде шифровано отново!</string>
+
+    <!--Install-->
+    <string name="keep_force_encryption">Запазване на наложеното шифроване</string>
+    <string name="keep_dm_verity">Запазване на AVB 2.0/dm-verity</string>
+    <string name="recovery_mode">Режим за възстановяване</string>
+    <string name="install_options_title">Настройки</string>
+    <string name="install_method_title">Метод</string>
+    <string name="install_next">Напред</string>
+    <string name="install_start">Начало</string>
+    <string name="manager_download_install">За да изтеглите и инсталирате, докоснете</string>
+    <string name="direct_install">Директно инсталиране (препоръчително)</string>
+    <string name="install_inactive_slot">Инсталиране в неактивен дял (след OTA)</string>
+    <string name="install_inactive_slot_msg">Устройство ЗАДЪЛЖИТЕЛНО ще зареди от текущия неактивен дял при следващия рестарт.\nИзползвайте само при приключила инсталация на OTA.\nПродължаване?</string>
+    <string name="setup_title">Допълнителни настройки</string>
+    <string name="select_patch_file">Избор и закърпване на файл</string>
+    <string name="patch_file_msg">Изберете образ (*.img) или архив на ODIN (*.tar)</string>
+    <string name="reboot_delay_toast">Рестартиране след 5 секунди…</string>
+    <string name="flash_screen_title">Инсталиране</string>
+
+    <!--Superuser-->
+    <string name="su_request_title">Запитване за достъп</string>
+    <string name="touch_filtered_warning">Тъй като друго приложение закрива заявката за достъп до правата на суперпотребителя, Magisk не може да потвърди вашия отговор</string>
+    <string name="deny">Отказ</string>
+    <string name="prompt">Запитване</string>
+    <string name="grant">Разрешаване</string>
+    <string name="su_warning">Дава пълен достъп до устройството.\nОткажете, ако не сте сигурни.</string>
+    <string name="forever">Винаги</string>
+    <string name="once">Веднъж</string>
+    <string name="tenmin">10 мин.</string>
+    <string name="twentymin">20 мин.</string>
+    <string name="thirtymin">30 мин.</string>
+    <string name="sixtymin">60 мин.</string>
+    <string name="su_allow_toast">%1$s получи достъп до суперпотребителя</string>
+    <string name="su_deny_toast">%1$s не получи достъп до суперпотребителя</string>
+    <string name="su_snack_grant">Достъп до суперпотребителя е разрешен на %1$s</string>
+    <string name="su_snack_deny">Достъп до суперпотребителя е отказан на %1$s</string>
+    <string name="su_snack_notif_on">Известията за %1$s са включени</string>
+    <string name="su_snack_notif_off">Известията за %1$s са изключени</string>
+    <string name="su_snack_log_on">Записването в дневника за %1$s е включено</string>
+    <string name="su_snack_log_off">Записването в дневника за %1$s е изключено</string>
+    <string name="su_revoke_title">Оттегляне?</string>
+    <string name="su_revoke_msg">Потвърждавате ли оттегляне на достъпа на %1$s?</string>
+    <string name="toast">Тост</string>
+    <string name="none">Без</string>
+
+    <string name="superuser_toggle_notification">Известия</string>
+    <string name="superuser_toggle_revoke">Оттегляне</string>
+    <string name="superuser_policy_none">За момента няма приложения, които да са поискали достъп до правата на суперпотребителя.</string>
+
+    <!--Logs-->
+    <string name="log_data_none">Дневникът е празен</string>
+    <string name="log_data_magisk_none">Дневникът на Magisk е празен</string>
+    <string name="menuSaveLog">Запазване на дневника</string>
+    <string name="menuClearLog">Изчистване на дневника</string>
+    <string name="logs_cleared">Дневникът е изчистен</string>
+    <string name="pid">PID: %1$d</string>
+    <string name="target_uid">Целеви UID: %1$d</string>
+
+    <!--SafetyNet-->
+
+    <!--MagiskHide-->
+    <string name="show_system_app">Показване на системни приложения</string>
+    <string name="show_os_app">Показване на приложения на ОС</string>
+    <string name="hide_filter_hint">Филтрира по име</string>
+    <string name="hide_search">Търсене</string>
+
+    <!--Module-->
+    <string name="no_info_provided">(Липсва информация)</string>
+    <string name="reboot_userspace">Бърз рестарт</string>
+    <string name="reboot_recovery">Рестарт в режим за възстановяване</string>
+    <string name="reboot_bootloader">Рестарт в bootloader</string>
+    <string name="reboot_download">Рестарт в режим за изтегляне</string>
+    <string name="reboot_edl">Рестарт в EDL</string>
+    <string name="module_version_author">%1$s от %2$s</string>
+    <string name="module_state_remove">Премахване</string>
+    <string name="module_state_restore">Възстановяване</string>
+    <string name="module_action_install_external">Инсталиране от хранилището</string>
+    <string name="update_available">Има обновяване</string>
+    <string name="suspend_text_riru">Модулът е спрян, защото е включено: %1$s</string>
+    <string name="suspend_text_zygisk">Модулът е спрян, защото не е включено: %1$s</string>
+    <string name="zygisk_module_unloaded">Поради несъвместимост модулът Zygisk не е зареден</string>
+    <string name="module_empty">Не са инсталирани модули</string>
+    <string name="confirm_install">Инсталиране на модула %1$s?</string>
+    <string name="confirm_install_title">Подвърждаване на инсталиране</string>
+
+    <!--Settings-->
+    <string name="settings_dark_mode_title">Режим на темата</string>
+    <string name="settings_dark_mode_message">Изберете режима, който ви отива най-много!</string>
+    <string name="settings_dark_mode_light">Винаги светло</string>
+    <string name="settings_dark_mode_system">Според системата</string>
+    <string name="settings_dark_mode_dark">Винаги тъмно</string>
+    <string name="settings_download_path_title">Папка за изтегляния</string>
+    <string name="settings_download_path_message">Файловете ще бъдат запазвани в %1$s</string>
+    <string name="settings_hide_app_title">Скриване на приложението на Magisk</string>
+    <string name="settings_hide_app_summary">Инсталира междинно приложение с произволен идестификатор и име</string>
+    <string name="settings_restore_app_title">Възстановяване на приложението на Magisk</string>
+    <string name="settings_restore_app_summary">Показва и възстановява оригиналното приложение</string>
+    <string name="language">Език</string>
+    <string name="system_default">(Според системата)</string>
+    <string name="settings_check_update_title">Проверка за обновяване</string>
+    <string name="settings_check_update_summary">Периодична проверка за обновяване във фонов режим</string>
+    <string name="settings_update_channel_title">Канал за обновяване</string>
+    <string name="settings_update_stable">Стабилен</string>
+    <string name="settings_update_beta">Бета</string>
+    <string name="settings_update_custom">Потребителски</string>
+    <string name="settings_update_custom_msg">Адрес на потребителски канал</string>
+    <string name="settings_zygisk_summary">Изпълняване на части от Magisk в демон на zygote</string>
+    <string name="settings_denylist_title">Налагане на черен списък</string>
+    <string name="settings_denylist_summary">На процесите в черния списък ще бъдат възстановени всички модификации, направени от Magisk</string>
+    <string name="settings_denylist_config_title">Настройка на черен списък</string>
+    <string name="settings_denylist_config_summary">Изберете процесите, които да бъдат включени в черния списък</string>
+    <string name="settings_hosts_title">Безсистемни хостове</string>
+    <string name="settings_hosts_summary">Поддръжка на безсистемни хостове, ползвани от приложения за спиране на реклами</string>
+    <string name="settings_hosts_toast">Модулът за безсистемни хостове е добавен</string>
+    <string name="settings_app_name_hint">Ново име</string>
+    <string name="settings_app_name_helper">Приложението ще бъде пакетирано с това име</string>
+    <string name="settings_app_name_error">Форматът е недействителен</string>
+    <string name="settings_su_app_adb">Приложения и ADB</string>
+    <string name="settings_su_app">Само приложения</string>
+    <string name="settings_su_adb">Само ADB</string>
+    <string name="settings_su_disable">Изключен</string>
+    <string name="settings_su_request_10">10 секунди</string>
+    <string name="settings_su_request_15">15 секунди</string>
+    <string name="settings_su_request_20">20 секунди</string>
+    <string name="settings_su_request_30">30 секунди</string>
+    <string name="settings_su_request_45">45 секунди</string>
+    <string name="settings_su_request_60">60 секунди</string>
+    <string name="superuser_access">Достъп до суперпотребителя</string>
+    <string name="auto_response">Автоматичен отговор</string>
+    <string name="request_timeout">Време за запитване</string>
+    <string name="superuser_notification">Известие за суперпотребителя</string>
+    <string name="settings_su_reauth_title">Повторно запитване след обновяване</string>
+    <string name="settings_su_reauth_summary">Повторно запитване за достъп до правата на суперпотребителя след обновяване на приложения</string>
+    <string name="settings_su_tapjack_title">Предпазване от измамно докосване</string>
+    <string name="settings_su_tapjack_summary">Прозорецът за достъп до суперпотребителя няма да реагира, докато е покрит от друг прозорец или слой</string>
+    <string name="settings_customization">Приспособяване</string>
+    <string name="setting_add_shortcut_summary">Добавя красив пряк път на началния екран ако името или текущата икона на скритото приложение са трудни за разпознаване</string>
+    <string name="settings_doh_title">DNS през HTTPS</string>
+    <string name="settings_doh_description">Заобикаля „отравянето“ на DNS в някои държави</string>
+
+    <string name="multiuser_mode">Многопотребителски режим</string>
+    <string name="settings_owner_only">Само собственика</string>
+    <string name="settings_owner_manage">Управление от страна на собственика</string>
+    <string name="settings_user_independent">Независимо от потребителя</string>
+    <string name="owner_only_summary">Само собственикът има достъп до суперпотребителя</string>
+    <string name="owner_manage_summary">Само собственикът може да управлява достъпа до суперпотребителя и да получава запитвания за достъп</string>
+    <string name="user_independent_summary">Всеки потребител има собствени правила за достъп до суперпотребителя</string>
+
+    <string name="mount_namespace_mode">Монтиране по пространства от имена</string>
+    <string name="settings_ns_global">Общо</string>
+    <string name="settings_ns_requester">Наследено</string>
+    <string name="settings_ns_isolate">Изолирано</string>
+    <string name="global_summary">Всички сесии с достъп до суперпотребителя използват общото пространство от имена</string>
+    <string name="requester_summary">Всички сесии с достъп до суперпотребителя наследяват пространството от имена на запитващото приложение</string>
+    <string name="isolate_summary">Всички сесии с достъп до суперпотребителя получават изолирани пространства от имена</string>
+
+    <!--Notifications-->
+    <string name="update_channel">Обновяване на Magisk</string>
+    <string name="progress_channel">Известия за напредък</string>
+    <string name="updated_channel">Завършено обновяване</string>
+    <string name="download_complete">Завършено изтегляне</string>
+    <string name="download_file_error">Грешка при изтегляне на файл</string>
+    <string name="magisk_update_title">Има обновяване на Magisk!</string>
+    <string name="updated_title">Magisk е обновен</string>
+    <string name="updated_text">За да отворите приложението, докоснете</string>
+
+    <!--Toasts, Dialogs-->
+    <string name="yes">Да</string>
+    <string name="no">Не</string>
+    <string name="repo_install_title">Инсталиране на %1$s %2$s(%3$d)</string>
+    <string name="download">Изтегляне</string>
+    <string name="reboot">Рестартиране</string>
+    <string name="release_notes">Бележки по изданието</string>
+    <string name="flashing">Инсталиране…</string>
+    <string name="done">Готово!</string>
+    <string name="failure">Грешка!</string>
+    <string name="hide_app_title">Скриване на приложението на Magisk…</string>
+    <string name="open_link_failed_toast">Не е намерено приложение, с което препратката да бъде отворена</string>
+    <string name="complete_uninstall">Премахване</string>
+    <string name="restore_img">Възстановяване на образи</string>
+    <string name="restore_img_msg">Възстановяване…</string>
+    <string name="restore_done">Възстановяването е успешно!</string>
+    <string name="restore_fail">На устройството липсва резервно копие на заводския образ!</string>
+    <string name="setup_fail">Грешка при първоначална настройка</string>
+    <string name="env_fix_title">Необходима е допълнителна настройка</string>
+    <string name="env_fix_msg">За да работи Magisk нормално, устройството се нуждае от допълнителна настройка. Да бъде ли продължено след рестарт?</string>
+    <string name="env_full_fix_msg">За да работи Magisk нормално, е необходимо да бъде инсталиран отново. Преинсталирайте Magisk от приложението, защото режимът за възстановяване не получава необходимата информация за устройството.</string>
+    <string name="setup_msg">Надстройка на средата…</string>
+    <string name="unsupport_magisk_title">Неподдържано издание на Magisk</string>
+    <string name="unsupport_magisk_msg">Това издание на приложението не поддържа издания на Magisk преди %1$s.\n\nПриложението ще се държи все едно няма инсталиран Magisk. Обновете Magisk възможно най-скоро.</string>
+    <string name="unsupport_general_title">Неочаквано състояние</string>
+    <string name="unsupport_system_app_msg">Приложението не се поддържа да работи като системно. Върнете го като потребителско.</string>
+    <string name="unsupport_other_su_msg">Намерен е двоичен файл „su“, който не е от Magisk. Премахнете всички други решения за достъп до правата на суперпотребителя и/или инсталирайте Magisk отново.</string>
+    <string name="unsupport_external_storage_msg">Magisk е инсталиран във външно хранилище. Преместете приложението във вътрешното хранилище.</string>
+    <string name="unsupport_nonroot_stub_msg">Скритото приложение на Magisk не може да продължи да работи, защото достъпът до правата на суперпотребителя е загубен. Възстановете оригиналното приложение.</string>
+    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
+    <string name="external_rw_permission_denied">За да използвате нази възможност, разрешете достъп до хранилището</string>
+    <string name="post_notifications_denied">За да използвате нази възможност, разрешете достъп до известията</string>
+    <string name="install_unknown_denied">За да използвате тази възможност, разрешете „инсталиране на неизвестни приложения“</string>
+    <string name="add_shortcut_title">Добавяне на пряк път на началния екран</string>
+    <string name="add_shortcut_msg">След скриване на приложението името или икона може да станат трудни за разпознаване. Желаете ли да бъде добаве красив пряк път на началния екран?</string>
+    <string name="app_not_found">Не е намерено приложение, което да извърши действието</string>
+    <string name="reboot_apply_change">Рестартиране за прилагане на промените</string>
+    <string name="restore_app_confirmation">По този начин ще възстановите скритото приложение в първоначалното му състояние. Това ли желаете да бъде направено?</string>
+
+</resources>

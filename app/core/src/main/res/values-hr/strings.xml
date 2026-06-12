@@ -1,0 +1,196 @@
+<resources>
+    <!--Universal-->
+
+    <!--Welcome Activity-->
+    <string name="modules">Moduli</string>
+    <string name="superuser">Superuser</string>
+    <string name="logs">Zapisnik događaja</string>
+    <string name="settings">Postavke</string>
+    <string name="install">Instaliranje</string>
+    <string name="section_home">Početna</string>
+    <string name="section_theme">Teme</string>
+
+    <!--Home-->
+    <string name="no_connection">Nema dostupne veze</string>
+    <string name="app_changelog">Popis izmjena</string>
+    <string name="loading">Učitavanje…</string>
+    <string name="update">Ažuriraj</string>
+    <string name="not_available">N/A</string>
+    <string name="hide">Sakrij</string>
+    <string name="home_package">Paket</string>
+
+    <string name="home_support_title">Podržite nas</string>
+    <string name="home_item_source">Izvor</string>
+    <string name="home_support_content">Magisk je i uvijek će biti besplatan i otvoren. Međutim, možete nam pokazati da vam je stalo slanjem male donacije.</string>
+    <string name="home_installed_version">Instalirana</string>
+    <string name="home_latest_version">Najnovija</string>
+    <string name="invalid_update_channel">Nevažeći kanal ažuriranja</string>
+    <string name="uninstall_magisk_title">Deinstaliraj Magisk</string>
+    <string name="uninstall_magisk_msg">Svi će moduli biti onemogućeni/uklonjeni!\nRoot će biti uklonjen!\nVaši su podaci potencijalno šifrirani, ako već nisu!</string>
+
+    <!--Install-->
+    <string name="keep_force_encryption">Zadrži prisilno šifirannje</string>
+    <string name="keep_dm_verity">Zadrži AVB 2.0/dm-verity</string>
+    <string name="recovery_mode">Recovery način</string>
+    <string name="install_options_title">Opcije</string>
+    <string name="install_method_title">Metoda</string>
+    <string name="install_next">Dalje</string>
+    <string name="install_start">Krenimo</string>
+    <string name="manager_download_install">Dodirnite za preuzimanje i instalaciju</string>
+    <string name="direct_install">Izravna instalacija (preporučeno)</string>
+    <string name="install_inactive_slot">Instaliraj u neaktivni utor (Nakon OTA)</string>
+    <string name="install_inactive_slot_msg">Vaš će se uređaj prisiliti pokrenuti s trenutnog neaktivnog mjesta nakon ponovnog pokretanja!\nKoristite tu opciju samo nakon što je OTA dovršena.\nContinue?</string>
+    <string name="setup_title">Dodatno postavljanje</string>
+    <string name="select_patch_file">Odaberite patch datoteku</string>
+    <string name="patch_file_msg">Odaberite raw (*.img) ili ODIN tarfile (*.tar)</string>
+    <string name="reboot_delay_toast">Ponovno pokretanje za 5 sekundi…</string>
+    <string name="flash_screen_title">Instalacija</string>
+
+    <!--Superuser-->
+    <string name="su_request_title">Superuser zahtjev</string>
+    <string name="deny">Odbij</string>
+    <string name="prompt">Upit</string>
+    <string name="grant">Odobri</string>
+    <string name="su_warning">Odobren puni pristup vašem uređaju.\nOdbijte ako niste sigurni!</string>
+    <string name="forever">Zauvijek</string>
+    <string name="once">Jednom</string>
+    <string name="tenmin">10 min</string>
+    <string name="twentymin">20 min</string>
+    <string name="thirtymin">30 min</string>
+    <string name="sixtymin">60 min</string>
+    <string name="su_allow_toast">%1$s su dodijeljena Superuser prava</string>
+    <string name="su_deny_toast">%1$s su odbijena Superuser prava</string>
+    <string name="su_snack_grant">Superuser prava su dodijeljena za %1$s</string>
+    <string name="su_snack_deny">Superuser prava su odbijena za %1$s</string>
+    <string name="su_snack_notif_on">Obavijesti za %1$s su odobrene</string>
+    <string name="su_snack_notif_off">Obavijesti za %1$s su odbijene</string>
+    <string name="su_snack_log_on">Zapisnik događaja omogućen je za %1$s</string>
+    <string name="su_snack_log_off">Zapisnik događaja onemogućen je za %1$s</string>
+    <string name="su_revoke_title">Opozvati?</string>
+    <string name="su_revoke_msg">Potvrdite da biste opozvali prava za %1$s?</string>
+    <string name="toast">Pop-up</string>
+    <string name="none">Nijedan</string>
+
+    <string name="superuser_toggle_notification">Obavijesti</string>
+    <string name="superuser_toggle_revoke">Opozovi</string>
+    <string name="superuser_policy_none">Još nijedna aplikacija nije zatražila Superuser prava.</string>
+
+    <!--Logs-->
+    <string name="log_data_none">Nemate zapisnika, pokušajte više upotrebljavati svoje aplikacije s omogućenim SU.</string>
+    <string name="log_data_magisk_none">Zapisnici Magiska su prazni, to je čudno.</string>
+    <string name="menuSaveLog">Spremi zapisnik</string>
+    <string name="menuClearLog">Izbriši zapisnik</string>
+    <string name="logs_cleared">Zapisnik uspješno izbrisan.</string>
+    <string name="pid">PID: %1$d</string>
+    <string name="target_uid">Ciljani UID: %1$d</string>
+
+    <!--SafetyNet-->
+
+    <!-- MagiskHide -->
+    <string name="show_system_app">Prikaži sistemske aplikacije</string>
+    <string name="hide_filter_hint">Filtriraj prema nazivu</string>
+    <string name="hide_search">Traži</string>
+
+    <!--Module -->
+    <string name="no_info_provided">(Nema podataka)</string>
+    <string name="reboot_recovery">Ponovo pokreni u Recovery</string>
+    <string name="reboot_bootloader">Ponovo pokreni u Bootloader</string>
+    <string name="reboot_download">Ponovo pokreni u Download</string>
+    <string name="reboot_edl">Ponovo pokreni u EDL</string>
+    <string name="module_version_author">%1$s od %2$s</string>
+    <string name="module_state_remove">Ukloni</string>
+    <string name="module_state_restore">Vrati</string>
+    <string name="module_action_install_external">Instaliraj iz pohrane</string>
+    <string name="update_available">Ažuriranje dostupno</string>
+
+    <!--Settings -->
+    <string name="settings_dark_mode_title">Teme</string>
+    <string name="settings_dark_mode_message">Odaberite temu koja najbolje odgovara vašem stilu!</string>
+    <string name="settings_dark_mode_light">Uvijek svijetla</string>
+    <string name="settings_dark_mode_system">Prati sustav</string>
+    <string name="settings_dark_mode_dark">Uvijek crna</string>
+    <string name="settings_download_path_title">Putanja preuzimanja</string>
+    <string name="settings_download_path_message">Datoteke će biti spremljene u %1$s</string>
+    <string name="language">Jezik</string>
+    <string name="system_default">(Zadano sustavom)</string>
+    <string name="settings_check_update_title">Provjeri za ažuriranja</string>
+    <string name="settings_check_update_summary">Povremeno provjeravaj ima li ažuriranja u pozadini</string>
+    <string name="settings_update_channel_title">Kanal ažuriranja</string>
+    <string name="settings_update_stable">Stabilna</string>
+    <string name="settings_update_beta">Beta</string>
+    <string name="settings_update_custom">Vlastiti kanal</string>
+    <string name="settings_update_custom_msg">Umetnite prilagođeni URL</string>
+    <string name="settings_hosts_title">Hostovi bez sistema</string>
+    <string name="settings_hosts_summary">Podrška za hostove bez sistema za Adblock aplikacije</string>
+    <string name="settings_hosts_toast">Dodan je modul hosta bez sistema</string>
+    <string name="settings_app_name_hint">Novi naziv</string>
+    <string name="settings_app_name_helper">Aplikacija će se prepakirati na ovaj naziv</string>
+    <string name="settings_app_name_error">Nevažeći format</string>
+    <string name="settings_su_app_adb">Aplikacije i ADB</string>
+    <string name="settings_su_app">Samo aplikacije</string>
+    <string name="settings_su_adb">Samo ADB</string>
+    <string name="settings_su_disable">Onemogućeno</string>
+    <string name="settings_su_request_10">10 sekundi</string>
+    <string name="settings_su_request_15">15 sekundi</string>
+    <string name="settings_su_request_20">20 sekundi</string>
+    <string name="settings_su_request_30">30 sekundi</string>
+    <string name="settings_su_request_45">45 sekundi</string>
+    <string name="settings_su_request_60">60 sekundi</string>
+    <string name="superuser_access">Superuser pristup</string>
+    <string name="auto_response">Automatski odgovor</string>
+    <string name="request_timeout">Vremensko ograničenje zahtjeva</string>
+    <string name="superuser_notification">Superuser obavijest</string>
+    <string name="settings_su_reauth_title">Ponovno provjerite autentičnost nakon ažuriranja</string>
+    <string name="settings_su_reauth_summary">Ponovno provjerite autentičnost Superuser-a dopuštenja nakon ažuriranja aplikacije</string>
+    <string name="settings_customization">Prilagodba</string>
+    <string name="setting_add_shortcut_summary">Dodajte lijepi prečac na početni zaslon u slučaju da je naziv i ikonu teško prepoznati nakon skrivanja aplikacije</string>
+    <string name="settings_doh_title">DNS preko HTTPS-a</string>
+    <string name="settings_doh_description">Zaobilazno trovanje DNS-om u nekim zemljama</string>
+
+    <string name="multiuser_mode">Višekorisnički način rada</string>
+    <string name="settings_owner_only">Samo vlasnik uređaja</string>
+    <string name="settings_owner_manage">Upravljano od strane vlasnika uređaja</string>
+    <string name="settings_user_independent">Neovisno o korisniku</string>
+    <string name="owner_only_summary">Samo vlasnik ima root pristup</string>
+    <string name="owner_manage_summary">Samo vlasnik može upravljati root pristupom i primati zahtjeve za root pristup</string>
+    <string name="user_independent_summary">Svaki korisnik ima vlastita root pravila</string>
+
+    <string name="mount_namespace_mode">Postavljanje imenskog prostora</string>
+    <string name="settings_ns_global">Globalni imenski prostor</string>
+    <string name="settings_ns_requester">Naslijediti imenski prostor</string>
+    <string name="settings_ns_isolate">Izolirani imenski prostor</string>
+    <string name="global_summary">Sve root sesije koriste globalni imenski prostor</string>
+    <string name="requester_summary">Root sesije će naslijediti imenski prostor tražitelja</string>
+    <string name="isolate_summary">Svaka root sesija ima svoj vlastiti imenski prostor</string>
+
+    <!--Notifications-->
+    <string name="update_channel">Magisk Ažuriranja</string>
+    <string name="progress_channel">Obavijesti o napretku</string>
+    <string name="download_complete">Preuzimanje završeno</string>
+    <string name="download_file_error">Pogreška pri preuzimanju datoteke</string>
+    <string name="magisk_update_title">Dostupno je Magisk ažuriranje!</string>
+
+    <!--Toasts, Dialogs-->
+    <string name="yes">Da</string>
+    <string name="no">Ne</string>
+    <string name="repo_install_title">Instaliraj %1$s %2$s(%3$d)</string>
+    <string name="download">Preuzmi</string>
+    <string name="reboot">Ponovno pokreni</string>
+    <string name="release_notes">Bilješke o izdavanju aplikacije</string>
+    <string name="flashing">Apliciranje…</string>
+    <string name="done">Dovršeno!</string>
+    <string name="failure">Nije uspjelo</string>
+    <string name="open_link_failed_toast">Nije pronađena aplikacija za otvaranje veze</string>
+    <string name="complete_uninstall">Dovršite deinstalaciju</string>
+    <string name="restore_img">Vrati Images</string>
+    <string name="restore_img_msg">Vraćanje…</string>
+    <string name="restore_done">Vraćanje je dovršeno!</string>
+    <string name="restore_fail">Izvorna Sig. kopija ne postoji!</string>
+    <string name="setup_fail">Postavljanje nije uspjelo</string>
+    <string name="env_fix_title">Zahtijeva dodatno postavljanje</string>
+    <string name="setup_msg">Postavljanje okruženja za pokretanje…</string>
+    <string name="unsupport_magisk_title">Nepodržana Magisk verzija</string>
+    <string name="external_rw_permission_denied">Odobrite dopuštenje za pohranu da biste omogućili ovu funkciju</string>
+    <string name="add_shortcut_title">Dodaj prečac na početni zaslon</string>
+    <string name="app_not_found">Nije pronađena nijedna aplikacijaza obradu ove radnju</string>
+</resources>

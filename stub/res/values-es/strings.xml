@@ -1,6 +1,0 @@
-<resources>
-    <string name="upgrade_msg">Debe actualizar a la versión completa de Magisk Manager para finalizar la instalación. ¿Descargar e instalar?</string>
-    <string name="no_internet_msg">¡Por favor conéctese a internet! Se requiere actualizar a la versión completa de Magisk Manager </string>
-    <string name="dling">Descargando</string>
-    <string name="relaunch_app">Vuelva a iniciar manualmente la aplicación</string>
-</resources>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.topjohnwu.magisk.ui.flash.FlashViewModel" />
+
+    </data>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/internal_action_bar_size"
+            app:layout_fitsSystemWindowsInsets="top"
+            tools:layout_marginTop="@dimen/internal_action_bar_size">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/flash_content"
+                scrollToLast="@{true}"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:orientation="vertical"
+                app:fitsSystemWindowsInsets="start|end|bottom"
+                app:items="@{viewModel.items}"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                tools:listitem="@layout/item_console_md2" />
+
+        </HorizontalScrollView>
+
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+            android:id="@+id/restart_btn"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="@dimen/l1"
+            android:layout_marginBottom="@dimen/l1"
+            android:clickable="@{!viewModel.flashing}"
+            android:enabled="@{!viewModel.flashing}"
+            android:focusable="true"
+            android:onClick="@{() -> viewModel.restartPressed()}"
+            android:text="@string/reboot"
+            android:textAllCaps="false"
+            android:textColor="?colorOnPrimary"
+            android:textStyle="bold"
+            app:backgroundTint="?colorPrimary"
+            app:icon="@drawable/ic_restart"
+            app:iconTint="?colorOnPrimary"
+            app:layout_fitsSystemWindowsInsets="bottom" />
+
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:id="@+id/snackbar_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:fitsSystemWindowsInsets="top|bottom" />
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+</layout>

@@ -1,0 +1,238 @@
+<resources>
+
+    <!--Sections-->
+    <string name="modules">モジュール</string>
+    <string name="superuser">スーパーユーザー</string>
+    <string name="logs">ログ</string>
+    <string name="settings">設定</string>
+    <string name="install">インストール</string>
+    <string name="section_home">ホーム</string>
+    <string name="section_theme">テーマ</string>
+    <string name="denylist">DenyList</string>
+
+    <!--Home-->
+    <string name="no_connection">インターネット接続なし</string>
+    <string name="app_changelog">アプリの更新履歴</string>
+    <string name="loading">読み込み中…</string>
+    <string name="update">更新</string>
+    <string name="not_available">なし</string>
+    <string name="hide">隠す</string>
+    <string name="home_package">パッケージ ID </string>
+    <string name="home_app_title">アプリ</string>
+
+    <string name="home_notice_content">Magisk は必ず公式の GitHub ページからダウンロードしてください。その他の提供元では悪意あるコードを含んでいる可能性があります!</string>
+    <string name="home_support_title">サポートする</string>
+    <string name="home_follow_title">フォローする</string>
+    <string name="home_item_source">ソース</string>
+    <string name="home_support_content">Magisk はフリーでオープンソースです。寄付を送ると､ Magisk の開発を支援することができます。</string>
+    <string name="home_installed_version">インストール済</string>
+    <string name="home_latest_version">最新版</string>
+    <string name="invalid_update_channel">不正な更新チャンネルです</string>
+    <string name="uninstall_magisk_title">Magisk のアンインストール</string>
+    <string name="uninstall_magisk_msg">すべてのモジュールが無効化/削除されます。\nアンインストール後は root が削除され､ストレージが暗号化されていない場合は暗号化される場合があります。</string>
+
+    <!--Install-->
+    <string name="keep_force_encryption">暗号化を維持する</string>
+    <string name="keep_dm_verity">AVB 2.0/dm-verity を維持する</string>
+    <string name="recovery_mode">リカバリーモード</string>
+    <string name="install_options_title">オプション</string>
+    <string name="install_method_title">方法</string>
+    <string name="install_next">次へ</string>
+    <string name="install_start">はじめる</string>
+    <string name="manager_download_install">タップしてダウンロード＆インストールします</string>
+    <string name="direct_install">直接インストール (推奨)</string>
+    <string name="install_inactive_slot">別のスロットにインストール (OTA 後)</string>
+    <string name="install_inactive_slot_msg">お使いのデバイスは再起動後に現在とは別のスロットで強制的に起動されます！\nこのオプションは OTA の完了後にのみ使用してください。\n続行しますか？</string>
+    <string name="setup_title">追加セットアップ</string>
+    <string name="select_patch_file">パッチするファイルの選択</string>
+    <string name="patch_file_msg">イメージファイル (*.img) または ODIN tar ファイル (*.tar) を選択してください</string>
+    <string name="reboot_delay_toast">5秒後に再起動します…</string>
+    <string name="flash_screen_title">インストール</string>
+
+    <!--Superuser-->
+    <string name="su_request_title">スーパーユーザー権限の要求</string>
+    <string name="touch_filtered_warning">他のアプリがスーパーユーザー権限の要求ダイアログを隠しているため、Magisk はあなたの応答を確認できません。</string>
+    <string name="deny">拒否</string>
+    <string name="prompt">尋ねる</string>
+    <string name="grant">許可</string>
+    <string name="su_warning">端末への完全なアクセスを許可します。\nもし確信が持てなければ拒否してください！</string>
+    <string name="forever">今後も</string>
+    <string name="once">今回のみ</string>
+    <string name="tenmin">10 分</string>
+    <string name="twentymin">20 分</string>
+    <string name="thirtymin">30 分</string>
+    <string name="sixtymin">60 分</string>
+    <string name="su_allow_toast">%1$s のスーパーユーザー権限を許可しました</string>
+    <string name="su_deny_toast">%1$s のスーパーユーザー権限を拒否しました</string>
+    <string name="su_snack_grant">%1$s のスーパーユーザー権限を許可しました</string>
+    <string name="su_snack_deny">%1$s のスーパーユーザー権限を拒否しました</string>
+    <string name="su_snack_notif_on">%1$s の通知は有効です</string>
+    <string name="su_snack_notif_off">%1$s の通知は無効です</string>
+    <string name="su_snack_log_on">%1$s のログは有効です</string>
+    <string name="su_snack_log_off">%1$s のログは無効です</string>
+    <string name="su_revoke_title">確認</string>
+    <string name="su_revoke_msg">%1$s の権限を取り消しますか？</string>
+    <string name="toast">トースト通知</string>
+    <string name="none">なし</string>
+
+    <string name="superuser_toggle_notification">通知</string>
+    <string name="superuser_toggle_revoke">取り消し</string>
+    <string name="superuser_policy_none">スーパーユーザー権限の許可を求めたアプリはまだありません</string>
+
+    <!--Logs-->
+    <string name="log_data_none">ログはありません。スーパーユーザー権限を使用するアプリをもっと使ってみてください</string>
+    <string name="log_data_magisk_none">おかしなことに Magisk のログは空です</string>
+    <string name="menuSaveLog">ログを保存</string>
+    <string name="menuClearLog">ログを消去</string>
+    <string name="logs_cleared">ログを消去しました</string>
+    <string name="pid">PID: %1$d</string>
+    <string name="target_uid">ターゲット UID: %1$d</string>
+
+    <!--SafetyNet-->
+
+    <!--MagiskHide-->
+    <string name="show_system_app">システムアプリを表示</string>
+    <string name="show_os_app">OS アプリを表示</string>
+    <string name="hide_filter_hint">名前で絞り込み</string>
+    <string name="hide_search">検索</string>
+
+    <!--Module-->
+    <string name="no_info_provided">(情報なし)</string>
+    <string name="reboot_userspace">ソフトリブート</string>
+    <string name="reboot_recovery">Recovery へ再起動</string>
+    <string name="reboot_bootloader">Bootloader へ再起動</string>
+    <string name="reboot_download">Download へ再起動</string>
+    <string name="reboot_edl">EDL へ再起動</string>
+    <string name="module_version_author">%1$s 開発者：%2$s</string>
+    <string name="module_state_remove">削除</string>
+    <string name="module_state_restore">復元</string>
+    <string name="module_action_install_external">ストレージからインストール</string>
+    <string name="update_available">更新あり</string>
+    <string name="suspend_text_riru">モジュールは %1$s が有効化されているため休止しました</string>
+    <string name="suspend_text_zygisk">モジュールは %1$s が有効化されていないため休止しました</string>
+    <string name="zygisk_module_unloaded">互換性がないため Zygisk モジュールは読み込まれませんでした</string>
+    <string name="module_empty">モジュールをインストールしていません</string>
+
+    <!--Settings-->
+    <string name="settings_dark_mode_title">テーマ</string>
+    <string name="settings_dark_mode_message">あなたの好きなスタイルを選びましょう！</string>
+    <string name="settings_dark_mode_light">ライトモード</string>
+    <string name="settings_dark_mode_system">システムに合わせる</string>
+    <string name="settings_dark_mode_dark">ダークモード</string>
+    <string name="settings_download_path_title">ファイルの保存場所</string>
+    <string name="settings_download_path_message">ファイルは %1$s に保存されます</string>
+    <string name="settings_hide_app_title">Magisk アプリを隠す</string>
+    <string name="settings_hide_app_summary">ランダムなパッケージ ID と任意のアプリ名のプロキシアプリをインストールします</string>
+    <string name="settings_restore_app_title">Magisk アプリを復元する</string>
+    <string name="settings_restore_app_summary">隠すのを止めて、元の APK をインストールします</string>
+    <string name="language">言語 (Language)</string>
+    <string name="system_default">(システム標準)</string>
+    <string name="settings_check_update_title">更新をチェック</string>
+    <string name="settings_check_update_summary">バックグラウンドで定期的に更新をチェックします</string>
+    <string name="settings_update_channel_title">更新チャンネル</string>
+    <string name="settings_update_stable">安定版</string>
+    <string name="settings_update_beta">ベータ版</string>
+    <string name="settings_update_custom">カスタム</string>
+    <string name="settings_update_custom_msg">カスタム URL を入力</string>
+    <string name="settings_zygisk_summary">Magisk の一部を Zygote デーモン上で実行します</string>
+    <string name="settings_denylist_title">DenyList を適用</string>
+    <string name="settings_denylist_summary">DenyList 内のプロセスは Magisk の変更がすべて戻されます</string>
+    <string name="settings_denylist_config_title">DenyList を構成</string>
+    <string name="settings_denylist_config_summary">DenyList に含めるプロセスを選択します</string>
+    <string name="settings_hosts_title">Systemless hosts</string>
+    <string name="settings_hosts_summary">広告ブロックアプリのための Systemless hosts サポートを有効化します</string>
+    <string name="settings_hosts_toast">Systemless hosts モジュールを追加しました</string>
+    <string name="settings_app_name_hint">アプリ名</string>
+    <string name="settings_app_name_helper">プロキシアプリはこのアプリ名でインストールされます</string>
+    <string name="settings_app_name_error">不正な形式</string>
+    <string name="settings_su_app_adb">アプリと ADB</string>
+    <string name="settings_su_app">アプリのみ</string>
+    <string name="settings_su_adb">ADB のみ</string>
+    <string name="settings_su_disable">無効</string>
+    <string name="settings_su_request_10">10 秒</string>
+    <string name="settings_su_request_15">15 秒</string>
+    <string name="settings_su_request_20">20 秒</string>
+    <string name="settings_su_request_30">30 秒</string>
+    <string name="settings_su_request_45">45 秒</string>
+    <string name="settings_su_request_60">60 秒</string>
+    <string name="superuser_access">スーパーユーザー権限を使用できるプログラム</string>
+    <string name="auto_response">自動応答</string>
+    <string name="request_timeout">要求のタイムアウト</string>
+    <string name="superuser_notification">スーパーユーザー通知</string>
+    <string name="settings_su_reauth_title">アップグレード後の再認証</string>
+    <string name="settings_su_reauth_summary">アプリのアップグレード後にスーパーユーザー権限を再認証します</string>
+    <string name="settings_su_tapjack_title">タップジャッキング保護を有効にする</string>
+    <string name="settings_su_tapjack_summary">他のウィンドウやオーバーレイで表示されている間は、スーパーユーザー権限の要求ダイアログが入力に応答しないようにします</string>
+    <string name="settings_su_auth_title">ユーザー認証</string>
+    <string name="settings_su_auth_summary">スーパーユーザー権限の要求でユーザー認証を行ないます</string>
+    <string name="settings_su_auth_insecure">端末の認証方法が設定されていません</string>
+    <string name="settings_customization">カスタマイズ</string>
+    <string name="setting_add_shortcut_summary">アプリを隠した後に見つけられなくなったときは、ここでホーム画面にショートカットを追加できます</string>
+    <string name="settings_doh_title">DNS over HTTPS</string>
+    <string name="settings_doh_description">一部の国で DNS キャッシュポイズニングから守ります</string>
+
+    <string name="multiuser_mode">複数ユーザーモード</string>
+    <string name="settings_owner_only">端末の管理者のみ</string>
+    <string name="settings_owner_manage">端末の管理者が管理</string>
+    <string name="settings_user_independent">ユーザー毎</string>
+    <string name="owner_only_summary">端末の管理者のみスーパーユーザー権限を利用できます</string>
+    <string name="owner_manage_summary">端末の管理者のみがスーパーユーザー権限を管理し、要求を受け付けられます</string>
+    <string name="user_independent_summary">ユーザー毎にそれぞれスーパーユーザー権限を設定できます</string>
+
+    <string name="mount_namespace_mode">名前空間のマウントモード</string>
+    <string name="settings_ns_global">グローバル名前空間</string>
+    <string name="settings_ns_requester">継承された名前空間</string>
+    <string name="settings_ns_isolate">分離された名前空間</string>
+    <string name="global_summary">すべての root セッションがグローバル名前空間を使用します</string>
+    <string name="requester_summary">root セッションはリクエスト者の名前空間を継承します</string>
+    <string name="isolate_summary">root セッション毎に分離された名前空間を使用します</string>
+
+    <!--Notifications-->
+    <string name="update_channel">Magisk の更新</string>
+    <string name="progress_channel">進捗通知</string>
+    <string name="updated_channel">更新完了</string>
+    <string name="download_complete">ダウンロード完了</string>
+    <string name="download_file_error">ダウンロード中にエラーが発生しました</string>
+    <string name="magisk_update_title">Magisk の更新があります！</string>
+    <string name="updated_title">Magisk を更新しました</string>
+    <string name="updated_text">タップでアプリを開きます</string>
+
+    <!--Toasts, Dialogs-->
+    <string name="yes">対応</string>
+    <string name="no">非対応</string>
+    <string name="repo_install_title">%1$s %2$s(%3$d) をインストール</string>
+    <string name="download">ダウンロード</string>
+    <string name="reboot">再起動</string>
+    <string name="release_notes">更新履歴</string>
+    <string name="flashing">書込中…</string>
+    <string name="done">完了！</string>
+    <string name="failure">失敗！</string>
+    <string name="hide_app_title">Magisk アプリを隠しています…</string>
+    <string name="open_link_failed_toast">このリンクを開けるアプリがありません</string>
+    <string name="complete_uninstall">完全にアンインストール</string>
+    <string name="restore_img">イメージのリストア</string>
+    <string name="restore_img_msg">リストア中…</string>
+    <string name="restore_done">リストア完了！</string>
+    <string name="restore_fail">Stock のバックアップがありません！</string>
+    <string name="setup_fail">セットアップに失敗しました</string>
+    <string name="env_fix_title">追加のセットアップが必要です</string>
+    <string name="env_fix_msg">Magisk を正常に動作させるためには追加のセットアップが必要です。今すぐ再起動しますか？</string>
+    <string name="setup_msg">追加セットアップを実行中…</string>
+    <string name="unsupport_magisk_title">対応していない Magisk バージョンです</string>
+    <string name="unsupport_magisk_msg">このバージョンのアプリではバージョン %1$s 以下の Magisk に対応していません。\n\nアプリで Magisk を使えないため、すぐに Magisk を更新してください</string>
+    <string name="unsupport_general_title">異常な状態です</string>
+    <string name="unsupport_system_app_msg">このアプリをシステムアプリとして起動することはサポートされていません。ユーザーアプリに戻してください。</string>
+    <string name="unsupport_other_su_msg">Magisk 以外の \"su\" バイナリが検出されました。競合する root 権限取得ソフトを削除し、Magisk をインストールし直してください。</string>
+    <string name="unsupport_external_storage_msg">Magisk が外部ストレージにインストールされています。内部ストレージに移動してください。</string>
+    <string name="unsupport_nonroot_stub_msg">root 権限が失われたため､隠し Magisk アプリが動作できなくなりました。元の APK を復元してください。</string>
+    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
+    <string name="external_rw_permission_denied">この機能を有効にするにはストレージ権限を許可してください</string>
+    <string name="post_notifications_denied">この機能を有効化するには権限を許可してください</string>
+    <string name="install_unknown_denied">この機能を有効化するには、不明なソースからのインストールを許可してください</string>
+    <string name="add_shortcut_title">ホーム画面にショートカットを追加</string>
+    <string name="add_shortcut_msg">アプリを隠すと、アプリ名やアイコンが判別しにくいことがあります。分かりやすいようホーム画面にショートカットを追加しますか？</string>
+    <string name="app_not_found">このアクションを扱えるアプリがありません</string>
+    <string name="reboot_apply_change">再起動して変更を適用</string>
+    <string name="restore_app_confirmation">隠しアプリを元のアプリへと戻します。続行しますか?</string>
+
+</resources>

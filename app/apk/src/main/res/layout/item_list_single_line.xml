@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="item"
+            type="com.topjohnwu.magisk.view.MagiskDialog.DialogItem" />
+
+        <variable
+            name="listener"
+            type="com.topjohnwu.magisk.view.MagiskDialog.DialogClickListener" />
+
+    </data>
+
+    <TextView
+        android:id="@android:id/text1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:onClick="@{() -> listener.onClick(item.position)}"
+        android:paddingStart="@dimen/l1"
+        android:paddingTop="@dimen/l_75"
+        android:paddingEnd="@dimen/l1"
+        android:paddingBottom="@dimen/l_75"
+        android:text="@{item.item}"
+        android:textAppearance="@style/AppearanceFoundation.Body"
+        tools:text="@tools:sample/lorem" />
+
+</layout>

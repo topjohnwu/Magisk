@@ -1,0 +1,3 @@
+# Excessive obfuscation
+-flattenpackagehierarchy
+-allowaccessmodification

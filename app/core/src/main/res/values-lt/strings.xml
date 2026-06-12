@@ -1,0 +1,238 @@
+<resources>
+
+    <!--Sections-->
+    <string name="modules">Moduliai</string>
+    <string name="superuser">Supernaudotojas</string>
+    <string name="logs">Žurnalas</string>
+    <string name="settings">Nustatymai</string>
+    <string name="install">Įdiegti</string>
+    <string name="section_home">Pagrindinis</string>
+    <string name="section_theme">Temos</string>
+    <string name="denylist">DenyList</string>
+
+    <!--Home-->
+    <string name="no_connection">Nėra ryšio</string>
+    <string name="app_changelog">Keitimų sąrašas</string>
+    <string name="loading">Įkeliama…</string>
+    <string name="update">Naujinti</string>
+    <string name="not_available">Neįdiegta</string>
+    <string name="hide">Slėpti</string>
+    <string name="home_package">Paketas</string>
+    <string name="home_app_title">Programėlė</string>
+
+    <string name="home_notice_content">Magisk siųskites TIK iš oficialiojo GitHub puslapio. Failai iš nežinomų šaltinių gali būti kenkėjiški!</string>
+    <string name="home_support_title">Palaikykite mus</string>
+    <string name="home_follow_title">Sekite mus</string>
+    <string name="home_item_source">Pirminis kodas</string>
+    <string name="home_support_content">Magisk yra ir visada bus nemokamas, atvirojo kodo. Tačiau galite paaukoti pinigų, jei norite parodyti, kad jums rūpi.</string>
+    <string name="home_installed_version">Įdiegta versija</string>
+    <string name="home_latest_version">Naujausia versija</string>
+    <string name="invalid_update_channel">Neteisingas naujinimų kanalas</string>
+    <string name="uninstall_magisk_title">Pašalinti Magisk</string>
+    <string name="uninstall_magisk_msg">Visi moduliai bus išjungti/pašalinti!\nRoot prieiga bus pašalinta!\nVidinė atmintis, iššifruota su Magisk, bus iš naujo užšifruota!</string>
+
+    <!--Install-->
+    <string name="keep_force_encryption">Neišjungti priverstinio šifravimo</string>
+    <string name="keep_dm_verity">Neišjungti AVB 2.0/dm-verity</string>
+    <string name="recovery_mode">Atkūrimo režimas</string>
+    <string name="install_options_title">Parinktys</string>
+    <string name="install_method_title">Būdas</string>
+    <string name="install_next">Toliau</string>
+    <string name="install_start">Įdiegti</string>
+    <string name="manager_download_install">Spustelėkite, kad atsisiųstumėte ir įdiegtumėte</string>
+    <string name="direct_install">Tiesioginis įdiegimas (rekomenduojama)</string>
+    <string name="install_inactive_slot">Įdiegti į antrąją vietą (po OTA naujinimo)</string>
+    <string name="install_inactive_slot_msg">Jūsų įremginys bus PRIVERSTAS pasileisti į dabartinę neaktyvią vietą po paleidimo iš naujo!\nNaudokite šią parinktį, kai OTA naujinimas yra baigtas.\nTęsti?</string>
+    <string name="setup_title">Išplėstinė sąranka</string>
+    <string name="select_patch_file">Pasirinkite ir taisykite failą</string>
+    <string name="patch_file_msg">Pasirinkite vaizdo failą (*.img) arba ODIN archyvą (*.tar)</string>
+    <string name="reboot_delay_toast">Paleidžiama iš naujo po 5 sekundžių…</string>
+    <string name="flash_screen_title">Įdiegimas</string>
+
+    <!--Superuser-->
+    <string name="su_request_title">Supernaudotojo užklausa</string>
+    <string name="touch_filtered_warning">Programėlė užstoja supernaudotojo užklausą, todėl Magisk negali patvirtinti jūsų atsakymo</string>
+    <string name="deny">Atmesti</string>
+    <string name="prompt">Klausti</string>
+    <string name="grant">Leisti</string>
+    <string name="su_warning">Suteikia prieigą prie jūsų įrenginio.\nAtmeskite, jei nesate tikri!</string>
+    <string name="forever">Amžinai</string>
+    <string name="once">Kartą</string>
+    <string name="tenmin">10 minučių</string>
+    <string name="twentymin">20 minučių</string>
+    <string name="thirtymin">30 minučių</string>
+    <string name="sixtymin">60 minučių</string>
+    <string name="su_allow_toast">%1$s suteiktos supernaudotojo teisės</string>
+    <string name="su_deny_toast">%1$s atmestos supernaudotojo teisės</string>
+    <string name="su_snack_grant">%1$s supernaudotojo teisės yra suteiktos</string>
+    <string name="su_snack_deny">%1$s supernaudotojo teisės yra atmestos</string>
+    <string name="su_snack_notif_on">%1$s pranešimai yra įjungti</string>
+    <string name="su_snack_notif_off">%1$s pranešimai yra išjungti</string>
+    <string name="su_snack_log_on">%1$s registravimas yra įjungtas</string>
+    <string name="su_snack_log_off">%1$s registravimas yra išjungtas</string>
+    <string name="su_revoke_title">Atšaukti?</string>
+    <string name="su_revoke_msg">Patvirtinkite %1$s supernaudotojo teisių atšaukimą</string>
+    <string name="toast">Iššokantys pranešimai</string>
+    <string name="none">Nėra</string>
+
+    <string name="superuser_toggle_notification">Pranešimai</string>
+    <string name="superuser_toggle_revoke">Atšaukti</string>
+    <string name="superuser_policy_none">Kol kas jokia programėlė neprašė supernaudotojo teisių.</string>
+
+    <!--Logs-->
+    <string name="log_data_none">Žurnalas tuščias</string>
+    <string name="log_data_magisk_none">Magisk žurnalas yra tuščias, keistoka</string>
+    <string name="menuSaveLog">Išsaugoti žurnalą</string>
+    <string name="menuClearLog">Valyti žurnalą</string>
+    <string name="logs_cleared">Žurnalas išvalytas</string>
+    <string name="pid">PID: %1$d</string>
+    <string name="target_uid">Tikslinis UID: %1$d</string>
+
+    <!--SafetyNet-->
+
+    <!--MagiskHide-->
+    <string name="show_system_app">Rodyti sistemos programėles</string>
+    <string name="show_os_app">Rodyti OS programėles</string>
+    <string name="hide_filter_hint">Filtruoti pagal pavadinimą</string>
+    <string name="hide_search">Ieškoti</string>
+
+    <!--Module-->
+    <string name="no_info_provided">(Nėra informacijos)</string>
+    <string name="reboot_userspace">Paleidimas neišjungus</string>
+    <string name="reboot_recovery">Paleidimas į Recovery</string>
+    <string name="reboot_bootloader">Paleidimas į Bootloader</string>
+    <string name="reboot_download">Paleidimas į Download</string>
+    <string name="reboot_edl">Paleidimas į EDL</string>
+    <string name="module_version_author">%1$s nuo %2$s</string>
+    <string name="module_state_remove">Šalinti</string>
+    <string name="module_state_restore">Atkurti</string>
+    <string name="module_action_install_external">Įdiegti iš saugyklos</string>
+    <string name="update_available">Prieinamas naujinimas</string>
+    <string name="suspend_text_riru">Modulis išjungtas, nes %1$s yra įjungtas</string>
+    <string name="suspend_text_zygisk">Modulis išjungtas, nes %1$s nėra įjungtas</string>
+    <string name="zygisk_module_unloaded">Zygisk moduis neįkeltas dėl nesuderinamumo</string>
+    <string name="module_empty">Modulių nėra</string>
+    <string name="confirm_install">Įdiegti modulį %1$s?</string>
+    <string name="confirm_install_title">Įdiegimo patvirtinimas</string>
+
+    <!--Settings-->
+    <string name="settings_dark_mode_title">Temos režimas</string>
+    <string name="settings_dark_mode_message">Pasirinkite režimą, kuris geriausiai atitinka jūsų stilių!</string>
+    <string name="settings_dark_mode_light">Visada šviesi</string>
+    <string name="settings_dark_mode_system">Sistemos</string>
+    <string name="settings_dark_mode_dark">Visada tamsi</string>
+    <string name="settings_download_path_title">Atsisiuntimo kelias</string>
+    <string name="settings_download_path_message">Failai bus išsaugoti %1$s</string>
+    <string name="settings_hide_app_title">Slėpti Magisk programėlę</string>
+    <string name="settings_hide_app_summary">Įdiegti įgaliotąją programėlę su atsitiktiniu paketo ID ir kitu pavadinimu</string>
+    <string name="settings_restore_app_title">Atkurti Magisk programėlę</string>
+    <string name="settings_restore_app_summary">Atkurti programėlę ir originalų APK</string>
+    <string name="language">Kalba</string>
+    <string name="system_default">(Sistemos numatytoji)</string>
+    <string name="settings_check_update_title">Naujinimų tikrinimas</string>
+    <string name="settings_check_update_summary">Periodiškai fone tikrinti, ar nėra naujinimų</string>
+    <string name="settings_update_channel_title">Naujinimų kanalas</string>
+    <string name="settings_update_stable">Stabilus</string>
+    <string name="settings_update_beta">Beta</string>
+    <string name="settings_update_custom">Tinkintas</string>
+    <string name="settings_update_custom_msg">Įdėkite tinkinto kanalo URL</string>
+    <string name="settings_zygisk_summary">Vykdyti Magisk dalis zygote tarnyboje</string>
+    <string name="settings_denylist_title">Aktyvinti DenyList</string>
+    <string name="settings_denylist_summary">Visos procesų, esančių denylist, Magisk modifikacijos bus atkurtos</string>
+    <string name="settings_denylist_config_title">Konfigūruoti DenyList</string>
+    <string name="settings_denylist_config_summary">Pasirinkite procesus, kuriuos norite įtraukti į denylist</string>
+    <string name="settings_hosts_title">Basisteminis hosts</string>
+    <string name="settings_hosts_summary">Basisteminis hosts palaiko reklamų blokatorių programėlėms</string>
+    <string name="settings_hosts_toast">Pridėtas besisteminio hosts modulis</string>
+    <string name="settings_app_name_hint">Naujas pavadinimas</string>
+    <string name="settings_app_name_helper">Programėlė bus perpakuota su šiuo pavadinimu</string>
+    <string name="settings_app_name_error">Netinkamas formatas</string>
+    <string name="settings_su_app_adb">Programėlės ir ADB</string>
+    <string name="settings_su_app">Tik programėlės</string>
+    <string name="settings_su_adb">Tik ADB</string>
+    <string name="settings_su_disable">Išjungta</string>
+    <string name="settings_su_request_10">10 sekundžių</string>
+    <string name="settings_su_request_15">15 sekundžių</string>
+    <string name="settings_su_request_20">20 sekundžių</string>
+    <string name="settings_su_request_30">30 sekundžių</string>
+    <string name="settings_su_request_45">45 sekundės</string>
+    <string name="settings_su_request_60">60 sekundžių</string>
+    <string name="superuser_access">Prieigos lygis</string>
+    <string name="auto_response">Automatinis atsakymas</string>
+    <string name="request_timeout">Atsakymo laukimas</string>
+    <string name="superuser_notification">Supernaudotojo pranešimas</string>
+    <string name="settings_su_reauth_title">Pakartotinis autentifikavimas</string>
+    <string name="settings_su_reauth_summary">Iš naujo prašyti supernaudotojo teisių po programėlių naujinimo</string>
+    <string name="settings_su_tapjack_title">Bakstelėjimų perėmimo apsauga</string>
+    <string name="settings_su_tapjack_summary">Supernaudotojo užklausos langas bus neaktyvus, kol jis yra užstotas kito lango</string>
+    <string name="settings_customization">Tinkinimas</string>
+    <string name="setting_add_shortcut_summary">Pridėti nuorodą į pagrindinį ekraną, jei po programėlės paslėpimo yra sunku atpažinti jos pavadinimą ir piktogramą</string>
+    <string name="settings_doh_title">DNS virš HTTPS</string>
+    <string name="settings_doh_description">Aktyvinti DoH (naudokite, jei kyla problemų jungiantis prie tinklo</string>
+
+    <string name="multiuser_mode">Daugelio naudotojų režimas</string>
+    <string name="settings_owner_only">Tik įrenginio savininkas</string>
+    <string name="settings_owner_manage">Valdoma įrenginio savininko</string>
+    <string name="settings_user_independent">Naudotojų taisyklės</string>
+    <string name="owner_only_summary">Tik savininkas turi root prieigą</string>
+    <string name="owner_manage_summary">Tik savininkas gali tvarkyti root prieigą ir gauti užklausas</string>
+    <string name="user_independent_summary">Kiekvienas naudotojas turi savo atskiras root taisykles</string>
+
+    <string name="mount_namespace_mode">Pavadinimų erdvės režimas</string>
+    <string name="settings_ns_global">Bendra pavadinimų erdvė</string>
+    <string name="settings_ns_requester">Paveldima pavadinimų erdvė</string>
+    <string name="settings_ns_isolate">Izoliuota pavadinimų erdvė</string>
+    <string name="global_summary">Visos root sesijos naudos bendrą pavainimų erdvę</string>
+    <string name="requester_summary">Root sesijos paveldės prašytojų pavadinimų erdvę</string>
+    <string name="isolate_summary">Kiekviena root sesija turės savo izoliuotą pavadinimų erdvę</string>
+
+    <!--Notifications-->
+    <string name="update_channel">Magisk naujinimai</string>
+    <string name="progress_channel">Progreso pranešimai</string>
+    <string name="updated_channel">Naujinimas baigtas</string>
+    <string name="download_complete">Atsisiuntimas baigtas</string>
+    <string name="download_file_error">Klaida atsisiunčiant failą</string>
+    <string name="magisk_update_title">Prieinamas Magisk naujinimas!</string>
+    <string name="updated_title">Magisk atnaujintas</string>
+    <string name="updated_text">Bakstelėkite, kad atidarytumėte programėlę</string>
+
+    <!--Toasts, Dialogs-->
+    <string name="yes">Taip</string>
+    <string name="no">Ne</string>
+    <string name="repo_install_title">Įdiegimas %1$s %2$s(%3$d)</string>
+    <string name="download">Atsisiųsti</string>
+    <string name="reboot">Paleisti iš naujo</string>
+    <string name="release_notes">Laidos informacija</string>
+    <string name="flashing">Diegiama…</string>
+    <string name="done">Baigta!</string>
+    <string name="failure">Nepavyko!</string>
+    <string name="hide_app_title">Slepiama Magisk programėlė…</string>
+    <string name="open_link_failed_toast">Nerasta programėlių nuorodos atidarymui</string>
+    <string name="complete_uninstall">Visiškas pašalinimas</string>
+    <string name="restore_img">Atkurti vaizdą</string>
+    <string name="restore_img_msg">Atkuriama…</string>
+    <string name="restore_done">Atkūrimas baigtas!</string>
+    <string name="restore_fail">Nėra atsarginės kopijos!</string>
+    <string name="setup_fail">Sąranka nepavyko</string>
+    <string name="env_fix_title">Reikalinga išplėstinė sąranka</string>
+    <string name="env_fix_msg">Jūsų įrenginiui reikalinga išplėstinė sąranka, kad Magisk veiktų tinkamai. Norite tęsti ir įrenginį paleisti iš naujo?</string>
+    <string name="env_full_fix_msg">Jūsų įrenginiui reikia iš naujo įdiegti Magisk, kad jis veiktų tinkamai. Iš naujo įdiekite Magisk su programėle, atkūrimo režimas negali gauti teisingos įrenginio informacijos.</string>
+    <string name="setup_msg">Vykdoma Running aplinkos sąranka…</string>
+    <string name="unsupport_magisk_title">Nepalaikoma Magisk versija</string>
+    <string name="unsupport_magisk_msg">Ši programėlės versija nepalaiko Magisk versijų, žemesnių už %1$s.\n\nProgramėlė veiks taip, lyg Magisk yra neįdiegtas. Kuo greičiau atnaujinkite Magisk.</string>
+    <string name="unsupport_general_title">Nenormali būsena</string>
+    <string name="unsupport_system_app_msg">Šios programėlės vykdymas kaip sistemos programėlės yra nepalaikomas. Nustatykite ją atgal į naudotojo programėlę.</string>
+    <string name="unsupport_other_su_msg">Aptiktas dvejetainis failas \"su\" ne iš Magisk. Pašalinkite pašalinį root teisių tiekėją ir/arba iš naujo įdiekite Magisk.</string>
+    <string name="unsupport_external_storage_msg">Magisk yra įdiegtas išorinėje saugykloje. Perkelkite programėlę į vidinę saugyklą.</string>
+    <string name="unsupport_nonroot_stub_msg">Paslėpta Magisk programėlė negali tęsti darbo, nes root teisės buvo prarastos. Atkurkite originalų APk.</string>
+    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
+    <string name="external_rw_permission_denied">Suteikti prieigą prie saugyklos</string>
+    <string name="post_notifications_denied">Suteikti prieigą prie pranešimų</string>
+    <string name="install_unknown_denied">Suteikti prieigą prie įdiegimo iš nežinomų šaltinių</string>
+    <string name="add_shortcut_title">Pridėti nuorodą į pagrindinį ekraną</string>
+    <string name="add_shortcut_msg">Po šios programėlės paslėpimo jos pavadinimas, piktograma gali būti sunkiai atpažįstamos. Norite pridėti nuorodą į pagrindinį ekraną?</string>
+    <string name="app_not_found">Nerasta programėlė, galinti atlikti šį veiksmą</string>
+    <string name="reboot_apply_change">Paleiskite iš naujo, kad pritaikytumėte pakeitimus</string>
+    <string name="restore_app_confirmation">Šis veiksmas atkurs paslėptą programėlę į originalią būseną. Tikrai norite tai padaryti?</string>
+
+</resources>

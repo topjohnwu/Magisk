@@ -1,4 +1,0 @@
-<resources>
-    <string name="upgrade_msg">Aggiorna alla versione completa di Magisk Manager per completare l\'installazione. Vuoi procedere al download e all\'installazione?</string>
-    <string name="no_internet_msg">Controlla la connessione a Internet! È necessaria per l\'aggiornamento di Magisk Manager.</string>
-</resources>

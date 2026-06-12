@@ -1,0 +1,12 @@
+[package]
+name = "rustup-wrapper"
+version = "0.0.0"
+edition = "2024"
+
+[dependencies]
+home = "0.5"
+
+[profile.release]
+strip = true
+lto = true
+codegen-units = 1

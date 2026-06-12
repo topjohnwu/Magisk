@@ -1,0 +1,6 @@
+<resources>
+    <string name="upgrade_msg">완전한 Magisk Manager로 업데이트하여 설치를 마치십시오. 다운로드하고 설치하시겠습니까?</string>
+    <string name="no_internet_msg">인터넷에 연결해 주시기 바랍니다! 완전한 Magisk Manager로 업데이트 해야 합니다.</string>
+    <string name="dling">다운로드중</string>
+    <string name="relaunch_app">앱을 수동으로 재시작 하세요</string>
+</resources>

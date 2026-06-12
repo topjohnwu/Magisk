@@ -1,0 +1,369 @@
+//
+// Copyright (C) 2010 The Android Open Source Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// Update file format: An update file contains all the operations needed
+// to update a system to a specific version. It can be a full payload which
+// can update from any version, or a delta payload which can only update
+// from a specific version.
+// The update format is represented by this struct pseudocode:
+// struct delta_update_file {
+//   char magic[4] = "CrAU";
+//   uint64 file_format_version;  // payload major version
+//   uint64 manifest_size;  // Size of protobuf DeltaArchiveManifest
+//
+//   // Only present if format_version >= 2:
+//   uint32 metadata_signature_size;
+//
+//   // The DeltaArchiveManifest protobuf serialized, not compressed.
+//   char manifest[manifest_size];
+//
+//   // The signature of the metadata (from the beginning of the payload up to
+//   // this location, not including the signature itself). This is a serialized
+//   // Signatures message.
+//   char metadata_signature_message[metadata_signature_size];
+//
+//   // Data blobs for files, no specific format. The specific offset
+//   // and length of each data blob is recorded in the DeltaArchiveManifest.
+//   struct {
+//     char data[];
+//   } blobs[];
+//
+//   // The signature of the entire payload, everything up to this location,
+//   // except that metadata_signature_message is skipped to simplify signing
+//   // process. These two are not signed:
+//   uint64 payload_signatures_message_size;
+//   // This is a serialized Signatures message.
+//   char payload_signatures_message[payload_signatures_message_size];
+//
+// };
+// The DeltaArchiveManifest protobuf is an ordered list of InstallOperation
+// objects. These objects are stored in a linear array in the
+// DeltaArchiveManifest. Each operation is applied in order by the client.
+// The DeltaArchiveManifest also contains the initial and final
+// checksums for the device.
+// The client will perform each InstallOperation in order, beginning even
+// before the entire delta file is downloaded (but after at least the
+// protobuf is downloaded). The types of operations are explained:
+// - REPLACE: Replace the dst_extents on the drive with the attached data,
+//   zero padding out to block size.
+// - REPLACE_BZ: bzip2-uncompress the attached data and write it into
+//   dst_extents on the drive, zero padding to block size.
+// - MOVE: Copy the data in src_extents to dst_extents. Extents may overlap,
+//   so it may be desirable to read all src_extents data into memory before
+//   writing it out. (deprecated)
+// - SOURCE_COPY: Copy the data in src_extents in the old partition to
+//   dst_extents in the new partition. There's no overlapping of data because
+//   the extents are in different partitions.
+// - BSDIFF: Read src_length bytes from src_extents into memory, perform
+//   bspatch with attached data, write new data to dst_extents, zero padding
+//   to block size. (deprecated)
+// - SOURCE_BSDIFF: Read the data in src_extents in the old partition, perform
+//   bspatch with the attached data and write the new data to dst_extents in the
+//   new partition.
+// - ZERO: Write zeros to the destination dst_extents.
+// - DISCARD: Discard the destination dst_extents blocks on the physical medium.
+//   the data read from those blocks is undefined.
+// - REPLACE_XZ: Replace the dst_extents with the contents of the attached
+//   xz file after decompression. The xz file should only use crc32 or no crc at
+//   all to be compatible with xz-embedded.
+// - PUFFDIFF: Read the data in src_extents in the old partition, perform
+//   puffpatch with the attached data and write the new data to dst_extents in
+//   the new partition.
+//
+// The operations allowed in the payload (supported by the client) depend on the
+// major and minor version. See InstallOperation.Type below for details.
+syntax = "proto2";
+package chromeos_update_engine;
+// Data is packed into blocks on disk, always starting from the beginning
+// of the block. If a file's data is too large for one block, it overflows
+// into another block, which may or may not be the following block on the
+// physical partition. An ordered list of extents is another
+// representation of an ordered list of blocks. For example, a file stored
+// in blocks 9, 10, 11, 2, 18, 12 (in that order) would be stored in
+// extents { {9, 3}, {2, 1}, {18, 1}, {12, 1} } (in that order).
+// In general, files are stored sequentially on disk, so it's more efficient
+// to use extents to encode the block lists (this is effectively
+// run-length encoding).
+// A sentinel value (kuint64max) as the start block denotes a sparse-hole
+// in a file whose block-length is specified by num_blocks.
+message Extent {
+  optional uint64 start_block = 1;
+  optional uint64 num_blocks = 2;
+}
+// Signatures: Updates may be signed by the OS vendor. The client verifies
+// an update's signature by hashing the entire download. The section of the
+// download that contains the signature is at the end of the file, so when
+// signing a file, only the part up to the signature part is signed.
+// Then, the client looks inside the download's Signatures message for a
+// Signature message that it knows how to handle. Generally, a client will
+// only know how to handle one type of signature, but an update may contain
+// many signatures to support many different types of client. Then client
+// selects a Signature message and uses that, along with a known public key,
+// to verify the download. The public key is expected to be part of the
+// client.
+message Signatures {
+  message Signature {
+    optional uint32 version = 1 [deprecated = true];
+    optional bytes data = 2;
+    // The DER encoded signature size of EC keys is nondeterministic for
+    // different input of sha256 hash. However, we need the size of the
+    // serialized signatures protobuf string to be fixed before signing;
+    // because this size is part of the content to be signed. Therefore, we
+    // always pad the signature data to the maximum possible signature size of
+    // a given key. And the payload verifier will truncate the signature to
+    // its correct size based on the value of |unpadded_signature_size|.
+    optional fixed32 unpadded_signature_size = 3;
+  }
+  repeated Signature signatures = 1;
+}
+message PartitionInfo {
+  optional uint64 size = 1;
+  optional bytes hash = 2;
+}
+message InstallOperation {
+  enum Type {
+    REPLACE = 0;     // Replace destination extents w/ attached data.
+    REPLACE_BZ = 1;  // Replace destination extents w/ attached bzipped data.
+    MOVE = 2 [deprecated = true];    // Move source extents to target extents.
+    BSDIFF = 3 [deprecated = true];  // The data is a bsdiff binary diff.
+    // On minor version 2 or newer, these operations are supported:
+    SOURCE_COPY = 4;    // Copy from source to target partition
+    SOURCE_BSDIFF = 5;  // Like BSDIFF, but read from source partition
+    // On minor version 3 or newer and on major version 2 or newer, these
+    // operations are supported:
+    REPLACE_XZ = 8;  // Replace destination extents w/ attached xz data.
+    // On minor version 4 or newer, these operations are supported:
+    ZERO = 6;     // Write zeros in the destination.
+    DISCARD = 7;  // Discard the destination blocks, reading as undefined.
+    BROTLI_BSDIFF = 10;  // Like SOURCE_BSDIFF, but compressed with brotli.
+    // On minor version 5 or newer, these operations are supported:
+    PUFFDIFF = 9;  // The data is in puffdiff format.
+    // On minor version 8 or newer, these operations are supported:
+    ZUCCHINI = 11;
+    // On minor version 9 or newer, these operations are supported:
+    LZ4DIFF_BSDIFF = 12;
+    LZ4DIFF_PUFFDIFF = 13;
+  }
+  required Type type = 1;
+  // Only minor version 6 or newer support 64 bits |data_offset| and
+  // |data_length|, older client will read them as uint32.
+  // The offset into the delta file (after the protobuf)
+  // where the data (if any) is stored
+  optional uint64 data_offset = 2;
+  // The length of the data in the delta file
+  optional uint64 data_length = 3;
+  // Ordered list of extents that are read from (if any) and written to.
+  repeated Extent src_extents = 4;
+  // Byte length of src, equal to the number of blocks in src_extents *
+  // block_size. It is used for BSDIFF and SOURCE_BSDIFF, because we need to
+  // pass that external program the number of bytes to read from the blocks we
+  // pass it.  This is not used in any other operation.
+  optional uint64 src_length = 5;
+  repeated Extent dst_extents = 6;
+  // Byte length of dst, equal to the number of blocks in dst_extents *
+  // block_size. Used for BSDIFF and SOURCE_BSDIFF, but not in any other
+  // operation.
+  optional uint64 dst_length = 7;
+  // Optional SHA 256 hash of the blob associated with this operation.
+  // This is used as a primary validation for http-based downloads and
+  // as a defense-in-depth validation for https-based downloads. If
+  // the operation doesn't refer to any blob, this field will have
+  // zero bytes.
+  optional bytes data_sha256_hash = 8;
+  // Indicates the SHA 256 hash of the source data referenced in src_extents at
+  // the time of applying the operation. If present, the update_engine daemon
+  // MUST read and verify the source data before applying the operation.
+  optional bytes src_sha256_hash = 9;
+}
+// Hints to VAB snapshot to skip writing some blocks if these blocks are
+// identical to the ones on the source image. The src & dst extents for each
+// CowMergeOperation should be contiguous, and they're a subset of an OTA
+// InstallOperation.
+// During merge time, we need to follow the pre-computed sequence to avoid
+// read after write, similar to the inplace update schema.
+message CowMergeOperation {
+  enum Type {
+    COW_COPY = 0;     // identical blocks
+    COW_XOR = 1;      // used when src/dst blocks are highly similar
+    COW_REPLACE = 2;  // Raw replace operation
+  }
+  optional Type type = 1;
+  optional Extent src_extent = 2;
+  optional Extent dst_extent = 3;
+  // For COW_XOR, source location might be unaligned, so this field is in range
+  // [0, block_size), representing how much should the src_extent shift toward
+  // larger block number. If this field is non-zero, then src_extent will
+  // include 1 extra block in the end, as the merge op actually references the
+  // first |src_offset| bytes of that extra block. For example, if |dst_extent|
+  // is [10, 15], |src_offset| is 500, then src_extent might look like [25, 31].
+  // Note that |src_extent| contains 1 extra block than the |dst_extent|.
+  optional uint32 src_offset = 4;
+}
+// Describes the update to apply to a single partition.
+message PartitionUpdate {
+  // A platform-specific name to identify the partition set being updated. For
+  // example, in Chrome OS this could be "ROOT" or "KERNEL".
+  required string partition_name = 1;
+  // Whether this partition carries a filesystem with post-install program that
+  // must be run to finalize the update process. See also |postinstall_path| and
+  // |filesystem_type|.
+  optional bool run_postinstall = 2;
+  // The path of the executable program to run during the post-install step,
+  // relative to the root of this filesystem. If not set, the default "postinst"
+  // will be used. This setting is only used when |run_postinstall| is set and
+  // true.
+  optional string postinstall_path = 3;
+  // The filesystem type as passed to the mount(2) syscall when mounting the new
+  // filesystem to run the post-install program. If not set, a fixed list of
+  // filesystems will be attempted. This setting is only used if
+  // |run_postinstall| is set and true.
+  optional string filesystem_type = 4;
+  // If present, a list of signatures of the new_partition_info.hash signed with
+  // different keys. If the update_engine daemon requires vendor-signed images
+  // and has its public key installed, one of the signatures should be valid
+  // for /postinstall to run.
+  repeated Signatures.Signature new_partition_signature = 5;
+  optional PartitionInfo old_partition_info = 6;
+  optional PartitionInfo new_partition_info = 7;
+  // The list of operations to be performed to apply this PartitionUpdate. The
+  // associated operation blobs (in operations[i].data_offset, data_length)
+  // should be stored contiguously and in the same order.
+  repeated InstallOperation operations = 8;
+  // Whether a failure in the postinstall step for this partition should be
+  // ignored.
+  optional bool postinstall_optional = 9;
+  // On minor version 6 or newer, these fields are supported:
+  // The extent for data covered by verity hash tree.
+  optional Extent hash_tree_data_extent = 10;
+  // The extent to store verity hash tree.
+  optional Extent hash_tree_extent = 11;
+  // The hash algorithm used in verity hash tree.
+  optional string hash_tree_algorithm = 12;
+  // The salt used for verity hash tree.
+  optional bytes hash_tree_salt = 13;
+  // The extent for data covered by FEC.
+  optional Extent fec_data_extent = 14;
+  // The extent to store FEC.
+  optional Extent fec_extent = 15;
+  // The number of FEC roots.
+  optional uint32 fec_roots = 16 [default = 2];
+  // Per-partition version used for downgrade detection, added
+  // as an effort to support partial updates. For most partitions,
+  // this is the build timestamp.
+  optional string version = 17;
+  // A sorted list of CowMergeOperation. When writing cow, we can choose to
+  // skip writing the raw bytes for these extents. During snapshot merge, the
+  // bytes will read from the source partitions instead.
+  repeated CowMergeOperation merge_operations = 18;
+  // Estimated size for COW image. This is used by libsnapshot
+  // as a hint. If set to 0, libsnapshot should use alternative
+  // methods for estimating size.
+  optional uint64 estimate_cow_size = 19;
+}
+message DynamicPartitionGroup {
+  // Name of the group.
+  required string name = 1;
+  // Maximum size of the group. The sum of sizes of all partitions in the group
+  // must not exceed the maximum size of the group.
+  optional uint64 size = 2;
+  // A list of partitions that belong to the group.
+  repeated string partition_names = 3;
+}
+message VABCFeatureSet {
+  optional bool threaded = 1;
+  optional bool batch_writes = 2;
+}
+// Metadata related to all dynamic partitions.
+message DynamicPartitionMetadata {
+  // All updatable groups present in |partitions| of this DeltaArchiveManifest.
+  // - If an updatable group is on the device but not in the manifest, it is
+  //   not updated. Hence, the group will not be resized, and partitions cannot
+  //   be added to or removed from the group.
+  // - If an updatable group is in the manifest but not on the device, the group
+  //   is added to the device.
+  repeated DynamicPartitionGroup groups = 1;
+  // Whether dynamic partitions have snapshots during the update. If this is
+  // set to true, the update_engine daemon creates snapshots for all dynamic
+  // partitions if possible. If this is unset, the update_engine daemon MUST
+  // NOT create snapshots for dynamic partitions.
+  optional bool snapshot_enabled = 2;
+  // If this is set to false, update_engine should not use VABC regardless. If
+  // this is set to true, update_engine may choose to use VABC if device
+  // supports it, but not guaranteed.
+  // VABC stands for Virtual AB Compression
+  optional bool vabc_enabled = 3;
+  // The compression algorithm used by VABC. Available ones are "gz", "brotli".
+  // See system/core/fs_mgr/libsnapshot/cow_writer.cpp for available options,
+  // as this parameter is ultimated forwarded to libsnapshot's CowWriter
+  optional string vabc_compression_param = 4;
+  // COW version used by VABC. The represents the major version in the COW
+  // header
+  optional uint32 cow_version = 5;
+  // A collection of knobs to tune Virtual AB Compression
+  optional VABCFeatureSet vabc_feature_set = 6;
+}
+// Definition has been duplicated from
+// $ANDROID_BUILD_TOP/build/tools/releasetools/ota_metadata.proto. Keep in sync.
+message ApexInfo {
+  optional string package_name = 1;
+  optional int64 version = 2;
+  optional bool is_compressed = 3;
+  optional int64 decompressed_size = 4;
+}
+// Definition has been duplicated from
+// $ANDROID_BUILD_TOP/build/tools/releasetools/ota_metadata.proto. Keep in sync.
+message ApexMetadata {
+  repeated ApexInfo apex_info = 1;
+}
+message DeltaArchiveManifest {
+  // Only present in major version = 1. List of install operations for the
+  // kernel and rootfs partitions. For major version = 2 see the |partitions|
+  // field.
+  reserved 1, 2;
+  // (At time of writing) usually 4096
+  optional uint32 block_size = 3 [default = 4096];
+  // If signatures are present, the offset into the blobs, generally
+  // tacked onto the end of the file, and the length. We use an offset
+  // rather than a bool to allow for more flexibility in future file formats.
+  // If either is absent, it means signatures aren't supported in this
+  // file.
+  optional uint64 signatures_offset = 4;
+  optional uint64 signatures_size = 5;
+  // Fields deprecated in major version 2.
+  reserved 6,7,8,9,10,11;
+  // The minor version, also referred as "delta version", of the payload.
+  // Minor version 0 is full payload, everything else is delta payload.
+  optional uint32 minor_version = 12 [default = 0];
+  // Only present in major version >= 2. List of partitions that will be
+  // updated, in the order they will be updated. This field replaces the
+  // |install_operations|, |kernel_install_operations| and the
+  // |{old,new}_{kernel,rootfs}_info| fields used in major version = 1. This
+  // array can have more than two partitions if needed, and they are identified
+  // by the partition name.
+  repeated PartitionUpdate partitions = 13;
+  // The maximum timestamp of the OS allowed to apply this payload.
+  // Can be used to prevent downgrading the OS.
+  optional int64 max_timestamp = 14;
+  // Metadata related to all dynamic partitions.
+  optional DynamicPartitionMetadata dynamic_partition_metadata = 15;
+  // If the payload only updates a subset of partitions on the device.
+  optional bool partial_update = 16;
+  // Information on compressed APEX to figure out how much space is required for
+  // their decompression
+  repeated ApexInfo apex_info = 17;
+  // Security patch level of the device, usually in the format of
+  // yyyy-mm-dd
+  optional string security_patch_level = 18;
+}

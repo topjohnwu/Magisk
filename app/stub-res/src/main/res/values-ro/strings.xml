@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="upgrade_msg">Treci la versiunea completă Magisk pentru a finaliza configurarea. Descarci și instalezi?</string>
+    <string name="no_internet_msg">Te rugăm să te conectezi la internet! Este necesară actualizarea la versiunea completă Magisk.</string>
+    <string name="dling">Se descarcă</string>
+    <string name="relaunch_app">Te rugăm să relansezi manual aplicația</string>
+</resources>

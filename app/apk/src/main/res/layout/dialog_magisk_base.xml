@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="data"
+            type="com.topjohnwu.magisk.view.MagiskDialog.Data" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:layout_width="match_parent">
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/dialog_base_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="16dp" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/dialog_base_end"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_end="16dp" />
+
+        <ImageView
+            android:id="@+id/dialog_base_icon"
+            style="@style/WidgetFoundation.Image.Big"
+            gone="@{data.icon == null}"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/l1"
+            android:src="@{data.icon}"
+            app:layout_constraintBottom_toTopOf="@+id/dialog_base_title"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@drawable/ic_delete_md2" />
+
+        <TextView
+            android:id="@+id/dialog_base_title"
+            gone="@{data.title.length == 0}"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/l1"
+            android:gravity="center"
+            android:text="@{data.title}"
+            android:textAppearance="@style/AppearanceFoundation.Title"
+            app:layout_constraintEnd_toEndOf="@+id/dialog_base_end"
+            app:layout_constraintStart_toStartOf="@+id/dialog_base_start"
+            app:layout_constraintTop_toBottomOf="@+id/dialog_base_icon"
+            tools:lines="1"
+            tools:text="@tools:sample/lorem/random" />
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/l_50"
+            android:overScrollMode="ifContentScrolls"
+            app:layout_constrainedHeight="true"
+            app:layout_constraintBottom_toTopOf="@+id/dialog_base_space"
+            app:layout_constraintEnd_toEndOf="@+id/dialog_base_end"
+            app:layout_constraintStart_toStartOf="@+id/dialog_base_start"
+            app:layout_constraintTop_toBottomOf="@+id/dialog_base_title">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/dialog_base_message"
+                    gone="@{data.message.length == 0}"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="@{data.message}"
+                    android:textAppearance="@style/AppearanceFoundation.Body"
+                    tools:lines="3"
+                    tools:text="@tools:sample/lorem/random" />
+
+                <FrameLayout
+                    android:id="@+id/dialog_base_container"
+                    gone="@{data.message.length != 0}"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </FrameLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+        <Space
+            android:id="@+id/dialog_base_space"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/l_50"
+            app:layout_constraintBottom_toTopOf="@+id/dialog_base_buttons"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.appcompat.widget.ButtonBarLayout
+            android:id="@+id/dialog_base_buttons"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="bottom|center_horizontal"
+            android:layoutDirection="locale"
+            android:orientation="horizontal"
+            android:paddingStart="12dp"
+            android:paddingTop="4dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="4dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <Button
+                android:id="@+id/dialog_base_button_2"
+                style="@style/WidgetFoundation.Button.Text"
+                gone="@{data.buttonNeutral.gone}"
+                isEnabled="@{data.buttonNeutral.isEnabled}"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:clickable="@{data.buttonNeutral.isEnabled}"
+                android:focusable="@{data.buttonNeutral.isEnabled}"
+                android:onClick="@{() -> data.buttonNeutral.clicked()}"
+                android:text="@{data.buttonNeutral.message}"
+                app:icon="@{data.buttonNeutral.icon}"
+                app:iconGravity="textStart"
+                tools:icon="@drawable/ic_bug_md2"
+                tools:text="Button 1" />
+
+            <Space
+                android:id="@+id/spacer"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:visibility="invisible" />
+
+            <Button
+                android:id="@+id/dialog_base_button_3"
+                style="@style/WidgetFoundation.Button.Text"
+                gone="@{data.buttonNegative.gone}"
+                isEnabled="@{data.buttonNegative.isEnabled}"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:clickable="@{data.buttonNegative.isEnabled}"
+                android:focusable="@{data.buttonNegative.isEnabled}"
+                android:onClick="@{() -> data.buttonNegative.clicked()}"
+                android:text="@{data.buttonNegative.message}"
+                app:icon="@{data.buttonNegative.icon}"
+                tools:icon="@drawable/ic_bug_md2"
+                tools:text="Button 1" />
+
+            <Button
+                android:id="@+id/dialog_base_button_1"
+                style="@style/WidgetFoundation.Button.Text"
+                gone="@{data.buttonPositive.gone}"
+                isEnabled="@{data.buttonPositive.isEnabled}"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:clickable="@{data.buttonPositive.isEnabled}"
+                android:focusable="@{data.buttonPositive.isEnabled}"
+                android:onClick="@{() -> data.buttonPositive.clicked()}"
+                android:text="@{data.buttonPositive.message}"
+                app:icon="@{data.buttonPositive.icon}"
+                app:iconGravity="textStart"
+                tools:icon="@drawable/ic_bug_md2"
+                tools:text="Button 1" />
+
+        </androidx.appcompat.widget.ButtonBarLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

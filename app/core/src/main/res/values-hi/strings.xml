@@ -1,0 +1,234 @@
+<resources>
+
+    <!--Sections-->
+    <string name="modules">मॉड्यूल</string>
+    <string name="superuser">सुपर यूज़र</string>
+    <string name="logs">लॉग्स</string>
+    <string name="settings">सेटिंग्स</string>
+    <string name="install">इंस्टॉल</string>
+    <string name="section_home">होम</string>
+    <string name="section_theme">थीम</string>
+    <string name="denylist">अस्वीकार सूची</string>
+
+    <!--Home-->
+    <string name="no_connection">कोई कनेक्शन उपलब्ध नहीं है</string>
+    <string name="app_changelog">बदलाव</string>
+    <string name="loading">लोड हो रहा है…</string>
+    <string name="update">अद्यतन करें</string>
+    <string name="not_available">उपलब्ध नहीं है</string>
+    <string name="hide">छिपाएँ</string>
+    <string name="home_package">पैकेज</string>
+    <string name="home_app_title">ऐप</string>
+
+    <string name="home_notice_content">मैजिस्क केवल आधिकारिक गिटहब पृष्ठ पेज से डाउनलोड करें। अज्ञात स्रोतों से फ़ाइलें दुर्भावनापूर्ण हो सकती हैं!</string>
+    <string name="home_support_title">हमें सहयोग दीजिये</string>
+    <string name="home_follow_title">अनुसरण करें</string>
+    <string name="home_item_source">स्रोत</string>
+    <string name="home_support_content">मैजिस्क है, और हमेशा मुफ्त और ओपन-सोर्स रहेगा। हालाँकि आप एक छोटा सा दान भेजकर हमारी मदद कर सकते है।</string>
+    <string name="home_installed_version">इंस्टॉल्ड</string>
+    <string name="home_latest_version">नवीनतम</string>
+    <string name="invalid_update_channel">अमान्य अपडेट चैनल</string>
+    <string name="uninstall_magisk_title">मैजिस्क को अनइंस्टॉल करें</string>
+    <string name="uninstall_magisk_msg">सभी मॉड्यूल्स को निष्क्रिय/हटा दिया जाएगा!\n रूट को हटा दिया जाएगा!\n आपका डेटा संभावित रूप से एन्क्रिप्ट किया गया है यदि पहले से नहीं है!</string>
+
+    <!--Install-->
+    <string name="keep_force_encryption">फ़ोर्स एन्क्रिप्शन को संरक्षित रखें</string>
+    <string name="keep_dm_verity">AVB 2.0/dm-verity को संरक्षित रखें</string>
+    <string name="recovery_mode">रिकवरी मोड</string>
+    <string name="install_options_title">विकल्प</string>
+    <string name="install_method_title">तरीका</string>
+    <string name="install_next">आगे</string>
+    <string name="install_start">तो चलिए शुरू करते हैं!</string>
+    <string name="manager_download_install">डाउनलोड और इंस्टॉल करने के लिए दबाएं</string>
+    <string name="direct_install">प्रत्यक्ष इंस्टॉल (अनुशंसित)</string>
+    <string name="install_inactive_slot">निष्क्रिय स्लॉट में इंस्टॉल करें (OTA के बाद)</string>
+    <string name="install_inactive_slot_msg">आपका डिवाइस रीबूट होने के बाद वर्तमान निष्क्रिय स्लॉट में बूट करने के लिए मजबूर किया जाएगा!\n इस विकल्प का उपयोग सिर्फ OTA हो जाने के बाद करें।\n जारी रखें?</string>
+    <string name="setup_title">अतिरिक्त सेटअप</string>
+    <string name="select_patch_file">एक फ़ाइल का चयन और पैच करें</string>
+    <string name="patch_file_msg">एक रॉ छवि (* .img) या एक ODIN tarfile (* .tar) का चयन करें</string>
+    <string name="reboot_delay_toast">5 सेकंड में रिबूट हो रहा है...</string>
+    <string name="flash_screen_title">इंस्टॉलेशन</string>
+
+    <!--Superuser-->
+    <string name="su_request_title">सुपरयूज़र अनुरोध</string>
+    <string name="touch_filtered_warning">चूंकि एक ऐप सुपरयूज़र अनुरोध को अस्पष्ट कर रहा है, इसलिए मैजिस्क आपकी प्रतिक्रिया को सत्यापित नहीं कर सकता</string>
+    <string name="deny">इंकार करें</string>
+    <string name="prompt">संकेत दिखाएँ</string>
+    <string name="grant">अनुमति दें</string>
+    <string name="su_warning">यह आपके डिवाइस की पूरी पहुँच की अनुमति देगा,\n यदि आप सुनिश्चित नहीं हैं तो इंकार करें!</string>
+    <string name="forever">सदैव</string>
+    <string name="once">एक बार</string>
+    <string name="tenmin">10 मिनिट</string>
+    <string name="twentymin">20 मिनट</string>
+    <string name="thirtymin">30 मिनट</string>
+    <string name="sixtymin">60 मिनट</string>
+    <string name="su_allow_toast"> %1$s को सुपरयूज़र अधिकार प्रदान किया गया</string>
+    <string name="su_deny_toast"> %1$s को सुपरयूज़र अधिकार से इंकार किया गया</string>
+    <string name="su_snack_grant"> %1$s को सुपरयूज़र अधिकार प्रदान किए गए </string>
+    <string name="su_snack_deny"> %1$s के सुपरयूज़र अधिकारों को अस्वीकार कर दिया गया है</string>
+    <string name="su_snack_notif_on"> %1$s की सूचनाएं सक्षम हैं</string>
+    <string name="su_snack_notif_off"> %1$s की सूचनाएं अक्षम हैं</string>
+    <string name="su_snack_log_on"> %1$s की लॉगिंग सक्षम है</string>
+    <string name="su_snack_log_off"> %1$s की लॉगिंग अक्षम है</string>
+    <string name="su_revoke_title">अधिकार वापस लें?</string>
+    <string name="su_revoke_msg"> %1$s के अधिकारों को रद्द करने की पुष्टि करें?</string>
+    <string name="toast">पॉप-अप सूचना</string>
+    <string name="none">कोई नहीं</string>
+
+    <string name="superuser_toggle_notification">सूचनाएं</string>
+    <string name="superuser_toggle_revoke">अधिकार वापस लें</string>
+    <string name="superuser_policy_none">किसी भी ऐप ने अभी तक सुपरयूज़र की अनुमति नहीं मांगी है।</string>
+
+    <!--Logs-->
+    <string name="log_data_none">कोई लॉग नहीं, अपने सुपरयूज़र सक्षम एप्लिकेशन का अधिक उपयोग करने का प्रयास करें।</string>
+    <string name="log_data_magisk_none">मैजिस्क लॉग खाली हैं, यह अजीब है।</string>
+    <string name="menuSaveLog">लॉग सहेजे</string>
+    <string name="menuClearLog">लॉग साफ़ करें</string>
+    <string name="logs_cleared">लॉग सफलतापूर्वक साफ़ किया गया।</string>
+    <string name="pid">PID: %1$d</string>
+    <string name="target_uid">लक्षित UID: %1$d</string>
+
+    <!--SafetyNet-->
+
+    <!-- MagiskHide -->
+    <string name="show_system_app">सिस्टम ऐप्स दिखाएं</string>
+    <string name="show_os_app">OS एप्लिकेशन दिखाएं</string>
+    <string name="hide_filter_hint">नाम से फ़िल्टर करें</string>
+    <string name="hide_search">खोजें</string>
+
+    <!--Module -->
+    <string name="no_info_provided">(कोई जानकारी नहीं दी गई)</string>
+    <string name="reboot_userspace">सॉफ्ट रिबूट</string>
+    <string name="reboot_recovery">रिकवरी रिबूट</string>
+    <string name="reboot_bootloader">बूटलोडर रिबूट</string>
+    <string name="reboot_download">डाउनलोड मोड रिबूट</string>
+    <string name="reboot_edl">EDL रिबूट</string>
+    <string name="module_version_author"> %2$s के द्वारा %1$s</string>
+    <string name="module_state_remove">हटाएँ</string>
+    <string name="module_state_restore">रिस्टोर करें</string>
+    <string name="module_action_install_external">स्टोरेज से इनस्टॉल करें</string>
+    <string name="update_available">अपडेट उपलब्ध</string>
+    <string name="suspend_text_riru">%1$s सक्रिय होने के कारण मॉड्यूल निलंबित</string>
+    <string name="suspend_text_zygisk">%1$s अक्षम होने के कारण मॉड्यूल निलंबित</string>
+    <string name="zygisk_module_unloaded">Zygisk मॉड्यूल असंगतता के कारण लोड होने में असमर्थ</string>
+    <string name="module_empty">कोई मॉड्यूल इंस्टॉल्ड नहीं</string>
+
+    <!--Settings -->
+    <string name="settings_dark_mode_title">थीम मोड</string>
+    <string name="settings_dark_mode_message">ऐसी थीम का चयन करें जो आपकी शैली के अनुकूल हो!</string>
+    <string name="settings_dark_mode_light">हमेशा सफेद रंग वाली</string>
+    <string name="settings_dark_mode_system">सिस्टम के अनुसार</string>
+    <string name="settings_dark_mode_dark">डार्क मोड</string>
+    <string name="settings_download_path_title">डाउनलोड पथ</string>
+    <string name="settings_download_path_message">फ़ाइलों को %1$s में सहेजा जाएगा</string>
+    <string name="settings_hide_app_title">मैजिस्क ऐप को छिपाएं</string>
+    <string name="settings_hide_app_summary">रैंडम पैकेज आईडी और कस्टम ऐप लेबल के साथ प्रॉक्सी ऐप इंस्टॉल करें</string>
+    <string name="settings_restore_app_title">मैजिस्क ऐप को पुनर्स्थापित करें</string>
+    <string name="settings_restore_app_summary">ऐप को उनहीदे करें और मूल एपीके को पुनर्स्थापित करें</string>
+    <string name="language">भाषा</string>
+    <string name="system_default">(सिस्टम डिफ़ॉल्ट)</string>
+    <string name="settings_check_update_title">अपडेट जांचें</string>
+    <string name="settings_check_update_summary">समय-समय पर बैकग्राउंड में अपडेट की जांच करते रहें</string>
+    <string name="settings_update_channel_title">अपडेट चैनल</string>
+    <string name="settings_update_stable">स्टेबल</string>
+    <string name="settings_update_beta">बीटा</string>
+    <string name="settings_update_custom">कस्टम चैनल</string>
+    <string name="settings_update_custom_msg">एक कस्टम URL डालें</string>
+    <string name="settings_zygisk_summary">मैजिस्क को जाइगोट डेमॉन के कुछ हिस्सों को चलाएं</string>
+    <string name="settings_denylist_title">अस्वीकार सूची लागू करें</string>
+    <string name="settings_denylist_summary">अस्वीकृत सूची की प्रक्रियाओं में सभी मैजिस्क संशोधन पूर्ववत हो जाएंगे</string>
+    <string name="settings_denylist_config_title">अस्वीकार सूची कॉन्फ़िगर करें</string>
+    <string name="settings_denylist_config_summary">अस्वीकार सूची में शामिल की जाने वाली प्रक्रियाओं का चयन करें</string>
+    <string name="settings_hosts_title">सिस्टमलेस होस्ट</string>
+    <string name="settings_hosts_summary">विज्ञापन ब्लॉक ऐप्स के लिए सिस्टमलेस होस्ट समर्थन:</string>
+    <string name="settings_hosts_toast">सिस्टमलेस होस्ट मॉड्यूल जोड़ा गया</string>
+    <string name="settings_app_name_hint">नया नाम</string>
+    <string name="settings_app_name_helper">इस नाम से ऐप को फिर से इंस्टॉल किया जाएगा</string>
+    <string name="settings_app_name_error">अवैध प्रारूप</string>
+    <string name="settings_su_app_adb">ऐप्स और एडीबी</string>
+    <string name="settings_su_app">केवल ऐप्स</string>
+    <string name="settings_su_adb">केवल एडीबी</string>
+    <string name="settings_su_disable">बंद है</string>
+    <string name="settings_su_request_10">10 सेकंड</string>
+    <string name="settings_su_request_15">15 सेकंड</string>
+    <string name="settings_su_request_20">20 सेकंड</string>
+    <string name="settings_su_request_30">30 सेकंड</string>
+    <string name="settings_su_request_45">45 सेकंड</string>
+    <string name="settings_su_request_60">60 सेकंड</string>
+    <string name="superuser_access">सुपरयूज़र एक्सेस</string>
+    <string name="auto_response">स्वचालित प्रतिक्रिया</string>
+    <string name="request_timeout">अनुरोध की समय समाप्ति सीमा</string>
+    <string name="superuser_notification">सुपरयूज़र सूचना</string>
+    <string name="settings_su_reauth_title">अपग्रेड के बाद प्रमाणीकरण</string>
+    <string name="settings_su_reauth_summary">एक ऐप अपडेट होने के बाद सुपरयूज़र अनुमति प्रमाणित करें</string>
+    <string name="settings_su_tapjack_title">टैपजैकिंग सुरक्षा</string>
+    <string name="settings_su_tapjack_summary">सुपरयुसर प्रॉम्प्ट डायलॉग किसी अन्य विंडो या ओवरले द्वारा अस्पष्ट होने पर इनपुट का जवाब नहीं देगा</string>
+    <string name="settings_customization">कस्टमाईजेशन</string>
+    <string name="setting_add_shortcut_summary">ऐप को छिपाने के बाद नाम और आइकन को पहचानना मुश्किल है, तो होम स्क्रीन में एक सुंदर शॉर्टकट जोड़ें</string>
+    <string name="settings_doh_title">HTTPS पर DNS</string>
+    <string name="settings_doh_description">कुछ राष्ट्रों में चल रही DNS विषाक्तता का समाधान</string>
+
+    <string name="multiuser_mode">बहु उपयोगकर्ता मोड</string>
+    <string name="settings_owner_only">केवल डिवाइस का मालिक</string>
+    <string name="settings_owner_manage">डिवाइस मालिक द्वारा प्रबंधित</string>
+    <string name="settings_user_independent"> स्वत्रंत उपयोगकर्ता</string>
+    <string name="owner_only_summary">केवल मालिक के पास ही रूट की पहुँच है</string>
+    <string name="owner_manage_summary">केवल मालिक रूट एक्सेस का प्रबंधन कर सकते हैं और अनुरोध संकेत प्राप्त कर सकते हैं</string>
+    <string name="user_independent_summary">प्रत्येक उपयोगकर्ता का अपना अलग रूट नियम होता है</string>
+
+    <string name="mount_namespace_mode">माउंट नेमस्पेस मोड</string>
+    <string name="settings_ns_global">ग्लोबल नेमस्पेस</string>
+    <string name="settings_ns_requester">इनहेरिट नेमस्पेस</string>
+    <string name="settings_ns_isolate">आइसोलेटेड नेमस्पेस</string>
+    <string name="global_summary">सभी रूट सत्र ग्लोबल नेमस्पेस का उपयोग करते हैं</string>
+    <string name="requester_summary">रूट सत्रों को उनके अनुरोधकर्ताओं के नेमस्पेस विरासत में मिलेंगे</string>
+    <string name="isolate_summary">प्रत्येक रूट सत्र का अपना अलग आइसोलेटेड नेमस्पेस होगा</string>
+
+    <!--Notifications-->
+    <string name="update_channel">मैजिस्क अपडेट</string>
+    <string name="progress_channel">प्रगति सूचनाएँ</string>
+    <string name="updated_channel">अपडेट पूरा हुआ</string>
+    <string name="download_complete">डाउनलोड सम्पन्न हुआ</string>
+    <string name="download_file_error">फ़ाइल डाउनलोड करने में त्रुटि</string>
+    <string name="magisk_update_title">मैजिस्क अपडेट उपलब्ध है!</string>
+    <string name="updated_title">मैजिस्क अपडेट पूरा हुआ</string>
+    <string name="updated_text">ऐप खोलने के लिए टैप करें</string>
+
+    <!--Toasts, Dialogs-->
+    <string name="yes">हाँ</string>
+    <string name="no">नहीं</string>
+    <string name="repo_install_title">इंस्टॉल %1$s %2$s(%3$d)</string>
+    <string name="download">डाउनलोड</string>
+    <string name="reboot">रीबूट</string>
+    <string name="release_notes">रिलीज नोट्स</string>
+    <string name="flashing">फ़्लैश हो रहा है...</string>
+    <string name="done">सफल हुआ!</string>
+    <string name="failure">असफल हुआ !</string>
+    <string name="hide_app_title">मैजिस्क ऐप अब छिप रहा है…</string>
+    <string name="open_link_failed_toast">लिंक खोलने के लिए कोई एप्लिकेशन नहीं मिला</string>
+    <string name="complete_uninstall">पूर्ण रूप से अनइंस्टॉल करें</string>
+    <string name="restore_img">इमेज रिस्टोर करें</string>
+    <string name="restore_img_msg">रिस्टोर हो रहा है...</string>
+    <string name="restore_done">रिस्टोर सफल हुआ!</string>
+    <string name="restore_fail">स्टॉक बैकअप मौजूद नहीं है!</string>
+    <string name="setup_fail">सेटअप असफल हुआ</string>
+    <string name="env_fix_title">अतिरिक्त सेटअप की आवश्यकता</string>
+    <string name="env_fix_msg">मैजिस्क के ठीक से काम करने के लिए आपके डिवाइस को अतिरिक्त सेटअप की आवश्यकता है। क्या आप आगे बढ़ना और रिबूट करना चाहते हैं?</string>
+    <string name="setup_msg">वातावरण सेटअप चल रहा है...</string>
+    <string name="unsupport_magisk_title">असमर्थित मैजिस्क संस्करण</string>
+    <string name="unsupport_magisk_msg">ऐप का यह संस्करण %1$s से कम के मैजिस्क संस्करणों का समर्थन नहीं करता है।\n\nऐप ऐसा व्यवहार करेगा जैसे कोई मैजिस्क इंस्टॉल नहीं है, कृपया जितनी जल्दी हो सके मैजिस्क को अपग्रेड करें।</string>
+    <string name="unsupport_general_title">असामान्य अवस्था</string>
+    <string name="unsupport_system_app_msg">इस ऐप को सिस्टम ऐप के रूप में चलाना समर्थित नहीं है। कृपया ऐप को उपयोगकर्ता ऐप पर वापस लाएं।</string>
+    <string name="unsupport_other_su_msg">एक \"su\" बाइनरी का पता चला है जो मैजिस्क से नहीं है। कृपया कोई प्रतिस्पर्धी मूल समाधान निकालें और/या मैजिस्क को फिर से स्थापित करें।</string>
+    <string name="unsupport_external_storage_msg">मैजिस्क बाहरी संग्रहण में स्थापित है। कृपया ऐप को इंटरनल स्टोरेज में ले जाएं।</string>
+    <string name="unsupport_nonroot_stub_msg">छिपा हुआ मैजिक ऐप काम करना जारी नहीं रख सकता क्योंकि रूट खो गया था। कृपया मूल APK को पुनर्स्थापित करें।</string>
+    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
+    <string name="external_rw_permission_denied">इसका उपयोग करने के लिए स्टोरेज अनुमति प्रदान करें</string>
+    <string name="install_unknown_denied">इस कार्यक्षमता को सक्षम करने के लिए "अज्ञात ऐप्स इंस्टॉल करें" की अनुमति दें</string>
+    <string name="add_shortcut_title">होम स्क्रीन पर शॉर्टकट जोड़ें</string>
+    <string name="add_shortcut_msg">इस ऐप को छिपाने के बाद इसका नाम और आइकन पहचानना मुश्किल हो सकता है। क्या आप होम स्क्रीन पर एक सुंदर शॉर्टकट जोड़ना चाहते हैं?</string>
+    <string name="app_not_found">इस एक्शन को संभालने के लिए कोई एप्लिकेशन नहीं मिली</string>
+    <string name="reboot_apply_change">परिवर्तन लागू करने के लिए रीबूट करें</string>
+    <string name="restore_app_confirmation">यह छिपे हुए ऐप को मूल ऐप पर वापस बहाल कर देगा। क्या आप वाकई ऐसा करना चाहते हैं?</string>
+
+</resources>

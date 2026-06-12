@@ -1,0 +1,72 @@
+cargo-features = ["panic-immediate-abort"]
+
+[workspace]
+exclude = ["external"]
+members = ["base", "base/derive", "boot", "core", "init", "sepolicy"]
+resolver = "2"
+
+[workspace.package]
+version = "0.0.0"
+edition = "2024"
+
+[workspace.dependencies]
+base = { path = "base" }
+derive = { path = "base/derive" }
+magiskpolicy = { path = "sepolicy" }
+cxx = { path = "external/cxx-rs" }
+cxx-gen = { path = "external/cxx-rs/gen/lib" }
+libc = "0.2.184"
+cfg-if = "1.0.4"
+num-traits = "0.2.19"
+num-derive = "0.4.2"
+thiserror = "2.0.18"
+byteorder = "1.5.0"
+size = "0.5.0"
+bytemuck = "1.25.0"
+fdt = "0.1.5"
+const_format = "0.2.35"
+bit-set = "0.10.0"
+syn = "2.0.117"
+quote = "1.0.45"
+proc-macro2 = "1.0.106"
+pb-rs = { version = "0.10.0", default-features = false }
+quick-protobuf = "0.8.1"
+flate2 = { version = "1.1.9", default-features = false }
+bzip2 = "0.6.1"
+zopfli = { version = "0.8.3", default-features = false}
+lz4 = "1.28.1"
+lzma-rust2 = { version = "0.16.2", default-features = false }
+nix = "0.31.2"
+bitflags = "2.11.0"
+
+# Rust crypto crates are tied together
+sha1 = "0.11.0"
+sha2 = "0.11.0"
+digest = "0.11.2"
+p256 = "0.14.0-rc.8"
+p384 = "0.14.0-rc.8"
+p521 = "0.14.0-rc.8"
+rsa = "0.10.0-rc.17"
+x509-cert = "0.3.0-rc.4"
+der = "0.8.0"
+
+[patch.crates-io]
+pb-rs = { git = "https://github.com/topjohnwu/quick-protobuf.git" }
+quick-protobuf = { git = "https://github.com/topjohnwu/quick-protobuf.git" }
+lz4-sys = { path = "external/lz4-sys" }
+
+[workspace.lints.clippy]
+unwrap_used = "deny"
+
+[profile.dev]
+opt-level = "z"
+lto = "thin"
+panic = "immediate-abort"
+debug = "none"
+
+[profile.release]
+opt-level = "z"
+lto = "fat"
+codegen-units = 1
+panic = "immediate-abort"
+strip = true

@@ -1,0 +1,247 @@
+<resources>
+
+    <!--Sections-->
+    <string name="modules">Module</string>
+    <string name="superuser">Superutilizator</string>
+    <string name="logs">Jurnale</string>
+    <string name="settings">Setări</string>
+    <string name="install">Instalează</string>
+    <string name="section_home">Start</string>
+    <string name="section_theme">Teme</string>
+    <string name="denylist">Listă de refuzări</string>
+
+    <!--Home-->
+    <string name="no_connection">Nicio conexiune disponibilă</string>
+    <string name="app_changelog">Jurnalul modificărilor</string>
+    <string name="loading">Se încarcă…</string>
+    <string name="update">Actualizează</string>
+    <string name="not_available">Indisponibil</string>
+    <string name="hide">Ascunde</string>
+    <string name="home_package">Pachet</string>
+    <string name="home_app_title">Aplicație</string>
+
+    <string name="home_notice_content">Descarcă Magisk NUMAI de pe pagina oficială GitHub. Fișierele din surse necunoscute pot fi rău intenționate!</string>
+    <string name="home_support_title">Sprijină-ne</string>
+    <string name="home_follow_title">Urmărește-ne</string>
+    <string name="home_item_source">Sursă</string>
+    <string name="home_support_content">Magisk este și va fi întotdeauna gratuit și open-source. Cu toate acestea, ne poți arăta că îți pasă făcând o donație.</string>
+    <string name="home_installed_version">Versiune instalată</string>
+    <string name="home_latest_version">Ultima versiune</string>
+    <string name="invalid_update_channel">Canal de actualizare nevalid</string>
+    <string name="uninstall_magisk_title">Dezinstalează Magisk</string>
+    <string name="uninstall_magisk_msg">Toate modulele vor fi dezactivate/eliminate!\nRootul va fi eliminat!\nOrice spațiu de stocare intern necriptat prin folosirea Magisk va fi recriptat!</string>
+
+    <!--Install-->
+    <string name="keep_force_encryption">Păstrează criptarea forțată</string>
+    <string name="keep_dm_verity">Păstrează AVB 2.0/dm-verity</string>
+    <string name="recovery_mode">Mod de recuperare</string>
+    <string name="install_options_title">Opțiuni</string>
+    <string name="install_method_title">Metodă</string>
+    <string name="install_next">Înainte</string>
+    <string name="install_start">Să-i dăm drumul</string>
+    <string name="manager_download_install">Apasă pentru a descărca și a instala</string>
+    <string name="direct_install">Instalează direct (Recomandat)</string>
+    <string name="install_inactive_slot">Instalează în slotul inactiv (După OTA)</string>
+    <string name="install_inactive_slot_msg">Dispozitivul va fi FORȚAT să booteze în slotul actual inactiv după repornire!\nFolosește această opțiune numai după terminarea OTA.\nContinui?</string>
+    <string name="setup_title">Configurare suplimentară</string>
+    <string name="select_patch_file">Selectează și patchuiește un fișier</string>
+    <string name="patch_file_msg">Selectează o imagine brută (*.img) sau un fișier tar ODIN (*.tar)</string>
+    <string name="reboot_delay_toast">Repornire în 5 secunde…</string>
+    <string name="flash_screen_title">Instalare</string>
+
+    <!--Superuser-->
+    <string name="su_request_title">Cerere de superutilizator</string>
+    <string name="touch_filtered_warning">Deoarece o aplicație ascunde o cerere de superutilizator, Magisk nu îți poate verifica răspunsul</string>
+    <string name="deny">Refuză</string>
+    <string name="prompt">Solicită</string>
+    <string name="grant">Acordă</string>
+    <string name="su_warning">Acordă acces complet la dispozitivul tău.\nRefuză dacă nu ești sigur!</string>
+    <string name="forever">Pentru totdeauna</string>
+    <string name="once">O singură dată</string>
+    <string name="tenmin">10 minute</string>
+    <string name="twentymin">20 de minute</string>
+    <string name="thirtymin">30 de minute</string>
+    <string name="sixtymin">60 de minute</string>
+    <string name="su_allow_toast">Aplicației %1$s i-au fost acordate drepturi de superutilizator</string>
+    <string name="su_deny_toast">Aplicației %1$s i-au fost refuzate drepturi de superutilizator</string>
+    <string name="su_snack_grant">Drepturile de superutilizator pentru %1$s au fost acordate</string>
+    <string name="su_snack_deny">Drepturile de superutilizator pentru %1$s au fost refuzate</string>
+    <string name="su_snack_notif_on">Notificările pentru %1$s au fost activate</string>
+    <string name="su_snack_notif_off">Notificările pentru %1$s au fost dezactivate</string>
+    <string name="su_snack_log_on">Jurnalizarea pentru %1$s a fost activată</string>
+    <string name="su_snack_log_off">Jurnalizarea pentru %1$s a fost dezactivată</string>
+    <string name="su_revoke_title">Revoci?</string>
+    <string name="su_revoke_msg">Confirmă revocarea drepturilor de superutilizator pentru %1$s</string>
+    <string name="toast">Mesaj</string>
+    <string name="none">Niciuna</string>
+
+    <string name="superuser_toggle_notification">Notificări</string>
+    <string name="superuser_toggle_revoke">Revocă</string>
+    <string name="superuser_policy_none">Nicio aplicație nu a cerut încă permisiunea de superutilizator.</string>
+
+    <!--Logs-->
+    <string name="log_data_none">Nu există jurnale, încearcă să folosești ceva mai mult aplicațiile care folosesc root</string>
+    <string name="log_data_magisk_none">Jurnalele Magisk sunt goale, asta-i ciudat</string>
+    <string name="menuSaveLog">Salvează jurnalul</string>
+    <string name="menuClearLog">Golește jurnalul acum</string>
+    <string name="logs_cleared">Jurnal golit cu succes</string>
+    <string name="pid">PID: %1$d</string>
+    <string name="target_uid">UID țintă: %1$d</string>
+    <string name="target_pid">PID țintă pentru ns-ul montat: %s</string>
+    <string name="selinux_context">Context SELinux: %s</string>
+    <string name="supp_group">Grup suplimentar: %s</string>
+
+    <!--SafetyNet-->
+
+    <!--MagiskHide-->
+    <string name="show_system_app">Afișează aplicațiile de sistem</string>
+    <string name="show_os_app">Afișează aplicațiile SO-ului</string>
+    <string name="hide_filter_hint">Filtrează după nume</string>
+    <string name="hide_search">Căutare</string>
+
+    <!--Module-->
+    <string name="no_info_provided">(Nu sunt furnizate informații)</string>
+    <string name="reboot_userspace">Repornire software</string>
+    <string name="reboot_recovery">Repornește în modul recovery</string>
+    <string name="reboot_bootloader">Repornește în modul bootloader</string>
+    <string name="reboot_download">Repornește în modul download</string>
+    <string name="reboot_edl">Repornește în EDL</string>
+    <string name="reboot_safe_mode">Mod sigur</string>
+    <string name="module_version_author">%1$s de %2$s</string>
+    <string name="module_state_remove">Elimină</string>
+    <string name="module_state_restore">Restaurează</string>
+    <string name="module_action_install_external">Instalează din spațiul de stocare</string>
+    <string name="update_available">Actualizare disponibilă</string>
+    <string name="suspend_text_riru">Modul suspendat deoarece %1$s este activat</string>
+    <string name="suspend_text_zygisk">Modul suspendat deoarece %1$s nu este activat</string>
+    <string name="zygisk_module_unloaded">Modulul Zygisk nu a fost încărcat din cauza incompatibilității</string>
+    <string name="module_empty">Niciun modul instalat</string>
+    <string name="confirm_install">Instalezi modulul %1$s?</string>
+    <string name="confirm_install_title">Confirmare pentru instalare</string>
+
+    <!--Settings-->
+    <string name="settings_dark_mode_title">Mod pentru temă</string>
+    <string name="settings_dark_mode_message">Selectează modul care ți se pliază cel mai bine stilului!</string>
+    <string name="settings_dark_mode_light">Mereu deschis</string>
+    <string name="settings_dark_mode_system">Urmează modul sistemului</string>
+    <string name="settings_dark_mode_dark">Mereu întunecat</string>
+    <string name="settings_download_path_title">Cale de descărcare</string>
+    <string name="settings_download_path_message">Fișierele vor fi salvate în %1$s</string>
+    <string name="settings_hide_app_title">Ascunde aplicația Magisk</string>
+    <string name="settings_hide_app_summary">Instalează o aplicație proxy cu ID aleatoriu pentru pachet și etichetă personalizată pentru aplicație</string>
+    <string name="settings_restore_app_title">Restaurează aplicația Magisk</string>
+    <string name="settings_restore_app_summary">Dezvăluie aplicația și restaurează APK-ul original</string>
+    <string name="language">Limbă</string>
+    <string name="system_default">(Implicită a sistemului)</string>
+    <string name="settings_check_update_title">Caută actualizări</string>
+    <string name="settings_check_update_summary">Caută periodic actualizări în fundal</string>
+    <string name="settings_update_channel_title">Canal de actualizare</string>
+    <string name="settings_update_stable">Stabil</string>
+    <string name="settings_update_beta">Beta</string>
+    <string name="settings_update_custom">Personalizat</string>
+    <string name="settings_update_custom_msg">Inserează un URL pentru canal personalizat</string>
+    <string name="settings_zygisk_summary">Rulează părți ale Magisk în daemonul zygote</string>
+    <string name="settings_denylist_title">Impune lista de refuzări</string>
+    <string name="settings_denylist_summary">Procesele din lista de refuzări vor avea toate modificările Magisk anulate</string>
+    <string name="settings_denylist_config_title">Configurează lista de refuzări</string>
+    <string name="settings_denylist_config_summary">Selectează procesele care vor fi incluse în lista de refuzări</string>
+    <string name="settings_hosts_title">Fișier hosts în afara partiției system</string>
+    <string name="settings_hosts_summary">Suport pentru fișierul hosts în afara partiției system, în cazul aplicațiilor care blochează reclame</string>
+    <string name="settings_hosts_toast">Modulul pentru fișierul hosts în afara partiției system, adăugat</string>
+    <string name="settings_app_name_hint">Nume nou</string>
+    <string name="settings_app_name_helper">Aplicația va fi reîmpachetată cu acest nume</string>
+    <string name="settings_app_name_error">Format nevalid</string>
+    <string name="settings_su_app_adb">Aplicații și ADB</string>
+    <string name="settings_su_app">Doar aplicații</string>
+    <string name="settings_su_adb">Doar ADB</string>
+    <string name="settings_su_disable">Dezactivat</string>
+    <string name="settings_su_request_10">10 secunde</string>
+    <string name="settings_su_request_15">15 secunde</string>
+    <string name="settings_su_request_20">20 de secunde</string>
+    <string name="settings_su_request_30">30 de secunde</string>
+    <string name="settings_su_request_45">45 de secunde</string>
+    <string name="settings_su_request_60">60 de secunde</string>
+    <string name="superuser_access">Acces pentru superutilizator</string>
+    <string name="auto_response">Răspuns automat</string>
+    <string name="request_timeout">Expirare pentru cerere</string>
+    <string name="superuser_notification">Notificare de superutilizator</string>
+    <string name="settings_su_reauth_title">Reautentificare după actualizare</string>
+    <string name="settings_su_reauth_summary">Cere din nou permisiunile de superutilizator după actualizarea aplicațiilor</string>
+    <string name="settings_su_tapjack_title">Protecție față de tapjacking</string>
+    <string name="settings_su_tapjack_summary">Caseta de dialog pentru solicitarea permisiunilor de superutilizator nu va răspunde la input cât timp este ascunsă de orice altă fereastră sau suprapunere</string>
+    <string name="settings_su_auth_title">Autentificarea utilizatorului</string>
+    <string name="settings_su_auth_summary">Cere autentificarea utilizatorului în timpul cererilor de superutilizator</string>
+    <string name="settings_su_auth_insecure">Nu este configurată nicio metodă de autentificare pe dispozitiv</string>
+    <string name="settings_customization">Personalizare</string>
+    <string name="setting_add_shortcut_summary">Adaugă o comandă rapidă frumoasă în ecranul de pornire în cazul în care numele și pictograma sunt dificil de recunoscut după ascunderea aplicației</string>
+    <string name="settings_doh_title">DNS prin HTTPS</string>
+    <string name="settings_doh_description">Soluție ocolitoare pentru poisoningul DNS în anumite țări</string>
+    <string name="settings_random_name_title">Randomizează numele ieșirii</string>
+    <string name="settings_random_name_description">Randomizează numele fișierului de ieșire a imaginilor patchuite și a fișierelor tar pentru a împiedica detectarea</string>
+
+    <string name="multiuser_mode">Mod de multiutilizator</string>
+    <string name="settings_owner_only">Numai proprietarul dispozitivului</string>
+    <string name="settings_owner_manage">Gestionat de proprietarul dispozitivului</string>
+    <string name="settings_user_independent">Utilizator independent</string>
+    <string name="owner_only_summary">Numai proprietarul are acces la root</string>
+    <string name="owner_manage_summary">Numai proprietarul poate să gestioneze accesul la root și să primească cereri</string>
+    <string name="user_independent_summary">Fiecare utilizator are propriile sale reguli separate pentru root</string>
+
+    <string name="mount_namespace_mode">Mod de montare a spațiului de nume</string>
+    <string name="settings_ns_global">Spațiu de nume global</string>
+    <string name="settings_ns_requester">Spațiu de nume moștenit</string>
+    <string name="settings_ns_isolate">Spațiu de nume izolat</string>
+    <string name="global_summary">Toate sesiunile de root folosesc spațiul de nume global</string>
+    <string name="requester_summary">Sesiunile de root vor moșteni spațiul de nume al solicitantului</string>
+    <string name="isolate_summary">Fiecare sesiune de root va avea propriul spațiu de nume izolat</string>
+
+    <!--Notifications-->
+    <string name="update_channel">Actualizări Magisk</string>
+    <string name="progress_channel">Notificări de progres</string>
+    <string name="updated_channel">Actualizare finalizată</string>
+    <string name="download_complete">Descărcare finalizată</string>
+    <string name="download_file_error">Eroare la descărcarea fișierului</string>
+    <string name="magisk_update_title">Actualizare Magisk disponibilă!</string>
+    <string name="updated_title">Magisk actualizat</string>
+    <string name="updated_text">Atinge pentru a deschide aplicația</string>
+
+    <!--Toasts, Dialogs-->
+    <string name="yes">Da</string>
+    <string name="no">Nu</string>
+    <string name="repo_install_title">Instalează %1$s %2$s(%3$d)</string>
+    <string name="download">Descarcă</string>
+    <string name="reboot">Repornește</string>
+    <string name="release_notes">Note privind versiunea</string>
+    <string name="flashing">Se scrie în memoria flash…</string>
+    <string name="done">Terminat!</string>
+    <string name="failure">Eșec!</string>
+    <string name="hide_app_title">Se ascunde aplicația Magisk…</string>
+    <string name="open_link_failed_toast">Nu a fost găsită nicio aplicație pentru a deschide linkul</string>
+    <string name="complete_uninstall">Finalizează dezinstalarea</string>
+    <string name="restore_img">Restaurează imagini</string>
+    <string name="restore_img_msg">Se restaurează…</string>
+    <string name="restore_done">Restaurare terminată!</string>
+    <string name="restore_fail">Nu există backup stock!</string>
+    <string name="setup_fail">Configurare eșuată</string>
+    <string name="env_fix_title">Necesită configurare suplimentară</string>
+    <string name="env_fix_msg">Dispozitivul are nevoie de configurare suplimentară pentru ca Magisk să funcționeze corect. Vrei să continui și să repornești?</string>
+    <string name="env_full_fix_msg">Dispozitivul are nevoie de rescrierea în memoria flash a Magisk pentru a funcționa corect. Te rugăm să reinstalezi Magisk în cadrul aplicației, modul de recuperare nu poate obține informații corecte despre dispozitiv.</string>
+    <string name="setup_msg">Rulează configurarea mediului…</string>
+    <string name="unsupport_magisk_title">Versiune Magisk nesuportată</string>
+    <string name="unsupport_magisk_msg">Această versiune a aplicației nu suportă versiunile Magisk mai mici de %1$s.\n\nAplicația se va comporta ca și cum Magisk nu este instalat, te rugăm să actualizezi Magisk cât mai curând posibil.</string>
+    <string name="unsupport_general_title">Stare anormală</string>
+    <string name="unsupport_system_app_msg">Rularea acestei aplicații ca aplicație de sistem nu este suportată. Te rugăm să readuci aplicația într-o aplicație de utilizator.</string>
+    <string name="unsupport_other_su_msg">A fost detectat un binar „su” care nu provine de la Magisk. Te rugăm să elimini orice soluție root concurentă și/sau să reinstalezi Magisk.</string>
+    <string name="unsupport_external_storage_msg">Magisk este instalat în spațiul de stocare extern. Te rugăm să muți aplicația în spațiul de stocare intern.</string>
+    <string name="unsupport_nonroot_stub_msg">Aplicația Magisk ascunsă nu poate continua să funcționeze deoarece rootul a fost pierdut. Te rugăm să restaurezi APK-ul original.</string>
+    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
+    <string name="external_rw_permission_denied">Acordă permisiunea de stocare pentru a activa această funcționalitate</string>
+    <string name="post_notifications_denied">Acordă permisiunea de notificări pentru a activa această funcționalitate</string>
+    <string name="install_unknown_denied">Permite „instalarea de aplicații necunoscute” pentru a activa această funcționalitate</string>
+    <string name="add_shortcut_title">Adaugă comandă rapidă pe ecranul de pornire</string>
+    <string name="add_shortcut_msg">După ascunderea acestei aplicații, numele și pictograma acesteia ar putea deveni dificil de recunoscut. Vrei să adaugi o comandă rapidă frumoasă pe ecranul de pornire?</string>
+    <string name="app_not_found">Nu s-a găsit nicio aplicație care să gestioneze această acțiune</string>
+    <string name="reboot_apply_change">Repornește pentru a aplica modificările</string>
+    <string name="restore_app_confirmation">Acest lucru va restaura aplicația ascunsă în aplicația originală. Sigur vrei să faci asta?</string>
+
+</resources>

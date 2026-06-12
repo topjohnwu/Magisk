@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/denyFragment"
+        android:name="com.topjohnwu.magisk.ui.deny.DenyListFragment"
+        android:label="DenyListFragment"
+        tools:layout="@layout/fragment_deny_md2" />
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.topjohnwu.magisk.ui.home.HomeFragment"
+        android:label="HomeFragment"
+        tools:layout="@layout/fragment_home_md2">
+
+        <action
+            android:id="@+id/action_homeFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment"
+            app:enterAnim="@anim/fragment_enter"
+            app:exitAnim="@anim/fragment_exit"
+            app:popEnterAnim="@anim/fragment_enter_pop"
+            app:popExitAnim="@anim/fragment_exit_pop" />
+
+        <action
+            android:id="@+id/action_homeFragment_to_installFragment"
+            app:destination="@id/installFragment"
+            app:enterAnim="@anim/fragment_enter"
+            app:exitAnim="@anim/fragment_exit"
+            app:popEnterAnim="@anim/fragment_enter_pop"
+            app:popExitAnim="@anim/fragment_exit_pop" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/flashFragment"
+        android:name="com.topjohnwu.magisk.ui.flash.FlashFragment"
+        android:label="FlashFragment"
+        tools:layout="@layout/fragment_flash_md2">
+
+        <argument
+            android:name="action"
+            app:argType="string" />
+
+        <argument
+            android:name="additional_data"
+            android:defaultValue="@null"
+            app:argType="android.net.Uri"
+            app:nullable="true" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/actionFragment"
+        android:name="com.topjohnwu.magisk.ui.module.ActionFragment"
+        android:label="ActionFragment"
+        tools:layout="@layout/fragment_action_md2" >
+
+        <argument
+            android:name="id"
+            app:argType="string" />
+
+        <argument
+            android:name="name"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/installFragment"
+        android:name="com.topjohnwu.magisk.ui.install.InstallFragment"
+        android:label="InstallFragment"
+        tools:layout="@layout/fragment_install_md2" />
+
+    <fragment
+        android:id="@+id/logFragment"
+        android:name="com.topjohnwu.magisk.ui.log.LogFragment"
+        android:label="LogFragment"
+        tools:layout="@layout/fragment_log_md2" />
+
+    <fragment
+        android:id="@+id/modulesFragment"
+        android:name="com.topjohnwu.magisk.ui.module.ModuleFragment"
+        android:label="ModuleFragment"
+        tools:layout="@layout/fragment_module_md2" />
+
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.topjohnwu.magisk.ui.settings.SettingsFragment"
+        android:label="SettingsFragment"
+        tools:layout="@layout/fragment_settings_md2">
+
+        <action
+            android:id="@+id/action_settingsFragment_to_themeFragment"
+            app:destination="@id/themeFragment"
+            app:enterAnim="@anim/fragment_enter"
+            app:exitAnim="@anim/fragment_exit"
+            app:popEnterAnim="@anim/fragment_enter_pop"
+            app:popExitAnim="@anim/fragment_exit_pop" />
+
+        <action
+            android:id="@+id/action_settingsFragment_to_denyFragment"
+            app:destination="@id/denyFragment"
+            app:enterAnim="@anim/fragment_enter"
+            app:exitAnim="@anim/fragment_exit"
+            app:popEnterAnim="@anim/fragment_enter_pop"
+            app:popExitAnim="@anim/fragment_exit_pop" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/superuserFragment"
+        android:name="com.topjohnwu.magisk.ui.superuser.SuperuserFragment"
+        android:label="SuperuserFragment"
+        tools:layout="@layout/fragment_superuser_md2" />
+
+    <fragment
+        android:id="@+id/themeFragment"
+        android:name="com.topjohnwu.magisk.ui.theme.ThemeFragment"
+        android:label="ThemeFragment"
+        tools:layout="@layout/fragment_theme_md2" />
+
+    <action
+        android:id="@+id/action_homeFragment"
+        app:destination="@id/homeFragment"
+        app:enterAnim="@anim/fragment_enter"
+        app:exitAnim="@anim/fragment_exit"
+        app:popEnterAnim="@anim/fragment_enter_pop"
+        app:popExitAnim="@anim/fragment_exit_pop"
+        app:popUpTo="@id/homeFragment"
+        app:popUpToInclusive="true" />
+
+    <action
+        android:id="@+id/action_superuserFragment"
+        app:destination="@id/superuserFragment"
+        app:enterAnim="@anim/fragment_enter"
+        app:exitAnim="@anim/fragment_exit"
+        app:popEnterAnim="@anim/fragment_enter_pop"
+        app:popExitAnim="@anim/fragment_exit_pop"
+        app:popUpTo="@id/homeFragment" />
+
+    <action
+        android:id="@+id/action_logFragment"
+        app:destination="@id/logFragment"
+        app:enterAnim="@anim/fragment_enter"
+        app:exitAnim="@anim/fragment_exit"
+        app:popEnterAnim="@anim/fragment_enter_pop"
+        app:popExitAnim="@anim/fragment_exit_pop"
+        app:popUpTo="@id/homeFragment" />
+
+    <action
+        android:id="@+id/action_moduleFragment"
+        app:destination="@id/modulesFragment"
+        app:enterAnim="@anim/fragment_enter"
+        app:exitAnim="@anim/fragment_exit"
+        app:popEnterAnim="@anim/fragment_enter_pop"
+        app:popExitAnim="@anim/fragment_exit_pop"
+        app:popUpTo="@id/homeFragment" />
+
+    <action
+        android:id="@+id/action_flashFragment"
+        app:destination="@id/flashFragment"
+        app:enterAnim="@anim/fragment_enter"
+        app:exitAnim="@anim/fragment_exit"
+        app:popEnterAnim="@anim/fragment_enter_pop"
+        app:popExitAnim="@anim/fragment_exit_pop" />
+
+    <action
+        android:id="@+id/action_actionFragment"
+        app:destination="@id/actionFragment"
+        app:enterAnim="@anim/fragment_enter"
+        app:exitAnim="@anim/fragment_exit"
+        app:popEnterAnim="@anim/fragment_enter_pop"
+        app:popExitAnim="@anim/fragment_exit_pop" />
+
+</navigation>

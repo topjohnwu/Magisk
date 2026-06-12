@@ -12,13 +12,11 @@
 
 # Denote all files that are truly binary and should not be modified.
 tools/** binary
+tools/rustup-wrapper/** -binary
+tools/elf-cleaner/** -binary
 *.jar binary
 *.exe binary
 *.apk binary
 *.png binary
 *.jpg binary
 *.ttf binary
-
-# Help GitHub detect languages
-native/jni/external/** linguist-vendored
-native/jni/systemproperties/** linguist-language=C++

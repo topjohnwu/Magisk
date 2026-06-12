@@ -1,0 +1,210 @@
+<resources>
+	<!--Sections-->
+    <string name="modules">Moduler</string>
+    <string name="superuser">Superuser</string>
+    <string name="logs">Logg</string>
+    <string name="settings">Inställningar</string>
+    <string name="install">Installera</string>
+    <string name="section_home">Hem</string>
+    <string name="section_theme">Tema</string>
+
+    <!--Home-->
+    <string name="no_connection">Ingen anslutning tillgänglig</string>
+    <string name="app_changelog">Ändringslogg</string>
+    <string name="loading">Laddar…</string>
+    <string name="update">Uppdatera</string>
+    <string name="not_available">Inte tillgänglig</string>
+    <string name="hide">Dölj</string>
+    <string name="home_package">Paket</string>
+    <string name="home_app_title">App</string>
+
+    <string name="home_notice_content">Ladda endast ned magisk från den officiella GitHub-sidan. Filer från okända källor kan innehålla skadlig kod!</string>
+    <string name="home_support_title">Stöd oss</string>
+    <string name="home_item_source">Källa</string>
+    <string name="home_support_content">Magisk är och kommer alltid att vara gratis med öppen källkod. Du kan dock visa din uppskattning genom att skicka en donation</string>
+    <string name="home_installed_version">Installerad</string>
+    <string name="home_latest_version">Senaste</string>
+    <string name="invalid_update_channel">Ogiltig uppdateringskanal</string>
+    <string name="uninstall_magisk_title">Avinstallera Magisk</string>
+    <string name="uninstall_magisk_msg">Alla moduler kommer att bli inaktiverade/borttagna!\nRoot kommer också att avinstalleras!\nDin data kan komma att krypteras om den inte är det redan!</string>
+
+    <!--Install-->
+    <string name="keep_force_encryption">Bibehåll tvingad kryptering</string>
+    <string name="keep_dm_verity">Bibehåll AVB 2.0/dm-verity</string>
+    <string name="recovery_mode">Recovery-läge</string>
+    <string name="install_options_title">Alternativ</string>
+    <string name="install_method_title">Metod</string>
+    <string name="install_next">Nästa</string>
+    <string name="install_start">Nu kör vi!</string>
+    <string name="manager_download_install">Tryck för att ladda ned och installera install</string>
+    <string name="direct_install">Direkt installation (Rekommenderas)</string>
+    <string name="install_inactive_slot">Installera till inaktiv Slot (Efter OTA)</string>
+    <string name="install_inactive_slot_msg">Din enhet kommer att bli TVINGAD att starta till den nuvarande inaktiva slot efter omstart!\nAnvänd endast detta alternativ efter att en OTA uppdatering är utförd.\nFortsätt??</string>
+    <string name="setup_title">Ytterligare installation</string>
+    <string name="select_patch_file">Välj och patcha en fil</string>
+    <string name="patch_file_msg">Välj en rå avbildningsfil (*.img) eller en ODIN tar-fil (*.tar)</string>
+    <string name="reboot_delay_toast">Omstart om 5 sekunder…</string>
+    <string name="flash_screen_title">Installation</string>
+
+    <!--Superuser-->
+    <string name="su_request_title">Superuser-förfrågan</string>
+    <string name="touch_filtered_warning">Eftersom en app döljer, eller ritar över en begäran om superuser, så kan inte Magisk verifera ditt svar</string>
+    <string name="deny">Neka</string>
+    <string name="prompt">Fråga</string>
+    <string name="grant">Bevilja</string>
+    <string name="su_warning">Beviljar full tillgång till din enhet.\nNeka om du är osäker!</string>
+    <string name="forever">För alltid</string>
+    <string name="once">En gång</string>
+    <string name="tenmin">10 minuter</string>
+    <string name="twentymin">20 minuter</string>
+    <string name="thirtymin">30 minuter</string>
+    <string name="sixtymin">60 minuter</string>
+    <string name="su_allow_toast">%1$s beviljades Superuser-rättigheter</string>
+    <string name="su_deny_toast">%1$s nekades Superuser-rättigheter</string>
+    <string name="su_snack_grant">Superuser-rättigheter till %1$s är beviljade</string>
+    <string name="su_snack_deny">Superuser-rättigheter of %1$s är nekade</string>
+    <string name="su_snack_notif_on">Aviseringar för %1$s är aktiverade</string>
+    <string name="su_snack_notif_off">Aviseringar för %1$s är inaktiverade</string>
+    <string name="su_snack_log_on">Loggning av %1$s är aktiverad</string>
+    <string name="su_snack_log_off">Logging av %1$s är inaktiverade</string>
+    <string name="su_revoke_title">Återkalla?</string>
+    <string name="su_revoke_msg">Bekräfta återkallning utav %1$s rättigheter?</string>
+    <string name="toast">Toast-meddelande</string>
+    <string name="none">Inga</string>
+
+    <string name="superuser_toggle_notification">Aviseringar</string>
+    <string name="superuser_toggle_revoke">Återkalla</string>
+    <string name="superuser_policy_none">Inga appar har bett om superuser-rättigheter ännu.</string>
+
+    <!--Logs-->
+    <string name="log_data_none">Du är logg-lös, försök att använda dina SU-aktiverade appar mer</string>
+    <string name="log_data_magisk_none">Magisks loggar är tomma. Underligt.</string>
+    <string name="menuSaveLog">Spara loggen</string>
+    <string name="menuClearLog">Rensa loggen</string>
+    <string name="logs_cleared">Loggrensning lyckades</string>
+    <!-- <string name="pid">PID: %1$d</string> -->
+    <!-- <string name="target_uid">Target UID: %1$d</string> -->
+
+    <!--SafetyNet-->
+
+    <!--MagiskHide-->
+    <string name="show_system_app">Visa system-appar</string>
+    <string name="show_os_app">Via OS-appar</string>
+    <string name="hide_filter_hint">Filtrera med namn</string>
+    <string name="hide_search">Sök</string>
+
+    <!--Module-->
+    <string name="no_info_provided">(Ingen information tillgänglig)</string>
+    <string name="reboot_userspace">Mjuk omstart</string>
+    <string name="reboot_recovery">Starta om till Recovery</string>
+    <string name="reboot_bootloader">Omstart till Bootloader</string>
+    <string name="reboot_download">Omstart till Nedladdningsläge</string>
+    <string name="reboot_edl">Omstart till EDL</string>
+    <string name="module_version_author">%1$s av %2$s</string>
+    <string name="module_state_remove">Ta bort</string>
+    <string name="module_state_restore">Återställ</string>
+    <string name="module_action_install_external">Installera från lagringsmedia</string>
+    <string name="update_available">Uppdatering tillgänglig</string>
+
+    <!--Settings-->
+    <string name="settings_dark_mode_title">Temaläge</string>
+    <string name="settings_dark_mode_message">Välj det läge som bäst passar din stil!</string>
+    <string name="settings_dark_mode_light">Alltid ljus</string>
+    <string name="settings_dark_mode_system">Följ systeminställningar</string>
+    <string name="settings_dark_mode_dark">Alltid mörk</string>
+    <string name="settings_download_path_title">Nedladdningsmapp</string>
+    <string name="settings_download_path_message">Filer kommer att spara till %1$s</string>
+    <string name="settings_hide_app_title">Göm Magisk-appen</string>
+    <string name="settings_hide_app_summary">Installera en proxy-app med ett slumpmässigt paket-ID och appnamn</string>
+    <string name="settings_restore_app_title">Återställ Magisk-appen</string>
+    <string name="settings_restore_app_summary">Ta bort proxy-appen och återställ den ursprungliga APK filen</string>
+    <string name="language">Språk</string>
+    <string name="system_default">(Följ systeminställningar)</string>
+    <string name="settings_check_update_title">Kontrollera uppdateringar</string>
+    <string name="settings_check_update_summary">Kontrollera regelbundet efter uppdateringar i bakgrunden</string>
+    <string name="settings_update_channel_title">Uppdateringskanal</string>
+    <string name="settings_update_stable">Stabil</string>
+    <string name="settings_update_beta">Beta</string>
+    <string name="settings_update_custom">Anpassad kanal</string>
+    <string name="settings_update_custom_msg">Lägg till en anpassad URL</string>
+    <string name="settings_hosts_title">Systemfri hosts</string>
+    <string name="settings_hosts_summary">Stöd för Adblock-appar med systemfri hosts-fil</string>
+    <string name="settings_hosts_toast">Lagt till modul för systemfri hosts-fil</string>
+    <string name="settings_app_name_hint">Nytt namn</string>
+    <string name="settings_app_name_helper">Appen kommer att pacakas om till detta namn</string>
+    <string name="settings_app_name_error">Ogiltigt format</string>
+    <string name="settings_su_app_adb">Appar och ADB</string>
+    <string name="settings_su_app">Bara Appar</string>
+    <string name="settings_su_adb">Bara ADB</string>
+    <string name="settings_su_disable">Inaktiverad</string>
+    <string name="settings_su_request_10">10 sekunder</string>
+    <string name="settings_su_request_15">15 sekunder</string>
+    <string name="settings_su_request_20">20 sekunder</string>
+    <string name="settings_su_request_30">30 sekunder</string>
+    <string name="settings_su_request_45">45 sekunder</string>
+    <string name="settings_su_request_60">60 sekunder</string>
+    <string name="superuser_access">Superuser-tillgång</string>
+    <string name="auto_response">Automatiskt svar</string>
+    <string name="request_timeout">Förfrågnings-timeout</string>
+    <string name="superuser_notification">Superuser-avisering</string>
+    <string name="settings_su_reauth_title">Återautentisera efter uppdatering</string>
+    <string name="settings_su_reauth_summary">Återautentisera superuser-rättigheter efter en applikationsuppdatering</string>
+    <string name="settings_su_tapjack_title">Aktivera Tapjacking-skydd</string>
+    <string name="settings_su_tapjack_summary">Superuser-dialogrutan kommer inte att lyssna på någon input om den är dold eller övertäckt utav något annat fönster.</string>
+    <string name="settings_customization">Anpassning</string>
+    <string name="setting_add_shortcut_summary">Lägg till en snygg genväg på startskärmen om namnet och ikonen är svåra att känna igen efter att appen har döljts</string>
+    <string name="settings_doh_title">DNS över HTTPS</string>
+    <string name="settings_doh_description">Lösning för DNS-förgiftning i vissa länder</string>
+
+    <string name="multiuser_mode">Multiuser-läge</string>
+    <string name="settings_owner_only">Endast enhetsägare</string>
+    <string name="settings_owner_manage">Enhetsägare hanterar</string>
+    <string name="settings_user_independent">Användaroberoende</string>
+    <string name="owner_only_summary">Endast ägare har root-åtkomst</string>
+    <string name="owner_manage_summary">Endast ägare kan hantera root-åtkomst och ta emot bägärda förfrågningar</string>
+    <string name="user_independent_summary">Varje användare har sina egna separata root-regler</string>
+
+    <string name="mount_namespace_mode">Montera namnrymdsläge</string>
+    <string name="settings_ns_global">Global namnrymd</string>
+    <string name="settings_ns_requester">Ärv namnrymden</string>
+    <string name="settings_ns_isolate">Isolerad namnrymd</string>
+    <string name="global_summary">Alla root-sessioner använder den globala namnrymden</string>
+    <string name="requester_summary">Root-sessioner kommer att ärva den sökandes namnrymd</string>
+    <string name="isolate_summary">Varje root-session kommer att ha sin egen isolerade namnrymd</string>
+
+
+    <!--Notifications-->
+    <string name="update_channel">Magisk-uppdatering</string>
+    <string name="progress_channel">Statusmeddelanden</string>
+    <string name="download_complete">Nedladdning slutförd</string>
+    <string name="download_file_error">Fel vid nedladdning utav fil</string>
+    <string name="magisk_update_title">En uppdatering för Magisk finns tillgänglig!</string>
+
+    <!--Toasts, Dialogs-->
+    <string name="yes">Ja</string>
+    <string name="no">Nej</string>
+    <string name="repo_install_title">Installera %1$s %2$s(%3$d)</string>
+    <string name="download">Ladda ned</string>
+    <string name="reboot">Omstart</string>
+    <string name="release_notes">Utgivningsanmärkningar</string>
+    <string name="flashing">Flashar…</string>
+    <string name="done">Färdig!</string>
+    <string name="failure">Misslyckades!</string>
+    <string name="hide_app_title">Gömmer Magisk-appen…</string>
+    <string name="open_link_failed_toast">Ingen app hittades som kan öppna länken link</string>
+    <string name="complete_uninstall">Komplett avinstallation</string>
+    <string name="restore_img">Återställ avbilder</string>
+    <string name="restore_img_msg">Återställer…</string>
+    <string name="restore_done">Återställning slutförd!</string>
+    <string name="restore_fail">Orörd backup hittades inte!</string>
+    <string name="setup_fail">Installation misslyckades</string>
+    <string name="env_fix_title">Kräver ytterligare installation</string>
+    <string name="env_fix_msg">Din enhet behöver ytterligare installation för att Magisk ska fungera korrekt. Vill du fortsätta och starta om enheten?</string>
+    <string name="setup_msg">Inställning av körmiljö…</string>
+    <string name="unsupport_magisk_title">Magisk-versionen stöds ej</string>
+    <string name="unsupport_magisk_msg">Denna version utav appen stödjer inte Magisk-versioner lägre än 1$s.\n\nAppen kommer att bete sig som att Magisk inte är installerat. Vänligen uppgradera din Magisk-version så snart som möjligt.</string>
+    <string name="external_rw_permission_denied">Tillåt tillgång till externt lagrinsmedia för att aktievera denna funktion</string>
+    <string name="add_shortcut_title">Lägg till genväg på hemskärmen</string>
+    <string name="add_shortcut_msg">Efter att appen dolts så kan ikonen och namnet vara svårt att känna igen. Vill du lägga till en snygg genväg till din hemskärm?</string>
+    <string name="app_not_found">Ingen applikation hittades för att hantera den här åtgärden</string>
+</resources>

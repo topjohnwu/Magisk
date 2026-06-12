@@ -1,0 +1,245 @@
+<resources>
+
+    <!--Sections-->
+    <string name="modules">Модульдер</string>
+    <string name="superuser">Superuser</string>
+    <string name="logs">Логтар</string>
+    <string name="settings">Баптау</string>
+    <string name="install">Орнату</string>
+    <string name="section_home">Басты бет</string>
+    <string name="section_theme">Кейіп</string>
+    <string name="denylist">DenyList</string>
+
+    <!--Home-->
+    <string name="no_connection">Байланыс жоқ</string>
+    <string name="app_changelog">Өзгеріс тізімі</string>
+    <string name="loading">Жүктелуде…</string>
+    <string name="update">Жаңарту</string>
+    <string name="not_available">Белгісіз</string>
+    <string name="hide">Жасыру</string>
+    <string name="home_package">Десте атауы</string>
+    <string name="home_app_title">Қолданба</string>
+
+    <string name="home_notice_content">Magisk-ті ТЕК ресми GitHub репозиториінен жүктеп алыңыз. Басқа көзден алынған файлдар зиянды болуы мүмкін!</string>
+    <string name="home_support_title">Бізді қолдау</string>
+    <string name="home_follow_title">Бізге жазылу</string>
+    <string name="home_item_source">Бастапқы коды</string>
+    <string name="home_support_content">Magisk жобасы тегін әрі еркін болып, болашақта да солай болып қала бермек. Қиын болмаса, бізді қаржылай қолдасаңыз болады.</string>
+    <string name="home_installed_version">Орнатылған</string>
+    <string name="home_latest_version">Соңғы</string>
+    <string name="invalid_update_channel">Жарамсыз жаңарту көзі</string>
+    <string name="uninstall_magisk_title">Magisk-ті жою</string>
+    <string name="uninstall_magisk_msg">Барлық модуль сөндіріледі/жойылады!\nRoot құқығынан айырыласыз!\nMagisk көмегімен шифрлауды сөндірген болсаңыз, құрылғының жады қайта шифрланады!</string>
+
+    <!--Install-->
+    <string name="keep_force_encryption">Шифрлауды сөндірмей қалдыру</string>
+    <string name="keep_dm_verity">AVB 2.0/dm-verity қалдыру</string>
+    <string name="recovery_mode">Recovery режімі</string>
+    <string name="install_options_title">Баптау</string>
+    <string name="install_method_title">Тәсіл</string>
+    <string name="install_next">Келесі</string>
+    <string name="install_start">Бастау</string>
+    <string name="manager_download_install">Жүктеп алып, орнату үшін басыңыз</string>
+    <string name="direct_install">Тікелей орнату (ұсынылады)</string>
+    <string name="install_inactive_slot">Белсенді емес слотқа орнату (OTA-дан кейін)</string>
+    <string name="install_inactive_slot_msg">Құрылғыңыз белсенді емес слотқа МӘЖБҮРЛІ ТҮРДЕ қайта жүктеледі!\nБұл тәсілді тек OTA жаңартуынан кейін қолданыңыз.\nЖалғастырасыз ба?</string>
+    <string name="setup_title">Қосымша баптау</string>
+    <string name="select_patch_file">Файл таңдап, патчтау</string>
+    <string name="patch_file_msg">Жад бөлімінің бейнесін (*.img), ODIN мұрағатын (*.tar) немесе payload.bin (*.bin) файлын таңдаңыз</string>
+    <string name="reboot_delay_toast">5 секундтан кейін қайта жүктеледі…</string>
+    <string name="flash_screen_title">Орнату</string>
+
+    <!--Superuser-->
+    <string name="su_request_title">Superuser құқығына сұраным</string>
+    <string name="touch_filtered_warning">Өзге қолданба Magisk терезесін бүркегендіктен, Superuser құқығына сұраным қабылданбады</string>
+    <string name="deny">Бас тарту</string>
+    <string name="prompt">Сұрау</string>
+    <string name="grant">Беру</string>
+    <string name="su_warning">Құрылғыңызға шексіз рұқсат бергелі жатырсыз.\nСенімді болмасаңыз, бас тартыңыз!</string>
+    <string name="forever">Әрдайым</string>
+    <string name="once">Бір рет</string>
+    <string name="tenmin">10 минут</string>
+    <string name="twentymin">20 минут</string>
+    <string name="thirtymin">30 минут</string>
+    <string name="sixtymin">60 минут</string>
+    <string name="su_allow_toast">%1$s Superuser құқығын алды</string>
+    <string name="su_deny_toast">%1$s Superuser құқығын алмады</string>
+    <string name="su_snack_grant">%1$s қолданбасына Superuser құқығы берілді</string>
+    <string name="su_snack_deny">%1$s қолданбасы Superuser құқығынан айырылды</string>
+    <string name="su_snack_notif_on">%1$s жайлы мәлімдемелер қосулы</string>
+    <string name="su_snack_notif_off">%1$s жайлы мәлімдемелер сөндірулі</string>
+    <string name="su_snack_log_on">%1$s әрекеттері логта сақталады</string>
+    <string name="su_snack_log_off">%1$s әрекеттері логта сақталмайды</string>
+    <string name="su_revoke_title">Superuser баптауын арылту</string>
+    <string name="su_revoke_msg">%1$s қолданбасының Superuser баптауын арылтасыз ба?</string>
+    <string name="toast">Қалқыма мәлімдеме</string>
+    <string name="none">Сөндірулі</string>
+
+    <string name="superuser_toggle_notification">Мәлімдеме</string>
+    <string name="superuser_toggle_revoke">Арылту</string>
+    <string name="superuser_policy_none">Superuser құқығын әлі еш қолданба сұраған жоқ.</string>
+
+    <!--Logs-->
+    <string name="log_data_none">Әрекет логы бос, root құқығын қажет ететін қолданбаларды көбірек қолданып көріңіз.</string>
+    <string name="log_data_magisk_none">Magisk логы бос, біртүрлі екен</string>
+    <string name="menuSaveLog">Логты сақтау</string>
+    <string name="menuClearLog">Логты тазалау</string>
+    <string name="logs_cleared">Лог сәтті тазаланды</string>
+    <string name="pid">PID: %1$d</string>
+    <string name="target_uid">Мақсатты UID: %1$d</string>
+    <string name="target_pid">Mount ns-тегі мақсатты PID: %s</string>
+    <string name="selinux_context">SELinux контексті: %s</string>
+    <string name="supp_group">Қосымша топ: %s</string>
+
+    <!--SafetyNet-->
+
+    <!--MagiskHide-->
+    <string name="show_system_app">Жүйе қолданбаларын көрсету</string>
+    <string name="show_os_app">ОЖ қолданбаларын көрсету</string>
+    <string name="hide_filter_hint">Атауы бойынша іздеу</string>
+    <string name="hide_search">Іздеу</string>
+
+    <!--Module-->
+    <string name="no_info_provided">(Ақпары жоқ)</string>
+    <string name="reboot_userspace">Жүйеге қайта жүктеу</string>
+    <string name="reboot_recovery">Recovery режіміне қайта жүктеу</string>
+    <string name="reboot_bootloader">Bootloader-ге қайта жүктеу</string>
+    <string name="reboot_download">Download режіміне қайта жүктеу</string>
+    <string name="reboot_edl">EDL режіміне қайта жүктеу</string>
+    <string name="reboot_safe_mode">Қауіпсіз режімге қайта жүктеу</string>
+    <string name="module_version_author">%1$s, %2$s жасаған</string>
+    <string name="module_state_remove">Жою</string>
+    <string name="module_state_restore">Қалпына келтіру</string>
+    <string name="module_action_install_external">Құрылғы жадынан орнату</string>
+    <string name="update_available">Жаңарту қолжетімді</string>
+    <string name="suspend_text_riru">Модуль сөндірілді, себебі %1$s қосылған</string>
+    <string name="suspend_text_zygisk">Модуль сөндірілді, себебі %1$s қосылмаған</string>
+    <string name="zygisk_module_unloaded">Zygisk модулі үйлеспегендіктен жүктелмеді</string>
+    <string name="module_empty">Еш модуль орнатылған жоқ</string>
+    <string name="confirm_install">%1$s модулін орнатасыз ба?</string>
+    <string name="confirm_install_title">Орнатуды растау</string>
+
+    <!--Settings-->
+    <string name="settings_dark_mode_title">Кейіп режімі</string>
+    <string name="settings_dark_mode_message">Өзіңізге ұнаған режімді таңдаңыз!</string>
+    <string name="settings_dark_mode_light">Әрдайым ақшыл</string>
+    <string name="settings_dark_mode_system">Жүйедегідей</string>
+    <string name="settings_dark_mode_dark">Әрдайым қараңғы</string>
+    <string name="settings_download_path_title">Жүктеу бумасы</string>
+    <string name="settings_download_path_message">Файлдар %1$s бумасына сақталады</string>
+    <string name="settings_hide_app_title">Magisk қолданбасын жасыру</string>
+    <string name="settings_hide_app_summary">Қолданба атауын өзгертіп, кездейсоқ десте атауы бар APK файлын құрастыру</string>
+    <string name="settings_restore_app_title">Magisk қолданбасын қалпына келтіру</string>
+    <string name="settings_restore_app_summary">Қолданбаны жасырын күйден шығарып, түпнұсқа APK орнату</string>
+    <string name="language">Тіл</string>
+    <string name="system_default">(Жүйедегідей)</string>
+    <string name="settings_check_update_title">Жаңартуды тексеру</string>
+    <string name="settings_check_update_summary">Жаңартудың бар-жоғын мезгіл-мезгіл тексеру</string>
+    <string name="settings_update_channel_title">Жаңарту көзі</string>
+    <string name="settings_update_stable">Тұрақты</string>
+    <string name="settings_update_beta">Beta</string>
+    <string name="settings_update_custom">Басқа</string>
+    <string name="settings_update_custom_msg">Басқа арнаның URL мекенжайын енгізіңіз</string>
+    <string name="settings_zygisk_summary">Magisk кодын zygote процесіне енгізу</string>
+    <string name="settings_denylist_title">DenyList-тi қолдану</string>
+    <string name="settings_denylist_summary">Magisk жасаған барлық өзгеріс DenyList-тегі процестерден жасырылады.</string>
+    <string name="settings_denylist_config_title">DenyList-тi баптау</string>
+    <string name="settings_denylist_config_summary">DenyList-ке қосқыңыз келетін процестерді таңдаңыз</string>
+    <string name="settings_hosts_title">Жүйеден тыс hosts</string>
+    <string name="settings_hosts_summary">Жарнама өшіретін қолданбалар үшін /system бөлімінен тыс hosts файлын қолдану</string>
+    <string name="settings_hosts_toast">Жүйеден тыс hosts модулі қосылды</string>
+    <string name="settings_app_name_hint">Жаңа атау</string>
+    <string name="settings_app_name_helper">Қолданбаның қайта құрылған нұсқасы осы атауға ие болады</string>
+    <string name="settings_app_name_error">Жарамсыз пішім</string>
+    <string name="settings_su_app_adb">Қолданбалар мен ADB</string>
+    <string name="settings_su_app">Қолданбалар ғана</string>
+    <string name="settings_su_adb">ADB ғана</string>
+    <string name="settings_su_disable">Сөндірулі</string>
+    <string name="settings_su_request_10">10 секунд</string>
+    <string name="settings_su_request_15">15 секунд</string>
+    <string name="settings_su_request_20">20 секунд</string>
+    <string name="settings_su_request_30">30 секунд</string>
+    <string name="settings_su_request_45">45 секунд</string>
+    <string name="settings_su_request_60">60 секунд</string>
+    <string name="superuser_access">Superuser құқығына рұқсат</string>
+    <string name="auto_response">Сұранымға әдепкі жауап</string>
+    <string name="request_timeout">Сұранымның күту уақыты</string>
+    <string name="superuser_notification">Superuser мәлімдемесі</string>
+    <string name="settings_su_reauth_title">Жаңартудан кейін қайта растау</string>
+    <string name="settings_su_reauth_summary">Әлдебір қолданба жаңартылғаннан кейін оның Superuser құқығын қайта растау</string>
+    <string name="settings_su_tapjack_title">Қабаттасудан қорғау</string>
+    <string name="settings_su_tapjack_summary">Өзге қолданба Magisk терезесін бүркесе, Superuser құқығын беру батырмасы сөндіріледі (tapjacking шабуылына жол бермеу үшін)</string>
+    <string name="settings_su_auth_title">Қолданушыны растау</string>
+    <string name="settings_su_auth_summary">Superuser құқығына сұраным келгенде қолданушының құпиясөзін не биометриялық дерегін сұрау</string>
+    <string name="settings_su_auth_insecure">Бұл құрылғыда аутентификация әдісі орнатылмаған</string>
+    <string name="settings_customization">Сыртқы көрініс</string>
+    <string name="setting_add_shortcut_summary">Жасырылған қолданбаны табу қиын болса, бастапқы экранға ыңғайлы таңбаша қосуға болады</string>
+    <string name="settings_doh_title">HTTPS арқылы DNS</string>
+    <string name="settings_doh_description">Кейбір елдерде қолданылатын жалған DNS-тен қорғау</string>
+
+    <string name="multiuser_mode">Көп қолданушы режімі</string>
+    <string name="settings_owner_only">Құрылғы иесі ғана</string>
+    <string name="settings_owner_manage">Құрылғы иесінің бақылауында</string>
+    <string name="settings_user_independent">Тәуелсіз қолданушылар</string>
+    <string name="owner_only_summary">Құрылғы иесі ғана root құқығын қолдана алады</string>
+    <string name="owner_manage_summary">Құрылғы иесі ғана сұранымдарды қабылдап, басқаларға root құқығын бере алады</string>
+    <string name="user_independent_summary">Әр қолданушы өз root ережелерін қолдана алады</string>
+
+    <string name="mount_namespace_mode">Mount атау кеңістігін баптау</string>
+    <string name="settings_ns_global">Ғаламдық атау кеңістігі</string>
+    <string name="settings_ns_requester">Мұраланған атау кеңістігі</string>
+    <string name="settings_ns_isolate">Оқшауланған атау кеңістігі</string>
+    <string name="global_summary">Root сеанстары ғаламдық атау кеңістігін қолданады</string>
+    <string name="requester_summary">Root сеанстары қолданушының атау кеңістігін мұралайды</string>
+    <string name="isolate_summary">Әр root сеансы өз атау кеңістігін қолданады</string>
+
+    <!--Notifications-->
+    <string name="update_channel">Magisk жаңартулары</string>
+    <string name="progress_channel">Прогресс мәлімдемесі</string>
+    <string name="updated_channel">Жаңарту аяқталды</string>
+    <string name="download_complete">Жүктеу аяқталды</string>
+    <string name="download_file_error">Файлды жүктеп алу қатесі</string>
+    <string name="magisk_update_title">Magisk жаңартуы қолжетімді!</string>
+    <string name="updated_title">Magisk жаңартылды</string>
+    <string name="updated_text">Қолданбасын ашу үшін басыңыз</string>
+
+    <!--Toasts, Dialogs-->
+    <string name="yes">Иә</string>
+    <string name="no">Жоқ</string>
+    <string name="repo_install_title">%1$s %2$s(%3$d) орнату</string>
+    <string name="download">Жүктеп алу</string>
+    <string name="reboot">Қайта жүктеу</string>
+    <string name="release_notes">Не жаңалық</string>
+    <string name="flashing">Орнатуда…</string>
+    <string name="done">Дайын!</string>
+    <string name="failure">Қате!</string>
+    <string name="hide_app_title">Magisk қолданбасын жасыруда…</string>
+    <string name="open_link_failed_toast">Сілтемені аша алатын қолданба табылмады</string>
+    <string name="complete_uninstall">Толығымен жою</string>
+    <string name="restore_img">Жад бөлімдерін қалпына келтіру</string>
+    <string name="restore_img_msg">Қалпына келтіруде…</string>
+    <string name="restore_done">Жад қалпына келтірілді!</string>
+    <string name="restore_fail">Өзгертілген бөлімдердің сақтық көшірмесі жоқ!</string>
+    <string name="setup_fail">Орнату сәтсіз аяқталды</string>
+    <string name="env_fix_title">Қосымша баптау керек</string>
+    <string name="env_fix_msg">Magisk дұрыс жұмыс істеуі үшін қосымша әрекет қажет. Орнатуды жалғастырып, құрылғыны қайта қосасыз ба?</string>
+    <string name="env_full_fix_msg">Magisk дұрыс жұмыс істеуі үшін оны қайта орнату керек. Magisk-ті қолданба арқылы қайта орнатыңыз; Recovery режімі құрылғыңыз туралы дұрыс ақпаратты таба алмайды.</string>
+    <string name="setup_msg">Жұмыс ортасын баптауда…</string>
+    <string name="unsupport_magisk_title">Үйлеспейтін Magisk нұсқасы</string>
+    <string name="unsupport_magisk_msg">Қолданбаның осы нұсқасы Magisk-тің %1$s дейінгі нұсқаларына үйлеспейді.\n\nҚолданба Magisk орнатылмағандай жұмыс істейді; Magisk-ті жақын арада жаңартыңыз.</string>
+    <string name="unsupport_general_title">Қалыпты емес жағдай</string>
+    <string name="unsupport_system_app_msg">Бұл қолданба жүйе қолданбасы ретінде жұмыс істей алмайды. Оны қалыпты қолданба ретінде қайта орнатыңыз.</string>
+    <string name="unsupport_other_su_msg">Magisk өзге бағдарламаға тиесілі \"su\" файлын анықтады. Қайшы келетін root қолданбасын жойып, Magisk-ті қайта орнатыңыз.</string>
+    <string name="unsupport_external_storage_msg">Magisk қолданбасы сыртқы жадқа орнатылды. Қолданбаны ішкі жадқа жылжытыңыз.</string>
+    <string name="unsupport_nonroot_stub_msg">Root құқығы жоғалғандықтан, жасырылған Magisk қолданбасы жұмыс істей алмайды. Түпнұсқа APK файлын орнатыңыз.</string>
+    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
+    <string name="external_rw_permission_denied">Мүмкіндікті қолдану үшін құрылғы жадына рұқсат беріңіз</string>
+    <string name="post_notifications_denied">Мүмкіндікті қолдану үшін мәлімдеме жіберуге рұқсат беріңіз</string>
+    <string name="install_unknown_denied">Мүмкіндікті қолдану үшін "белгісіз қолданбаларды орнатуға" рұқсат беріңіз</string>
+    <string name="add_shortcut_title">Бастапқы экранға таңбаша қосу</string>
+    <string name="add_shortcut_msg">Қолданба жасырылғаннан кейін, оның атауы мен таңбашасын тану қиын болуы мүмкін. Бастапқы экранға ыңғайлы таңбаша қосу керек пе?</string>
+    <string name="app_not_found">Бұл әрекетті орындай алатын қолданба табылмады</string>
+    <string name="reboot_apply_change">Өзгерістерді қолдану үшін құрылғыны қайта қосыңыз</string>
+    <string name="restore_app_confirmation">Сөйтсеңіз, жасырын қолданба түпнұсқа қолданбаға айналады. Мұны істеу керек екеніне сенімдісіз бе?</string>
+
+</resources>

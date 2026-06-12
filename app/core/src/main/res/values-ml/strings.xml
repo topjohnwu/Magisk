@@ -1,0 +1,235 @@
+<resources>
+
+    <!--Sections-->
+    <string name="modules">മൊഡ്യുൾസ്</string>
+    <string name="superuser">സൂപ്പർയുസർ</string>
+    <string name="logs">ലോഗ്സ്</string>
+    <string name="settings">സെറ്റിംഗ്സ്</string>
+    <string name="install">ഇൻസ്റ്റോൾ</string>
+    <string name="section_home">ഹോം</string>
+    <string name="section_theme">തീമുകൾ</string>
+    <string name="denylist">നിഷിദ്ധ പട്ടിക</string>
+
+    <!--Home-->
+    <string name="no_connection">കണക്ഷൻ ലഭ്യമല്ല</string>
+    <string name="app_changelog">മാറ്റങ്ങൾ</string>
+    <string name="loading">ലോഡിംഗ്...</string>
+    <string name="update">അപ്ഡേറ്റ്</string>
+    <string name="not_available">ലഭ്യമല്ല</string>
+    <string name="hide">മറയ്ക്കൂ</string>
+    <string name="home_package">പാക്കേജ്</string>
+    <string name="home_app_title">ആപ്പ്</string>
+
+    <string name="home_notice_content">ഔദ്യോഗിക ഗിറ്റ്ഹബ് പേജിൽ നിന്ന് മാത്രം മജിസ്‌ക് ഡൗൺലോഡ് ചെയ്യുക. അജ്ഞാത ഉറവിടങ്ങളിൽ നിന്നുള്ള ഫയലുകൾ ക്ഷുദ്രകരമാകാം!</string>
+    <string name="home_support_title">ഞങ്ങളെ തുണയ്‌ക്കുക</string>
+    <string name="home_follow_title">ഞങ്ങളെ ഫോളോ ചെയ്യുക</string>
+    <string name="home_item_source">സോഴ്സ്</string>
+    <string name="home_support_content">മജിസ്‌ക് എല്ലായ്പ്പോഴും സ്വതന്ത്രവും ഓപ്പൺ സോഴ്‌സും ആയിരിക്കും. എന്നിരുന്നാലും, ഒരു സംഭാവന നൽകിക്കൊണ്ട് നിങ്ങൾ പിന്തുണയ്ക്കുന്നുവെന്ന് ഞങ്ങളെ കാണിക്കാനാകും.</string>
+    <string name="home_installed_version">ഇൻസ്റ്റാൾ ചെയ്ത പതിപ്പ്</string>
+    <string name="home_latest_version">പുതിയ പതിപ്പ്</string>
+    <string name="invalid_update_channel">അപ്‌ഡേറ്റ് ചാനൽ അസാധുവാണ്</string>
+    <string name="uninstall_magisk_title">മജിസ്‌ക് അൺഇൻസ്റ്റാൾ ചെയ്യുക</string>
+    <string name="uninstall_magisk_msg">എല്ലാ മൊഡ്യൂളുകളും പ്രവർത്തനരഹിതമാക്കും/നീക്കം ചെയ്യപ്പെടും!\nറൂട്ട് നീക്കം ചെയ്യപ്പെടും!\nമജിസ്‌ക് വഴി  അൺഎൻക്രിപ്റ്റ്  ചെയ്യപ്പെട്ട ഇന്റെര്ണല് സ്റ്റോറേജുകൾ വീണ്ടും എൻക്രിപ്റ്റ് ചെയ്യപ്പെടും!!</string>
+
+    <!--Install-->
+    <string name="keep_force_encryption">ഫോഴ്‌സ് എൻക്രിപ്ഷൻ സംരക്ഷിക്കുക</string>
+    <string name="keep_dm_verity">AVB 2.0/dm-verity സംരക്ഷിക്കുക</string>
+    <string name="recovery_mode">റിക്കവറി മോഡ്</string>
+    <string name="install_options_title">ഓപ്ഷനുകൾ</string>
+    <string name="install_method_title">രീതി</string>
+    <string name="install_next">അടുത്തത്</string>
+    <string name="install_start">നമുക്ക് തുടങ്ങാം</string>
+    <string name="manager_download_install">ഡൗൺലോഡ് ചെയ്ത് ഇൻസ്റ്റാൾ ചെയ്യാൻ അമർത്തുക</string>
+    <string name="direct_install">നേരിട്ടുള്ള ഇൻസ്റ്റാളേഷൻ (ശുപാർശ ചെയ്യുന്നത്)</string>
+    <string name="install_inactive_slot">നിഷ്ക്രിയ സ്ലോട്ടിലേക്ക് ഇൻസ്‌റ്റാൾ ചെയ്യുക (OTA-ന് ശേഷം)</string>
+    <string name="install_inactive_slot_msg">റീബൂട്ടിന് ശേഷം നിങ്ങളുടെ ഉപകരണം നിലവിലെ നിഷ്‌ക്രിയ സ്ലോട്ടിലേക്ക് ബൂട്ട് ചെയ്യാൻ നിർബന്ധിതരാകും!\nOTA പൂർത്തിയാക്കിയതിന് ശേഷം മാത്രം ഈ ഓപ്ഷൻ ഉപയോഗിക്കുക.\nതുടരണോ?</string>
+    <string name="setup_title">അധിക സജ്ജീകരണം</string>
+    <string name="select_patch_file">ഒരു ഫയൽ തിരഞ്ഞെടുത്ത് പാച്ച് ചെയ്യുക</string>
+    <string name="patch_file_msg">ഒരു റോ ഇമേജ് (*.img) അല്ലെങ്കിൽ ഒരു ODIN ടാർ ഫയൽ (*.tar) തിരഞ്ഞെടുക്കുക</string>
+    <string name="reboot_delay_toast">5 സെക്കൻഡിൽ റീബൂട്ട് ചെയ്യുന്നു…</string>
+    <string name="flash_screen_title">ഇൻസ്റ്റലേഷൻ</string>
+
+    <!--Superuser-->
+    <string name="su_request_title">സൂപ്പർയൂസർ അഭ്യർത്ഥന</string>
+    <string name="touch_filtered_warning">ഒരു ആപ്പ് ഒരു സൂപ്പർയൂസർ അഭ്യർത്ഥന മറയ്ക്കുന്നതിനാൽ, മജിസ്‌ക്-ന് നിങ്ങളുടെ പ്രതികരണം പരിശോധിക്കാൻ കഴിയില്ല</string>
+    <string name="deny">നിഷേധിക്കുക</string>
+    <string name="prompt">പ്രോംപ്റ്റ്</string>
+    <string name="grant">അനുവദിക്കുക</string>
+    <string name="su_warning">നിങ്ങളുടെ ഉപകരണത്തിലേക്ക് പൂർണ്ണ ആക്‌സസ് നൽകും.\nനിങ്ങൾക്ക് ഉറപ്പില്ലെങ്കിൽ നിരസിക്കുക!</string>
+    <string name="forever">എന്നേക്കും</string>
+    <string name="once">ഒരിക്കൽ</string>
+    <string name="tenmin">10 മിനിറ്റ്</string>
+    <string name="twentymin">20 മിനിറ്റ്</string>
+    <string name="thirtymin">30 മിനിറ്റ്</string>
+    <string name="sixtymin">60 മിനിറ്റ്</string>
+    <string name="su_allow_toast">%1$s-ന് സൂപ്പർയൂസർ അവകാശം ലഭിച്ചു</string>
+    <string name="su_deny_toast">%1$s-ന് സൂപ്പർയൂസർ അവകാശം നിഷേധിച്ചു </string>
+    <string name="su_snack_grant">%1$s-ന്റെ സൂപ്പർയൂസർ അവകാശം അനുവദിച്ചിരിക്കുന്നു </string>
+    <string name="su_snack_deny">1$s-ന്റെ സൂപ്പർയൂസർ അവകാശം നിഷേധിക്കപ്പെട്ടിരിക്കുന്നു</string>
+    <string name="su_snack_notif_on">%1$s-ന്റെ അറിയിപ്പുകൾ പ്രവർത്തനക്ഷമമാക്കി</string>
+    <string name="su_snack_notif_off">%1$s-ന്റെ അറിയിപ്പുകൾ പ്രവർത്തനരഹിതമാക്കി</string>
+    <string name="su_snack_log_on">%1$s-ന്റെ ലോഗിംഗ് പ്രവർത്തനക്ഷമമാക്കി</string>
+    <string name="su_snack_log_off">%1$s-ന്റെ ലോഗിംഗ് പ്രവർത്തനരഹിതമാക്കി</string>
+    <string name="su_revoke_title">പിൻവലിക്കണോ?</string>
+    <string name="su_revoke_msg">%1$s-ന്റെ സൂപ്പർയൂസർ അവകാശം അസാധുവാക്കാൻ സ്ഥിരീകരിക്കുക</string>
+    <string name="toast">ടോസ്റ്റ്</string>
+    <string name="none">ഒന്നുമില്</string>
+
+    <string name="superuser_toggle_notification">അറിയിപ്പുകൾ</string>
+    <string name="superuser_toggle_revoke">പിന്‍വലിക്കുക</string>
+    <string name="superuser_policy_none">ആപ്പുകളൊന്നും ഇതുവരെ സൂപ്പർയൂസർ അനുമതി ചോദിച്ചിട്ടില്ല.</string>
+
+    <!--Logs-->
+    <string name="log_data_none">നിങ്ങൾക്ക് ലോഗുകൾ ഒന്നുമില്ലലോ, റൂട്ട് ആപ്പുകൾ കൂടുതൽ ഉപയോഗിക്കൂ</string>
+    <string name="log_data_magisk_none">മജിസ്‌ക് ലോഗുകൾ കാലിയാണ്, \nഎവിടെയോ എന്തോ ഒരു തകരാറു പോലെ</string>
+    <string name="menuSaveLog">ലോഗ് സേവ് ചെയ്യുക</string>
+    <string name="menuClearLog">ലോഗ് മായ്‌ക്കുക</string>
+    <string name="logs_cleared">ലോഗ് മായ്ച്ചു</string>
+    <string name="pid">PID: %1$d</string>
+    <string name="target_uid">ടാർഗെറ്റ് UID: %1$d</string>
+
+    <!--SafetyNet-->
+
+    <!--MagiskHide-->
+    <string name="show_system_app">സിസ്റ്റം ആപ്പുകൾ കാണിക്കുക</string>
+    <string name="show_os_app">OS ആപ്പുകൾ കാണിക്കുക</string>
+    <string name="hide_filter_hint">പേര് പ്രകാരം ഫിൽട്ടർ ചെയ്യുക</string>
+    <string name="hide_search">തിരയുക</string>
+
+    <!--Module-->
+    <string name="no_info_provided">(വിവരങ്ങളൊന്നും നൽകിയിട്ടില്ല)</string>
+    <string name="reboot_userspace">സോഫ്റ്റ് റീബൂട്ട്</string>
+    <string name="reboot_recovery">റിക്കവറിയിലേക്ക് റീബൂട്ട് ചെയ്യുക</string>
+    <string name="reboot_bootloader">ബൂട്ട്ലോഡറിലേക്ക് റീബൂട്ട് ചെയ്യുക</string>
+    <string name="reboot_download">ഡൗൺലോഡ് മോഡിലേക്ക് റീബൂട്ട് ചെയ്യുക</string>
+    <string name="reboot_edl">EDL-ലേക്ക് റീബൂട്ട് ചെയ്യുക</string>
+    <string name="module_version_author">%1$s നിർമ്മിച്ചത് %2$s</string>
+    <string name="module_state_remove">നീക്കുക</string>
+    <string name="module_state_restore">പുനഃസ്ഥാപിക്കുക</string>
+    <string name="module_action_install_external">സ്റ്റോറേജിൽ നിന്ന് ഇൻസ്റ്റാൾ ചെയ്യുക</string>
+    <string name="update_available">അപ്ഡേറ്റ് ലഭ്യമാണ്</string>
+    <string name="suspend_text_riru">%1$s പ്രവർത്തനക്ഷമമാക്കിയതിനാൽ മൊഡ്യൂൾ താൽക്കാലികമായി നിർത്തി</string>
+    <string name="suspend_text_zygisk">%1$s പ്രവർത്തനക്ഷമമാക്കാത്തതിനാൽ മൊഡ്യൂൾ താൽക്കാലികമായി നിർത്തി</string>
+    <string name="zygisk_module_unloaded">പൊരുത്തക്കേട് കാരണം Zygisk മൊഡ്യൂൾ ലോഡ് ചെയ്തിട്ടില്ല</string>
+    <string name="module_empty">മൊഡ്യൂൾ ഇൻസ്റ്റാൾ ചെയ്തിട്ടില്ല</string>
+
+    <!--Settings-->
+    <string name="settings_dark_mode_title">തീം മോഡ്</string>
+    <string name="settings_dark_mode_message">നിങ്ങളുടെ ശൈലിക്ക് ഏറ്റവും അനുയോജ്യമായ മോഡ് തിരഞ്ഞെടുക്കുക!</string>
+    <string name="settings_dark_mode_light">എപ്പോഴും ലൈറ്റ്</string>
+    <string name="settings_dark_mode_system">സിസ്റ്റം തീം</string>
+    <string name="settings_dark_mode_dark">എപ്പോഴും ഡാർക്ക്</string>
+    <string name="settings_download_path_title">ഡൗൺലോഡ് സ്ഥലം</string>
+    <string name="settings_download_path_message">ഫയലുകൾ %1$s-ലേക്ക് സേവ് ചെയ്യപ്പെടും</string>
+    <string name="settings_hide_app_title">മജിസ്‌ക് ആപ്പ് മറയ്ക്കുക</string>
+    <string name="settings_hide_app_summary">ക്രമരഹിതമായ പാക്കേജ് ഐഡിയും ഇഷ്‌ടാനുസൃത ആപ്പ് ലേബലും ഉള്ള ഒരു പ്രോക്‌സി ആപ്പ് ഇൻസ്‌റ്റാൾ ചെയ്യുക</string>
+    <string name="settings_restore_app_title">മജിസ്‌ക് ആപ്പ് പുനഃസ്ഥാപിക്കുക</string>
+    <string name="settings_restore_app_summary">ആപ്പ് മറച്ചത് മാറ്റി യഥാർത്ഥ APK പുനഃസ്ഥാപിക്കുക</string>
+    <string name="language">ഭാഷ</string>
+    <string name="system_default">(സിസ്റ്റം ക്രമാനുസാരം)</string>
+    <string name="settings_check_update_title">അപ്ഡേറ്റുകൾക്കായി നോക്കുക</string>
+    <string name="settings_check_update_summary">പശ്ചാത്തലത്തിൽ അപ്ഡേറ്റുകൾക്കായി ഇടയ്ക്കിടെ പരിശോധിക്കുക</string>
+    <string name="settings_update_channel_title">അപ്ഡേറ്റിനുള്ള ചാനൽ</string>
+    <string name="settings_update_stable">സ്റ്റേബിൾ</string>
+    <string name="settings_update_beta">ബീറ്റ</string>
+    <string name="settings_update_custom">കസ്റ്റം</string>
+    <string name="settings_update_custom_msg">കസ്റ്റം ചാനലിന്റെ URL ചേർക്കുക</string>
+    <string name="settings_zygisk_summary">സൈഗോട്ട് ഡെമണിൽ മജിസ്കിന്റെ ഭാഗങ്ങൾ പ്രവർത്തിപ്പിക്കുക</string>
+    <string name="settings_denylist_title">നിഷിദ്ധ പട്ടിക പ്രാബല്യത്തിലാകുക</string>
+    <string name="settings_denylist_summary">നിഷിദ്ധ പട്ടികയിലെ പ്രോസസ്സുകൾക്കായി എല്ലാ മജിസ്‌ക് പരിഷ്‌ക്കരണങ്ങളും പഴയപടിയാക്കും</string>
+    <string name="settings_denylist_config_title">നിഷിദ്ധ പട്ടിക കോൺഫിഗർ ചെയ്യുക</string>
+    <string name="settings_denylist_config_summary">നിഷിദ്ധ പട്ടികയിൽ ഉൾപ്പെടുത്തേണ്ട പ്രോസസ്സുകൾ തിരഞ്ഞെടുക്കുക</string>
+    <string name="settings_hosts_title">സിസ്റ്റംലെസ്സ് ഹോസ്റ്റ്</string>
+    <string name="settings_hosts_summary">പരസ്യം തടയുന്ന ആപ്പുകൾക്കായി സിസ്റ്റംലെസ്സ് ഹോസ്റ്റ്</string>
+    <string name="settings_hosts_toast">സിസ്റ്റംലെസ്സ് ഹോസ്റ്റ് മൊഡ്യൂൾ ചേർത്തു</string>
+    <string name="settings_app_name_hint">പുതിയ പേര്</string>
+    <string name="settings_app_name_helper">ആപ്പ് ഈ പേരിൽ വീണ്ടും പാക്ക് ചെയ്യും</string>
+    <string name="settings_app_name_error">അസാധുവായ ഫോർമാറ്റ്</string>
+    <string name="settings_su_app_adb">ആപ്പുകളും ADB</string>
+    <string name="settings_su_app">ആപ്പുകൾ മാത്രം</string>
+    <string name="settings_su_adb">ADB മാത്രം</string>
+    <string name="settings_su_disable">അപ്രാപ്തമാക്കി</string>
+    <string name="settings_su_request_10">10 സെക്കന്റുകൾ</string>
+    <string name="settings_su_request_15">15 സെക്കന്റുകൾ</string>
+    <string name="settings_su_request_20">20 സെക്കന്റുകൾ</string>
+    <string name="settings_su_request_30">30 സെക്കന്റുകൾ</string>
+    <string name="settings_su_request_45">45 സെക്കന്റുകൾ</string>
+    <string name="settings_su_request_60">60 സെക്കന്റുകൾ</string>
+    <string name="superuser_access">സൂപ്പർയൂസർ ആക്സസ്</string>
+    <string name="auto_response">സ്വയമേവ പ്രതികരണം</string>
+    <string name="request_timeout">അഭ്യർത്ഥന സമയപരിധി</string>
+    <string name="superuser_notification">സൂപ്പർയൂസർ അറിയിപ്പ്</string>
+    <string name="settings_su_reauth_title">അപ്‌ഗ്രേഡിന് ശേഷം വീണ്ടും പ്രാമാണീകരിക്കുക</string>
+    <string name="settings_su_reauth_summary">ആപ്പുകൾ അപ്‌ഗ്രേഡ് ചെയ്‌തതിന് ശേഷം സൂപ്പർയൂസർ അനുമതികൾക്കായി വീണ്ടും ആവശ്യപ്പെടുക</string>
+    <string name="settings_su_tapjack_title">ടാപ്പ്ജാക്കിംഗ് സംരക്ഷണം</string>
+    <string name="settings_su_tapjack_summary">സൂപ്പർയൂസർ പ്രോംപ്റ്റ് ഡയലോഗ് മറ്റേതെങ്കിലും വിൻഡോയോ ഓവർലേയോ മറയ്ക്കുമ്പോൾ ഇൻപുട്ടിനോട് പ്രതികരിക്കില്</string>
+    <string name="settings_customization">കസ്റ്റമയിസേഷൻ</string>
+    <string name="setting_add_shortcut_summary">ആപ്പ് മറച്ചതിന് ശേഷം പേരും ഐക്കണും തിരിച്ചറിയാൻ പ്രയാസമാണെങ്കിൽ ഹോം സ്‌ക്രീനിലേക്ക് മനോഹരമായ ഒരു ഷോർട്ട്ക്കട് ചേർക്കുക</string>
+    <string name="settings_doh_title">DNS ഓവർ HTTPS</string>
+    <string name="settings_doh_description">ചില രാജ്യങ്ങളിലെ DNS പോയ്സണിങിന് പരിഹാരം</string>
+
+    <string name="multiuser_mode">മൾട്ടിയൂസർ മോഡ്</string>
+    <string name="settings_owner_only">ഉപകരണ ഉടമ മാത്രം</string>
+    <string name="settings_owner_manage">ഉപകരണ ഉടമ നിയന്ത്രിക്കുന്നു</string>
+    <string name="settings_user_independent">ഉപയോക്താവിനെ ആശ്രയിക്കുന്നില്</string>
+    <string name="owner_only_summary">ഉടമയ്ക്ക് മാത്രമേ റൂട്ട് ആക്സസ് ഉള്ളൂ</string>
+    <string name="owner_manage_summary">റൂട്ട് ആക്‌സസ് നിയന്ത്രിക്കാനും അഭ്യർത്ഥന നിർദ്ദേശങ്ങൾ സ്വീകരിക്കാനും ഉടമയ്ക്ക് മാത്രമേ കഴിയൂ</string>
+    <string name="user_independent_summary">ഓരോ ഉപയോക്താവിനും അവരുടേതായ പ്രത്യേക റൂട്ട് നിയമങ്ങൾ ഉണ്ടാവാം</string>
+
+    <string name="mount_namespace_mode">മൗണ്ട് നെയിംസ്പേസ് മോഡ്</string>
+    <string name="settings_ns_global">ഗ്ലോബൽ നെയിംസ്പേസ്</string>
+    <string name="settings_ns_requester">പൂര്‍വ്വാര്‍ജ്ജിതമായ് നെയിംസ്പേസ്</string>
+    <string name="settings_ns_isolate">ഒറ്റപ്പെട് നെയിംസ്പേസ്</string>
+    <string name="global_summary">എല്ലാ റൂട്ട് സെഷനുകളും ഗ്ലോബൽ മൗണ്ട് നെയിംസ്പേസ് ഉപയോഗിക്കും</string>
+    <string name="requester_summary">റൂട്ട് സെഷനുകൾ അവരുടെ അഭ്യർത്ഥനയുടെ നെയിംസ്പേസ് ഉപയോഗിക്കും</string>
+    <string name="isolate_summary">ഓരോ റൂട്ട് സെഷനും അതിന്റേതായ ഒറ്റപ്പെട്ട നെയിംസ്പേസ് ഉണ്ടായിരിക്കും</string>
+
+    <!--Notifications-->
+    <string name="update_channel">മജിസ്‌ക് അപ്‌ഡേറ്റുകൾ</string>
+    <string name="progress_channel">പുരോഗതി അറിയിപ്പുകൾ</string>
+    <string name="updated_channel">അപ്‌ഡേറ്റ് പൂർത്തിയായി</string>
+    <string name="download_complete">ഡൗൺലോഡ് പൂർത്തിയായി</string>
+    <string name="download_file_error">ഫയൽ ഡൗൺലോഡ് ചെയ്യുന്നതിൽ പിശക്</string>
+    <string name="magisk_update_title">മജിസ്‌ക് അപ്‌ഡേറ്റ് ലഭ്യമാണ്!</string>
+    <string name="updated_title">മജിസ്‌ക് അപ്ഡേറ്റ് ചെയ്തു</string>
+    <string name="updated_text">ആപ്പ് തുറക്കാൻ ടാപ്പ് ചെയ്യുക</string>
+
+    <!--Toasts, Dialogs-->
+    <string name="yes">അതെ</string>
+    <string name="no">ഇല്ല</string>
+    <string name="repo_install_title">%1$s %2$s(%3$d) ഇൻസ്റ്റാൾ ചെയ്യുക</string>
+    <string name="download">ഡൗൺലോഡ്</string>
+    <string name="reboot">റീബൂട്ട്</string>
+    <string name="release_notes">റിലീസ് നോട്ടുകൾ</string>
+    <string name="flashing">ഫ്ലാഷ് ചെയ്യുന്നു...</string>
+    <string name="done">ചെയ്തു!</string>
+    <string name="failure">പരാജയപ്പെട്ടു!</string>
+    <string name="hide_app_title">മജിസ്‌ക് ആപ്പ് മറയ്ക്കുന്നു...</string>
+    <string name="open_link_failed_toast">ലിങ്ക് തുറക്കാൻ ആപ്പൊന്നും കണ്ടെത്തിയില്ല</string>
+    <string name="complete_uninstall">പൂർണ്ണമായും അൺഇൻസ്റ്റാൾ ചെയ്യുക</string>
+    <string name="restore_img">ഇമേജുകൾ റിസ്റ്റോർ ചെയ്യുക</string>
+    <string name="restore_img_msg">റിസ്റ്റോർ ചെയ്യുന്നു…</string>
+    <string name="restore_done">റിസ്റ്റോർ ചെയ്തു!</string>
+    <string name="restore_fail">സ്റ്റോക്ക് ബാക്കപ്പ് നിലവിലില്ല!</string>
+    <string name="setup_fail">സെറ്റപ്പ് പരാജയപ്പെട്ടു</string>
+    <string name="env_fix_title">കൂടുതൽ സജ്ജീകരണം ആവശ്യമാണ്</string>
+    <string name="env_fix_msg">മജിസ്‌ക് ശരിയായി പ്രവർത്തിക്കാൻ നിങ്ങളുടെ ഉപകരണത്തിന് കൂടുതൽ സജ്ജീകരണം ആവശ്യമാണ്. നിങ്ങൾക്ക് തുടരാനും റീബൂട്ട് ചെയ്യാനും താൽപ്പര്യമുണ്ടോ?</string>
+    <string name="setup_msg">ഇൻവൈറൻമൻറ്റ് സജ്ജീകരണം പ്രവർത്തിക്കുന്നു...</string>
+    <string name="unsupport_magisk_title">പിന്തുണയ്ക്കാത്ത മജിസ്‌ക് പതിപ്പ്</string>
+    <string name="unsupport_magisk_msg">ആപ്പിന്റെ ഈ പതിപ്പ് %1$s-ൽ താഴെയുള്ള മജിസ്‌ക് പതിപ്പുകളെ പിന്തുണയ്‌ക്കുന്നില്ല.\n\nമജിസ്‌ക് ഇൻസ്റ്റാൾ ചെയ്തിട്ടില്ലെന്ന മട്ടിൽ ആപ്പ് പ്രവർത്തിക്കും, ദയവായി മജിസ്‌ക് എത്രയും വേഗം അപ്‌ഗ്രേഡ് ചെയ്യുക.</string>
+    <string name="unsupport_general_title">അസാധാരണമായ നില</string>
+    <string name="unsupport_system_app_msg">ഒരു സിസ്റ്റം ആപ്പായി ഈ ആപ്പ് പ്രവർത്തിപ്പിക്കുന്നത് സാധ്യമല്ല. ഒരു യൂസർ ആപ്പിലേക്ക് ആപ്പ് പുനഃസ്ഥാപിക്കുക.</string>
+    <string name="unsupport_other_su_msg">മജിസ്‌ക്-ൽ നിന്ന് അല്ലാത്ത ഒരു \"su\" ബൈനറി കണ്ടെത്തി. അധിക റൂട്ട് സൊല്യൂഷൻ നീക്കം ചെയ്യുക കൂടാതെ/അല്ലെങ്കിൽ മാജിസ്ക് വീണ്ടും ഇൻസ്റ്റാൾ ചെയ്യുക.</string>
+    <string name="unsupport_external_storage_msg">മജിസ്‌ക് ഇക്സ്റ്റർനൽ സ്റ്റോറേജിൽ ഇൻസ്റ്റാൾ ചെയ്തിരിക്കുകയാണ്. ആപ്പ് ഇൻറ്റർനൽ സ്റ്റോറേജിലെക് നീക്കുക.</string>
+    <string name="unsupport_nonroot_stub_msg">റൂട്ട് നഷ്‌ടമായതിനാൽ മറഞ്ഞിരിക്കുന്ന മജിസ്‌ക് ആപ്പിന് തുടർന്നും പ്രവർത്തിക്കാനാകില്ല. യഥാർത്ഥ APK പുനഃസ്ഥാപിക്കുക.</string>
+    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
+    <string name="external_rw_permission_denied">ഈ പ്രവർത്തനം പ്രവർത്തനക്ഷമമാക്കാൻ സ്റ്റോറജ് ​​അനുമതി നൽകുക</string>
+    <string name="post_notifications_denied">ഈ പ്രവർത്തനം പ്രവർത്തനക്ഷമമാക്കാൻ അറിയിപ്പ്‌ അനുമതി നൽകുക</string>
+    <string name="install_unknown_denied">ഈ പ്രവർത്തനം പ്രവർത്തനക്ഷമമാക്കാൻ "install unknown apps" അനുവദിക്കുക</string>
+    <string name="add_shortcut_title">ഹോം സ്ക്രീനിലേക്ക് ഷോർട്ട്കട്ട് ചേർക്കുക</string>
+    <string name="add_shortcut_msg">ഈ ആപ്പ് മറച്ചതിന് ശേഷം, അതിന്റെ പേരും ഐക്കണും തിരിച്ചറിയാൻ ബുദ്ധിമുട്ടായേക്കാം. ഹോം സ്‌ക്രീനിലേക്ക് മനോഹരമായ ഒരു ഷോർറ്റ്കറ്റ ചേർക്കാൻ നിങ്ങൾ ആഗ്രഹിക്കുന്നുണ്ടോ?</string>
+    <string name="app_not_found">ഈ പ്രവർത്തനം കൈകാര്യം ചെയ്യാൻ ഒരു ആപ്പും കണ്ടെത്തിയില്ല</string>
+    <string name="reboot_apply_change">മാറ്റങ്ങൾ പ്രയോഗിക്കാൻ റീബൂട്ട് ചെയ്യുക</string>
+    <string name="restore_app_confirmation">ഇത് മറച്ച ആപ്പിനെ യഥാർത്ഥ ആപ്പിലേക്ക് തിരികെ കൊണ്ടുവരും. നിങ്ങൾ ശരിക്കും ഇത് ചെയ്യാൻ ആഗ്രഹിക്കുന്നുണ്ടോ?</string>
+
+</resources>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- For stub on API 31+, we cannot rely on the platform SplashScreen -->
+    <!-- Force using SplashScreen.Common that was used for older APIs -->
+    <style name="StubSplashTheme" parent="Theme.SplashScreen.Common">
+        <item name="android:enforceStatusBarContrast">false</item>
+        <item name="android:enforceNavigationBarContrast">false</item>
+        <item name="windowSplashScreenBackground">@color/splash_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_magisk_padded</item>
+    </style>
+</resources>

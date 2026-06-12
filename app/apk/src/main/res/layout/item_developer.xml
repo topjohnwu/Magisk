@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="item"
+            type="com.topjohnwu.magisk.ui.home.DeveloperItem" />
+
+        <variable
+            name="viewModel"
+            type="com.topjohnwu.magisk.ui.home.HomeViewModel" />
+
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="@dimen/l1"
+        android:paddingEnd="@dimen/l1">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{item.handle}"
+            android:textAppearance="@style/AppearanceFoundation.Caption"
+            android:textStyle="bold"
+            tools:text="\@topjohnwu" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            app:items="@{item.items}"
+            app:extraBindings="@{viewModel.extraBindings}"
+            app:nestedScrollingEnabled="@{false}"
+            android:overScrollMode="never"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:fadingEdgeLength="@dimen/l1"
+            android:orientation="horizontal"
+            android:requiresFadingEdge="horizontal"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:itemCount="3"
+            tools:listitem="@layout/item_icon_link" />
+
+    </LinearLayout>
+
+</layout>

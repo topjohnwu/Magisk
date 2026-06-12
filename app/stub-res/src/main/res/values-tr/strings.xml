@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="upgrade_msg">Kurulumu tamamlamak için tam Magisk Manager\'a yükseltin. İndirip yüklensin mi?</string>
+    <string name="no_internet_msg">Lütfen internete bağlanın! Magisk Manager\'ın tam sürümüne yükseltmek gerekiyor.</string>
+    <string name="dling">İndiriliyor</string>
+    <string name="relaunch_app">Lütfen uygulamayı el ile yeniden açınız.</string>
+</resources>
+

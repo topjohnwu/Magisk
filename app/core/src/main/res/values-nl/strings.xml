@@ -1,0 +1,193 @@
+<resources>
+
+    <!--Sections-->
+    <string name="modules">Modules</string>
+    <string name="superuser">Superuser</string>
+    <string name="logs">Logboek</string>
+    <string name="settings">Instellingen</string>
+    <string name="install">Installeren</string>
+    <string name="section_home">Overzicht</string>
+    <string name="section_theme">Thema\'s</string>
+
+    <!--Home-->
+    <string name="no_connection">Geen internetverbinding</string>
+    <string name="app_changelog">Wijzigingslog</string>
+    <string name="loading">Bezig met laden…</string>
+    <string name="update">Updaten</string>
+    <string name="not_available">Niet beschikbaar</string>
+    <string name="hide">Verbergen</string>
+    <string name="home_package">Pakket</string>
+
+    <string name="home_support_title">Ondersteun ons</string>
+    <string name="home_item_source">Broncode</string>
+    <string name="home_support_content">Magisk is en zal altijd gratis en open source blijven, maar als je wilt, kun je een kleine donatie doen.</string>
+    <string name="home_installed_version">Geïnstalleerd</string>
+    <string name="home_latest_version">Actueel</string>
+    <string name="invalid_update_channel">Ongeldig updatekanaal</string>
+    <string name="uninstall_magisk_title">Magisk deïnstalleren</string>
+    <string name="uninstall_magisk_msg">Alle modules worden uitgeschakeld/verwijderd!\nRoot wordt verwijderd!\nJe gegevens worden, als ze dat nog niet waren, mogelijk versleuteld!</string>
+
+
+    <!--Install-->
+    <string name="keep_force_encryption">Afgedwongen versleuteling behouden</string>
+    <string name="keep_dm_verity">AVB 2.0/dm-verity behouden</string>
+    <string name="recovery_mode">Herstelmodus</string>
+    <string name="install_options_title">Opties</string>
+    <string name="install_method_title">Methode</string>
+    <string name="install_next">Volgende</string>
+    <string name="install_start">Aan de slag</string>
+    <string name="manager_download_install">Druk om te downloaden en installeren</string>
+    <string name="direct_install">Direct installeren (aanbevolen)</string>
+    <string name="install_inactive_slot">Installeren in inactieve sleuf (na OTA)</string>
+    <string name="install_inactive_slot_msg">Je apparaat wordt GEDWONGEN opgestart in de huidige inactieve sleuf na het herstarten!\nGebruik deze optie alleen NA het installeren van een OTA-update.\nWil je doorgaan?</string>
+    <string name="setup_title">Installatie afronden</string>
+    <string name="select_patch_file">Kies en patch een bestand</string>
+    <string name="patch_file_msg">Kies een schijfkopie (*.img) of ODIN-tarbestand (*.tar)</string>
+    <string name="reboot_delay_toast">Je apparaat wordt over 5 seconden herstart…</string>
+    <string name="flash_screen_title">Installatie</string>
+
+    <!--Superuser-->
+    <string name="su_request_title">Superuserverzoek</string>
+    <string name="deny">Weigeren</string>
+    <string name="prompt">Vraag</string>
+    <string name="grant">Toestaan</string>
+    <string name="su_warning">Verleent volledige toegang tot je apparaat.\nBij twijfel, altijd weigeren!</string>
+    <string name="forever">Permanent</string>
+    <string name="once">Eenmalig</string>
+    <string name="tenmin">10 min</string>
+    <string name="twentymin">20 min</string>
+    <string name="thirtymin">30 min</string>
+    <string name="sixtymin">60 min</string>
+    <string name="su_allow_toast">%1$s beschikt nu over superuserrechten</string>
+    <string name="su_deny_toast">Superuserrecht van %1$s geweigerd</string>
+    <string name="su_snack_grant">%1$s beschikt nu over superuserrechten</string>
+    <string name="su_snack_deny">Superuserrecht van %1$s geweigerd</string>
+    <string name="su_snack_notif_on">%1$s-meldingen ingeschakeld</string>
+    <string name="su_snack_notif_off">%1$s-meldingen uitgeschakeld</string>
+    <string name="su_snack_log_on">%1$s wordt nu gelogd</string>
+    <string name="su_snack_log_off">%1$s wordt niet gelogd</string>
+    <string name="su_revoke_title">Intrekken?</string>
+    <string name="su_revoke_msg">Wil je de rechten van %1$s intrekken?</string>
+    <string name="toast">Ballon</string>
+    <string name="none">Geen</string>
+
+    <string name="superuser_toggle_notification">Meldingen</string>
+    <string name="superuser_toggle_revoke">Intrekken</string>
+    <string name="superuser_policy_none">Er zijn nog geen superuserverzoeken geweest.</string>
+
+    <!--Logs-->
+    <string name="log_data_none">Er is nog niks gelogd. Gebruik meer apps met superuserrechten!</string>
+    <string name="log_data_magisk_none">Het Magisk-logboek is leeg. Dit is ongebruikelijk.</string>
+    <string name="menuSaveLog">Logboek opslaan</string>
+    <string name="menuClearLog">Logboek wissen</string>
+    <string name="logs_cleared">Het logboek is gewist.</string>
+    <string name="pid">PID: %1$d</string>
+    <string name="target_uid">Doel-uid: %1$d</string>
+
+    <!--SafetyNet-->
+
+    <!-- MagiskHide -->
+    <string name="show_system_app">Systeemapps tonen</string>
+    <string name="hide_filter_hint">Filteren op naam</string>
+    <string name="hide_search">Zoeken</string>
+
+    <!--Module Fragment-->
+    <string name="no_info_provided">(geen informatie verstrekt)</string>
+    <string name="reboot_recovery">Recovery starten</string>
+    <string name="reboot_bootloader">Bootloader starten</string>
+    <string name="reboot_download">Downloadmodus starten</string>
+    <string name="reboot_edl">EDL starten</string>
+    <string name="module_version_author">%1$s van %2$s</string>
+    <string name="module_state_remove">Verwijderen</string>
+    <string name="module_state_restore">Herstellen</string>
+    <string name="module_action_install_external">Gedownloade module installeren</string>
+    <string name="update_available">Update beschikbaar</string>
+
+    <!--Settings -->
+    <string name="settings_dark_mode_title">Thema</string>
+    <string name="settings_dark_mode_message">Kies het thema dat het best bij je past!</string>
+    <string name="settings_dark_mode_light">Licht</string>
+    <string name="settings_dark_mode_system">Systeemstandaard</string>
+    <string name="settings_dark_mode_dark">Donker</string>
+    <string name="settings_download_path_title">Downloadpad</string>
+    <string name="settings_download_path_message">Bestanden worden opgeslagen in %1$s</string>
+    <string name="language">Taal</string>
+    <string name="system_default">(systeemstandaard)</string>
+    <string name="settings_check_update_summary">Controleer automatisch op updates op de achtergrond.</string>
+    <string name="settings_update_channel_title">Updatekanaal</string>
+    <string name="settings_update_stable">Stabiel</string>
+    <string name="settings_update_beta">Bèta</string>
+    <string name="settings_update_custom">Aangepast</string>
+    <string name="settings_update_custom_msg">Voer een aangepaste url in</string>
+    <string name="settings_hosts_title">Systeemloze hosts</string>
+    <string name="settings_hosts_summary">Systeemloze hosts-ondersteuning voor advertentieblokkeringsapps.</string>
+    <string name="settings_hosts_toast">De systeemloze hosts-module is toegevoegd</string>
+    <string name="settings_app_name_hint">Nieuwe naam</string>
+    <string name="settings_app_name_helper">De app wordt opnieuw ingepakt onder deze naam</string>
+    <string name="settings_app_name_error">Onjuiste opmaak</string>
+    <string name="settings_su_app_adb">Apps en ADB</string>
+    <string name="settings_su_app">Alleen apps</string>
+    <string name="settings_su_adb">Alleen ADB</string>
+    <string name="settings_su_disable">Uitgeschakeld</string>
+    <string name="settings_su_request_10">10 seconden</string>
+    <string name="settings_su_request_15">15 seconden</string>
+    <string name="settings_su_request_20">20 seconden</string>
+    <string name="settings_su_request_30">30 seconden</string>
+    <string name="settings_su_request_45">45 seconden</string>
+    <string name="settings_su_request_60">60 seconden</string>
+    <string name="superuser_access">Superusertoegang</string>
+    <string name="auto_response">Automatisch antwoord</string>
+    <string name="request_timeout">Verzoektime-out</string>
+    <string name="superuser_notification">Superusermelding</string>
+    <string name="settings_su_reauth_title">Opnieuw goedkeuren na update</string>
+    <string name="settings_su_reauth_summary">Superuserrechten opnieuw goedkeuren na app-updates.</string>
+    <string name="settings_customization">Aanpassingen</string>
+
+    <string name="multiuser_mode">Meerdere gebruikers</string>
+    <string name="settings_owner_only">Alleen apparaateigenaar</string>
+    <string name="settings_owner_manage">Beheerd door apparaateigenaar</string>
+    <string name="settings_user_independent">Gebruikeronafhankelijk</string>
+    <string name="owner_only_summary">Alleen de apparaateigenaar heeft roottoegang</string>
+    <string name="owner_manage_summary">Alleen de eigenaar kan roottoegang goedkeuren en verzoeken ontvangen</string>
+    <string name="user_independent_summary">Elke gebruiker heeft zijn/haar eigen rootregels</string>
+
+    <string name="mount_namespace_mode">Naamruimtemodus aankoppelen</string>
+    <string name="settings_ns_global">Globale naamruimte</string>
+    <string name="settings_ns_requester">Naamruimte overnemen</string>
+    <string name="settings_ns_isolate">Geïsoleerde naamruimte</string>
+    <string name="global_summary">Alle rootsessies gebruiken de globale naamruimte</string>
+    <string name="requester_summary">Rootsessies gebruiken de naamruimte van de verzoeker</string>
+    <string name="isolate_summary">Elke rootsessie heeft zijn eigen geïsoleerde naamruimte</string>
+
+    <!--Notifications-->
+    <string name="update_channel">Magisk-updates</string>
+    <string name="progress_channel">Voortgangsmeldingen</string>
+    <string name="download_complete">Downloaden voltooid</string>
+    <string name="download_file_error">Het bestand kan niet worden gedownload</string>
+    <string name="magisk_update_title">Er is een Magisk-update beschikbaar!</string>
+
+    <!--Toasts, Dialogs-->
+    <string name="yes">Ja</string>
+    <string name="no">Nee</string>
+    <string name="repo_install_title">%1$s installeren %2$s(%3$d)</string>
+    <string name="download">Downloaden</string>
+    <string name="reboot">Herstarten</string>
+    <string name="release_notes">Wijzigingslog</string>
+    <string name="flashing">Bezig met flashen…</string>
+    <string name="done">Voltooid!</string>
+    <string name="failure">Mislukt</string>
+    <string name="open_link_failed_toast">Er is geen app op je apparaat die deze link kan openen</string>
+    <string name="complete_uninstall">Volledig deïnstalleren</string>
+    <string name="restore_img">Schijfkopieën herstellen</string>
+    <string name="restore_img_msg">Bezig met herstellen…</string>
+    <string name="restore_done">Herstellen voltooid!</string>
+    <string name="restore_fail">Er is geen back-up beschikbaar.</string>
+    <string name="setup_fail">Installatie mislukt</string>
+    <string name="env_fix_title">Installatie nog niet afgerond</string>
+    <string name="setup_msg">Bezig met toepassen van omgevingsinstellingen…</string>
+    <string name="unsupport_magisk_title">Niet-ondersteunde Magisk-versie</string>
+    <string name="external_rw_permission_denied">Verleen het opslagrecht om deze functie gebruiken</string>
+    <string name="add_shortcut_title">Snelkoppeling maken op startscherm</string>
+    <string name="app_not_found">Er is geen app op je apparaat die deze handeling kan uitvoeren</string>
+
+</resources>

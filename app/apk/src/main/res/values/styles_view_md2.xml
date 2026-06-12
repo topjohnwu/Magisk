@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="W" parent="android:Widget" />
+
+    <!--region Home-->
+
+    <style name="W.Home" />
+
+    <style name="W.Home.Item">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:paddingStart">@dimen/l1</item>
+        <item name="android:paddingEnd">@dimen/l1</item>
+    </style>
+
+    <style name="W.Home.Item.Top">
+        <item name="android:paddingTop">@dimen/l_75</item>
+    </style>
+
+    <style name="W.Home.Item.Bottom">
+        <item name="android:paddingBottom">@dimen/l_75</item>
+    </style>
+
+    <style name="W.Home.ItemContent">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:textAppearance">@style/AppearanceFoundation.Caption.Variant</item>
+    </style>
+
+    <style name="W.Home.ItemContent.Right">
+        <item name="android:layout_marginStart">@dimen/l_50</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAppearance">@style/AppearanceFoundation.Caption</item>
+    </style>
+
+    <!--endregion-->
+
+    <!--region Themes-->
+
+    <style name="W.Theme">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/l1</item>
+        <item name="android:layout_weight">1</item>
+    </style>
+
+    <style name="W.Theme.Left">
+        <item name="android:layout_marginEnd">@dimen/l1</item>
+    </style>
+
+    <style name="W.Theme.Right" />
+
+    <style name="W.Theme.Container" parent="Empty">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:baselineAligned">false</item>
+    </style>
+
+    <!--endregion-->
+
+</resources>

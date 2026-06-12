@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="data"
+            type="com.topjohnwu.magisk.ui.settings.DownloadPath" />
+
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/margin_generic">
+
+        <TextView
+            android:id="@+id/dialog_custom_download_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@{@string/settings_download_path_message(data.path)}"
+            android:textAppearance="@style/AppearanceFoundation.Caption"
+            tools:text="@string/settings_download_path_message" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_generic"
+            android:hint="@string/settings_download_path_title"
+            app:boxStrokeColor="?colorOnSurfaceVariant"
+            app:errorTextColor="?colorError"
+            app:hintEnabled="true"
+            app:hintTextAppearance="@style/AppearanceFoundation.Tiny"
+            app:hintTextColor="?colorOnSurfaceVariant">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/dialog_custom_download_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textUri"
+                android:text="@={data.inputResult}"
+                android:textAppearance="@style/AppearanceFoundation.Body"
+                android:textColor="?colorOnSurface"
+                tools:text="@tools:sample/lorem" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+    </LinearLayout>
+
+</layout>

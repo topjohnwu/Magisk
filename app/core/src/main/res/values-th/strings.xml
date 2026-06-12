@@ -1,0 +1,139 @@
+<resources>
+
+    <!--Welcome Activity-->
+    <string name="modules">โมดูล</string>
+    <string name="superuser">Superuser</string>
+    <string name="logs">บันทึก</string>
+    <string name="settings">ตั้งค่า</string>
+    <string name="install">ติดตั้ง</string>
+
+    <!--Status Fragment-->
+    <string name="invalid_update_channel">ช่องทางการอัปเดตไม่ถูกต้อง</string>
+    <string name="keep_force_encryption">เก็บค่าบังคับการเข้ารหัส</string>
+    <string name="keep_dm_verity">เก็บค่า AVB 2.0/dm-verity</string>
+    <string name="uninstall_magisk_title">ถอนการติดตั้ง Magisk</string>
+    <string name="uninstall_magisk_msg">โมดูลทั้งหมดจะถูกปิดการใช้งาน/ถูกลบ, สิทธิการเข้าถึง Root จะถูกลบ และข้อมูลของคุณอาจถูกเข้ารหัส</string>
+    <string name="update">อัปเดต</string>
+
+    <!--Module Fragment-->
+    <string name="no_info_provided">(ไม่มีข้อมูล)</string>
+    <string name="reboot_recovery">รีบู๊ตไปโหมดกู้คืน</string>
+    <string name="reboot_bootloader">รีบู๊ตไป Bootloader</string>
+    <string name="reboot_download">รีบู๊ตไป Download</string>
+
+    <!--Repo Fragment-->
+    <string name="update_available">มีการอัปเดต</string>
+    <string name="home_installed_version">ติดตั้งแล้ว</string>
+
+    <!--Log Fragment-->
+    <string name="menuSaveLog">เก็บบันทึก</string>
+    <string name="menuClearLog">ล้างบันทึก</string>
+    <string name="logs_cleared">บันทึกถูกล้างแล้ว</string>
+
+    <!--About Activity-->
+    <string name="app_changelog">สิ่งที่เพิ่มใหม่</string>
+
+    <!-- System Components, Notifications -->
+    <string name="update_channel">การอัปเดต Magisk</string>
+    <string name="progress_channel">สถานะ</string>
+    <string name="download_complete">ดาวน์โหลดสำเร็จ</string>
+    <string name="download_file_error">เกิดข้อผิดพลาดในการดาวน์โหลดไฟล์</string>
+    <string name="magisk_update_title">มีการอัปเดต Magisk!</string>
+
+    <!--Toasts, Dialogs-->
+    <string name="repo_install_title">ติดตั้ง %1$s %2$s(%3$d)</string>
+    <string name="download">ดาวน์โหลด</string>
+    <string name="reboot">รีบู๊ต</string>
+    <string name="release_notes">ข้อมูลเพิ่มเติม</string>
+    <string name="manager_download_install">แตะเพื่อดาวน์โหลดและติดตั้ง</string>
+    <string name="flashing">กำลังแฟลช</string>
+    <string name="open_link_failed_toast">ไม่พบแอปพลิเคชันสำหรับเปิดลิ้งค์</string>
+    <string name="direct_install">การติดตั้งโดยตรง (แนะนำ)</string>
+    <string name="install_inactive_slot">ติดตั้งไปยัง Slot ที่ไม่ใช้งาน (หลังจาก OTA)</string>
+    <string name="install_inactive_slot_msg">อุปกรณ์ของคุณจะถูกบังคับให้บู๊ตไป Slot ที่ไม่ใช่งานหลังจากรีบูต!\nใช้ตัวเลือกนี้หลังจาก OTA เสร็จเท่านั้น\nดำเนินการต่อ?</string>
+    <string name="complete_uninstall">ถอนการติดตั้งแบบสมบูรณ์</string>
+    <string name="restore_img">กู้คืน Images</string>
+    <string name="restore_img_msg">กำลังกู้คืน…</string>
+    <string name="restore_done">การกู้คืนสำเร็จ!</string>
+    <string name="restore_fail">ไม่มีไฟล์แบ็คอัพ!</string>
+    <string name="setup_fail">การตั้งค่าล้มเหลว</string>
+    <string name="env_fix_title">ต้องมีการตั้งค่าเพิ่มเติม</string>
+    <string name="setup_title">การตั้งค่าเพิ่มเติม</string>
+    <string name="setup_msg">กำลังรันการตั้งค่า…</string>
+
+    <!--Settings Activity -->
+    <string name="language">ภาษา</string>
+    <string name="system_default">(มาตรฐานระบบ)</string>
+    <string name="settings_check_update_title">ตรวจสอบการอัปเดต</string>
+    <string name="settings_check_update_summary">ตรวจสอบการอัปเดตเป็นระยะในพื้นหลัง</string>
+    <string name="settings_update_channel_title">ช่องทางการอัปเดต</string>
+    <string name="settings_update_stable">เสถียร</string>
+    <string name="settings_update_beta">เบต้า</string>
+    <string name="settings_update_custom">กำหนดเอง</string>
+    <string name="settings_update_custom_msg">ใส่ URL</string>
+    <string name="settings_hosts_title">Systemless hosts</string>
+    <string name="settings_hosts_summary">การรองรับ Systemless hosts เพื่อแอพ Adblock ต่างๆ</string>
+    <string name="settings_hosts_toast">ทำการเพิ่มโมดูล systemless hosts แล้ว</string>
+
+    <string name="settings_su_app_adb">แอปและ ADB</string>
+    <string name="settings_su_app">แอปเท่านั้น</string>
+    <string name="settings_su_adb">ADB เท่านั้น</string>
+    <string name="settings_su_disable">ปิด</string>
+    <string name="settings_su_request_10">10 วินาที</string>
+    <string name="settings_su_request_15">15 วินาที</string>
+    <string name="settings_su_request_20">20 วินาที</string>
+    <string name="settings_su_request_30">30 วินาที</string>
+    <string name="settings_su_request_45">45 วินาที</string>
+    <string name="settings_su_request_60">60 วินาที</string>
+    <string name="superuser_access">การเข้าถึง Superuser</string>
+    <string name="auto_response">การตอบกลับ</string>
+    <string name="request_timeout">เวลาการขอใช้งาน</string>
+    <string name="superuser_notification">การแจ้งเตือน Superuser</string>
+    <string name="settings_su_reauth_title">ขอสิทธิ์ใหม่หลังจากอัปเกรด</string>
+    <string name="settings_su_reauth_summary">ขอสิทธิ์ superuser ใหม่หลังจากแอปถูกอัปเกรด</string>
+
+    <string name="multiuser_mode">โหมดผู้ใช้หลายคน</string>
+    <string name="settings_owner_only">เจ้าของอุปกรณ์เท่านั้น</string>
+    <string name="settings_owner_manage">จัดการโดยเจ้าของอุปกรณ์</string>
+    <string name="settings_user_independent">ตามผู้ใช้</string>
+    <string name="owner_only_summary">เฉพาะเจ้าของที่มีสิทธิ์การเข้าถึง root</string>
+    <string name="owner_manage_summary">เจ้าของสามารถจัดการสิทธิ์การเข้าถึง root</string>
+    <string name="user_independent_summary">ผู้ใช้แต่ละคนสามารถจัดการกฏของตนเอง</string>
+
+    <string name="mount_namespace_mode">Mount Namespace Mode</string>
+    <string name="settings_ns_global">Global Namespace</string>
+    <string name="settings_ns_requester">Inherit Namespace</string>
+    <string name="settings_ns_isolate">Isolated Namespace</string>
+    <string name="global_summary">All root sessions use the global mount namespace.</string>
+    <string name="requester_summary">Root sessions will inherit their requester\'s namespace.</string>
+    <string name="isolate_summary">Each root session will have its own isolated namespace.</string>
+
+    <!--Superuser-->
+    <string name="su_request_title">การขอเข้าถึง Superuser</string>
+    <string name="deny">ปฏิเสธ</string>
+    <string name="prompt">ถาม</string>
+    <string name="grant">อนุญาต</string>
+    <string name="su_warning">จะให้การเข้าถึงอุปกรณ์ในทุกรูปแบบ กรุณาปฏิเสธหากคุณไม่มั่นใจ!</string>
+    <string name="forever">ตลอดกาล</string>
+    <string name="once">ครั้งเดียว</string>
+    <string name="tenmin">10 นาที</string>
+    <string name="twentymin">20 นาที</string>
+    <string name="thirtymin">30 นาที</string>
+    <string name="sixtymin">60 นาที</string>
+    <string name="su_allow_toast">%1$s ถูกอนุญาตสิทธิ์ Superuser</string>
+    <string name="su_deny_toast">%1$s ถูกปฏิเสธสิทธิ์ Superuser</string>
+    <string name="su_snack_grant">สิทธิ์ Superuser ของ %1$s ถูกอนุญาต</string>
+    <string name="su_snack_deny">สิทธิ์ Superuser ของ %1$s ถูกปฏิเสธ</string>
+    <string name="su_snack_notif_on">การแจ้งเตือนของ %1$s ถูกเปิด</string>
+    <string name="su_snack_notif_off">การแจ้งเตือนของ %1$s ถูกปิด</string>
+    <string name="su_snack_log_on">การบันทึก %1$s ถูกเปิด</string>
+    <string name="su_snack_log_off">การบันทึก %1$s ถูกปิด</string>
+    <string name="su_revoke_title">ลบสิทธิ์?</string>
+    <string name="su_revoke_msg">ยืนยันการลบสิทธิ์ของ %1$s?</string>
+    <string name="toast">การเตือน</string>
+    <string name="none">ไม่มี</string>
+
+    <!--Superuser logs-->
+    <string name="target_uid">UID เป้าหมาย: %1$d</string>
+
+</resources>

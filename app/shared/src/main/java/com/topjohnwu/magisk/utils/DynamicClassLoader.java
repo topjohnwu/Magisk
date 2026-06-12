@@ -1,22 +1,23 @@
 package com.topjohnwu.magisk.utils;
 
+import android.os.Process;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
 
-import dalvik.system.DexClassLoader;
+import dalvik.system.BaseDexClassLoader;
 
-public class DynamicClassLoader extends DexClassLoader {
-
-    private static final ClassLoader base = Object.class.getClassLoader();
+public class DynamicClassLoader extends BaseDexClassLoader {
 
     public DynamicClassLoader(File apk) {
-        super(apk.getPath(), apk.getParent(), null, base);
+        this(apk, DynamicClassLoader.class.getClassLoader());
     }
 
     public DynamicClassLoader(File apk, ClassLoader parent) {
-        super(apk.getPath(), apk.getParent(), null, parent);
+        // Set optimizedDirectory to null for RootService to bypass DexFile's security checks
+        super(apk.getPath(), Process.myUid() == 0 ? null : apk.getParentFile(), null, parent);
     }
 
     @Override
@@ -28,7 +29,7 @@ public class DynamicClassLoader extends DexClassLoader {
 
         try {
             // Then check boot classpath
-            return base.loadClass(name);
+            return getSystemClassLoader().loadClass(name);
         } catch (ClassNotFoundException ignored) {
             try {
                 // Next try current dex
@@ -46,7 +47,7 @@ public class DynamicClassLoader extends DexClassLoader {
 
     @Override
     public URL getResource(String name) {
-        URL resource = base.getResource(name);
+        URL resource = getSystemClassLoader().getResource(name);
         if (resource != null)
             return resource;
         resource = findResource(name);
@@ -58,7 +59,7 @@ public class DynamicClassLoader extends DexClassLoader {
 
     @Override
     public Enumeration<URL> getResources(String name) throws IOException {
-        return new CompoundEnumeration<>(base.getResources(name),
+        return new CompoundEnumeration<>(getSystemClassLoader().getResources(name),
                 findResources(name), getParent().getResources(name));
     }
 }

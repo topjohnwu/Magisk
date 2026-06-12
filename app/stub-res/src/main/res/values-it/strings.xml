@@ -1,0 +1,6 @@
+<resources>
+    <string name="upgrade_msg">Aggiorna alla versione completa di Magisk per completare l\'installazione. Vuoi procedere con il download e l\'installazione?</string>
+    <string name="no_internet_msg">Controlla la connessione a Internet! È necessaria per l\'aggiornamento alla versione completa di Magisk.</string>
+    <string name="dling">Download in corso</string>
+    <string name="relaunch_app">Riavvia manualmente l\'app</string>
+</resources>

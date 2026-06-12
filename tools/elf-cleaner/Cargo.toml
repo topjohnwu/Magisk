@@ -1,0 +1,13 @@
+[package]
+name = "elf-cleaner"
+version = "0.0.0"
+edition = "2024"
+
+[dependencies]
+object = { version = "0.36", features = ["build"] }
+anyhow = "1.0"
+
+[profile.release]
+strip = true
+lto = true
+codegen-units = 1

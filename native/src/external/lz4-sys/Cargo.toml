@@ -1,0 +1,10 @@
+[package]
+name = "lz4-sys"
+license = "MIT"
+version = "1.11.1+lz4-1.10.0"
+authors = [ "Jens Heyens <jens.heyens@ewetel.net>", "Artem V. Navrotskiy <bozaro@buzzsoft.ru>", "Patrick Marks <pmarks@gmail.com>"]
+description = "Rust LZ4 sys package."
+repository = "https://github.com/10xGenomics/lz4-rs"
+
+[dependencies]
+libc = "0.2"

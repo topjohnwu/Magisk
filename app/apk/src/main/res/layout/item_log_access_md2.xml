@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="com.topjohnwu.magisk.R" />
+
+        <variable
+            name="item"
+            type="com.topjohnwu.magisk.ui.log.SuLogRvItem" />
+
+        <variable
+            name="viewModel"
+            type="com.topjohnwu.magisk.ui.log.LogViewModel" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="?listPreferredItemHeightSmall"
+        tools:layout_gravity="center">
+
+        <include
+            android:id="@+id/log_track_container"
+            bullet="@{item.log.action >= 2 ? R.drawable.ic_check_md2 : R.drawable.ic_close_md2}"
+            isBottom="@{item.isBottom}"
+            isSelected="@{item.log.action != 2}"
+            isTop="@{item.isTop}"
+            layout="@layout/item_log_track_md2"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/l1"
+            android:paddingTop="@dimen/l_50"
+            android:paddingBottom="@dimen/l_50"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/log_track_container"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/log_app_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{item.log.appName}"
+                android:textAppearance="@style/AppearanceFoundation.Body"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@+id/log_info"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="@string/magisk" />
+
+            <TextView
+                android:id="@+id/log_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{item.info}"
+                android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/log_app_name"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

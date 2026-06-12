@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.topjohnwu.magisk.ui.log.LogViewModel" />
+
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <include
+            android:id="@+id/log_filter_magisk"
+            layout="@layout/include_log_magisk"
+            viewModel="@{viewModel}"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            gone="@{viewModel.loading}"
+            android:id="@+id/log_filter_toggle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginStart="@dimen/l1"
+            android:layout_marginEnd="@dimen/l1"
+            android:layout_marginBottom="72dp"
+            app:layout_fitsSystemWindowsInsets="bottom"
+            app:backgroundTint="?colorSurfaceSurfaceVariant"
+            app:srcCompat="@drawable/ic_folder_list"
+            app:tint="?colorPrimary"
+            tools:layout_marginBottom="64dp" />
+
+        <com.google.android.material.circularreveal.cardview.CircularRevealCardView
+            android:id="@+id/log_filter"
+            style="@style/WidgetFoundation.Card"
+            app:cardBackgroundColor="?colorSurface"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="bottom"
+            android:visibility="invisible"
+            app:cardCornerRadius="0dp">
+
+            <include
+                android:id="@+id/log_filter_superuser"
+                layout="@layout/include_log_superuser"
+                viewModel="@{viewModel}"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </com.google.android.material.circularreveal.cardview.CircularRevealCardView>
+
+    </FrameLayout>
+
+</layout>

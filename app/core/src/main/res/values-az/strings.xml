@@ -1,0 +1,239 @@
+<resources>
+
+    <!--Sections-->
+    <string name="modules">Modullar</string>
+    <string name="superuser">Super İstifadəçi</string>
+    <string name="logs">Qeydlər</string>
+    <string name="settings">Ayarlar</string>
+    <string name="install">Quraşdır</string>
+    <string name="section_home">Əsas Səhifə</string>
+    <string name="section_theme">Mövzular</string>
+    <string name="denylist">Rəddedilənlər siyahısı</string>
+
+    <!--Home-->
+    <string name="no_connection">Bağlantı yoxdur</string>
+    <string name="app_changelog">Dəyişikliklər</string>
+    <string name="loading">Yüklənir…</string>
+    <string name="update">Yenilə</string>
+    <string name="not_available">Yüklü deyil</string>
+    <string name="hide">Gizlə</string>
+    <string name="home_package">Paket</string>
+    <string name="home_app_title">Tətbiq</string>
+
+    <string name="home_notice_content">Magiski YALNIZ rəsmi GitHub səhifəsindən endirin. Bilinməyən mənbələrdəki fayllar zərərli ola bilər!</string>
+    <string name="home_support_title">Bizə Dəstək ol</string>
+    <string name="home_follow_title">Bizi İzləyin</string>
+    <string name="home_item_source">Mənbə</string>
+    <string name="home_support_content">Magisk pulsuzdur və həmişə belə qalacaq. Amma istəsən bizə dəstək ola bilərsən.</string>
+    <string name="home_installed_version">Qurulan</string>
+    <string name="home_latest_version">Ən son versiya</string>
+    <string name="invalid_update_channel">Keçərsiz yeniləmə kanalı</string>
+    <string name="uninstall_magisk_title">Magisk\'i sil</string>
+    <string name="uninstall_magisk_msg">Bütün modullar ləğv olunacaq/silinəcək. Root silinəcək, və əgər hal-hazırda deyilsə, bütün məlumatlarınız potensiyal olaraq şifrələnəcək.</string>
+
+    <!--Install-->
+    <string name="keep_force_encryption">Zorla şifrələməni saxla</string>
+    <string name="keep_dm_verity">AVB 2.0/dm-verity saxla</string>
+    <string name="recovery_mode">Xilasetmə Modu</string>
+    <string name="install_options_title">Ayarlar</string>
+    <string name="install_method_title">Metod</string>
+    <string name="install_next">Növbəti</string>
+    <string name="install_start">Başlat</string>
+    <string name="manager_download_install">Endirmək və quraşdırmaq üçün bas</string>
+    <string name="direct_install">Birbaşa Quraşdır (Tövsiyyə olunur)</string>
+    <string name="install_inactive_slot">Aktiv olmayan Slot\'a quraşdır (OTA\'dan sonra)</string>
+    <string name="install_inactive_slot_msg">Cihazınız yenidən başladıqdan sonra aktiv olmayan slotda başlamağa MƏCBUR ediləcək!\nBu seçimi ancaq OTA bitdikdən sonra tətbiq edin.\nDavam edilsin?</string>
+    <string name="setup_title">Əlavə Sazlamalar</string>
+    <string name="select_patch_file">Fayl seç və yamaqla</string>
+    <string name="patch_file_msg">(*.img) yaxud ODIN (*.tar) seç</string>
+    <string name="reboot_delay_toast">5 saniyəyə yenidən başlayacaq…</string>
+    <string name="flash_screen_title">Quraşdırılma</string>
+
+    <!--Superuser-->
+    <string name="su_request_title">Super İstifadəçi İcazəsi</string>
+    <string name="touch_filtered_warning">Hansısa tətbiq Super İstifadəçi icazəsini pozduğuna görə, Magisk göstərişinizi yerinə yetirə bilmir</string>
+    <string name="deny">İmtina et</string>
+    <string name="prompt">İstək</string>
+    <string name="grant">İcazə ver</string>
+    <string name="su_warning">Bu tətbiqə tam səlahiyyət verəcək.\nƏmin deyilsənsə imtina et!</string>
+    <string name="forever">Həmişə</string>
+    <string name="once">1 dəfəlik</string>
+    <string name="tenmin">10 dəqiqəlik</string>
+    <string name="twentymin">20 dəqiqəlik</string>
+    <string name="thirtymin">30 dəqiqəlik</string>
+    <string name="sixtymin">60 dəqiqəlik</string>
+    <string name="su_allow_toast">%1$s Super İstifadəçi icazəsi aldı</string>
+    <string name="su_deny_toast">%1$s Super İstifadəçi icazəsi ala bilmədi</string>
+    <string name="su_snack_grant">%1$s üçün Super İstifadəçi haqları verilib</string>
+    <string name="su_snack_deny">%1$s üçün Super İstifadəçi haqları verilməyib</string>
+    <string name="su_snack_notif_on">%1$s üçün bildirişlər açıqdır</string>
+    <string name="su_snack_notif_off">%1$s üçün bildirişlər qapalıdır</string>
+    <string name="su_snack_log_on">%1$s qeydləri açıqdır</string>
+    <string name="su_snack_log_off">%1$s qeydləri qapalıdır</string>
+    <string name="su_revoke_title">Sil</string>
+    <string name="su_revoke_msg">%1$s üçün Super İstifadəçi haqlarının silinməsini təsdiqlə</string>
+    <string name="toast">Tost</string>
+    <string name="none">Heçbiri</string>
+
+    <string name="superuser_toggle_notification">bildirişlər</string>
+    <string name="superuser_toggle_revoke">Sil</string>
+    <string name="superuser_policy_none">Hələ heçbir tətbiq Super İstifadəçi icazəsi istəməyib.</string>
+
+    <!--Logs-->
+    <string name="log_data_none">Qeyd yoxdur, root icazəli tətbiqlərdən daha çox istifadə edin</string>
+    <string name="log_data_magisk_none">Qəribədir, Magisk qeydləri boşdur</string>
+    <string name="menuSaveLog">Qeydləri saxla</string>
+    <string name="menuClearLog">Qeydləri sil</string>
+    <string name="logs_cleared">Qeydlər silindi</string>
+    <string name="pid">PID: %1$d</string>
+    <string name="target_uid">Hədəf UID: %1$d</string>
+    <string name="selinux_context">SELinux kontenti: %s</string>
+    <string name="supp_group">Əlavə grup: %s</string>
+
+    <!--SafetyNet-->
+
+    <!--MagiskHide-->
+    <string name="show_system_app">Sistem tətbiqlərini göstər</string>
+    <string name="show_os_app">Əməliyyat sistemi tətbiqlərini göstər</string>
+    <string name="hide_filter_hint">Adla sırala</string>
+    <string name="hide_search">Axtar</string>
+
+    <!--Module-->
+    <string name="no_info_provided">(Məlumat verilməyib)</string>
+    <string name="reboot_userspace">Yumuşaq yenidən başlat</string>
+    <string name="reboot_recovery">Xilasetmə modunda yenidən başlat</string>
+    <string name="reboot_bootloader">Önyükləyici modunda yenidən başlat</string>
+    <string name="reboot_download">Yükləmə modunda yenidən başlat</string>
+    <string name="reboot_edl">EDL modunda yenidən başlat</string>
+    <string name="module_version_author">%2$s tərəfindən %1$s buraxılışı</string>
+    <string name="module_state_remove">Sil</string>
+    <string name="module_state_restore">Bərpa et</string>
+    <string name="module_action_install_external">Yaddaşdan yüklə</string>
+    <string name="update_available">Yeniləmə Mövcuddur</string>
+    <string name="suspend_text_riru">%1$s açıq olduğundan Magisk modulu dayandırıldı</string>
+    <string name="suspend_text_zygisk">%1$s qapalı olduğu üçün Magisk modulu dayandırıldı</string>
+    <string name="zygisk_module_unloaded">Zygisk modulu uyğunsuzluq səbəbindən açılmadı</string>
+    <string name="module_empty">Yüklü modul yoxdur</string>
+    <string name="confirm_install">%1$s modulu yüklənsin?</string>
+    <string name="confirm_install_title">Yükləmə Təsdiqi</string>
+
+    <!--Settings-->
+    <string name="settings_dark_mode_title">Mövzu Modu</string>
+    <string name="settings_dark_mode_message">Zövqünüzə uyğun modu seçin!</string>
+    <string name="settings_dark_mode_light">Həmişə Açıq</string>
+    <string name="settings_dark_mode_system">Sistemə Uyğun</string>
+    <string name="settings_dark_mode_dark">Həmişə Qaranlıq</string>
+    <string name="settings_download_path_title">Endirmə yolu</string>
+    <string name="settings_download_path_message">Fayllar %1$s\'a yerləşdiriləcək</string>
+    <string name="settings_hide_app_title">Magisk tətbiqini gizlət</string>
+    <string name="settings_hide_app_summary">Təsadüfi paket ID\'si ilə proxy yüklə və özəl tətbiq adı yaz</string>
+    <string name="settings_restore_app_title">Magisk tətbiqini bərpa et</string>
+    <string name="settings_restore_app_summary">Tətbiqi üzə çıxar və orijinal APKnı bərpa et</string>
+    <string name="language">Dil</string>
+    <string name="system_default">(Sistem Dili)</string>
+    <string name="settings_check_update_title">Yeniləməni Yoxla</string>
+    <string name="settings_check_update_summary">Vaxtaşırı arxaplanda yeniləmələri yoxla</string>
+    <string name="settings_update_channel_title">Yeniləmə Kanalı</string>
+    <string name="settings_update_stable">Sabit</string>
+    <string name="settings_update_beta">Beta</string>
+    <string name="settings_update_custom">Özəl</string>
+    <string name="settings_update_custom_msg">Özəl kanal URL\'si daxil et</string>
+    <string name="settings_zygisk_summary">Magiskin bəzi hissələrini zygote daemonda aç</string>
+    <string name="settings_denylist_title">İstisnaları Məcbur İşlət</string>
+    <string name="settings_denylist_summary">İstisnalar siyahısındakı proseslər Magisk əlavələrini tərsinə çevirəcək</string>
+    <string name="settings_denylist_config_title">İstisnaları Ayarla</string>
+    <string name="settings_denylist_config_summary">İstisnalara yerləşdiriləcək prosesi seçin</string>
+    <string name="settings_hosts_title">Sistemsiz hostlar</string>
+    <string name="settings_hosts_summary">Reklam əngəlləyici tətbiqlər üçün host faylları</string>
+    <string name="settings_hosts_toast">Sistemsiz hostların əlavəsi quruldu</string>
+    <string name="settings_app_name_hint">Yeni Ad</string>
+    <string name="settings_app_name_helper">Tətbiq bu adla yenidən paketlənəcək</string>
+    <string name="settings_app_name_error">Keçərsiz Format</string>
+    <string name="settings_su_app_adb">Tətbiqlər və ADB</string>
+    <string name="settings_su_app">Yalmız Tətbiqlər</string>
+    <string name="settings_su_adb">Yalnız ADB</string>
+    <string name="settings_su_disable">Heç Biri</string>
+    <string name="settings_su_request_10">10 saniyə</string>
+    <string name="settings_su_request_15">15 saniyə</string>
+    <string name="settings_su_request_20">20 saniyə</string>
+    <string name="settings_su_request_30">30 saniyə</string>
+    <string name="settings_su_request_45">45 saniyə</string>
+    <string name="settings_su_request_60">60 saniyə</string>
+    <string name="superuser_access">Super istifadəçi İcazəsi</string>
+    <string name="auto_response">Avtomatik Cavab</string>
+    <string name="request_timeout">İstək Vaxtaşımı</string>
+    <string name="superuser_notification">Super İstifadəçi Bildirişi</string>
+    <string name="settings_su_reauth_title">Yüksəltdikdən sonra yenidən səlahiyətləndir</string>
+    <string name="settings_su_reauth_summary">Tətbiqləri yüksəltdikdən sonra Super İstifadəçi icazəsi istə</string>
+    <string name="settings_su_tapjack_title">Saxta Ekran (Tapjacking) Qoruması</string>
+    <string name="settings_su_tapjack_summary">Super İstifadəçi icazə pəncərəsi digər pəncərələr tərəfindən əngəlləndikdə heçbir girişə cavab verməyəcək</string>
+    <string name="settings_customization">Özəlləşdirmə</string>
+    <string name="setting_add_shortcut_summary">Tətbiqi gizlətdikdən sonra tapmaq çətin olmasın deyə ana ekrana qısayol əlavə et</string>
+    <string name="settings_doh_title">HTTPS üzərindən DNS</string>
+    <string name="settings_doh_description">Bəzi ölkələrdə DNS problemlərini həll edir</string>
+
+    <string name="multiuser_mode">Çox istifadəçi Modu</string>
+    <string name="settings_owner_only">Yalnız Cihazın Sahibi</string>
+    <string name="settings_owner_manage">Cihaz Sahibinin İdarəsində</string>
+    <string name="settings_user_independent">İstifadəçidən Qeyri-Asılı</string>
+    <string name="owner_only_summary">Yalnız cihaz sahibində root icazəsi var</string>
+    <string name="owner_manage_summary">Yalnız cihaz sahibində root icazəsi verə yaxud istəyə bilər</string>
+    <string name="user_independent_summary">Hər istifadəçinin öz root icazəsi var</string>
+
+    <string name="mount_namespace_mode">Adlarfəzası modunu qoş</string>
+    <string name="settings_ns_global">Beynəlxalq Adlarfəzası</string>
+    <string name="settings_ns_requester">Adlarfəzası Daxil et</string>
+    <string name="settings_ns_isolate">Təklənmiş Adlarfəzası</string>
+    <string name="global_summary">Bütün kök girişləri beynəlxaq adlarfəzası işlədəcək</string>
+    <string name="requester_summary">Bütün kök girişləri öz adlarfəzalarından icazə alacaq</string>
+    <string name="isolate_summary">Hər kök giriş üçün ayrıca kök adlarfəzası olacaq</string>
+
+    <!--Notifications-->
+    <string name="update_channel">Magisk Yeniləmələri</string>
+    <string name="progress_channel">İrəliləmə Bildirişləri</string>
+    <string name="updated_channel">Yeniləmə Bitdi</string>
+    <string name="download_complete">Endirmə Bitdi</string>
+    <string name="download_file_error">Faylı endirmək münkün olmadı</string>
+    <string name="magisk_update_title">Magisk Yeniləməsi Var!</string>
+    <string name="updated_title">Magisk Yeniləndi</string>
+    <string name="updated_text">Tətbiqi açmaq üçün toxun</string>
+
+    <!--Toasts, Dialogs-->
+    <string name="yes">Mövcud</string>
+    <string name="no">Mövcud Deyil</string>
+    <string name="repo_install_title">Quraşdır %1$s %2$s(%3$d)</string>
+    <string name="download">Endir</string>
+    <string name="reboot">Yenidən başlat</string>
+    <string name="release_notes">Yeniliklər</string>
+    <string name="flashing">Flashlanır...</string>
+    <string name="done">Bitdi!</string>
+    <string name="failure">Alınmadı!</string>
+    <string name="hide_app_title">Magisk tətbiqi gizlədilir…</string>
+    <string name="open_link_failed_toast">Keçidi açaçaq tətbiq yoxdur</string>
+    <string name="complete_uninstall">Tamamilə sil</string>
+    <string name="restore_img">Nüsxələri Bərpa et</string>
+    <string name="restore_img_msg">Bərpa Edilir…</string>
+    <string name="restore_done">Bərpa Edildi!</string>
+    <string name="restore_fail">Bərpa üçün nüxsələr mövcud deyil!</string>
+    <string name="setup_fail">Qurma uğursuz oldu</string>
+    <string name="env_fix_title">Əlavə yükləməyə ethiyac var</string>
+    <string name="env_fix_msg">Cihazınız Magiskin düzgün işləməsi üçün əlavə yükləməyə ehtiyac duyur. Yenidən başlatmaq istəyirsiniz?</string>
+    <string name="setup_msg">Yüklənir…</string>
+    <string name="unsupport_magisk_title">Bu Magisk versiyası dəstəklənmir</string>
+    <string name="unsupport_magisk_msg">Tətbiqin bu versiyası Magiskin %1$s versiyasından aşağıları dəstəkləmir.\n\nTətbiq sanki Magisk heç yoxmuş kimi davranacaq, lütfən Magiski yüksəldin.</string>
+    <string name="unsupport_general_title">Anormal Hal</string>
+    <string name="unsupport_system_app_msg">Bu tətbiqi sistem tətbiqi kimi açmaq olmur. Onu yenidən istifadəçi tətbiqi etməlisiniz.</string>
+    <string name="unsupport_other_su_msg">Magiskdən olmayan \"su\" tapıldı. Lütfən digər kök tətbiqi silin yaxud Magiski yenidən quraşdırın.</string>
+    <string name="unsupport_external_storage_msg">Magisk xarici yaddaşa qurulub. Lütfən tətbiqi daxili yaddaşa keçirin.</string>
+    <string name="unsupport_nonroot_stub_msg">Gizli Magisk tətbiqi kök itirildiyinə görə işləməyəcək. Orijinal APKnı geri qaytarın.</string>
+    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
+    <string name="external_rw_permission_denied">Bu funksiyanı işə salmaq üçün yaddaş icazəsi verin</string>
+    <string name="post_notifications_denied">Bu funksiyanı işə salmaq üçün bildiriş icazəsi verin</string>
+    <string name="install_unknown_denied">"bilinməyən tətbiqləri quraşdır"\ı açsanız bu funksiya işə düşəcək</string>
+    <string name="add_shortcut_title">Ana ekranda qısayol yarat</string>
+    <string name="add_shortcut_msg">Tətbiqi gizlətdikdən sonra tapmaq çətin olmasın deyə ana ekranda qısayol yaradılsın?</string>
+    <string name="app_not_found">Bu işi görəcək heçbir tətbiq yoxdur</string>
+    <string name="reboot_apply_change">Dəyişikliklər təkrar başladıqdan sonra olacaq</string>
+    <string name="restore_app_confirmation">Gizli tətbiq əvvəlki halına qayıdacaq. Davam edilsin?</string>
+
+</resources>

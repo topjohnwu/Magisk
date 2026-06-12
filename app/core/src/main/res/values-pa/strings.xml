@@ -1,0 +1,198 @@
+<resources>
+
+    <!--Sections-->
+    <string name="modules">ਮੋਡੀਊਲ</string>
+    <string name="superuser">ਸੁਪਰਯੂਜ਼ਰ</string>
+    <string name="logs">ਲੋਗਜ਼</string>
+    <string name="settings">ਸੈਟਿੰਗਜ਼</string>
+    <string name="install">ਇੰਸਟਾਲ</string>
+    <string name="section_home">ਹੋਮ</string>
+    <string name="section_theme">ਥੀਮ</string>
+
+    <!--Home-->
+    <string name="no_connection">ਕੋਈ ਸੰਪਰਕ ਉਪਲਬਧ ਨਹੀਂ ਹੈ</string>
+    <string name="app_changelog">ਬਦਲਾਓ</string>
+    <string name="loading">ਲੋਡ ਹੋ ਰਿਹਾ ਹੈ</string>
+    <string name="update">ਅੱਪਡੇਟ</string>
+    <string name="not_available">N/A</string>
+    <string name="hide">ਓਹਲੇ</string>
+    <string name="home_package">ਪੈਕੇਜ</string>
+
+    <string name="home_support_title">ਸਾਡਾ ਸਮਰਥਨ ਕਰੋ</string>
+    <string name="home_item_source">ਸਰੋਤ</string>
+    <string name="home_support_content">ਮੈਜਿਸਕ ਮੁਫਤ ਅਤੇ ਖੁੱਲਾ ਸਰੋਤ ਹੈ, ਅਤੇ ਹਮੇਸ਼ਾਂ ਰਹੇਗਾ। ਹਾਲਾਂਕਿ, ਤੁਸੀਂ ਦਿਖਾ ਸਕਦੇ ਹੋ ਕਿ ਤੁਸੀਂ ਇੱਕ ਛੋਟਾ ਜਿਹਾ ਦਾਨ ਭੇਜ ਕੇ ਦੇਖਭਾਲ ਕਰਦੇ ਹੋ।</string>
+    <string name="home_installed_version">ਇੰਸਟਾਲਡ</string>
+    <string name="home_latest_version">ਨਵੀਨਤਮ</string>
+    <string name="invalid_update_channel">ਅਵੈਧ ਅਪਡੇਟ ਚੈਨਲ</string>
+    <string name="uninstall_magisk_title">ਮੈਜਿਸਕ ਨੂੰ ਅਣਇੰਸਟੌਲ ਕਰੋ</string>
+    <string name="uninstall_magisk_msg">ਸਾਰੇ ਮੋਡੀਊਲ ਅਯੋਗ/ਮਿਟਾ ਦਿੱਤੇ ਜਾਣਗੇ!\n ਰੂਟ ਨੂੰ ਹਟਾਇਆ ਜਾਏਗਾ!\n ਤੁਹਾਡਾ ਡਾਟਾ ਸੰਭਾਵਤ ਤੌਰ ਤੇ ਐਨਕ੍ਰਿਪਟ ਕੀਤਾ ਗਿਆ ਹੈ ਜੇ ਪਹਿਲਾਂ ਹੀ ਨਹੀਂ!</string>
+
+    <!--Install-->
+    <string name="keep_force_encryption">ਫੋਰਸ ਇਨਕ੍ਰਿਪਸ਼ਨ ਨੂੰ ਸੁਰੱਖਿਅਤ ਰੱਖੋ</string>
+    <string name="keep_dm_verity">AVB 2.0/dm-verity ਨੂੰ ਸੁਰੱਖਿਅਤ ਰੱਖੋ</string>
+    <string name="recovery_mode">ਰਿਕਵਰੀ ਮੋਡ</string>
+    <string name="install_options_title">ਚੋਣ</string>
+    <string name="install_method_title">ਤਰੀਕਾ</string>
+    <string name="install_next">ਅੱਗੇ</string>
+    <string name="install_start">ਤਾਂ ਆਓ ਸ਼ੁਰੂ ਕਰੀਏ!</string>
+    <string name="manager_download_install">ਡਾਊਨਲੋਡ ਅਤੇ ਇੰਸਟੌਲ ਕਰਨ ਲਈ ਦਬਾਓ</string>
+    <string name="direct_install">ਸਿੱਦਾ ਇੰਸਟਾਲ (ਸਿਫਾਰਸ਼ੀ)</string>
+    <string name="install_inactive_slot">ਨਾ-ਸਰਗਰਮ ਸਲਾਟ ਵਿੱਚ ਇੰਸਟਾਲ ਕਰੋ (OTA ਤੋਂ ਬਾਅਦ)</string>
+    <string name="install_inactive_slot_msg">ਤੁਹਾਡੀ ਡਿਵਾਈਸ ਨੂੰ ਮੁੜ ਚਾਲੂ ਹੋਣ ਤੋਂ ਬਾਅਦ ਮੌਜੂਦਾ ਨਿਸ਼ਕਿਰਿਆ ਨੰਬਰ ਤੇ ਬੂਟ ਕਰਨ ਲਈ ਮਜਬੂਰ ਕੀਤਾ ਜਾਏਗਾ!\n OTA ਪੂਰਾ ਹੋਣ ਤੋਂ ਬਾਅਦ ਹੀ ਇਸ ਵਿਕਲਪ ਦੀ ਵਰਤੋਂ ਕਰੋ।\n ਜਾਰੀ ਰੱਖਣਾ ਹੈ?</string>
+    <string name="setup_title">ਅਤਿਰਿਕਤ ਸੈਟਅਪ</string>
+    <string name="select_patch_file">ਇੱਕ ਫਾਈਲ ਚੁਣੋ ਅਤੇ ਪੈਚ ਕਰੋ</string>
+    <string name="patch_file_msg">ਇੱਕ ਰੋ ਛੱਞੀ ਨੂੰ (* .img) ਜਾਂ ਇੱਕ Odin tarfile (* .tar) ਦੀ ਚੋਣ ਕਰੋ</string>
+    <string name="reboot_delay_toast">5 ਸਕਿੰਟਾਂ ਵਿੱਚ ਰੀਬੂਟ ਹੋ ਰਿਹਾ ਹੈ …</string>
+    <string name="flash_screen_title">ਇੰਸਟਾਲੇਸ਼ਨ</string>
+
+    <!--Superuser-->
+    <string name="su_request_title">ਸੁਪਰਯੂਜ਼ਰ ਮੰਗ</string>
+    <string name="deny">ਇਨਕਾਰ ਕਰੋ</string>
+    <string name="prompt">ਸੰਕੇਤ ਦਿਖਾਓ</string>
+    <string name="grant">ਆਗਿਆ ਦਿਓ</string>
+    <string name="su_warning">ਇਹ ਤੁਹਾਡੀ ਡਿਵਾਈਸ ਤੇ ਪੂਰੀ ਪਹੁੰਚ ਦੀ ਆਗਿਆ ਦੇਵੇਗਾ,\n ਜੇ ਤੁਹਾਨੂੰ ਯਕੀਨ ਨਹੀਂ ਹੈ ਤਾਂ ਇਨਕਾਰ ਕਰੋ!</string>
+    <string name="forever">ਹਮੇਸ਼ਾ</string>
+    <string name="once">ਇਕ ਵਾਰ</string>
+    <string name="tenmin">10 ਮਿੰਟ</string>
+    <string name="twentymin">20 ਮਿੰਟ</string>
+    <string name="thirtymin">30 ਮਿੰਟ</string>
+    <string name="sixtymin">60 ਮਿੰਟ</string>
+    <string name="su_allow_toast"> %1$s ਨੂੰ ਸੁਪਰਯੂਜ਼ਰ ਅਧਿਕਾਰ ਦਿੱਤੇ ਗਏ ਸਨ</string>
+    <string name="su_deny_toast"> %1$s ਸੁਪਰਯੂਜ਼ਰ ਅਧਿਕਾਰਾਂ ਤੋਂ ਇਨਕਾਰ ਕੀਤਾ ਗਿਆ ਸੀ</string>
+    <string name="su_snack_grant"> %1$s ਨੂੰ ਸੁਪਰਯੂਜ਼ਰ ਅਧਿਕਾਰ ਦਿੱਤੇ ਗਏ ਸਨ</string>
+    <string name="su_snack_deny"> %1$s ਸੁਪਰ ਯੂਜ਼ਰ ਅਧਿਕਾਰਾਂ ਤੋਂ ਇਨਕਾਰ ਕੀਤਾ ਗਿਆ ਹੈ</string>
+    <string name="su_snack_notif_on"> %1$s ਦੀਆਂ ਸੂਚਨਾਵਾਂ ਯੋਗ ਹਨ</string>
+    <string name="su_snack_notif_off"> %1$s ਦੀਆਂ ਸੂਚਨਾਵਾਂ ਅਯੋਗ ਹਨ</string>
+    <string name="su_snack_log_on"> %1$s ਦੀਆਂ ਲੌਗਿੰਗ ਯੋਗ ਹਨ</string>
+    <string name="su_snack_log_off"> %1$s ਦੀਆਂ ਲੌਗਿੰਗ ਅਯੋਗ ਹਨ</string>
+    <string name="su_revoke_title">ਅਧਿਕਾਰ ਵਾਪਸ ਲਓ?</string>
+    <string name="su_revoke_msg"> %1$s ਦੇ ਅਧਿਕਾਰਾਂ ਨੂੰ ਰੱਦ ਕਰਨ ਦੀ ਪੁਸ਼ਟੀ ਕਰਦੇ ਹੋ?</string>
+    <string name="toast">ਪੌਪ-ਅੱਪ ਸੂਚਨਾ</string>
+    <string name="none">ਕੋਈ ਨਹੀਂ</string>
+
+    <string name="superuser_toggle_notification">ਸੂਚਨਾ</string>
+    <string name="superuser_toggle_revoke">ਅਧਿਕਾਰ ਵਾਪਸ ਲਓ</string>
+    <string name="superuser_policy_none">ਅਜੇ ਤੱਕ ਕਿਸੇ ਵੀ ਐਪ ਨੇ ਸੁਪਰਯੂਜ਼ਰ ਲਈ ਆਗਿਆ ਨਹੀਂ ਮੰਗੀ ਹੈ।</string>
+
+    <!--Logs-->
+    <string name="log_data_none">ਕੋਈ ਲੌਗਸ ਨਹੀਂ, ਆਪਣੀ ਸੁਪਰਯੂਜ਼ਰ ਸਮਰਥਿਤ ਐਪਲੀਕੇਸ਼ਨ ਨੂੰ ਹੋਰ ਵਰਤਣ ਦੀ ਕੋਸ਼ਿਸ਼ ਕਰੋ।</string>
+    <string name="log_data_magisk_none">ਮੈਜਿਸਕ ਲੌਗਸ ਖਾਲੀ ਹਨ, ਇਹ ਅਜੀਬ ਹੈ।</string>
+    <string name="menuSaveLog">ਲੌਗ ਸੇਵ ਕਰੋ</string>
+    <string name="menuClearLog">ਲੌਗ ਸਾਫ ਕਰੋ</string>
+    <string name="logs_cleared">ਲੌਗ ਸਫਲਤਾਪੂਰਕ ਸਾਫ ਹੋ ਗਏ ਹਨ।</string>
+    <string name="pid">PID: %1$d</string>
+    <string name="target_uid">ਟੀਚਾ UID: %1$d</string>
+
+    <!--SafetyNet-->
+
+    <!-- MagiskHide -->
+    <string name="show_system_app">ਸਿਸਟਮ ਐਪਸ ਦਿਖਾਓ</string>
+    <string name="show_os_app">OS ਐਪਲੀਕੇਸ਼ਨ ਦਿਖਾਓ</string>
+    <string name="hide_filter_hint">ਨਾਮ ਦੁਆਰਾ ਫਿਲਟਰ ਕਰੋ</string>
+    <string name="hide_search">ਖੋਜੋ</string>
+
+    <!--Module -->
+    <string name="no_info_provided">(ਕੋਈ ਜਾਣਕਾਰੀ ਨਹੀਂ ਦਿੱਤੀ ਗਈ)</string>
+    <string name="reboot_userspace">ਸਾਫਟ ਰੀਬੂਟ</string>
+    <string name="reboot_recovery">ਰਿਕਵਰੀ ਰੀਬੂਟ</string>
+    <string name="reboot_bootloader">ਬੂਟਲੋਡਰ ਰੀਬੂਟ</string>
+    <string name="reboot_download">ਡਾਊਨਲੋਡ ਮੋਡ ਰੀਬੂਟ</string>
+    <string name="reboot_edl">EDL ਰੀਬੂਟ</string>
+    <string name="module_version_author"> %2$s ਦੇ ਦੁਆਰਾ %1$s</string>
+    <string name="module_state_remove">ਹਟਾਓ</string>
+    <string name="module_state_restore">ਰੀਸਟੋਰ ਕਰੋ</string>
+    <string name="module_action_install_external">ਸਟੋਰੇਜ ਤੋਂ ਇੰਸਟਾਲ ਕਰੋ</string>
+    <string name="update_available">ਅਪਡੇਟ ਉਪਲੱਬਧ ਹੈ</string>
+
+    <!--Settings -->
+    <string name="settings_dark_mode_title">ਥੀਮ ਮੋਡ</string>
+    <string name="settings_dark_mode_message">ਕੋਈ ਥੀਮ ਚੁਣੋ ਜੋ ਤੁਹਾਡੀ ਸ਼ੈਲੀ ਦੇ ਅਨੁਕੂਲ ਹੋਵੇ!</string>
+    <string name="settings_dark_mode_light">ਹਮੇਸ਼ਾਂ ਚਿੱਟੇ ਰੰਗ ਦੀ</string>
+    <string name="settings_dark_mode_system">ਸਿਸਟਮ ਦੇ ਅਨੁਸਾਰ</string>
+    <string name="settings_dark_mode_dark">ਹਮੇਸ਼ਾ ਗਹਿਰੇ ਰੰਗ ਦੀ</string>
+    <string name="settings_download_path_title">ਡਾਊਨਲੋਡ ਮਾਰਗ</string>
+    <string name="settings_download_path_message">ਫਾਈਲਾਂ ਨੂੰ %1$s ਵਿੱਚ ਸੇਵ ਕੀਤਾ ਜਾਏਗਾ</string>
+    <string name="language">ਭਾਸ਼ਾ</string>
+    <string name="system_default">(ਸਿਸਟਮ ਡਿਫੌਲਟ)</string>
+    <string name="settings_check_update_title">ਚੈੱਕ ਅੱਪਡੇਟ</string>
+    <string name="settings_check_update_summary">ਸਮੇਂ-ਸਮੇਂ \'ਤੇ ਪਿਛੋਕੜ ਦੇ ਅਪਡੇਟਾਂ ਦੀ ਜਾਂਚ ਕਰੋ</string>
+    <string name="settings_update_channel_title">ਅਪਡੇਟ ਚੈਨਲ</string>
+    <string name="settings_update_stable">ਸਥਿਰ</string>
+    <string name="settings_update_beta">ਬੀਟਾ</string>
+    <string name="settings_update_custom">ਕਸਟਮ ਚੈਨਲ</string>
+    <string name="settings_update_custom_msg">ਇੱਕ ਕਸਟਮ URL ਦਾਖਲ ਕਰੋ</string>
+    <string name="settings_hosts_title">Systemless ਹੋਸਟ</string>
+    <string name="settings_hosts_summary">Adblock ਐਪਸ ਲਈ Systemless ਹੋਸਟ ਦੀ ਸਹਿਯੋਗ</string>
+    <string name="settings_hosts_toast">Systemless ਹੋਸਟ ਮੋਡੀਊਲ ਸ਼ਾਮਲ ਕੀਤਾ ਗਿਆ</string>
+    <string name="settings_app_name_hint">ਨਵਾਂ ਨਾਮ</string>
+    <string name="settings_app_name_helper">ਇਸ ਨਾਮ ਨਾਲ ਐਪ ਦੁਬਾਰਾ ਇੰਸਟਾਲ ਕੀਤਾ ਜਾਵੇਗਾ</string>
+    <string name="settings_app_name_error">ਗਲਤ ਫਾਰਮੈਟ</string>
+    <string name="settings_su_app_adb">ਐਪਸ ਅਤੇ ਐਡਬੀ</string>
+    <string name="settings_su_app">ਸਿਰਫ ਐਪਸ</string>
+    <string name="settings_su_adb">ਸਿਰਫ ਐਡਬੀ</string>
+    <string name="settings_su_disable">ਬੰਦ ਹੈ</string>
+    <string name="settings_su_request_10">10 ਸਕਿੰਟ</string>
+    <string name="settings_su_request_15">15 ਸਕਿੰਟ</string>
+    <string name="settings_su_request_20">20 ਸਕਿੰਟ</string>
+    <string name="settings_su_request_30">30 ਸਕਿੰਟ</string>
+    <string name="settings_su_request_45">45 ਸਕਿੰਟ</string>
+    <string name="settings_su_request_60">60 ਸਕਿੰਟ</string>
+    <string name="superuser_access">ਸੁਪਰਯੂਜ਼ਰ ਐਕਸੈਸ</string>
+    <string name="auto_response">ਆਟੋਮੈਟਿਕ ਜਵਾਬ</string>
+    <string name="request_timeout">ਬੇਨਤੀ ਦਾ ਸਮਾਂ ਸਮਾਪਤ</string>
+    <string name="superuser_notification">ਸੁਪਰਯੂਜ਼ਰ ਸੂਚਨਾ</string>
+    <string name="settings_su_reauth_title">ਅਪਗ੍ਰੇਡ ਹੋਣ ਤੋਂ ਬਾਅਦ ਪ੍ਰਮਾਣਿਕਤਾ</string>
+    <string name="settings_su_reauth_summary">ਇੱਕ ਐਪ ਦੇ ਅਪਡੇਟ ਹੋਣ ਤੋਂ ਬਾਅਦ ਸੁਪਰਯੂਜ਼ਰ ਆਗਿਆ ਪ੍ਰਮਾਣਿਤ ਕਰੋ</string>
+    <string name="settings_customization">ਕਸਟਮਾਈਜੇਸ਼ਨ</string>
+    <string name="setting_add_shortcut_summary">ਐਪ ਨੂੰ ਲੁਕਾਉਣ ਤੋਂ ਬਾਅਦ ਨਾਮ ਅਤੇ ਆਈਕਾਨ ਨੂੰ ਪਛਾਣਨਾ ਮੁਸ਼ਕਲ ਹੈ, ਤਾਂ ਹੋਮ ਸਕ੍ਰੀਨ ਵਿਚ ਇਕ ਸੁੰਦਰ ਸ਼ਾਰਟਕੱਟ ਸ਼ਾਮਲ ਕਰੋ</string>
+    <string name="settings_doh_title">DNS ਉੱਤੇ HTTPS</string>
+    <string name="settings_doh_description">ਕੁਝ ਦੇਸ਼ਾਂ ਵਿੱਚ ਚੱਲ ਰਹੇ DNS ਵਿਸ਼ਾਕਤਤਾ ਦਾ ਹੱਲ</string>
+
+    <string name="multiuser_mode">ਮਲਟੀ ਯੂਜ਼ਰ ਮੋਡ</string>
+    <string name="settings_owner_only">ਸਿਰਫ ਡਿਵਾਈਸ ਮਾਲਕ</string>
+    <string name="settings_owner_manage">ਡਿਵਾਈਸ ਮਾਲਕ ਦੁਆਰਾ ਪ੍ਰਬੰਧਿਤ</string>
+    <string name="settings_user_independent">ਸੁਤੰਤਰ ਉਪਭੋਗਤਾ</string>
+    <string name="owner_only_summary">ਸਿਰਫ ਮਾਲਕ ਕੋਲ ਰੂਟ ਐਕਸੈਸ ਹੈ</string>
+    <string name="owner_manage_summary">ਸਿਰਫ ਮਾਲਕ ਰੂਟ ਐਕਸੈਸ ਦਾ ਪ੍ਰਬੰਧ ਕਰ ਸਕਦੇ ਹਨ ਅਤੇ ਬੇਨਤੀ ਸਿਗਨਲ ਪ੍ਰਾਪਤ ਕਰ ਸਕਦੇ ਹਨ</string>
+    <string name="user_independent_summary">ਹਰੇਕ ਉਪਭੋਗਤਾ ਦਾ ਆਪਣਾ ਵੱਖਰਾ ਰੂਟ ਨਿਯਮ ਹੁੰਦਾ ਹੈ</string>
+
+    <string name="mount_namespace_mode">ਮਾਉਂਟ ਨੇਮਸਪੇਸ ਮੋਡ</string>
+    <string name="settings_ns_global">ਗਲੋਬਲ ਨੇਮਸਪੇਸ</string>
+    <string name="settings_ns_requester">ਇਨਹੇਰਟ ਨੇਮਸਪੇਸ</string>
+    <string name="settings_ns_isolate">ਆਈਸੋਲੇਟਿਡ ਨੇਮਸਪੇਸ</string>
+    <string name="global_summary">ਸਾਰੇ ਰੂਟ ਸੈਸ਼ਨ ਗਲੋਬਲ ਨੇਮਸਪੇਸ ਦੀ ਵਰਤੋਂ ਕਰਦੇ ਹਨ</string>
+    <string name="requester_summary">ਰੂਟ ਸੈਸ਼ਨ ਨਾਮਸਪੇਸ ਬੇਨਤੀਆਂ ਨੂੰ ਪ੍ਰਾਪਤ ਕਰਨਗੇ</string>
+    <string name="isolate_summary">ਹਰੇਕ ਰੂਟ ਸੈਸ਼ਨ ਦਾ ਆਪਣਾ ਵੱਖਰਾ ਨਾਮਸਪੇਸ ਹੋਵੇਗਾ</string>
+
+    <!--Notifications-->
+    <string name="update_channel">ਮੈਜਿਸਕ ਅਪਡੇਟ</string>
+    <string name="progress_channel">ਤਰੱਕੀ ਦੀਆਂ ਸੂਚਨਾਵਾਂ</string>
+    <string name="download_complete">ਡਾਊਨਲੋਡ ਪੂਰਾ</string>
+    <string name="download_file_error">ਫਾਈਲ ਡਾਊਨਲੋਡ ਕਰਨ ਦੌਰਾਨ ਗਲਤੀ</string>
+    <string name="magisk_update_title">ਮੈਜਿਸਕ ਅਪਡੇਟ ਉਪਲੱਬਧ!</string>
+
+    <!--Toasts, Dialogs-->
+    <string name="yes">ਹਾਂ</string>
+    <string name="no">ਨਹੀਂ</string>
+    <string name="repo_install_title">ਇੰਸਟਾਲ %1$s %2$s(%3$d)</string>
+    <string name="download">ਡਾਊਨਲੋਡ</string>
+    <string name="reboot">ਰੀਬੂਟ</string>
+    <string name="release_notes">ਰੀਲਿਜ਼ ਨੋਟਿਸ</string>
+    <string name="flashing">ਫਲੈਸ਼ਿੰਗ …</string>
+    <string name="done">ਸਫਲ ਹੋਇਆ!</string>
+    <string name="failure">ਅਸਫਲ ਹੋਇਆ</string>
+    <string name="open_link_failed_toast">ਲਿੰਕ ਖੋਲ੍ਹਣ ਲਈ ਕੋਈ ਐਪਲੀਕੇਸ਼ਨ ਨਹੀਂ ਮਿਲੀ</string>
+    <string name="complete_uninstall">ਪੂਰੀ ਤਰ੍ਹਾਂ ਅਣਇੰਸਟੌਲ ਕਰੋ</string>
+    <string name="restore_img">ਇਮੇਜ ਰਿਸਟੋਰ ਕਰੋ</string>
+    <string name="restore_img_msg">ਰਿਸਟੋਰ ਹੋ ਰਿਹਾ ਹੈ …</string>
+    <string name="restore_done">रिस्टोर ਸਫਲ ਹੋਇਆ!</string>
+    <string name="restore_fail">ਸਟਾਕ ਬੈਕਅਪ ਮੌਜੂਦ ਨਹੀਂ ਹੈ!</string>
+    <string name="setup_fail">ਸੈਟਅਪ ਅਸਫਲ ਹੋਇਆ</string>
+    <string name="env_fix_title">ਵਾਧੂ ਸੈਟਅਪ ਚਾਹੀਦਾ ਹੈ</string>
+    <string name="setup_msg">ਵਾਤਾਵਰਣ ਸੈਟਅਪ ਚੱਲ ਰਿਹਾ ਹੈ …</string>
+    <string name="unsupport_magisk_title">ਗ਼ੈਰ ਮੈਜਿਸਕ ਵਰਜਨ</string>
+    <string name="external_rw_permission_denied">ਇਸ ਦੀ ਵਰਤੋਂ ਕਰਨ ਲਈ ਸਟੋਰੇਜ ਦੀ ਆਗਿਆ ਦਿਓ</string>
+    <string name="add_shortcut_title">ਹੋਮਸਕ੍ਰੀਨ \'ਤੇ ਸ਼ਾਰਟਕੱਟ ਸ਼ਾਮਲ ਕਰੋ</string>
+    <string name="app_not_found">ਇਸ ਐਕਸ਼ਨ ਨੂੰ ਸੰਭਾਲਣ ਲਈ ਕੋਈ ਐਪਲੀਕੇਸ਼ਨ ਨਹੀਂ ਮਿਲੀ</string>
+
+</resources>
