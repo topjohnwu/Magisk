@@ -21,7 +21,7 @@ macro_rules! match_patterns {
             let b = $buf.get_unchecked(len..);
             if !b.is_empty() && b[0] == b'=' {
                 for c in b.iter() {
-                    if b" \n\0".contains(c) {
+                    if b" \n,\0".contains(c) {
                         break;
                     }
                     len += 1;
