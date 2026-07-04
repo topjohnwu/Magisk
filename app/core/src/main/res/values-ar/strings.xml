@@ -1,7 +1,7 @@
 <resources>
 
     <!--Sections-->
-    <string name="modules">إضافات</string>
+    <string name="modules">الإضافات</string>
     <string name="superuser">صلاحية الروت</string>
     <string name="logs">السجلات</string>
     <string name="settings">الإعدادات</string>
@@ -51,14 +51,14 @@
     <string name="direct_install_summary">تثبيت Magisk مباشرةً على قسم الإقلاع</string>
     <string name="install_inactive_slot">التثبيت على الفتحة غير النشطة (بعد OTA)</string>
     <string name="install_inactive_slot_summary">التثبيت على الفتحة غير النشطة بعد تحديث OTA</string>
-    <string name="select_patch_file_summary">تصحيح ملف صورة خام أو ملف ODIN tar أو payload.bin</string>
+    <string name="select_patch_file_summary">تصحيح ملف النظام أو ملف ODIN tar أو payload.bin</string>
     <string name="install_inactive_slot_msg">سيُجبَر جهازك على الإقلاع من الفتحة غير النشطة الحالية بعد إعادة التشغيل!\nاستخدم هذا الخيار فقط بعد اكتمال تحديث OTA.\nهل تريد المتابعة؟</string>
     <string name="setup_title">إعداد إضافي</string>
     <string name="select_patch_file">تحديد ملف وتصحيحه</string>
-    <string name="patch_file_msg">حدد صورة خام (‎*.img) أو ملف ODIN tar (‎*.tar) أو ملف payload.bin (‎*.bin)</string>
-    <string name="download_patch_file">تنزيل ملف وتصحيحه</string>
-    <string name="download_dialog_title">أدخل رابط الصورة</string>
-    <string name="download_dialog_msg">صورة OTA كاملة أو صورة المصنع</string>
+    <string name="patch_file_msg">حدد ملف خام (‎*.img) أو ملف ODIN tar (‎*.tar) أو ملف payload.bin (‎*.bin)</string>
+    <string name="download_patch_file">تنزيل ملف وتعديله</string>
+    <string name="download_dialog_title">أدخل رابط الملف</string>
+    <string name="download_dialog_msg">ملف OTA كاملة أو ملف المصنع</string>
     <string name="reboot_delay_toast">إعادة التشغيل خلال 5 ثوانٍ…</string>
     <string name="flash_screen_title">التثبيت</string>
 
@@ -66,7 +66,7 @@
     <string name="su_request_title">يطلب هذا التطبيق صلاحية الروت، يمنح وصولًا كاملًا إلى جهازك. ارفض إن لم تكن متأكدًا!</string>
     <string name="touch_filtered_warning">يحجب أحد التطبيقات طلب صلاحية الروت، لذا لا يستطيع Magisk التحقق من استجابتك.</string>
     <string name="deny">رفض</string>
-    <string name="prompt">استفسار</string>
+    <string name="prompt">اسأل</string>
     <string name="restrict">تقييد</string>
     <string name="grant">منح</string>
     <string name="su_warning">يمنح وصولًا كاملًا إلى جهازك.\nارفض إن لم تكن متأكدًا!</string>
@@ -76,16 +76,16 @@
     <string name="twentymin">20 دقيقة</string>
     <string name="thirtymin">30 دقيقة</string>
     <string name="sixtymin">60 دقيقة</string>
-    <string name="su_allow_toast">تم منح %1$s صلاحيات صلاحية الروت</string>
-    <string name="su_deny_toast">تم رفض صلاحيات صلاحية الروت لـ %1$s</string>
-    <string name="su_snack_grant">تم منح صلاحيات صلاحية الروت لـ %1$s</string>
-    <string name="su_snack_deny">تم رفض صلاحيات صلاحية الروت لـ %1$s</string>
+    <string name="su_allow_toast">تم منح %1$s صلاحيات الروت</string>
+    <string name="su_deny_toast">تم رفض صلاحيات الروت لـ %1$s</string>
+    <string name="su_snack_grant">تم منح صلاحيات الروت لـ %1$s</string>
+    <string name="su_snack_deny">تم رفض صلاحيات الروت لـ %1$s</string>
     <string name="su_snack_notif_on">تم تفعيل إشعارات %1$s</string>
     <string name="su_snack_notif_off">تم تعطيل إشعارات %1$s</string>
     <string name="su_snack_log_on">تم تفعيل تسجيل %1$s</string>
     <string name="su_snack_log_off">تم تعطيل تسجيل %1$s</string>
     <string name="su_revoke_title">سحب الصلاحية؟</string>
-    <string name="su_revoke_msg">تأكيد سحب صلاحيات صلاحية الروت من %1$s</string>
+    <string name="su_revoke_msg">تأكيد سحب صلاحيات الروت من %1$s</string>
     <string name="toast">إشعار منبثق</string>
     <string name="notification">إشعار</string>
     <string name="none">بدون</string>
@@ -94,7 +94,7 @@
     <string name="su_notification_denied_title">تم رفض صلاحية الروت</string>
     <string name="superuser_toggle_notification">الإشعارات</string>
     <string name="superuser_toggle_revoke">سحب الصلاحية</string>
-    <string name="superuser_policy_none">لم يطلب أي تطبيق صلاحيات صلاحية الروت بعد.</string>
+    <string name="superuser_policy_none">لم يطلب أي تطبيق صلاحيات الروت بعد.</string>
 
     <!--Logs-->
     <string name="log_data_none">لا توجد سجلات. جرّب استخدام تطبيقات الروت أكثر.</string>
@@ -226,12 +226,12 @@
     <string name="owner_manage_summary">مالك الجهاز فقط يستطيع إدارة الروت واستقبال طلبات الصلاحية</string>
     <string name="user_independent_summary">لكل مستخدم قواعد وصول جذري خاصة به</string>
     <string name="mount_namespace_mode">وضع فضاء أسماء التحميل</string>
-    <string name="settings_ns_global">فضاء أسماء عام</string>
-    <string name="settings_ns_requester">توارث فضاء الأسماء</string>
-    <string name="settings_ns_isolate">فضاء أسماء معزول</string>
+    <string name="settings_ns_global">فضاء global namespace</string>
+    <string name="settings_ns_requester">توارث namespace</string>
+    <string name="settings_ns_isolate">namespace معزول</string>
     <string name="global_summary">تستخدم جميع جلسات الروت public namespace للتحميل</string>
-    <string name="requester_summary">ترث جلسات الجذر فضاء أسماء الطرف الطالب</string>
-    <string name="isolate_summary">لكل جلسة جذر فضاء أسماء معزول خاص بها</string>
+    <string name="requester_summary">ترث جلسات الروت طالب ال namespace</string>
+    <string name="isolate_summary">لكل جلسة روت namespace معزول خاص بها</string>
 
     <!--Notifications-->
     <string name="update_channel">تحديثات Magisk</string>
@@ -251,7 +251,7 @@
     <string name="reboot">إعادة التشغيل</string>
     <string name="close">إغلاق</string>
     <string name="release_notes">ملاحظات الإصدار</string>
-    <string name="flashing">جارٍ الكتابة…</string>
+    <string name="flashing">جارٍ التثبيت…</string>
     <string name="running">جارٍ التنفيذ…</string>
     <string name="done">تم!</string>
     <string name="done_action">اكتمل تنفيذ إجراء %1$s</string>
@@ -259,7 +259,7 @@
     <string name="hide_app_title">جارٍ إخفاء تطبيق Magisk…</string>
     <string name="open_link_failed_toast">لا يوجد تطبيق لفتح الرابط</string>
     <string name="complete_uninstall">إلغاء تثبيت كامل</string>
-    <string name="restore_img">استعادة الصور</string>
+    <string name="restore_img">استعادة الملف</string>
     <string name="restore_img_msg">جارٍ الاستعادة…</string>
     <string name="restore_done">اكتملت الاستعادة!</string>
     <string name="restore_fail">لا تتوفر نسخة احتياطية أصلية!</string>
