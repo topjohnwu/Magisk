@@ -273,7 +273,7 @@ fn dtb_patch(file: &Utf8CStr) -> LoggedResult<bool> {
                         let w = unsafe {
                             &mut *std::mem::transmute::<&[u8], &UnsafeCell<[u8]>>(w).get()
                         };
-                        w[..=4].copy_from_slice(b"want");
+                        w[..4].copy_from_slice(b"want");
                         eprintln!("Patch [skip_initramfs] -> [want_initramfs] in dtb.{n:04}");
                         patched = true;
                     }
