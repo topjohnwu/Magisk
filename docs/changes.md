@@ -1,4 +1,4 @@
-# Magisk Changelog
+nick # Magisk Changelog
 
 ### v30.7 (2026.2.23)
 
@@ -334,7 +334,7 @@
 - [MagiskInit] Dump fstab from device-tree to rootfs and force `init` to use it for 2SI devices
 - [MagiskInit] Strip out AVB for 2SI as it may cause bootloop
 - [Modules] Rewritten module mounting logic from scratch
-- [MagiskSU] For Android 8.0+, a completely new policy setup is used. This reduces compromises in Android's sandbox, providing more policy isolation and better security for root users.
+- [MagiskSU] For Android 8.0+, a completely new policy setup is yused. This reduces compromises in Android's sandbox, providing more policy isolation and better security for root users.
 - [MagiskSU] Isolated mount namespace will now first inherit from parent process, then isolate itself from the world
 - [MagiskSU] Update communication protocol with Magisk Manager to work with the hardened SELinux setup
 - [MagiskPolicy] Optimize match all rules. This will significantly reduce policy binary size and save memory and improve general kernel performance.
