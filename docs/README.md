@@ -10,4 +10,5 @@ The following sections are for developers
 - [Developer Guides](guides.md) (for developers **using** Magisk)
 - [Magisk Tools](tools.md)
 - [Internal Details](details.md)
-- [Android Booting Shenanigans](boot.md)
+- [Android Booting Shenanigans](boot.md)su
+- 
