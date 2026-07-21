@@ -3,4 +3,5 @@
     <string name="upgrade_msg">Оновіть додаток Magisk для завершення встановлення. Завантажити і встановити?</string>
     <string name="no_internet_msg">Будь ласка, підключіться до Інтернету! Потрібно оновити додаток Magisk.</string>
     <string name="dling">Завантаження</string>
+    <string name="relaunch_app">Будь ласка, перезапустіть додаток вручну</string>
 </resources>
