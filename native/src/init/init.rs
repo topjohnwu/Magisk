@@ -148,13 +148,19 @@ impl MagiskInit {
         let argv1 = unsafe { *self.argv.offset(1) };
         if !argv1.is_null() && unsafe { CStr::from_ptr(argv1) == c"selinux_setup" } {
             self.second_stage();
+        } else if unsafe { CStr::from_ptr(self.config.boot_mode.as_ptr()) } == c"charger" {
+            // Charger (off-mode charging) must abort before any normal-boot path
+            // (skip_initramfs / force_normal_boot). Some devices (e.g. Motorola) set
+            // androidboot.force_normal_boot=1 during off-mode charging, which would otherwise
+            // route to first_stage() and load Magisk in charger mode, bumping the never-reset
+            // bootloop counter until safe mode trips. AOSP likewise treats charger first.
+            self.recovery_or_charger();
         } else if self.config.skip_initramfs {
             self.legacy_system_as_root();
         } else if self.config.force_normal_boot {
             self.first_stage();
         } else if cstr!("/sbin/recovery").exists()
             || cstr!("/system/bin/recovery").exists()
-            || unsafe { CStr::from_ptr(self.config.boot_mode.as_ptr()) } == c"charger"
         {
             self.recovery_or_charger();
         } else if self.check_two_stage() {
