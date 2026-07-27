@@ -282,6 +282,9 @@ int add_list(int client) {
 }
 
 static int rm_list(const char *pkg, const char *proc) {
+    if (!validate(pkg, proc))
+        return DenyResponse::INVALID_PKG;
+
     {
         mutex_guard lock(data_lock);
         if (!ensure_data())
