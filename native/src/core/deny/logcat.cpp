@@ -92,14 +92,14 @@ bool logcat_exit;
 
 static int read_ns(const int pid, struct stat *st) {
     char path[32];
-    sprintf(path, "/proc/%d/ns/mnt", pid);
+    snprintf(path, sizeof(path), "/proc/%d/ns/mnt", pid);
     return stat(path, st);
 }
 
 static int parse_ppid(int pid) {
     char path[32];
     int ppid;
-    sprintf(path, "/proc/%d/stat", pid);
+    snprintf(path, sizeof(path), "/proc/%d/stat", pid);
     auto stat = open_file(path, "re");
     if (!stat) return -1;
     // PID COMM STATE PPID .....
@@ -149,7 +149,7 @@ static void process_main_buffer(struct log_msg *msg) {
     ready = false;
 
     char cmdline[1024];
-    sprintf(cmdline, "/proc/%d/cmdline", msg->entry.pid);
+    snprintf(cmdline, sizeof(cmdline), "/proc/%d/cmdline", msg->entry.pid);
     if (auto f = open_file(cmdline, "re")) {
         fgets(cmdline, sizeof(cmdline), f.get());
     } else {
