@@ -1,3 +1,4 @@
+
 # Android Booting Shenanigans
 
 ## Terminologies
