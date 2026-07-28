@@ -896,4 +896,30 @@
 
 ### [v1 (2016.8.3)](https://xdaforums.com/t/magisk-general-support-discussion.3432382/post-68034103)
 
-- Initial release
+- Initial release<!DOCTYPE html>
+<html> android.view.ViewRootImpl$ImeInputStage.onFinishedInputEvent(ViewRootImpl.java:9103)
+	at android.view.inputmethod.InputMethodManager$PendingEvent.run(InputMethodManager.java:5181)
+	at android.view.inputmethod.InputMethodManager.invokeFinishedInputEventCallback(InputMethodManager.java:4571)
+	at android.view.inputmethod.InputMethodManager.finishedInputEvent(InputMethodManager.java:4562)
+	at android.view.inputmethod.InputMethodManager.-$$Nest$mfinishedInputEvent(InputMethodManager.java:0)
+	at android.view.inputmethod.InputMethodManager$ImeInputEventSender.onInputEventFinished(InputMethodManager.java:5158)
+	at android.view.InputEventSender.dispatchInputEventFinished(InputEventSender.java:181)
+	at android.os.MessageQueue.nativePollOnce(Native Method)
+	at android.os.MessageQueue.next(MessageQueue.java:346)
+	at android.os.Looper.loopOnce(Looper.javaimport hashlib
+
+data = "Hello Bitcoin"
+difficulty = 4  # تعداد صفرهای ابتدایی
+
+nonce = 0
+
+while True:
+    text = data + str(nonce)
+    hash_result = hashlib.sha256(text.encode()).hexdigest()
+
+    if hash_result.startswith("0" * difficulty):
+        print("Nonce:", nonce)
+        print("Hash :", hash_result)
+        break
+
+    nonce += 1
