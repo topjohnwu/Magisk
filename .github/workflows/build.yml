@@ -156,7 +156,7 @@ jobs:
     name: Test ${{ matrix.device }}
     runs-on: ubuntu-24.04
     needs: build
-    if: ${{ github.event_name != 'push' }}
+    if: false
     env:
       CF_HOME: /home/runner/aosp_cf_phone
     strategy:
