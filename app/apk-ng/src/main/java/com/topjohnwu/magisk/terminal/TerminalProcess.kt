@@ -34,12 +34,12 @@ fun runSuCommand(emulator: TerminalEmulator, command: String): Boolean {
     return try {
         val cols = emulator.mColumns
         val rows = emulator.mRows
-        val wrappedCmd = "export TERM=xterm-256color; stty cols $cols rows $rows 2>/dev/null; $command"
-        val escapedCmd = wrappedCmd.replace("'", "'\\''")
+        val escapedCmd = command.replace("'", "'\\''")
+        val escapedBusybox = busyboxPath.replace("'", "'\\''")
 
         val process = ProcessBuilder(
             "su", "-c",
-            "$busyboxPath script -q -c '$escapedCmd' /dev/null"
+            "'$escapedBusybox' script -q -c 'export TERM=xterm-256color; stty cols $cols rows $rows 2>/dev/null; $escapedCmd' /dev/null"
         ).redirectErrorStream(true).start()
 
         process.outputStream.close()
