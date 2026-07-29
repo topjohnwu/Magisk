@@ -17,6 +17,7 @@ import com.topjohnwu.magisk.core.tasks.MagiskInstaller
 import com.topjohnwu.magisk.core.utils.RootUtils
 import com.topjohnwu.superuser.CallbackList
 import com.topjohnwu.superuser.Shell
+import com.topjohnwu.superuser.ShellUtils
 import com.topjohnwu.superuser.nio.ExtendedFile
 import kotlinx.coroutines.runBlocking
 import org.apache.commons.compress.archivers.zip.ZipFile
@@ -39,15 +40,22 @@ class Environment : BaseTest {
         @JvmStatic
         fun before() = BaseTest.prerequisite()
 
+        // Whether we're running with live setup (patches through live_setup.sh)
+        fun isLiveSetup(): Boolean {
+            val liveMarker = ShellUtils.fastCmd("echo \$MAGISKTMP/.magisk/live")
+            return RootUtils.fs.getFile(liveMarker).exists()
+        }
+
         // The kernel running on emulators < API 26 does not play well with
         // magic mount. Skip mount_test on those legacy platforms.
         fun mount(): Boolean {
             return Build.VERSION.SDK_INT >= 26
         }
 
-        // It is possible that there are no suitable preinit partition to use
+        // It is possible that there are no suitable preinit partition to use.
+        // We also skip this test when running within a live setup.
         fun preinit(): Boolean {
-            return Shell.cmd("magisk --preinit-device").exec().isSuccess
+            return !isLiveSetup() && Shell.cmd("magisk --preinit-device").exec().isSuccess
         }
 
         fun lsposed(): Boolean {

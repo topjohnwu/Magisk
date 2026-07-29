@@ -149,6 +149,8 @@ mkdir -p $MAGISKTMP/.magisk/worker
 mount_tmpfs $MAGISKTMP/.magisk/worker
 mount --make-private $MAGISKTMP/.magisk/worker
 touch $MAGISKTMP/.magisk/config
+# Create a marker file to understand it is a live setup
+touch $MAGISKTMP/.magisk/live
 
 export MAGISKTMP
 MAKEDEV=1 $MAGISKTMP/magisk --preinit-device 2>&1

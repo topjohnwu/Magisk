@@ -259,6 +259,28 @@ dl_main() {
   dl_emu "$avd_pkg"
 }
 
+live_test_main() {
+  local apks=($(print_apks "$@"))
+  for apk in "${apks[@]}"; do
+    # Cleanup
+    adb shell pm uninstall com.topjohnwu.magisk || true
+    adb shell pm uninstall repackaged.com.topjohnwu.magisk.test || true
+    adb shell /system/xbin/su 0 rm -rf /data/adb/modules
+
+    # "Install" Magisk
+    ./build.py -v emulator $apk
+    timeout $boot_timeout bash -c wait_for_boot
+
+    run_setup $apk
+
+    # Trigger Magisk soft reboot
+    ./build.py -v emulator $apk
+    timeout $boot_timeout bash -c wait_for_boot
+
+    run_tests
+  done
+}
+
 case "$1" in
   test )
     shift
@@ -266,6 +288,12 @@ case "$1" in
     export -f wait_for_boot
     set -x
     test_main "$@"
+    ;;
+  live-test )
+    shift
+    export -f wait_for_boot
+    set -x
+    live_test_main "$@"
     ;;
   run )
     shift
