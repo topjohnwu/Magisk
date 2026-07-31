@@ -95,26 +95,14 @@ impl MagiskD {
         // Check user root access settings
         match cfg.root_access {
             RootAccess::Disabled => return false,
-            RootAccess::AppsOnly => {
-                if uid == AID_SHELL {
-                    return false;
-                }
-            }
-            RootAccess::AdbOnly => {
-                if uid != AID_SHELL {
-                    return false;
-                }
-            }
+            RootAccess::AppsOnly if uid == AID_SHELL => return false,
+            RootAccess::AdbOnly if uid != AID_SHELL => return false,
             _ => {}
         }
 
         // Check multiuser settings
         match cfg.multiuser_mode {
-            MultiuserMode::OwnerOnly => {
-                if to_user_id(uid) != 0 {
-                    return false;
-                }
-            }
+            MultiuserMode::OwnerOnly if to_user_id(uid) != 0 => return false,
             MultiuserMode::OwnerManaged => uid = to_app_id(uid),
             _ => {}
         }
