@@ -252,17 +252,13 @@ impl MagiskD {
                     warn!("Root access is disabled!");
                     return Ok(Arc::new(SuInfo::deny(uid)));
                 }
-                RootAccess::AdbOnly => {
-                    if uid != AID_SHELL {
-                        warn!("Root access limited to ADB only!");
-                        return Ok(Arc::new(SuInfo::deny(uid)));
-                    }
+                RootAccess::AdbOnly if uid != AID_SHELL => {
+                    warn!("Root access limited to ADB only!");
+                    return Ok(Arc::new(SuInfo::deny(uid)));
                 }
-                RootAccess::AppsOnly => {
-                    if uid == AID_SHELL {
-                        warn!("Root access is disabled for ADB!");
-                        return Ok(Arc::new(SuInfo::deny(uid)));
-                    }
+                RootAccess::AppsOnly if uid == AID_SHELL => {
+                    warn!("Root access is disabled for ADB!");
+                    return Ok(Arc::new(SuInfo::deny(uid)));
                 }
                 _ => {}
             };

@@ -195,13 +195,13 @@ impl MagiskD {
         let mut state = self.boot_stage_lock.lock();
 
         match code {
-            RequestCode::POST_FS_DATA => {
-                if check_data() && !state.contains(BootState::PostFsDataDone) {
-                    if self.post_fs_data() {
-                        state.insert(BootState::SafeMode);
-                    }
-                    state.insert(BootState::PostFsDataDone);
+            RequestCode::POST_FS_DATA
+                if check_data() && !state.contains(BootState::PostFsDataDone) =>
+            {
+                if self.post_fs_data() {
+                    state.insert(BootState::SafeMode);
                 }
+                state.insert(BootState::PostFsDataDone);
             }
             RequestCode::LATE_START => {
                 drop(client);
