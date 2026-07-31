@@ -35,6 +35,92 @@ pub enum Token<'a> {
     ID(&'a str),
 }
 
+pub enum PolicyStatement<'a> {
+    Allow {
+        src: Vec<&'a str>,
+        target: Vec<&'a str>,
+        class: Vec<&'a str>,
+        perm: Vec<&'a str>,
+    },
+    Deny {
+        src: Vec<&'a str>,
+        target: Vec<&'a str>,
+        class: Vec<&'a str>,
+        perm: Vec<&'a str>,
+    },
+    AuditAllow {
+        src: Vec<&'a str>,
+        target: Vec<&'a str>,
+        class: Vec<&'a str>,
+        perm: Vec<&'a str>,
+    },
+    DontAudit {
+        src: Vec<&'a str>,
+        target: Vec<&'a str>,
+        class: Vec<&'a str>,
+        perm: Vec<&'a str>,
+    },
+    AllowXperm {
+        src: Vec<&'a str>,
+        target: Vec<&'a str>,
+        class: Vec<&'a str>,
+        xperm: Vec<Xperm>,
+    },
+    AuditAllowXperm {
+        src: Vec<&'a str>,
+        target: Vec<&'a str>,
+        class: Vec<&'a str>,
+        xperm: Vec<Xperm>,
+    },
+    DontAuditXperm {
+        src: Vec<&'a str>,
+        target: Vec<&'a str>,
+        class: Vec<&'a str>,
+        xperm: Vec<Xperm>,
+    },
+    Permissive {
+        type_: Vec<&'a str>,
+    },
+    Enforce {
+        type_: Vec<&'a str>,
+    },
+    TypeAttribute {
+        type_: Vec<&'a str>,
+        attr: Vec<&'a str>,
+    },
+    Type {
+        type_: &'a str,
+        attr: Vec<&'a str>,
+    },
+    Attribute {
+        attr: &'a str,
+    },
+    TypeTransition {
+        src: &'a str,
+        target: &'a str,
+        class: &'a str,
+        default: &'a str,
+        object: &'a str,
+    },
+    TypeChange {
+        src: &'a str,
+        target: &'a str,
+        class: &'a str,
+        default: &'a str,
+    },
+    TypeMember {
+        src: &'a str,
+        target: &'a str,
+        class: &'a str,
+        default: &'a str,
+    },
+    GenfsCon {
+        fs_name: &'a str,
+        path: &'a str,
+        context: &'a str,
+    },
+}
+
 type Tokens<'a> = Peekable<IntoIter<Token<'a>>>;
 type ParseResult<'a, T> = Result<T, ParseError<'a>>;
 
@@ -120,7 +206,8 @@ fn parse_sterm<'a>(tokens: &mut Tokens<'a>) -> ParseResult<'a, Vec<&'a str>> {
 }
 
 fn parse_xperm_hex(s: &str) -> Option<u16> {
-    s.strip_prefix("0x").and_then(|s| u16::from_str_radix(s, 16).ok())
+    s.strip_prefix("0x")
+        .and_then(|s| u16::from_str_radix(s, 16).ok())
 }
 
 fn parse_xperm_range(s: &str) -> Option<(u16, u16)> {
@@ -294,6 +381,217 @@ fn tokenize_statement(statement: &str) -> Vec<Token<'_>> {
     tokens
 }
 
+// statement ::= AL sterm(s) sterm(t) sterm(c) sterm(p) { PolicyStatement::Allow };
+// statement ::= DN sterm(s) sterm(t) sterm(c) sterm(p) { PolicyStatement::Deny };
+// statement ::= AA sterm(s) sterm(t) sterm(c) sterm(p) { PolicyStatement::AuditAllow };
+// statement ::= DA sterm(s) sterm(t) sterm(c) sterm(p) { PolicyStatement::DontAudit };
+// statement ::= AX sterm(s) sterm(t) sterm(c) ID(i) xperms(p) { PolicyStatement::AllowXperm };
+// statement ::= AY sterm(s) sterm(t) sterm(c) ID(i) xperms(p) { PolicyStatement::AuditAllowXperm };
+// statement ::= DX sterm(s) sterm(t) sterm(c) ID(i) xperms(p) { PolicyStatement::DontAuditXperm };
+// statement ::= PM sterm(t) { PolicyStatement::Permissive };
+// statement ::= EF sterm(t) { PolicyStatement::Enforce };
+// statement ::= TA term(t) term(a) { PolicyStatement::TypeAttribute };
+// statement ::= TY ID(t) { PolicyStatement::Type };
+// statement ::= TY ID(t) term(a) { PolicyStatement::Type };
+// statement ::= AT ID(t) { PolicyStatement::Attribute };
+// statement ::= TT ID(s) ID(t) ID(c) ID(d) { PolicyStatement::TypeTransition };
+// statement ::= TT ID(s) ID(t) ID(c) ID(d) ID(o) { PolicyStatement::TypeTransition };
+// statement ::= TC ID(s) ID(t) ID(c) ID(d) { PolicyStatement::TypeChange };
+// statement ::= TM ID(s) ID(t) ID(c) ID(d) { PolicyStatement::TypeMember };
+// statement ::= GF ID(s) ID(t) ID(c) { PolicyStatement::GenfsCon };
+fn parse_statement_tokens<'a>(tokens: &mut Tokens<'a>) -> ParseResult<'a, PolicyStatement<'a>> {
+    let action = match tokens.next() {
+        Some(token) => token,
+        _ => Err(ParseError::ShowHelp)?,
+    };
+    let check_additional_args = |tokens: &mut Tokens<'a>| {
+        if tokens.peek().is_none() {
+            Ok(())
+        } else {
+            Err(ParseError::General)
+        }
+    };
+    match action {
+        Token::AL | Token::DN | Token::AA | Token::DA => {
+            let result = || -> ParseResult<PolicyStatement<'a>> {
+                let src = parse_sterm(tokens)?;
+                let target = parse_sterm(tokens)?;
+                let class = parse_sterm(tokens)?;
+                let perm = parse_sterm(tokens)?;
+                check_additional_args(tokens)?;
+                let stmt = match action {
+                    Token::AL => PolicyStatement::Allow {
+                        src,
+                        target,
+                        class,
+                        perm,
+                    },
+                    Token::DN => PolicyStatement::Deny {
+                        src,
+                        target,
+                        class,
+                        perm,
+                    },
+                    Token::AA => PolicyStatement::AuditAllow {
+                        src,
+                        target,
+                        class,
+                        perm,
+                    },
+                    Token::DA => PolicyStatement::DontAudit {
+                        src,
+                        target,
+                        class,
+                        perm,
+                    },
+                    _ => unreachable!(),
+                };
+                Ok(stmt)
+            }();
+            result.map_err(|_| ParseError::AvtabAv(action))
+        }
+        Token::AX | Token::AY | Token::DX => {
+            let result = || -> ParseResult<PolicyStatement<'a>> {
+                let src = parse_sterm(tokens)?;
+                let target = parse_sterm(tokens)?;
+                let class = parse_sterm(tokens)?;
+                match_string(tokens, "ioctl")?;
+                let xperm = parse_xperms(tokens)?;
+                check_additional_args(tokens)?;
+                let stmt = match action {
+                    Token::AX => PolicyStatement::AllowXperm {
+                        src,
+                        target,
+                        class,
+                        xperm,
+                    },
+                    Token::AY => PolicyStatement::AuditAllowXperm {
+                        src,
+                        target,
+                        class,
+                        xperm,
+                    },
+                    Token::DX => PolicyStatement::DontAuditXperm {
+                        src,
+                        target,
+                        class,
+                        xperm,
+                    },
+                    _ => unreachable!(),
+                };
+                Ok(stmt)
+            }();
+            result.map_err(|_| ParseError::AvtabXperms(action))
+        }
+        Token::PM | Token::EF => {
+            let result = || -> ParseResult<PolicyStatement<'a>> {
+                let type_ = parse_sterm(tokens)?;
+                check_additional_args(tokens)?;
+                let stmt = match action {
+                    Token::PM => PolicyStatement::Permissive { type_ },
+                    Token::EF => PolicyStatement::Enforce { type_ },
+                    _ => unreachable!(),
+                };
+                Ok(stmt)
+            }();
+            result.map_err(|_| ParseError::TypeState(action))
+        }
+        Token::TA => {
+            let result = || -> ParseResult<PolicyStatement<'a>> {
+                let type_ = parse_term(tokens)?;
+                let attr = parse_term(tokens)?;
+                check_additional_args(tokens)?;
+                Ok(PolicyStatement::TypeAttribute { type_, attr })
+            }();
+            result.map_err(|_| ParseError::TypeAttr)
+        }
+        Token::TY => {
+            let result = || -> ParseResult<PolicyStatement<'a>> {
+                let type_ = parse_id(tokens)?;
+                let attr = if tokens.peek().is_none() {
+                    vec![]
+                } else {
+                    parse_term(tokens)?
+                };
+                check_additional_args(tokens)?;
+                Ok(PolicyStatement::Type { type_, attr })
+            }();
+            result.map_err(|_| ParseError::NewType)
+        }
+        Token::AT => {
+            let result = || -> ParseResult<PolicyStatement<'a>> {
+                let attr = parse_id(tokens)?;
+                check_additional_args(tokens)?;
+                Ok(PolicyStatement::Attribute { attr })
+            }();
+            result.map_err(|_| ParseError::NewAttr)
+        }
+        Token::TC | Token::TM => {
+            let result = || -> ParseResult<PolicyStatement<'a>> {
+                let src = parse_id(tokens)?;
+                let target = parse_id(tokens)?;
+                let class = parse_id(tokens)?;
+                let default = parse_id(tokens)?;
+                check_additional_args(tokens)?;
+                let stmt = match action {
+                    Token::TC => PolicyStatement::TypeChange {
+                        src,
+                        target,
+                        class,
+                        default,
+                    },
+                    Token::TM => PolicyStatement::TypeMember {
+                        src,
+                        target,
+                        class,
+                        default,
+                    },
+                    _ => unreachable!(),
+                };
+                Ok(stmt)
+            }();
+            result.map_err(|_| ParseError::AvtabType(action))
+        }
+        Token::TT => {
+            let result = || -> ParseResult<PolicyStatement<'a>> {
+                let src = parse_id(tokens)?;
+                let target = parse_id(tokens)?;
+                let class = parse_id(tokens)?;
+                let default = parse_id(tokens)?;
+                let object = if tokens.peek().is_none() {
+                    ""
+                } else {
+                    parse_id(tokens)?
+                };
+                check_additional_args(tokens)?;
+                Ok(PolicyStatement::TypeTransition {
+                    src,
+                    target,
+                    class,
+                    default,
+                    object,
+                })
+            }();
+            result.map_err(|_| ParseError::TypeTrans)
+        }
+        Token::GF => {
+            let result = || -> ParseResult<PolicyStatement<'a>> {
+                let fs_name = parse_id(tokens)?;
+                let path = parse_id(tokens)?;
+                let context = parse_id(tokens)?;
+                check_additional_args(tokens)?;
+                Ok(PolicyStatement::GenfsCon {
+                    fs_name,
+                    path,
+                    context,
+                })
+            }();
+            result.map_err(|_| ParseError::GenfsCon)
+        }
+        _ => Err(ParseError::UnknownAction(action)),
+    }
+}
+
 impl SePolicy {
     pub fn load_rules(&mut self, rules: &str) {
         let mut cursor = Cursor::new(rules.as_bytes());
@@ -323,191 +621,122 @@ impl SePolicy {
             return;
         }
         let mut tokens = tokenize_statement(statement).into_iter().peekable();
-        let result = self.exec_statement(&mut tokens);
-        if let Err(e) = result {
-            warn!("Syntax error in: \"{}\"", statement);
-            error!("Hint: {}", e);
+        let result = parse_statement_tokens(&mut tokens);
+        match result {
+            Ok(stmt) => self.exec_statement(stmt),
+            Err(e) => {
+                warn!("Syntax error in: \"{}\"", statement);
+                error!("Hint: {}", e);
+            }
         }
     }
 
-    // statement ::= AL sterm(s) sterm(t) sterm(c) sterm(p) { sepolicy.allow(s, t, c, p); };
-    // statement ::= DN sterm(s) sterm(t) sterm(c) sterm(p) { sepolicy.deny(s, t, c, p); };
-    // statement ::= AA sterm(s) sterm(t) sterm(c) sterm(p) { sepolicy.auditallow(s, t, c, p); };
-    // statement ::= DA sterm(s) sterm(t) sterm(c) sterm(p) { sepolicy.dontaudit(s, t, c, p); };
-    // statement ::= AX sterm(s) sterm(t) sterm(c) ID(i) xperms(p) { sepolicy.allowxperm(s, t, c, p); };
-    // statement ::= AY sterm(s) sterm(t) sterm(c) ID(i) xperms(p) { sepolicy.auditallowxperm(s, t, c, p); };
-    // statement ::= DX sterm(s) sterm(t) sterm(c) ID(i) xperms(p) { sepolicy.dontauditxperm(s, t, c, p); };
-    // statement ::= PM sterm(t) { sepolicy.permissive(t); };
-    // statement ::= EF sterm(t) { sepolicy.enforce(t); };
-    // statement ::= TA term(t) term(a) { sepolicy.typeattribute(t, a); };
-    // statement ::= TY ID(t) { sepolicy.type_(t, vec![]);};
-    // statement ::= TY ID(t) term(a) { sepolicy.type_(t, a);};
-    // statement ::= AT ID(t) { sepolicy.attribute(t); };
-    // statement ::= TT ID(s) ID(t) ID(c) ID(d) { sepolicy.type_transition(s, t, c, d, vec![]); };
-    // statement ::= TT ID(s) ID(t) ID(c) ID(d) ID(o) { sepolicy.type_transition(s, t, c, d, vec![o]); };
-    // statement ::= TC ID(s) ID(t) ID(c) ID(d) { sepolicy.type_change(s, t, c, d); };
-    // statement ::= TM ID(s) ID(t) ID(c) ID(d) { sepolicy.type_member(s, t, c, d);};
-    // statement ::= GF ID(s) ID(t) ID(c) { sepolicy.genfscon(s, t, c); };
-    fn exec_statement<'a>(&mut self, tokens: &mut Tokens<'a>) -> ParseResult<'a, ()> {
-        let action = match tokens.next() {
-            Some(token) => token,
-            _ => Err(ParseError::ShowHelp)?,
-        };
-        let check_additional_args = |tokens: &mut Tokens<'a>| {
-            if tokens.peek().is_none() {
-                Ok(())
-            } else {
-                Err(ParseError::General)
+    fn exec_statement(&mut self, statement: PolicyStatement<'_>) {
+        match statement {
+            PolicyStatement::Allow {
+                src,
+                target,
+                class,
+                perm,
+            } => {
+                self.allow(src, target, class, perm);
             }
-        };
-        match action {
-            Token::AL | Token::DN | Token::AA | Token::DA => {
-                let result = || -> ParseResult<()> {
-                    let s = parse_sterm(tokens)?;
-                    let t = parse_sterm(tokens)?;
-                    let c = parse_sterm(tokens)?;
-                    let p = parse_sterm(tokens)?;
-                    check_additional_args(tokens)?;
-                    match action {
-                        Token::AL => self.allow(s, t, c, p),
-                        Token::DN => self.deny(s, t, c, p),
-                        Token::AA => self.auditallow(s, t, c, p),
-                        Token::DA => self.dontaudit(s, t, c, p),
-                        _ => unreachable!(),
-                    }
-                    Ok(())
-                }();
-                if result.is_err() {
-                    Err(ParseError::AvtabAv(action))?
-                }
+            PolicyStatement::Deny {
+                src,
+                target,
+                class,
+                perm,
+            } => {
+                self.deny(src, target, class, perm);
             }
-            Token::AX | Token::AY | Token::DX => {
-                let result = || -> ParseResult<()> {
-                    let s = parse_sterm(tokens)?;
-                    let t = parse_sterm(tokens)?;
-                    let c = parse_sterm(tokens)?;
-                    match_string(tokens, "ioctl")?;
-                    let p = parse_xperms(tokens)?;
-                    check_additional_args(tokens)?;
-                    match action {
-                        Token::AX => self.allowxperm(s, t, c, p),
-                        Token::AY => self.auditallowxperm(s, t, c, p),
-                        Token::DX => self.dontauditxperm(s, t, c, p),
-                        _ => unreachable!(),
-                    }
-                    Ok(())
-                }();
-                if result.is_err() {
-                    Err(ParseError::AvtabXperms(action))?
-                }
+            PolicyStatement::AuditAllow {
+                src,
+                target,
+                class,
+                perm,
+            } => {
+                self.auditallow(src, target, class, perm);
             }
-            Token::PM | Token::EF => {
-                let result = || -> ParseResult<()> {
-                    let t = parse_sterm(tokens)?;
-                    check_additional_args(tokens)?;
-                    match action {
-                        Token::PM => self.permissive(t),
-                        Token::EF => self.enforce(t),
-                        _ => unreachable!(),
-                    }
-                    Ok(())
-                }();
-                if result.is_err() {
-                    Err(ParseError::TypeState(action))?
-                }
+            PolicyStatement::DontAudit {
+                src,
+                target,
+                class,
+                perm,
+            } => {
+                self.dontaudit(src, target, class, perm);
             }
-            Token::TA => {
-                let result = || -> ParseResult<()> {
-                    let t = parse_term(tokens)?;
-                    let a = parse_term(tokens)?;
-                    check_additional_args(tokens)?;
-                    self.typeattribute(t, a);
-                    Ok(())
-                }();
-                if result.is_err() {
-                    Err(ParseError::TypeAttr)?
-                }
+            PolicyStatement::AllowXperm {
+                src,
+                target,
+                class,
+                xperm,
+            } => {
+                self.allowxperm(src, target, class, xperm);
             }
-            Token::TY => {
-                let result = || -> ParseResult<()> {
-                    let t = parse_id(tokens)?;
-                    let a = if tokens.peek().is_none() {
-                        vec![]
-                    } else {
-                        parse_term(tokens)?
-                    };
-                    check_additional_args(tokens)?;
-                    self.type_(t, a);
-                    Ok(())
-                }();
-                if result.is_err() {
-                    Err(ParseError::NewType)?
-                }
+            PolicyStatement::AuditAllowXperm {
+                src,
+                target,
+                class,
+                xperm,
+            } => {
+                self.auditallowxperm(src, target, class, xperm);
             }
-            Token::AT => {
-                let result = || -> ParseResult<()> {
-                    let t = parse_id(tokens)?;
-                    check_additional_args(tokens)?;
-                    self.attribute(t);
-                    Ok(())
-                }();
-                if result.is_err() {
-                    Err(ParseError::NewAttr)?
-                }
+            PolicyStatement::DontAuditXperm {
+                src,
+                target,
+                class,
+                xperm,
+            } => {
+                self.dontauditxperm(src, target, class, xperm);
             }
-            Token::TC | Token::TM => {
-                let result = || -> ParseResult<()> {
-                    let s = parse_id(tokens)?;
-                    let t = parse_id(tokens)?;
-                    let c = parse_id(tokens)?;
-                    let d = parse_id(tokens)?;
-                    check_additional_args(tokens)?;
-                    match action {
-                        Token::TC => self.type_change(s, t, c, d),
-                        Token::TM => self.type_member(s, t, c, d),
-                        _ => unreachable!(),
-                    }
-                    Ok(())
-                }();
-                if result.is_err() {
-                    Err(ParseError::AvtabType(action))?
-                }
+            PolicyStatement::Permissive { type_ } => {
+                self.permissive(type_);
             }
-            Token::TT => {
-                let result = || -> ParseResult<()> {
-                    let s = parse_id(tokens)?;
-                    let t = parse_id(tokens)?;
-                    let c = parse_id(tokens)?;
-                    let d = parse_id(tokens)?;
-                    let o = if tokens.peek().is_none() {
-                        ""
-                    } else {
-                        parse_id(tokens)?
-                    };
-                    check_additional_args(tokens)?;
-                    self.type_transition(s, t, c, d, o);
-                    Ok(())
-                }();
-                if result.is_err() {
-                    Err(ParseError::TypeTrans)?
-                }
+            PolicyStatement::Enforce { type_ } => {
+                self.enforce(type_);
             }
-            Token::GF => {
-                let result = || -> ParseResult<()> {
-                    let s = parse_id(tokens)?;
-                    let t = parse_id(tokens)?;
-                    let c = parse_id(tokens)?;
-                    check_additional_args(tokens)?;
-                    self.genfscon(s, t, c);
-                    Ok(())
-                }();
-                if result.is_err() {
-                    Err(ParseError::GenfsCon)?
-                }
+            PolicyStatement::TypeAttribute { type_, attr } => {
+                self.typeattribute(type_, attr);
             }
-            _ => Err(ParseError::UnknownAction(action))?,
+            PolicyStatement::Type { type_, attr } => {
+                self.type_(type_, attr);
+            }
+            PolicyStatement::Attribute { attr } => {
+                self.attribute(attr);
+            }
+            PolicyStatement::TypeTransition {
+                src,
+                target,
+                class,
+                default,
+                object,
+            } => {
+                self.type_transition(src, target, class, default, object);
+            }
+            PolicyStatement::TypeChange {
+                src,
+                target,
+                class,
+                default,
+            } => {
+                self.type_change(src, target, class, default);
+            }
+            PolicyStatement::TypeMember {
+                src,
+                target,
+                class,
+                default,
+            } => {
+                self.type_member(src, target, class, default);
+            }
+            PolicyStatement::GenfsCon {
+                fs_name,
+                path,
+                context,
+            } => {
+                self.genfscon(fs_name, path, context);
+            }
         }
-        Ok(())
     }
 }
 
