@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import NoReturn
 
 
-ondk_version = "r30.0"
+ondk_version = "r30.1"
 
 
 def color_print(code, str):
@@ -92,7 +92,7 @@ def ensure_cargo():
         os.environ["RUSTUP_TOOLCHAIN"] = str(paths().rust_sysroot)
     else:
         os.environ["PATH"] = (
-            f"{paths().rust_sysroot / "bin"}{os.pathsep}{os.environ["PATH"]}"
+            f"{paths().rust_sysroot / 'bin'}{os.pathsep}{os.environ['PATH']}"
         )
         # Cargo calls executables in $RUSTROOT/lib/rustlib/$TRIPLE/bin, we need
         # to make sure the runtime linker also search $RUSTROOT/lib for libraries.
