@@ -8,6 +8,7 @@ use crate::ffi::Xperm;
 use base::nix::fcntl::OFlag;
 use base::{BufReadExt, LoggedResult, Utf8CStr, error, warn};
 
+#[derive(Debug, PartialEq)]
 pub enum Token<'a> {
     AL,
     DN,
@@ -35,6 +36,7 @@ pub enum Token<'a> {
     ID(&'a str),
 }
 
+#[derive(Debug, PartialEq)]
 pub enum PolicyStatement<'a> {
     Allow {
         src: Vec<&'a str>,
@@ -124,6 +126,7 @@ pub enum PolicyStatement<'a> {
 type Tokens<'a> = Peekable<IntoIter<Token<'a>>>;
 type ParseResult<'a, T> = Result<T, ParseError<'a>>;
 
+#[derive(Debug, PartialEq)]
 enum ParseError<'a> {
     General,
     AvtabAv(Token<'a>),
@@ -879,4 +882,325 @@ allowxperm source target class ioctl *
         ParseError::AvtabType(Token::TM),
         ParseError::GenfsCon
     )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn parse(statement: &str) -> ParseResult<PolicyStatement> {
+        let mut tokens = tokenize_statement(statement).into_iter().peekable();
+        parse_statement_tokens(&mut tokens)
+    }
+
+    #[test]
+    fn test_parse_allow() {
+        assert_eq!(
+            parse("allow s t c p"),
+            Ok(PolicyStatement::Allow {
+                src: vec!["s"],
+                target: vec!["t"],
+                class: vec!["c"],
+                perm: vec!["p"],
+            })
+        );
+
+        assert_eq!(
+            parse("allow { s1 s2 } { t1 t2 } { c1 c2 } { p1 p2 }"),
+            Ok(PolicyStatement::Allow {
+                src: vec!["s1", "s2"],
+                target: vec!["t1", "t2"],
+                class: vec!["c1", "c2"],
+                perm: vec!["p1", "p2"],
+            })
+        );
+
+        assert_eq!(
+            parse("allow * * * *"),
+            Ok(PolicyStatement::Allow {
+                src: vec![],
+                target: vec![],
+                class: vec![],
+                perm: vec![],
+            })
+        );
+    }
+
+    #[test]
+    fn test_parse_deny_auditallow_dontaudit() {
+        assert_eq!(
+            parse("deny s t c p"),
+            Ok(PolicyStatement::Deny {
+                src: vec!["s"],
+                target: vec!["t"],
+                class: vec!["c"],
+                perm: vec!["p"],
+            })
+        );
+
+        assert_eq!(
+            parse("auditallow s t c p"),
+            Ok(PolicyStatement::AuditAllow {
+                src: vec!["s"],
+                target: vec!["t"],
+                class: vec!["c"],
+                perm: vec!["p"],
+            })
+        );
+
+        assert_eq!(
+            parse("dontaudit s t c p"),
+            Ok(PolicyStatement::DontAudit {
+                src: vec!["s"],
+                target: vec!["t"],
+                class: vec!["c"],
+                perm: vec!["p"],
+            })
+        );
+    }
+
+    #[test]
+    fn test_parse_xperms() {
+        assert_eq!(
+            parse("allowxperm s t c ioctl 0x8910"),
+            Ok(PolicyStatement::AllowXperm {
+                src: vec!["s"],
+                target: vec!["t"],
+                class: vec!["c"],
+                xperm: vec![Xperm {
+                    low: 0x8910,
+                    high: 0x8910,
+                    reset: false,
+                }],
+            })
+        );
+
+        assert_eq!(
+            parse("auditallowxperm s t c ioctl 0x8910-0x8926"),
+            Ok(PolicyStatement::AuditAllowXperm {
+                src: vec!["s"],
+                target: vec!["t"],
+                class: vec!["c"],
+                xperm: vec![Xperm {
+                    low: 0x8910,
+                    high: 0x8926,
+                    reset: false,
+                }],
+            })
+        );
+
+        assert_eq!(
+            parse("dontauditxperm s t c ioctl ~{ 0x8910 0x892A }"),
+            Ok(PolicyStatement::DontAuditXperm {
+                src: vec!["s"],
+                target: vec!["t"],
+                class: vec!["c"],
+                xperm: vec![
+                    Xperm {
+                        low: 0x8910,
+                        high: 0x8910,
+                        reset: true,
+                    },
+                    Xperm {
+                        low: 0x892A,
+                        high: 0x892A,
+                        reset: true,
+                    },
+                ],
+            })
+        );
+
+        assert_eq!(
+            parse("allowxperm s t c ioctl *"),
+            Ok(PolicyStatement::AllowXperm {
+                src: vec!["s"],
+                target: vec!["t"],
+                class: vec!["c"],
+                xperm: vec![Xperm {
+                    low: 0x0000,
+                    high: 0xFFFF,
+                    reset: false,
+                }],
+            })
+        );
+    }
+
+    #[test]
+    fn test_parse_permissive_enforce() {
+        assert_eq!(
+            parse("permissive t"),
+            Ok(PolicyStatement::Permissive { type_: vec!["t"] })
+        );
+
+        assert_eq!(
+            parse("enforce { t1 t2 }"),
+            Ok(PolicyStatement::Enforce {
+                type_: vec!["t1", "t2"]
+            })
+        );
+    }
+
+    #[test]
+    fn test_parse_type_and_attribute() {
+        assert_eq!(
+            parse("typeattribute t { a1 a2 }"),
+            Ok(PolicyStatement::TypeAttribute {
+                type_: vec!["t"],
+                attr: vec!["a1", "a2"],
+            })
+        );
+
+        assert_eq!(
+            parse("type my_type"),
+            Ok(PolicyStatement::Type {
+                type_: "my_type",
+                attr: vec![],
+            })
+        );
+
+        assert_eq!(
+            parse("type my_type { a1 a2 }"),
+            Ok(PolicyStatement::Type {
+                type_: "my_type",
+                attr: vec!["a1", "a2"],
+            })
+        );
+
+        assert_eq!(
+            parse("attribute my_attr"),
+            Ok(PolicyStatement::Attribute { attr: "my_attr" })
+        );
+    }
+
+    #[test]
+    fn test_parse_transitions_and_members() {
+        assert_eq!(
+            parse("type_transition s t c d"),
+            Ok(PolicyStatement::TypeTransition {
+                src: "s",
+                target: "t",
+                class: "c",
+                default: "d",
+                object: "",
+            })
+        );
+
+        assert_eq!(
+            parse("type_transition s t c d o"),
+            Ok(PolicyStatement::TypeTransition {
+                src: "s",
+                target: "t",
+                class: "c",
+                default: "d",
+                object: "o",
+            })
+        );
+
+        assert_eq!(
+            parse("type_change s t c d"),
+            Ok(PolicyStatement::TypeChange {
+                src: "s",
+                target: "t",
+                class: "c",
+                default: "d",
+            })
+        );
+
+        assert_eq!(
+            parse("type_member s t c d"),
+            Ok(PolicyStatement::TypeMember {
+                src: "s",
+                target: "t",
+                class: "c",
+                default: "d",
+            })
+        );
+    }
+
+    #[test]
+    fn test_parse_genfscon() {
+        assert_eq!(
+            parse("genfscon sysfs /fs_context context_t"),
+            Ok(PolicyStatement::GenfsCon {
+                fs_name: "sysfs",
+                path: "/fs_context",
+                context: "context_t",
+            })
+        );
+    }
+
+    #[test]
+    fn test_parse_syntax_errors_and_corner_cases() {
+        // Unknown action
+        assert!(matches!(
+            parse("unknown_action s t c p"),
+            Err(ParseError::UnknownAction(_))
+        ));
+
+        // Missing arguments
+        assert!(matches!(parse("allow s t c"), Err(ParseError::AvtabAv(_))));
+
+        // Extra trailing arguments
+        assert!(matches!(
+            parse("allow s t c p extra"),
+            Err(ParseError::AvtabAv(_))
+        ));
+
+        // Invalid xperm missing "ioctl"
+        assert!(matches!(
+            parse("allowxperm s t c 0x8910"),
+            Err(ParseError::AvtabXperms(_))
+        ));
+
+        // Extra arguments on attribute
+        assert!(matches!(
+            parse("attribute a1 extra"),
+            Err(ParseError::NewAttr)
+        ));
+
+        // Empty token iterator
+        assert!(matches!(parse(""), Err(ParseError::ShowHelp)));
+
+        // No spaces around braces and commas
+        assert_eq!(
+            parse("allow{s1 s2}{t1 t2}c p"),
+            Ok(PolicyStatement::Allow {
+                src: vec!["s1", "s2"],
+                target: vec!["t1", "t2"],
+                class: vec!["c"],
+                perm: vec!["p"],
+            })
+        );
+
+        assert_eq!(
+            parse("allow {s1,s2} {t1,t2} c p"),
+            Ok(PolicyStatement::Allow {
+                src: vec!["s1", "s2"],
+                target: vec!["t1", "t2"],
+                class: vec!["c"],
+                perm: vec!["p"],
+            })
+        );
+
+        // Multiple spaces between tokens
+        assert_eq!(
+            parse("allow    s    t    c    p"),
+            Ok(PolicyStatement::Allow {
+                src: vec!["s"],
+                target: vec!["t"],
+                class: vec!["c"],
+                perm: vec!["p"],
+            })
+        );
+
+        assert_eq!(
+            parse("allow   {   s1   s2   }   {   t1   t2   }   c   p"),
+            Ok(PolicyStatement::Allow {
+                src: vec!["s1", "s2"],
+                target: vec!["t1", "t2"],
+                class: vec!["c"],
+                perm: vec!["p"],
+            })
+        );
+    }
 }
