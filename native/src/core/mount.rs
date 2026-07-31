@@ -140,11 +140,8 @@ pub fn find_preinit_device() -> String {
             if !info.fs_option.split(',').any(|s| s == "rw") {
                 return None;
             }
-            if let Some(path) = Path::new(&info.source).parent() {
-                if !path.ends_with("by-name") && !path.ends_with("block") {
-                    return None;
-                }
-            } else {
+            let path = Path::new(&info.source).parent()?;
+            if !path.ends_with("by-name") && !path.ends_with("block") {
                 return None;
             }
             // use device major number to filter out device-mapper
