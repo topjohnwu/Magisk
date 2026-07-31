@@ -213,37 +213,22 @@ fn parse_xperm_hex(s: &str) -> Option<u16> {
         .and_then(|s| u16::from_str_radix(s, 16).ok())
 }
 
-fn parse_xperm_range(s: &str) -> Option<(u16, u16)> {
-    let (low, high) = s.split_once('-')?;
-    Some((parse_xperm_hex(low)?, parse_xperm_hex(high)?))
-}
-
 // xperm ::= HX(low) { Xperm{low, high: low, reset: false} };
 // xperm ::= HX(low) HP HX(high) { Xperm{low, high, reset: false} };
-// xperm ::= ID("0x<low>-0x<high>") { Xperm{low, high, reset: false} };
 fn parse_xperm<'a>(tokens: &mut Tokens<'a>) -> ParseResult<'a, Xperm> {
-    let (low, high) = match tokens.next() {
-        Some(Token::HX(low)) => {
-            let high = match tokens.peek() {
-                Some(Token::HP) => {
-                    tokens.next();
-                    match tokens.next() {
-                        Some(Token::HX(high)) => high,
-                        _ => throw!(),
-                    }
-                }
-                _ => low,
-            };
-            (low, high)
-        }
-        Some(Token::ID(s)) => {
-            if let Some((low, high)) = parse_xperm_range(s) {
-                (low, high)
-            } else {
-                throw!()
+    let low = match tokens.next() {
+        Some(Token::HX(low)) => low,
+        _ => throw!(),
+    };
+    let high = match tokens.peek() {
+        Some(Token::HP) => {
+            tokens.next();
+            match tokens.next() {
+                Some(Token::HX(high)) => high,
+                _ => throw!(),
             }
         }
-        _ => throw!(),
+        _ => low,
     };
     Ok(Xperm {
         low,
@@ -253,7 +238,6 @@ fn parse_xperm<'a>(tokens: &mut Tokens<'a>) -> ParseResult<'a, Xperm> {
 }
 
 // xperms ::= HX(low) { if low > 0 { vec![Xperm{low, high: low, reset: false}] } else { vec![Xperm{low: 0x0000, high: 0xFFFF, reset: true}] }};
-// xperms ::= ID("0x<low>-0x<high>") { vec![Xperm{low, high, reset: false}] };
 // xperms ::= LB xperm_list(l) RB { l };
 // xperms ::= TL LB xperm_list(mut l) RB { l.iter_mut().for_each(|x| { x.reset = true; }); l };
 // xperms ::= ST { vec![Xperm{low: 0x0000, high: 0xFFFF, reset: false}] };
@@ -272,8 +256,9 @@ fn parse_xperms<'a>(tokens: &mut Tokens<'a>) -> ParseResult<'a, Vec<Xperm>> {
         }
         _ => false,
     };
-    match tokens.next() {
+    match tokens.peek() {
         Some(Token::LB) => {
+            tokens.next();
             // parse xperm_list
             loop {
                 let mut xperm = parse_xperm(tokens)?;
@@ -286,33 +271,25 @@ fn parse_xperms<'a>(tokens: &mut Tokens<'a>) -> ParseResult<'a, Vec<Xperm>> {
             }
         }
         Some(Token::ST) => {
+            tokens.next();
             xperms.push(Xperm {
                 low: 0x0000,
                 high: 0xFFFF,
                 reset,
             });
         }
-        Some(Token::HX(low)) => {
-            if low > 0 {
-                xperms.push(Xperm {
-                    low,
-                    high: low,
-                    reset,
-                });
-            } else {
-                xperms.push(Xperm {
-                    low: 0x0000,
-                    high: 0xFFFF,
-                    reset,
-                });
-            }
+        Some(Token::HX(0)) => {
+            tokens.next();
+            xperms.push(Xperm {
+                low: 0x0000,
+                high: 0xFFFF,
+                reset: true,
+            });
         }
-        Some(Token::ID(s)) => {
-            if let Some((low, high)) = parse_xperm_range(s) {
-                xperms.push(Xperm { low, high, reset });
-            } else {
-                throw!();
-            }
+        Some(Token::HX(_)) => {
+            let mut xperm = parse_xperm(tokens)?;
+            xperm.reset = reset;
+            xperms.push(xperm);
         }
         _ => throw!(),
     }
@@ -347,6 +324,7 @@ fn extract_token<'a>(s: &'a str, tokens: &mut Vec<Token<'a>>) {
         "type_member" => tokens.push(Token::TM),
         "genfscon" => tokens.push(Token::GF),
         "*" => tokens.push(Token::ST),
+        "-" => tokens.push(Token::HP),
         "" => {}
         _ => {
             if let Some(idx) = s.find('{') {
@@ -367,6 +345,13 @@ fn extract_token<'a>(s: &'a str, tokens: &mut Vec<Token<'a>>) {
             } else if let Some(s) = s.strip_prefix('~') {
                 tokens.push(Token::TL);
                 extract_token(s, tokens);
+            } else if let Some(idx) = s.find('-')
+                && parse_xperm_hex(&s[..idx]).is_some()
+            {
+                let (a, b) = s.split_at(idx);
+                extract_token(a, tokens);
+                tokens.push(Token::HP);
+                extract_token(&b[1..], tokens);
             } else if let Some(n) = parse_xperm_hex(s) {
                 tokens.push(Token::HX(n));
             } else {
@@ -990,6 +975,41 @@ mod tests {
         );
 
         assert_eq!(
+            parse("auditallowxperm s t c ioctl 0x8910 - 0x8926"),
+            Ok(PolicyStatement::AuditAllowXperm {
+                src: vec!["s"],
+                target: vec!["t"],
+                class: vec!["c"],
+                xperm: vec![Xperm {
+                    low: 0x8910,
+                    high: 0x8926,
+                    reset: false,
+                }],
+            })
+        );
+
+        assert_eq!(
+            parse("allowxperm s t c ioctl { 0x8910-0x8926 0x892A-0x8935 }"),
+            Ok(PolicyStatement::AllowXperm {
+                src: vec!["s"],
+                target: vec!["t"],
+                class: vec!["c"],
+                xperm: vec![
+                    Xperm {
+                        low: 0x8910,
+                        high: 0x8926,
+                        reset: false,
+                    },
+                    Xperm {
+                        low: 0x892A,
+                        high: 0x8935,
+                        reset: false,
+                    },
+                ],
+            })
+        );
+
+        assert_eq!(
             parse("dontauditxperm s t c ioctl ~{ 0x8910 0x892A }"),
             Ok(PolicyStatement::DontAuditXperm {
                 src: vec!["s"],
@@ -1200,6 +1220,17 @@ mod tests {
                 target: vec!["t1", "t2"],
                 class: vec!["c"],
                 perm: vec!["p"],
+            })
+        );
+
+        // Type names containing hyphens (issue #9819 regression)
+        assert_eq!(
+            parse("allow mslgd vendor_port-bridge dir { search }"),
+            Ok(PolicyStatement::Allow {
+                src: vec!["mslgd"],
+                target: vec!["vendor_port-bridge"],
+                class: vec!["dir"],
+                perm: vec!["search"],
             })
         );
     }
