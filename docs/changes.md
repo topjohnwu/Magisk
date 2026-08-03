@@ -388,10 +388,7 @@
 - [MagiskBoot] Support inject/modify `mnt_point` value in DTB fstab
 - [MagiskBoot] Support patching QCDT
 - [MagiskBoot] Support patching DTBH
-- [MagiskBoot] Support patching PXA-DT
-- [MagiskInit] [2SI] Support non A/B setup (Android 10)
-- [MagiskHide] Fix bug that reject process names with ":"
-- [MagicMount] Fix a bug that cause /product mirror not created
+- [MagiskBoot] Support patching that cause /product mirror not created
 
 ### v19.4 (2019.9.19)
 
@@ -886,14 +883,11 @@
 
 ### [v2 (2016.8.9)](https://xdaforums.com/t/magisk-general-support-discussion.3432382/post-68108058)
 
-- Fix verity patch. It should now work on all devices (might fix some of the unable-to-boot issues)
+ Fix verity patch. It should now work on all devices (might fix some of the unable-to-boot issues)
 - All scripts will now run in selinux permissive mode for maximum compatibility (this will **NOT** turn your device to permissive)
 - Add Nougat Developer Preview 5 support
 - Add systemless host support for AdBlock Apps (enabled by default)
-- Add support for new root disable method
-- Remove sepolicy patches that uses SuperSU's supolicy tool; it is now using a minimal set of modifications
-- Removed Magisk Manager in Magisk patch, it is now included in Magisk phh's superuser only
-
+- Add support for new roo
 ### [v1 (2016.8.3)](https://xdaforums.com/t/magisk-general-support-discussion.3432382/post-68034103)
 
-- Initial release
+- In
