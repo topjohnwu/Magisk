@@ -1,1 +1,7 @@
-<resources></resources>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="upgrade_msg">Pro dokončení nastavení aktualizujte na plnou verzi Magisku. Stáhnout a nainstalovat?</string>
+    <string name="no_internet_msg">Připojte se prosím k internetu! Je nutné aktualizovat na plnou verzi Magisku.</string>
+    <string name="dling">Stahuji</string>
+    <string name="relaunch_app">Prosím, ručně znovu spusťte aplikaci</string>
+</resources>

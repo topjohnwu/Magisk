@@ -11,25 +11,32 @@
     <string name="denylist">DenyList</string>
 
     <!--Home-->
-    <string name="no_connection">Žádné připojení</string>
+    <string name="no_connection">Bez připojení</string>
     <string name="app_changelog">Seznam změn</string>
     <string name="loading">Načítání…</string>
     <string name="update">Aktualizovat</string>
     <string name="not_available">N/A</string>
     <string name="hide">Skrýt</string>
+    <string name="restore">Obnovit</string>
     <string name="home_package">Balíček</string>
     <string name="home_app_title">Aplikace</string>
-
-    <string name="home_notice_content">Stahujte Magisk POUZE z oficiální stránky GitHub. Soubory z neznámých zdrojů mohou být škodlivé!</string>
+    <string name="home_core_title">Jádro</string>
+    <string name="reinstall">Přeinstalovat</string>
+    <string name="home_notice_content">Stahujte Magisk POUZE z oficiální stránky na GitHubu. Soubory z neznámých zdrojů mohou být škodlivé!</string>
     <string name="home_support_title">Podpořte nás</string>
     <string name="home_follow_title">Sledujte nás</string>
     <string name="home_item_source">Zdroj</string>
-    <string name="home_support_content">Magisk je a vždy bude svobodný s otevřeným kódem. Můžete nám však zaslat malý dar jako poděkování.</string>
+    <string name="home_support_content">Magisk je a vždy bude zdarma a s otevřeným zdrojovým kódem. Projevit svou podporu nám však můžete přispěním finančního daru.</string>
+    <string name="donate">Přispět</string>
+    <string name="documents">Dokumenty</string>
+    <string name="report_bugs">Nahlásit chyby</string>
+    <string name="home_status_title">Status</string>
     <string name="home_installed_version">Nainstalováno</string>
-    <string name="home_latest_version">Poslední</string>
+    <string name="home_latest_version">Nejnovější</string>
     <string name="invalid_update_channel">Neplatný kanál aktualizace</string>
+    <string name="uninstall">Odinstalovat</string>
     <string name="uninstall_magisk_title">Odinstalovat Magisk</string>
-    <string name="uninstall_magisk_msg">Všechny moduly budou zakázány/odstraněny!\nROOT bude odstraněn!\nPokud jsou data dešifrována, můžou být zašifrována!</string>
+    <string name="uninstall_magisk_msg">Všechny moduly budou deaktivovány/odstraněny!\nOprávnění root budou odebrána!\nVeškeré interní úložiště, které nebylo zašifrováno pomocí Magisku, bude znovu zašifrováno!</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Ponechat Force Encryption</string>
@@ -41,19 +48,23 @@
     <string name="install_start">Spustit</string>
     <string name="manager_download_install">Stiskněte pro stažení a instalaci</string>
     <string name="direct_install">Přímá instalace (doporučeno)</string>
+    <string name="direct_install_summary">Nainstaluje Magisk přímo na spouštěcí oddíl</string>
     <string name="install_inactive_slot">Instalace do druhého slotu (po OTA)</string>
+    <string name="install_inactive_slot_summary">Nainstaluje se do neaktivního slotu po aktualizaci OTA</string>
+    <string name="select_patch_file_summary">Patchuje raw obraz, soubor ODIN tar nebo soubor payload.bin</string>
     <string name="install_inactive_slot_msg">Vaše zařízení bude po restartu VYNUCENĚ spuštěno do aktuálního neaktivního slotu!\nTuto možnost použijte pouze po dokončení OTA.\nChcete pokračovat?</string>
     <string name="setup_title">Další nastavení</string>
     <string name="select_patch_file">Vybrat a opravit soubor</string>
-    <string name="patch_file_msg">Vyberte soubor RAW (*.img) nebo soubor TAR pro ODIN (*.tar)</string>
+    <string name="patch_file_msg">Vyberte soubor RAW (*.img), soubor TAR pro ODIN (*.tar), nebo payload.bin (*.bin)</string>
     <string name="reboot_delay_toast">Restartování za 5 sekund…</string>
     <string name="flash_screen_title">Instalace</string>
 
     <!--Superuser-->
-    <string name="su_request_title">Požadavek SuperUser</string>
-    <string name="touch_filtered_warning">Magisk nemůže ověřit Vaši odpověď, protože aplikace zavírá požadavek SuperUser</string>
+    <string name="su_request_title">Požadavek SuperUsera</string>
+    <string name="touch_filtered_warning">Magisk nemůže ověřit Vaši odpověď, protože aplikace zavírá požadavek SuperUsera</string>
     <string name="deny">Zakázat</string>
     <string name="prompt">Zeptat se</string>
+    <string name="restrict">Omezit</string>
     <string name="grant">Povolit</string>
     <string name="su_warning">Povolí plný přístup k Vašemu zařízení.\nZakažte, pokud si nejste jisti!</string>
     <string name="forever">Trvale</string>
@@ -62,41 +73,54 @@
     <string name="twentymin">20 minut</string>
     <string name="thirtymin">30 minut</string>
     <string name="sixtymin">60 minut</string>
-    <string name="su_allow_toast">Pro %1$s bylo oprávnění SuperUser povoleno</string>
-    <string name="su_deny_toast">Pro %1$s bylo oprávnění SuperUser zakázáno</string>
-    <string name="su_snack_grant">SuperUser oprávnění pro %1$s je povoleno</string>
-    <string name="su_snack_deny">SuperUser oprávnění pro %1$s je zakázáno</string>
+    <string name="su_allow_toast">Pro %1$s bylo oprávnění SuperUsera povoleno</string>
+    <string name="su_deny_toast">Pro %1$s bylo oprávnění SuperUsera zakázáno</string>
+    <string name="su_snack_grant">Oprávnění SuperUsera pro %1$s je povoleno</string>
+    <string name="su_snack_deny">Oprávnění SuperUsera pro %1$s je zakázáno</string>
     <string name="su_snack_notif_on">Oznámení pro %1$s jsou povolena</string>
     <string name="su_snack_notif_off">Oznámení pro %1$s jsou zakázána</string>
     <string name="su_snack_log_on">Protokolování %1$s je povoleno</string>
     <string name="su_snack_log_off">Protokolování %1$s je zakázáno</string>
     <string name="su_revoke_title">Smazat?</string>
-    <string name="su_revoke_msg">Potvrzením odeberete %1$s oprávnění SuperUser</string>
+    <string name="su_revoke_msg">Potvrzením odeberete %1$s oprávnění SuperUsera</string>
     <string name="toast">Text</string>
+    <string name="notification">Oznámení</string>
     <string name="none">Žádné</string>
-
+    <string name="su_notification_channel">Oznámení Superusera</string>
+    <string name="su_notification_granted_title">Superuser udělen</string>
+    <string name="su_notification_denied_title">Superuser zamítnut</string>
     <string name="superuser_toggle_notification">Oznámení</string>
-    <string name="superuser_toggle_revoke">Smazat</string>
-    <string name="superuser_policy_none">Žádná aplikace nepožádala o oprávnění SuperUser.</string>
+    <string name="superuser_toggle_revoke">Zrušit</string>
+    <string name="superuser_policy_none">Žádná aplikace zatím nepožádala o oprávnění SuperUsera.</string>
 
     <!--Logs-->
-    <string name="log_data_none">Nemáte žádné protokoly. Vyzkoušejte nějakou aplikaci vyžadující oprávnění SuperUser</string>
+    <string name="log_data_none">Nemáte žádné protokoly. Vyzkoušejte nějakou aplikaci vyžadující oprávnění SuperUsera</string>
     <string name="log_data_magisk_none">Protokoly Magisk jsou prázdné. To je zvláštní</string>
     <string name="menuSaveLog">Uložit protokol</string>
     <string name="menuClearLog">Smazat protokol</string>
     <string name="logs_cleared">Protokol byl smazán</string>
+    <string name="save_log">Uložit protokol</string>
+    <string name="clear_log">Vyčistit protokol</string>
+    <string name="back">Zpět</string>
+    <string name="superuser_setting">Nastavení Superusera</string>
+    <string name="enabled">Zapnuto</string>
+    <string name="disabled">Vypnuto</string>
     <string name="pid">PID:%1$d</string>
     <string name="target_uid">Cílové UID: %1$d</string>
     <string name="target_pid">Připojit PID cílového ns: %s</string>
     <string name="selinux_context">SELinux kontext: %s</string>
     <string name="supp_group">Sekundární skupina: %s</string>
 
-    <!--SafetyNet-->
-
     <!--MagiskHide-->
     <string name="show_system_app">Zobrazit systémové aplikace</string>
     <string name="show_os_app">Zobrazit OS aplikace</string>
-    <string name="hide_filter_hint">Filtrovat podle názvu</string>
+    <string name="hide_filter_hint">Filtrovat dle názvu</string>
+    <string name="sort_by_name">Seřadit dle jména</string>
+    <string name="sort_by_package_name">Seřadit dle názvu balíčku</string>
+    <string name="sort_by_install_time">Seřadit dle času instalace</string>
+    <string name="sort_by_update_time">Seřadit dle času aktualizace</string>
+    <string name="sort_reverse">Obrácené řazení</string>
+    <string name="menu_sort">Seřadit</string>
     <string name="hide_search">Vyhledávání</string>
 
     <!--Module-->
@@ -106,8 +130,10 @@
     <string name="reboot_bootloader">Restartovat do Bootloader</string>
     <string name="reboot_download">Restartovat do Download</string>
     <string name="reboot_edl">Restartovat do EDL</string>
+    <string name="reboot_safe_mode">Nouzový režim</string>
     <string name="module_version_author">%1$s od %2$s</string>
     <string name="module_state_remove">Odstranit</string>
+    <string name="module_action">Akce</string>
     <string name="module_state_restore">Obnovit</string>
     <string name="module_action_install_external">Instalace z úložiště</string>
     <string name="update_available">Dostupná aktualizace</string>
@@ -122,7 +148,7 @@
     <string name="settings_dark_mode_title">Režim motivu</string>
     <string name="settings_dark_mode_message">Vyberte režim, který nejlépe vyhovuje Vašemu stylu!</string>
     <string name="settings_dark_mode_light">Světlý</string>
-    <string name="settings_dark_mode_system">Podle systému</string>
+    <string name="settings_dark_mode_system">Dle systému</string>
     <string name="settings_dark_mode_dark">Tmavý</string>
     <string name="settings_download_path_title">Složka pro stahování</string>
     <string name="settings_download_path_message">Soubory budou uloženy do %1$s.</string>
@@ -131,12 +157,13 @@
     <string name="settings_restore_app_title">Obnovit aplikaci Magisk</string>
     <string name="settings_restore_app_summary">Obnoví aplikaci zpět do původního APK</string>
     <string name="language">Jazyk</string>
-    <string name="system_default">(výchozí podle systému)</string>
+    <string name="system_default">(výchozí dle systému)</string>
     <string name="settings_check_update_title">Zkontrolovat aktualizace</string>
     <string name="settings_check_update_summary">Povolí pravidelnou kontrolu aktualizace na pozadí</string>
     <string name="settings_update_channel_title">Kanál aktualizace</string>
     <string name="settings_update_stable">Stabilní</string>
     <string name="settings_update_beta">Beta</string>
+    <string name="settings_update_debug">Debug</string>
     <string name="settings_update_custom">Vlastní</string>
     <string name="settings_update_custom_msg">Vložte vlastní URL</string>
     <string name="settings_zygisk_summary">Spustí části Magisku v démonu Zygote</string>
@@ -160,19 +187,32 @@
     <string name="settings_su_request_30">30 sekund</string>
     <string name="settings_su_request_45">45 sekund</string>
     <string name="settings_su_request_60">60 sekund</string>
-    <string name="superuser_access">Přístup SuperUser</string>
+    <string name="superuser_access">Přístup SuperUsera</string>
     <string name="auto_response">Automatická odezva</string>
     <string name="request_timeout">Časový limit požadavku</string>
-    <string name="superuser_notification">Oznámení SuperUser</string>
+    <string name="superuser_notification">Oznámení SuperUsera</string>
     <string name="settings_su_reauth_title">Opětovné ověření po aktualizaci</string>
-    <string name="settings_su_reauth_summary">Opětovné ověření oprávnění SuperUser po aktualizaci aplikace.</string>
+    <string name="settings_su_reauth_summary">Opětovné ověření oprávnění SuperUsera po aktualizaci aplikace</string>
     <string name="settings_su_tapjack_title">Povolit ochranu před TapJack</string>
-    <string name="settings_su_tapjack_summary">Okno dialogu SuperUser nebude reagovat na kliknutí v případě, že je zavřené nebo překryté jiným oknem</string>
+    <string name="settings_su_tapjack_summary">Okno dialogu SuperUsera nebude reagovat na kliknutí v případě, že je zavřené nebo překryté jiným oknem</string>
+    <string name="settings_su_auth_title">Ověření uživatele</string>
+    <string name="settings_su_auth_summary">Požadovat ověření uživatele při požadavcích Superusera</string>
+    <string name="settings_su_auth_insecure">Na zařízení není nastavena žádná metoda ověřování</string>
+    <string name="settings_su_restrict_title">Omezit oprávnění uživatele root</string>
+    <string name="settings_su_restrict_summary">Ve výchozím nastavení omezí novým aplikacím oprávnění Superusera. Upozornění: většina aplikací tím přestane fungovat. Toto nepovolujte, pokud nevíte, co děláte</string>
     <string name="settings_customization">Přizpůsobit</string>
-    <string name="setting_add_shortcut_summary">Přidá odkaz na domovskou obrazovku v případě, že se po skrytí aplikace její název a ikona těžko rozpoznávají.</string>
+    <string name="settings_color_mode">Barevný režim</string>
+    <string name="color_mode_system">Dle systému</string>
+    <string name="color_mode_light">Světlý</string>
+    <string name="color_mode_dark">Tmavý</string>
+    <string name="color_mode_monet_system">Monet (Dle systému)</string>
+    <string name="color_mode_monet_light">Monet (Světlý)</string>
+    <string name="color_mode_monet_dark">Monet (Tmavý)</string>
+    <string name="setting_add_shortcut_summary">Přidá odkaz na domovskou obrazovku v případě, že se po skrytí aplikace její název a ikona těžko rozpoznávají</string>
     <string name="settings_doh_title">DNS přes HTTPS</string>
-    <string name="settings_doh_description">Obejde DNS v některých zemích</string>
-
+    <string name="settings_doh_description">Vyřeší problém s otrávením DNS v některých zemích</string>
+    <string name="settings_random_name_title">Vytvářet náhodný výstupní název</string>
+    <string name="settings_random_name_description">Bude vytvářet náhodné názvy výstupních souborů patchnutých obrazů a souborů tar, k zabránění jejich odhalení</string>
     <string name="multiuser_mode">Režim více uživatelů</string>
     <string name="settings_owner_only">Vlastník zařízení</string>
     <string name="settings_owner_manage">Správce zařízení</string>
@@ -180,14 +220,13 @@
     <string name="owner_only_summary">Pouze vlastník má přístup ROOT</string>
     <string name="owner_manage_summary">Přístup ROOT má správce zařízení, který přijímá požadavky k přístupu</string>
     <string name="user_independent_summary">Každý uživatel má svá vlastní pravidla přístupu ROOT</string>
-
     <string name="mount_namespace_mode">Režim připojení jmenného prostoru</string>
     <string name="settings_ns_global">Globální jmenný prostor</string>
     <string name="settings_ns_requester">Odvozený jmenný prostor</string>
     <string name="settings_ns_isolate">Izolovaný jmenný prostor</string>
-    <string name="global_summary">Všechny relace ROOT používají globální jmenný prostor.</string>
-    <string name="requester_summary">Relace ROOT je odvozena od jmenného prostoru žadatele.</string>
-    <string name="isolate_summary">Každá relace ROOT má svůj vlastní izolovaný jmenný prostor.</string>
+    <string name="global_summary">Všechny relace ROOT používají globální jmenný prostor</string>
+    <string name="requester_summary">Relace ROOT je odvozena od jmenného prostoru žadatele</string>
+    <string name="isolate_summary">Každá relace ROOT má svůj vlastní izolovaný jmenný prostor</string>
 
     <!--Notifications-->
     <string name="update_channel">Aktualizace Magisk</string>
@@ -199,15 +238,18 @@
     <string name="updated_title">Magisk aktualizován</string>
     <string name="updated_text">Klepnutím otevřete aplikaci</string>
 
-<!--Toasts, Dialogs-->
+    <!--Toasts, Dialogs-->
     <string name="yes">Ano</string>
     <string name="no">Ne</string>
     <string name="repo_install_title">Instalovat %1$s %2$s(%3$d)</string>
     <string name="download">Stáhnout</string>
     <string name="reboot">Restartovat</string>
+    <string name="close">Zavřít</string>
     <string name="release_notes">Seznam změn</string>
     <string name="flashing">Flashuji…</string>
-    <string name="done">Hotovo!</string>
+    <string name="running">Pracuji…</string>
+    <string name="done">Dokončeno!</string>
+    <string name="done_action">Akce %1$s byla dokončena</string>
     <string name="failure">Nepodařilo se!</string>
     <string name="hide_app_title">Skrývám aplikaci Magisk…</string>
     <string name="open_link_failed_toast">Nebyla nalezena žádná aplikace pro otevření odkazu</string>
