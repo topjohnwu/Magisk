@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.databinding.Bindable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
@@ -46,17 +47,25 @@ class InstallViewModel(svc: NetworkService, markwon: Markwon) : BaseViewModel() 
         set(value) = set(value, field, { field = it }, BR.step)
 
     private var methodId = -1
+    private var spuriousMethodId = -1
 
     @get:Bindable
     var method
         get() = methodId
         set(value) = set(value, methodId, { methodId = it }, BR.method) {
+            if (it == spuriousMethodId) {
+                spuriousMethodId = -1
+                return@set
+            }
             when (it) {
                 R.id.method_patch -> {
                     GetContentEvent("*/*", UriCallback()).publish()
                 }
                 R.id.method_download -> {
-                    DownloadDialog { url -> uri.value = url }.show()
+                    DownloadDialog(
+                        callback = { url -> _uri.value = url },
+                        onCancel = { resetMethod() },
+                    ).show()
                 }
                 R.id.method_inactive_slot -> {
                     SecondSlotWarningDialog().show()
@@ -64,13 +73,29 @@ class InstallViewModel(svc: NetworkService, markwon: Markwon) : BaseViewModel() 
             }
         }
 
-    val data: LiveData<Uri?> get() = uri
+    private fun resetMethod() {
+        spuriousMethodId = methodId
+        method = -1
+    }
+
+    private val _uri = MutableLiveData<Uri?>()
+    val data: LiveData<Uri?> get() = _uri
+
+    private val sourceObserver = Observer<PatchSource?> { source ->
+        when (source) {
+            is PatchSource.File -> _uri.value = source.uri
+            PatchSource.Cancelled -> resetMethod()
+            null -> return@Observer
+        }
+        patchSource.value = null
+    }
 
     @get:Bindable
     var notes: Spanned = SpannedString("")
         set(value) = set(value, field, { field = it }, BR.notes)
 
     init {
+        patchSource.observeForever(sourceObserver)
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val noteFile = File(AppContext.cacheDir, "${APP_VERSION_CODE}.md")
@@ -125,6 +150,16 @@ class InstallViewModel(svc: NetworkService, markwon: Markwon) : BaseViewModel() 
         }
     }
 
+    override fun onCleared() {
+        patchSource.removeObserver(sourceObserver)
+        super.onCleared()
+    }
+
+    private sealed interface PatchSource {
+        data class File(val uri: Uri) : PatchSource
+        data object Cancelled : PatchSource
+    }
+
     @Parcelize
     class UriCallback : ContentResultCallback {
         override fun onActivityLaunch() {
@@ -132,7 +167,11 @@ class InstallViewModel(svc: NetworkService, markwon: Markwon) : BaseViewModel() 
         }
 
         override fun onActivityResult(result: Uri) {
-            uri.value = result
+            patchSource.value = PatchSource.File(result)
+        }
+
+        override fun onActivityCancel() {
+            patchSource.value = PatchSource.Cancelled
         }
     }
 
@@ -147,6 +186,6 @@ class InstallViewModel(svc: NetworkService, markwon: Markwon) : BaseViewModel() 
 
     companion object {
         private const val INSTALL_STATE_KEY = "install_state"
-        private val uri = MutableLiveData<Uri?>()
+        private val patchSource = MutableLiveData<PatchSource?>()
     }
 }

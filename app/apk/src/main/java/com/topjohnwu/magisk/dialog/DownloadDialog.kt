@@ -8,7 +8,10 @@ import com.topjohnwu.magisk.core.R
 import com.topjohnwu.magisk.events.DialogBuilder
 import com.topjohnwu.magisk.view.MagiskDialog
 
-class DownloadDialog(private val callback: (Uri) -> Unit) : DialogBuilder {
+class DownloadDialog(
+    private val callback: (Uri) -> Unit,
+    private val onCancel: (() -> Unit)? = null,
+) : DialogBuilder {
 
     override fun build(dialog: MagiskDialog) {
         val editText = EditText(dialog.context).apply {
@@ -16,6 +19,8 @@ class DownloadDialog(private val callback: (Uri) -> Unit) : DialogBuilder {
             hint = context.getString(R.string.download_dialog_msg)
             requestFocus()
         }
+
+        var confirmed = false
 
         dialog.apply {
             setTitle(R.string.download_dialog_title)
@@ -26,6 +31,7 @@ class DownloadDialog(private val callback: (Uri) -> Unit) : DialogBuilder {
                     val url = editText.text.toString().trim()
                     isValidUrl(url)?.let {
                         doNotDismiss = false
+                        confirmed = true
                         callback(it)
                     } ?: run {
                         doNotDismiss = true
@@ -37,6 +43,9 @@ class DownloadDialog(private val callback: (Uri) -> Unit) : DialogBuilder {
                 text = android.R.string.cancel
             }
             setCancelable(true)
+            setOnDismissListener {
+                if (!confirmed) onCancel?.invoke()
+            }
         }
     }
 
