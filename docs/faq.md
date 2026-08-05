@@ -2,6 +2,10 @@
 
 ### Q: I installed a module and it bootlooped my device. Help!
 
+Magisk will now automatically invoke it's 'safe mode' after 2 bad boot attempts... If the device fails to boot normally twice in a row, Magisk will boot with Zygisk functions and all modules disabled the third time. (To facilitate this, a bootloop counter has been added to the magisk.db table.)
+
+#### Old Methods
+
 If you have USB debugging enabled in developer options, connect your phone to the PC. If your device is detected (check by `adb devices`), enter ADB shell and run the command `magisk --remove-modules`. This will remove all your modules and automatically reboot the device.
 
 If unfortunately you do not have USB debugging enabled you can boot using the Safe Mode key combo to cause Magisk to create an empty file named 'disable' in modules directories which disables modules when next booted with Magisk. Most modern Android devices support such a special key combo at boot to enter system Safe Mode as an emergency option, but **please note** that Magisk's key combo detection occurs _earlier_ than system detection so the key combo timing indicated by many online guides may need to be altered to activate Magisk's Safe Mode. (It's possible to activate system Safe Mode but not Magisk Safe Mode and vice versa.)
