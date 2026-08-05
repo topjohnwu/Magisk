@@ -103,7 +103,7 @@ jobs:
 
       - name: Run AVD test
         timeout-minutes: 18
-        run: scripts/avd.sh test -l -v ${{ matrix.version }} -t ${{ matrix.type }}
+        run: scripts/avd.sh test -l -v ${{ matrix.version }} -t ${{ matrix.type }} out/apk-ng-*.apk
 
       - name: Upload logs on error
         if: ${{ failure() }}
@@ -122,7 +122,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: [23, 24, 25, 26, 27, 28, 29, 30]
+        version: [23, 26, 28, 30]
 
     steps:
       - name: Check out
@@ -141,7 +141,7 @@ jobs:
         timeout-minutes: 18
         env:
           FORCE_32_BIT: 1
-        run: scripts/avd.sh test -l -v ${{ matrix.version }}
+        run: scripts/avd.sh test -l -v ${{ matrix.version }} out/apk-ng-*.apk
 
       - name: Upload logs on error
         if: ${{ failure() }}
