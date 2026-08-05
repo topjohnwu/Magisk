@@ -13,6 +13,12 @@ pub fn errno() -> &'static mut i32 {
     unsafe { &mut *libc::__errno() }
 }
 
+// Simple fork without double-fork or waitpid; nolibc-compatible.
+// Returns 0 in child, child pid in parent, -1 on error.
+pub fn xfork() -> i32 {
+    unsafe { libc::fork() }
+}
+
 // When len is 0, don't care whether buf is null or not
 #[inline]
 pub unsafe fn slice_from_ptr<'a, T>(buf: *const T, len: usize) -> &'a [T] {
