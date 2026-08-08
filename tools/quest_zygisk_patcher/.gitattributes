@@ -1,0 +1,5 @@
+*.md text eol=lf diff
+*.py text eol=lf diff
+.gitignore text eol=lf diff
+LICENSE text eol=lf diff
+fixed_magisk_arm64 binary
