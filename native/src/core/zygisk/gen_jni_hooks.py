@@ -176,6 +176,9 @@ mount_sysprop_overrides = Argument("mount_sysprop_overrides", jboolean, True)
 # b qpr2
 use_fifo_ui = Argument("use_fifo_ui", jboolean, False)
 
+# c qpr2
+cgroup_uid = Argument("cgroup_uid", jint, False)
+
 # server
 permitted_capabilities = Argument("permitted_capabilities", jlong)
 effective_capabilities = Argument("effective_capabilities", jlong)
@@ -308,6 +311,33 @@ fas_b = ForkApp(
     "b",
     [
         uid,
+        gid,
+        gids,
+        runtime_flags,
+        rlimits,
+        mount_external,
+        se_info,
+        nice_name,
+        fds_to_close,
+        fds_to_ignore,
+        is_child_zygote,
+        instruction_set,
+        app_data_dir,
+        is_top_app,
+        use_fifo_ui,
+        pkg_data_info_list,
+        whitelisted_data_info_list,
+        mount_data_dirs,
+        mount_storage_dirs,
+        mount_sysprop_overrides,
+    ],
+)
+
+fas_c = ForkApp(
+    "c",
+    [
+        uid,
+        cgroup_uid,
         gid,
         gids,
         runtime_flags,
@@ -517,6 +547,31 @@ spec_u = SpecializeApp(
     ],
 )
 
+spec_c = SpecializeApp(
+    "c",
+    [
+        uid,
+        cgroup_uid,
+        gid,
+        gids,
+        runtime_flags,
+        rlimits,
+        mount_external,
+        se_info,
+        nice_name,
+        is_child_zygote,
+        instruction_set,
+        app_data_dir,
+        is_top_app,
+        pkg_data_info_list,
+        whitelisted_data_info_list,
+        mount_data_dirs,
+        mount_storage_dirs,
+        mount_sysprop_overrides,
+        Anon(jstring),
+    ],
+)
+
 spec_xr_u = SpecializeApp(
     "xr_u",
     [
@@ -648,6 +703,7 @@ with open("jni_hooks.hpp", "w") as f:
                 fas_r,
                 fas_u,
                 fas_b,
+                fas_c,
                 fas_samsung_m,
                 fas_samsung_n,
                 fas_samsung_o,
@@ -660,7 +716,7 @@ with open("jni_hooks.hpp", "w") as f:
     f.write(
         gen_jni_def(
             "specialize_app_methods",
-            [spec_q, spec_q_alt, spec_r, spec_u, spec_xr_u, spec_samsung_q, spec_nubia_u],
+            [spec_q, spec_q_alt, spec_r, spec_u, spec_c, spec_xr_u, spec_samsung_q, spec_nubia_u],
         )
     )
 
