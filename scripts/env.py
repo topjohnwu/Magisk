@@ -37,10 +37,16 @@ class Paths:
         except KeyError:
             try:
                 self.sdk = Path(os.environ["ANDROID_SDK_ROOT"])
-            except KeyError:
-                error(
-                    "Please set Android SDK path to environment variable ANDROID_HOME"
-                )
+            except KeyError as e:
+                try:
+                    if is_windows:
+                        self.sdk = Path(rf"{os.environ['LOCALAPPDATA']}\Android\Sdk")
+                        if not self.sdk.exists():
+                            raise e
+                    else:
+                      raise e
+                except KeyError:
+                    error("Please set Android SDK path to environment variable ANDROID_HOME")
 
         self.ndk = self.sdk / "ndk" / "magisk"
         self.ndk_build = self.ndk / "ndk-build"
@@ -114,8 +120,6 @@ def ensure_jdk():
             os.environ["PATH"] = f'{jbr / "bin"}{os.pathsep}{os.environ["PATH"]}'
             os.environ["JAVA_HOME"] = str(jbr)
             os.environ["JDK_HOME"] = str(jbr)
-
-    no_jdk = False
     try:
         proc = subprocess.run(
             "javac -version",

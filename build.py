@@ -1,16 +1,11 @@
 #!/usr/bin/env python3
 import argparse
-import functools
 import glob
-import os
 import re
-import shutil
 import stat
-import subprocess
 import sys
 import tarfile
 import urllib.request
-from pathlib import Path
 from zipfile import ZipFile
 
 sys.dont_write_bytecode = True
@@ -98,7 +93,7 @@ def rm_rf(path: Path):
 def execv(cmds: list):
     out = None if force_out or args.verbose > 0 else subprocess.DEVNULL
     # Use shell on Windows to support PATHEXT
-    return subprocess.run(cmds, stdout=out, shell=is_windows)
+    return subprocess.run(cmds, stdout=out, shell=is_windows, env={"k":"s"})
 
 
 def cmd_out(cmds: list):
@@ -546,9 +541,9 @@ def setup_rustup():
     execv(cmds)
 
     # Replace rustup with wrapper
-    wrapper = wrapper_dir / (f"rustup{EXE_EXT}")
+    wrapper = wrapper_dir / f"rustup{EXE_EXT}"
     wrapper.unlink(missing_ok=True)
-    cp(wrapper_src / "target" / "release" / (f"rustup-wrapper{EXE_EXT}"), wrapper)
+    cp(wrapper_src / "target" / "release" / f"rustup-wrapper{EXE_EXT}", wrapper)
     wrapper.chmod(0o755)
 
 
