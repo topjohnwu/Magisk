@@ -92,6 +92,8 @@ def rm_rf(path: Path):
 
 def execv(cmds: list):
     out = None if force_out or args.verbose > 0 else subprocess.DEVNULL
+    if force_out or args.verbose > 0:
+        print("* Executing: " + " ".join(cmds))
     # Use shell on Windows to support PATHEXT
     return subprocess.run(cmds, stdout=out, shell=is_windows)
 
