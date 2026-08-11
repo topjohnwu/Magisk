@@ -47,7 +47,7 @@ fun Project.setupCommon() {
         }
         buildToolsVersion = "37.0.0"
         ndkPath = "${androidComponents.sdkComponents.sdkDirectory.get().asFile}/ndk/magisk"
-        ndkVersion = "30.0.14904198"
+        ndkVersion = "30.0.15729638"
 
         defaultConfig.apply {
             minSdk = 23
@@ -282,7 +282,7 @@ fun Project.setupMainApk() {
             versionName = Config.version
             versionCode = Config.versionCode
             ndk {
-                abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64", "riscv64")
+                abiFilters += ABI_SUPPORT_LIST
                 debugSymbolLevel = "FULL"
             }
         }
