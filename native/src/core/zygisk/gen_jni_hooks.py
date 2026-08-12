@@ -8,6 +8,12 @@ class JType:
         self.cpp = cpp
         self.jni = jni
 
+    def shorty(self) -> str:
+        if self.cpp in primitives + ["void"]:
+            return self.jni
+        else:
+            return "L"
+
 
 class JArray(JType):
     def __init__(self, type: JType):
@@ -66,6 +72,10 @@ class JNIMethod:
     def jni_sig(self):
         args = "".join(map(lambda x: x.type.jni, self.args))
         return f"({args}){self.ret.type.jni}"
+
+    def shorty(self):
+        args = "".join(map(lambda x: x.type.shorty(), self.args))
+        return f"{self.ret.type.shorty()}{args}"
 
 
 class JNIHook(JNIMethod):
@@ -160,7 +170,7 @@ is_child_zygote = Argument("is_child_zygote", jboolean, True)
 is_top_app = Argument("is_top_app", jboolean, True)
 
 # q running on xr
-is_perception_app = Argument("is_perception_app", jboolean, False)
+is_perception_app = Argument("is_perception_app", jboolean)
 
 # r
 pkg_data_info_list = Argument("pkg_data_info_list", JArray(jstring), True)
@@ -174,10 +184,10 @@ mount_storage_dirs = Argument("mount_storage_dirs", jboolean, True)
 mount_sysprop_overrides = Argument("mount_sysprop_overrides", jboolean, True)
 
 # b qpr2
-use_fifo_ui = Argument("use_fifo_ui", jboolean, False)
+use_fifo_ui = Argument("use_fifo_ui", jboolean)
 
 # c qpr2
-cgroup_uid = Argument("cgroup_uid", jint, False)
+cgroup_uid = Argument("cgroup_uid", jint)
 
 # server
 permitted_capabilities = Argument("permitted_capabilities", jlong)
@@ -673,6 +683,7 @@ def gen_jni_def(field: str, methods: list[JNIHook]):
         decl += ind(1) + f"// {m.name}"
         decl += ind(1) + "{"
         decl += ind(2) + f'"{m.hook_target()}",'
+        decl += ind(2) + f"// {m.shorty()}"
         decl += ind(2) + f'"{m.jni_sig()}",'
         decl += ind(2) + f"(void *) +{m.cpp_lambda_sig()} {{"
         orig_fn_ptr = f"get_defs()->{field}[{i}].fnPtr"
@@ -695,19 +706,19 @@ with open("jni_hooks.hpp", "w") as f:
         gen_jni_def(
             "fork_app_methods",
             [
-                fas_l,
-                fas_o,
-                fas_p,
-                fas_q_alt,
-                fas_r,
-                fas_u,
-                fas_b,
                 fas_c,
-                fas_samsung_m,
-                fas_samsung_n,
-                fas_samsung_o,
-                fas_samsung_p,
+                fas_b,
+                fas_u,
+                fas_r,
+                fas_q_alt,
+                fas_p,
+                fas_o,
+                fas_l,
                 fas_nubia_u,
+                fas_samsung_p,
+                fas_samsung_o,
+                fas_samsung_n,
+                fas_samsung_m,
             ],
         )
     )
@@ -715,7 +726,16 @@ with open("jni_hooks.hpp", "w") as f:
     f.write(
         gen_jni_def(
             "specialize_app_methods",
-            [spec_q, spec_q_alt, spec_r, spec_u, spec_c, spec_xr_u, spec_samsung_q, spec_nubia_u],
+            [
+                spec_c,
+                spec_u,
+                spec_r,
+                spec_q,
+                spec_nubia_u,
+                spec_xr_u,
+                spec_samsung_q,
+                spec_q_alt,
+            ],
         )
     )
 
