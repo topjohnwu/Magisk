@@ -64,6 +64,8 @@ dump_vars() {
     eval val=\$$name
     echo local $name=\"$val\"\;
   done
+  # Always export AVD_TEST_LOG
+  echo export AVD_TEST_LOG=\"$AVD_TEST_LOG\";
 }
 
 parse_args() {
@@ -83,7 +85,7 @@ parse_args() {
         type="$OPTARG"
         ;;
       l )
-        export AVD_TEST_LOG=1
+        AVD_TEST_LOG=1
         ;;
       \? )
         echo "Error: Invalid option: -$OPTARG" 1>&2
@@ -103,7 +105,7 @@ parse_args() {
   # Determine API level
   local api
   case $ver in
-    +([0-9\.])) api=$ver ;;
+    +([0-9])?(\.+([0-9]))*) api="${ver%%[^0-9.]*}";;
     TiramisuPrivacySandbox) api=33 ;;
     UpsideDownCakePrivacySandbox) api=34 ;;
     VanillaIceCream) api=35 ;;
