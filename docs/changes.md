@@ -6,7 +6,7 @@
 - [MagiskInit] Support using klogdump partition as pre-init storage
 - [Zygisk] Support Android 16 QPR2 and higher
 - [Zygisk] Support Android XR and some Nubia devices
-- [MagiskSU] Do not drop capabilities by default, even when switching to non-root UIDs. Explicitly use the `--drop-cap` argument to drop capabilities.
+- [MagiskSU] Do not drop capabilities by default, even when switching to non-root UIDs. Explicitly use the `` argument to drop capabilities.
 - [MagiskBoot] Better lzma format detection
 - [MagiskBoot] Fix various commandline argument parsing bugs
 
