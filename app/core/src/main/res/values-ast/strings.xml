@@ -200,9 +200,7 @@
     <string name="reboot">Reaniciar</string>
     <string name="close">Zarrar</string>
     <string name="release_notes">Notes de la versión</string>
-    <string name="flashing">Flaxando…</string>
-    <string name="running">Executando…</string>
-    <string name="done">¡Fecho!</string>
+    <string name="flashing">Flaxando…</string>    <string name="done">¡Fecho!</string>
     <string name="done_action">Completóse l\'aición de: %1$s</string>
     <string name="failure">¡Falló!</string>
     <string name="hide_app_title">Escondiendo l\'aplicación Magisk…</string>

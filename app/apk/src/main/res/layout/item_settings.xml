@@ -39,8 +39,7 @@
                 style="@style/WidgetFoundation.Icon"
                 gone="@{item.icon == 0}"
                 android:background="@null"
-                app:srcCompat="@{item.icon}"
-                tools:srcCompat="@drawable/ic_fingerprint" />
+                app:srcCompat="@{item.icon}" />
 
             <LinearLayout
                 android:layout_width="0dp"

@@ -17,26 +17,15 @@
     <string name="loading">Учитавање…</string>
     <string name="update">Ажурирање</string>
     <string name="not_available">N/A</string>
-    <string name="hide">Сакриј</string>
-    <string name="restore">Поврати</string>
-    <string name="home_package">Пакет</string>
-    <string name="home_app_title">Апл.</string>
-    <string name="home_core_title">Core</string>
-    <string name="reinstall">Поново инсталирај</string>
+    <string name="hide">Сакриј</string>    <string name="home_package">Пакет</string>
+    <string name="home_app_title">Апл.</string>    <string name="reinstall">Поново инсталирај</string>
     <string name="home_notice_content">Преузмите Magisk САМО са званичне GitHub странице. Фајлови из непознатих извора могу бити малициозни!</string>
     <string name="home_support_title">Подржите нас</string>
     <string name="home_follow_title">Запратите нас</string>
     <string name="home_item_source">Извор</string>
-    <string name="home_support_content">Magisk јесте и увек ће бити бесплатан и open source. Међутим, можете показати да Вам је стало својом донацијом.</string>
-    <string name="donate">Донирај</string>
-    <string name="documents">Документи</string>
-    <string name="report_bugs">Пријави bug-ове</string>
-    <string name="home_status_title">Статус</string>
-    <string name="home_installed_version">Инсталирано</string>
+    <string name="home_support_content">Magisk јесте и увек ће бити бесплатан и open source. Међутим, можете показати да Вам је стало својом донацијом.</string>    <string name="home_installed_version">Инсталирано</string>
     <string name="home_latest_version">Најновије</string>
-    <string name="invalid_update_channel">Невалидан канал ажурирања</string>
-    <string name="uninstall">Деинсталирај</string>
-    <string name="uninstall_magisk_title">Деинсталирај Magisk</string>
+    <string name="invalid_update_channel">Невалидан канал ажурирања</string>    <string name="uninstall_magisk_title">Деинсталирај Magisk</string>
     <string name="uninstall_magisk_msg">Сви модули ће бити онемогућени/уклоњени!\nКорен ће бити уклоњен!\nСвако неенкриптовано интерно складиште ће употребом Magisk-а бити поново енкриптовано!</string>
 
     <!--Install-->
@@ -48,12 +37,7 @@
     <string name="install_next">Наредно</string>
     <string name="install_start">Почнимо</string>
     <string name="manager_download_install">Притисни да преузмеш и инсталираш</string>
-    <string name="direct_install">Директна инсталација (Препоручено)</string>
-    <string name="direct_install_summary">Директно инсталирај Magisk на boot партицију</string>
-    <string name="install_inactive_slot">Инсталација на неактиван слот (Након OTA)</string>
-    <string name="install_inactive_slot_summary">Инсталација на неактиван слот након OTA ажурирања</string>
-    <string name="select_patch_file_summary">Patch-уј слику, ODIN tar или payload.bin фајл</string>
-    <string name="install_inactive_slot_msg">Ваш уређај ће бити ФОРСИРАН да се покрене на тренутно неактивном слоту након поновног покретања!\nКористите опцију само кад се OTA заврши.\nНастави?</string>
+    <string name="direct_install">Директна инсталација (Препоручено)</string>    <string name="install_inactive_slot">Инсталација на неактиван слот (Након OTA)</string>    <string name="install_inactive_slot_msg">Ваш уређај ће бити ФОРСИРАН да се покрене на тренутно неактивном слоту након поновног покретања!\nКористите опцију само кад се OTA заврши.\nНастави?</string>
     <string name="setup_title">Додатне поставке</string>
     <string name="select_patch_file">Изабери фајл</string>
     <string name="patch_file_msg">Изабери слику (*.img) или ODIN tarfile (*.tar) или payload.bin (*.bin)</string>
@@ -102,12 +86,7 @@
     <string name="log_data_magisk_none">Magisk логови су празни, то је чудно.</string>
     <string name="menuSaveLog">Сачувај лог</string>
     <string name="menuClearLog">Уклони лог</string>
-    <string name="logs_cleared">Лог успешно уклоњен</string>
-    <string name="save_log">Сачувај лог</string>
-    <string name="clear_log">Уклони лог</string>
-    <string name="back">Назад</string>
-    <string name="superuser_setting">Супер-корисничко подешавање</string>
-    <string name="enabled">Омогућено</string>
+    <string name="logs_cleared">Лог успешно уклоњен</string>    <string name="back">Назад</string>    <string name="enabled">Омогућено</string>
     <string name="disabled">Онемогућено</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Циљани UID: %1$d</string>
@@ -252,9 +231,7 @@
     <string name="reboot">Поново покрени</string>
     <string name="close">Затвори</string>
     <string name="release_notes">Release notes</string>
-    <string name="flashing">Флешовање…</string>
-    <string name="running">Покретање…</string>
-    <string name="done">Завршено!</string>
+    <string name="flashing">Флешовање…</string>    <string name="done">Завршено!</string>
     <string name="done_action">Покретање акције %1$s завршено</string>
     <string name="failure">Неуспешно!</string>
     <string name="hide_app_title">Скривање Magisk апликације…</string>

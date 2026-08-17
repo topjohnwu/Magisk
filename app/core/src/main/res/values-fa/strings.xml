@@ -212,9 +212,7 @@
     <string name="reboot">راه اندازی مجدد</string>
     <string name="close">بستن</string>
     <string name="release_notes">نکته های نسخه</string>
-    <string name="flashing">ر حال فلش کردن…</string>
-    <string name="running">در حال اجرا…</string>
-    <string name="done">تمام!</string>
+    <string name="flashing">ر حال فلش کردن…</string>    <string name="done">تمام!</string>
     <string name="done_action">انجام عملیات %1$s به پایان رسید</string>
     <string name="failure">ناموفق</string>
     <string name="hide_app_title">در حال مخفی کردن برنامه Magisk…</string>

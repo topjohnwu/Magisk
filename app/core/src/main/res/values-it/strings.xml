@@ -16,26 +16,15 @@
     <string name="loading">Caricamento…</string>
     <string name="update">Aggiorna</string>
     <string name="not_available">N/D</string>
-    <string name="hide">Nascondi</string>
-    <string name="restore">Ripristina</string>
-    <string name="home_package">Pacchetto</string>
-    <string name="home_app_title">App</string>
-    <string name="home_core_title">Core</string>
-    <string name="reinstall">Reinstalla</string>
+    <string name="hide">Nascondi</string>    <string name="home_package">Pacchetto</string>
+    <string name="home_app_title">App</string>    <string name="reinstall">Reinstalla</string>
     <string name="home_notice_content">Scarica Magisk SOLTANTO dalla pagina GitHub ufficiale. I file provenienti da fonti sconosciute possono essere dannosi!</string>
     <string name="home_support_title">Supportaci</string>
     <string name="home_follow_title">Seguici</string>
     <string name="home_item_source">Codice sorgente</string>
-    <string name="home_support_content">Magisk è, e sempre sarà, gratuito ed open source. Puoi comunque mostrarci il tuo apprezzamento facendo una donazione.</string>
-    <string name="donate">Dona</string>
-    <string name="documents">Documenti</string>
-    <string name="report_bugs">Segnala bug</string>
-    <string name="home_status_title">Stato</string>
-    <string name="home_installed_version">Installata</string>
+    <string name="home_support_content">Magisk è, e sempre sarà, gratuito ed open source. Puoi comunque mostrarci il tuo apprezzamento facendo una donazione.</string>    <string name="home_installed_version">Installata</string>
     <string name="home_latest_version">Ultima</string>
-    <string name="invalid_update_channel">Canale di aggiornamento non valido</string>
-    <string name="uninstall">Disinstalla</string>
-    <string name="uninstall_magisk_title">Disinstalla Magisk</string>
+    <string name="invalid_update_channel">Canale di aggiornamento non valido</string>    <string name="uninstall_magisk_title">Disinstalla Magisk</string>
     <string name="uninstall_magisk_msg">Tutti i moduli verranno disabilitati/rimossi!\nIl root verrà rimosso!\nGli spazi di archiviazione interni decriptati tramite l\'uso di Magisk verranno nuovamente criptati!</string>
 
     <!--Install-->
@@ -47,12 +36,7 @@
     <string name="install_next">Avanti</string>
     <string name="install_start">Andiamo!</string>
     <string name="manager_download_install">Apri questa notifica per scaricare e installare</string>
-    <string name="direct_install">Installazione diretta (raccomandata)</string>
-    <string name="direct_install_summary">Installa Magisk direttamente nella partizione di boot</string>
-    <string name="install_inactive_slot">Installa nello slot inattivo (dopo un aggiornamento OTA)</string>
-    <string name="install_inactive_slot_summary">Installa nello slot inattivo dopo un aggiornamento OTA</string>
-    <string name="select_patch_file_summary">Applica una patch a un\'immagine raw, un file tar di ODIN o un file payload.bin</string>
-    <string name="install_inactive_slot_msg">Questo dispositivo verrà FORZATO ad avviarsi usando lo slot inattivo!\nUsa questo metodo solo dopo che un aggiornamento OTA è stato installato.\nVuoi continuare?</string>
+    <string name="direct_install">Installazione diretta (raccomandata)</string>    <string name="install_inactive_slot">Installa nello slot inattivo (dopo un aggiornamento OTA)</string>    <string name="install_inactive_slot_msg">Questo dispositivo verrà FORZATO ad avviarsi usando lo slot inattivo!\nUsa questo metodo solo dopo che un aggiornamento OTA è stato installato.\nVuoi continuare?</string>
     <string name="setup_title">Configurazione aggiuntiva</string>
     <string name="select_patch_file">Seleziona e aggiorna un file</string>
     <string name="patch_file_msg">Seleziona un\'immagine in formato .img, un file .tar di ODIN o un file payload.bin</string>
@@ -101,12 +85,7 @@
     <string name="log_data_magisk_none">Il registro eventi di Magisk è vuoto, questo è davvero strano.</string>
     <string name="menuSaveLog">Salva registro eventi</string>
     <string name="menuClearLog">Svuota il registro eventi</string>
-    <string name="logs_cleared">Registro eventi svuotato correttamente.</string>
-    <string name="save_log">Salva registro</string>
-    <string name="clear_log">Svuota registro</string>
-    <string name="back">Indietro</string>
-    <string name="superuser_setting">Impostazioni accesso root</string>
-    <string name="enabled">Abilitato</string>
+    <string name="logs_cleared">Registro eventi svuotato correttamente.</string>    <string name="back">Indietro</string>    <string name="enabled">Abilitato</string>
     <string name="disabled">Disabilitato</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Target UID: %1$d</string>
@@ -253,9 +232,7 @@
     <string name="reboot">Riavvia</string>
     <string name="close">Chiudi</string>
     <string name="release_notes">Note di rilascio</string>
-    <string name="flashing">Flash in corso…</string>
-    <string name="running">In esecuzione…</string>
-    <string name="done">Completato!</string>
+    <string name="flashing">Flash in corso…</string>    <string name="done">Completato!</string>
     <string name="done_action">Azione di %1$s completata</string>
     <string name="failure">Fallito</string>
     <string name="hide_app_title">Sto nascondendo l\'app di Magisk…</string>
