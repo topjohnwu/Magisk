@@ -16,26 +16,15 @@
     <string name="loading">جارٍ التحميل…</string>
     <string name="update">تحديث</string>
     <string name="not_available">غير متاح</string>
-    <string name="hide">إخفاء</string>
-    <string name="restore">استعادة</string>
-    <string name="home_package">الحزمة</string>
-    <string name="home_app_title">التطبيق</string>
-    <string name="home_core_title">النواة</string>
-    <string name="reinstall">إعادة التثبيت</string>
+    <string name="hide">إخفاء</string>    <string name="home_package">الحزمة</string>
+    <string name="home_app_title">التطبيق</string>    <string name="reinstall">إعادة التثبيت</string>
     <string name="home_notice_content">قم بتنزيل Magisk من صفحة GitHub الرسمية فقط. الملفات من مصادر مجهولة قد تكون ضارة!</string>
     <string name="home_support_title">ادعمنا</string>
     <string name="home_follow_title">تابعنا</string>
     <string name="home_item_source">المصدر</string>
-    <string name="home_support_content">Magisk مجاني ومفتوح المصدر، وسيظل كذلك دائمًا. غير أنك تستطيع التعبير عن اهتمامك بالتبرع.</string>
-    <string name="donate">تبرع</string>
-    <string name="documents">المستندات</string>
-    <string name="report_bugs">الإبلاغ عن أخطاء</string>
-    <string name="home_status_title">الحالة</string>
-    <string name="home_installed_version">المثبّت</string>
+    <string name="home_support_content">Magisk مجاني ومفتوح المصدر، وسيظل كذلك دائمًا. غير أنك تستطيع التعبير عن اهتمامك بالتبرع.</string>    <string name="home_installed_version">المثبّت</string>
     <string name="home_latest_version">الأحدث</string>
-    <string name="invalid_update_channel">قناة التحديث غير صالحة</string>
-    <string name="uninstall">إلغاء التثبيت</string>
-    <string name="uninstall_magisk_title">إلغاء تثبيت Magisk</string>
+    <string name="invalid_update_channel">قناة التحديث غير صالحة</string>    <string name="uninstall_magisk_title">إلغاء تثبيت Magisk</string>
     <string name="uninstall_magisk_msg">سيتم تعطيل/إزالة جميع الإضافات!\nسيتم إزالة الوصول الجذري!\nسيتم إعادة تشفير أي تخزين داخلي تم فك تشفيره باستخدام Magisk!</string>
 
     <!--Install-->
@@ -47,12 +36,7 @@
     <string name="install_next">التالي</string>
     <string name="install_start">هيا بنا</string>
     <string name="manager_download_install">اضغط للتنزيل والتثبيت</string>
-    <string name="direct_install">التثبيت المباشر (موصى به)</string>
-    <string name="direct_install_summary">تثبيت Magisk مباشرةً على قسم الإقلاع</string>
-    <string name="install_inactive_slot">التثبيت على الفتحة غير النشطة (بعد OTA)</string>
-    <string name="install_inactive_slot_summary">التثبيت على الفتحة غير النشطة بعد تحديث OTA</string>
-    <string name="select_patch_file_summary">تصحيح ملف النظام أو ملف ODIN tar أو payload.bin</string>
-    <string name="install_inactive_slot_msg">سيُجبَر جهازك على الإقلاع من الفتحة غير النشطة الحالية بعد إعادة التشغيل!\nاستخدم هذا الخيار فقط بعد اكتمال تحديث OTA.\nهل تريد المتابعة؟</string>
+    <string name="direct_install">التثبيت المباشر (موصى به)</string>    <string name="install_inactive_slot">التثبيت على الفتحة غير النشطة (بعد OTA)</string>    <string name="install_inactive_slot_msg">سيُجبَر جهازك على الإقلاع من الفتحة غير النشطة الحالية بعد إعادة التشغيل!\nاستخدم هذا الخيار فقط بعد اكتمال تحديث OTA.\nهل تريد المتابعة؟</string>
     <string name="setup_title">إعداد إضافي</string>
     <string name="select_patch_file">تحديد ملف وتصحيحه</string>
     <string name="patch_file_msg">حدد ملف خام (‎*.img) أو ملف ODIN tar (‎*.tar) أو ملف payload.bin (‎*.bin)</string>
@@ -101,12 +85,7 @@
     <string name="log_data_magisk_none">سجلات Magisk فارغة، هذا غريب.</string>
     <string name="menuSaveLog">حفظ السجل</string>
     <string name="menuClearLog">مسح السجل الآن</string>
-    <string name="logs_cleared">تم مسح السجل بنجاح</string>
-    <string name="save_log">حفظ السجل</string>
-    <string name="clear_log">مسح السجل</string>
-    <string name="back">رجوع</string>
-    <string name="superuser_setting">إعدادات صلاحية الروت</string>
-    <string name="enabled">مفعّل</string>
+    <string name="logs_cleared">تم مسح السجل بنجاح</string>    <string name="back">رجوع</string>    <string name="enabled">مفعّل</string>
     <string name="disabled">معطّل</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">UID المستهدف: %1$d</string>
@@ -251,9 +230,7 @@
     <string name="reboot">إعادة التشغيل</string>
     <string name="close">إغلاق</string>
     <string name="release_notes">ملاحظات الإصدار</string>
-    <string name="flashing">جارٍ التثبيت…</string>
-    <string name="running">جارٍ التنفيذ…</string>
-    <string name="done">تم!</string>
+    <string name="flashing">جارٍ التثبيت…</string>    <string name="done">تم!</string>
     <string name="done_action">اكتمل تنفيذ إجراء %1$s</string>
     <string name="failure">فشل!</string>
     <string name="hide_app_title">جارٍ إخفاء تطبيق Magisk…</string>

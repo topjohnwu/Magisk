@@ -16,26 +16,15 @@
     <string name="loading">Yükleniyor…</string>
     <string name="update">Güncelle</string>
     <string name="not_available">Yok</string>
-    <string name="hide">Gizle</string>
-    <string name="restore">Geri Yükle</string>
-    <string name="home_package">Paket</string>
-    <string name="home_app_title">Uygulama</string>
-    <string name="home_core_title">Çekirdek</string>
-    <string name="reinstall">Yeniden Yükle</string>
+    <string name="hide">Gizle</string>    <string name="home_package">Paket</string>
+    <string name="home_app_title">Uygulama</string>    <string name="reinstall">Yeniden Yükle</string>
     <string name="home_notice_content">Magisk\'i SADECE resmi GitHub sayfasından indirin. Bilinmeyen kaynaklardan alınan dosyalar kötü amaçlı olabilir!</string>
     <string name="home_support_title">Bizi Destekleyin</string>
     <string name="home_follow_title">Bizi Takip Edin</string>
     <string name="home_item_source">Kaynak</string>
-    <string name="home_support_content">Magisk her zaman ücretsiz ve açık kaynaklı kalacaktır. Ancak bağış yaparak bize destek olduğunuzu gösterebilirsiniz.</string>
-    <string name="donate">Bağış Yap</string>
-    <string name="documents">Belgeler</string>
-    <string name="report_bugs">Hata Bildir</string>
-    <string name="home_status_title">Durum</string>
-    <string name="home_installed_version">Yüklü</string>
+    <string name="home_support_content">Magisk her zaman ücretsiz ve açık kaynaklı kalacaktır. Ancak bağış yaparak bize destek olduğunuzu gösterebilirsiniz.</string>    <string name="home_installed_version">Yüklü</string>
     <string name="home_latest_version">En Son</string>
-    <string name="invalid_update_channel">Geçersiz güncelleme kanalı</string>
-    <string name="uninstall">Kaldır</string>
-    <string name="uninstall_magisk_title">Magisk\'i Kaldır</string>
+    <string name="invalid_update_channel">Geçersiz güncelleme kanalı</string>    <string name="uninstall_magisk_title">Magisk\'i Kaldır</string>
     <string name="uninstall_magisk_msg">Tüm modüller devre dışı bırakılacak/kaldırılacak!\nRoot kaldırılacak!\nMagisk kullanımıyla şifresi çözülen tüm dahili depolama birimleri yeniden şifrelenecek!</string>
 
     <!--Install-->
@@ -47,12 +36,7 @@
     <string name="install_next">İleri</string>
     <string name="install_start">Başlayalım</string>
     <string name="manager_download_install">İndirmek ve yüklemek için dokunun</string>
-    <string name="direct_install">Doğrudan kurulum (Önerilen)</string>
-    <string name="direct_install_summary">Magisk\'i doğrudan boot (ön yükleme) bölümüne kurun</string>
-    <string name="install_inactive_slot">Etkin olmayan slota kur (OTA\'dan sonra)</string>
-    <string name="install_inactive_slot_summary">Bir OTA güncellemesinden sonra etkin olmayan slota kur</string>
-    <string name="select_patch_file_summary">Bir ham imajı, ODIN tar veya payload.bin dosyasını yamalayın</string>
-    <string name="install_inactive_slot_msg">Cihazınız yeniden başlatıldıktan sonra mevcut etkin olmayan slottan başlatılmaya ZORLANACAK!\nBu seçeneği yalnızca OTA işlemi bittikten sonra kullanın.\nDevam edilsin mi?</string>
+    <string name="direct_install">Doğrudan kurulum (Önerilen)</string>    <string name="install_inactive_slot">Etkin olmayan slota kur (OTA\'dan sonra)</string>    <string name="install_inactive_slot_msg">Cihazınız yeniden başlatıldıktan sonra mevcut etkin olmayan slottan başlatılmaya ZORLANACAK!\nBu seçeneği yalnızca OTA işlemi bittikten sonra kullanın.\nDevam edilsin mi?</string>
     <string name="setup_title">Ek kurulum</string>
     <string name="select_patch_file">Bir dosya seçin ve yamalayın</string>
     <string name="patch_file_msg">Bir ham imaj (*.img), ODIN tar dosyası (*.tar) veya payload.bin (*.bin) seçin</string>
@@ -98,12 +82,7 @@
     <string name="log_data_magisk_none">Magisk günlükleri boş, bu çok garip.</string>
     <string name="menuSaveLog">Günlüğü kaydet</string>
     <string name="menuClearLog">Günlüğü şimdi temizle</string>
-    <string name="logs_cleared">Günlük başarıyla temizlendi</string>
-    <string name="save_log">Günlüğü kaydet</string>
-    <string name="clear_log">Günlüğü temizle</string>
-    <string name="back">Geri</string>
-    <string name="superuser_setting">Süper Kullanıcı Ayarı</string>
-    <string name="enabled">Etkin</string>
+    <string name="logs_cleared">Günlük başarıyla temizlendi</string>    <string name="back">Geri</string>    <string name="enabled">Etkin</string>
     <string name="disabled">Devre Dışı</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Hedef UID: %1$d</string>
@@ -246,9 +225,7 @@
     <string name="reboot">Yeniden Başlat</string>
     <string name="close">Kapat</string>
     <string name="release_notes">Sürüm notları</string>
-    <string name="flashing">Yazılıyor…</string>
-    <string name="running">Çalışıyor…</string>
-    <string name="done">Tamamlandı!</string>
+    <string name="flashing">Yazılıyor…</string>    <string name="done">Tamamlandı!</string>
     <string name="done_action">%1$s işlemi tamamlandı</string>
     <string name="failure">Başarısız!</string>
     <string name="hide_app_title">Magisk uygulaması gizleniyor…</string>

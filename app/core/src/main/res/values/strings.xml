@@ -238,9 +238,7 @@
     <string name="reboot">Reboot</string>
     <string name="close">Close</string>
     <string name="release_notes">Release notes</string>
-    <string name="flashing">Flashing…</string>
-    <string name="running">Running…</string>
-    <string name="done">Done!</string>
+    <string name="flashing">Flashing…</string>    <string name="done">Done!</string>
     <string name="done_action">Done running action of %1$s</string>
     <string name="failure">Failed!</string>
     <string name="hide_app_title">Hiding the Magisk app…</string>

@@ -16,26 +16,15 @@
     <string name="loading">Načítání…</string>
     <string name="update">Aktualizovat</string>
     <string name="not_available">N/A</string>
-    <string name="hide">Skrýt</string>
-    <string name="restore">Obnovit</string>
-    <string name="home_package">Balíček</string>
-    <string name="home_app_title">Aplikace</string>
-    <string name="home_core_title">Jádro</string>
-    <string name="reinstall">Přeinstalovat</string>
+    <string name="hide">Skrýt</string>    <string name="home_package">Balíček</string>
+    <string name="home_app_title">Aplikace</string>    <string name="reinstall">Přeinstalovat</string>
     <string name="home_notice_content">Stahujte Magisk POUZE z oficiální stránky na GitHubu. Soubory z neznámých zdrojů mohou být škodlivé!</string>
     <string name="home_support_title">Podpořte nás</string>
     <string name="home_follow_title">Sledujte nás</string>
     <string name="home_item_source">Zdroj</string>
-    <string name="home_support_content">Magisk je a vždy bude zdarma a s otevřeným zdrojovým kódem. Projevit svou podporu nám však můžete přispěním finančního daru.</string>
-    <string name="donate">Přispět</string>
-    <string name="documents">Dokumenty</string>
-    <string name="report_bugs">Nahlásit chyby</string>
-    <string name="home_status_title">Status</string>
-    <string name="home_installed_version">Nainstalováno</string>
+    <string name="home_support_content">Magisk je a vždy bude zdarma a s otevřeným zdrojovým kódem. Projevit svou podporu nám však můžete přispěním finančního daru.</string>    <string name="home_installed_version">Nainstalováno</string>
     <string name="home_latest_version">Nejnovější</string>
-    <string name="invalid_update_channel">Neplatný kanál aktualizace</string>
-    <string name="uninstall">Odinstalovat</string>
-    <string name="uninstall_magisk_title">Odinstalovat Magisk</string>
+    <string name="invalid_update_channel">Neplatný kanál aktualizace</string>    <string name="uninstall_magisk_title">Odinstalovat Magisk</string>
     <string name="uninstall_magisk_msg">Všechny moduly budou deaktivovány/odstraněny!\nOprávnění root budou odebrána!\nVeškeré interní úložiště, které nebylo zašifrováno pomocí Magisku, bude znovu zašifrováno!</string>
 
     <!--Install-->
@@ -47,12 +36,7 @@
     <string name="install_next">Další</string>
     <string name="install_start">Spustit</string>
     <string name="manager_download_install">Stiskněte pro stažení a instalaci</string>
-    <string name="direct_install">Přímá instalace (doporučeno)</string>
-    <string name="direct_install_summary">Nainstaluje Magisk přímo na spouštěcí oddíl</string>
-    <string name="install_inactive_slot">Instalace do druhého slotu (po OTA)</string>
-    <string name="install_inactive_slot_summary">Nainstaluje se do neaktivního slotu po aktualizaci OTA</string>
-    <string name="select_patch_file_summary">Patchuje raw obraz, soubor ODIN tar nebo soubor payload.bin</string>
-    <string name="install_inactive_slot_msg">Vaše zařízení bude po restartu VYNUCENĚ spuštěno do aktuálního neaktivního slotu!\nTuto možnost použijte pouze po dokončení OTA.\nChcete pokračovat?</string>
+    <string name="direct_install">Přímá instalace (doporučeno)</string>    <string name="install_inactive_slot">Instalace do druhého slotu (po OTA)</string>    <string name="install_inactive_slot_msg">Vaše zařízení bude po restartu VYNUCENĚ spuštěno do aktuálního neaktivního slotu!\nTuto možnost použijte pouze po dokončení OTA.\nChcete pokračovat?</string>
     <string name="setup_title">Další nastavení</string>
     <string name="select_patch_file">Vybrat a opravit soubor</string>
     <string name="patch_file_msg">Vyberte soubor RAW (*.img), soubor TAR pro ODIN (*.tar), nebo payload.bin (*.bin)</string>
@@ -98,12 +82,7 @@
     <string name="log_data_magisk_none">Protokoly Magisk jsou prázdné. To je zvláštní</string>
     <string name="menuSaveLog">Uložit protokol</string>
     <string name="menuClearLog">Smazat protokol</string>
-    <string name="logs_cleared">Protokol byl smazán</string>
-    <string name="save_log">Uložit protokol</string>
-    <string name="clear_log">Vyčistit protokol</string>
-    <string name="back">Zpět</string>
-    <string name="superuser_setting">Nastavení Superusera</string>
-    <string name="enabled">Zapnuto</string>
+    <string name="logs_cleared">Protokol byl smazán</string>    <string name="back">Zpět</string>    <string name="enabled">Zapnuto</string>
     <string name="disabled">Vypnuto</string>
     <string name="pid">PID:%1$d</string>
     <string name="target_uid">Cílové UID: %1$d</string>
@@ -246,9 +225,7 @@
     <string name="reboot">Restartovat</string>
     <string name="close">Zavřít</string>
     <string name="release_notes">Seznam změn</string>
-    <string name="flashing">Flashuji…</string>
-    <string name="running">Pracuji…</string>
-    <string name="done">Dokončeno!</string>
+    <string name="flashing">Flashuji…</string>    <string name="done">Dokončeno!</string>
     <string name="done_action">Akce %1$s byla dokončena</string>
     <string name="failure">Nepodařilo se!</string>
     <string name="hide_app_title">Skrývám aplikaci Magisk…</string>

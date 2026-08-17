@@ -16,26 +16,15 @@
     <string name="loading">Memuat…</string>
     <string name="update">Perbarui</string>
     <string name="not_available">N/A</string>
-    <string name="hide">Tutup</string>
-    <string name="restore">Pulihkan</string>
-    <string name="home_package">Paket</string>
-    <string name="home_app_title">Aplikasi</string>
-    <string name="home_core_title">Inti</string>
-    <string name="reinstall">Pasang ulang</string>
+    <string name="hide">Tutup</string>    <string name="home_package">Paket</string>
+    <string name="home_app_title">Aplikasi</string>    <string name="reinstall">Pasang ulang</string>
     <string name="home_notice_content">Unduh Magisk HANYA dari halaman GitHub resmi. Berkas dari sumber yang tidak dikenal dapat berbahaya!</string>
     <string name="home_support_title">Dukung Kami</string>
     <string name="home_follow_title">Ikuti Kami</string>
     <string name="home_item_source">Sumber</string>
-    <string name="home_support_content">Magisk akan selalu menjadi aplikasi gratis dan serta bersumber terbuka. Bagaimanapun juga, Anda dapat menunjukan kepedulian Anda kepada kami dengan memberikan sedikit donasi.</string>
-    <string name="donate">Donasi</string>
-    <string name="documents">Dokumentasi</string>
-    <string name="report_bugs">Laporkan bug</string>
-    <string name="home_status_title">Status</string>
-    <string name="home_installed_version">Terpasang</string>
+    <string name="home_support_content">Magisk akan selalu menjadi aplikasi gratis dan serta bersumber terbuka. Bagaimanapun juga, Anda dapat menunjukan kepedulian Anda kepada kami dengan memberikan sedikit donasi.</string>    <string name="home_installed_version">Terpasang</string>
     <string name="home_latest_version">Terbaru</string>
-    <string name="invalid_update_channel">Saluran pembaruan tidak valid</string>
-    <string name="uninstall">Hapus</string>
-    <string name="uninstall_magisk_title">Hapus Magisk</string>
+    <string name="invalid_update_channel">Saluran pembaruan tidak valid</string>    <string name="uninstall_magisk_title">Hapus Magisk</string>
     <string name="uninstall_magisk_msg">Semua modul akan dinonaktifkan/dihapus!\nRoot akan dihapus!\nSemua data internal yang tidak dienkripsi melalui penggunaan Magisk akan dienkripsi ulang!</string>
 
     <!--Install-->
@@ -47,15 +36,9 @@
     <string name="install_next">Berikutnya</string>
     <string name="install_start">Mulai</string>
     <string name="manager_download_install">Ketuk untuk mengunduh dan memasang</string>
-    <string name="direct_install">Pasang langsung (Disarankan)</string>
-    <string name="direct_install_summary">Memasang Magisk langsung ke partisi boot</string>
-    <string name="install_inactive_slot">Pasang ke slot tidak aktif (Setelah OTA)</string>
-    <string name="install_inactive_slot_summary">Memasang ke slot yang tidak aktif setelah pembaruan OTA</string>
-    <string name="install_inactive_slot_msg">Perangkat Anda akan DIPAKSA untuk boot ke slot tidak aktif saat ini setelah dimulai ulang!\nGunakan opsi ini hanya setelah OTA selesai.\nLanjutkan?</string>
+    <string name="direct_install">Pasang langsung (Disarankan)</string>    <string name="install_inactive_slot">Pasang ke slot tidak aktif (Setelah OTA)</string>    <string name="install_inactive_slot_msg">Perangkat Anda akan DIPAKSA untuk boot ke slot tidak aktif saat ini setelah dimulai ulang!\nGunakan opsi ini hanya setelah OTA selesai.\nLanjutkan?</string>
     <string name="setup_title">Penyiapan tambahan</string>
-    <string name="select_patch_file">Pilih dan tambal berkas</string>
-    <string name="select_patch_file_summary">Tambal berkas image mentah, tar ODIN, atau payload.bin</string>
-    <string name="patch_file_msg">Pilih berkas image mentah (*.img) atau tar ODIN (*.tar) atau payload.bin (*.bin)</string>
+    <string name="select_patch_file">Pilih dan tambal berkas</string>    <string name="patch_file_msg">Pilih berkas image mentah (*.img) atau tar ODIN (*.tar) atau payload.bin (*.bin)</string>
     <string name="download_patch_file">Unduh dan tambal berkas</string>
     <string name="download_dialog_title">Masukkan URL image</string>
     <string name="download_dialog_msg">Image OTA penuh atau image pabrik</string>
@@ -98,12 +81,7 @@
     <string name="log_data_magisk_none">Log Magisk kosong, ini aneh.</string>
     <string name="menuSaveLog">Simpan log</string>
     <string name="menuClearLog">Bersihkan log</string>
-    <string name="logs_cleared">Log berhasil dibersihkan</string>
-    <string name="save_log">Simpan log</string>
-    <string name="clear_log">Bersihkan log</string>
-    <string name="back">Kembali</string>
-    <string name="superuser_setting">Setelan Superuser</string>
-    <string name="enabled">Aktif</string>
+    <string name="logs_cleared">Log berhasil dibersihkan</string>    <string name="back">Kembali</string>    <string name="enabled">Aktif</string>
     <string name="disabled">Nonaktif</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">UID Target: %1$d</string>
@@ -248,9 +226,7 @@
     <string name="reboot">Mulai ulang</string>
     <string name="close">Tutup</string>
     <string name="release_notes">Catatan rilis</string>
-    <string name="flashing">Memasang…</string>
-    <string name="running">Memproses…</string>
-    <string name="done">Selesai!</string>
+    <string name="flashing">Memasang…</string>    <string name="done">Selesai!</string>
     <string name="done_action">Aksi %1$s selesai</string>
     <string name="failure">Gagal!</string>
     <string name="hide_app_title">Menyembunyikan aplikasi Magisk…</string>

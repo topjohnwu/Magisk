@@ -210,9 +210,7 @@
     <string name="reboot">הפעלה מחדש</string>
     <string name="close">סגירה</string>
     <string name="release_notes">הערות שחרור</string>
-    <string name="flashing">צורב…</string>
-    <string name="running">רץ…</string>
-    <string name="done">בוצע!</string>
+    <string name="flashing">צורב…</string>    <string name="done">בוצע!</string>
     <string name="done_action">בוצעה ריצת פעולה של %1$s</string>
     <string name="failure">נכשל!</string>
     <string name="hide_app_title">מסתיר את יישום Magisk…</string>

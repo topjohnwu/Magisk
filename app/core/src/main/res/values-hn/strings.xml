@@ -212,9 +212,7 @@
     <string name="reboot">Reboot karo</string>
     <string name="close">Close karo</string>
     <string name="release_notes">Release notes</string>
-    <string name="flashing">Flash ho raha hai…</string>
-    <string name="running">Chal raha hai…</string>
-    <string name="done">Ho gaya!</string>
+    <string name="flashing">Flash ho raha hai…</string>    <string name="done">Ho gaya!</string>
     <string name="done_action">%1$s ka action complete ho gaya</string>
     <string name="failure">Fail ho gaya!</string>
     <string name="hide_app_title">Magisk app ko chhupa rahe hain…</string>

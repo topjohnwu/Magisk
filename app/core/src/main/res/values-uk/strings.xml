@@ -16,26 +16,15 @@
     <string name="loading">Завантаження…</string>
     <string name="update">Оновити</string>
     <string name="not_available">Н/Д</string>
-    <string name="hide">Сховати</string>
-    <string name="restore">Відновити</string>
-    <string name="home_package">Пакунок</string>
-    <string name="home_app_title">Застосунок</string>
-    <string name="home_core_title">Ядро</string>
-    <string name="reinstall">Перевстановити</string>
+    <string name="hide">Сховати</string>    <string name="home_package">Пакунок</string>
+    <string name="home_app_title">Застосунок</string>    <string name="reinstall">Перевстановити</string>
     <string name="home_notice_content">Завантажуйте Magisk ЛИШЕ з офіційної сторінки на GitHub. Файли з невідомих джерел можуть містити шкідливий функціонал!</string>
     <string name="home_support_title">Підтримати нас</string>
     <string name="home_follow_title">Слідкуйте за нами</string>
     <string name="home_item_source">Джерело</string>
-    <string name="home_support_content">Magisk є, і завжди буде безкоштовним та з відкритим кодом. Однак, якщо вам не байдуже, можете зробити невеличке пожертвування.</string>
-    <string name="donate">Пожертвувати</string>
-    <string name="documents">Документація</string>
-    <string name="report_bugs">Повідомити про помилку</string>
-    <string name="home_status_title">Стан</string>
-    <string name="home_installed_version">Встановлено</string>
+    <string name="home_support_content">Magisk є, і завжди буде безкоштовним та з відкритим кодом. Однак, якщо вам не байдуже, можете зробити невеличке пожертвування.</string>    <string name="home_installed_version">Встановлено</string>
     <string name="home_latest_version">Найновіша</string>
-    <string name="invalid_update_channel">Невірний канал оновлення</string>
-    <string name="uninstall">Видалити</string>
-    <string name="uninstall_magisk_title">Видалити Magisk</string>
+    <string name="invalid_update_channel">Невірний канал оновлення</string>    <string name="uninstall_magisk_title">Видалити Magisk</string>
     <string name="uninstall_magisk_msg">Ця дія призведе до вимкнення/видалення всіх модулів! Рут буде повністю видалено!\nВаші дані можуть зашифруватися, якщо вони не зашифровані!\nВпевнені, що бажаєте продовжити?</string>
 
     <!--Install-->
@@ -47,12 +36,7 @@
     <string name="install_next">Далі</string>
     <string name="install_start">Встановити</string>
     <string name="manager_download_install">Натисніть, щоб завантажити і встановити</string>
-    <string name="direct_install">Пряме встановлення (рекомендовано)</string>
-    <string name="direct_install_summary">Встановити Magisk безпосередньо в розділ boot</string>
-    <string name="install_inactive_slot">Встановити в неактивний слот (після OTA)</string>
-    <string name="install_inactive_slot_summary">Встановити в неактивний слот після оновлення OTA</string>
-    <string name="select_patch_file_summary">Пропатчити необроблений образ, ODIN tar або файл payload.bin</string>
-    <string name="install_inactive_slot_msg">Ваш пристрій буде примусово перезавантажено в неактивний слот!\nВикористовуйте цю опцію тільки для встановлення OTA.\nПродовжити?</string>
+    <string name="direct_install">Пряме встановлення (рекомендовано)</string>    <string name="install_inactive_slot">Встановити в неактивний слот (після OTA)</string>    <string name="install_inactive_slot_msg">Ваш пристрій буде примусово перезавантажено в неактивний слот!\nВикористовуйте цю опцію тільки для встановлення OTA.\nПродовжити?</string>
     <string name="setup_title">Додаткове налаштування</string>
     <string name="select_patch_file">Вибрати і пропатчити файл</string>
     <string name="patch_file_msg">Виберіть необроблений образ (*.img) або стиснутий файл ODIN (*.tar)</string>
@@ -101,12 +85,7 @@
     <string name="log_data_magisk_none">Журнал Magisk порожній, це дивно.</string>
     <string name="menuSaveLog">Зберегти журнал</string>
     <string name="menuClearLog">Очистити журнал</string>
-    <string name="logs_cleared">Журнал успішно очищено</string>
-    <string name="save_log">Зберегти журнал</string>
-    <string name="clear_log">Очистити журнал</string>
-    <string name="back">Назад</string>
-    <string name="superuser_setting">Налаштування суперкористувача</string>
-    <string name="enabled">Увімкнено</string>
+    <string name="logs_cleared">Журнал успішно очищено</string>    <string name="back">Назад</string>    <string name="enabled">Увімкнено</string>
     <string name="disabled">Вимкнено</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Цільовий UID: %1$d</string>
@@ -251,9 +230,7 @@
     <string name="reboot">Перезавантажити</string>
     <string name="close">Закрити</string>
     <string name="release_notes">Особливості версії</string>
-    <string name="flashing">Прошивання…</string>
-    <string name="running">Виконання…</string>
-    <string name="done">Готово!</string>
+    <string name="flashing">Прошивання…</string>    <string name="done">Готово!</string>
     <string name="done_action">Дію %1$s виконано</string>
     <string name="failure">Не вдалося!</string>
     <string name="hide_app_title">Ховання застосунку Magisk…</string>
