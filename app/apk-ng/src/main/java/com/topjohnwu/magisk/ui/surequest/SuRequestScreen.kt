@@ -127,7 +127,7 @@ fun SuRequestScreen(viewModel: SuRequestViewModel) {
                 Text(
                     text = stringResource(CoreR.string.su_warning),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.primary,
+                    color = MaterialTheme.colorScheme.error,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                 )

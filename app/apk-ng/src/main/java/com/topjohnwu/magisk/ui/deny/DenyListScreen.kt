@@ -80,7 +80,6 @@ fun DenyListScreen(viewModel: DenyListViewModel, onBack: () -> Unit) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
                 },

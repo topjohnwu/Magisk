@@ -43,7 +43,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -277,10 +276,12 @@ private fun SuLogCard(log: SuLog) {
 
 @Composable
 private fun SuActionBadge(allowed: Boolean) {
-    val bg = if (allowed) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+    val bg = if (allowed) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.errorContainer
+    val fg = if (allowed) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onErrorContainer
     val text = if (allowed) stringResource(CoreR.string.granted) else stringResource(CoreR.string.denied)
     Badge(
         containerColor = bg,
+        contentColor = fg,
     ) { Text(text = text) }
 }
 
@@ -382,14 +383,14 @@ private fun MagiskLogCard(entry: MagiskLogEntry) {
 
 @Composable
 private fun LogLevelBadge(level: Char) {
+    val colorScheme = MaterialTheme.colorScheme
     val (bg, fg) = when (level) {
-        'V' -> Color(0xFF9E9E9E) to Color.White
-        'D' -> Color(0xFF2196F3) to Color.White
-        'I' -> Color(0xFF4CAF50) to Color.White
-        'W' -> Color(0xFFFFC107) to Color.Black
-        'E' -> Color(0xFFF44336) to Color.White
-        'F' -> Color(0xFF9C27B0) to Color.White
-        else -> Color(0xFF757575) to Color.White
+        'V' -> colorScheme.surfaceVariant to colorScheme.onSurfaceVariant
+        'D' -> colorScheme.secondaryContainer to colorScheme.onSecondaryContainer
+        'I' -> colorScheme.primaryContainer to colorScheme.onPrimaryContainer
+        'W' -> colorScheme.tertiaryContainer to colorScheme.onTertiaryContainer
+        'E', 'F' -> colorScheme.errorContainer to colorScheme.onErrorContainer
+        else -> colorScheme.surfaceVariant to colorScheme.onSurfaceVariant
     }
     Badge(
         containerColor = bg,

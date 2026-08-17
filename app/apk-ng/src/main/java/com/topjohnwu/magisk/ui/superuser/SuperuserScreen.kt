@@ -190,7 +190,8 @@ private fun PolicyCard(
 internal fun SharedUidBadge(modifier: Modifier = Modifier) {
     Badge(
         modifier = modifier,
-        containerColor = MaterialTheme.colorScheme.primary,
+        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
     ) {
         Text(stringResource(CoreR.string.shared_uid))
     }

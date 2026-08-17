@@ -67,7 +67,6 @@ fun FlashScreen(viewModel: FlashViewModel, action: String, onBack: () -> Unit) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 },
@@ -80,7 +79,6 @@ fun FlashScreen(viewModel: FlashViewModel, action: String, onBack: () -> Unit) {
                             Icon(
                                 painter = painterResource(R.drawable.ic_save),
                                 contentDescription = stringResource(CoreR.string.menuSaveLog),
-                                tint = MaterialTheme.colorScheme.onSurface
                             )
                         }
                     }
@@ -92,7 +90,6 @@ fun FlashScreen(viewModel: FlashViewModel, action: String, onBack: () -> Unit) {
                             Icon(
                                 painter = painterResource(R.drawable.ic_restart),
                                 contentDescription = stringResource(CoreR.string.reboot),
-                                tint = MaterialTheme.colorScheme.onSurface
                             )
                         }
                     }
