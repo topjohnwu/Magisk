@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Undo
@@ -72,6 +73,7 @@ import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.ui.component.ConfirmResult
 import com.topjohnwu.magisk.ui.component.MarkdownTextAsync
 import com.topjohnwu.magisk.ui.component.rememberConfirmDialog
+import com.topjohnwu.magisk.ui.component.verticalScrollbar
 import com.topjohnwu.magisk.utils.textHolder
 import kotlinx.coroutines.launch
 import com.topjohnwu.magisk.core.R as CoreR
@@ -183,11 +185,14 @@ fun ModuleScreen(viewModel: ModuleViewModel) {
             return@Scaffold
         }
 
+        val listState = rememberLazyListState()
         LazyColumn(
+            state = listState,
             modifier = Modifier
                 .fillMaxSize()
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
                 .padding(padding)
+                .verticalScrollbar(listState, contentPadding = PaddingValues(bottom = 160.dp))
                 .padding(horizontal = 12.dp),
             contentPadding = PaddingValues(bottom = 160.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)

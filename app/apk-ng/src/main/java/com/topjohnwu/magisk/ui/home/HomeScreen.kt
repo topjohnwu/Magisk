@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -81,6 +82,7 @@ import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.ui.component.LoadingDialogHandle
 import com.topjohnwu.magisk.ui.component.MarkdownTextAsync
 import com.topjohnwu.magisk.ui.component.rememberLoadingDialog
+import com.topjohnwu.magisk.ui.component.verticalScrollbar
 import com.topjohnwu.magisk.ui.flash.FlashUtils
 import com.topjohnwu.magisk.ui.install.InstallBottomSheet
 import com.topjohnwu.magisk.ui.install.InstallViewModel
@@ -185,6 +187,8 @@ fun HomeScreen(viewModel: HomeViewModel, installVm: InstallViewModel) {
         )
     }
 
+    val scrollState = rememberScrollState()
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -200,9 +204,11 @@ fun HomeScreen(viewModel: HomeViewModel, installVm: InstallViewModel) {
     ) { padding ->
         Column(
             modifier = Modifier
+                .fillMaxSize()
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
                 .padding(padding)
-                .verticalScroll(rememberScrollState())
+                .verticalScrollbar(scrollState, contentPadding = PaddingValues(top = 12.dp, bottom = 88.dp))
+                .verticalScroll(scrollState)
                 .padding(horizontal = 16.dp)
                 .padding(top = 12.dp, bottom = 88.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)

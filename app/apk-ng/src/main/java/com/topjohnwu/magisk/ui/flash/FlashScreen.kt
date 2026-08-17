@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.ui.flash
 
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -31,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.ui.component.rememberExternalStoragePermissionLauncher
+import com.topjohnwu.magisk.ui.component.verticalScrollbar
 import com.topjohnwu.magisk.ui.terminal.TerminalScreen
 import com.topjohnwu.magisk.core.R as CoreR
 
@@ -121,6 +123,7 @@ fun FlashScreen(viewModel: FlashViewModel, action: String, onBack: () -> Unit) {
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
+                    .verticalScrollbar(listState, contentPadding = PaddingValues(vertical = 4.dp))
                     .horizontalScroll(rememberScrollState())
                     .padding(horizontal = 8.dp, vertical = 4.dp)
             ) {

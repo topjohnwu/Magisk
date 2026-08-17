@@ -60,6 +60,7 @@ import com.topjohnwu.magisk.core.ktx.timeDateFormat
 import com.topjohnwu.magisk.core.ktx.toTime
 import com.topjohnwu.magisk.core.model.su.SuLog
 import com.topjohnwu.magisk.ui.component.rememberExternalStoragePermissionLauncher
+import com.topjohnwu.magisk.ui.component.verticalScrollbar
 import com.topjohnwu.magisk.core.R as CoreR
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -167,10 +168,13 @@ private fun SuLogTab(logs: List<SuLog>, nestedScrollConnection: NestedScrollConn
                 )
             }
         } else {
+            val listState = rememberLazyListState()
             LazyColumn(
+                state = listState,
                 modifier = Modifier
                     .weight(1f)
                     .nestedScroll(nestedScrollConnection)
+                    .verticalScrollbar(listState, contentPadding = PaddingValues(top = 8.dp, bottom = 88.dp))
                     .padding(horizontal = 12.dp),
                 contentPadding = PaddingValues(top = 8.dp, bottom = 88.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -308,6 +312,7 @@ private fun MagiskLogTab(
                 modifier = Modifier
                     .weight(1f)
                     .nestedScroll(nestedScrollConnection)
+                    .verticalScrollbar(listState, contentPadding = PaddingValues(top = 8.dp, bottom = 88.dp))
                     .padding(horizontal = 12.dp),
                 contentPadding = PaddingValues(top = 8.dp, bottom = 88.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
