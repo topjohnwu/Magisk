@@ -244,9 +244,7 @@ private fun LoadingDialog(showDialog: MutableState<Boolean>) {
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Start,
                     ) {
-                        CircularProgressIndicator(
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
+                        CircularProgressIndicator()
                         Text(
                             modifier = Modifier.padding(start = 16.dp),
                             text = stringResource(com.topjohnwu.magisk.core.R.string.loading),
@@ -317,7 +315,7 @@ private fun ConfirmDialogContent(
 
 @Composable
 fun MarkdownText(text: String) {
-    val contentColor = MaterialTheme.colorScheme.onBackground.toArgb()
+    val contentColor = MaterialTheme.colorScheme.onSurface.toArgb()
     AndroidView(
         factory = { context ->
             TextView(context).apply {
@@ -356,7 +354,7 @@ fun MarkdownTextAsync(getMarkdownText: suspend () -> String) {
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
-            CircularProgressIndicator(color = MaterialTheme.colorScheme.onBackground)
+            CircularProgressIndicator()
         }
     }
 }
