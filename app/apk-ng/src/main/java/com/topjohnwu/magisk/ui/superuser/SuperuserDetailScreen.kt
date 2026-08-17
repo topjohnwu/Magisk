@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.ui.superuser
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -41,6 +42,7 @@ import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.topjohnwu.magisk.ui.component.ConfirmResult
 import com.topjohnwu.magisk.ui.component.SettingsSwitch
 import com.topjohnwu.magisk.ui.component.rememberConfirmDialog
+import com.topjohnwu.magisk.ui.component.verticalScrollbar
 import kotlinx.coroutines.launch
 import com.topjohnwu.magisk.core.R as CoreR
 
@@ -55,6 +57,7 @@ fun SuperuserDetailScreen(
     val items = uiState.policies.filter { it.policy.uid == uid }
     val item = items.firstOrNull()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    val scrollState = rememberScrollState()
     val scope = rememberCoroutineScope()
     val revokeDialog = rememberConfirmDialog()
     val revokeTitle = stringResource(CoreR.string.su_revoke_title)
@@ -87,8 +90,9 @@ fun SuperuserDetailScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
-                .verticalScroll(rememberScrollState())
                 .padding(padding)
+                .verticalScrollbar(scrollState, contentPadding = PaddingValues(bottom = 88.dp))
+                .verticalScroll(scrollState)
                 .padding(horizontal = 12.dp)
                 .padding(bottom = 88.dp)
         ) {

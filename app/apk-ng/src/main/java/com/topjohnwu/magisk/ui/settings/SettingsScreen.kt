@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.ui.settings
 
 import android.os.Build
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -44,12 +45,14 @@ import com.topjohnwu.magisk.ui.component.SettingsArrow
 import com.topjohnwu.magisk.ui.component.SettingsDropdown
 import com.topjohnwu.magisk.ui.component.SettingsSwitch
 import com.topjohnwu.magisk.ui.component.SmallTitle
+import com.topjohnwu.magisk.ui.component.verticalScrollbar
 import com.topjohnwu.magisk.core.R as CoreR
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(viewModel: SettingsViewModel) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    val scrollState = rememberScrollState()
     Scaffold(
         topBar = {
             TopAppBar(
@@ -62,8 +65,9 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
             modifier = Modifier
                 .fillMaxSize()
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
-                .verticalScroll(rememberScrollState())
                 .padding(padding)
+                .verticalScrollbar(scrollState, contentPadding = PaddingValues(bottom = 88.dp))
+                .verticalScroll(scrollState)
                 .padding(horizontal = 12.dp)
                 .padding(bottom = 88.dp)
         ) {

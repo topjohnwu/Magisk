@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.sp
 import com.topjohnwu.magisk.terminal.TerminalEmulator
+import com.topjohnwu.magisk.ui.component.terminalScrollbar
 import kotlin.math.max
 
 @Composable
@@ -63,23 +64,36 @@ fun TerminalScreen(
             }
         }
 
+        val activeTranscriptRows = emulator?.screen?.activeTranscriptRows ?: 0
+        val scrollableState = rememberScrollableState { delta ->
+            val emu = emulator ?: return@rememberScrollableState 0f
+            val minTop = -emu.screen.activeTranscriptRows
+            val rowDelta = -(delta / lineHeight).toInt()
+            if (rowDelta != 0) {
+                val newTopRow = (topRow + rowDelta).coerceIn(minTop, 0)
+                topRow = newTopRow
+                scrolledToBottom = newTopRow >= 0
+            }
+            delta
+        }
+
         Spacer(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.Black)
+                .terminalScrollbar(
+                    activeTranscriptRows = activeTranscriptRows,
+                    topRow = topRow,
+                    visibleRows = rows,
+                    onScrollToRow = { newRow ->
+                        topRow = newRow
+                        scrolledToBottom = newRow >= 0
+                    },
+                    isScrollInProgress = scrollableState.isScrollInProgress,
+                )
                 .scrollable(
                     orientation = Orientation.Vertical,
-                    state = rememberScrollableState { delta ->
-                        val emu = emulator ?: return@rememberScrollableState 0f
-                        val minTop = -emu.screen.activeTranscriptRows
-                        val rowDelta = -(delta / lineHeight).toInt()
-                        if (rowDelta != 0) {
-                            val newTopRow = (topRow + rowDelta).coerceIn(minTop, 0)
-                            topRow = newTopRow
-                            scrolledToBottom = newTopRow >= 0
-                        }
-                        delta
-                    }
+                    state = scrollableState
                 )
                 .drawBehind {
                     @Suppress("UNUSED_EXPRESSION")
