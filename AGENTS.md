@@ -25,7 +25,7 @@ Guidelines and instructions for AI models and automated agents operating in the 
 
 ## 4. Guidelines for AI Models
 
-1. **Git / Commit Control:** NEVER commit changes or amend an existing git commit without the user's explicit request or approval. When explicitly requested to commit changes, follow the 50/72 rule for commit messages (subject line <= 50 characters, blank line before body, wrap body lines at 72 characters) and include an `Assisted-by: <ModelVersion>` trailer in the commit message body (using a pretty name, e.g., `Assisted-by: Gemini 3.6 Flash`).
+1. **Git / Commit Control:** NEVER commit changes or amend an existing git commit without the user's explicit request or approval. When explicitly requested to commit changes, follow the 50/72 rule for commit messages (subject line <= 50 characters, blank line before body, wrap body lines at 72 characters) and include an `Assisted-by: <Friendly Name of Current Model>` trailer in the commit message body.
 2. **Build Invocation:** Execute `./build.py <command>` directly without `scripts/env.py`. Prefix standalone tool executions (like `./gradlew` or raw `cargo`) with `scripts/env.py`.
 3. **Pre-build Native Code:** Before modifying code in `native/`, build native binaries at least once with `./build.py native` to generate required bindings and header files.
 4. **App Subproject Context:** Refer to [`app/AGENTS.md`](app/AGENTS.md) when working inside the `app/` subproject.

@@ -1,9 +1,10 @@
 # AGENTS.md (native subproject)
 
-Guidelines for AI models operating inside the `native/` subproject.
+Guidelines for AI models operating inside the `native/` subproject. Always include and follow the top-level [`AGENTS.md`](../AGENTS.md).
 
 ## 1. Environment & Build Requirements
 
+- **General Guidelines:** Always follow the top-level [`AGENTS.md`](../AGENTS.md) for general repository rules, environment execution setup, and commit control policies.
 - **Working Directory:** Execute commands from repo root via `./build.py`.
 - **Pre-build Requirement:** ALWAYS run `./build.py native` at least once before editing native sources to generate FFI bindings, headers, and flags (`flags.h`, `flags.rs`, `*-rs.hpp`, `*-rs.cpp`, protobuf generated modules).
 

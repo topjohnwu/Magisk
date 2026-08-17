@@ -1,9 +1,10 @@
 # AGENTS.md (app subproject)
 
-Guidelines for AI models operating inside the `app/` subproject.
+Guidelines for AI models operating inside the `app/` subproject. Always include and follow the top-level [`AGENTS.md`](../AGENTS.md).
 
 ## 1. Environment & Gradle Setup
 
+- **General Guidelines:** Always follow the top-level [`AGENTS.md`](../AGENTS.md) for general repository rules, environment execution setup, and commit control policies.
 - **Working Directory:** Set working directory to `app/` when working on app code.
 - **Environment Wrapper:** Standalone `./gradlew` commands MUST be prefixed with `../scripts/env.py` (e.g., `../scripts/env.py ./gradlew assembleDebug`), or run `./build.py app` from root.
 
