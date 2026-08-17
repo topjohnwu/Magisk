@@ -132,6 +132,7 @@ mkdir /data/adb/post-fs-data.d 2>/dev/null
 mkdir /data/adb/service.d 2>/dev/null
 
 for file in magisk magisk32 magiskpolicy stub.apk; do
+  if [ ! -e $file ]; then continue; fi
   chmod 755 ./$file
   cp -af ./$file $MAGISKTMP/$file
   cp -af ./$file $MAGISKBIN/$file
