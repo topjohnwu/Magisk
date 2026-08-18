@@ -1,5 +1,9 @@
 package com.topjohnwu.magisk.ui.deny
+
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,12 +21,16 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -33,6 +41,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -45,6 +54,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.state.ToggleableState
@@ -107,7 +117,7 @@ fun DenyListScreen(viewModel: DenyListViewModel, onBack: () -> Unit) {
                                 DropdownMenuItem(
                                     text = { Text(stringResource(resId)) },
                                     trailingIcon = if (sortBy == sort) {
-                                        { Icon(androidx.compose.material.icons.Icons.Default.Check, contentDescription = null) }
+                                        { Icon(Icons.Default.Check, contentDescription = null) }
                                     } else null,
                                     onClick = {
                                         viewModel.setSortBy(sort)
@@ -178,7 +188,7 @@ fun DenyListScreen(viewModel: DenyListViewModel, onBack: () -> Unit) {
                 onQueryChange = viewModel::setQuery,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 12.dp, vertical = 4.dp)
+                    .padding(horizontal = 16.dp, vertical = 6.dp)
             )
 
             if (loading) {
@@ -225,14 +235,53 @@ private fun SearchInput(query: String, onQueryChange: (String) -> Unit, modifier
         value = query,
         onValueChange = onQueryChange,
         modifier = modifier,
-        label = { Text(stringResource(CoreR.string.hide_filter_hint)) }
+        placeholder = { Text(stringResource(CoreR.string.hide_filter_hint)) },
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        },
+        trailingIcon = if (query.isNotEmpty()) {
+            {
+                IconButton(onClick = { onQueryChange("") }) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        } else null,
+        shape = RoundedCornerShape(28.dp),
+        singleLine = true,
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+        )
     )
 }
 
 @Composable
 private fun DenyAppCard(app: DenyAppState) {
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Column {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp)),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
+    ) {
+        Column(
+            modifier = Modifier.animateContentSize(
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioLowBouncy,
+                    stiffness = Spring.StiffnessMedium
+                )
+            )
+        ) {
             if (app.checkedPercent > 0f) {
                 LinearProgressIndicator(
                     progress = { app.checkedPercent },
@@ -244,7 +293,7 @@ private fun DenyAppCard(app: DenyAppState) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { app.isExpanded = !app.isExpanded }
-                    .padding(12.dp),
+                    .padding(14.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
@@ -256,8 +305,9 @@ private fun DenyAppCard(app: DenyAppState) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = app.info.label,
-                        style = MaterialTheme.typography.bodyLarge,
+                        style = MaterialTheme.typography.titleMedium,
                     )
+                    Spacer(Modifier.height(2.dp))
                     Text(
                         text = app.info.packageName,
                         style = MaterialTheme.typography.bodyMedium,
@@ -279,7 +329,7 @@ private fun DenyAppCard(app: DenyAppState) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 52.dp)
+                        .padding(start = 52.dp, bottom = 8.dp)
                 ) {
                     app.processes.forEach { proc ->
                         ProcessRow(proc)
@@ -295,6 +345,7 @@ private fun ProcessRow(proc: DenyProcessState) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
             .clickable { proc.toggle() }
             .padding(horizontal = 12.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically

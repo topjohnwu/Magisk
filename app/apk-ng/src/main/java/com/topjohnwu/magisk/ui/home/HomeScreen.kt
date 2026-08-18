@@ -32,6 +32,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -66,7 +67,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.content.getSystemService
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.BuildConfig
@@ -334,9 +334,9 @@ private fun NoticeCard(onHide: () -> Unit) {
             .fillMaxWidth()
             .background(
                 MaterialTheme.colorScheme.tertiaryContainer,
-                RoundedCornerShape(16.dp)
+                RoundedCornerShape(20.dp)
             )
-            .padding(start = 16.dp, top = 4.dp, bottom = 4.dp, end = 4.dp)
+            .padding(start = 16.dp, top = 6.dp, bottom = 6.dp, end = 6.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically
@@ -347,13 +347,13 @@ private fun NoticeCard(onHide: () -> Unit) {
                 color = MaterialTheme.colorScheme.onTertiaryContainer,
                 modifier = Modifier
                     .weight(1f)
-                    .padding(vertical = 8.dp)
+                    .padding(vertical = 6.dp)
             )
             IconButton(onClick = onHide) {
                 Icon(
                     imageVector = Icons.Default.Close,
                     contentDescription = stringResource(CoreR.string.hide),
-                    modifier = Modifier.size(15.dp),
+                    modifier = Modifier.size(18.dp),
                     tint = MaterialTheme.colorScheme.onTertiaryContainer,
                 )
             }
@@ -368,18 +368,18 @@ private fun InstallButton(
 ) {
     FilledTonalButton(
         onClick = onClick,
-        shape = RoundedCornerShape(16.dp),
-        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
+        shape = RoundedCornerShape(20.dp),
+        contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp)
     ) {
         Icon(
             painter = painterResource(R.drawable.ic_download),
             contentDescription = null,
             modifier = Modifier.size(18.dp),
         )
-        Spacer(Modifier.width(4.dp))
+        Spacer(Modifier.width(6.dp))
         Text(
             text = label,
-            fontSize = 14.sp
+            style = MaterialTheme.typography.labelLarge,
         )
     }
 }
@@ -400,12 +400,13 @@ private fun CoreCard(
 
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(24.dp)
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(18.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -416,6 +417,7 @@ private fun CoreCard(
                 Icon(
                     painter = painterResource(CoreR.drawable.ic_magisk_outline),
                     contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(48.dp)
                 )
                 Spacer(Modifier.width(16.dp))
@@ -454,7 +456,8 @@ private fun UninstallButton(
             containerColor = MaterialTheme.colorScheme.errorContainer,
             contentColor = MaterialTheme.colorScheme.onErrorContainer
         ),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(20.dp),
+        contentPadding = PaddingValues(vertical = 12.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
         Icon(
@@ -465,7 +468,7 @@ private fun UninstallButton(
         Spacer(Modifier.width(8.dp))
         Text(
             text = stringResource(CoreR.string.uninstall_magisk_title),
-            fontSize = 16.sp
+            style = MaterialTheme.typography.labelLarge,
         )
     }
 }
@@ -489,12 +492,13 @@ private fun AppCard(
 
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(24.dp)
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(18.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -505,6 +509,7 @@ private fun AppCard(
                     Icon(
                         painter = painterResource(R.drawable.ic_manager),
                         contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(36.dp)
                     )
                     Spacer(Modifier.width(12.dp))
@@ -521,7 +526,7 @@ private fun AppCard(
                         Icon(
                             imageVector = hideRestoreIcon,
                             contentDescription = null,
-                            modifier = Modifier.size(18.dp),
+                            modifier = Modifier.size(20.dp),
                         )
                     }
                 }
@@ -591,7 +596,8 @@ private fun StatusCard() {
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp)
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
     ) {
         Row(
             modifier = Modifier
@@ -612,6 +618,7 @@ private fun StatusCard() {
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                    Spacer(Modifier.height(4.dp))
                     Text(
                         text = info.status,
                         style = MaterialTheme.typography.titleMedium,
@@ -633,9 +640,10 @@ private fun StatusCard() {
 private fun SupportCard(onLinkClicked: (String) -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp)
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(18.dp)) {
             Text(
                 text = stringResource(CoreR.string.home_support_content),
                 style = MaterialTheme.typography.bodyMedium
@@ -696,14 +704,15 @@ private val developers = listOf(
 private fun DevelopersCard(onLinkClicked: (String) -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp)
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
     ) {
         Column {
             developers.forEachIndexed { index, dev ->
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                        .padding(horizontal = 18.dp, vertical = 10.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
@@ -728,7 +737,7 @@ private fun DevelopersCard(onLinkClicked: (String) -> Unit) {
                 if (index < developers.lastIndex) {
                     HorizontalDivider(
                         thickness = 0.5.dp,
-                        modifier = Modifier.padding(horizontal = 16.dp)
+                        modifier = Modifier.padding(horizontal = 18.dp)
                     )
                 }
             }
