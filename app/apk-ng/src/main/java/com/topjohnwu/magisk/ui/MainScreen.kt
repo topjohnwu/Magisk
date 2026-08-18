@@ -1,10 +1,13 @@
 package com.topjohnwu.magisk.ui
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,9 +21,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -33,14 +38,16 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.activity.compose.LocalActivity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.VMFactory
@@ -152,18 +159,18 @@ private fun FloatingNavigationBar(
     modifier: Modifier = Modifier
 ) {
     val scope = rememberCoroutineScope()
-    val shape = RoundedCornerShape(28.dp)
+    val shape = RoundedCornerShape(32.dp)
     val navBarInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
 
     Row(
         modifier = modifier
-            .padding(bottom = navBarInset + 12.dp, start = 24.dp, end = 24.dp)
-            .shadow(elevation = 6.dp, shape = shape)
+            .padding(bottom = navBarInset + 12.dp, start = 20.dp, end = 20.dp)
+            .shadow(elevation = 8.dp, shape = shape)
             .clip(shape)
             .background(MaterialTheme.colorScheme.surfaceContainer)
             .fillMaxWidth()
-            .height(64.dp)
-            .padding(horizontal = 4.dp),
+            .height(68.dp)
+            .padding(horizontal = 6.dp, vertical = 6.dp),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -189,39 +196,80 @@ private fun FloatingNavItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val contentColor by animateColorAsState(
+    val indicatorColor by animateColorAsState(
+        targetValue = if (selected) MaterialTheme.colorScheme.secondaryContainer else Color.Transparent,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioNoBouncy, stiffness = Spring.StiffnessMedium),
+        label = "navIndicatorColor"
+    )
+
+    val iconTint by animateColorAsState(
         targetValue = when {
             !enabled -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-            selected -> MaterialTheme.colorScheme.primary
+            selected -> MaterialTheme.colorScheme.onSecondaryContainer
             else -> MaterialTheme.colorScheme.onSurfaceVariant
         },
-        animationSpec = tween(200),
-        label = "navItemColor"
+        animationSpec = tween(150),
+        label = "navIconTint"
+    )
+
+    val labelColor by animateColorAsState(
+        targetValue = when {
+            !enabled -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+            selected -> MaterialTheme.colorScheme.onSurface
+            else -> MaterialTheme.colorScheme.onSurfaceVariant
+        },
+        animationSpec = tween(150),
+        label = "navLabelColor"
+    )
+
+    val iconScale by animateFloatAsState(
+        targetValue = if (selected) 1.08f else 1.0f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium),
+        label = "navIconScale"
+    )
+
+    val indicatorWidth by animateDpAsState(
+        targetValue = if (selected) 48.dp else 24.dp,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessMedium),
+        label = "navIndicatorWidth"
     )
 
     Column(
         modifier = modifier
+            .clip(CircleShape)
             .clickable(
                 enabled = enabled,
-                indication = null,
-                interactionSource = remember { MutableInteractionSource() },
                 role = Role.Tab,
                 onClick = onClick,
-            ),
+            )
+            .padding(vertical = 2.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = label,
-            modifier = Modifier.size(24.dp),
-            tint = contentColor,
-        )
+        Box(
+            modifier = Modifier
+                .width(indicatorWidth)
+                .height(28.dp)
+                .clip(CircleShape)
+                .background(indicatorColor),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = label,
+                modifier = Modifier
+                    .size(22.dp)
+                    .scale(iconScale),
+                tint = iconTint,
+            )
+        }
         Spacer(Modifier.height(2.dp))
         Text(
             text = label,
-            fontSize = 11.sp,
-            color = contentColor,
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
+            color = labelColor,
+            maxLines = 1,
         )
     }
 }

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -36,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.topjohnwu.magisk.core.R
 import com.topjohnwu.magisk.core.di.ServiceLocator
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CoroutineScope
@@ -232,7 +234,8 @@ private fun LoadingDialog(showDialog: MutableState<Boolean>) {
             properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false)
         ) {
             Surface(
-                shape = MaterialTheme.shapes.extraLarge,
+                shape = RoundedCornerShape(28.dp),
+                color = MaterialTheme.colorScheme.surfaceContainerHigh,
                 tonalElevation = 6.dp,
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -244,10 +247,14 @@ private fun LoadingDialog(showDialog: MutableState<Boolean>) {
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Start,
                     ) {
-                        CircularProgressIndicator()
+                        CircularProgressIndicator(
+                            color = MaterialTheme.colorScheme.primary,
+                        )
                         Text(
                             modifier = Modifier.padding(start = 16.dp),
-                            text = stringResource(com.topjohnwu.magisk.core.R.string.loading),
+                            text = stringResource(R.string.loading),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurface,
                         )
                     }
                 }
@@ -270,8 +277,10 @@ private fun ConfirmDialogContent(
                 dismiss()
                 showDialog.value = false
             },
+            shape = RoundedCornerShape(28.dp),
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             title = if (visuals.title.isNotEmpty()) {
-                { Text(text = visuals.title) }
+                { Text(text = visuals.title, style = MaterialTheme.typography.titleLarge) }
             } else null,
             text = {
                 visuals.content?.let { content ->
@@ -280,6 +289,7 @@ private fun ConfirmDialogContent(
                     } else {
                         Text(
                             text = content,
+                            style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurface,
                         )
                     }
@@ -293,7 +303,8 @@ private fun ConfirmDialogContent(
                     }
                 ) {
                     Text(
-                        text = visuals.confirm ?: stringResource(android.R.string.ok)
+                        text = visuals.confirm ?: stringResource(android.R.string.ok),
+                        style = MaterialTheme.typography.labelLarge,
                     )
                 }
             },
@@ -305,7 +316,8 @@ private fun ConfirmDialogContent(
                     }
                 ) {
                     Text(
-                        text = visuals.dismiss ?: stringResource(android.R.string.cancel)
+                        text = visuals.dismiss ?: stringResource(android.R.string.cancel),
+                        style = MaterialTheme.typography.labelLarge,
                     )
                 }
             }

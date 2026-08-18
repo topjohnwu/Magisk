@@ -11,6 +11,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -20,6 +21,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -30,10 +33,11 @@ fun SettingsArrow(
     onClick: () -> Unit
 ) {
     ListItem(
-        headlineContent = { Text(title) },
-        supportingContent = summary?.let { { Text(it) } },
+        headlineContent = { Text(title, style = MaterialTheme.typography.bodyLarge) },
+        supportingContent = summary?.let { { Text(it, style = MaterialTheme.typography.bodyMedium) } },
         leadingContent = leadingContent,
         trailingContent = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null) },
+        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
         modifier = Modifier.clickable(onClick = onClick)
     )
 }
@@ -47,9 +51,10 @@ fun SettingsSwitch(
     onCheckedChange: (Boolean) -> Unit
 ) {
     ListItem(
-        headlineContent = { Text(title) },
-        supportingContent = summary?.takeIf { it.isNotEmpty() }?.let { { Text(it) } },
+        headlineContent = { Text(title, style = MaterialTheme.typography.bodyLarge) },
+        supportingContent = summary?.takeIf { it.isNotEmpty() }?.let { { Text(it, style = MaterialTheme.typography.bodyMedium) } },
         trailingContent = { Switch(checked = checked, onCheckedChange = onCheckedChange, enabled = enabled) },
+        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
         modifier = Modifier.clickable(enabled = enabled, onClick = { onCheckedChange(!checked) })
     )
 }
@@ -67,12 +72,13 @@ fun SettingsDropdown(
     var expanded by remember { mutableStateOf(false) }
     Box {
         ListItem(
-            headlineContent = { Text(title) },
+            headlineContent = { Text(title, style = MaterialTheme.typography.bodyLarge) },
             supportingContent = {
                 val currentSummary = summary ?: items.getOrNull(selectedIndex) ?: ""
-                if (currentSummary.isNotEmpty()) Text(currentSummary)
+                if (currentSummary.isNotEmpty()) Text(currentSummary, style = MaterialTheme.typography.bodyMedium)
             },
             trailingContent = { Icon(Icons.Default.ArrowDropDown, contentDescription = null) },
+            colors = ListItemDefaults.colors(containerColor = Color.Transparent),
             modifier = Modifier.clickable(enabled = enabled, onClick = { expanded = true })
         )
         DropdownMenu(
@@ -97,6 +103,7 @@ fun SmallTitle(text: String) {
     Text(
         text = text,
         style = MaterialTheme.typography.labelLarge,
+        fontWeight = FontWeight.SemiBold,
         color = MaterialTheme.colorScheme.primary,
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
     )

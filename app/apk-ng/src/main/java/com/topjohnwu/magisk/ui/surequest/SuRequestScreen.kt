@@ -3,9 +3,11 @@ package com.topjohnwu.magisk.ui.surequest
 import android.view.MotionEvent
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,8 +17,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Slider
@@ -28,6 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringArrayResource
@@ -79,29 +84,31 @@ fun SuRequestScreen(viewModel: SuRequestViewModel) {
         Card(
             modifier = Modifier
                 .widthIn(min = 320.dp, max = 420.dp)
-                .padding(24.dp)
+                .padding(24.dp),
+            shape = RoundedCornerShape(28.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
         ) {
             Column(
-                modifier = Modifier.padding(20.dp),
+                modifier = Modifier.padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(horizontal = 8.dp)
+                    modifier = Modifier.padding(horizontal = 4.dp)
                 ) {
                     if (icon != null) {
                         Image(
                             painter = rememberDrawablePainter(icon),
                             contentDescription = null,
-                            modifier = Modifier.size(40.dp)
+                            modifier = Modifier.size(44.dp)
                         )
-                        Spacer(Modifier.width(12.dp))
+                        Spacer(Modifier.width(14.dp))
                     }
                     Column {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
                                 text = title,
-                                style = MaterialTheme.typography.bodyLarge,
+                                style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
@@ -112,6 +119,7 @@ fun SuRequestScreen(viewModel: SuRequestViewModel) {
                                 SharedUidBadge()
                             }
                         }
+                        Spacer(Modifier.height(2.dp))
                         Text(
                             text = packageName,
                             style = MaterialTheme.typography.bodyMedium,
@@ -124,13 +132,22 @@ fun SuRequestScreen(viewModel: SuRequestViewModel) {
 
                 Spacer(Modifier.height(16.dp))
 
-                Text(
-                    text = stringResource(CoreR.string.su_warning),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.error,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(MaterialTheme.colorScheme.errorContainer)
+                        .padding(12.dp)
+                ) {
+                    Text(
+                        text = stringResource(CoreR.string.su_warning),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onErrorContainer,
+                        fontWeight = FontWeight.Medium,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
 
                 Spacer(Modifier.height(16.dp))
 
@@ -138,7 +155,7 @@ fun SuRequestScreen(viewModel: SuRequestViewModel) {
                     text = "${stringResource(CoreR.string.request_timeout)}: $sliderLabel",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.fillMaxWidth().padding(start = 8.dp),
+                    modifier = Modifier.fillMaxWidth().padding(start = 4.dp),
                 )
                 Spacer(Modifier.height(8.dp))
                 Slider(
@@ -150,23 +167,30 @@ fun SuRequestScreen(viewModel: SuRequestViewModel) {
                     },
                     valueRange = 0f..5f,
                     steps = 4,
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp)
+                    modifier = Modifier.fillMaxWidth()
                 )
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(20.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     OutlinedButton(
                         onClick = { viewModel.denyPressed() },
+                        shape = RoundedCornerShape(20.dp),
+                        contentPadding = PaddingValues(vertical = 12.dp),
                         modifier = Modifier.weight(1f),
                     ) {
-                        Text(denyText)
+                        Text(
+                            text = denyText,
+                            style = MaterialTheme.typography.labelLarge,
+                        )
                     }
                     Button(
                         enabled = grantEnabled,
                         onClick = { viewModel.grantPressed() },
+                        shape = RoundedCornerShape(20.dp),
+                        contentPadding = PaddingValues(vertical = 12.dp),
                         modifier = Modifier
                             .weight(1f)
                             .then(
@@ -189,7 +213,10 @@ fun SuRequestScreen(viewModel: SuRequestViewModel) {
                                 } else Modifier
                             )
                     ) {
-                        Text(stringResource(CoreR.string.grant))
+                        Text(
+                            text = stringResource(CoreR.string.grant),
+                            style = MaterialTheme.typography.labelLarge,
+                        )
                     }
                 }
             }

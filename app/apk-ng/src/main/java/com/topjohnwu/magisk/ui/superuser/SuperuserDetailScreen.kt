@@ -1,12 +1,14 @@
 package com.topjohnwu.magisk.ui.superuser
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -19,6 +21,7 @@ import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -37,7 +40,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.topjohnwu.magisk.ui.component.ConfirmResult
 import com.topjohnwu.magisk.ui.component.SettingsSwitch
@@ -94,11 +96,16 @@ fun SuperuserDetailScreen(
                 .verticalScrollbar(scrollState, contentPadding = PaddingValues(bottom = 88.dp))
                 .verticalScroll(scrollState)
                 .padding(horizontal = 12.dp)
-                .padding(bottom = 88.dp)
+                .padding(bottom = 88.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Card(modifier = Modifier.fillMaxWidth()) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
+            ) {
                 Row(
-                    modifier = Modifier.padding(16.dp),
+                    modifier = Modifier.padding(18.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Image(
@@ -119,6 +126,7 @@ fun SuperuserDetailScreen(
                                 SharedUidBadge()
                             }
                         }
+                        Spacer(Modifier.height(2.dp))
                         Text(
                             text = item.packageName,
                             style = MaterialTheme.typography.bodyMedium,
@@ -133,23 +141,29 @@ fun SuperuserDetailScreen(
                 }
             }
 
-            if (uiState.suRestrict || item.isRestricted) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
+            ) {
+                if (uiState.suRestrict || item.isRestricted) {
+                    SettingsSwitch(
+                        title = stringResource(CoreR.string.settings_su_restrict_title),
+                        checked = item.isRestricted,
+                        onCheckedChange = { viewModel.toggleRestrict(item) }
+                    )
+                }
                 SettingsSwitch(
-                    title = stringResource(CoreR.string.settings_su_restrict_title),
-                    checked = item.isRestricted,
-                    onCheckedChange = { viewModel.toggleRestrict(item) }
+                    title = stringResource(CoreR.string.superuser_toggle_notification),
+                    checked = item.notification,
+                    onCheckedChange = { viewModel.updateNotify(item) }
+                )
+                SettingsSwitch(
+                    title = stringResource(CoreR.string.logs),
+                    checked = item.logging,
+                    onCheckedChange = { viewModel.updateLogging(item) }
                 )
             }
-            SettingsSwitch(
-                title = stringResource(CoreR.string.superuser_toggle_notification),
-                checked = item.notification,
-                onCheckedChange = { viewModel.updateNotify(item) }
-            )
-            SettingsSwitch(
-                title = stringResource(CoreR.string.logs),
-                checked = item.logging,
-                onCheckedChange = { viewModel.updateLogging(item) }
-            )
 
             RevokeButton {
                 if (viewModel.requiresAuth) {
@@ -180,7 +194,8 @@ private fun RevokeButton(
             containerColor = MaterialTheme.colorScheme.errorContainer,
             contentColor = MaterialTheme.colorScheme.onErrorContainer
         ),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(20.dp),
+        contentPadding = PaddingValues(vertical = 12.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
         Icon(
@@ -191,7 +206,7 @@ private fun RevokeButton(
         Spacer(Modifier.width(8.dp))
         Text(
             text = stringResource(CoreR.string.superuser_toggle_revoke),
-            fontSize = 16.sp
+            style = MaterialTheme.typography.labelLarge,
         )
     }
 }
