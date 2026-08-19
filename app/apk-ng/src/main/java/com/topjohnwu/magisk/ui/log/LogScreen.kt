@@ -66,7 +66,10 @@ import com.topjohnwu.magisk.core.R as CoreR
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LogScreen(viewModel: LogViewModel) {
+fun LogScreen(
+    viewModel: LogViewModel,
+    modifier: Modifier = Modifier
+) {
     val uiState by viewModel.uiState.collectAsState()
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
     val tabTitles = listOf(
@@ -79,6 +82,7 @@ fun LogScreen(viewModel: LogViewModel) {
     }
 
     Scaffold(
+        modifier = modifier,
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(CoreR.string.logs)) },
@@ -108,9 +112,10 @@ fun LogScreen(viewModel: LogViewModel) {
             )
         }
     ) { padding ->
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .padding(padding)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
         ) {
             PrimaryTabRow(
                 selectedTabIndex = selectedTab,
@@ -151,8 +156,12 @@ fun LogScreen(viewModel: LogViewModel) {
 }
 
 @Composable
-private fun SuLogTab(logs: List<SuLog>, nestedScrollConnection: NestedScrollConnection) {
-    Column(modifier = Modifier.fillMaxSize()) {
+private fun SuLogTab(
+    logs: List<SuLog>,
+    nestedScrollConnection: NestedScrollConnection,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier.fillMaxSize()) {
         if (logs.isEmpty()) {
             Box(
                 modifier = Modifier
@@ -181,7 +190,7 @@ private fun SuLogTab(logs: List<SuLog>, nestedScrollConnection: NestedScrollConn
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(logs, key = { it.id }) { log ->
-                    SuLogCard(log)
+                    SuLogCard(log = log)
                 }
             }
         }
@@ -189,7 +198,10 @@ private fun SuLogTab(logs: List<SuLog>, nestedScrollConnection: NestedScrollConn
 }
 
 @Composable
-private fun SuLogCard(log: SuLog) {
+private fun SuLogCard(
+    log: SuLog,
+    modifier: Modifier = Modifier
+) {
     val res = LocalResources.current
     val pm = LocalContext.current.packageManager
     val icon = remember(log.packageName) {
@@ -222,7 +234,7 @@ private fun SuLogCard(log: SuLog) {
     }
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
     ) {
@@ -263,7 +275,7 @@ private fun SuLogCard(log: SuLog) {
                         maxLines = 1,
                     )
                     Spacer(Modifier.height(4.dp))
-                    SuActionBadge(allowed)
+                    SuActionBadge(allowed = allowed)
                 }
             }
 
@@ -282,11 +294,15 @@ private fun SuLogCard(log: SuLog) {
 }
 
 @Composable
-private fun SuActionBadge(allowed: Boolean) {
+private fun SuActionBadge(
+    allowed: Boolean,
+    modifier: Modifier = Modifier
+) {
     val bg = if (allowed) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.errorContainer
     val fg = if (allowed) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onErrorContainer
     val text = if (allowed) stringResource(CoreR.string.granted) else stringResource(CoreR.string.denied)
     Badge(
+        modifier = modifier,
         containerColor = bg,
         contentColor = fg,
     ) {
@@ -302,9 +318,10 @@ private fun SuActionBadge(allowed: Boolean) {
 @Composable
 private fun MagiskLogTab(
     entries: List<MagiskLogEntry>,
-    nestedScrollConnection: NestedScrollConnection
+    nestedScrollConnection: NestedScrollConnection,
+    modifier: Modifier = Modifier
 ) {
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = modifier.fillMaxSize()) {
         if (entries.isEmpty()) {
             Box(
                 modifier = Modifier
@@ -332,8 +349,8 @@ private fun MagiskLogTab(
                 contentPadding = PaddingValues(top = 8.dp, bottom = 88.dp),
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                items(entries.size, key = { it }) { index ->
-                    MagiskLogCard(entries[index])
+                items(entries, key = { "${it.timestamp}_${it.pid}_${it.tid}_${it.message.hashCode()}" }) { entry ->
+                    MagiskLogCard(entry = entry)
                 }
             }
         }
@@ -341,11 +358,14 @@ private fun MagiskLogTab(
 }
 
 @Composable
-private fun MagiskLogCard(entry: MagiskLogEntry) {
+private fun MagiskLogCard(
+    entry: MagiskLogEntry,
+    modifier: Modifier = Modifier
+) {
     var expanded by remember { mutableStateOf(false) }
 
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clickable { expanded = !expanded },
         shape = RoundedCornerShape(16.dp),
@@ -363,7 +383,7 @@ private fun MagiskLogCard(entry: MagiskLogEntry) {
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         modifier = Modifier.weight(1f)
                     ) {
-                        LogLevelBadge(entry.level)
+                        LogLevelBadge(level = entry.level)
                         Text(
                             text = entry.tag,
                             style = MaterialTheme.typography.titleMedium,
@@ -398,7 +418,10 @@ private fun MagiskLogCard(entry: MagiskLogEntry) {
 }
 
 @Composable
-private fun LogLevelBadge(level: Char) {
+private fun LogLevelBadge(
+    level: Char,
+    modifier: Modifier = Modifier
+) {
     val colorScheme = MaterialTheme.colorScheme
     val (bg, fg) = when (level) {
         'V' -> colorScheme.surfaceVariant to colorScheme.onSurfaceVariant
@@ -409,6 +432,7 @@ private fun LogLevelBadge(level: Char) {
         else -> colorScheme.surfaceVariant to colorScheme.onSurfaceVariant
     }
     Badge(
+        modifier = modifier,
         containerColor = bg,
         contentColor = fg,
     ) {

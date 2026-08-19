@@ -8,6 +8,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -24,7 +25,12 @@ import com.topjohnwu.magisk.core.R as CoreR
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ActionScreen(viewModel: ActionViewModel, actionName: String, onBack: () -> Unit) {
+fun ActionScreen(
+    viewModel: ActionViewModel,
+    actionName: String,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     val actionState by viewModel.actionState.collectAsState()
     val finished = actionState != ActionViewModel.State.RUNNING
     val saveLog = rememberExternalStoragePermissionLauncher {
@@ -33,9 +39,10 @@ fun ActionScreen(viewModel: ActionViewModel, actionName: String, onBack: () -> U
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
+        modifier = modifier,
         topBar = {
             TopAppBar(
-                title = { androidx.compose.material3.Text(actionName) },
+                title = { Text(actionName) },
                 navigationIcon = {
                     IconButton(
                         modifier = Modifier.padding(start = 16.dp),

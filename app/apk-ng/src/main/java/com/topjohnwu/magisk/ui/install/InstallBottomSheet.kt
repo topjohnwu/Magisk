@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.ui.install
 
+import android.R
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -24,7 +25,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -48,17 +48,19 @@ import com.topjohnwu.magisk.core.R as CoreR
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InstallBottomSheet(
-    show: MutableState<Boolean>,
+    show: Boolean,
+    onDismiss: () -> Unit,
     installVm: InstallViewModel,
+    modifier: Modifier = Modifier
 ) {
     val installUiState by installVm.uiState.collectAsState()
-    val showDownloadDialog = rememberSaveable { mutableStateOf(false) }
+    var showDownloadDialog by rememberSaveable { mutableStateOf(false) }
     val filePicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         uri?.let { installVm.onPatchFileSelected(it) }
     }
 
     val secondSlotDialog = rememberConfirmDialog()
-    val secondSlotTitle = stringResource(android.R.string.dialog_alert_title)
+    val secondSlotTitle = stringResource(R.string.dialog_alert_title)
     val secondSlotMsg = stringResource(CoreR.string.install_inactive_slot_msg)
 
     LaunchedEffect(installUiState.requestFilePicker) {
@@ -80,21 +82,25 @@ fun InstallBottomSheet(
 
     LaunchedEffect(installUiState.showDownloadDialog) {
         if (installUiState.showDownloadDialog) {
-            showDownloadDialog.value = true
+            showDownloadDialog = true
             installVm.onDownloadDialogConsumed()
         }
     }
 
-    if (showDownloadDialog.value) {
+    if (showDownloadDialog) {
         DownloadComposableDialog(
-            showDialog = showDownloadDialog,
-            onConfirm = { url -> installVm.onDownloadUrlSelected(url) }
+            onDismiss = { showDownloadDialog = false },
+            onConfirm = { url ->
+                showDownloadDialog = false
+                installVm.onDownloadUrlSelected(url)
+            }
         )
     }
 
-    if (show.value) {
+    if (show) {
         ModalBottomSheet(
-            onDismissRequest = { show.value = false },
+            modifier = modifier,
+            onDismissRequest = onDismiss,
         ) {
             Text(
                 text = stringResource(CoreR.string.install),
@@ -116,7 +122,7 @@ fun InstallBottomSheet(
                 SettingsArrow(
                     title = stringResource(CoreR.string.select_patch_file),
                     onClick = {
-                        show.value = false
+                        onDismiss()
                         installVm.selectMethod(InstallViewModel.Method.PATCH)
                     },
                 )
@@ -124,7 +130,7 @@ fun InstallBottomSheet(
                 SettingsArrow(
                     title = stringResource(CoreR.string.download_patch_file),
                     onClick = {
-                        show.value = false
+                        onDismiss()
                         installVm.selectMethod(InstallViewModel.Method.DOWNLOAD)
                     },
                 )
@@ -133,7 +139,7 @@ fun InstallBottomSheet(
                     SettingsArrow(
                         title = stringResource(CoreR.string.direct_install),
                         onClick = {
-                            show.value = false
+                            onDismiss()
                             installVm.selectMethod(InstallViewModel.Method.DIRECT)
                             installVm.install()
                         },
@@ -144,7 +150,7 @@ fun InstallBottomSheet(
                     SettingsArrow(
                         title = stringResource(CoreR.string.install_inactive_slot),
                         onClick = {
-                            show.value = false
+                            onDismiss()
                             installVm.selectMethod(InstallViewModel.Method.INACTIVE_SLOT)
                         },
                     )
@@ -157,9 +163,10 @@ fun InstallBottomSheet(
 @Composable
 private fun InstallOptionsSection(
     uiState: InstallViewModel.UiState,
-    viewModel: InstallViewModel
+    viewModel: InstallViewModel,
+    modifier: Modifier = Modifier
 ) {
-    Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+    Column(modifier = modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -206,9 +213,14 @@ private fun InstallOptionsSection(
 }
 
 @Composable
-private fun CheckboxRow(label: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+private fun CheckboxRow(
+    label: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -227,11 +239,10 @@ private fun CheckboxRow(label: String, checked: Boolean, onCheckedChange: (Boole
 
 @Composable
 fun DownloadComposableDialog(
-    showDialog: MutableState<Boolean>,
-    onConfirm: (Uri) -> Unit
+    onDismiss: () -> Unit,
+    onConfirm: (Uri) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    if (!showDialog.value) return
-
     var url by rememberSaveable { mutableStateOf("") }
     var isError by rememberSaveable { mutableStateOf(false) }
 
@@ -245,7 +256,8 @@ fun DownloadComposableDialog(
     }
 
     AlertDialog(
-        onDismissRequest = { showDialog.value = false },
+        modifier = modifier,
+        onDismissRequest = onDismiss,
         title = { Text(stringResource(CoreR.string.download_dialog_title)) },
         text = {
             Column(modifier = Modifier.padding(top = 8.dp)) {
@@ -266,7 +278,6 @@ fun DownloadComposableDialog(
                     keyboardActions = KeyboardActions(
                         onDone = {
                             isValidUrl(url.trim())?.let {
-                                showDialog.value = false
                                 onConfirm(it)
                             } ?: run {
                                 isError = true
@@ -288,19 +299,18 @@ fun DownloadComposableDialog(
             TextButton(
                 onClick = {
                     isValidUrl(url.trim())?.let {
-                        showDialog.value = false
                         onConfirm(it)
                     } ?: run {
                         isError = true
                     }
                 }
             ) {
-                Text(stringResource(android.R.string.ok))
+                Text(stringResource(R.string.ok))
             }
         },
         dismissButton = {
-            TextButton(onClick = { showDialog.value = false }) {
-                Text(stringResource(android.R.string.cancel))
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.cancel))
             }
         }
     )

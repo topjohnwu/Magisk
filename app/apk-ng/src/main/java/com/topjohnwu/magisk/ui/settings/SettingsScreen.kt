@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.ui.settings
 
+import android.R
 import android.os.Build
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -53,10 +54,14 @@ import com.topjohnwu.magisk.core.R as CoreR
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(viewModel: SettingsViewModel) {
+fun SettingsScreen(
+    viewModel: SettingsViewModel,
+    modifier: Modifier = Modifier
+) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val scrollState = rememberScrollState()
     Scaffold(
+        modifier = modifier,
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(CoreR.string.settings)) },
@@ -74,16 +79,16 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
                 .padding(horizontal = 12.dp)
                 .padding(bottom = 88.dp)
         ) {
-            CustomizationSection(viewModel)
+            CustomizationSection(viewModel = viewModel)
             Spacer(Modifier.height(12.dp))
             AppSettingsSection()
             if (Info.env.isActive) {
                 Spacer(Modifier.height(12.dp))
-                MagiskSection(viewModel)
+                MagiskSection(viewModel = viewModel)
             }
             if (Info.showSuperUser) {
                 Spacer(Modifier.height(12.dp))
-                SuperuserSection(viewModel)
+                SuperuserSection(viewModel = viewModel)
             }
         }
     }
@@ -92,12 +97,15 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
 // --- Customization ---
 
 @Composable
-private fun CustomizationSection(viewModel: SettingsViewModel) {
+private fun CustomizationSection(
+    viewModel: SettingsViewModel,
+    modifier: Modifier = Modifier
+) {
     val context = LocalContext.current
 
     SmallTitle(text = stringResource(CoreR.string.settings_customization))
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
     ) {
@@ -158,13 +166,14 @@ private fun CustomizationSection(viewModel: SettingsViewModel) {
 // --- App Settings ---
 
 @Composable
-private fun AppSettingsSection() {
-    val context = LocalContext.current
+private fun AppSettingsSection(
+    modifier: Modifier = Modifier
+) {
     val resources = LocalResources.current
 
     SmallTitle(text = stringResource(CoreR.string.home_app_title))
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
     ) {
@@ -193,10 +202,11 @@ private fun AppSettingsSection() {
 
         // Update Channel URL (for custom channel)
         if (updateChannel == Config.Value.CUSTOM_CHANNEL) {
-            UpdateChannelUrlDialog(
-                show = showUrlDialog,
-                onDismiss = { showUrlDialog = false }
-            )
+            if (showUrlDialog) {
+                UpdateChannelUrlDialog(
+                    onDismiss = { showUrlDialog = false }
+                )
+            }
             SettingsArrow(
                 title = stringResource(CoreR.string.settings_update_custom),
                 summary = Config.customChannelUrl.ifBlank { null },
@@ -230,10 +240,11 @@ private fun AppSettingsSection() {
 
         // Download Path
         var showDownloadDialog by remember { mutableStateOf(false) }
-        DownloadPathDialog(
-            show = showDownloadDialog,
-            onDismiss = { showDownloadDialog = false }
-        )
+        if (showDownloadDialog) {
+            DownloadPathDialog(
+                onDismiss = { showDownloadDialog = false }
+            )
+        }
         SettingsArrow(
             title = stringResource(CoreR.string.settings_download_path_title),
             summary = MediaStoreUtils.fullPath(Config.downloadDir),
@@ -259,10 +270,13 @@ private fun AppSettingsSection() {
 // --- Magisk ---
 
 @Composable
-private fun MagiskSection(viewModel: SettingsViewModel) {
+private fun MagiskSection(
+    viewModel: SettingsViewModel,
+    modifier: Modifier = Modifier
+) {
     SmallTitle(text = stringResource(CoreR.string.magisk))
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
     ) {
@@ -312,13 +326,15 @@ private fun MagiskSection(viewModel: SettingsViewModel) {
 // --- Superuser ---
 
 @Composable
-private fun SuperuserSection(viewModel: SettingsViewModel) {
-    val context = LocalContext.current
+private fun SuperuserSection(
+    viewModel: SettingsViewModel,
+    modifier: Modifier = Modifier
+) {
     val resources = LocalResources.current
 
     SmallTitle(text = stringResource(CoreR.string.superuser))
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
     ) {
@@ -492,70 +508,70 @@ private fun SuperuserSection(viewModel: SettingsViewModel) {
 // --- Dialogs ---
 
 @Composable
-private fun UpdateChannelUrlDialog(show: Boolean, onDismiss: () -> Unit) {
-    val showState = rememberSaveable { mutableStateOf(show) }
-    showState.value = show
+private fun UpdateChannelUrlDialog(
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     var url by rememberSaveable { mutableStateOf(Config.customChannelUrl) }
 
-    if (showState.value) {
-        AlertDialog(
-            onDismissRequest = onDismiss,
-            title = { Text(stringResource(CoreR.string.settings_update_custom_msg)) },
-            text = {
-                OutlinedTextField(
-                    value = url,
-                    onValueChange = { url = it },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        Config.customChannelUrl = url
-                        Info.resetUpdate()
-                        onDismiss()
-                    }
-                ) {
-                    Text(stringResource(android.R.string.ok))
+    AlertDialog(
+        modifier = modifier,
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(CoreR.string.settings_update_custom_msg)) },
+        text = {
+            OutlinedTextField(
+                value = url,
+                onValueChange = { url = it },
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    Config.customChannelUrl = url
+                    Info.resetUpdate()
+                    onDismiss()
                 }
+            ) {
+                Text(stringResource(R.string.ok))
             }
-        )
-    }
+        }
+    )
 }
 
 @Composable
-private fun DownloadPathDialog(show: Boolean, onDismiss: () -> Unit) {
-    val showState = rememberSaveable { mutableStateOf(show) }
-    showState.value = show
+private fun DownloadPathDialog(
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     var path by rememberSaveable { mutableStateOf(Config.downloadDir) }
 
-    if (showState.value) {
-        AlertDialog(
-            onDismissRequest = onDismiss,
-            title = { Text(stringResource(CoreR.string.settings_download_path_title)) },
-            text = {
-                Column {
-                    Text(
-                        text = stringResource(CoreR.string.settings_download_path_message, MediaStoreUtils.fullPath(path)),
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                    OutlinedTextField(
-                        value = path,
-                        onValueChange = { path = it },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        Config.downloadDir = path
-                        onDismiss()
-                    }
-                ) {
-                    Text(stringResource(android.R.string.ok))
-                }
+    AlertDialog(
+        modifier = modifier,
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(CoreR.string.settings_download_path_title)) },
+        text = {
+            Column {
+                Text(
+                    text = stringResource(CoreR.string.settings_download_path_message, MediaStoreUtils.fullPath(path)),
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                OutlinedTextField(
+                    value = path,
+                    onValueChange = { path = it },
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
-        )
-    }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    Config.downloadDir = path
+                    onDismiss()
+                }
+            ) {
+                Text(stringResource(R.string.ok))
+            }
+        }
+    )
 }

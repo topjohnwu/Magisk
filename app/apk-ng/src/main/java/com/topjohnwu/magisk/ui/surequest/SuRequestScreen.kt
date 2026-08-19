@@ -26,6 +26,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -48,16 +49,20 @@ import com.topjohnwu.magisk.core.R as CoreR
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun SuRequestScreen(viewModel: SuRequestViewModel) {
-    if (!viewModel.showUi) return
+fun SuRequestScreen(
+    viewModel: SuRequestViewModel,
+    modifier: Modifier = Modifier
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    if (!uiState.showUi) return
 
     val context = LocalContext.current
-    val icon = viewModel.icon
-    val title = viewModel.title
-    val packageName = viewModel.packageName
-    val grantEnabled = viewModel.grantEnabled
-    val denyCountdown = viewModel.denyCountdown
-    val selectedPosition = viewModel.selectedItemPosition
+    val icon = uiState.icon
+    val title = uiState.title
+    val packageName = uiState.packageName
+    val grantEnabled = uiState.grantEnabled
+    val denyCountdown = uiState.denyCountdown
+    val selectedPosition = uiState.selectedItemPosition
     val timeoutEntries = stringArrayResource(CoreR.array.allow_timeout).toList()
     // Slider order: Once(1), 10min(2), 20min(3), 30min(4), 60min(5), Forever(0)
     val sliderToIndex = intArrayOf(1, 2, 3, 4, 5, 0)
@@ -78,7 +83,7 @@ fun SuRequestScreen(viewModel: SuRequestViewModel) {
     }
 
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         Card(
@@ -114,7 +119,7 @@ fun SuRequestScreen(viewModel: SuRequestViewModel) {
                                 overflow = TextOverflow.Ellipsis,
                                 modifier = Modifier.weight(1f, fill = false),
                             )
-                            if (viewModel.isSharedUid) {
+                            if (uiState.isSharedUid) {
                                 Spacer(Modifier.width(6.dp))
                                 SharedUidBadge()
                             }
@@ -163,7 +168,7 @@ fun SuRequestScreen(viewModel: SuRequestViewModel) {
                     onValueChange = { value ->
                         viewModel.spinnerTouched()
                         val pos = value.toInt().coerceIn(0, sliderToIndex.lastIndex)
-                        viewModel.selectedItemPosition = sliderToIndex[pos]
+                        viewModel.setSelectedItemPosition(sliderToIndex[pos])
                     },
                     valueRange = 0f..5f,
                     steps = 4,
@@ -194,7 +199,7 @@ fun SuRequestScreen(viewModel: SuRequestViewModel) {
                         modifier = Modifier
                             .weight(1f)
                             .then(
-                                if (viewModel.useTapjackProtection) {
+                                if (uiState.useTapjackProtection) {
                                     Modifier.pointerInteropFilter { event ->
                                         if (event.flags and MotionEvent.FLAG_WINDOW_IS_OBSCURED != 0 ||
                                             event.flags and MotionEvent.FLAG_WINDOW_IS_PARTIALLY_OBSCURED != 0

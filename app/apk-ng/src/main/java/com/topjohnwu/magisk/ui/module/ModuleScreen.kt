@@ -32,7 +32,6 @@ import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -50,7 +49,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -87,20 +85,22 @@ import com.topjohnwu.magisk.core.R as CoreR
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ModuleScreen(viewModel: ModuleViewModel) {
+fun ModuleScreen(
+    viewModel: ModuleViewModel,
+    modifier: Modifier = Modifier
+) {
     val uiState by viewModel.uiState.collectAsState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val colorScheme = MaterialTheme.colorScheme
     val context = LocalContext.current
     val resources = LocalResources.current
     val scope = rememberCoroutineScope()
-    val activity = context as MainActivity
 
     val localInstallDialog = rememberConfirmDialog()
     val confirmInstallTitle = stringResource(CoreR.string.confirm_install_title)
 
     var pendingOnlineModule by remember { mutableStateOf<OnlineModule?>(null) }
-    val showOnlineDialog = rememberSaveable { mutableStateOf(false) }
+    var showOnlineDialog by rememberSaveable { mutableStateOf(false) }
 
     val filePicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         if (uri != null) {
@@ -120,26 +120,28 @@ fun ModuleScreen(viewModel: ModuleViewModel) {
         }
     }
 
-    if (showOnlineDialog.value && pendingOnlineModule != null) {
+    if (showOnlineDialog && pendingOnlineModule != null) {
         OnlineModuleDialog(
             item = pendingOnlineModule!!,
-            showDialog = showOnlineDialog,
             onDownload = { install ->
-                showOnlineDialog.value = false
-                DownloadEngine.startWithActivity(
-                    activity,
-                    OnlineModuleSubject(pendingOnlineModule!!, install)
-                )
+                showOnlineDialog = false
+                (context as? MainActivity)?.let { activity ->
+                    DownloadEngine.startWithActivity(
+                        activity,
+                        OnlineModuleSubject(pendingOnlineModule!!, install)
+                    )
+                }
                 pendingOnlineModule = null
             },
             onDismiss = {
-                showOnlineDialog.value = false
+                showOnlineDialog = false
                 pendingOnlineModule = null
             }
         )
     }
 
     Scaffold(
+        modifier = modifier,
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(CoreR.string.modules)) },
@@ -223,7 +225,7 @@ fun ModuleScreen(viewModel: ModuleViewModel) {
                     onUpdateClick = { onlineModule ->
                         if (onlineModule != null && Info.isConnected.value == true) {
                             pendingOnlineModule = onlineModule
-                            showOnlineDialog.value = true
+                            showOnlineDialog = true
                         }
                     }
                 )
@@ -234,7 +236,12 @@ fun ModuleScreen(viewModel: ModuleViewModel) {
 }
 
 @Composable
-private fun ModuleCard(item: ModuleItem, viewModel: ModuleViewModel, onUpdateClick: (OnlineModule?) -> Unit) {
+private fun ModuleCard(
+    item: ModuleItem,
+    viewModel: ModuleViewModel,
+    onUpdateClick: (OnlineModule?) -> Unit,
+    modifier: Modifier = Modifier
+) {
     val infoAlpha = if (!item.isRemoved && item.isEnabled && !item.showNotice) 1f else 0.5f
     val strikeThrough = if (item.isRemoved) TextDecoration.LineThrough else TextDecoration.None
     val colorScheme = MaterialTheme.colorScheme
@@ -242,7 +249,7 @@ private fun ModuleCard(item: ModuleItem, viewModel: ModuleViewModel, onUpdateCli
     val hasDescription = item.module.description.isNotBlank()
 
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(20.dp))
             .clickable(enabled = hasDescription) { expanded = !expanded },
@@ -428,9 +435,9 @@ private fun ModuleCard(item: ModuleItem, viewModel: ModuleViewModel, onUpdateCli
 @Composable
 private fun OnlineModuleDialog(
     item: OnlineModule,
-    showDialog: MutableState<Boolean>,
     onDownload: (install: Boolean) -> Unit,
     onDismiss: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val svc = ServiceLocator.networkService
     val title = stringResource(
@@ -438,34 +445,31 @@ private fun OnlineModuleDialog(
         item.name, item.version, item.versionCode
     )
 
-    if (showDialog.value) {
-        AlertDialog(
-            onDismissRequest = onDismiss,
-            title = { Text(title) },
-            text = {
-                MarkdownTextAsync {
-                    val str = svc.fetchString(item.changelog)
-                    if (str.length > 1000) str.substring(0, 1000) else str
+    AlertDialog(
+        modifier = modifier,
+        onDismissRequest = onDismiss,
+        title = { Text(title) },
+        text = {
+            MarkdownTextAsync {
+                val str = svc.fetchString(item.changelog)
+                if (str.length > 1000) str.substring(0, 1000) else str
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { onDownload(true) }) {
+                Text(stringResource(CoreR.string.install))
+            }
+        },
+        dismissButton = {
+            Row {
+                TextButton(onClick = onDismiss) {
+                    Text(stringResource(android.R.string.cancel))
                 }
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = { onDownload(true) }
-                ) {
-                    Text(stringResource(CoreR.string.install))
-                }
-            },
-            dismissButton = {
-                Row {
-                    TextButton(onClick = onDismiss) {
-                        Text(stringResource(android.R.string.cancel))
-                    }
-                    Spacer(Modifier.weight(1f))
-                    TextButton(onClick = { onDownload(false) }) {
-                        Text(stringResource(CoreR.string.download))
-                    }
+                Spacer(Modifier.weight(1f))
+                TextButton(onClick = { onDownload(false) }) {
+                    Text(stringResource(CoreR.string.download))
                 }
             }
-        )
-    }
+        }
+    )
 }

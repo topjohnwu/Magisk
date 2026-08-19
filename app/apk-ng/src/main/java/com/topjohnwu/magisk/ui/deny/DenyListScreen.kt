@@ -52,6 +52,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -65,7 +66,11 @@ import com.topjohnwu.magisk.core.R as CoreR
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DenyListScreen(viewModel: DenyListViewModel, onBack: () -> Unit) {
+fun DenyListScreen(
+    viewModel: DenyListViewModel,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     val loading by viewModel.loading.collectAsState()
     val apps by viewModel.filteredApps.collectAsState()
     val query by viewModel.query.collectAsState()
@@ -74,11 +79,12 @@ fun DenyListScreen(viewModel: DenyListViewModel, onBack: () -> Unit) {
     val sortBy by viewModel.sortBy.collectAsState()
     val sortReverse by viewModel.sortReverse.collectAsState()
 
-    val showSortMenu = remember { mutableStateOf(false) }
-    val showFilterMenu = remember { mutableStateOf(false) }
+    var showSortMenu by remember { mutableStateOf(false) }
+    var showFilterMenu by remember { mutableStateOf(false) }
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
+        modifier = modifier,
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(CoreR.string.denylist)) },
@@ -96,7 +102,7 @@ fun DenyListScreen(viewModel: DenyListViewModel, onBack: () -> Unit) {
                 actions = {
                     Box {
                         IconButton(
-                            onClick = { showSortMenu.value = true },
+                            onClick = { showSortMenu = true },
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.Sort,
@@ -104,8 +110,8 @@ fun DenyListScreen(viewModel: DenyListViewModel, onBack: () -> Unit) {
                             )
                         }
                         DropdownMenu(
-                            expanded = showSortMenu.value,
-                            onDismissRequest = { showSortMenu.value = false }
+                            expanded = showSortMenu,
+                            onDismissRequest = { showSortMenu = false }
                         ) {
                             val sortOptions = listOf(
                                 CoreR.string.sort_by_name to SortBy.NAME,
@@ -121,7 +127,7 @@ fun DenyListScreen(viewModel: DenyListViewModel, onBack: () -> Unit) {
                                     } else null,
                                     onClick = {
                                         viewModel.setSortBy(sort)
-                                        showSortMenu.value = false
+                                        showSortMenu = false
                                     }
                                 )
                             }
@@ -132,7 +138,7 @@ fun DenyListScreen(viewModel: DenyListViewModel, onBack: () -> Unit) {
                                 } else null,
                                 onClick = {
                                     viewModel.toggleSortReverse()
-                                    showSortMenu.value = false
+                                    showSortMenu = false
                                 }
                             )
                         }
@@ -141,7 +147,7 @@ fun DenyListScreen(viewModel: DenyListViewModel, onBack: () -> Unit) {
                     Box {
                         IconButton(
                             modifier = Modifier.padding(end = 16.dp),
-                            onClick = { showFilterMenu.value = true },
+                            onClick = { showFilterMenu = true },
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Tune,
@@ -149,8 +155,8 @@ fun DenyListScreen(viewModel: DenyListViewModel, onBack: () -> Unit) {
                             )
                         }
                         DropdownMenu(
-                            expanded = showFilterMenu.value,
-                            onDismissRequest = { showFilterMenu.value = false }
+                            expanded = showFilterMenu,
+                            onDismissRequest = { showFilterMenu = false }
                         ) {
                             DropdownMenuItem(
                                 text = { Text(stringResource(CoreR.string.show_system_app)) },
@@ -159,7 +165,7 @@ fun DenyListScreen(viewModel: DenyListViewModel, onBack: () -> Unit) {
                                 } else null,
                                 onClick = {
                                     viewModel.setShowSystem(!showSystem)
-                                    showFilterMenu.value = false
+                                    showFilterMenu = false
                                 }
                             )
                             DropdownMenuItem(
@@ -172,7 +178,7 @@ fun DenyListScreen(viewModel: DenyListViewModel, onBack: () -> Unit) {
                                         viewModel.setShowSystem(true)
                                     }
                                     viewModel.setShowOS(!showOS)
-                                    showFilterMenu.value = false
+                                    showFilterMenu = false
                                 }
                             )
                         }
@@ -221,7 +227,7 @@ fun DenyListScreen(viewModel: DenyListViewModel, onBack: () -> Unit) {
                         items = apps,
                         key = { it.info.packageName }
                     ) { app ->
-                        DenyAppCard(app)
+                        DenyAppCard(app = app)
                     }
                 }
             }
@@ -230,7 +236,11 @@ fun DenyListScreen(viewModel: DenyListViewModel, onBack: () -> Unit) {
 }
 
 @Composable
-private fun SearchInput(query: String, onQueryChange: (String) -> Unit, modifier: Modifier = Modifier) {
+private fun SearchInput(
+    query: String,
+    onQueryChange: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
     OutlinedTextField(
         value = query,
         onValueChange = onQueryChange,
@@ -266,9 +276,12 @@ private fun SearchInput(query: String, onQueryChange: (String) -> Unit, modifier
 }
 
 @Composable
-private fun DenyAppCard(app: DenyAppState) {
+private fun DenyAppCard(
+    app: DenyAppState,
+    modifier: Modifier = Modifier
+) {
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(20.dp)),
         shape = RoundedCornerShape(20.dp),
@@ -332,7 +345,7 @@ private fun DenyAppCard(app: DenyAppState) {
                         .padding(start = 52.dp, bottom = 8.dp)
                 ) {
                     app.processes.forEach { proc ->
-                        ProcessRow(proc)
+                        ProcessRow(proc = proc)
                     }
                 }
             }
@@ -341,9 +354,12 @@ private fun DenyAppCard(app: DenyAppState) {
 }
 
 @Composable
-private fun ProcessRow(proc: DenyProcessState) {
+private fun ProcessRow(
+    proc: DenyProcessState,
+    modifier: Modifier = Modifier
+) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
             .clickable { proc.toggle() }

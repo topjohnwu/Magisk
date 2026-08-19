@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.ui.superuser
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -22,6 +23,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -54,6 +56,8 @@ fun SuperuserDetailScreen(
     uid: Int,
     viewModel: SuperuserViewModel,
     onBack: () -> Unit,
+    modifier: Modifier = Modifier,
+    onAuthenticate: ((onSuccess: () -> Unit) -> Unit)? = null,
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val items = uiState.policies.filter { it.policy.uid == uid }
@@ -65,9 +69,20 @@ fun SuperuserDetailScreen(
     val revokeTitle = stringResource(CoreR.string.su_revoke_title)
     val revokeMsg = item?.let { stringResource(CoreR.string.su_revoke_msg, it.appName) } ?: ""
 
-    LaunchedEffect(Unit) { viewModel.refreshSuRestrict() }
+    LaunchedEffect(Unit) {
+        viewModel.refreshSuRestrict()
+        if (uiState.policies.isEmpty()) {
+            viewModel.startLoading()
+        }
+    }
+    LaunchedEffect(onAuthenticate) {
+        if (onAuthenticate != null) {
+            viewModel.authenticate = onAuthenticate
+        }
+    }
 
     Scaffold(
+        modifier = modifier,
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(CoreR.string.settings)) },
@@ -86,6 +101,18 @@ fun SuperuserDetailScreen(
             )
         }
     ) { padding ->
+        if (uiState.loading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+            return@Scaffold
+        }
+
         if (item == null) return@Scaffold
 
         Column(
@@ -165,21 +192,23 @@ fun SuperuserDetailScreen(
                 )
             }
 
-            RevokeButton {
-                if (viewModel.requiresAuth) {
-                    viewModel.authenticate { viewModel.performDelete(item, onBack) }
-                } else {
-                    scope.launch {
-                        val result = revokeDialog.awaitConfirm(
-                            title = revokeTitle,
-                            content = revokeMsg,
-                        )
-                        if (result == ConfirmResult.Confirmed) {
-                            viewModel.performDelete(item, onBack)
+            RevokeButton(
+                onClick = {
+                    if (viewModel.requiresAuth) {
+                        viewModel.authenticate { viewModel.performDelete(item, onBack) }
+                    } else {
+                        scope.launch {
+                            val result = revokeDialog.awaitConfirm(
+                                title = revokeTitle,
+                                content = revokeMsg,
+                            )
+                            if (result == ConfirmResult.Confirmed) {
+                                viewModel.performDelete(item, onBack)
+                            }
                         }
                     }
                 }
-            }
+            )
         }
     }
 }
@@ -187,6 +216,7 @@ fun SuperuserDetailScreen(
 @Composable
 private fun RevokeButton(
     onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Button(
         onClick = onClick,
@@ -196,7 +226,7 @@ private fun RevokeButton(
         ),
         shape = RoundedCornerShape(20.dp),
         contentPadding = PaddingValues(vertical = 12.dp),
-        modifier = Modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth()
     ) {
         Icon(
             imageVector = Icons.Default.Cancel,

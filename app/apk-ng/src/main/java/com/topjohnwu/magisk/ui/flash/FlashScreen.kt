@@ -37,9 +37,13 @@ import com.topjohnwu.magisk.ui.terminal.TerminalScreen
 import com.topjohnwu.magisk.core.R as CoreR
 
 @OptIn(ExperimentalMaterial3Api::class)
-
 @Composable
-fun FlashScreen(viewModel: FlashViewModel, action: String, onBack: () -> Unit) {
+fun FlashScreen(
+    viewModel: FlashViewModel,
+    action: String,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     val flashState by viewModel.flashState.collectAsState()
     val showReboot by viewModel.showReboot.collectAsState()
     val finished = flashState != FlashViewModel.State.FLASHING
@@ -56,6 +60,7 @@ fun FlashScreen(viewModel: FlashViewModel, action: String, onBack: () -> Unit) {
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
+        modifier = modifier,
         topBar = {
             TopAppBar(
                 title = { Text("${stringResource(CoreR.string.flash_screen_title)} - $statusText") },

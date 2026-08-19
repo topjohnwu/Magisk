@@ -42,6 +42,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -78,7 +79,12 @@ enum class Tab(val titleRes: Int, val iconRes: Int) {
 }
 
 @Composable
-fun MainScreen(initialTab: Int = Tab.HOME.ordinal) {
+fun MainScreen(
+    modifier: Modifier = Modifier,
+    initialTab: Int = Tab.HOME.ordinal,
+    superuserViewModel: SuperuserViewModel? = null,
+    onAuthenticate: ((onSuccess: () -> Unit) -> Unit)? = null,
+) {
     val navigator = LocalNavigator.current
     val visibleTabs = remember {
         Tab.entries.filter { tab ->
@@ -92,7 +98,7 @@ fun MainScreen(initialTab: Int = Tab.HOME.ordinal) {
     val initialPage = visibleTabs.indexOf(Tab.entries[initialTab]).coerceAtLeast(0)
     val pagerState = rememberPagerState(initialPage = initialPage, pageCount = { visibleTabs.size })
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxSize()) {
         HorizontalPager(
             state = pagerState,
             modifier = Modifier.fillMaxSize(),
@@ -112,11 +118,16 @@ fun MainScreen(initialTab: Int = Tab.HOME.ordinal) {
                     HomeScreen(vm, installVm)
                 }
                 Tab.SUPERUSER -> {
-                    val activity = LocalActivity.current as MainActivity
-                    val vm: SuperuserViewModel = viewModel(viewModelStoreOwner = activity, factory = VMFactory)
-                    LaunchedEffect(Unit) {
-                        vm.authenticate = { onSuccess ->
-                            activity.extension.withAuthentication { if (it) onSuccess() }
+                    val activity = LocalActivity.current as? ComponentActivity
+                    val vm: SuperuserViewModel = superuserViewModel
+                        ?: if (activity != null) {
+                            viewModel(viewModelStoreOwner = activity, factory = VMFactory)
+                        } else {
+                            viewModel(factory = VMFactory)
+                        }
+                    LaunchedEffect(onAuthenticate) {
+                        if (onAuthenticate != null) {
+                            vm.authenticate = onAuthenticate
                         }
                     }
                     LaunchedEffect(isCurrentPage) {
@@ -140,11 +151,10 @@ fun MainScreen(initialTab: Int = Tab.HOME.ordinal) {
                     ModuleScreen(vm)
                 }
                 Tab.SETTINGS -> {
-                    val activity = LocalActivity.current as MainActivity
                     val vm: SettingsViewModel = viewModel(factory = VMFactory)
-                    LaunchedEffect(Unit) {
-                        vm.authenticate = { onSuccess ->
-                            activity.extension.withAuthentication { if (it) onSuccess() }
+                    LaunchedEffect(onAuthenticate) {
+                        if (onAuthenticate != null) {
+                            vm.authenticate = onAuthenticate
                         }
                     }
                     CollectNavEvents(vm, navigator)

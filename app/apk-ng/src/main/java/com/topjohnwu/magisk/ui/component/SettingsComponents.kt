@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun SettingsArrow(
     title: String,
+    modifier: Modifier = Modifier,
     summary: String? = null,
     leadingContent: @Composable (() -> Unit)? = null,
     onClick: () -> Unit
@@ -38,15 +39,16 @@ fun SettingsArrow(
         leadingContent = leadingContent,
         trailingContent = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null) },
         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-        modifier = Modifier.clickable(onClick = onClick)
+        modifier = modifier.clickable(onClick = onClick)
     )
 }
 
 @Composable
 fun SettingsSwitch(
     title: String,
-    summary: String? = null,
     checked: Boolean,
+    modifier: Modifier = Modifier,
+    summary: String? = null,
     enabled: Boolean = true,
     onCheckedChange: (Boolean) -> Unit
 ) {
@@ -55,7 +57,7 @@ fun SettingsSwitch(
         supportingContent = summary?.takeIf { it.isNotEmpty() }?.let { { Text(it, style = MaterialTheme.typography.bodyMedium) } },
         trailingContent = { Switch(checked = checked, onCheckedChange = onCheckedChange, enabled = enabled) },
         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-        modifier = Modifier.clickable(enabled = enabled, onClick = { onCheckedChange(!checked) })
+        modifier = modifier.clickable(enabled = enabled, onClick = { onCheckedChange(!checked) })
     )
 }
 
@@ -63,14 +65,15 @@ fun SettingsSwitch(
 @Composable
 fun SettingsDropdown(
     title: String,
-    summary: String? = null,
     items: List<String>,
     selectedIndex: Int,
+    modifier: Modifier = Modifier,
+    summary: String? = null,
     enabled: Boolean = true,
     onSelectedIndexChange: (Int) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
-    Box {
+    Box(modifier = modifier) {
         ListItem(
             headlineContent = { Text(title, style = MaterialTheme.typography.bodyLarge) },
             supportingContent = {
@@ -99,12 +102,15 @@ fun SettingsDropdown(
 }
 
 @Composable
-fun SmallTitle(text: String) {
+fun SmallTitle(
+    text: String,
+    modifier: Modifier = Modifier
+) {
     Text(
         text = text,
         style = MaterialTheme.typography.labelLarge,
         fontWeight = FontWeight.SemiBold,
         color = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+        modifier = modifier.padding(horizontal = 16.dp, vertical = 8.dp)
     )
 }

@@ -192,7 +192,7 @@ fun rememberConfirmCallback(
 fun rememberLoadingDialog(): LoadingDialogHandle {
     val visible = remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
-    LoadingDialog(visible)
+    LoadingDialog(visible = visible.value)
     return remember { LoadingDialogHandleImpl(visible, scope) }
 }
 
@@ -217,9 +217,14 @@ fun rememberConfirmDialog(callback: ConfirmCallback): ConfirmDialogHandle {
     if (visible.value) {
         ConfirmDialogContent(
             visuals = handle.visuals,
-            confirm = { scope.launch { resultChannel.send(ConfirmResult.Confirmed) } },
-            dismiss = { scope.launch { resultChannel.send(ConfirmResult.Canceled) } },
-            showDialog = visible
+            confirm = {
+                visible.value = false
+                scope.launch { resultChannel.send(ConfirmResult.Confirmed) }
+            },
+            dismiss = {
+                visible.value = false
+                scope.launch { resultChannel.send(ConfirmResult.Canceled) }
+            }
         )
     }
 
@@ -227,8 +232,11 @@ fun rememberConfirmDialog(callback: ConfirmCallback): ConfirmDialogHandle {
 }
 
 @Composable
-private fun LoadingDialog(showDialog: MutableState<Boolean>) {
-    if (showDialog.value) {
+fun LoadingDialog(
+    visible: Boolean,
+    modifier: Modifier = Modifier
+) {
+    if (visible) {
         Dialog(
             onDismissRequest = {},
             properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false)
@@ -237,7 +245,7 @@ private fun LoadingDialog(showDialog: MutableState<Boolean>) {
                 shape = RoundedCornerShape(28.dp),
                 color = MaterialTheme.colorScheme.surfaceContainerHigh,
                 tonalElevation = 6.dp,
-                modifier = Modifier.fillMaxWidth()
+                modifier = modifier.fillMaxWidth()
             ) {
                 Box(
                     modifier = Modifier.padding(24.dp).fillMaxWidth(),
@@ -264,69 +272,57 @@ private fun LoadingDialog(showDialog: MutableState<Boolean>) {
 }
 
 @Composable
-private fun ConfirmDialogContent(
+fun ConfirmDialogContent(
     visuals: DialogVisuals,
     confirm: () -> Unit,
     dismiss: () -> Unit,
-    showDialog: MutableState<Boolean>
+    modifier: Modifier = Modifier
 ) {
-    if (showDialog.value) {
-        AlertDialog(
-            modifier = Modifier.windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top)),
-            onDismissRequest = {
-                dismiss()
-                showDialog.value = false
-            },
-            shape = RoundedCornerShape(28.dp),
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-            title = if (visuals.title.isNotEmpty()) {
-                { Text(text = visuals.title, style = MaterialTheme.typography.titleLarge) }
-            } else null,
-            text = {
-                visuals.content?.let { content ->
-                    if (visuals.markdown) {
-                        MarkdownText(content)
-                    } else {
-                        Text(
-                            text = content,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-                    }
-                }
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        confirm()
-                        showDialog.value = false
-                    }
-                ) {
+    AlertDialog(
+        modifier = modifier.windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top)),
+        onDismissRequest = dismiss,
+        shape = RoundedCornerShape(28.dp),
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+        title = if (visuals.title.isNotEmpty()) {
+            { Text(text = visuals.title, style = MaterialTheme.typography.titleLarge) }
+        } else null,
+        text = {
+            visuals.content?.let { content ->
+                if (visuals.markdown) {
+                    MarkdownText(content)
+                } else {
                     Text(
-                        text = visuals.confirm ?: stringResource(android.R.string.ok),
-                        style = MaterialTheme.typography.labelLarge,
-                    )
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-                        dismiss()
-                        showDialog.value = false
-                    }
-                ) {
-                    Text(
-                        text = visuals.dismiss ?: stringResource(android.R.string.cancel),
-                        style = MaterialTheme.typography.labelLarge,
+                        text = content,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                 }
             }
-        )
-    }
+        },
+        confirmButton = {
+            TextButton(onClick = confirm) {
+                Text(
+                    text = visuals.confirm ?: stringResource(android.R.string.ok),
+                    style = MaterialTheme.typography.labelLarge,
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = dismiss) {
+                Text(
+                    text = visuals.dismiss ?: stringResource(android.R.string.cancel),
+                    style = MaterialTheme.typography.labelLarge,
+                )
+            }
+        }
+    )
 }
 
 @Composable
-fun MarkdownText(text: String) {
+fun MarkdownText(
+    text: String,
+    modifier: Modifier = Modifier
+) {
     val contentColor = MaterialTheme.colorScheme.onSurface.toArgb()
     AndroidView(
         factory = { context ->
@@ -339,14 +335,17 @@ fun MarkdownText(text: String) {
             textView.setTextColor(contentColor)
             ServiceLocator.markwon.setMarkdown(textView, text)
         },
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .heightIn(max = 300.dp)
     )
 }
 
 @Composable
-fun MarkdownTextAsync(getMarkdownText: suspend () -> String) {
+fun MarkdownTextAsync(
+    modifier: Modifier = Modifier,
+    getMarkdownText: suspend () -> String
+) {
     var mdText by remember { mutableStateOf<String?>(null) }
     var error by remember { mutableStateOf(false) }
 
@@ -360,10 +359,13 @@ fun MarkdownTextAsync(getMarkdownText: suspend () -> String) {
     }
 
     when {
-        error -> Text(stringResource(com.topjohnwu.magisk.core.R.string.download_file_error))
-        mdText != null -> MarkdownText(mdText!!)
+        error -> Text(
+            text = stringResource(R.string.download_file_error),
+            modifier = modifier
+        )
+        mdText != null -> MarkdownText(text = mdText!!, modifier = modifier)
         else -> Box(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
             CircularProgressIndicator()
