@@ -143,7 +143,7 @@ object DownloadPath : BaseSettingsItem.Input() {
 
 object UpdateChannel : BaseSettingsItem.Selector() {
     override var value
-        get() = Config.updateChannel
+        get() = Config.updateChannelIndex
         set(value) {
             Config.updateChannel = value
             Info.resetUpdate()
