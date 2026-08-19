@@ -99,11 +99,14 @@ fun MainScreen(initialTab: Int = Tab.HOME.ordinal) {
             beyondViewportPageCount = visibleTabs.size - 1,
             userScrollEnabled = true,
         ) { page ->
+            val isCurrentPage = pagerState.currentPage == page
             when (visibleTabs[page]) {
                 Tab.HOME -> {
                     val vm: HomeViewModel = viewModel(factory = VMFactory)
                     val installVm: InstallViewModel = viewModel(factory = VMFactory)
-                    LaunchedEffect(Unit) { vm.startLoading() }
+                    LaunchedEffect(isCurrentPage) {
+                        if (isCurrentPage) vm.startLoading()
+                    }
                     CollectNavEvents(vm, navigator)
                     CollectNavEvents(installVm, navigator)
                     HomeScreen(vm, installVm)
@@ -115,18 +118,24 @@ fun MainScreen(initialTab: Int = Tab.HOME.ordinal) {
                         vm.authenticate = { onSuccess ->
                             activity.extension.withAuthentication { if (it) onSuccess() }
                         }
-                        vm.startLoading()
+                    }
+                    LaunchedEffect(isCurrentPage) {
+                        if (isCurrentPage) vm.startLoading()
                     }
                     SuperuserScreen(vm)
                 }
                 Tab.LOG -> {
                     val vm: LogViewModel = viewModel(factory = VMFactory)
-                    LaunchedEffect(Unit) { vm.startLoading() }
+                    LaunchedEffect(isCurrentPage) {
+                        if (isCurrentPage) vm.startLoading()
+                    }
                     LogScreen(vm)
                 }
                 Tab.MODULES -> {
                     val vm: ModuleViewModel = viewModel(factory = VMFactory)
-                    LaunchedEffect(Unit) { vm.startLoading() }
+                    LaunchedEffect(isCurrentPage) {
+                        if (isCurrentPage) vm.startLoading()
+                    }
                     CollectNavEvents(vm, navigator)
                     ModuleScreen(vm)
                 }
