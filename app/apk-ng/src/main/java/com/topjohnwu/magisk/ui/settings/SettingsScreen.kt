@@ -173,7 +173,7 @@ private fun AppSettingsSection() {
             resources.getStringArray(CoreR.array.update_channel).toList()
         }
         var updateChannel by remember {
-            mutableIntStateOf(Config.updateChannel.coerceIn(0, updateChannelEntries.size - 1))
+            mutableIntStateOf(Config.updateChannelIndex)
         }
         var showUrlDialog by remember { mutableStateOf(false) }
 
