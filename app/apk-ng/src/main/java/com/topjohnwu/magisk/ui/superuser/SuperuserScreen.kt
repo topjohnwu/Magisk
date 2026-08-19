@@ -53,12 +53,16 @@ import com.topjohnwu.magisk.core.R as CoreR
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SuperuserScreen(viewModel: SuperuserViewModel) {
+fun SuperuserScreen(
+    viewModel: SuperuserViewModel,
+    modifier: Modifier = Modifier
+) {
     val uiState by viewModel.uiState.collectAsState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val navigator = LocalNavigator.current
 
     Scaffold(
+        modifier = modifier,
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(CoreR.string.superuser)) },
@@ -136,9 +140,10 @@ private fun PolicyCard(
     item: PolicyItem,
     onToggle: () -> Unit,
     onDetail: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(20.dp))
             .alpha(if (item.isEnabled) 1f else 0.5f),
