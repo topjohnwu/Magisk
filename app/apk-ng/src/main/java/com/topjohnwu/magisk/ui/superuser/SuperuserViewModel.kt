@@ -5,10 +5,6 @@ import android.content.pm.PackageManager
 import android.content.pm.PackageManager.MATCH_UNINSTALLED_PACKAGES
 import android.graphics.drawable.Drawable
 import android.os.Process
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.arch.AsyncLoadViewModel
 import com.topjohnwu.magisk.core.AppContext
@@ -20,6 +16,7 @@ import com.topjohnwu.magisk.core.ktx.getLabel
 import com.topjohnwu.magisk.core.model.su.SuPolicy
 import com.topjohnwu.magisk.core.su.SuEvents
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -29,19 +26,17 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
 
-class PolicyItem(
+data class PolicyItem(
     val policy: SuPolicy,
     val packageName: String,
     val isSharedUid: Boolean,
     val icon: Drawable,
     val appName: String,
+    val policyValue: Int = policy.policy,
+    val notification: Boolean = policy.notification,
+    val logging: Boolean = policy.logging,
 ) {
     val title get() = appName
-
-    var policyValue by mutableIntStateOf(policy.policy)
-    var notification by mutableStateOf(policy.notification)
-    var logging by mutableStateOf(policy.logging)
-
     val isEnabled get() = policyValue >= SuPolicy.ALLOW
     val isRestricted get() = policyValue == SuPolicy.RESTRICT
 }
@@ -53,7 +48,7 @@ class SuperuserViewModel(
     var authenticate: (onSuccess: () -> Unit) -> Unit = { it() }
 
     init {
-        @OptIn(kotlinx.coroutines.FlowPreview::class)
+        @OptIn(FlowPreview::class)
         viewModelScope.launch {
             SuEvents.policyChanged.debounce(500).collect { reload() }
         }
@@ -96,7 +91,10 @@ class SuperuserViewModel(
                             packageName = info.packageName,
                             isSharedUid = info.sharedUserId != null,
                             icon = info.applicationInfo?.loadIcon(pm) ?: pm.defaultActivityIcon,
-                            appName = info.applicationInfo?.getLabel(pm) ?: info.packageName
+                            appName = info.applicationInfo?.getLabel(pm) ?: info.packageName,
+                            policyValue = policy.policy,
+                            notification = policy.notification,
+                            logging = policy.logging,
                         )
                     } catch (_: PackageManager.NameNotFoundException) {
                         null
@@ -133,27 +131,35 @@ class SuperuserViewModel(
     }
 
     fun updateNotify(item: PolicyItem) {
-        item.notification = !item.notification
-        item.policy.notification = item.notification
+        val newNotification = !item.notification
+        item.policy.notification = newNotification
         viewModelScope.launch {
             db.update(item.policy)
-            _uiState.value.policies
-                .filter { it.policy.uid == item.policy.uid }
-                .forEach { it.notification = item.notification }
-            val res = if (item.notification) R.string.su_snack_notif_on else R.string.su_snack_notif_off
+            _uiState.update { state ->
+                state.copy(
+                    policies = state.policies.map {
+                        if (it.policy.uid == item.policy.uid) it.copy(notification = newNotification) else it
+                    }
+                )
+            }
+            val res = if (newNotification) R.string.su_snack_notif_on else R.string.su_snack_notif_off
             showSnackbar(AppContext.getString(res, item.appName))
         }
     }
 
     fun updateLogging(item: PolicyItem) {
-        item.logging = !item.logging
-        item.policy.logging = item.logging
+        val newLogging = !item.logging
+        item.policy.logging = newLogging
         viewModelScope.launch {
             db.update(item.policy)
-            _uiState.value.policies
-                .filter { it.policy.uid == item.policy.uid }
-                .forEach { it.logging = item.logging }
-            val res = if (item.logging) R.string.su_snack_log_on else R.string.su_snack_log_off
+            _uiState.update { state ->
+                state.copy(
+                    policies = state.policies.map {
+                        if (it.policy.uid == item.policy.uid) it.copy(logging = newLogging) else it
+                    }
+                )
+            }
+            val res = if (newLogging) R.string.su_snack_log_on else R.string.su_snack_log_off
             showSnackbar(AppContext.getString(res, item.appName))
         }
     }
@@ -162,11 +168,14 @@ class SuperuserViewModel(
         fun updateState() {
             viewModelScope.launch {
                 item.policy.policy = newPolicy
-                item.policyValue = newPolicy
                 db.update(item.policy)
-                _uiState.value.policies
-                    .filter { it.policy.uid == item.policy.uid }
-                    .forEach { it.policyValue = newPolicy }
+                _uiState.update { state ->
+                    state.copy(
+                        policies = state.policies.map {
+                            if (it.policy.uid == item.policy.uid) it.copy(policyValue = newPolicy) else it
+                        }
+                    )
+                }
                 val res = if (newPolicy >= SuPolicy.ALLOW) R.string.su_snack_grant else R.string.su_snack_deny
                 showSnackbar(AppContext.getString(res, item.appName))
             }

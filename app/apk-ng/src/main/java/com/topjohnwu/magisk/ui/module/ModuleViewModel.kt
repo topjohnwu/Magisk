@@ -2,13 +2,10 @@ package com.topjohnwu.magisk.ui.module
 
 import android.content.Context
 import android.net.Uri
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.arch.AsyncLoadViewModel
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.core.R as CoreR
 import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.core.model.module.LocalModule
 import com.topjohnwu.magisk.core.model.module.OnlineModule
@@ -16,19 +13,29 @@ import com.topjohnwu.magisk.core.utils.TextHolder
 import com.topjohnwu.magisk.core.utils.asText
 import com.topjohnwu.magisk.ui.flash.FlashUtils
 import com.topjohnwu.magisk.ui.navigation.Route
+import com.topjohnwu.magisk.utils.asFlow
 import com.topjohnwu.magisk.view.Notifications
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
+import com.topjohnwu.magisk.core.R as CoreR
 
-class ModuleItem(val module: LocalModule) {
+data class ModuleItem(
+    val module: LocalModule,
+    val isEnabled: Boolean = module.enable,
+    val isRemoved: Boolean = module.remove,
+    val showUpdate: Boolean = module.updateInfo != null,
+) {
     val showNotice: Boolean
     val showAction: Boolean
     val noticeText: TextHolder
+    val isUpdated = module.updated
+    val updateReady get() = module.outdated && !isRemoved && isEnabled
 
     init {
         val isZygisk = module.isZygisk
@@ -46,19 +53,13 @@ class ModuleItem(val module: LocalModule) {
                 else -> CoreR.string.suspend_text_zygisk.asText(CoreR.string.zygisk.asText())
             }
     }
-
-    var isEnabled by mutableStateOf(module.enable)
-    var isRemoved by mutableStateOf(module.remove)
-    var showUpdate by mutableStateOf(module.updateInfo != null)
-    val isUpdated = module.updated
-    val updateReady get() = module.outdated && !isRemoved && isEnabled
 }
 
 @Parcelize
 class OnlineModuleSubject(
     override val module: OnlineModule,
     override val autoLaunch: Boolean,
-    override val notifyId: Int = Notifications.nextId()
+    override val notifyId: Int = Notifications.nextId(),
 ) : Subject.Module() {
     override fun pendingIntent(context: Context) = FlashUtils.installIntent(context, file)
 }
@@ -72,6 +73,14 @@ class ModuleViewModel : AsyncLoadViewModel() {
 
     private val _uiState = MutableStateFlow(UiState())
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            Info.isConnected.asFlow().collect {
+                startLoading()
+            }
+        }
+    }
 
     override suspend fun doLoadWork() {
         _uiState.update { it.copy(loading = true) }
@@ -88,23 +97,18 @@ class ModuleViewModel : AsyncLoadViewModel() {
         }
     }
 
-    private val networkObserver: (Boolean) -> Unit = { startLoading() }
-
-    init {
-        Info.isConnected.observeForever(networkObserver)
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        Info.isConnected.removeObserver(networkObserver)
-    }
-
     private suspend fun loadUpdateInfo() {
         withContext(Dispatchers.IO) {
-            _uiState.value.modules.forEach { item ->
-                if (item.module.fetch()) {
-                    item.showUpdate = item.module.updateInfo != null
-                }
+            _uiState.update { state ->
+                state.copy(
+                    modules = state.modules.map { item ->
+                        if (item.module.fetch()) {
+                            item.copy(showUpdate = item.module.updateInfo != null)
+                        } else {
+                            item
+                        }
+                    }
+                )
             }
         }
     }
@@ -118,12 +122,26 @@ class ModuleViewModel : AsyncLoadViewModel() {
     }
 
     fun toggleEnabled(item: ModuleItem) {
-        item.isEnabled = !item.isEnabled
-        item.module.enable = item.isEnabled
+        val newEnabled = !item.isEnabled
+        item.module.enable = newEnabled
+        _uiState.update { state ->
+            state.copy(
+                modules = state.modules.map {
+                    if (it.module.id == item.module.id) it.copy(isEnabled = newEnabled) else it
+                }
+            )
+        }
     }
 
     fun toggleRemove(item: ModuleItem) {
-        item.isRemoved = !item.isRemoved
-        item.module.remove = item.isRemoved
+        val newRemoved = !item.isRemoved
+        item.module.remove = newRemoved
+        _uiState.update { state ->
+            state.copy(
+                modules = state.modules.map {
+                    if (it.module.id == item.module.id) it.copy(isRemoved = newRemoved) else it
+                }
+            )
+        }
     }
 }

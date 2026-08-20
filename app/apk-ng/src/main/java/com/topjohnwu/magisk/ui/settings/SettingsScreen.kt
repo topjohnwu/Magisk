@@ -24,7 +24,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -38,6 +37,7 @@ import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.pm.ShortcutManagerCompat
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
@@ -305,7 +305,7 @@ private fun MagiskSection(
             )
 
             // DenyList
-            val denyListEnabled by viewModel.denyListEnabled.collectAsState()
+            val denyListEnabled by viewModel.denyListEnabled.collectAsStateWithLifecycle()
             SettingsSwitch(
                 title = stringResource(CoreR.string.settings_denylist_title),
                 summary = stringResource(CoreR.string.settings_denylist_summary),
