@@ -2,9 +2,6 @@ package com.topjohnwu.magisk.ui.deny
 
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager.MATCH_UNINSTALLED_PACKAGES
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.arch.AsyncLoadViewModel
 import com.topjohnwu.magisk.core.AppContext
@@ -20,9 +17,38 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.toCollection
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
 
 enum class SortBy { NAME, PACKAGE_NAME, INSTALL_TIME, UPDATE_TIME }
+
+data class DenyProcessState(
+    val process: ProcessInfo,
+    val isEnabled: Boolean = process.isEnabled,
+) {
+    val displayName: String =
+        if (process.isIsolated) "(isolated) ${process.name}*" else process.name
+}
+
+data class DenyAppState(
+    val info: AppProcessInfo,
+    val processes: List<DenyProcessState> = info.processes.map { DenyProcessState(it) },
+    val isExpanded: Boolean = false,
+) : Comparable<DenyAppState> {
+
+    val itemsChecked: Int get() = processes.count { it.isEnabled }
+    val isChecked: Boolean get() = itemsChecked > 0
+    val checkedPercent: Float get() = if (processes.isEmpty()) 0f else itemsChecked.toFloat() / processes.size
+
+    override fun compareTo(other: DenyAppState) = comparator.compare(this, other)
+
+    companion object {
+        private val comparator = compareBy<DenyAppState>(
+            { it.itemsChecked == 0 },
+            { it.info }
+        )
+    }
+}
 
 class DenyListViewModel : AsyncLoadViewModel() {
 
@@ -88,6 +114,69 @@ class DenyListViewModel : AsyncLoadViewModel() {
     fun setSortBy(s: SortBy) { _sortBy.value = s }
     fun toggleSortReverse() { _sortReverse.value = !_sortReverse.value }
 
+    fun toggleExpanded(app: DenyAppState) {
+        _allApps.update { apps ->
+            apps.map {
+                if (it.info.packageName == app.info.packageName) it.copy(isExpanded = !it.isExpanded) else it
+            }
+        }
+    }
+
+    fun toggleAll(app: DenyAppState) {
+        val willCheck = !app.isChecked
+        if (!willCheck) {
+            Shell.cmd("magisk --denylist rm ${app.info.packageName}").submit()
+        }
+        _allApps.update { apps ->
+            apps.map { currentApp ->
+                if (currentApp.info.packageName == app.info.packageName) {
+                    val newProcs = currentApp.processes.map { proc ->
+                        if (willCheck) {
+                            if (!proc.isEnabled) {
+                                val (name, pkg) = proc.process
+                                Shell.cmd("magisk --denylist add $pkg '$name'").submit()
+                            }
+                            proc.copy(isEnabled = true)
+                        } else {
+                            if (proc.process.isIsolated && proc.isEnabled) {
+                                val (name, pkg) = proc.process
+                                Shell.cmd("magisk --denylist rm $pkg '$name'").submit()
+                            }
+                            proc.copy(isEnabled = false)
+                        }
+                    }
+                    currentApp.copy(processes = newProcs)
+                } else {
+                    currentApp
+                }
+            }
+        }
+    }
+
+    fun toggleProcess(app: DenyAppState, proc: DenyProcessState) {
+        val newEnabled = !proc.isEnabled
+        val arg = if (newEnabled) "add" else "rm"
+        val (name, pkg) = proc.process
+        Shell.cmd("magisk --denylist $arg $pkg '$name'").submit()
+
+        _allApps.update { apps ->
+            apps.map { currentApp ->
+                if (currentApp.info.packageName == app.info.packageName) {
+                    val newProcs = currentApp.processes.map { currentProc ->
+                        if (currentProc.process.name == proc.process.name && currentProc.process.packageName == proc.process.packageName) {
+                            currentProc.copy(isEnabled = newEnabled)
+                        } else {
+                            currentProc
+                        }
+                    }
+                    currentApp.copy(processes = newProcs)
+                } else {
+                    currentApp
+                }
+            }
+        }
+    }
+
     @SuppressLint("InlinedApi")
     override suspend fun doLoadWork() {
         _loading.value = true
@@ -111,52 +200,5 @@ class DenyListViewModel : AsyncLoadViewModel() {
         }
         _allApps.value = apps
         _loading.value = false
-    }
-}
-
-class DenyAppState(val info: AppProcessInfo) : Comparable<DenyAppState> {
-    val processes = info.processes.map { DenyProcessState(it) }
-    var isExpanded by mutableStateOf(false)
-
-    val itemsChecked: Int get() = processes.count { it.isEnabled }
-    val isChecked: Boolean get() = itemsChecked > 0
-    val checkedPercent: Float get() = if (processes.isEmpty()) 0f else itemsChecked.toFloat() / processes.size
-
-    fun toggleAll() {
-        if (isChecked) {
-            Shell.cmd("magisk --denylist rm ${info.packageName}").submit()
-            processes.filter { it.isEnabled }.forEach { proc ->
-                if (proc.process.isIsolated) {
-                    proc.toggle()
-                } else {
-                    proc.isEnabled = false
-                }
-            }
-        } else {
-            processes.filterNot { it.isEnabled }.forEach { it.toggle() }
-        }
-    }
-
-    override fun compareTo(other: DenyAppState) = comparator.compare(this, other)
-
-    companion object {
-        private val comparator = compareBy<DenyAppState>(
-            { it.itemsChecked == 0 },
-            { it.info }
-        )
-    }
-}
-
-class DenyProcessState(val process: ProcessInfo) {
-    var isEnabled by mutableStateOf(process.isEnabled)
-
-    val displayName: String =
-        if (process.isIsolated) "(isolated) ${process.name}*" else process.name
-
-    fun toggle() {
-        isEnabled = !isEnabled
-        val arg = if (isEnabled) "add" else "rm"
-        val (name, pkg) = process
-        Shell.cmd("magisk --denylist $arg $pkg \'$name\'").submit()
     }
 }

@@ -48,7 +48,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TriStateCheckbox
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,6 +59,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.topjohnwu.magisk.ui.component.verticalScrollbar
 import com.topjohnwu.magisk.core.R as CoreR
@@ -71,13 +71,13 @@ fun DenyListScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val loading by viewModel.loading.collectAsState()
-    val apps by viewModel.filteredApps.collectAsState()
-    val query by viewModel.query.collectAsState()
-    val showSystem by viewModel.showSystem.collectAsState()
-    val showOS by viewModel.showOS.collectAsState()
-    val sortBy by viewModel.sortBy.collectAsState()
-    val sortReverse by viewModel.sortReverse.collectAsState()
+    val loading by viewModel.loading.collectAsStateWithLifecycle()
+    val apps by viewModel.filteredApps.collectAsStateWithLifecycle()
+    val query by viewModel.query.collectAsStateWithLifecycle()
+    val showSystem by viewModel.showSystem.collectAsStateWithLifecycle()
+    val showOS by viewModel.showOS.collectAsStateWithLifecycle()
+    val sortBy by viewModel.sortBy.collectAsStateWithLifecycle()
+    val sortReverse by viewModel.sortReverse.collectAsStateWithLifecycle()
 
     var showSortMenu by remember { mutableStateOf(false) }
     var showFilterMenu by remember { mutableStateOf(false) }
@@ -225,9 +225,15 @@ fun DenyListScreen(
                 ) {
                     items(
                         items = apps,
-                        key = { it.info.packageName }
+                        key = { it.info.packageName },
+                        contentType = { "DenyAppCard" }
                     ) { app ->
-                        DenyAppCard(app = app)
+                        DenyAppCard(
+                            app = app,
+                            onToggleExpand = { viewModel.toggleExpanded(app) },
+                            onToggleAll = { viewModel.toggleAll(app) },
+                            onToggleProcess = { proc -> viewModel.toggleProcess(app, proc) }
+                        )
                     }
                 }
             }
@@ -278,6 +284,9 @@ private fun SearchInput(
 @Composable
 private fun DenyAppCard(
     app: DenyAppState,
+    onToggleExpand: () -> Unit,
+    onToggleAll: () -> Unit,
+    onToggleProcess: (DenyProcessState) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -305,7 +314,7 @@ private fun DenyAppCard(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { app.isExpanded = !app.isExpanded }
+                    .clickable(onClick = onToggleExpand)
                     .padding(14.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -334,7 +343,7 @@ private fun DenyAppCard(
                         app.checkedPercent < 1f -> ToggleableState.Indeterminate
                         else -> ToggleableState.On
                     },
-                    onClick = { app.toggleAll() }
+                    onClick = onToggleAll
                 )
             }
 
@@ -345,7 +354,10 @@ private fun DenyAppCard(
                         .padding(start = 52.dp, bottom = 8.dp)
                 ) {
                     app.processes.forEach { proc ->
-                        ProcessRow(proc = proc)
+                        ProcessRow(
+                            proc = proc,
+                            onToggle = { onToggleProcess(proc) }
+                        )
                     }
                 }
             }
@@ -356,13 +368,14 @@ private fun DenyAppCard(
 @Composable
 private fun ProcessRow(
     proc: DenyProcessState,
+    onToggle: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .clickable { proc.toggle() }
+            .clickable(onClick = onToggle)
             .padding(horizontal = 12.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -376,7 +389,7 @@ private fun ProcessRow(
         Spacer(Modifier.width(8.dp))
         Checkbox(
             checked = proc.isEnabled,
-            onCheckedChange = { proc.toggle() }
+            onCheckedChange = { onToggle() }
         )
     }
 }

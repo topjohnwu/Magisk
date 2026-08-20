@@ -16,14 +16,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalResources
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.net.toUri
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
@@ -185,9 +186,9 @@ class MainActivity : ComponentActivity(), SplashScreenHost {
                         )
                     }
                     MainActivityDialogs(
-                        showInvalid = showInvalidState.collectAsState().value,
-                        unsupportedMessages = showUnsupported.collectAsState().value,
-                        showShortcut = showShortcutPrompt.collectAsState().value,
+                        showInvalid = showInvalidState.collectAsStateWithLifecycle().value,
+                        unsupportedMessages = showUnsupported.collectAsStateWithLifecycle().value,
+                        showShortcut = showShortcutPrompt.collectAsStateWithLifecycle().value,
                         onInvalidConfirmed = {
                             showInvalidState.value = false
                             handleInvalidStateInstall()
@@ -207,7 +208,7 @@ class MainActivity : ComponentActivity(), SplashScreenHost {
 
     @Composable
     private fun HandleFlashIntent(navigator: Navigator) {
-        val intentVersion by intentState.collectAsState()
+        val intentVersion by intentState.collectAsStateWithLifecycle()
         LaunchedEffect(intentVersion) {
             val currentIntent = intent ?: return@LaunchedEffect
             if (currentIntent.action == FlashUtils.INTENT_FLASH) {
@@ -303,6 +304,7 @@ private fun MainActivityDialogs(
     onShortcutDismissed: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val resources = LocalResources.current
     val invalidDialog = rememberConfirmDialog(
         onConfirm = onInvalidConfirmed,
         onDismiss = {}
@@ -311,9 +313,9 @@ private fun MainActivityDialogs(
     LaunchedEffect(showInvalid) {
         if (showInvalid) {
             invalidDialog.showConfirm(
-                title = CoreR.string.unsupport_nonroot_stub_title.let { "" },
-                content = CoreR.string.unsupport_nonroot_stub_msg.let { "" },
-                confirm = CoreR.string.install.let { "" },
+                title = resources.getString(CoreR.string.unsupport_nonroot_stub_title),
+                content = resources.getString(CoreR.string.unsupport_nonroot_stub_msg),
+                confirm = resources.getString(CoreR.string.install),
             )
         }
     }
@@ -327,9 +329,10 @@ private fun MainActivityDialogs(
     val currentUnsupported = unsupportedMessages.getOrNull(currentUnsupportedIndex)
     LaunchedEffect(currentUnsupported) {
         if (currentUnsupported != null) {
+            val (titleRes, msgRes) = currentUnsupported
             unsupportedDialog.showConfirm(
-                title = "",
-                content = "",
+                title = resources.getString(titleRes),
+                content = resources.getString(msgRes),
             )
         }
     }
@@ -342,8 +345,8 @@ private fun MainActivityDialogs(
     LaunchedEffect(showShortcut) {
         if (showShortcut) {
             shortcutDialog.showConfirm(
-                title = "",
-                content = "",
+                title = resources.getString(CoreR.string.add_shortcut_title),
+                content = resources.getString(CoreR.string.add_shortcut_msg),
             )
         }
     }

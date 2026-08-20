@@ -12,12 +12,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.ui.component.rememberExternalStoragePermissionLauncher
 import com.topjohnwu.magisk.ui.terminal.TerminalScreen
@@ -31,7 +31,7 @@ fun ActionScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val actionState by viewModel.actionState.collectAsState()
+    val actionState by viewModel.actionState.collectAsStateWithLifecycle()
     val finished = actionState != ActionViewModel.State.RUNNING
     val saveLog = rememberExternalStoragePermissionLauncher {
         viewModel.saveLog()

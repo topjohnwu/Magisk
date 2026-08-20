@@ -36,7 +36,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -56,6 +55,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.topjohnwu.magisk.core.ktx.timeDateFormat
 import com.topjohnwu.magisk.core.ktx.toTime
@@ -70,7 +70,7 @@ fun LogScreen(
     viewModel: LogViewModel,
     modifier: Modifier = Modifier
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
     val tabTitles = listOf(
         stringResource(CoreR.string.superuser),
@@ -189,7 +189,11 @@ private fun SuLogTab(
                 contentPadding = PaddingValues(top = 8.dp, bottom = 88.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(logs, key = { it.id }) { log ->
+                items(
+                    items = logs,
+                    key = { it.id },
+                    contentType = { "SuLogCard" }
+                ) { log ->
                     SuLogCard(log = log)
                 }
             }
@@ -349,7 +353,11 @@ private fun MagiskLogTab(
                 contentPadding = PaddingValues(top = 8.dp, bottom = 88.dp),
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                items(entries, key = { "${it.timestamp}_${it.pid}_${it.tid}_${it.message.hashCode()}" }) { entry ->
+                items(
+                    items = entries,
+                    key = { "${it.timestamp}_${it.pid}_${it.tid}_${it.message.hashCode()}" },
+                    contentType = { "MagiskLogCard" }
+                ) { entry ->
                     MagiskLogCard(entry = entry)
                 }
             }

@@ -4,6 +4,7 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.widget.Toast
 import androidx.core.net.toUri
+import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.arch.AsyncLoadViewModel
 import com.topjohnwu.magisk.core.AppContext
 import com.topjohnwu.magisk.core.BuildConfig
@@ -12,11 +13,13 @@ import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.ktx.await
 import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.repository.NetworkService
+import com.topjohnwu.magisk.utils.asFlow
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import com.topjohnwu.magisk.core.R as CoreR
 
 class HomeViewModel(
@@ -36,37 +39,57 @@ class HomeViewModel(
         val showManagerInstall: Boolean = false,
         val showHideRestore: Boolean = false,
         val envFixCode: Int = 0,
+        val magiskState: State = computeMagiskState(),
+        val magiskInstalledVersion: String = computeMagiskInstalledVersion(),
+        val managerInstalledVersion: String = computeManagerInstalledVersion(),
     )
 
     private val _uiState = MutableStateFlow(UiState())
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
-    val magiskState
-        get() = when {
+    val magiskState get() = _uiState.value.magiskState
+    val magiskInstalledVersion get() = _uiState.value.magiskInstalledVersion
+    val managerInstalledVersion get() = _uiState.value.managerInstalledVersion
+
+    companion object {
+        private var checkedEnv = false
+
+        fun computeMagiskState() = when {
             Info.isRooted && Info.env.isUnsupported -> State.OUTDATED
             !Info.env.isActive -> State.INVALID
             Info.env.versionCode < BuildConfig.APP_VERSION_CODE -> State.OUTDATED
             else -> State.UP_TO_DATE
         }
 
-    val magiskInstalledVersion: String
-        get() = Info.env.run {
+        fun computeMagiskInstalledVersion() = Info.env.run {
             if (isActive)
                 "$versionString ($versionCode)" + if (isDebug) " (D)" else ""
             else
                 ""
         }
 
-    val managerInstalledVersion: String
-        get() = "${BuildConfig.APP_VERSION_NAME} (${BuildConfig.APP_VERSION_CODE})" +
-            if (BuildConfig.DEBUG) " (D)" else ""
+        fun computeManagerInstalledVersion() =
+            "${BuildConfig.APP_VERSION_NAME} (${BuildConfig.APP_VERSION_CODE})" +
+                if (BuildConfig.DEBUG) " (D)" else ""
+    }
 
-    companion object {
-        private var checkedEnv = false
+    init {
+        viewModelScope.launch {
+            Info.isConnected.asFlow().collect {
+                startLoading()
+            }
+        }
     }
 
     override suspend fun doLoadWork() {
-        _uiState.update { it.copy(appState = State.LOADING) }
+        _uiState.update {
+            it.copy(
+                appState = State.LOADING,
+                magiskState = computeMagiskState(),
+                magiskInstalledVersion = computeMagiskInstalledVersion(),
+                managerInstalledVersion = computeManagerInstalledVersion(),
+            )
+        }
         Info.fetchUpdate(svc)?.apply {
             val isDebug = Config.updateChannel == Config.Value.DEBUG_CHANNEL
             _uiState.update {
@@ -79,17 +102,6 @@ class HomeViewModel(
             _uiState.update { it.copy(appState = State.INVALID, managerRemoteVersion = "") }
         }
         ensureEnv()
-    }
-
-    private val networkObserver: (Boolean) -> Unit = { startLoading() }
-
-    init {
-        Info.isConnected.observeForever(networkObserver)
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        Info.isConnected.removeObserver(networkObserver)
     }
 
     fun onLinkPressed(link: String) {
