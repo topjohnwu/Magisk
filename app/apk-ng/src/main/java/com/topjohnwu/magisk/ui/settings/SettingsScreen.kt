@@ -42,6 +42,7 @@ import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.isRunningAsStub
+import com.topjohnwu.magisk.core.model.ColorMode
 import com.topjohnwu.magisk.core.utils.LocaleSetting
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.ui.ThemeState
@@ -137,19 +138,30 @@ private fun CustomizationSection(
         }
 
         // Color Mode
+        val isDynamicColorSupported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
         val resources = LocalResources.current
-        val colorModeEntries = remember {
+        val rawColorModeEntries = remember {
             resources.getStringArray(CoreR.array.color_mode).toList()
         }
+        val colorModeEntries = remember(isDynamicColorSupported) {
+            if (isDynamicColorSupported) {
+                rawColorModeEntries
+            } else {
+                rawColorModeEntries.drop(3)
+            }
+        }
         var colorMode by remember { mutableIntStateOf(Config.colorMode) }
+        val selectedIndex = ColorMode.fromValue(colorMode).toUiIndex(isDynamicColorSupported)
+
         SettingsDropdown(
             title = stringResource(CoreR.string.settings_color_mode),
             items = colorModeEntries,
-            selectedIndex = colorMode,
+            selectedIndex = selectedIndex,
             onSelectedIndexChange = { index ->
-                colorMode = index
-                Config.colorMode = index
-                ThemeState.colorMode = index
+                val newMode = ColorMode.fromUiIndex(index, isDynamicColorSupported)
+                colorMode = newMode.value
+                Config.colorMode = newMode.value
+                ThemeState.colorMode = newMode.value
             }
         )
 

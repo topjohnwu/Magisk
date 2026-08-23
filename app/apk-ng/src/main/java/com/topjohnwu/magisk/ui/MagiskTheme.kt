@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.topjohnwu.magisk.core.Config
+import com.topjohnwu.magisk.core.model.ColorMode
 
 private val MagiskLightColorScheme = lightColorScheme(
     primary = Color(0xFF006B5D),
@@ -179,19 +180,11 @@ fun MagiskTheme(
     content: @Composable () -> Unit
 ) {
     val isDark = isSystemInDarkTheme()
-    val mode = ThemeState.colorMode
+    val mode = ColorMode.fromValue(ThemeState.colorMode)
     val context = LocalContext.current
 
-    val isDarkTheme = when (mode) {
-        1 -> false
-        2 -> true
-        3 -> isDark
-        4 -> false
-        5 -> true
-        else -> isDark
-    }
-
-    val useDynamicColor = mode in listOf(3, 4, 5) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+    val isDarkTheme = mode.isDark(isDark)
+    val useDynamicColor = mode.isMonet && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
 
     val colorScheme = when {
         useDynamicColor && isDarkTheme -> dynamicDarkColorScheme(context)
