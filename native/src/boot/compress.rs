@@ -222,13 +222,13 @@ pub fn get_encoder<'a, W: Write + 'a>(
 ) -> std::io::Result<Box<dyn WriteFinish<W> + 'a>> {
     Ok(match format {
         FileFormat::XZ => {
-            let mut opt = XzOptions::with_preset(9);
+            let mut opt = XzOptions::with_preset(6);
             opt.set_check_sum_type(CheckType::Crc32);
             Box::new(XzWriter::new(w, opt)?)
         }
         FileFormat::LZMA => Box::new(LzmaWriter::new_use_header(
             w,
-            &LzmaOptions::with_preset(9),
+            &LzmaOptions::with_preset(6),
             None,
         )?),
         FileFormat::BZIP2 => Box::new(BzEncoder::new(w, BzCompression::best())),
