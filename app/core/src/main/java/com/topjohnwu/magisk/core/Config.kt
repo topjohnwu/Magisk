@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.core
 import android.os.Bundle
 import androidx.core.content.edit
 import com.topjohnwu.magisk.core.di.ServiceLocator
+import com.topjohnwu.magisk.core.model.ColorMode
 import com.topjohnwu.magisk.core.repository.DBConfig
 import com.topjohnwu.magisk.core.repository.PreferenceConfig
 import com.topjohnwu.magisk.core.utils.LocaleSetting
@@ -110,7 +111,7 @@ object Config : PreferenceConfig, DBConfig {
     var safetyNotice by preference(Key.SAFETY, true)
     var darkTheme by preference(Key.DARK_THEME, -1)
     var themeOrdinal by preference(Key.THEME_ORDINAL, 0)
-    var colorMode by preference(Key.COLOR_MODE, 0)
+    var colorMode by preference(Key.COLOR_MODE, ColorMode.MONET_SYSTEM.value)
 
     private var checkUpdatePrefs by preference(Key.CHECK_UPDATES, true)
     private var localePrefs by preference(Key.LOCALE, "")

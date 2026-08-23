@@ -69,11 +69,11 @@
     </string-array>
 
     <string-array name="color_mode">
-        <item>@string/color_mode_system</item>
-        <item>@string/color_mode_light</item>
-        <item>@string/color_mode_dark</item>
         <item>@string/color_mode_monet_system</item>
         <item>@string/color_mode_monet_light</item>
         <item>@string/color_mode_monet_dark</item>
+        <item>@string/color_mode_system</item>
+        <item>@string/color_mode_light</item>
+        <item>@string/color_mode_dark</item>
     </string-array>
 </resources>
