@@ -1,4 +1,5 @@
-use crate::ffi::{FileFormat, check_fmt};
+use crate::ffi::FileFormat;
+use crate::format::check_fmt;
 use base::nix::fcntl::OFlag;
 use base::{Chunker, FileOrStd, LoggedResult, ReadExt, Utf8CStr, Utf8CString, WriteExt, log_err};
 use bzip2::Compression as BzCompression;

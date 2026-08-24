@@ -3,7 +3,7 @@
 
 pub use base;
 use compress::{compress_bytes, decompress_bytes};
-use format::{fmt_compressed, fmt_compressed_any, fmt2name};
+use format::{check_fmt, fmt_compressed, fmt_compressed_any, fmt2name};
 use sign::{SHA, get_sha, sha256_hash, sign_payload_for_cxx};
 use std::env;
 
@@ -56,7 +56,6 @@ pub mod ffi {
         fn unpack(image: Utf8CStrRef, skip_decomp: bool, hdr: bool) -> i32;
         fn repack(src_img: Utf8CStrRef, out_img: Utf8CStrRef, skip_comp: bool);
         fn split_image_dtb(filename: Utf8CStrRef, skip_decomp: bool) -> i32;
-        fn check_fmt(buf: &[u8]) -> FileFormat;
     }
 
     extern "Rust" {
@@ -67,6 +66,7 @@ pub mod ffi {
         fn output_size(self: &SHA) -> usize;
         fn sha256_hash(data: &[u8], out: &mut [u8]);
 
+        fn check_fmt(buf: &[u8]) -> FileFormat;
         fn compress_bytes(format: FileFormat, in_bytes: &[u8], out_fd: i32);
         fn decompress_bytes(format: FileFormat, in_bytes: &[u8], out_fd: i32);
         fn fmt2name(fmt: FileFormat) -> *const c_char;
