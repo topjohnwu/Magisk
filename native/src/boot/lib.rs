@@ -3,6 +3,7 @@
 
 pub use base;
 use compress::{compress_bytes, decompress_bytes};
+use dtb::find_dtb_offset_for_cxx;
 use format::{check_fmt, fmt_compressed, fmt_compressed_any, fmt2name};
 use sign::{SHA, get_sha, sha256_hash, sign_payload_for_cxx};
 use std::env;
@@ -75,6 +76,9 @@ pub mod ffi {
 
         #[cxx_name = "sign_payload"]
         fn sign_payload_for_cxx(payload: &[u8]) -> Vec<u8>;
+
+        #[cxx_name = "find_dtb_offset"]
+        fn find_dtb_offset_for_cxx(buf: &[u8]) -> i32;
     }
 
     // BootImage FFI

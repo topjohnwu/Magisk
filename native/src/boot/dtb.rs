@@ -1,11 +1,16 @@
 use argh::FromArgs;
 use base::{LoggedResult, MappedFile, Utf8CStr, argh};
-use fdt::node::{FdtNode, NodeProperty};
-use fdt::{Fdt, FdtError};
+use fdt::nodes::{Node, NodeProperty};
+use fdt::parsing::Panic;
+use fdt::parsing::unaligned::UnalignedParser;
+use fdt::{Fdt, FdtError, FdtHeader};
 use std::cell::UnsafeCell;
 
 use crate::check_env;
 use crate::patch::patch_verity;
+
+type UnalignedFdt<'a> = Fdt<'a, (UnalignedParser<'a>, Panic)>;
+type UnalignedNode<'a> = Node<'a, (UnalignedParser<'a>, Panic)>;
 
 #[derive(FromArgs)]
 #[argh(subcommand)]
@@ -52,7 +57,7 @@ Supported actions:
 
 const MAX_PRINT_LEN: usize = 32;
 
-fn print_node(node: &FdtNode) {
+fn print_node(node: &UnalignedNode) {
     fn pretty_node(depth_set: &[bool]) {
         let mut depth_set = depth_set.iter().peekable();
         while let Some(depth) = depth_set.next() {
@@ -89,13 +94,13 @@ fn print_node(node: &FdtNode) {
         }
     }
 
-    fn do_print_node(node: &FdtNode, depth_set: &mut Vec<bool>) {
+    fn do_print_node(node: &UnalignedNode, depth_set: &mut Vec<bool>) {
         pretty_node(depth_set);
         let depth = depth_set.len();
         depth_set.push(true);
-        println!("{}", node.name);
-        let mut properties = node.properties().peekable();
-        let mut children = node.children().peekable();
+        println!("{}", node.name().name);
+        let mut properties = node.properties().iter().peekable();
+        let mut children = node.children().iter().peekable();
         while let Some(NodeProperty { name, value }) = properties.next() {
             let size = value.len();
             let is_str = !(size > 1 && value[0] == 0)
@@ -136,7 +141,46 @@ fn print_node(node: &FdtNode) {
     do_print_node(node, &mut vec![]);
 }
 
-fn for_each_fdt<F: FnMut(usize, Fdt) -> LoggedResult<()>>(
+const DTB_MAGIC: &[u8] = b"\xd0\x0d\xfe\xed";
+
+/// Minimum size of a valid, non-empty flattened device tree (72 bytes / 0x48).
+///
+/// A minimal DTB containing only an empty root node (`/`) with zero properties is
+/// exactly 72 bytes:
+/// - 40 bytes: Standard FDT header
+/// - 16 bytes: Empty memory reserve map (null terminator entry)
+/// - 16 bytes: Root node struct block (`BEGIN_NODE` + empty name `""` + `END_NODE` + `END`)
+const MIN_NON_EMPTY_DTB_SIZE: usize = 0x48;
+
+pub(crate) fn find_dtb_offset(buf: &[u8]) -> Option<usize> {
+    let mut pos = 0;
+    while pos + size_of::<FdtHeader>() <= buf.len() {
+        let rel_pos = buf[pos..].windows(4).position(|w| w == DTB_MAGIC)?;
+        let curr = pos + rel_pos;
+        let sub = &buf[curr..];
+
+        let Ok(fdt) = Fdt::new_unaligned_fallible(sub) else {
+            pos = curr + 4;
+            continue;
+        };
+
+        if fdt.total_size() <= MIN_NON_EMPTY_DTB_SIZE
+            || fdt.find_node("/").ok().flatten().is_none()
+        {
+            pos = curr + 4;
+            continue;
+        }
+
+        return Some(curr);
+    }
+    None
+}
+
+pub(crate) fn find_dtb_offset_for_cxx(buf: &[u8]) -> i32 {
+    find_dtb_offset(buf).map_or(-1, |v| v as i32)
+}
+
+fn for_each_fdt<F: FnMut(usize, UnalignedFdt) -> LoggedResult<()>>(
     file: &Utf8CStr,
     rw: bool,
     mut f: F,
@@ -150,16 +194,13 @@ fn for_each_fdt<F: FnMut(usize, Fdt) -> LoggedResult<()>>(
     let mut buf = Some(file.as_ref());
     let mut dtb_num = 0usize;
     while let Some(slice) = buf {
-        let slice = if let Some(pos) = slice.windows(4).position(|w| w == b"\xd0\x0d\xfe\xed") {
+        let slice = if let Some(pos) = find_dtb_offset(slice) {
             &slice[pos..]
         } else {
             break;
         };
-        if slice.len() < 40 {
-            break;
-        }
-        let fdt = match Fdt::new(slice) {
-            Err(FdtError::BufferTooSmall) => {
+        let fdt = match Fdt::new_unaligned(slice) {
+            Err(FdtError::SliceTooSmall) => {
                 eprintln!("dtb.{dtb_num:04} is truncated");
                 break;
             }
@@ -177,8 +218,9 @@ fn for_each_fdt<F: FnMut(usize, Fdt) -> LoggedResult<()>>(
     Ok(())
 }
 
-fn find_fstab<'b, 'a: 'b>(fdt: &'b Fdt<'a>) -> Option<FdtNode<'b, 'a>> {
-    fdt.all_nodes().find(|node| node.name == "fstab")
+fn find_fstab<'a>(fdt: &UnalignedFdt<'a>) -> Option<UnalignedNode<'a>> {
+    fdt.all_nodes()
+        .find_map(|(_, node)| (node.name().name == "fstab").then_some(node))
 }
 
 fn dtb_print(file: &Utf8CStr, fstab: bool) -> LoggedResult<()> {
@@ -188,11 +230,8 @@ fn dtb_print(file: &Utf8CStr, fstab: bool) -> LoggedResult<()> {
                 eprintln!("Found fstab in dtb.{n:04}");
                 print_node(&fstab);
             }
-        } else if let Some(mut root) = fdt.find_node("/") {
+        } else if let Some(root) = fdt.find_node("/") {
             eprintln!("Printing dtb.{n:04}");
-            if root.name.is_empty() {
-                root.name = "/";
-            }
             print_node(&root);
         }
         Ok(())
@@ -203,11 +242,11 @@ fn dtb_test(file: &Utf8CStr) -> LoggedResult<bool> {
     let mut ret = true;
     for_each_fdt(file, false, |_, fdt| {
         if let Some(fstab) = find_fstab(&fdt) {
-            for child in fstab.children() {
-                if child.name != "system" {
+            for child in fstab.children().iter() {
+                if child.name().name != "system" {
                     continue;
                 }
-                if let Some(mount_point) = child.property("mnt_point")
+                if let Some(mount_point) = child.raw_property("mnt_point")
                     && mount_point.value == b"/system_root\0"
                 {
                     ret = false;
@@ -224,11 +263,11 @@ fn dtb_patch(file: &Utf8CStr) -> LoggedResult<bool> {
     let keep_verity = check_env("KEEPVERITY");
     let mut patched = false;
     for_each_fdt(file, true, |n, fdt| {
-        for node in fdt.all_nodes() {
-            if node.name != "chosen" {
+        for (_, node) in fdt.all_nodes() {
+            if node.name().name != "chosen" {
                 continue;
             }
-            if let Some(boot_args) = node.property("bootargs") {
+            if let Some(boot_args) = node.raw_property("bootargs") {
                 boot_args.value.windows(14).for_each(|w| {
                     if w == b"skip_initramfs" {
                         let w = unsafe {
@@ -245,8 +284,8 @@ fn dtb_patch(file: &Utf8CStr) -> LoggedResult<bool> {
             return Ok(());
         }
         if let Some(fstab) = find_fstab(&fdt) {
-            for child in fstab.children() {
-                if let Some(flags) = child.property("fsmgr_flags") {
+            for child in fstab.children().iter() {
+                if let Some(flags) = child.raw_property("fsmgr_flags") {
                     let flags = unsafe {
                         &mut *std::mem::transmute::<&[u8], &UnsafeCell<[u8]>>(flags.value).get()
                     };

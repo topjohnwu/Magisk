@@ -5,6 +5,8 @@
 #include <bitset>
 #include <rust/cxx.h>
 
+enum class FileFormat : uint8_t;
+
 /******************
  * Special Headers
  *****************/
