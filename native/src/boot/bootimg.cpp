@@ -53,55 +53,6 @@ static bool check_env(const char *name) {
     return val != nullptr && val == "true"sv;
 }
 
-static bool guess_lzma(const uint8_t *buf, size_t len) {
-    // 0     : (pb * 5 + lp) * 9 + lc
-    // 1 - 4 : dict size, must be 2^n
-    // 5 - 12: all 0xFF
-    if (len <= 13) return false;
-    if (memcmp(buf, "\x5d", 1) != 0) return false;
-    uint32_t dict_sz = 0;
-    memcpy(&dict_sz, buf + 1, sizeof(dict_sz));
-    if (dict_sz == 0 || (dict_sz & (dict_sz - 1)) != 0) return false;
-    if (memcmp(buf + 5, "\xff\xff\xff\xff\xff\xff\xff\xff", 8) != 0) return false;
-    return true;
-}
-
-FileFormat check_fmt(const void *buf, size_t len) {
-    if (CHECKED_MATCH(CHROMEOS_MAGIC)) {
-        return FileFormat::CHROMEOS;
-    } else if (CHECKED_MATCH(BOOT_MAGIC)) {
-        return FileFormat::AOSP;
-    } else if (CHECKED_MATCH(VENDOR_BOOT_MAGIC)) {
-        return FileFormat::AOSP_VENDOR;
-    } else if (CHECKED_MATCH(GZIP1_MAGIC) || CHECKED_MATCH(GZIP2_MAGIC)) {
-        return FileFormat::GZIP;
-    } else if (CHECKED_MATCH(LZOP_MAGIC)) {
-        return FileFormat::LZOP;
-    } else if (CHECKED_MATCH(XZ_MAGIC)) {
-        return FileFormat::XZ;
-    } else if (guess_lzma(static_cast<const uint8_t *>(buf), len)) {
-        return FileFormat::LZMA;
-    } else if (CHECKED_MATCH(BZIP_MAGIC)) {
-        return FileFormat::BZIP2;
-    } else if (CHECKED_MATCH(LZ41_MAGIC) || CHECKED_MATCH(LZ42_MAGIC)) {
-        return FileFormat::LZ4;
-    } else if (CHECKED_MATCH(LZ4_LEG_MAGIC)) {
-        return FileFormat::LZ4_LEGACY;
-    } else if (CHECKED_MATCH(MTK_MAGIC)) {
-        return FileFormat::MTK;
-    } else if (CHECKED_MATCH(DTB_MAGIC)) {
-        return FileFormat::DTB;
-    } else if (CHECKED_MATCH(DHTB_MAGIC)) {
-        return FileFormat::DHTB;
-    } else if (CHECKED_MATCH(TEGRABLOB_MAGIC)) {
-        return FileFormat::BLOB;
-    } else if (len >= 0x28 && memcmp(&((char *)buf)[0x24], ZIMAGE_MAGIC, 4) == 0) {
-        return FileFormat::ZIMAGE;
-    } else {
-        return FileFormat::UNKNOWN;
-    }
-}
-
 void dyn_img_hdr::print() const {
     uint32_t ver = header_version();
     fprintf(stderr, "%-*s [%u]\n", PADDING, "HEADER_VER", ver);
@@ -478,7 +429,6 @@ std::span<const vendor_ramdisk_table_entry_v4> boot_img::vendor_ramdisk_tbl() co
     }
     return span(reinterpret_cast<table_entry *>(vendor_ramdisk_table), hdr->vendor_ramdisk_table_entry_num());
 }
-
 
 #define assert_off() \
 if ((addr + off) > (map.data() + map_end)) {      \
