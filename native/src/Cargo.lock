@@ -470,9 +470,9 @@ checksum = "877a4ace8713b0bcf2a4e7eec82529c029f1d0619886d18145fea96c3ffe5c0f"
 
 [[package]]
 name = "fdt"
-version = "0.1.5"
+version = "0.2.0-alpha2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "784a4df722dc6267a04af36895398f59d21d07dce47232adf31ec0ff2fa45e67"
+checksum = "c8ccfb5c9d9425b2191070f0435636f4a9cdfedd107e33b15f861622b222726a"
 
 [[package]]
 name = "ff"
