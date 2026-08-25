@@ -18,12 +18,10 @@ use lzma_rust2::{CheckType, LzmaOptions, LzmaReader, LzmaWriter, XzOptions, XzRe
 use std::cmp::min;
 use std::fmt::Write as FmtWrite;
 use std::fs::File;
-use std::io::{BufWriter, Cursor, Read, Write};
+use std::io::{Cursor, Read, Write};
 use std::mem::ManuallyDrop;
-use std::num::NonZeroU64;
 use std::ops::DerefMut;
 use std::os::fd::{FromRawFd, RawFd};
-use zopfli::{BlockType, GzipEncoder as ZopFliEncoder, Options as ZopfliOptions};
 
 pub trait WriteFinish<W: Write>: Write {
     fn finish(self: Box<Self>) -> std::io::Result<W>;
@@ -42,13 +40,6 @@ macro_rules! finish_impl {
 }
 
 finish_impl!(GzEncoder<W>, BzEncoder<W>, XzWriter<W>, LzmaWriter<W>);
-
-impl<W: Write> WriteFinish<W> for BufWriter<ZopFliEncoder<W>> {
-    fn finish(self: Box<Self>) -> std::io::Result<W> {
-        let inner = self.into_inner()?;
-        ZopFliEncoder::finish(inner)
-    }
-}
 
 impl<W: Write> WriteFinish<W> for LZ4FrameEncoder<W> {
     fn finish(self: Box<Self>) -> std::io::Result<W> {
@@ -246,15 +237,6 @@ pub fn get_encoder<'a, W: Write + 'a>(
         }
         FileFormat::LZ4_LEGACY => Box::new(LZ4BlockEncoder::new(w, false)),
         FileFormat::LZ4_LG => Box::new(LZ4BlockEncoder::new(w, true)),
-        FileFormat::ZOPFLI => {
-            // These options are already better than gzip -9
-            let opt = ZopfliOptions {
-                iteration_count: unsafe { NonZeroU64::new_unchecked(1) },
-                maximum_block_splits: 1,
-                ..Default::default()
-            };
-            Box::new(ZopFliEncoder::new_buffered(opt, BlockType::Dynamic, w)?)
-        }
         FileFormat::GZIP => Box::new(GzEncoder::new(w, GzCompression::best())),
         _ => unreachable!(),
     })
@@ -270,7 +252,7 @@ pub fn get_decoder<'a, R: Read + 'a>(
         FileFormat::BZIP2 => Box::new(BzDecoder::new(r)),
         FileFormat::LZ4 => Box::new(LZ4FrameDecoder::new(r)?),
         FileFormat::LZ4_LG | FileFormat::LZ4_LEGACY => Box::new(LZ4BlockDecoder::new(r)),
-        FileFormat::ZOPFLI | FileFormat::GZIP => Box::new(MultiGzDecoder::new(r)),
+        FileFormat::GZIP => Box::new(MultiGzDecoder::new(r)),
         _ => unreachable!(),
     })
 }

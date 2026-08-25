@@ -43,15 +43,6 @@ struct blob_hdr {
     uint32_t version;       /* 0x00000001 */
 } __attribute__((packed));
 
-struct zimage_hdr {
-    uint32_t code[9];
-    uint32_t magic;      /* zImage magic */
-    uint32_t start;      /* absolute load/run zImage address */
-    uint32_t end;        /* zImage end address */
-    uint32_t endian;     /* endianness flag */
-    // There could be more fields, but we don't care
-} __attribute__((packed));
-
 /**************
  * AVB Headers
  **************/
@@ -680,6 +671,8 @@ enum {
     BOOT_FLAGS_MAX
 };
 
+struct ZImage;
+
 struct boot_img {
     // Memory map of the whole image
     const mmap_data map;
@@ -715,19 +708,7 @@ struct boot_img {
     const mtk_hdr *k_hdr = nullptr;
     const mtk_hdr *r_hdr = nullptr;
 
-    // The pointers/values after parse_image
-    // +---------------+
-    // | z_info.hdr    | z_info.hdr_sz
-    // +---------------+
-    // | kernel        | hdr->kernel_size()
-    // +---------------+
-    // | z_info.tail   |
-    // +---------------+
-    struct {
-        const zimage_hdr *hdr = nullptr;
-        uint32_t hdr_sz = 0;
-        byte_view tail{};
-    } z_info;
+    std::unique_ptr<ZImage> z_info;
 
     // AVB structs
     const AvbFooter *avb_footer = nullptr;
@@ -751,7 +732,6 @@ struct boot_img {
     ~boot_img();
 
     bool parse_image(const uint8_t *addr, FileFormat type);
-    void parse_zimage();
     const uint8_t *parse_hdr(const uint8_t *addr, FileFormat type);
     std::span<const vendor_ramdisk_table_entry_v4> vendor_ramdisk_tbl() const;
 

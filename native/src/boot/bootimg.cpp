@@ -294,49 +294,6 @@ const uint8_t *boot_img::parse_hdr(const uint8_t *addr, FileFormat type) {
     return addr;
 }
 
-void boot_img::parse_zimage() {
-    z_info.hdr = reinterpret_cast<const zimage_hdr *>(kernel);
-
-    const uint8_t* piggy = nullptr;
-    // Skip 0x28, which includes zimage header
-    for (const uint8_t* curr = kernel + 0x28; curr < kernel + hdr->kernel_size(); curr++) {
-        if (check_fmt_lg(curr, hdr->kernel_size() - (curr - kernel)) != FileFormat::UNKNOWN) {
-            piggy = curr;
-            break;
-        }
-    }
-
-    if (piggy != nullptr) {
-        fprintf(stderr, "ZIMAGE_KERNEL\n");
-        z_info.hdr_sz = piggy - kernel;
-
-        // Find end of piggy
-        uint32_t piggy_size = z_info.hdr->end - z_info.hdr->start;
-        uint32_t piggy_end = piggy_size;
-        uint32_t offsets[16];
-        memcpy(offsets, kernel + piggy_size - sizeof(offsets), sizeof(offsets));
-        for (int i = 15; i >= 0; --i) {
-            if (offsets[i] > (piggy_size - 0xFF) && offsets[i] < piggy_size) {
-                piggy_end = offsets[i];
-                break;
-            }
-        }
-
-        if (piggy_end == piggy_size) {
-            fprintf(stderr, "! Could not find end of zImage piggy, keeping raw kernel\n");
-        } else {
-            flags[ZIMAGE_KERNEL] = true;
-            z_info.tail = byte_view(kernel + piggy_end, hdr->kernel_size() - piggy_end);
-            // Shift the kernel pointer and resize
-            kernel += z_info.hdr_sz;
-            hdr->kernel_size() = piggy_end - z_info.hdr_sz;
-            k_fmt = check_fmt_lg(kernel, hdr->kernel_size());
-        }
-    } else {
-        fprintf(stderr, "! Could not find zImage piggy, keeping raw kernel\n");
-    }
-}
-
 static const char *vendor_ramdisk_type(int type) {
     switch (type) {
     case VENDOR_RAMDISK_TYPE_PLATFORM:
@@ -432,7 +389,18 @@ bool boot_img::parse_image(const uint8_t *addr, FileFormat type) {
             k_fmt = check_fmt_lg(kernel, hdr->kernel_size());
         }
         if (k_fmt == FileFormat::ZIMAGE) {
-            parse_zimage();
+            z_info = ZImage::parse(byte_view(kernel, hdr->kernel_size()));
+            if (z_info != nullptr) {
+                fprintf(stderr, "ZIMAGE_KERNEL\n");
+                flags[ZIMAGE_KERNEL] = true;
+                kernel = z_info->piggy.data();
+                if (z_info->fmt != FileFormat::GZIP) {
+                    hdr->kernel_size() = z_info->piggy.size() - sizeof(uint32_t);
+                } else {
+                    hdr->kernel_size() = z_info->piggy.size();
+                }
+                k_fmt = z_info->fmt;
+            }
         }
         fprintf(stderr, "%-*s [%s]\n", PADDING, "KERNEL_FMT", fmt2name(k_fmt));
     }
@@ -654,43 +622,42 @@ void repack(Utf8CStr src_img, Utf8CStr out_img, bool skip_comp) {
         xwrite(fd, boot.k_hdr, sizeof(mtk_hdr));
     }
     if (boot.flags[ZIMAGE_KERNEL]) {
-        // Copy zImage headers
-        xwrite(fd, boot.z_info.hdr, boot.z_info.hdr_sz);
+        // Copy zImage headers stub
+        xwrite(fd, boot.z_info->head.data(), boot.z_info->head.size());
     }
+    uint32_t z_payload_sz = 0;
     if (access(KERNEL_FILE, R_OK) == 0) {
         mmap_data m(KERNEL_FILE);
+        uint32_t payload_sz = 0;
         if (!skip_comp && !fmt_compressed_any(check_fmt(m.data(), m.size())) && fmt_compressed(boot.k_fmt)) {
-            // Always use zopfli for zImage compression
-            auto fmt = (boot.flags[ZIMAGE_KERNEL] && boot.k_fmt == FileFormat::GZIP) ? FileFormat::ZOPFLI : boot.k_fmt;
-            hdr->kernel_size() = compress_len(fmt, m, fd);
+            payload_sz = compress_len(boot.k_fmt, m, fd);
+            if (boot.flags[ZIMAGE_KERNEL] && boot.k_fmt != FileFormat::GZIP) {
+                // For non-gzip compression in zImage, size_append appends the 4-byte LE uncompressed size
+                uint32_t sz = m.size();
+                xwrite(fd, &sz, sizeof(sz));
+                payload_sz += sizeof(sz);
+            }
+            hdr->kernel_size() = payload_sz;
         } else {
-            hdr->kernel_size() = xwrite(fd, m.data(), m.size());
+            payload_sz = xwrite(fd, m.data(), m.size());
+            hdr->kernel_size() = payload_sz;
         }
 
         if (boot.flags[ZIMAGE_KERNEL]) {
-            if (hdr->kernel_size() > boot.hdr->kernel_size()) {
-                fprintf(stderr, "! Recompressed kernel is too large, using original kernel\n");
-                ftruncate64(fd, lseek64(fd, - (off64_t) hdr->kernel_size(), SEEK_CUR));
-                xwrite(fd, boot.kernel, boot.hdr->kernel_size());
-            } else if (!skip_comp) {
-                // Pad zeros to make sure the zImage file size does not change
-                // Also ensure the last 4 bytes are the uncompressed vmlinux size
-                uint32_t sz = m.size();
-                write_zero(fd, boot.hdr->kernel_size() - hdr->kernel_size() - sizeof(sz));
-                xwrite(fd, &sz, sizeof(sz));
-            }
-
-            // zImage size shall remain the same
-            hdr->kernel_size() = boot.hdr->kernel_size();
+            z_payload_sz = payload_sz;
+            auto tail_buf = boot.z_info->new_tail(payload_sz);
+            xwrite(fd, tail_buf.data(), tail_buf.size());
+            hdr->kernel_size() = boot.z_info->head.size() + payload_sz + tail_buf.size();
         }
     } else if (boot.hdr->kernel_size() != 0) {
-        xwrite(fd, boot.kernel, boot.hdr->kernel_size());
-        hdr->kernel_size() = boot.hdr->kernel_size();
-    }
-    if (boot.flags[ZIMAGE_KERNEL]) {
-        // Copy zImage tail and adjust size accordingly
-        hdr->kernel_size() += boot.z_info.hdr_sz;
-        hdr->kernel_size() += xwrite(fd, boot.z_info.tail.data(), boot.z_info.tail.size());
+        if (boot.flags[ZIMAGE_KERNEL]) {
+            xwrite(fd, boot.z_info->piggy.data(), boot.z_info->piggy.size());
+            xwrite(fd, boot.z_info->tail.data(), boot.z_info->tail.size());
+            hdr->kernel_size() = boot.z_info->head.size() + boot.z_info->piggy.size() + boot.z_info->tail.size();
+        } else {
+            xwrite(fd, boot.kernel, boot.hdr->kernel_size());
+            hdr->kernel_size() = boot.hdr->kernel_size();
+        }
     }
 
     // kernel dtb
@@ -852,6 +819,13 @@ void repack(Utf8CStr src_img, Utf8CStr out_img, bool skip_comp) {
         auto m_hdr = reinterpret_cast<mtk_hdr *>(out.data() + off.ramdisk);
         m_hdr->size = hdr->ramdisk_size();
         hdr->ramdisk_size() += sizeof(mtk_hdr);
+    }
+
+    // zImage header stub
+    if (boot.flags[ZIMAGE_KERNEL] && z_payload_sz) {
+        auto head_stub = boot.z_info->new_head(z_payload_sz);
+        uint8_t *head_ptr = out.data() + off.kernel + (boot.flags[MTK_KERNEL] ? sizeof(mtk_hdr) : 0);
+        memcpy(head_ptr, head_stub.data(), head_stub.size());
     }
 
     // Make sure header size matches

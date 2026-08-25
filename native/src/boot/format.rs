@@ -9,7 +9,6 @@ impl FromStr for FileFormat {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "gzip" => Ok(Self::GZIP),
-            "zopfli" => Ok(Self::ZOPFLI),
             "xz" => Ok(Self::XZ),
             "lzma" => Ok(Self::LZMA),
             "bzip2" => Ok(Self::BZIP2),
@@ -31,7 +30,6 @@ impl FileFormat {
     fn as_cstr(&self) -> &'static Utf8CStr {
         match *self {
             Self::GZIP => cstr!("gzip"),
-            Self::ZOPFLI => cstr!("zopfli"),
             Self::LZOP => cstr!("lzop"),
             Self::XZ => cstr!("xz"),
             Self::LZMA => cstr!("lzma"),
@@ -49,7 +47,7 @@ impl FileFormat {
 impl FileFormat {
     pub fn ext(&self) -> &'static str {
         match *self {
-            Self::GZIP | Self::ZOPFLI => "gz",
+            Self::GZIP => "gz",
             Self::LZOP => "lzo",
             Self::XZ => "xz",
             Self::LZMA => "lzma",
@@ -63,7 +61,6 @@ impl FileFormat {
         matches!(
             *self,
             Self::GZIP
-                | Self::ZOPFLI
                 | Self::XZ
                 | Self::LZMA
                 | Self::BZIP2
@@ -76,7 +73,6 @@ impl FileFormat {
     pub fn formats() -> String {
         [
             Self::GZIP,
-            Self::ZOPFLI,
             Self::XZ,
             Self::LZMA,
             Self::BZIP2,

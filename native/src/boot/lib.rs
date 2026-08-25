@@ -19,6 +19,7 @@ mod payload;
 #[allow(warnings)]
 mod proto;
 mod sign;
+mod zimage;
 
 #[cxx::bridge]
 pub mod ffi {
@@ -32,7 +33,6 @@ pub mod ffi {
         BLOB,
         /* Compression formats */
         GZIP,
-        ZOPFLI,
         XZ,
         LZMA,
         BZIP2,
@@ -45,6 +45,17 @@ pub mod ffi {
         MTK,
         DTB,
         ZIMAGE,
+    }
+
+    struct ZImage<'a> {
+        head: &'a [u8],
+        piggy: &'a [u8],
+        tail: &'a [u8],
+        fmt: FileFormat,
+        off_inflated_size: u32,
+        off_lc0: u32,
+        off_lc1: u32,
+        off_table: u32,
     }
 
     unsafe extern "C++" {
@@ -79,6 +90,11 @@ pub mod ffi {
 
         #[cxx_name = "find_dtb_offset"]
         fn find_dtb_offset_for_cxx(buf: &[u8]) -> i32;
+
+        #[Self = ZImage]
+        unsafe fn parse<'a>(zimg: &'a [u8]) -> UniquePtr<ZImage<'a>>;
+        fn new_head(self: &ZImage, payload_sz: usize) -> Vec<u8>;
+        fn new_tail(self: &ZImage, payload_sz: usize) -> Vec<u8>;
     }
 
     // BootImage FFI
