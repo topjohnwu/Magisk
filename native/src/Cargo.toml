@@ -33,7 +33,6 @@ pb-rs = { version = "0.10.0", default-features = false }
 quick-protobuf = "0.8.1"
 flate2 = { version = "1.1.9", default-features = false }
 bzip2 = "0.6.1"
-zopfli = { version = "0.8.3", default-features = false}
 lz4 = "1.28.1"
 lzma-rust2 = { version = "0.18.0", default-features = false }
 nix = "0.31.3"
