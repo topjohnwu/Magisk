@@ -1,16 +1,21 @@
+# Artifacts
 out
 *.zip
 *.jks
 *.apk
 *.log
+
+# Local configs
 /config.prop
 /notes.md
-
-# Built binaries
-native/out
 
 # Android Studio
 *.iml
 .idea
 .cursor
-ramdisk.img
+
+# Ignore all skills by default, as random skills may be installed
+/.agents/skills/*
+
+# Keep Magisk custom skills in repository
+!/.agents/skills/magisk-*/

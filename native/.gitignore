@@ -1,8 +1,11 @@
 /build
-obj
-libs
+/obj
+/libs
+/out
 /.externalNativeBuild
 /.cxx
+/compile_commands.json
+
+# Auto generated
 *-rs.cpp
 *-rs.hpp
-/compile_commands.json
