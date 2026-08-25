@@ -1,12 +1,17 @@
-# AGENTS.md (native subproject)
+---
+name: magisk-native
+description: Guidelines, architecture, C++/Rust FFI bindings, development conventions, and build workflows for the Magisk native codebase (native/ subproject). Use when working on, modifying, building, debugging, or testing native C, C++, and Rust code in native/ (including magisk, magiskinit, magiskboot, magiskpolicy, resetprop, zygisk, and native crates/modules).
+---
 
-Guidelines for AI models operating inside the `native/` subproject. Always include and follow the top-level [`AGENTS.md`](../AGENTS.md).
+# Magisk Native Subproject Guidelines
+
+Guidelines and workflows for developing and building native C, C++, and Rust components in the `native/` subproject.
 
 ## 1. Environment & Build Requirements
 
-- **General Guidelines:** Always follow the top-level [`AGENTS.md`](../AGENTS.md) for general repository rules, environment execution setup, and commit control policies.
-- **Working Directory:** Execute commands from repo root via `./build.py`.
-- **Pre-build Requirement:** ALWAYS run `./build.py native` at least once before editing native sources to generate FFI bindings, headers, and flags (`flags.h`, `flags.rs`, `*-rs.hpp`, `*-rs.cpp`, protobuf generated modules).
+- **General Guidelines:** Always follow the top-level [`AGENTS.md`](../../../AGENTS.md) and [`magisk-git`](../magisk-git/SKILL.md) for general repository rules, environment execution setup, and commit control policies.
+- **Working Directory:** Execute commands from repo root via `./build.py`. Standalone tool executions (e.g. `cargo`, `rustc`, `ndk-build`) MUST be prefixed with `scripts/env.py`.
+- **Codegen Requirement:** ALWAYS run `./build.py gen` before editing native sources to generate FFI bindings, headers, and flags (`flags.h`, `flags.rs`, `*-rs.hpp`, `*-rs.cpp`, protobuf generated modules) without performing a full build.
 
 ## 2. Component Architecture
 
@@ -56,7 +61,7 @@ The build process follows a two-stage hybrid pipeline orchestrated by `build.py`
 - **Build Specific Target(s):** `./build.py native [magisk|magiskinit|magiskboot|magiskpolicy|resetprop]`
 - **Rust Clippy Lint:** `./build.py clippy`
 - **Cargo Commands:** `./build.py cargo check`, `./build.py cargo test`
-- **Generate IDE Database:** `./build.py gen`
+- **Generate Bindings & IDE Files:** `./build.py gen`
 - **Clean Native Artifacts:** `./build.py clean native`
 
 ## 6. Rust & C++ Conventions
