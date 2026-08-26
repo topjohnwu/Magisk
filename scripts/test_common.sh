@@ -8,10 +8,8 @@ export ANDROID_EMULATOR_HOME="$ANDROID_USER_HOME"
 export ANDROID_AVD_HOME="$ANDROID_EMULATOR_HOME/avd"
 export PATH="$PATH:$ANDROID_HOME/platform-tools"
 
-emu="$ANDROID_HOME/emulator/emulator"
-cli_tools="$ANDROID_HOME/cmdline-tools/latest"
-sdk="$cli_tools/bin/sdkmanager"
-avd="$cli_tools/bin/avdmanager"
+cmdline_tools="$ANDROID_HOME/cmdline-tools/latest"
+android="$cmdline_tools/bin/android"
 
 boot_timeout=100
 
@@ -26,6 +24,20 @@ print_title() {
 
 print_error() {
   echo -e "\n\033[41;39m${1}\033[0m\n" >&2
+}
+
+ensure_android_cli() {
+  local sdk="$cmdline_tools/bin/sdkmanager"
+  if [ ! -x "$android" ]; then
+    # Update to the latest cmdline-tools
+    yes | "$sdk" --licenses > /dev/null 2>&1
+    "$sdk" 'cmdline-tools;latest'
+    # Rename cmdline-tools if updated
+    if [ -e "${cmdline_tools}-2" ]; then
+      rm -rf "$cmdline_tools"
+      mv "${cmdline_tools}-2" "$cmdline_tools"
+    fi
+  fi
 }
 
 # $1 = TestClass#method

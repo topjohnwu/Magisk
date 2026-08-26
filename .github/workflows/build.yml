@@ -139,9 +139,7 @@ jobs:
 
       - name: Run AVD test
         timeout-minutes: 18
-        env:
-          FORCE_32_BIT: 1
-        run: scripts/avd.sh test -l -v ${{ matrix.version }} out/apk-ng-*.apk
+        run: scripts/avd.sh test -l -a x86 -v ${{ matrix.version }} out/apk-ng-*.apk
 
       - name: Upload logs on error
         if: ${{ failure() }}
