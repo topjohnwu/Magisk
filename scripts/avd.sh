@@ -31,17 +31,34 @@ test_error() {
 }
 
 wait_for_boot() {
-  set -e
-  adb wait-for-device
-  while true; do
-    local result="$(adb exec-out getprop sys.boot_completed)"
-    if [ $? -ne 0 ]; then
-      exit 1
-    elif [ "$result" = "1" ]; then
-      break
+  local trace=false
+  if [[ $- == *x* ]]; then
+    trace=true
+    set +x
+  fi
+
+  local emu_pid=$1
+  local elapsed=0
+
+  while [ $elapsed -lt $boot_timeout ]; do
+    if [ -n "$emu_pid" ] && ! kill -0 "$emu_pid" 2>/dev/null; then
+      $trace && set -x
+      print_error "! Emulator process died unexpectedly"
+      return 1
+    fi
+    local result
+    result="$(adb exec-out getprop sys.boot_completed 2>/dev/null || true)"
+    if [ "$result" = "1" ]; then
+      $trace && set -x
+      return 0
     fi
     sleep 2
+    elapsed=$((elapsed + 2))
   done
+
+  $trace && set -x
+  print_error "! Timed out waiting for emulator to boot (${boot_timeout}s)"
+  return 1
 }
 
 dump_vars() {
@@ -189,12 +206,13 @@ test_emu() {
   else
     "$emu" "@${avd_name}" $emu_args $magisk_args > /dev/null 2>&1 &
   fi
-  timeout $boot_timeout bash -c wait_for_boot
+  local emu_pid=$!
+  wait_for_boot $emu_pid
 
   run_setup $apk
 
   adb reboot
-  timeout $boot_timeout bash -c wait_for_boot
+  wait_for_boot $emu_pid
 
   run_tests
 
@@ -225,7 +243,7 @@ test_main() {
   # Launch stock emulator
   print_title "* Launching $avd_pkg"
   "$emu" "@${avd_name}" $emu_args > /dev/null 2>&1 &
-  timeout $boot_timeout bash -c wait_for_boot
+  wait_for_boot $!
 
   # Patch images
   local images=()
@@ -252,8 +270,17 @@ run_main() {
 
   setup_emu "$avd_pkg" $ver
   print_title "* Launching $avd_pkg"
-  "$emu" "@${avd_name}" $emu_args > /dev/null 2>&1 &
-  wait_for_boot
+  local emu_log=$(mktemp)
+  "$emu" "@${avd_name}" $emu_args > "$emu_log" 2>&1 &
+  local emu_pid=$!
+
+  if ! wait_for_boot "$emu_pid"; then
+    echo "--- Emulator Output ---"
+    cat "$emu_log"
+    rm -f "$emu_log"
+    exit 1
+  fi
+  rm -f "$emu_log"
   cleanup
 }
 
@@ -276,13 +303,13 @@ live_test_main() {
 
     # "Install" Magisk
     ./build.py -v emulator $apk
-    timeout $boot_timeout bash -c wait_for_boot
+    wait_for_boot
 
     run_setup $apk
 
     # Trigger Magisk soft reboot
     ./build.py -v emulator $apk
-    timeout $boot_timeout bash -c wait_for_boot
+    wait_for_boot
 
     run_tests
   done
@@ -292,13 +319,11 @@ case "$1" in
   test )
     shift
     trap test_error EXIT
-    export -f wait_for_boot
     set -x
     test_main "$@"
     ;;
   live-test )
     shift
-    export -f wait_for_boot
     set -x
     live_test_main "$@"
     ;;
