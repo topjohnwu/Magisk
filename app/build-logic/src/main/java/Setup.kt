@@ -308,9 +308,9 @@ fun Project.setupMainApk() {
 }
 
 const val LSPOSED_DOWNLOAD_URL =
-    "https://github.com/LSPosed/LSPosed/releases/download/v1.9.2/LSPosed-v1.9.2-7024-zygisk-release.zip"
+    "https://github.com/topjohnwu/magisk-files/releases/download/files/LSPosed-v2.1.1-7790-release.zip"
 const val LSPOSED_CHECKSUM =
-    "0ebc6bcb465d1c4b44b7220ab5f0252e6b4eb7fe43da74650476d2798bb29622"
+    "f58eb92678e9d8b982de4987b249bfa8593f7c1524aff3be9976a5cb478d3263"
 
 const val SHAMIKO_DOWNLOAD_URL =
     "https://github.com/LSPosed/LSPosed.github.io/releases/download/shamiko-383/Shamiko-v1.2.1-383-release.zip"
