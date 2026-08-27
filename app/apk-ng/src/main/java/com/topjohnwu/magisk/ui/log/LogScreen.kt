@@ -355,7 +355,6 @@ private fun MagiskLogTab(
             ) {
                 items(
                     items = entries,
-                    key = { "${it.timestamp}_${it.pid}_${it.tid}_${it.message.hashCode()}" },
                     contentType = { "MagiskLogCard" }
                 ) { entry ->
                     MagiskLogCard(entry = entry)
@@ -389,18 +388,23 @@ private fun MagiskLogCard(
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.weight(1f)
                     ) {
                         LogLevelBadge(level = entry.level)
-                        Text(
-                            text = entry.tag,
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
+                        if (entry.pid != 0) {
+                            val pidTidText = if (entry.tid != 0 && entry.tid != entry.pid) {
+                                "PID: ${entry.pid}  TID: ${entry.tid}"
+                            } else {
+                                "PID: ${entry.pid}"
+                            }
+                            Text(
+                                text = pidTidText,
+                                fontSize = 11.sp,
+                                fontFamily = FontFamily.Monospace,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                            )
+                        }
                     }
-                    Spacer(Modifier.width(8.dp))
                     Text(
                         text = entry.timestamp,
                         fontSize = 11.sp,
@@ -409,7 +413,7 @@ private fun MagiskLogCard(
                         maxLines = 1,
                     )
                 }
-                Spacer(Modifier.height(6.dp))
+                Spacer(Modifier.height(8.dp))
             }
 
             Text(
