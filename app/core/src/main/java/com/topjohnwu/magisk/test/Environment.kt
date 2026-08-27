@@ -59,7 +59,7 @@ class Environment : BaseTest {
         }
 
         fun lsposed(): Boolean {
-            return Build.VERSION.SDK_INT in 27..34
+            return Build.VERSION.SDK_INT in 28..37 && Const.CPU_ABI != "x86"
         }
 
         fun shamiko(): Boolean {
