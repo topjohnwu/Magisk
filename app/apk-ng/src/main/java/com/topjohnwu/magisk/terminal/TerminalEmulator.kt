@@ -192,6 +192,9 @@ class TerminalEmulator(
 
     val isAlternateBufferActive: Boolean get() = screen === mAltBuffer
 
+    val maxUsedColumn: Int
+        get() = maxOf(screen.maxUsedColumn, cursorCol + 1)
+
     private fun getTerminalTranscriptRows(transcriptRows: Int?): Int {
         return if (transcriptRows == null || transcriptRows < TERMINAL_TRANSCRIPT_ROWS_MIN || transcriptRows > TERMINAL_TRANSCRIPT_ROWS_MAX)
             DEFAULT_TERMINAL_TRANSCRIPT_ROWS
