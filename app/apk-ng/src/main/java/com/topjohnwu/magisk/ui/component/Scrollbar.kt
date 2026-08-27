@@ -173,6 +173,43 @@ fun rememberTerminalScrollbarAdapter(
     }
 }
 
+@Composable
+fun rememberTerminalHorizontalScrollbarAdapter(
+    scrollX: Float,
+    maxScrollX: Float,
+    viewportWidth: Float,
+    onScrollToX: (Float) -> Unit,
+): ScrollbarStateAdapter {
+    val currentOnScroll = rememberUpdatedState(onScrollToX)
+    return remember(scrollX, maxScrollX, viewportWidth) {
+        object : ScrollbarStateAdapter {
+            override val isScrollable: Boolean
+                get() = maxScrollX > 0f
+
+            override val thumbRatio: Float
+                get() {
+                    val totalWidth = viewportWidth + maxScrollX
+                    return if (totalWidth > 0f) {
+                        (viewportWidth / totalWidth).coerceIn(0.08f, 1f)
+                    } else 1f
+                }
+
+            override val offsetRatio: Float
+                get() {
+                    return if (maxScrollX > 0f) {
+                        (scrollX / maxScrollX).coerceIn(0f, 1f)
+                    } else 0f
+                }
+
+            override fun scrollTo(fraction: Float) {
+                if (maxScrollX > 0f) {
+                    currentOnScroll.value(fraction.coerceIn(0f, 1f) * maxScrollX)
+                }
+            }
+        }
+    }
+}
+
 fun Modifier.verticalScrollbar(
     state: ScrollState,
     contentPadding: PaddingValues = PaddingValues(0.dp),
@@ -180,6 +217,20 @@ fun Modifier.verticalScrollbar(
 ): Modifier = composed {
     val adapter = rememberScrollbarAdapter(state)
     verticalScrollbar(
+        adapter = adapter,
+        isScrollInProgress = state.isScrollInProgress,
+        contentPadding = contentPadding,
+        thumbColor = thumbColor,
+    )
+}
+
+fun Modifier.horizontalScrollbar(
+    state: ScrollState,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    thumbColor: Color? = null,
+): Modifier = composed {
+    val adapter = rememberScrollbarAdapter(state)
+    horizontalScrollbar(
         adapter = adapter,
         isScrollInProgress = state.isScrollInProgress,
         contentPadding = contentPadding,
@@ -217,6 +268,29 @@ fun Modifier.terminalScrollbar(
         onScrollToRow = onScrollToRow
     )
     verticalScrollbar(
+        adapter = adapter,
+        isScrollInProgress = isScrollInProgress,
+        contentPadding = contentPadding,
+        thumbColor = thumbColor,
+    )
+}
+
+fun Modifier.terminalHorizontalScrollbar(
+    scrollX: Float,
+    maxScrollX: Float,
+    viewportWidth: Float,
+    onScrollToX: (Float) -> Unit,
+    isScrollInProgress: Boolean = false,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    thumbColor: Color? = null,
+): Modifier = composed {
+    val adapter = rememberTerminalHorizontalScrollbarAdapter(
+        scrollX = scrollX,
+        maxScrollX = maxScrollX,
+        viewportWidth = viewportWidth,
+        onScrollToX = onScrollToX,
+    )
+    horizontalScrollbar(
         adapter = adapter,
         isScrollInProgress = isScrollInProgress,
         contentPadding = contentPadding,
@@ -332,6 +406,121 @@ fun Modifier.verticalScrollbar(
                         color = (if (isDragging) resolvedThumbColor else resolvedThumbColor.copy(alpha = 0.5f)),
                         topLeft = Offset(left, thumbOffset),
                         size = Size(thicknessPx, thumbHeight),
+                        cornerRadius = CornerRadius(thicknessPx / 2f, thicknessPx / 2f),
+                        alpha = alpha
+                    )
+                }
+            }
+        }
+}
+
+fun Modifier.horizontalScrollbar(
+    adapter: ScrollbarStateAdapter,
+    isScrollInProgress: Boolean = false,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    thumbColor: Color? = null,
+    minThumbWidth: Dp = 36.dp,
+    hitTargetHeight: Dp = 32.dp,
+): Modifier = composed {
+    val layoutDirection = LocalLayoutDirection.current
+    val resolvedThumbColor = thumbColor ?: MaterialTheme.colorScheme.onSurfaceVariant
+
+    var isDragging by remember { mutableStateOf(false) }
+    val alphaAnim = remember { Animatable(0f) }
+
+    val isScrollable by remember(adapter) { derivedStateOf { adapter.isScrollable } }
+
+    LaunchedEffect(isScrollInProgress, isDragging, isScrollable) {
+        if (!isScrollable) {
+            alphaAnim.snapTo(0f)
+            return@LaunchedEffect
+        }
+        if (isScrollInProgress || isDragging) {
+            alphaAnim.animateTo(1f, animationSpec = tween(150))
+        } else {
+            delay(1500)
+            alphaAnim.animateTo(0f, animationSpec = tween(500))
+        }
+    }
+
+    val animatedThickness by animateDpAsState(
+        targetValue = if (isDragging) 6.dp else 4.dp,
+        label = "horizontal_scrollbar_thickness"
+    )
+
+    this
+        .pointerInput(adapter, contentPadding, layoutDirection, isScrollable) {
+            if (!isScrollable) return@pointerInput
+
+            val paddingBottom = contentPadding.calculateBottomPadding().toPx()
+            val paddingStart = contentPadding.calculateStartPadding(layoutDirection).toPx()
+            val paddingEnd = contentPadding.calculateEndPadding(layoutDirection).toPx()
+            val hitHeightPx = hitTargetHeight.toPx()
+            val minThumbWidthPx = minThumbWidth.toPx()
+
+            fun calculateFraction(x: Float, width: Float, thumbW: Float): Float {
+                val trackWidth = width - paddingStart - paddingEnd
+                val availableWidth = trackWidth - thumbW
+                return if (availableWidth > 0f) {
+                    val rawX = when (layoutDirection) {
+                        LayoutDirection.Ltr -> x - paddingStart - thumbW / 2f
+                        LayoutDirection.Rtl -> (width - paddingEnd - x) - thumbW / 2f
+                    }
+                    (rawX / availableWidth).coerceIn(0f, 1f)
+                } else 0f
+            }
+
+            awaitEachGesture {
+                val down = awaitFirstDown(requireUnconsumed = false)
+                val width = size.width.toFloat()
+                val height = size.height.toFloat()
+
+                val isHit = down.position.y >= (height - paddingBottom - hitHeightPx)
+
+                if (isHit && down.position.x in paddingStart..(width - paddingEnd)) {
+                    down.consume()
+                    isDragging = true
+                    val trackWidth = width - paddingStart - paddingEnd
+                    val thumbW = (trackWidth * adapter.thumbRatio).coerceAtLeast(minThumbWidthPx)
+                    adapter.scrollTo(calculateFraction(down.position.x, width, thumbW))
+
+                    val pointerId = down.id
+                    while (true) {
+                        val event = awaitPointerEvent()
+                        val change = event.changes.firstOrNull { it.id == pointerId } ?: break
+                        if (!change.pressed) break
+                        change.consume()
+                        adapter.scrollTo(calculateFraction(change.position.x, width, thumbW))
+                    }
+                    isDragging = false
+                }
+            }
+        }
+        .drawWithContent {
+            drawContent()
+
+            val alpha = alphaAnim.value
+            if (alpha > 0f && isScrollable) {
+                val paddingBottom = contentPadding.calculateBottomPadding().toPx()
+                val paddingStart = contentPadding.calculateStartPadding(layoutDirection).toPx()
+                val paddingEnd = contentPadding.calculateEndPadding(layoutDirection).toPx()
+                val minThumbWidthPx = minThumbWidth.toPx()
+                val thicknessPx = animatedThickness.toPx()
+
+                val trackWidth = size.width - paddingStart - paddingEnd
+                if (trackWidth > 0f) {
+                    val thumbWidth = (trackWidth * adapter.thumbRatio).coerceAtLeast(minThumbWidthPx)
+                    val offset = (trackWidth - thumbWidth) * adapter.offsetRatio
+                    val thumbOffset = when (layoutDirection) {
+                        LayoutDirection.Ltr -> paddingStart + offset
+                        LayoutDirection.Rtl -> size.width - paddingEnd - offset - thumbWidth
+                    }
+                    val top = size.height - paddingBottom - 2.dp.toPx() - thicknessPx
+
+                    drawRoundRect(
+                        color = (if (isDragging) resolvedThumbColor else resolvedThumbColor.copy(alpha = 0.5f)),
+                        topLeft = Offset(thumbOffset, top),
+                        size = Size(thumbWidth, thicknessPx),
                         cornerRadius = CornerRadius(thicknessPx / 2f, thicknessPx / 2f),
                         alpha = alpha
                     )

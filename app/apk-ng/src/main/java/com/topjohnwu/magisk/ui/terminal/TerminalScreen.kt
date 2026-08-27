@@ -11,20 +11,26 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.withTranslation
 import com.topjohnwu.magisk.terminal.TerminalEmulator
+import com.topjohnwu.magisk.ui.component.terminalHorizontalScrollbar
 import com.topjohnwu.magisk.ui.component.terminalScrollbar
 import kotlin.math.max
+
+private const val MIN_TERMINAL_COLUMNS = 256
 
 @Composable
 fun TerminalScreen(
@@ -40,14 +46,22 @@ fun TerminalScreen(
     var emulator by remember { mutableStateOf<TerminalEmulator?>(null) }
     var updateTick by remember { mutableIntStateOf(0) }
     var topRow by remember { mutableIntStateOf(0) }
+    var scrollX by remember { mutableFloatStateOf(0f) }
     var scrolledToBottom by remember { mutableStateOf(true) }
 
     BoxWithConstraints(modifier = modifier) {
-        val widthPx = constraints.maxWidth
-        val heightPx = constraints.maxHeight
-        val cols = max(4, (widthPx / renderer.fontWidth).toInt())
-        val rows = max(4, (heightPx - renderer.fontLineSpacingAndAscent) / renderer.fontLineSpacing)
+        val widthPx = constraints.maxWidth.toFloat()
+        val heightPx = constraints.maxHeight.toFloat()
+        val visibleCols = max(4, (widthPx / renderer.fontWidth).toInt())
+        val cols = max(MIN_TERMINAL_COLUMNS, visibleCols)
+        val rows = max(4, ((heightPx - renderer.fontLineSpacingAndAscent) / renderer.fontLineSpacing).toInt())
         val lineHeight = renderer.fontLineSpacing.toFloat()
+
+        @Suppress("UNUSED_EXPRESSION")
+        updateTick
+        val maxUsedCol = emulator?.maxUsedColumn ?: 0
+        val contentWidthPx = maxOf(widthPx, (maxUsedCol + 2) * renderer.fontWidth)
+        val maxScrollX = maxOf(0f, contentWidthPx - widthPx)
 
         LaunchedEffect(cols, rows) {
             val emu = emulator
@@ -64,8 +78,12 @@ fun TerminalScreen(
             }
         }
 
+        LaunchedEffect(maxScrollX) {
+            scrollX = scrollX.coerceIn(0f, maxScrollX)
+        }
+
         val activeTranscriptRows = emulator?.screen?.activeTranscriptRows ?: 0
-        val scrollableState = rememberScrollableState { delta ->
+        val verticalScrollableState = rememberScrollableState { delta ->
             val emu = emulator ?: return@rememberScrollableState 0f
             val minTop = -emu.screen.activeTranscriptRows
             val rowDelta = -(delta / lineHeight).toInt()
@@ -77,9 +95,17 @@ fun TerminalScreen(
             delta
         }
 
+        val horizontalScrollableState = rememberScrollableState { delta ->
+            val oldScrollX = scrollX
+            val newScrollX = (scrollX - delta).coerceIn(0f, maxScrollX)
+            scrollX = newScrollX
+            -(newScrollX - oldScrollX)
+        }
+
         Spacer(
             modifier = Modifier
                 .fillMaxSize()
+                .clipToBounds()
                 .background(Color.Black)
                 .terminalScrollbar(
                     activeTranscriptRows = activeTranscriptRows,
@@ -89,18 +115,31 @@ fun TerminalScreen(
                         topRow = newRow
                         scrolledToBottom = newRow >= 0
                     },
-                    isScrollInProgress = scrollableState.isScrollInProgress,
+                    isScrollInProgress = verticalScrollableState.isScrollInProgress,
+                )
+                .terminalHorizontalScrollbar(
+                    scrollX = scrollX,
+                    maxScrollX = maxScrollX,
+                    viewportWidth = widthPx,
+                    onScrollToX = { newScrollX -> scrollX = newScrollX },
+                    isScrollInProgress = horizontalScrollableState.isScrollInProgress,
                 )
                 .scrollable(
                     orientation = Orientation.Vertical,
-                    state = scrollableState
+                    state = verticalScrollableState
+                )
+                .scrollable(
+                    orientation = Orientation.Horizontal,
+                    state = horizontalScrollableState
                 )
                 .drawBehind {
                     @Suppress("UNUSED_EXPRESSION")
                     updateTick
                     val emu = emulator ?: return@drawBehind
                     drawIntoCanvas { canvas ->
-                        renderer.render(emu, canvas.nativeCanvas, topRow, -1, -1, -1, -1)
+                        canvas.nativeCanvas.withTranslation(-scrollX, 0f) {
+                            renderer.render(emu, this, topRow, -1, -1, -1, -1)
+                        }
                     }
                 }
         )

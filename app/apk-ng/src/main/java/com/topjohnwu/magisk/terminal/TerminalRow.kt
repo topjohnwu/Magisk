@@ -94,6 +94,32 @@ class TerminalRow(private val columns: Int, style: Long) {
 
     val spaceUsed: Int get() = _spaceUsed.toInt()
 
+    val maxUsedColumn: Int
+        get() {
+            var lastIdx = -1
+            for (i in spaceUsed - 1 downTo 0) {
+                if (text[i] != ' ') {
+                    lastIdx = i
+                    break
+                }
+            }
+            if (lastIdx == -1) return 0
+            var col = 0
+            var charIdx = 0
+            while (charIdx <= lastIdx && charIdx < spaceUsed) {
+                val c = text[charIdx++]
+                val isHigh = Character.isHighSurrogate(c)
+                val codePoint = if (isHigh && charIdx < spaceUsed) {
+                    Character.toCodePoint(c, text[charIdx++])
+                } else {
+                    c.code
+                }
+                val w = WcWidth.width(codePoint)
+                if (w > 0) col += w
+            }
+            return col
+        }
+
     /** Note that the column may end of second half of wide character. */
     fun findStartOfColumn(column: Int): Int {
         if (column == columns) return spaceUsed

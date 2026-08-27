@@ -33,6 +33,17 @@ class TerminalBuffer(columns: Int, totalRows: Int, screenRows: Int) {
         blockSet(0, 0, columns, screenRows, ' '.code, TextStyle.NORMAL)
     }
 
+    val maxUsedColumn: Int
+        get() {
+            var maxCol = 0
+            for (row in -activeTranscriptRows until screenRows) {
+                val line = lines[externalToInternalRow(row)] ?: continue
+                val used = line.maxUsedColumn
+                if (used > maxCol) maxCol = used
+            }
+            return maxCol
+        }
+
     val transcriptText: String
         get() = getSelectedText(0, -activeTranscriptRows, columns, screenRows).trim()
 
