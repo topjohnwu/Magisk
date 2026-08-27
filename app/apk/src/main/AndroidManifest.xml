@@ -2,6 +2,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-sdk
+        tools:overrideLibrary="
+            androidx.navigation,
+            androidx.navigation.common,
+            androidx.navigation.ui,
+            androidx.navigation.ui.ktx,
+            androidx.navigation.fragment,
+            androidx.navigation.fragment.ktx" />
+
     <application android:localeConfig="@xml/locale_config">
         <activity
             android:name=".ui.MainActivity"
