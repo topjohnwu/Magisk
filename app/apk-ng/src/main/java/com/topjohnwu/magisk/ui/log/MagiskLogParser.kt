@@ -5,7 +5,6 @@ data class MagiskLogEntry(
     val pid: Int = 0,
     val tid: Int = 0,
     val level: Char = 'I',
-    val tag: String = "",
     val message: String = "",
     val isParsed: Boolean = false,
 )
@@ -13,8 +12,9 @@ data class MagiskLogEntry(
 object MagiskLogParser {
 
     // Logcat format: "MM-DD HH:MM:SS.mmm  PID  TID LEVEL TAG     : message"
-    private val logcatRegex = Regex(
-        """(\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}\.\d{3})\s+(\d+)\s+(\d+)\s+([VDIWEF])\s+(.+?)\s*:\s+(.*)"""
+    // Magisk log format: "MM-DD HH:MM:SS.mmm  PID  TID LEVEL : message"
+    private val logRegex = Regex(
+        """(\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}\.\d{3})\s+(\d+)\s+(\d+)\s+([VDIWEF])\s+(?::\s*)?(.*)"""
     )
 
     fun parse(raw: String): List<MagiskLogEntry> {
@@ -26,7 +26,7 @@ object MagiskLogParser {
         for (line in lines) {
             if (line.isBlank()) continue
 
-            val match = logcatRegex.find(line)
+            val match = logRegex.find(line)
             if (match != null) {
                 result.add(
                     MagiskLogEntry(
@@ -34,8 +34,7 @@ object MagiskLogParser {
                         pid = match.groupValues[2].toIntOrNull() ?: 0,
                         tid = match.groupValues[3].toIntOrNull() ?: 0,
                         level = match.groupValues[4].firstOrNull() ?: 'I',
-                        tag = match.groupValues[5].trim(),
-                        message = match.groupValues[6],
+                        message = match.groupValues[5],
                         isParsed = true,
                     )
                 )
