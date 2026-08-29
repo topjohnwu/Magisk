@@ -65,6 +65,7 @@ import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -198,7 +199,8 @@ fun ModuleScreen(
                     Text(
                         text = stringResource(CoreR.string.module_empty),
                         style = MaterialTheme.typography.bodyLarge,
-                        color = colorScheme.onSurfaceVariant
+                        color = colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center
                     )
                 }
             }
