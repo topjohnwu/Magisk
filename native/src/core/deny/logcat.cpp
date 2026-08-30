@@ -146,8 +146,7 @@ static void process_main_buffer(struct log_msg *msg) {
     // handle edge cases where apps print logs themselves and lead us into a honeycomb
     if (tag == "WebViewZygoteInit") {
         int pid = msg->entry.pid;
-        if (entry.uid != WEBVIEW_ZYGOTE_UID || entry.message[0] != 'S' ||
-            !proc_context_match(pid, "u:r:webview_zygote:s0")) {
+        if (entry.uid != WEBVIEW_ZYGOTE_UID || entry.message[0] != 'S') {
             return;
         }
 
