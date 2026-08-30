@@ -142,8 +142,8 @@ static void process_main_buffer(struct log_msg *msg) {
         }
     };
 
-    // Unlike app zygote, webview zygote uid is fixed. This means we don't have to
-    // handle edge case like apps prints log themselves and lead us into honeycomb
+    // Unlike app zygote, webview zygote UID is fixed. This means we don't have to
+    // handle edge cases where apps print logs themselves and lead us into a honeycomb
     if (tag == "WebViewZygoteInit") {
         int pid = msg->entry.pid;
         if (entry.uid != WEBVIEW_ZYGOTE_UID || entry.message[0] != 'S' ||
