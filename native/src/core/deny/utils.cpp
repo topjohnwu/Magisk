@@ -182,8 +182,6 @@ static bool add_hide_set(const char *pkg, const char *proc) {
     if (str_eql(pkg, ISOLATED_MAGIC)) {
         // Kill all matching isolated processes
         kill_process<&proc_name_match<str_starts_with>>(proc, true);
-    } else if (str_eql(pkg, WEBVIEW_ZYGOTE_MAGIC)) {
-        kill_process<&proc_context_match>("u:r:webview_zygote:s0", true);
     } else {
         kill_process(proc);
     }
@@ -395,9 +393,6 @@ int enable_deny() {
             kill_process("usap32", true);
             kill_process("usap64", true);
             kill_process<&proc_context_match>("u:r:app_zygote:s0", true);
-        }
-        if (pkg_to_procs.find(WEBVIEW_ZYGOTE_MAGIC) != pkg_to_procs.end()) {
-            kill_process<&proc_context_match>("u:r:webview_zygote:s0", true);
         }
     }
 
