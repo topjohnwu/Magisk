@@ -746,24 +746,24 @@ private data class DeveloperInfo(val name: String, val links: List<LinkInfo>)
 
 private val developers = listOf(
     DeveloperInfo("topjohnwu", listOf(
-        LinkInfo(CoreR.string.twitter, CoreR.drawable.ic_twitter, "https://twitter.com/topjohnwu"),
+        LinkInfo(CoreR.string.twitter, CoreR.drawable.ic_twitter, "https://x.com/topjohnwu"),
         LinkInfo(CoreR.string.github, CoreR.drawable.ic_github, Const.Url.SOURCE_CODE_URL),
     )),
     DeveloperInfo("vvb2060", listOf(
-        LinkInfo(CoreR.string.twitter, CoreR.drawable.ic_twitter, "https://twitter.com/vvb2060"),
+        LinkInfo(CoreR.string.twitter, CoreR.drawable.ic_twitter, "https://x.com/vvb2060"),
         LinkInfo(CoreR.string.github, CoreR.drawable.ic_github, "https://github.com/vvb2060"),
     )),
     DeveloperInfo("yujincheng08", listOf(
         LinkInfo(CoreR.string.sponsor, CoreR.drawable.ic_favorite, "https://github.com/sponsors/yujincheng08"),
-        LinkInfo(CoreR.string.twitter, CoreR.drawable.ic_twitter, "https://twitter.com/shanasaimoe"),
+        LinkInfo(CoreR.string.twitter, CoreR.drawable.ic_twitter, "https://x.com/shanasaimoe"),
         LinkInfo(CoreR.string.github, CoreR.drawable.ic_github, "https://github.com/yujincheng08"),
     )),
-    DeveloperInfo("rikkawww", listOf(
-        LinkInfo(CoreR.string.twitter, CoreR.drawable.ic_twitter, "https://twitter.com/rikkawww"),
-        LinkInfo(CoreR.string.github, CoreR.drawable.ic_github, "https://github.com/rikkawww"),
+    DeveloperInfo("aviraxp", listOf(
+        LinkInfo(CoreR.string.sponsor, CoreR.drawable.ic_favorite, "https://ko-fi.com/A46115EM"),
+        LinkInfo(CoreR.string.github, CoreR.drawable.ic_github, "https://github.com/aviraxp"),
     )),
     DeveloperInfo("canyie", listOf(
-        LinkInfo(CoreR.string.twitter, CoreR.drawable.ic_twitter, "https://twitter.com/canyie2977"),
+        LinkInfo(CoreR.string.twitter, CoreR.drawable.ic_twitter, "https://x.com/canyie2977"),
         LinkInfo(CoreR.string.github, CoreR.drawable.ic_github, "https://github.com/canyie"),
     )),
 )
