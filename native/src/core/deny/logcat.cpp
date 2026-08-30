@@ -132,6 +132,33 @@ static void process_main_buffer(struct log_msg *msg) {
     if (android_log_processLogBuffer(&msg->entry, &entry) < 0) return;
     entry.tagLen--;
     auto tag = string_view(entry.tag, entry.tagLen);
+    auto revert = [](int pid, const char *name, int uid) {
+        kill(pid, SIGSTOP);
+        if (fork_dont_care() == 0) {
+            LOGI("logcat: revert [%s] PID=[%d] UID=[%d]\n", name, pid, uid);
+            revert_unmount(pid);
+            kill(pid, SIGCONT);
+            _exit(0);
+        }
+    };
+
+    // Unlike app zygote, webview zygote uid is fixed. This means we don't have to
+    // handle edge case like apps prints log themselves and lead us into honeycomb
+    if (tag == "WebViewZygoteInit") {
+        int pid = msg->entry.pid;
+        if (entry.uid != WEBVIEW_ZYGOTE_UID || entry.message[0] != 'S' ||
+            !proc_context_match(pid, "u:r:webview_zygote:s0")) {
+            return;
+        }
+
+        if (is_deny_target(WEBVIEW_ZYGOTE_UID, WEBVIEW_ZYGOTE_MAGIC)) {
+            revert(pid, WEBVIEW_ZYGOTE_MAGIC, WEBVIEW_ZYGOTE_UID);
+        } else {
+            LOGD("logcat: skip [%s] PID=[%d] UID=[%d]\n",
+                 WEBVIEW_ZYGOTE_MAGIC, pid, WEBVIEW_ZYGOTE_UID);
+        }
+        return;
+    }
 
     static bool ready = false;
     if (tag == "AppZygote") {
@@ -158,13 +185,7 @@ static void process_main_buffer(struct log_msg *msg) {
 
     if (is_deny_target(entry.uid, cmdline)) {
         int pid = msg->entry.pid;
-        kill(pid, SIGSTOP);
-        if (fork_dont_care() == 0) {
-            LOGI("logcat: revert [%s] PID=[%d] UID=[%d]\n", cmdline, pid, entry.uid);
-            revert_unmount(pid);
-            kill(pid, SIGCONT);
-            _exit(0);
-        }
+        revert(pid, cmdline, entry.uid);
     } else {
         LOGD("logcat: skip [%s] PID=[%d] UID=[%d]\n", cmdline, msg->entry.pid, entry.uid);
     }

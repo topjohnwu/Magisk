@@ -29,32 +29,36 @@ class CmdlineListItem(line: String) {
 }
 
 const val ISOLATED_MAGIC = "isolated"
+const val WEBVIEW_ZYGOTE_MAGIC = "webview_zygote"
+const val WEBVIEW_ZYGOTE_UID = 1053
 
 @SuppressLint("InlinedApi")
 class AppProcessInfo(
     private val info: ApplicationInfo,
     pm: PackageManager,
-    denyList: List<CmdlineListItem>
+    denyList: List<CmdlineListItem>,
+    private val labelOverride: String? = null,
+    private val processesOverride: Collection<ProcessInfo>? = null,
 ) : Comparable<AppProcessInfo> {
 
     private val denyList = denyList.filter {
         it.packageName == info.packageName || it.packageName == ISOLATED_MAGIC
     }
 
-    val label = info.getLabel(pm)
+    val label = labelOverride ?: info.getLabel(pm)
     val iconImage: Drawable = runCatching { info.loadIcon(pm) }.getOrDefault(pm.defaultActivityIcon)
     val packageName: String get() = info.packageName
     var firstInstallTime: Long = 0L
         private set
     var lastUpdateTime: Long = 0L
         private set
-    val processes = fetchProcesses(pm)
+    val processes = processesOverride ?: fetchProcesses(pm)
 
     override fun compareTo(other: AppProcessInfo) = comparator.compare(this, other)
 
     fun isSystemApp() = info.flags and ApplicationInfo.FLAG_SYSTEM != 0
 
-    fun isApp() = ProcessCompat.isApplicationUid(info.uid)
+    fun isApp() = packageName == WEBVIEW_ZYGOTE_MAGIC || ProcessCompat.isApplicationUid(info.uid)
 
     private fun createProcess(name: String, pkg: String = info.packageName) =
         ProcessInfo(name, pkg, denyList.any { it.process == name && it.packageName == pkg })
@@ -117,6 +121,30 @@ class AppProcessInfo(
     }
 
     companion object {
+        fun webViewZygote(
+            pm: PackageManager,
+            denyList: List<CmdlineListItem>,
+            label: String,
+        ): AppProcessInfo {
+            val info = ApplicationInfo().apply {
+                packageName = WEBVIEW_ZYGOTE_MAGIC
+                uid = WEBVIEW_ZYGOTE_UID
+            }
+            val enabled = denyList.any {
+                it.packageName == WEBVIEW_ZYGOTE_MAGIC &&
+                    it.process == WEBVIEW_ZYGOTE_MAGIC
+            }
+            return AppProcessInfo(
+                info,
+                pm,
+                denyList,
+                labelOverride = label,
+                processesOverride = listOf(
+                    ProcessInfo(WEBVIEW_ZYGOTE_MAGIC, WEBVIEW_ZYGOTE_MAGIC, enabled)
+                ),
+            )
+        }
+
         private val comparator = compareBy<AppProcessInfo>(
             { it.label.lowercase(Locale.ROOT) },
             { it.info.packageName }
