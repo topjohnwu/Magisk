@@ -190,8 +190,15 @@ class DenyListViewModel : AsyncLoadViewModel() {
                     .concurrentMap { AppProcessInfo(it, pm, denyList) }
                     .filter { it.processes.isNotEmpty() }
                     .concurrentMap { DenyAppState(it) }
-                    .toCollection(ArrayList(size))
+                    .toCollection(ArrayList(size + 1))
             }
+            apps += DenyAppState(
+                AppProcessInfo.webViewZygote(
+                    pm,
+                    denyList,
+                    "WebView Zygote",
+                )
+            )
             apps.sortWith(compareBy(
                 { it.processes.count { p -> p.isEnabled } == 0 },
                 { it.info }

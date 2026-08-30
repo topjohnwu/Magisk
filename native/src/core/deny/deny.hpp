@@ -3,6 +3,8 @@
 #include <string_view>
 
 #define ISOLATED_MAGIC "isolated"
+#define WEBVIEW_ZYGOTE_MAGIC "webview_zygote"
+#define WEBVIEW_ZYGOTE_UID 1053
 
 namespace DenyRequest {
 enum : int {
