@@ -543,9 +543,9 @@ private fun AppCard(
                         painter = painterResource(R.drawable.ic_manager),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(36.dp)
+                        modifier = Modifier.size(48.dp)
                     )
-                    Spacer(Modifier.width(12.dp))
+                    Spacer(Modifier.width(16.dp))
                     Text(
                         text = stringResource(CoreR.string.home_app_title),
                         style = MaterialTheme.typography.titleLarge
