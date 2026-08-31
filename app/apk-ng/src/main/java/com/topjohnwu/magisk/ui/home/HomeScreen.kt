@@ -244,6 +244,14 @@ fun HomeScreen(
                 title = { Text(stringResource(CoreR.string.section_home)) },
                 scrollBehavior = scrollBehavior,
                 actions = {
+                    if (Info.env.isActive) {
+                        IconButton(onClick = { viewModel.onDeletePressed() }) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = stringResource(CoreR.string.uninstall_magisk_title),
+                            )
+                        }
+                    }
                     if (Info.isRooted) {
                         RebootButton()
                     }
@@ -284,11 +292,6 @@ fun HomeScreen(
                 isHidden = context.packageName != BuildConfig.APP_PACKAGE_NAME,
                 onManagerPressed = viewModel::onManagerPressed,
                 onHideRestorePressed = viewModel::onHideRestorePressed,
-            )
-
-            UninstallButton(
-                onClick = { viewModel.onDeletePressed() },
-                enabled = Info.env.isActive
             )
 
             Text(
@@ -502,35 +505,6 @@ private fun CoreCard(
     }
 }
 
-@Composable
-private fun UninstallButton(
-    onClick: () -> Unit,
-    enabled: Boolean,
-    modifier: Modifier = Modifier
-) {
-    Button(
-        onClick = onClick,
-        enabled = enabled,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.errorContainer,
-            contentColor = MaterialTheme.colorScheme.onErrorContainer
-        ),
-        shape = RoundedCornerShape(20.dp),
-        contentPadding = PaddingValues(vertical = 12.dp),
-        modifier = modifier.fillMaxWidth()
-    ) {
-        Icon(
-            imageVector = Icons.Default.Delete,
-            contentDescription = null,
-            modifier = Modifier.size(18.dp)
-        )
-        Spacer(Modifier.width(8.dp))
-        Text(
-            text = stringResource(CoreR.string.uninstall_magisk_title),
-            style = MaterialTheme.typography.labelLarge,
-        )
-    }
-}
 
 @Composable
 private fun AppCard(
