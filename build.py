@@ -16,7 +16,6 @@ from zipfile import ZipFile
 sys.dont_write_bytecode = True
 from scripts.env import *
 
-
 # Common constants
 support_abis = {
     "arm64-v8a": "aarch64-linux-android",
@@ -350,9 +349,9 @@ def build_app():
     cp(source, target)
 
 
-def build_app_ng():
-    header("* Building the next generation Magisk app")
-    apk = build_apk(":apk-ng")
+def build_app_legacy():
+    header("* Building the legacy Magisk app")
+    apk = build_apk(":apk-legacy")
     header(f"Output: {apk}")
 
 
@@ -419,7 +418,6 @@ def cleanup():
 def build_all():
     build_native()
     build_app()
-    build_app_ng()
     build_test()
 
 
@@ -732,8 +730,8 @@ def parse_args():
 
     app_parser = subparsers.add_parser("app", help="build the Magisk app")
 
-    app_ng_parser = subparsers.add_parser(
-        "app-ng", help="build the next generation Magisk app"
+    app_legacy_parser = subparsers.add_parser(
+        "app-legacy", help="build the legacy Magisk app"
     )
 
     stub_parser = subparsers.add_parser("stub", help="build the stub app")
@@ -795,7 +793,7 @@ def parse_args():
     rustup_parser.set_defaults(func=setup_rustup)
     gen_parser.set_defaults(func=gen_ide)
     app_parser.set_defaults(func=build_app)
-    app_ng_parser.set_defaults(func=build_app_ng)
+    app_legacy_parser.set_defaults(func=build_app_legacy)
     stub_parser.set_defaults(func=build_stub)
     test_parser.set_defaults(func=build_test)
     emu_parser.set_defaults(func=setup_avd)
