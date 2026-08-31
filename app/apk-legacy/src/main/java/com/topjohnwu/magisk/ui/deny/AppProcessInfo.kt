@@ -12,6 +12,8 @@ import android.content.pm.PackageManager.MATCH_DISABLED_COMPONENTS
 import android.content.pm.PackageManager.MATCH_UNINSTALLED_PACKAGES
 import android.content.pm.ServiceInfo
 import android.graphics.drawable.Drawable
+import android.os.Build
+import android.os.Build.VERSION.SDK_INT
 import androidx.core.os.ProcessCompat
 import com.topjohnwu.magisk.core.ktx.getLabel
 import java.util.Locale
@@ -29,36 +31,28 @@ class CmdlineListItem(line: String) {
 }
 
 const val ISOLATED_MAGIC = "isolated"
-const val WEBVIEW_ZYGOTE_MAGIC = "webview_zygote"
-const val WEBVIEW_ZYGOTE_UID = 1053
 
 @SuppressLint("InlinedApi")
 class AppProcessInfo(
     private val info: ApplicationInfo,
     pm: PackageManager,
-    denyList: List<CmdlineListItem>,
-    private val labelOverride: String? = null,
-    private val processesOverride: Collection<ProcessInfo>? = null,
+    denyList: List<CmdlineListItem>
 ) : Comparable<AppProcessInfo> {
 
     private val denyList = denyList.filter {
         it.packageName == info.packageName || it.packageName == ISOLATED_MAGIC
     }
 
-    val label = labelOverride ?: info.getLabel(pm)
+    val label = info.getLabel(pm)
     val iconImage: Drawable = runCatching { info.loadIcon(pm) }.getOrDefault(pm.defaultActivityIcon)
     val packageName: String get() = info.packageName
-    var firstInstallTime: Long = 0L
-        private set
-    var lastUpdateTime: Long = 0L
-        private set
-    val processes = processesOverride ?: fetchProcesses(pm)
+    val processes = fetchProcesses(pm)
 
     override fun compareTo(other: AppProcessInfo) = comparator.compare(this, other)
 
     fun isSystemApp() = info.flags and ApplicationInfo.FLAG_SYSTEM != 0
 
-    fun isApp() = packageName == WEBVIEW_ZYGOTE_MAGIC || ProcessCompat.isApplicationUid(info.uid)
+    fun isApp() = ProcessCompat.isApplicationUid(info.uid)
 
     private fun createProcess(name: String, pkg: String = info.packageName) =
         ProcessInfo(name, pkg, denyList.any { it.process == name && it.packageName == pkg })
@@ -73,30 +67,19 @@ class AppProcessInfo(
     private fun Array<out ComponentInfo>?.toProcessList() =
         orEmpty().map { createProcess(it.getProcName()) }
 
-    private fun Array<ServiceInfo>?.toProcessList(): List<ProcessInfo> {
-        if (this == null) return emptyList()
-        val result = mutableListOf<ProcessInfo>()
-        var hasIsolated = false
-        for (si in this) {
-            if (si.isIsolated) {
-                if (si.useAppZygote) {
-                    val proc = info.processName ?: info.packageName
-                    result.add(createProcess("${proc}_zygote"))
-                } else {
-                    hasIsolated = true
-                }
+    private fun Array<ServiceInfo>?.toProcessList() = orEmpty().map {
+        if (it.isIsolated) {
+            if (it.useAppZygote) {
+                val proc = info.processName ?: info.packageName
+                createProcess("${proc}_zygote")
             } else {
-                result.add(createProcess(si.getProcName()))
+                val proc = if (SDK_INT >= Build.VERSION_CODES.Q)
+                    "${it.getProcName()}:${it.name}" else it.getProcName()
+                createProcess(proc, ISOLATED_MAGIC)
             }
+        } else {
+            createProcess(it.getProcName())
         }
-        if (hasIsolated) {
-            val prefix = "${info.processName ?: info.packageName}:"
-            val isEnabled = denyList.any {
-                it.packageName == ISOLATED_MAGIC && it.process.startsWith(prefix)
-            }
-            result.add(ProcessInfo(prefix, ISOLATED_MAGIC, isEnabled))
-        }
-        return result
     }
 
     private fun fetchProcesses(pm: PackageManager): Collection<ProcessInfo> {
@@ -109,9 +92,6 @@ class AppProcessInfo(
             pm.getPackageArchiveInfo(info.sourceDir, flag) ?: return emptyList()
         }
 
-        firstInstallTime = packageInfo.firstInstallTime
-        lastUpdateTime = packageInfo.lastUpdateTime
-
         val processSet = TreeSet<ProcessInfo>(compareBy({ it.name }, { it.isIsolated }))
         processSet += packageInfo.activities.toProcessList()
         processSet += packageInfo.services.toProcessList()
@@ -121,30 +101,6 @@ class AppProcessInfo(
     }
 
     companion object {
-        fun webViewZygote(
-            pm: PackageManager,
-            denyList: List<CmdlineListItem>,
-            label: String,
-        ): AppProcessInfo {
-            val info = ApplicationInfo().apply {
-                packageName = WEBVIEW_ZYGOTE_MAGIC
-                uid = WEBVIEW_ZYGOTE_UID
-            }
-            val enabled = denyList.any {
-                it.packageName == WEBVIEW_ZYGOTE_MAGIC &&
-                    it.process == WEBVIEW_ZYGOTE_MAGIC
-            }
-            return AppProcessInfo(
-                info,
-                pm,
-                denyList,
-                labelOverride = label,
-                processesOverride = listOf(
-                    ProcessInfo(WEBVIEW_ZYGOTE_MAGIC, WEBVIEW_ZYGOTE_MAGIC, enabled)
-                ),
-            )
-        }
-
         private val comparator = compareBy<AppProcessInfo>(
             { it.label.lowercase(Locale.ROOT) },
             { it.info.packageName }
@@ -158,4 +114,5 @@ data class ProcessInfo(
     var isEnabled: Boolean
 ) {
     val isIsolated = packageName == ISOLATED_MAGIC
+    val isAppZygote = name.endsWith("_zygote")
 }
