@@ -17,7 +17,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -88,18 +90,23 @@ fun SuRequestScreen(
     ) {
         Card(
             modifier = Modifier
-                .widthIn(min = 320.dp, max = 420.dp)
-                .padding(24.dp),
+                .padding(horizontal = 16.dp, vertical = 16.dp)
+                .fillMaxWidth()
+                .widthIn(max = 560.dp),
             shape = RoundedCornerShape(28.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
         ) {
             Column(
-                modifier = Modifier.padding(24.dp),
+                modifier = Modifier
+                    .verticalScroll(rememberScrollState())
+                    .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(horizontal = 4.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 4.dp)
                 ) {
                     if (icon != null) {
                         Image(
@@ -109,31 +116,30 @@ fun SuRequestScreen(
                         )
                         Spacer(Modifier.width(14.dp))
                     }
-                    Column {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                text = title,
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier.weight(1f, fill = false),
-                            )
-                            if (uiState.isSharedUid) {
-                                Spacer(Modifier.width(6.dp))
-                                SharedUidBadge()
-                            }
-                        }
-                        Spacer(Modifier.height(2.dp))
-                        Text(
-                            text = packageName,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f, fill = false),
+                    )
+                    if (uiState.isSharedUid) {
+                        Spacer(Modifier.width(6.dp))
+                        SharedUidBadge()
                     }
                 }
+
+                Spacer(Modifier.height(8.dp))
+
+                Text(
+                    text = packageName,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 4.dp),
+                )
 
                 Spacer(Modifier.height(16.dp))
 
