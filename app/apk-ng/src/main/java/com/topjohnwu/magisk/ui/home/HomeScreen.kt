@@ -424,14 +424,10 @@ private fun NoticeCard(
 private fun InstallButton(
     label: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isPrimary: Boolean = false,
 ) {
-    FilledTonalButton(
-        onClick = onClick,
-        shape = RoundedCornerShape(20.dp),
-        contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
-        modifier = modifier
-    ) {
+    val buttonContent = @Composable {
         Icon(
             painter = painterResource(R.drawable.ic_download),
             contentDescription = null,
@@ -443,6 +439,26 @@ private fun InstallButton(
             style = MaterialTheme.typography.labelLarge,
         )
     }
+
+    if (isPrimary) {
+        Button(
+            onClick = onClick,
+            shape = RoundedCornerShape(20.dp),
+            contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
+            modifier = modifier,
+        ) {
+            buttonContent()
+        }
+    } else {
+        FilledTonalButton(
+            onClick = onClick,
+            shape = RoundedCornerShape(20.dp),
+            contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
+            modifier = modifier,
+        ) {
+            buttonContent()
+        }
+    }
 }
 
 @Composable
@@ -452,6 +468,7 @@ private fun CoreCard(
     onInstallClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val isInstalled = state != HomeViewModel.State.INVALID
     val actionLabel = when (state) {
         HomeViewModel.State.OUTDATED -> stringResource(CoreR.string.update)
         HomeViewModel.State.INVALID -> stringResource(CoreR.string.install)
@@ -478,7 +495,7 @@ private fun CoreCard(
                 Icon(
                     painter = painterResource(CoreR.drawable.ic_magisk_outline),
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
+                    tint = if (isInstalled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
                     modifier = Modifier.size(48.dp)
                 )
                 Spacer(Modifier.width(16.dp))
@@ -488,9 +505,17 @@ private fun CoreCard(
                         style = MaterialTheme.typography.titleLarge
                     )
                     Text(
-                        text = version.ifEmpty { stringResource(CoreR.string.not_available) },
+                        text = if (isInstalled) {
+                            version.ifEmpty { stringResource(CoreR.string.not_available) }
+                        } else {
+                            stringResource(CoreR.string.not_installed)
+                        },
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = if (isInstalled) {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        } else {
+                            MaterialTheme.colorScheme.error
+                        }
                     )
                 }
             }
@@ -499,6 +524,7 @@ private fun CoreCard(
                 InstallButton(
                     label = actionLabel,
                     onClick = onInstallClicked,
+                    isPrimary = !isInstalled,
                 )
             }
         }
