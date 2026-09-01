@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.ui.settings
 
-import android.R
 import android.os.Build
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -545,7 +544,7 @@ private fun UpdateChannelUrlDialog(
                     onDismiss()
                 }
             ) {
-                Text(stringResource(R.string.ok))
+                Text(stringResource(android.R.string.ok))
             }
         }
     )
@@ -582,7 +581,7 @@ private fun DownloadPathDialog(
                     onDismiss()
                 }
             ) {
-                Text(stringResource(R.string.ok))
+                Text(stringResource(android.R.string.ok))
             }
         }
     )
