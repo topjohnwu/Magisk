@@ -20,7 +20,7 @@ object FlashUtils {
             action = INTENT_FLASH
             putExtra(EXTRA_FLASH_ACTION, Const.Value.FLASH_ZIP)
             putExtra(EXTRA_FLASH_URI, file.toString())
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
         }
         return PendingIntent.getActivity(
             context, file.hashCode(), intent,

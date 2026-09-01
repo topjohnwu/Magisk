@@ -228,10 +228,11 @@ class MainActivity : ComponentActivity(), SplashScreenHost {
     }
 
     private fun getInitialTab(intent: Intent?): Int {
-        val section = if (intent?.action == Intent.ACTION_APPLICATION_PREFERENCES) {
-            Const.Nav.SETTINGS
-        } else {
-            intent?.getStringExtra(Const.Key.OPEN_SECTION)
+        val section = when {
+            intent?.action == Intent.ACTION_APPLICATION_PREFERENCES -> Const.Nav.SETTINGS
+            intent?.action == FlashUtils.INTENT_FLASH &&
+                intent.getStringExtra(FlashUtils.EXTRA_FLASH_ACTION) == Const.Value.FLASH_ZIP -> Const.Nav.MODULES
+            else -> intent?.getStringExtra(Const.Key.OPEN_SECTION)
         }
         return when (section) {
             Const.Nav.SUPERUSER -> Tab.SUPERUSER.ordinal
