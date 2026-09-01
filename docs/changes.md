@@ -1,5 +1,19 @@
 # Magisk Changelog
 
+### v31.0 (2026.9.1)
+
+- [App] Complete UI overhaul with Jetpack Compose and Material 3, completely removing the legacy View and Fragment architecture
+- [App] Support downloading and streaming boot image extraction directly from remote OTA URLs
+- [MagiskBoot] Support dynamic zImage payload sizes without requiring exact size padding during repack
+- [MagiskBoot] Update AVB hash descriptor image size to match unpacked image size
+- [MagiskBoot] Lower default compression preset for XZ and LZMA to reduce memory usage during repacking
+- [Zygisk] Support Android 17 (API 37)
+- [Zygisk] Support Meta Quest (Horizon OS) lazy partition zygotes
+- [MagiskPolicy] Fix identifier parsing for names containing hyphens
+- [resetprop] Add `--compact` (`-c`) flag to compact property storage areas
+- [MagiskInit] Properly prioritize charger mode detection before `force_normal_boot`
+- [DenyList] Add `webview_zygote` as an unmount target
+
 ### v30.7 (2026.2.23)
 
 - [MagiskInit] Support Android 16 QPR2 sepolicy format

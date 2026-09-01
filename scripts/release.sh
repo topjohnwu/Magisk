@@ -44,7 +44,6 @@ set_version() {
 
   sed -i "s:versionCode=.*:versionCode=${code}:g" $GCONFIG
   sed -i "s:version=.*:version=${ver}:g" $CONFIG
-  sed -i "1s:.*:## $(date +'%Y.%-m.%-d') Magisk v$ver:" $NOTES
 
   # Commit version code changes
   git add -u .
@@ -61,6 +60,7 @@ build() {
   $BUILDCMD clean
   $BUILDCMD all
   $BUILDCMD -r all
+  $BUILDCMD -r app-legacy
 }
 
 upload() {
@@ -80,15 +80,14 @@ upload() {
   git push origin master
   git push --tags
 
-  # Prepare release notes
-  tail -n +3 $NOTES > release.md
-
   # Publish release
   local release_apk="Magisk-v${ver}.apk"
+  local legacy_apk="Magisk-v${ver}-legacy.apk"
   cp $out/app-release.apk $release_apk
-  gh release create --verify-tag $tag -p -t "$title" -F release.md $release_apk $out/app-debug.apk $NOTES
+  cp $out/apk-legacy-release.apk $legacy_apk
+  gh release create --verify-tag $tag -d -t "$title" -F $NOTES $release_apk $legacy_apk $out/app-debug.apk
 
-  rm -f $release_apk release.md
+  rm -f $release_apk $legacy_apk
 }
 
 # Use GNU sed on macOS
