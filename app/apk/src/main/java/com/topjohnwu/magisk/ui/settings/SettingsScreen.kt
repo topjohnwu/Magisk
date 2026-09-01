@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -19,7 +18,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -45,6 +43,7 @@ import com.topjohnwu.magisk.core.model.ColorMode
 import com.topjohnwu.magisk.core.utils.LocaleSetting
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.ui.ThemeState
+import com.topjohnwu.magisk.ui.component.MagiskDialog
 import com.topjohnwu.magisk.ui.component.SettingsArrow
 import com.topjohnwu.magisk.ui.component.SettingsDropdown
 import com.topjohnwu.magisk.ui.component.SettingsSwitch
@@ -525,29 +524,27 @@ private fun UpdateChannelUrlDialog(
 ) {
     var url by rememberSaveable { mutableStateOf(Config.customChannelUrl) }
 
-    AlertDialog(
+    MagiskDialog(
         modifier = modifier,
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(CoreR.string.settings_update_custom_msg)) },
-        text = {
+        title = stringResource(CoreR.string.settings_update_custom_msg),
+        confirmText = stringResource(android.R.string.ok),
+        onConfirm = {
+            Config.customChannelUrl = url
+            Info.resetUpdate()
+            onDismiss()
+        },
+        dismissText = stringResource(android.R.string.cancel),
+        onDismiss = onDismiss,
+    ) {
+        Column(modifier = Modifier.padding(top = 8.dp)) {
             OutlinedTextField(
                 value = url,
                 onValueChange = { url = it },
                 modifier = Modifier.fillMaxWidth()
             )
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    Config.customChannelUrl = url
-                    Info.resetUpdate()
-                    onDismiss()
-                }
-            ) {
-                Text(stringResource(android.R.string.ok))
-            }
         }
-    )
+    }
 }
 
 @Composable
@@ -557,32 +554,28 @@ private fun DownloadPathDialog(
 ) {
     var path by rememberSaveable { mutableStateOf(Config.downloadDir) }
 
-    AlertDialog(
+    MagiskDialog(
         modifier = modifier,
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(CoreR.string.settings_download_path_title)) },
-        text = {
-            Column {
-                Text(
-                    text = stringResource(CoreR.string.settings_download_path_message, MediaStoreUtils.fullPath(path)),
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-                OutlinedTextField(
-                    value = path,
-                    onValueChange = { path = it },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
+        title = stringResource(CoreR.string.settings_download_path_title),
+        confirmText = stringResource(android.R.string.ok),
+        onConfirm = {
+            Config.downloadDir = path
+            onDismiss()
         },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    Config.downloadDir = path
-                    onDismiss()
-                }
-            ) {
-                Text(stringResource(android.R.string.ok))
-            }
+        dismissText = stringResource(android.R.string.cancel),
+        onDismiss = onDismiss,
+    ) {
+        Column {
+            Text(
+                text = stringResource(CoreR.string.settings_download_path_message, MediaStoreUtils.fullPath(path)),
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            OutlinedTextField(
+                value = path,
+                onValueChange = { path = it },
+                modifier = Modifier.fillMaxWidth()
+            )
         }
-    )
+    }
 }

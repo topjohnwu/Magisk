@@ -4,6 +4,7 @@ import android.widget.TextView
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -272,50 +274,120 @@ fun LoadingDialog(
 }
 
 @Composable
+fun MagiskDialog(
+    onDismissRequest: () -> Unit,
+    title: String? = null,
+    modifier: Modifier = Modifier,
+    confirmButton: @Composable (() -> Unit)? = null,
+    dismissButton: @Composable (() -> Unit)? = null,
+    content: @Composable () -> Unit,
+) {
+    AlertDialog(
+        modifier = modifier.windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top)),
+        onDismissRequest = onDismissRequest,
+        shape = RoundedCornerShape(28.dp),
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+        title = if (!title.isNullOrEmpty()) {
+            { Text(text = title, style = MaterialTheme.typography.titleLarge) }
+        } else null,
+        text = {
+            ProvideTextStyle(value = MaterialTheme.typography.bodyMedium) {
+                content()
+            }
+        },
+        confirmButton = {
+            confirmButton?.invoke()
+        },
+        dismissButton = dismissButton?.let {
+            { it() }
+        }
+    )
+}
+
+@Composable
+fun MagiskDialog(
+    onDismissRequest: () -> Unit,
+    title: String? = null,
+    modifier: Modifier = Modifier,
+    confirmText: String? = null,
+    onConfirm: (() -> Unit)? = null,
+    confirmEnabled: Boolean = true,
+    dismissText: String? = null,
+    onDismiss: (() -> Unit)? = null,
+    neutralText: String? = null,
+    onNeutral: (() -> Unit)? = null,
+    content: @Composable () -> Unit,
+) {
+    MagiskDialog(
+        onDismissRequest = onDismissRequest,
+        title = title,
+        modifier = modifier,
+        confirmButton = if (confirmText != null || onConfirm != null) {
+            {
+                TextButton(
+                    onClick = { onConfirm?.invoke() },
+                    enabled = confirmEnabled,
+                ) {
+                    Text(
+                        text = confirmText ?: stringResource(android.R.string.ok),
+                        style = MaterialTheme.typography.labelLarge,
+                    )
+                }
+            }
+        } else null,
+        dismissButton = if (dismissText != null || onDismiss != null || neutralText != null || onNeutral != null) {
+            {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (onDismiss != null || dismissText != null) {
+                        TextButton(onClick = { onDismiss?.invoke() }) {
+                            Text(
+                                text = dismissText ?: stringResource(android.R.string.cancel),
+                                style = MaterialTheme.typography.labelLarge,
+                            )
+                        }
+                    }
+                    if (neutralText != null && onNeutral != null) {
+                        if (onDismiss != null || dismissText != null) {
+                            Spacer(Modifier.weight(1f))
+                        }
+                        TextButton(onClick = onNeutral) {
+                            Text(
+                                text = neutralText,
+                                style = MaterialTheme.typography.labelLarge,
+                            )
+                        }
+                    }
+                }
+            }
+        } else null,
+        content = content
+    )
+}
+
+@Composable
 fun ConfirmDialogContent(
     visuals: DialogVisuals,
     confirm: () -> Unit,
     dismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    AlertDialog(
-        modifier = modifier.windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top)),
+    MagiskDialog(
+        modifier = modifier,
         onDismissRequest = dismiss,
-        shape = RoundedCornerShape(28.dp),
-        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-        title = if (visuals.title.isNotEmpty()) {
-            { Text(text = visuals.title, style = MaterialTheme.typography.titleLarge) }
-        } else null,
-        text = {
-            visuals.content?.let { content ->
-                if (visuals.markdown) {
-                    MarkdownText(content)
-                } else {
-                    Text(
-                        text = content,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = confirm) {
-                Text(
-                    text = visuals.confirm ?: stringResource(android.R.string.ok),
-                    style = MaterialTheme.typography.labelLarge,
-                )
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = dismiss) {
-                Text(
-                    text = visuals.dismiss ?: stringResource(android.R.string.cancel),
-                    style = MaterialTheme.typography.labelLarge,
-                )
+        title = visuals.title,
+        confirmText = visuals.confirm,
+        onConfirm = confirm,
+        dismissText = visuals.dismiss,
+        onDismiss = dismiss,
+    ) {
+        visuals.content?.let { content ->
+            if (visuals.markdown) {
+                MarkdownText(content)
+            } else {
+                Text(text = content)
             }
         }
-    )
+    }
 }
 
 @Composable

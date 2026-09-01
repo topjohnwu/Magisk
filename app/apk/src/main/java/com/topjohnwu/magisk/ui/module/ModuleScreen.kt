@@ -31,7 +31,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -45,7 +44,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -77,6 +75,7 @@ import com.topjohnwu.magisk.core.download.DownloadEngine
 import com.topjohnwu.magisk.core.model.module.OnlineModule
 import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.ui.component.ConfirmResult
+import com.topjohnwu.magisk.ui.component.MagiskDialog
 import com.topjohnwu.magisk.ui.component.MarkdownTextAsync
 import com.topjohnwu.magisk.ui.component.rememberConfirmDialog
 import com.topjohnwu.magisk.ui.component.verticalScrollbar
@@ -451,31 +450,20 @@ private fun OnlineModuleDialog(
         item.name, item.version, item.versionCode
     )
 
-    AlertDialog(
+    MagiskDialog(
         modifier = modifier,
         onDismissRequest = onDismiss,
-        title = { Text(title) },
-        text = {
-            MarkdownTextAsync {
-                val str = svc.fetchString(item.changelog)
-                if (str.length > 1000) str.substring(0, 1000) else str
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = { onDownload(true) }) {
-                Text(stringResource(CoreR.string.install))
-            }
-        },
-        dismissButton = {
-            Row {
-                TextButton(onClick = onDismiss) {
-                    Text(stringResource(android.R.string.cancel))
-                }
-                Spacer(Modifier.weight(1f))
-                TextButton(onClick = { onDownload(false) }) {
-                    Text(stringResource(CoreR.string.download))
-                }
-            }
+        title = title,
+        confirmText = stringResource(CoreR.string.install),
+        onConfirm = { onDownload(true) },
+        dismissText = stringResource(android.R.string.cancel),
+        onDismiss = onDismiss,
+        neutralText = stringResource(CoreR.string.download),
+        onNeutral = { onDownload(false) },
+    ) {
+        MarkdownTextAsync {
+            val str = svc.fetchString(item.changelog)
+            if (str.length > 1000) str.substring(0, 1000) else str
         }
-    )
+    }
 }
