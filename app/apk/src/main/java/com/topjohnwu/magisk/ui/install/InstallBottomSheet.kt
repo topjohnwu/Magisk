@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -39,6 +38,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.ui.component.ConfirmResult
+import com.topjohnwu.magisk.ui.component.MagiskDialog
 import com.topjohnwu.magisk.ui.component.MarkdownText
 import com.topjohnwu.magisk.ui.component.SettingsArrow
 import com.topjohnwu.magisk.ui.component.rememberConfirmDialog
@@ -254,63 +254,50 @@ fun DownloadComposableDialog(
         return uri
     }
 
-    AlertDialog(
+    val submit = {
+        isValidUrl(url.trim())?.let {
+            onConfirm(it)
+        } ?: run {
+            isError = true
+        }
+    }
+
+    MagiskDialog(
         modifier = modifier,
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(CoreR.string.download_dialog_title)) },
-        text = {
-            Column(modifier = Modifier.padding(top = 8.dp)) {
-                OutlinedTextField(
-                    value = url,
-                    onValueChange = {
-                        url = it
-                        isError = false
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text(stringResource(CoreR.string.download_dialog_msg)) },
-                    isError = isError,
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Uri,
-                        imeAction = ImeAction.Done
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            isValidUrl(url.trim())?.let {
-                                onConfirm(it)
-                            } ?: run {
-                                isError = true
-                            }
-                        }
-                    )
+        title = stringResource(CoreR.string.download_dialog_title),
+        confirmText = stringResource(android.R.string.ok),
+        onConfirm = submit,
+        dismissText = stringResource(android.R.string.cancel),
+        onDismiss = onDismiss,
+    ) {
+        Column(modifier = Modifier.padding(top = 8.dp)) {
+            OutlinedTextField(
+                value = url,
+                onValueChange = {
+                    url = it
+                    isError = false
+                },
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text(stringResource(CoreR.string.download_dialog_msg)) },
+                isError = isError,
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Uri,
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = { submit() }
                 )
-                if (isError) {
-                    Text(
-                        text = stringResource(CoreR.string.download_dialog_title),
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.padding(start = 16.dp, top = 4.dp)
-                    )
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    isValidUrl(url.trim())?.let {
-                        onConfirm(it)
-                    } ?: run {
-                        isError = true
-                    }
-                }
-            ) {
-                Text(stringResource(android.R.string.ok))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(android.R.string.cancel))
+            )
+            if (isError) {
+                Text(
+                    text = stringResource(CoreR.string.download_dialog_title),
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                )
             }
         }
-    )
+    }
 }

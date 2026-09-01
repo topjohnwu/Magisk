@@ -30,9 +30,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.PowerSettingsNew
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
@@ -47,7 +45,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.VerticalDivider
@@ -81,6 +78,7 @@ import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.tasks.AppMigration
 import com.topjohnwu.magisk.core.tasks.MagiskInstaller
 import com.topjohnwu.magisk.ui.MainActivity
+import com.topjohnwu.magisk.ui.component.MagiskDialog
 import com.topjohnwu.magisk.ui.component.MarkdownTextAsync
 import com.topjohnwu.magisk.ui.component.rememberLoadingDialog
 import com.topjohnwu.magisk.ui.component.verticalScrollbar
@@ -823,28 +821,17 @@ private fun UninstallComposableDialog(
     onRestoreImage: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    AlertDialog(
+    MagiskDialog(
         modifier = modifier,
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(CoreR.string.uninstall_magisk_title)) },
-        text = {
-            Text(
-                text = stringResource(CoreR.string.uninstall_magisk_msg),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-        },
-        confirmButton = {
-            TextButton(onClick = onCompleteUninstall) {
-                Text(stringResource(CoreR.string.complete_uninstall))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onRestoreImage) {
-                Text(stringResource(CoreR.string.restore_img))
-            }
-        }
-    )
+        title = stringResource(CoreR.string.uninstall_magisk_title),
+        confirmText = stringResource(CoreR.string.complete_uninstall),
+        onConfirm = onCompleteUninstall,
+        dismissText = stringResource(CoreR.string.restore_img),
+        onDismiss = onRestoreImage,
+    ) {
+        Text(text = stringResource(CoreR.string.uninstall_magisk_msg))
+    }
 }
 
 @Composable
@@ -854,28 +841,21 @@ private fun ManagerInstallComposableDialog(
     onInstall: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    AlertDialog(
+    MagiskDialog(
         modifier = modifier,
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(CoreR.string.install)) },
-        text = {
-            MarkdownTextAsync {
-                val text = Info.update.note
-                File(cacheDir, "${Info.update.versionCode}.md").writeText(text)
-                text
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onInstall) {
-                Text(stringResource(CoreR.string.install))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(android.R.string.cancel))
-            }
+        title = stringResource(CoreR.string.install),
+        confirmText = stringResource(CoreR.string.install),
+        onConfirm = onInstall,
+        dismissText = stringResource(android.R.string.cancel),
+        onDismiss = onDismiss,
+    ) {
+        MarkdownTextAsync {
+            val text = Info.update.note
+            File(cacheDir, "${Info.update.versionCode}.md").writeText(text)
+            text
         }
-    )
+    }
 }
 
 @Composable
@@ -890,34 +870,23 @@ private fun EnvFixComposableDialog(
         Info.env.versionCode != BuildConfig.APP_VERSION_CODE ||
         Info.env.versionString != BuildConfig.APP_VERSION_NAME
 
-    AlertDialog(
+    MagiskDialog(
         modifier = modifier,
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(CoreR.string.env_fix_title)) },
-        text = {
-            Text(
-                text = stringResource(
-                    if (needsFullFix) CoreR.string.env_full_fix_msg else CoreR.string.env_fix_msg
-                ),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface,
+        title = stringResource(CoreR.string.env_fix_title),
+        confirmText = stringResource(android.R.string.ok),
+        onConfirm = {
+            if (needsFullFix) onNavigateInstall() else onFixEnv()
+        },
+        dismissText = stringResource(android.R.string.cancel),
+        onDismiss = onDismiss,
+    ) {
+        Text(
+            text = stringResource(
+                if (needsFullFix) CoreR.string.env_full_fix_msg else CoreR.string.env_fix_msg
             )
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    if (needsFullFix) onNavigateInstall() else onFixEnv()
-                }
-            ) {
-                Text(stringResource(android.R.string.ok))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(android.R.string.cancel))
-            }
-        }
-    )
+        )
+    }
 }
 
 @Composable
@@ -930,35 +899,26 @@ private fun HideAppDialog(
     var appName by rememberSaveable { mutableStateOf(defaultName) }
     val isError = appName.length > AppMigration.MAX_LABEL_LENGTH || appName.isBlank()
 
-    AlertDialog(
+    MagiskDialog(
         modifier = modifier,
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(CoreR.string.settings_hide_app_title)) },
-        text = {
-            Column(modifier = Modifier.padding(top = 8.dp)) {
-                OutlinedTextField(
-                    value = appName,
-                    onValueChange = { appName = it },
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text(stringResource(CoreR.string.settings_app_name_hint)) },
-                    isError = isError
-                )
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = { if (!isError) onConfirm(appName) },
-                enabled = !isError
-            ) {
-                Text(stringResource(android.R.string.ok))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(android.R.string.cancel))
-            }
+        title = stringResource(CoreR.string.settings_hide_app_title),
+        confirmText = stringResource(android.R.string.ok),
+        onConfirm = { if (!isError) onConfirm(appName) },
+        confirmEnabled = !isError,
+        dismissText = stringResource(android.R.string.cancel),
+        onDismiss = onDismiss,
+    ) {
+        Column(modifier = Modifier.padding(top = 8.dp)) {
+            OutlinedTextField(
+                value = appName,
+                onValueChange = { appName = it },
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text(stringResource(CoreR.string.settings_app_name_hint)) },
+                isError = isError
+            )
         }
-    )
+    }
 }
 
 @Composable
@@ -967,26 +927,15 @@ private fun RestoreAppDialog(
     onConfirm: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    AlertDialog(
+    MagiskDialog(
         modifier = modifier,
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(CoreR.string.settings_restore_app_title)) },
-        text = {
-            Text(
-                text = stringResource(CoreR.string.restore_app_confirmation),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-        },
-        confirmButton = {
-            TextButton(onClick = onConfirm) {
-                Text(stringResource(android.R.string.ok))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(android.R.string.cancel))
-            }
-        }
-    )
+        title = stringResource(CoreR.string.settings_restore_app_title),
+        confirmText = stringResource(android.R.string.ok),
+        onConfirm = onConfirm,
+        dismissText = stringResource(android.R.string.cancel),
+        onDismiss = onDismiss,
+    ) {
+        Text(text = stringResource(CoreR.string.restore_app_confirmation))
+    }
 }
