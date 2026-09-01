@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -37,10 +39,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -62,6 +63,7 @@ import com.topjohnwu.magisk.core.ktx.toTime
 import com.topjohnwu.magisk.core.model.su.SuLog
 import com.topjohnwu.magisk.ui.component.rememberExternalStoragePermissionLauncher
 import com.topjohnwu.magisk.ui.component.verticalScrollbar
+import kotlinx.coroutines.launch
 import com.topjohnwu.magisk.core.R as CoreR
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -71,11 +73,12 @@ fun LogScreen(
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    var selectedTab by rememberSaveable { mutableIntStateOf(0) }
+    val scope = rememberCoroutineScope()
     val tabTitles = listOf(
         stringResource(CoreR.string.superuser),
         stringResource(CoreR.string.magisk)
     )
+    val pagerState = rememberPagerState(pageCount = { tabTitles.size })
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val saveMagiskLog = rememberExternalStoragePermissionLauncher {
         viewModel.saveMagiskLog()
@@ -87,7 +90,7 @@ fun LogScreen(
             TopAppBar(
                 title = { Text(stringResource(CoreR.string.logs)) },
                 actions = {
-                    if (selectedTab == 1) {
+                    if (pagerState.currentPage == 1) {
                         IconButton(onClick = saveMagiskLog) {
                             Icon(
                                 imageVector = Icons.Default.Download,
@@ -98,7 +101,7 @@ fun LogScreen(
                     IconButton(
                         modifier = Modifier.padding(end = 16.dp),
                         onClick = {
-                            if (selectedTab == 0) viewModel.clearLog()
+                            if (pagerState.currentPage == 0) viewModel.clearLog()
                             else viewModel.clearMagiskLog()
                         }
                     ) {
@@ -118,15 +121,15 @@ fun LogScreen(
                 .padding(padding)
         ) {
             PrimaryTabRow(
-                selectedTabIndex = selectedTab,
+                selectedTabIndex = pagerState.currentPage,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 12.dp, vertical = 8.dp)
             ) {
                 tabTitles.forEachIndexed { index, title ->
                     Tab(
-                        selected = selectedTab == index,
-                        onClick = { selectedTab = index },
+                        selected = pagerState.currentPage == index,
+                        onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
                         text = { Text(title) }
                     )
                 }
@@ -140,15 +143,21 @@ fun LogScreen(
                     CircularProgressIndicator()
                 }
             } else {
-                when (selectedTab) {
-                    0 -> SuLogTab(
-                        logs = uiState.suLogs,
-                        nestedScrollConnection = scrollBehavior.nestedScrollConnection
-                    )
-                    1 -> MagiskLogTab(
-                        entries = uiState.magiskLogEntries,
-                        nestedScrollConnection = scrollBehavior.nestedScrollConnection
-                    )
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier.fillMaxSize(),
+                    beyondViewportPageCount = 1,
+                ) { page ->
+                    when (page) {
+                        0 -> SuLogTab(
+                            logs = uiState.suLogs,
+                            nestedScrollConnection = scrollBehavior.nestedScrollConnection
+                        )
+                        1 -> MagiskLogTab(
+                            entries = uiState.magiskLogEntries,
+                            nestedScrollConnection = scrollBehavior.nestedScrollConnection
+                        )
+                    }
                 }
             }
         }
