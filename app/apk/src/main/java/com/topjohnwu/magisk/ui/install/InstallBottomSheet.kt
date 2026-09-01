@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.ui.install
 
-import android.R
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -60,7 +59,7 @@ fun InstallBottomSheet(
     }
 
     val secondSlotDialog = rememberConfirmDialog()
-    val secondSlotTitle = stringResource(R.string.dialog_alert_title)
+    val secondSlotTitle = stringResource(android.R.string.dialog_alert_title)
     val secondSlotMsg = stringResource(CoreR.string.install_inactive_slot_msg)
 
     LaunchedEffect(installUiState.requestFilePicker) {
@@ -305,12 +304,12 @@ fun DownloadComposableDialog(
                     }
                 }
             ) {
-                Text(stringResource(R.string.ok))
+                Text(stringResource(android.R.string.ok))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.cancel))
+                Text(stringResource(android.R.string.cancel))
             }
         }
     )
