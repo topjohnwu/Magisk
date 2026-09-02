@@ -1,8 +1,9 @@
 # Magisk Changelog
 
-### v31.0 (2026.9.1)
+### v31.0 (2026.9.2)
 
 - [App] Complete UI overhaul with Jetpack Compose and Material 3, completely removing the legacy View and Fragment architecture
+- [App] Add new built-in terminal emulator with full TTY and ANSI support for module flashing and action scripts
 - [App] Support downloading and streaming boot image extraction directly from remote OTA URLs
 - [MagiskBoot] Support dynamic zImage payload sizes without requiring exact size padding during repack
 - [MagiskBoot] Update AVB hash descriptor image size to match unpacked image size
