@@ -34,6 +34,7 @@ data class DenyAppState(
     val info: AppProcessInfo,
     val processes: List<DenyProcessState> = info.processes.map { DenyProcessState(it) },
     val isExpanded: Boolean = false,
+    val initiallyChecked: Boolean = info.processes.any { it.isEnabled },
 ) : Comparable<DenyAppState> {
 
     val itemsChecked: Int get() = processes.count { it.isEnabled }
@@ -44,7 +45,7 @@ data class DenyAppState(
 
     companion object {
         private val comparator = compareBy<DenyAppState>(
-            { it.itemsChecked == 0 },
+            { !it.initiallyChecked },
             { it.info }
         )
     }
@@ -85,6 +86,7 @@ class DenyListViewModel : AsyncLoadViewModel() {
 
         val filtered = apps.filter { app ->
             val passFilter = app.isChecked ||
+                app.initiallyChecked ||
                 ((showSys || !app.info.isSystemApp()) &&
                 ((showSys && showOS) || app.info.isApp()))
             val passQuery = q.isBlank() ||
@@ -100,7 +102,7 @@ class DenyListViewModel : AsyncLoadViewModel() {
             SortBy.INSTALL_TIME -> compareByDescending { it.info.firstInstallTime }
             SortBy.UPDATE_TIME -> compareByDescending { it.info.lastUpdateTime }
         }
-        val comparator = compareBy<DenyAppState> { it.itemsChecked == 0 }
+        val comparator = compareBy<DenyAppState> { !it.initiallyChecked }
             .then(if (reverse) secondary.reversed() else secondary)
         filtered.sortedWith(comparator)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
@@ -200,7 +202,7 @@ class DenyListViewModel : AsyncLoadViewModel() {
                 )
             )
             apps.sortWith(compareBy(
-                { it.processes.count { p -> p.isEnabled } == 0 },
+                { !it.initiallyChecked },
                 { it.info }
             ))
             apps
