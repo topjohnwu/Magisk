@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
@@ -283,7 +284,11 @@ fun MagiskDialog(
     content: @Composable () -> Unit,
 ) {
     AlertDialog(
-        modifier = modifier.windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top)),
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+        modifier = modifier
+            .padding(horizontal = 24.dp)
+            .widthIn(max = 560.dp)
+            .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top)),
         onDismissRequest = onDismissRequest,
         shape = RoundedCornerShape(28.dp),
         containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
