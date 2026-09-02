@@ -83,7 +83,7 @@ import com.topjohnwu.magisk.ui.component.MarkdownTextAsync
 import com.topjohnwu.magisk.ui.component.rememberLoadingDialog
 import com.topjohnwu.magisk.ui.component.verticalScrollbar
 import com.topjohnwu.magisk.ui.flash.FlashUtils
-import com.topjohnwu.magisk.ui.install.InstallBottomSheet
+import com.topjohnwu.magisk.ui.install.InstallDialog
 import com.topjohnwu.magisk.ui.install.InstallViewModel
 import kotlinx.coroutines.launch
 import java.io.File
@@ -107,7 +107,7 @@ fun HomeScreen(
     var showEnvFixDialog by rememberSaveable { mutableStateOf(false) }
     var showHideDialog by rememberSaveable { mutableStateOf(false) }
     var showRestoreDialog by rememberSaveable { mutableStateOf(false) }
-    var showInstallSheet by rememberSaveable { mutableStateOf(false) }
+    var showInstallDialog by rememberSaveable { mutableStateOf(false) }
     var envFixCode by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(uiState.showUninstall) {
@@ -183,7 +183,7 @@ fun HomeScreen(
             onDismiss = { showEnvFixDialog = false },
             onNavigateInstall = {
                 showEnvFixDialog = false
-                showInstallSheet = true
+                showInstallDialog = true
             },
             onFixEnv = {
                 showEnvFixDialog = false
@@ -276,7 +276,7 @@ fun HomeScreen(
                 modifier = Modifier.fillMaxWidth(),
                 state = uiState.magiskState,
                 version = uiState.magiskInstalledVersion,
-                onInstallClicked = { showInstallSheet = true }
+                onInstallClicked = { showInstallDialog = true }
             )
 
             StatusCard()
@@ -311,9 +311,9 @@ fun HomeScreen(
         }
     }
 
-    InstallBottomSheet(
-        show = showInstallSheet,
-        onDismiss = { showInstallSheet = false },
+    InstallDialog(
+        show = showInstallDialog,
+        onDismiss = { showInstallDialog = false },
         installVm = installVm,
     )
 }
