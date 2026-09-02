@@ -412,9 +412,7 @@ fun MarkdownText(
             textView.setTextColor(contentColor)
             ServiceLocator.markwon.setMarkdown(textView, text)
         },
-        modifier = modifier
-            .fillMaxWidth()
-            .heightIn(max = 300.dp)
+        modifier = modifier.fillMaxWidth()
     )
 }
 
