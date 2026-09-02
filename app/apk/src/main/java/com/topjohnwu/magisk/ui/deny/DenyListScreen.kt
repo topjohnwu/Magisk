@@ -218,9 +218,9 @@ fun DenyListScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .nestedScroll(scrollBehavior.nestedScrollConnection)
-                        .verticalScrollbar(listState, contentPadding = PaddingValues(top = 8.dp, bottom = 88.dp))
+                        .verticalScrollbar(listState, contentPadding = PaddingValues(vertical = 8.dp))
                         .padding(horizontal = 12.dp),
-                    contentPadding = PaddingValues(top = 8.dp, bottom = 88.dp),
+                    contentPadding = PaddingValues(vertical = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(
