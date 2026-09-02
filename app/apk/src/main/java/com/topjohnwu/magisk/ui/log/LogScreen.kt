@@ -1,6 +1,8 @@
 package com.topjohnwu.magisk.ui.log
 
+import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -45,6 +47,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -87,75 +91,89 @@ fun LogScreen(
     Scaffold(
         modifier = modifier,
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(CoreR.string.logs)) },
-                actions = {
-                    if (pagerState.currentPage == 1) {
-                        IconButton(onClick = saveMagiskLog) {
+            val colorTransitionFraction = scrollBehavior.state.overlappedFraction
+            val fraction = FastOutLinearInEasing.transform(colorTransitionFraction)
+            val headerContainerColor = lerp(
+                MaterialTheme.colorScheme.surface,
+                MaterialTheme.colorScheme.surfaceContainer,
+                fraction
+            )
+
+            Column(
+                modifier = Modifier.background(headerContainerColor)
+            ) {
+                TopAppBar(
+                    title = { Text(stringResource(CoreR.string.logs)) },
+                    actions = {
+                        if (pagerState.currentPage == 1) {
+                            IconButton(onClick = saveMagiskLog) {
+                                Icon(
+                                    imageVector = Icons.Default.Download,
+                                    contentDescription = stringResource(CoreR.string.menuSaveLog),
+                                )
+                            }
+                        }
+                        IconButton(
+                            modifier = Modifier.padding(end = 16.dp),
+                            onClick = {
+                                if (pagerState.currentPage == 0) viewModel.clearLog()
+                                else viewModel.clearMagiskLog()
+                            }
+                        ) {
                             Icon(
-                                imageVector = Icons.Default.Download,
-                                contentDescription = stringResource(CoreR.string.menuSaveLog),
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = stringResource(CoreR.string.menuClearLog),
                             )
                         }
-                    }
-                    IconButton(
-                        modifier = Modifier.padding(end = 16.dp),
-                        onClick = {
-                            if (pagerState.currentPage == 0) viewModel.clearLog()
-                            else viewModel.clearMagiskLog()
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = stringResource(CoreR.string.menuClearLog),
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.Transparent,
+                        scrolledContainerColor = Color.Transparent,
+                    ),
+                    scrollBehavior = scrollBehavior
+                )
+                PrimaryTabRow(
+                    selectedTabIndex = pagerState.currentPage,
+                    containerColor = Color.Transparent,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    tabTitles.forEachIndexed { index, title ->
+                        Tab(
+                            selected = pagerState.currentPage == index,
+                            onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
+                            text = { Text(title) }
                         )
                     }
-                },
-                scrollBehavior = scrollBehavior
-            )
-        }
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-        ) {
-            PrimaryTabRow(
-                selectedTabIndex = pagerState.currentPage,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                tabTitles.forEachIndexed { index, title ->
-                    Tab(
-                        selected = pagerState.currentPage == index,
-                        onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
-                        text = { Text(title) }
-                    )
                 }
             }
-
-            if (uiState.loading) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-            } else {
-                HorizontalPager(
-                    state = pagerState,
-                    modifier = Modifier.fillMaxSize(),
-                    beyondViewportPageCount = 1,
-                ) { page ->
-                    when (page) {
-                        0 -> SuLogTab(
-                            logs = uiState.suLogs,
-                            nestedScrollConnection = scrollBehavior.nestedScrollConnection
-                        )
-                        1 -> MagiskLogTab(
-                            entries = uiState.magiskLogEntries,
-                            nestedScrollConnection = scrollBehavior.nestedScrollConnection
-                        )
-                    }
+        }
+    ) { padding ->
+        if (uiState.loading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        } else {
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+                beyondViewportPageCount = 1,
+            ) { page ->
+                when (page) {
+                    0 -> SuLogTab(
+                        logs = uiState.suLogs,
+                        nestedScrollConnection = scrollBehavior.nestedScrollConnection
+                    )
+                    1 -> MagiskLogTab(
+                        entries = uiState.magiskLogEntries,
+                        nestedScrollConnection = scrollBehavior.nestedScrollConnection
+                    )
                 }
             }
         }
