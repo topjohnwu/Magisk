@@ -122,9 +122,7 @@ fun LogScreen(
         ) {
             PrimaryTabRow(
                 selectedTabIndex = pagerState.currentPage,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 12.dp, vertical = 8.dp)
+                modifier = Modifier.fillMaxWidth()
             ) {
                 tabTitles.forEachIndexed { index, title ->
                     Tab(

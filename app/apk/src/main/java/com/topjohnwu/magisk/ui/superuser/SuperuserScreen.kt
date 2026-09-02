@@ -33,6 +33,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -151,7 +152,6 @@ private fun PolicyCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp))
             .alpha(if (item.isEnabled) 1f else 0.5f),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
@@ -196,13 +196,7 @@ private fun PolicyCard(
                 }
             }
 
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .padding(vertical = 12.dp)
-                    .width(0.5.dp)
-                    .background(MaterialTheme.colorScheme.outlineVariant)
-            )
+            VerticalDivider(modifier = Modifier.padding(vertical = 12.dp))
 
             Box(
                 modifier = Modifier

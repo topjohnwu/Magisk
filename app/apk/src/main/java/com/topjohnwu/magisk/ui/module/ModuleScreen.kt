@@ -151,7 +151,6 @@ fun ModuleScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { filePicker.launch("application/zip") },
-                shape = RoundedCornerShape(20.dp),
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                 contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 content = {
@@ -255,7 +254,6 @@ private fun ModuleCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp))
             .clickable(enabled = hasDescription) { expanded = !expanded },
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = colorScheme.surfaceContainerLow)
@@ -328,10 +326,7 @@ private fun ModuleCard(
                 }
             }
 
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 12.dp),
-                thickness = 0.5.dp,
-            )
+            HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 AnimatedVisibility(
@@ -342,7 +337,6 @@ private fun ModuleCard(
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         if (item.showAction) {
                             FilledTonalButton(
-                                shape = RoundedCornerShape(20.dp),
                                 contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
                                 onClick = { viewModel.runAction(item.module.id, item.module.name) },
                             ) {
@@ -373,7 +367,6 @@ private fun ModuleCard(
                     exit = fadeOut()
                 ) {
                     FilledTonalButton(
-                        shape = RoundedCornerShape(20.dp),
                         modifier = Modifier.padding(end = 8.dp),
                         colors = ButtonDefaults.filledTonalButtonColors(
                             containerColor = colorScheme.tertiaryContainer,
@@ -400,7 +393,6 @@ private fun ModuleCard(
                 }
 
                 FilledTonalButton(
-                    shape = RoundedCornerShape(20.dp),
                     colors = if (item.isRemoved) {
                         ButtonDefaults.filledTonalButtonColors()
                     } else {
