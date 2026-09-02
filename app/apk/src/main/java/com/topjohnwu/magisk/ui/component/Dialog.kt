@@ -34,6 +34,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -398,18 +399,23 @@ fun ConfirmDialogContent(
 @Composable
 fun MarkdownText(
     text: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.onSurface,
+    linkColor: Color = MaterialTheme.colorScheme.primary,
 ) {
-    val contentColor = MaterialTheme.colorScheme.onSurface.toArgb()
+    val contentColorArgb = color.toArgb()
+    val linkColorArgb = linkColor.toArgb()
     AndroidView(
         factory = { context ->
             TextView(context).apply {
-                setTextColor(contentColor)
+                setTextColor(contentColorArgb)
+                setLinkTextColor(linkColorArgb)
                 ServiceLocator.markwon.setMarkdown(this, text)
             }
         },
         update = { textView ->
-            textView.setTextColor(contentColor)
+            textView.setTextColor(contentColorArgb)
+            textView.setLinkTextColor(linkColorArgb)
             ServiceLocator.markwon.setMarkdown(textView, text)
         },
         modifier = modifier.fillMaxWidth()
