@@ -277,8 +277,8 @@ fun LoadingDialog(
 @Composable
 fun MagiskDialog(
     onDismissRequest: () -> Unit,
-    title: String? = null,
     modifier: Modifier = Modifier,
+    title: @Composable (() -> Unit)? = null,
     confirmButton: @Composable (() -> Unit)? = null,
     dismissButton: @Composable (() -> Unit)? = null,
     content: @Composable () -> Unit,
@@ -292,9 +292,7 @@ fun MagiskDialog(
         onDismissRequest = onDismissRequest,
         shape = RoundedCornerShape(28.dp),
         containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-        title = if (!title.isNullOrEmpty()) {
-            { Text(text = title, style = MaterialTheme.typography.titleLarge) }
-        } else null,
+        title = title,
         text = {
             ProvideTextStyle(value = MaterialTheme.typography.bodyMedium) {
                 content()
@@ -325,7 +323,9 @@ fun MagiskDialog(
 ) {
     MagiskDialog(
         onDismissRequest = onDismissRequest,
-        title = title,
+        title = if (!title.isNullOrEmpty()) {
+            { Text(text = title, style = MaterialTheme.typography.titleLarge) }
+        } else null,
         modifier = modifier,
         confirmButton = if (confirmText != null || onConfirm != null) {
             {

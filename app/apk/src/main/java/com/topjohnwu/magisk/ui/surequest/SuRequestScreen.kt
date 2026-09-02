@@ -4,29 +4,22 @@ import android.view.MotionEvent
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -46,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.topjohnwu.magisk.core.ktx.toast
+import com.topjohnwu.magisk.ui.component.MagiskDialog
 import com.topjohnwu.magisk.ui.superuser.SharedUidBadge
 import com.topjohnwu.magisk.core.R as CoreR
 
@@ -84,153 +78,127 @@ fun SuRequestScreen(
         stringResource(CoreR.string.deny)
     }
 
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Card(
-            modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 16.dp)
-                .fillMaxWidth()
-                .widthIn(max = 560.dp),
-            shape = RoundedCornerShape(28.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
-        ) {
-            Column(
-                modifier = Modifier
-                    .verticalScroll(rememberScrollState())
-                    .padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+    MagiskDialog(
+        modifier = modifier,
+        onDismissRequest = { viewModel.denyPressed() },
+        title = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 4.dp)
-                ) {
-                    if (icon != null) {
-                        Image(
-                            painter = rememberDrawablePainter(icon),
-                            contentDescription = null,
-                            modifier = Modifier.size(44.dp)
-                        )
-                        Spacer(Modifier.width(14.dp))
-                    }
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f, fill = false),
+                if (icon != null) {
+                    Image(
+                        painter = rememberDrawablePainter(icon),
+                        contentDescription = null,
+                        modifier = Modifier.size(44.dp)
                     )
-                    if (uiState.isSharedUid) {
-                        Spacer(Modifier.width(6.dp))
-                        SharedUidBadge()
-                    }
+                    Spacer(Modifier.width(14.dp))
                 }
-
-                Spacer(Modifier.height(8.dp))
-
-                Text(
-                    text = packageName,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 4.dp),
-                )
-
-                Spacer(Modifier.height(16.dp))
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(MaterialTheme.colorScheme.errorContainer)
-                        .padding(12.dp)
-                ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = title,
+                            style = MaterialTheme.typography.titleLarge,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                        if (uiState.isSharedUid) {
+                            Spacer(Modifier.width(6.dp))
+                            SharedUidBadge()
+                        }
+                    }
                     Text(
-                        text = stringResource(CoreR.string.su_warning),
+                        text = packageName,
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onErrorContainer,
-                        fontWeight = FontWeight.Medium,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth()
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                     )
-                }
-
-                Spacer(Modifier.height(16.dp))
-
-                Text(
-                    text = "${stringResource(CoreR.string.request_timeout)}: $sliderLabel",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.fillMaxWidth().padding(start = 4.dp),
-                )
-                Spacer(Modifier.height(8.dp))
-                Slider(
-                    value = sliderValue,
-                    onValueChange = { value ->
-                        viewModel.spinnerTouched()
-                        val pos = value.toInt().coerceIn(0, sliderToIndex.lastIndex)
-                        viewModel.setSelectedItemPosition(sliderToIndex[pos])
-                    },
-                    valueRange = 0f..5f,
-                    steps = 4,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(Modifier.height(20.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    OutlinedButton(
-                        onClick = { viewModel.denyPressed() },
-                        shape = RoundedCornerShape(20.dp),
-                        contentPadding = PaddingValues(vertical = 12.dp),
-                        modifier = Modifier.weight(1f),
-                    ) {
-                        Text(
-                            text = denyText,
-                            style = MaterialTheme.typography.labelLarge,
-                        )
-                    }
-                    Button(
-                        enabled = grantEnabled,
-                        onClick = { viewModel.grantPressed() },
-                        shape = RoundedCornerShape(20.dp),
-                        contentPadding = PaddingValues(vertical = 12.dp),
-                        modifier = Modifier
-                            .weight(1f)
-                            .then(
-                                if (uiState.useTapjackProtection) {
-                                    Modifier.pointerInteropFilter { event ->
-                                        if (event.flags and MotionEvent.FLAG_WINDOW_IS_OBSCURED != 0 ||
-                                            event.flags and MotionEvent.FLAG_WINDOW_IS_PARTIALLY_OBSCURED != 0
-                                        ) {
-                                            if (event.action == MotionEvent.ACTION_UP) {
-                                                context.toast(
-                                                    CoreR.string.touch_filtered_warning,
-                                                    Toast.LENGTH_SHORT
-                                                )
-                                            }
-                                            true
-                                        } else {
-                                            false
-                                        }
-                                    }
-                                } else Modifier
-                            )
-                    ) {
-                        Text(
-                            text = stringResource(CoreR.string.grant),
-                            style = MaterialTheme.typography.labelLarge,
-                        )
-                    }
                 }
             }
+        },
+        confirmButton = {
+            TextButton(
+                enabled = grantEnabled,
+                onClick = { viewModel.grantPressed() },
+                modifier = if (uiState.useTapjackProtection) {
+                    Modifier.pointerInteropFilter { event ->
+                        if (event.flags and MotionEvent.FLAG_WINDOW_IS_OBSCURED != 0 ||
+                            event.flags and MotionEvent.FLAG_WINDOW_IS_PARTIALLY_OBSCURED != 0
+                        ) {
+                            if (event.action == MotionEvent.ACTION_UP) {
+                                context.toast(
+                                    CoreR.string.touch_filtered_warning,
+                                    Toast.LENGTH_SHORT
+                                )
+                            }
+                            true
+                        } else {
+                            false
+                        }
+                    }
+                } else Modifier
+            ) {
+                Text(
+                    text = stringResource(CoreR.string.grant),
+                    style = MaterialTheme.typography.labelLarge,
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = { viewModel.denyPressed() }
+            ) {
+                Text(
+                    text = denyText,
+                    style = MaterialTheme.typography.labelLarge,
+                )
+            }
+        }
+    ) {
+        Column(
+            modifier = Modifier.verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(MaterialTheme.colorScheme.errorContainer)
+                    .padding(12.dp)
+            ) {
+                Text(
+                    text = stringResource(CoreR.string.su_warning),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onErrorContainer,
+                    fontWeight = FontWeight.Medium,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            Text(
+                text = "${stringResource(CoreR.string.request_timeout)}: $sliderLabel",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 4.dp),
+            )
+            Spacer(Modifier.height(8.dp))
+            Slider(
+                value = sliderValue,
+                onValueChange = { value ->
+                    viewModel.spinnerTouched()
+                    val pos = value.toInt().coerceIn(0, sliderToIndex.lastIndex)
+                    viewModel.setSelectedItemPosition(sliderToIndex[pos])
+                },
+                valueRange = 0f..5f,
+                steps = 4,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }
