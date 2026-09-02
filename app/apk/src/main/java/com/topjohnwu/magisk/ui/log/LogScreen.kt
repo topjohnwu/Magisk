@@ -193,9 +193,9 @@ private fun SuLogTab(
                 modifier = Modifier
                     .weight(1f)
                     .nestedScroll(nestedScrollConnection)
-                    .verticalScrollbar(listState, contentPadding = PaddingValues(top = 8.dp, bottom = 88.dp))
+                    .verticalScrollbar(listState, contentPadding = PaddingValues(vertical = 8.dp))
                     .padding(horizontal = 12.dp),
-                contentPadding = PaddingValues(top = 8.dp, bottom = 88.dp),
+                contentPadding = PaddingValues(vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(
@@ -357,9 +357,9 @@ private fun MagiskLogTab(
                 modifier = Modifier
                     .weight(1f)
                     .nestedScroll(nestedScrollConnection)
-                    .verticalScrollbar(listState, contentPadding = PaddingValues(top = 8.dp, bottom = 88.dp))
+                    .verticalScrollbar(listState, contentPadding = PaddingValues(vertical = 8.dp))
                     .padding(horizontal = 12.dp),
-                contentPadding = PaddingValues(top = 8.dp, bottom = 88.dp),
+                contentPadding = PaddingValues(vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 items(

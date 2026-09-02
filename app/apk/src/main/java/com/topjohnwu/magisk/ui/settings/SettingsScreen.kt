@@ -73,10 +73,9 @@ fun SettingsScreen(
                 .fillMaxSize()
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
                 .padding(padding)
-                .verticalScrollbar(scrollState, contentPadding = PaddingValues(bottom = 88.dp))
+                .verticalScrollbar(scrollState, contentPadding = PaddingValues(vertical = 12.dp))
                 .verticalScroll(scrollState)
-                .padding(horizontal = 12.dp)
-                .padding(bottom = 88.dp)
+                .padding(horizontal = 12.dp, vertical = 12.dp)
         ) {
             CustomizationSection(viewModel = viewModel)
             Spacer(Modifier.height(12.dp))

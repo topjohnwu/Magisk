@@ -119,9 +119,9 @@ fun SuperuserScreen(
                 .fillMaxSize()
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
                 .padding(padding)
-                .verticalScrollbar(listState, contentPadding = PaddingValues(bottom = 88.dp))
+                .verticalScrollbar(listState, contentPadding = PaddingValues(vertical = 4.dp))
                 .padding(horizontal = 12.dp),
-            contentPadding = PaddingValues(bottom = 88.dp),
+            contentPadding = PaddingValues(vertical = 4.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             item { Spacer(Modifier.height(4.dp)) }

@@ -154,7 +154,6 @@ fun ModuleScreen(
                 shape = RoundedCornerShape(20.dp),
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                 contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                modifier = Modifier.padding(bottom = 88.dp, end = 20.dp),
                 content = {
                     Icon(
                         imageVector = Icons.Default.Add,
@@ -213,9 +212,9 @@ fun ModuleScreen(
                 .fillMaxSize()
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
                 .padding(padding)
-                .verticalScrollbar(listState, contentPadding = PaddingValues(bottom = 160.dp))
+                .verticalScrollbar(listState, contentPadding = PaddingValues(top = 4.dp, bottom = 80.dp))
                 .padding(horizontal = 12.dp),
-            contentPadding = PaddingValues(bottom = 160.dp),
+            contentPadding = PaddingValues(top = 4.dp, bottom = 80.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             item { Spacer(Modifier.height(4.dp)) }
