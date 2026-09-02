@@ -385,16 +385,13 @@ private fun NoticeCard(
     onHide: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(
-                MaterialTheme.colorScheme.tertiaryContainer,
-                RoundedCornerShape(20.dp)
-            )
-            .padding(start = 16.dp, top = 6.dp, bottom = 6.dp, end = 6.dp)
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer)
     ) {
         Row(
+            modifier = Modifier.padding(start = 16.dp, top = 6.dp, bottom = 6.dp, end = 6.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
@@ -440,7 +437,6 @@ private fun InstallButton(
     if (isPrimary) {
         Button(
             onClick = onClick,
-            shape = RoundedCornerShape(20.dp),
             contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
             modifier = modifier,
         ) {
@@ -449,7 +445,6 @@ private fun InstallButton(
     } else {
         FilledTonalButton(
             onClick = onClick,
-            shape = RoundedCornerShape(20.dp),
             contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
             modifier = modifier,
         ) {
