@@ -1,99 +1,100 @@
 package com.topjohnwu.magisk.ui
 
+import android.annotation.SuppressLint
 import android.os.Build
 import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
 import androidx.compose.material3.Typography
-import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.core.view.WindowCompat
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.view.WindowCompat
+import com.google.android.material.color.utilities.DynamicColor
+import com.google.android.material.color.utilities.Hct
+import com.google.android.material.color.utilities.MaterialDynamicColors
+import com.google.android.material.color.utilities.SchemeTonalSpot
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.model.ColorMode
 
-private val MagiskLightColorScheme = lightColorScheme(
-    primary = Color(0xFF006B5D),
-    onPrimary = Color(0xFFFFFFFF),
-    primaryContainer = Color(0xFF73F5DD),
-    onPrimaryContainer = Color(0xFF00201B),
-    secondary = Color(0xFF4A635D),
-    onSecondary = Color(0xFFFFFFFF),
-    secondaryContainer = Color(0xFFCCE8E0),
-    onSecondaryContainer = Color(0xFF05201A),
-    tertiary = Color(0xFF19658A),
-    onTertiary = Color(0xFFFFFFFF),
-    tertiaryContainer = Color(0xFFCBE6FF),
-    onTertiaryContainer = Color(0xFF001E30),
-    error = Color(0xFFBA1A1A),
-    onError = Color(0xFFFFFFFF),
-    errorContainer = Color(0xFFFFDAD6),
-    onErrorContainer = Color(0xFF410002),
-    background = Color(0xFFF2F6F4),
-    onBackground = Color(0xFF171D1B),
-    surface = Color(0xFFF2F6F4),
-    onSurface = Color(0xFF171D1B),
-    surfaceVariant = Color(0xFFD9E5E0),
-    onSurfaceVariant = Color(0xFF384A46),
-    outline = Color(0xFF6F7975),
-    outlineVariant = Color(0xFFBFC9C4),
-    surfaceDim = Color(0xFFD5DBD8),
-    surfaceBright = Color(0xFFF8FAF8),
-    surfaceContainerLowest = Color(0xFFFFFFFF),
-    surfaceContainerLow = Color(0xFFE8EEEC),
-    surfaceContainer = Color(0xFFE2E8E5),
-    surfaceContainerHigh = Color(0xFFDCE2DF),
-    surfaceContainerHighest = Color(0xFFD6DDD9),
-)
+@SuppressLint("RestrictedApi")
+fun dynamicColorScheme(
+    seed: Color,
+    isDark: Boolean,
+    contrastLevel: Double = 0.0
+): ColorScheme {
+    val scheme = SchemeTonalSpot(Hct.fromInt(seed.toArgb()), isDark, contrastLevel)
+    val dyn = MaterialDynamicColors()
+    fun DynamicColor.toColor() = Color(getArgb(scheme))
 
-private val MagiskDarkColorScheme = darkColorScheme(
-    primary = Color(0xFF42E2CA),
-    onPrimary = Color(0xFF003730),
-    primaryContainer = Color(0xFF005046),
-    onPrimaryContainer = Color(0xFF6FF7E3),
-    secondary = Color(0xFFB1CCC4),
-    onSecondary = Color(0xFF1B352F),
-    secondaryContainer = Color(0xFF324B45),
-    onSecondaryContainer = Color(0xFFCCE8E0),
-    tertiary = Color(0xFF90CEFF),
-    onTertiary = Color(0xFF003352),
-    tertiaryContainer = Color(0xFF004B72),
-    onTertiaryContainer = Color(0xFFCCE5FF),
-    error = Color(0xFFFFB4AB),
-    onError = Color(0xFF690005),
-    errorContainer = Color(0xFF93000A),
-    onErrorContainer = Color(0xFFFFDAD6),
-    background = Color(0xFF101413),
-    onBackground = Color(0xFFE0E3E1),
-    surface = Color(0xFF101413),
-    onSurface = Color(0xFFE0E3E1),
-    surfaceVariant = Color(0xFF3F4945),
-    onSurfaceVariant = Color(0xFFC0C9C4),
-    outline = Color(0xFF889590),
-    outlineVariant = Color(0xFF3F4945),
-    surfaceDim = Color(0xFF101413),
-    surfaceBright = Color(0xFF363A39),
-    surfaceContainerLowest = Color(0xFF0B0E0D),
-    surfaceContainerLow = Color(0xFF181D1B),
-    surfaceContainer = Color(0xFF1E2321),
-    surfaceContainerHigh = Color(0xFF292E2C),
-    surfaceContainerHighest = Color(0xFF343937),
-)
+    return ColorScheme(
+        primary = dyn.primary().toColor(),
+        onPrimary = dyn.onPrimary().toColor(),
+        primaryContainer = dyn.primaryContainer().toColor(),
+        onPrimaryContainer = dyn.onPrimaryContainer().toColor(),
+        inversePrimary = dyn.inversePrimary().toColor(),
+        secondary = dyn.secondary().toColor(),
+        onSecondary = dyn.onSecondary().toColor(),
+        secondaryContainer = dyn.secondaryContainer().toColor(),
+        onSecondaryContainer = dyn.onSecondaryContainer().toColor(),
+        tertiary = dyn.tertiary().toColor(),
+        onTertiary = dyn.onTertiary().toColor(),
+        tertiaryContainer = dyn.tertiaryContainer().toColor(),
+        onTertiaryContainer = dyn.onTertiaryContainer().toColor(),
+        background = dyn.background().toColor(),
+        onBackground = dyn.onBackground().toColor(),
+        surface = dyn.surface().toColor(),
+        onSurface = dyn.onSurface().toColor(),
+        surfaceVariant = dyn.surfaceVariant().toColor(),
+        onSurfaceVariant = dyn.onSurfaceVariant().toColor(),
+        surfaceTint = dyn.surfaceTint().toColor(),
+        inverseSurface = dyn.inverseSurface().toColor(),
+        inverseOnSurface = dyn.inverseOnSurface().toColor(),
+        error = dyn.error().toColor(),
+        onError = dyn.onError().toColor(),
+        errorContainer = dyn.errorContainer().toColor(),
+        onErrorContainer = dyn.onErrorContainer().toColor(),
+        outline = dyn.outline().toColor(),
+        outlineVariant = dyn.outlineVariant().toColor(),
+        scrim = dyn.scrim().toColor(),
+        surfaceBright = dyn.surfaceBright().toColor(),
+        surfaceDim = dyn.surfaceDim().toColor(),
+        surfaceContainer = dyn.surfaceContainer().toColor(),
+        surfaceContainerHigh = dyn.surfaceContainerHigh().toColor(),
+        surfaceContainerHighest = dyn.surfaceContainerHighest().toColor(),
+        surfaceContainerLow = dyn.surfaceContainerLow().toColor(),
+        surfaceContainerLowest = dyn.surfaceContainerLowest().toColor(),
+        primaryFixed = dyn.primaryFixed().toColor(),
+        primaryFixedDim = dyn.primaryFixedDim().toColor(),
+        onPrimaryFixed = dyn.onPrimaryFixed().toColor(),
+        onPrimaryFixedVariant = dyn.onPrimaryFixedVariant().toColor(),
+        secondaryFixed = dyn.secondaryFixed().toColor(),
+        secondaryFixedDim = dyn.secondaryFixedDim().toColor(),
+        onSecondaryFixed = dyn.onSecondaryFixed().toColor(),
+        onSecondaryFixedVariant = dyn.onSecondaryFixedVariant().toColor(),
+        tertiaryFixed = dyn.tertiaryFixed().toColor(),
+        tertiaryFixedDim = dyn.tertiaryFixedDim().toColor(),
+        onTertiaryFixed = dyn.onTertiaryFixed().toColor(),
+        onTertiaryFixedVariant = dyn.onTertiaryFixedVariant().toColor(),
+    )
+}
+
+val MagiskAccentColor = Color(0xFF00AF9C)
 
 object ThemeState {
     var colorMode by mutableIntStateOf(Config.colorMode)
@@ -193,8 +194,8 @@ fun MagiskTheme(
     val colorScheme = when {
         useDynamicColor && isDarkTheme -> dynamicDarkColorScheme(context)
         useDynamicColor && !isDarkTheme -> dynamicLightColorScheme(context)
-        isDarkTheme -> MagiskDarkColorScheme
-        else -> MagiskLightColorScheme
+        isDarkTheme -> dynamicColorScheme(MagiskAccentColor, isDark = true)
+        else -> dynamicColorScheme(MagiskAccentColor, isDark = false)
     }
 
     val activity = LocalActivity.current

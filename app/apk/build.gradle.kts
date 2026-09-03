@@ -47,6 +47,7 @@ dependencies {
     implementation(libs.lifecycle.runtime.compose)
     implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.compose.material3)
+    implementation(libs.material)
 
     // Navigation3
     implementation(libs.navigation3.runtime)
