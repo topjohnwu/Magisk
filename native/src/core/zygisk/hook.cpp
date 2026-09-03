@@ -265,6 +265,18 @@ ZygiskContext::~ZygiskContext() {
     // Cleanup
     g_hook->should_unmap = true;
     g_hook->restore_zygote_hook(env);
+
+    // For DenyList-targeted apps, no Zygisk modules are loaded and none of the six
+    // bootstrap PLT hooks (fork/unshare/strdup/selinux_android_setcontext/
+    // __android_log_close/dlclose in libandroid_runtime.so and libnativebridge.so) are
+    // needed for anything post-specialize. Restore those GOT slots now so that any
+    // dladdr()/GOT-integrity check performed by the app before the lazy pthread_attr_destroy
+    // unload eventually fires (which may be never on native-loop apps that don't re-enter
+    // ART thread setup) resolves to the real system libraries instead of libzygisk.so.
+    // The libzygisk.so mapping itself still leaves via the unloader path below.
+    if ((info_flags & UNMOUNT_MASK) == UNMOUNT_MASK) {
+        g_hook->restore_plt_hook();
+    }
     g_hook->hook_unloader();
 }
 
@@ -471,6 +483,14 @@ void HookContext::restore_plt_hook() {
         ZLOGE("Failed to restore plt_hook\n");
         should_unmap = false;
     }
+    // Clear the backup so a follow-up restore call (e.g. the one from pthread_attr_destroy
+    // after hook_unloader has since installed its own hook) processes only the newly
+    // registered entries rather than re-committing the already-restored six bootstrap
+    // slots — the redundant CommitHook is cheap but a spurious RegisterHook failure would
+    // clear should_unmap and disable the final dlclose. This lets denylisted apps have
+    // their GOT restored early (from ~ZygiskContext) while still relying on the lazy
+    // pthread_attr_destroy path to unload libzygisk.so.
+    plt_backup.clear();
 }
 
 // -----------------------------------------------------------------
