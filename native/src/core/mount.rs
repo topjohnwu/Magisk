@@ -234,10 +234,19 @@ pub fn revert_unmount(pid: i32) {
     }
 
     let mut targets = Vec::new();
+    let magisk_tmp = get_magisk_tmp();
 
-    // Unmount Magisk tmpfs and mounts from module files
+    // Unmount everything anchored to the Magisk tmpfs. The historical filter matched only
+    // `source == "magisk"` and `root` under /adb/modules, which left the top-level tmpfs at
+    // $MAGISKTMP, the .magisk subtree (devpts at .magisk/pts, preinit bind at .magisk/preinit,
+    // worker, etc.), and any future entry under $MAGISKTMP visible in the app's mountinfo
+    // even after the revert ran. Matching on the mount target closes those leaks.
     for info in parse_mount_info("self") {
-        if info.source == "magisk" || info.root.starts_with("/adb/modules") {
+        if info.source == "magisk"
+            || info.root.starts_with("/adb/modules")
+            || info.target.as_str().starts_with(magisk_tmp.as_str())
+            || info.target.contains("/.magisk/")
+        {
             targets.push(info.target);
         }
     }

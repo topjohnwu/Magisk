@@ -159,7 +159,7 @@ pub mod ffi {
         fn exec_script(script: Utf8CStrRef);
         fn exec_common_scripts(stage: Utf8CStrRef);
         fn exec_module_scripts(state: Utf8CStrRef, modules: &Vec<ModuleInfo>);
-        fn install_apk(apk: Utf8CStrRef);
+        fn install_apk(apk: Utf8CStrRef, pkg: Utf8CStrRef);
         fn uninstall_pkg(apk: Utf8CStrRef);
         fn install_module(zip: Utf8CStrRef);
 
