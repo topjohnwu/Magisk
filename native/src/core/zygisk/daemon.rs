@@ -25,10 +25,18 @@ pub fn zygisk_should_load_module(flags: u32) -> bool {
 }
 
 #[allow(unused_variables)]
-fn exec_zygiskd(is_64_bit: bool, remote: UnixStream) {
+fn exec_zygiskd(is_64_bit: bool, remote: UnixStream, nickname: &str) {
     // This fd has to survive exec
     unsafe {
         libc::fcntl(remote.as_raw_fd(), libc::F_SETFD, 0);
+    }
+
+    // Hand the per-install daemon nickname to the child through the environment. execl
+    // preserves envp, so entry.cpp's zygiskd() reads it before its own set_nice_name and
+    // avoids the literal "zygiskd64" / "zygiskd32" strings that would otherwise show up
+    // in /proc/*/comm and `ps` on the device.
+    if !nickname.is_empty() {
+        unsafe { std::env::set_var("MAGISK_NICKNAME", nickname) };
     }
 
     // Start building the exec arguments
@@ -92,8 +100,9 @@ impl ZygiskState {
         } else {
             // Create a new socket pair and fork zygiskd process
             let (mut local, remote) = UnixStream::pair()?;
+            let nick = daemon.nickname.clone();
             if fork_dont_care() == 0 {
-                exec_zygiskd(is_64_bit, remote);
+                exec_zygiskd(is_64_bit, remote, &nick);
             }
             if let Some(module_fds) = daemon.get_module_fds(is_64_bit) {
                 local.send_fds(&module_fds)?;

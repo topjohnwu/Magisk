@@ -1,7 +1,7 @@
 use crate::bootstages::BootState;
 use crate::consts::{
-    MAGISK_FILE_CON, MAGISK_FULL_VER, MAGISK_PROC_CON, MAGISK_VER_CODE, MAGISK_VERSION,
-    MAIN_CONFIG, MAIN_SOCKET, ROOTMNT, ROOTOVL,
+    DATABIN, MAGISK_FILE_CON, MAGISK_FULL_VER, MAGISK_PROC_CON, MAGISK_VER_CODE, MAGISK_VERSION,
+    MAIN_CONFIG, MAIN_SOCKET, NICKNAMEFILE, ROOTMNT, ROOTOVL,
 };
 use crate::db::Sqlite3;
 use crate::ffi::{
@@ -19,7 +19,7 @@ use crate::zygisk::ZygiskState;
 use base::const_format::concatcp;
 use base::{
     AtomicArc, BufReadExt, FileAttr, FsPathBuilder, LoggedResult, ReadExt, ResultExt, Utf8CStr,
-    Utf8CStrBuf, WriteExt, cstr, fork_dont_care, info, libc, log_err, set_nice_name,
+    Utf8CStrBuf, Utf8CString, WriteExt, cstr, fork_dont_care, info, libc, log_err, set_nice_name,
 };
 use nix::fcntl::OFlag;
 use nix::mount::MsFlags;
@@ -27,7 +27,7 @@ use nix::sys::signal::SigSet;
 use nix::unistd::{dup2_stderr, dup2_stdin, dup2_stdout, getpid, getuid, setsid};
 use num_traits::AsPrimitive;
 use std::fmt::Write as _;
-use std::io::{BufReader, Write};
+use std::io::{BufReader, Read, Write};
 use std::os::fd::{AsFd, AsRawFd, IntoRawFd, RawFd};
 use std::os::unix::net::{UCred, UnixListener, UnixStream};
 use std::process::{Command, exit};
@@ -64,6 +64,11 @@ pub struct MagiskD {
     pub cached_su_info: AtomicArc<SuInfo>,
     pub sdk_int: i32,
     pub is_emulator: bool,
+    // Per-install random daemon nice-name. Persisted in /data/adb/magisk/nickname so
+    // that magiskd and its zygiskd helpers never expose the literals "magiskd" /
+    // "zygiskd64" / "zygiskd32" in /proc/*/comm or `ps` output — the two cheapest
+    // Magisk-detection greps for any app with basic /proc visibility.
+    pub nickname: String,
     is_recovery: bool,
     exe_attr: FileAttr,
 }
@@ -277,8 +282,67 @@ fn switch_cgroup(cgroup: &str, pid: i32) {
     }
 }
 
+// Generate an 8-hex-char random suffix from /proc/sys/kernel/random/uuid. Returns
+// a fallback deterministic string if the read fails — never panics.
+fn gen_random_nickname() -> String {
+    let mut out = String::with_capacity(10);
+    out.push_str("d_");
+    if let Ok(mut f) = std::fs::File::open("/proc/sys/kernel/random/uuid") {
+        let mut buf = String::new();
+        if f.read_to_string(&mut buf).is_ok() {
+            for c in buf.chars() {
+                if c.is_ascii_alphanumeric() && out.len() < 10 {
+                    out.push(c.to_ascii_lowercase());
+                }
+            }
+        }
+    }
+    while out.len() < 10 {
+        out.push('0');
+    }
+    out
+}
+
+fn is_valid_nickname(s: &str) -> bool {
+    !s.is_empty()
+        && s.len() <= 13 // leave headroom for "64"/"32" suffix under PR_SET_NAME's 15-char cap
+        && s.chars()
+            .all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '-')
+}
+
+// Load a per-install random nice-name from NICKNAMEFILE, or generate + persist one on
+// first observation. Failure to persist is non-fatal — the daemon will simply retry
+// on the next boot; the process still gets the freshly generated in-memory name for
+// this run.
+fn load_or_gen_nickname() -> String {
+    let path = cstr!(NICKNAMEFILE);
+    if let Ok(mut file) = path.open(OFlag::O_RDONLY | OFlag::O_CLOEXEC) {
+        let mut buf = String::new();
+        if file.read_to_string(&mut buf).is_ok() {
+            let trimmed = buf.trim();
+            if is_valid_nickname(trimmed) {
+                return trimmed.to_string();
+            }
+        }
+    }
+    let nick = gen_random_nickname();
+    // Best-effort persistence — /data/adb/magisk may not exist yet on very first boot;
+    // setup_magisk_env creates it in post-fs-data, so the file lands on the next boot.
+    let _ = cstr!(DATABIN).mkdirs(0o755);
+    if let Ok(mut file) =
+        path.create(OFlag::O_WRONLY | OFlag::O_TRUNC | OFlag::O_CLOEXEC, 0o600)
+    {
+        file.write_all(nick.as_bytes()).log_ok();
+    }
+    nick
+}
+
 fn daemon_entry() {
-    set_nice_name(cstr!("magiskd"));
+    let nickname = load_or_gen_nickname();
+    // Copy into a Utf8CString so we can hand it to set_nice_name as a Utf8CStr — the
+    // owning `nickname` String is later moved into the MagiskD singleton.
+    let nick_cstr: Utf8CString = nickname.clone().into();
+    set_nice_name(&nick_cstr);
     android_logging();
 
     // Block all signals
@@ -396,6 +460,7 @@ fn daemon_entry() {
         is_emulator,
         is_recovery,
         exe_attr,
+        nickname,
         ..Default::default()
     };
     MAGISKD.set(daemon).ok();

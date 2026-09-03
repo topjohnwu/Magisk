@@ -17,13 +17,28 @@ static void zygiskd(int socket) {
     if (getuid() != 0 || fcntl(socket, F_GETFD) < 0)
         exit(-1);
 
+    // Prefer the per-install nickname the parent daemon exports via MAGISK_NICKNAME so
+    // that /proc/*/comm never carries the literal "zygiskd64" / "zygiskd32" strings.
+    // Fall back to the historical names only if the env var is missing (e.g. someone
+    // launched the applet by hand for debugging).
 #if defined(__LP64__)
-    set_nice_name("zygiskd64");
-    LOGI("* Launching zygiskd64\n");
+    constexpr const char *fallback = "zygiskd64";
+    constexpr const char *arch = "64";
 #else
-    set_nice_name("zygiskd32");
-    LOGI("* Launching zygiskd32\n");
+    constexpr const char *fallback = "zygiskd32";
+    constexpr const char *arch = "32";
 #endif
+    const char *nick = getenv("MAGISK_NICKNAME");
+    char name_buf[16] = {};
+    if (nick && *nick) {
+        ssprintf(name_buf, sizeof(name_buf), "%s%s", nick, arch);
+        set_nice_name(name_buf);
+        LOGI("* Launching %s\n", name_buf);
+    } else {
+        set_nice_name(fallback);
+        LOGI("* Launching %s\n", fallback);
+    }
+    unsetenv("MAGISK_NICKNAME");
 
     // Load modules
     vector<comp_entry> modules;

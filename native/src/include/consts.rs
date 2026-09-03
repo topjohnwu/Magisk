@@ -20,6 +20,7 @@ pub const SECURE_DIR: &str = "/data/adb";
 pub const MODULEROOT: &str = concatcp!(SECURE_DIR, "/modules");
 pub const MODULEUPGRADE: &str = concatcp!(SECURE_DIR, "/modules_update");
 pub const DATABIN: &str = concatcp!(SECURE_DIR, "/magisk");
+pub const NICKNAMEFILE: &str = concatcp!(DATABIN, "/nickname");
 pub const MAGISKDB: &str = concatcp!(SECURE_DIR, "/magisk.db");
 
 // tmpfs paths
