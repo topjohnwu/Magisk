@@ -14,6 +14,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -75,17 +76,17 @@ fun SettingsScreen(
                 .padding(padding)
                 .verticalScrollbar(scrollState, contentPadding = PaddingValues(vertical = 12.dp))
                 .verticalScroll(scrollState)
-                .padding(horizontal = 12.dp, vertical = 12.dp)
+                .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
             CustomizationSection(viewModel = viewModel)
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(16.dp))
             AppSettingsSection()
             if (Info.env.isActive) {
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(16.dp))
                 MagiskSection(viewModel = viewModel)
             }
             if (Info.showSuperUser) {
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(16.dp))
                 SuperuserSection(viewModel = viewModel)
             }
         }
@@ -134,6 +135,11 @@ private fun CustomizationSection(
             )
         }
 
+        HorizontalDivider(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+        )
+
         // Color Mode
         val isDynamicColorSupported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
         val resources = LocalResources.current
@@ -163,6 +169,10 @@ private fun CustomizationSection(
         )
 
         if (isRunningAsStub && ShortcutManagerCompat.isRequestPinShortcutSupported(context)) {
+            HorizontalDivider(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+            )
             SettingsArrow(
                 title = stringResource(CoreR.string.add_shortcut_title),
                 summary = stringResource(CoreR.string.setting_add_shortcut_summary),
@@ -211,6 +221,10 @@ private fun AppSettingsSection(
 
         // Update Channel URL (for custom channel)
         if (updateChannel == Config.Value.CUSTOM_CHANNEL) {
+            HorizontalDivider(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+            )
             if (showUrlDialog) {
                 UpdateChannelUrlDialog(
                     onDismiss = { showUrlDialog = false }
@@ -222,6 +236,11 @@ private fun AppSettingsSection(
                 onClick = { showUrlDialog = true }
             )
         }
+
+        HorizontalDivider(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+        )
 
         // DoH Toggle
         var doh by remember { mutableStateOf(Config.doh) }
@@ -235,6 +254,11 @@ private fun AppSettingsSection(
             }
         )
 
+        HorizontalDivider(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+        )
+
         // Update Checker
         var checkUpdate by remember { mutableStateOf(Config.checkUpdate) }
         SettingsSwitch(
@@ -245,6 +269,11 @@ private fun AppSettingsSection(
                 checkUpdate = newValue
                 Config.checkUpdate = newValue
             }
+        )
+
+        HorizontalDivider(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
         )
 
         // Download Path
@@ -260,6 +289,11 @@ private fun AppSettingsSection(
             onClick = {
                 showDownloadDialog = true
             }
+        )
+
+        HorizontalDivider(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
         )
 
         // Random Package Name
@@ -297,6 +331,11 @@ private fun MagiskSection(
         )
 
         if (Const.Version.atLeast_24_0()) {
+            HorizontalDivider(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+            )
+
             // Zygisk
             var zygisk by remember { mutableStateOf(Config.zygisk) }
             SettingsSwitch(
@@ -313,6 +352,11 @@ private fun MagiskSection(
                 }
             )
 
+            HorizontalDivider(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+            )
+
             // DenyList
             val denyListEnabled by viewModel.denyListEnabled.collectAsStateWithLifecycle()
             SettingsSwitch(
@@ -320,6 +364,11 @@ private fun MagiskSection(
                 summary = stringResource(CoreR.string.settings_denylist_summary),
                 checked = denyListEnabled,
                 onCheckedChange = { viewModel.toggleDenyList(it) }
+            )
+
+            HorizontalDivider(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
             )
 
             // DenyList Config
@@ -359,6 +408,10 @@ private fun SuperuserSection(
                     Config.suTapjack = it
                 }
             )
+            HorizontalDivider(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+            )
         }
 
         // Authentication
@@ -379,6 +432,11 @@ private fun SuperuserSection(
             }
         )
 
+        HorizontalDivider(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+        )
+
         // Access Mode
         val accessEntries = remember {
             resources.getStringArray(CoreR.array.su_access).toList()
@@ -392,6 +450,11 @@ private fun SuperuserSection(
                 accessMode = it
                 Config.rootMode = it
             }
+        )
+
+        HorizontalDivider(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
         )
 
         // Multiuser Mode
@@ -414,6 +477,11 @@ private fun SuperuserSection(
             }
         )
 
+        HorizontalDivider(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+        )
+
         // Mount Namespace Mode
         val namespaceEntries = remember {
             resources.getStringArray(CoreR.array.namespace).toList()
@@ -431,6 +499,11 @@ private fun SuperuserSection(
                 mntNamespaceMode = it
                 Config.suMntNamespaceMode = it
             }
+        )
+
+        HorizontalDivider(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
         )
 
         // Automatic Response
@@ -451,6 +524,11 @@ private fun SuperuserSection(
             }
         )
 
+        HorizontalDivider(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+        )
+
         // Request Timeout
         val timeoutEntries = remember {
             resources.getStringArray(CoreR.array.request_timeout).toList()
@@ -467,6 +545,11 @@ private fun SuperuserSection(
                 timeoutIndex = it
                 Config.suDefaultTimeout = timeoutValues[it]
             }
+        )
+
+        HorizontalDivider(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
         )
 
         // SU Notification
@@ -486,6 +569,10 @@ private fun SuperuserSection(
 
         // Reauthenticate (SDK < O)
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            HorizontalDivider(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+            )
             var reAuth by remember { mutableStateOf(Config.suReAuth) }
             SettingsSwitch(
                 title = stringResource(CoreR.string.settings_su_reauth_title),
@@ -500,6 +587,10 @@ private fun SuperuserSection(
 
         // Restrict (version >= 30.1)
         if (Const.Version.atLeast_30_1()) {
+            HorizontalDivider(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+            )
             var restrict by remember { mutableStateOf(Config.suRestrict) }
             SettingsSwitch(
                 title = stringResource(CoreR.string.settings_su_restrict_title),
@@ -540,6 +631,7 @@ private fun UpdateChannelUrlDialog(
             OutlinedTextField(
                 value = url,
                 onValueChange = { url = it },
+                shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -573,6 +665,7 @@ private fun DownloadPathDialog(
             OutlinedTextField(
                 value = path,
                 onValueChange = { path = it },
+                shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.fillMaxWidth()
             )
         }
