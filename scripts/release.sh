@@ -8,6 +8,7 @@ set -e
 # These variables can be modified as needed
 CONFIG=config.prop
 NOTES=notes.md
+APK_CERT=b4cb83b4dad99f997dbe872f013aa16c14eec41d167021f371f7e1330f273ee6
 
 # These are constants, do not modify
 GCONFIG=app/gradle.properties
@@ -19,6 +20,70 @@ grep_prop() {
   shift
   local FILES=$@
   sed -n "$REGEX" $FILES | head -n 1
+}
+
+find_apksigner() {
+  local sdk="${ANDROID_HOME:-$ANDROID_SDK_ROOT}"
+  if [ -n "$sdk" ] && [ -d "$sdk/build-tools" ]; then
+    local exe
+    exe=$(find "$sdk/build-tools" -mindepth 2 -maxdepth 2 -name apksigner 2>/dev/null | sort -V | tail -n 1)
+    if [ -n "$exe" ] && [ -x "$exe" ]; then
+      echo "$exe"
+      return 0
+    fi
+  fi
+  echo "Error: apksigner not found in Android SDK build-tools." >&2
+  return 1
+}
+
+verify_apks() {
+  local apksigner
+  apksigner=$(find_apksigner) || exit 1
+
+  local out=$(grep_prop outdir $CONFIG)
+  if [ -z "$out" ]; then
+    out=out
+  fi
+
+  local apks=("$out"/*.apk)
+  if [ ! -e "${apks[0]}" ]; then
+    echo "Error: No APKs found in $out" >&2
+    exit 1
+  fi
+
+  local expected_cert
+  expected_cert=$(echo "$APK_CERT" | tr '[:upper:]' '[:lower:]')
+
+  echo "* Verifying APK signatures"
+  for apk in "${apks[@]}"; do
+    echo "Verifying $(basename "$apk")..."
+    local raw_output
+    if ! raw_output=$("$apksigner" verify --print-certs "$apk" 2>&1); then
+      echo "Error: $apk failed signature verification!" >&2
+      echo "$raw_output" >&2
+      exit 1
+    fi
+
+    local certs
+    certs=$(echo "$raw_output" | sed -n 's/.*certificate SHA-256 digest: *\([a-fA-F0-9]*\).*/\1/p' | \
+      tr '[:upper:]' '[:lower:]' | sort -u)
+
+    if [ -z "$certs" ]; then
+      echo "Error: Could not extract signing certificate from $apk!" >&2
+      exit 1
+    fi
+
+    for cert in $certs; do
+      if [ "$cert" != "$expected_cert" ]; then
+        echo "Error: $apk signature mismatch!" >&2
+        echo "  Expected: $expected_cert" >&2
+        echo "  Found:    $cert" >&2
+        exit 1
+      fi
+    done
+    echo "  -> Verified: $expected_cert"
+  done
+  echo "All APKs successfully verified!"
 }
 
 ensure_config() {
@@ -65,6 +130,7 @@ build() {
 
 upload() {
   gh auth status
+  verify_apks
 
   local code=$(grep_prop magisk.versionCode $GCONFIG)
   local ver=$(echo - | awk "{ print $code / 1000 }")
@@ -96,10 +162,17 @@ if command -v gsed >/dev/null; then
   export -f sed
 fi
 
-trap disable_version_config EXIT
-ensure_config
 case $1 in
-  build ) build $2 ;;
-  upload ) upload ;;
+  build )
+    trap disable_version_config EXIT
+    ensure_config
+    build $2
+    ;;
+  upload )
+    upload
+    ;;
+  verify )
+    verify_apks
+    ;;
   * ) exit 1 ;;
 esac
