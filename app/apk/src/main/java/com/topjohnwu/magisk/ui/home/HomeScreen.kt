@@ -24,13 +24,21 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Android
+import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Memory
 import androidx.compose.material.icons.filled.PowerSettingsNew
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.RestartAlt
+import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
@@ -59,10 +67,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.content.getSystemService
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -293,7 +303,8 @@ fun HomeScreen(
 
             Text(
                 text = stringResource(CoreR.string.home_support_title),
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 4.dp)
             )
@@ -302,7 +313,8 @@ fun HomeScreen(
 
             Text(
                 text = stringResource(CoreR.string.home_follow_title),
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 4.dp)
             )
@@ -330,16 +342,16 @@ private fun RebootButton(
     val showSafeMode = Const.Version.atLeast_28_0()
 
     val items = buildList {
-        add(RebootOption(CoreR.string.reboot) { reboot() })
+        add(RebootOption(CoreR.string.reboot, Icons.Default.RestartAlt) { reboot() })
         if (showUserspace) {
-            add(RebootOption(CoreR.string.reboot_userspace) { reboot("userspace") })
+            add(RebootOption(CoreR.string.reboot_userspace, Icons.Default.Refresh) { reboot("userspace") })
         }
-        add(RebootOption(CoreR.string.reboot_recovery) { reboot("recovery") })
-        add(RebootOption(CoreR.string.reboot_bootloader) { reboot("bootloader") })
-        add(RebootOption(CoreR.string.reboot_download) { reboot("download") })
-        add(RebootOption(CoreR.string.reboot_edl) { reboot("edl") })
+        add(RebootOption(CoreR.string.reboot_recovery, Icons.Default.Build) { reboot("recovery") })
+        add(RebootOption(CoreR.string.reboot_bootloader, Icons.Default.Android) { reboot("bootloader") })
+        add(RebootOption(CoreR.string.reboot_download, Icons.Default.Download) { reboot("download") })
+        add(RebootOption(CoreR.string.reboot_edl, Icons.Default.Memory) { reboot("edl") })
         if (showSafeMode) {
-            add(RebootOption(CoreR.string.reboot_safe_mode) {
+            add(RebootOption(CoreR.string.reboot_safe_mode, Icons.Default.Security) {
                 val newVal = if (safeModeEnabled >= 2) 0 else 2
                 Config.bootloop = newVal
                 safeModeEnabled = newVal
@@ -358,14 +370,40 @@ private fun RebootButton(
         }
         DropdownMenu(
             expanded = showMenu,
-            onDismissRequest = { showMenu = false }
+            onDismissRequest = { showMenu = false },
+            shape = RoundedCornerShape(16.dp)
         ) {
             items.forEach { item ->
                 val isSafeMode = item.labelRes == CoreR.string.reboot_safe_mode
+                if (isSafeMode) {
+                    HorizontalDivider(
+                        modifier = Modifier.padding(vertical = 4.dp),
+                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                    )
+                }
                 DropdownMenuItem(
-                    text = { Text(stringResource(item.labelRes)) },
+                    text = {
+                        Text(
+                            text = stringResource(item.labelRes),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = item.icon,
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    },
                     trailingIcon = if (isSafeMode && safeModeEnabled >= 2) {
-                        { Icon(Icons.Default.Check, contentDescription = null) }
+                        {
+                            Icon(
+                                imageVector = Icons.Default.Check,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
                     } else null,
                     onClick = {
                         item.action()
@@ -377,7 +415,7 @@ private fun RebootButton(
     }
 }
 
-private class RebootOption(val labelRes: Int, val action: () -> Unit)
+private class RebootOption(val labelRes: Int, val icon: ImageVector, val action: () -> Unit)
 
 @Composable
 private fun NoticeCard(
@@ -424,9 +462,9 @@ private fun InstallButton(
         Icon(
             painter = painterResource(R.drawable.ic_download),
             contentDescription = null,
-            modifier = Modifier.size(18.dp),
+            modifier = Modifier.size(ButtonDefaults.IconSize),
         )
-        Spacer(Modifier.width(6.dp))
+        Spacer(Modifier.width(ButtonDefaults.IconSpacing))
         Text(
             text = label,
             style = MaterialTheme.typography.labelLarge,
@@ -436,7 +474,7 @@ private fun InstallButton(
     if (isPrimary) {
         Button(
             onClick = onClick,
-            contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
+            contentPadding = ButtonDefaults.ButtonWithIconContentPadding,
             modifier = modifier,
         ) {
             buttonContent()
@@ -444,7 +482,7 @@ private fun InstallButton(
     } else {
         FilledTonalButton(
             onClick = onClick,
-            contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
+            contentPadding = ButtonDefaults.ButtonWithIconContentPadding,
             modifier = modifier,
         ) {
             buttonContent()
@@ -469,7 +507,7 @@ private fun CoreCard(
 
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(24.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
     ) {
         Row(
@@ -542,7 +580,7 @@ private fun AppCard(
 
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(24.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
     ) {
         Column(
@@ -569,23 +607,27 @@ private fun AppCard(
                     )
                 }
 
-                if (Info.env.isActive) {
-                    val hideRestoreIcon = if (isHidden) Icons.Default.Visibility else Icons.Default.VisibilityOff
-                    Spacer(modifier = Modifier.weight(1f))
-                    IconButton(onClick = onHideRestorePressed) {
-                        Icon(
-                            imageVector = hideRestoreIcon,
-                            contentDescription = null,
-                            modifier = Modifier.size(20.dp),
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (Info.env.isActive) {
+                        val hideRestoreIcon = if (isHidden) Icons.Default.Visibility else Icons.Default.VisibilityOff
+                        IconButton(onClick = onHideRestorePressed) {
+                            Icon(
+                                imageVector = hideRestoreIcon,
+                                contentDescription = stringResource(
+                                    if (isHidden) CoreR.string.settings_restore_app_title else CoreR.string.settings_hide_app_title
+                                ),
+                                modifier = Modifier.size(20.dp),
+                            )
+                        }
+                    }
+
+                    if (actionLabel != null) {
+                        Spacer(Modifier.width(4.dp))
+                        InstallButton(
+                            label = actionLabel,
+                            onClick = onManagerPressed,
                         )
                     }
-                }
-
-                if (actionLabel != null) {
-                    InstallButton(
-                        label = actionLabel,
-                        onClick = onManagerPressed,
-                    )
                 }
             }
 
@@ -652,7 +694,7 @@ private fun StatusCard(
 
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
     ) {
         Row(
@@ -684,7 +726,8 @@ private fun StatusCard(
                 if (index < statuses.lastIndex) {
                     VerticalDivider(
                         thickness = 0.5.dp,
-                        modifier = Modifier.padding(vertical = 12.dp)
+                        modifier = Modifier.padding(vertical = 12.dp),
+                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
                     )
                 }
             }
@@ -699,32 +742,49 @@ private fun SupportCard(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
     ) {
         Column(modifier = Modifier.padding(18.dp)) {
             Text(
                 text = stringResource(CoreR.string.home_support_content),
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(Modifier.height(16.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
+                horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { onLinkClicked(Const.Url.PATREON_URL) }) {
+                FilledTonalButton(
+                    onClick = { onLinkClicked(Const.Url.PATREON_URL) },
+                    contentPadding = ButtonDefaults.ButtonWithIconContentPadding
+                ) {
                     Icon(
                         painter = painterResource(CoreR.drawable.ic_patreon),
-                        contentDescription = stringResource(CoreR.string.patreon),
-                        modifier = Modifier.size(32.dp)
+                        contentDescription = null,
+                        modifier = Modifier.size(ButtonDefaults.IconSize),
+                    )
+                    Spacer(Modifier.width(ButtonDefaults.IconSpacing))
+                    Text(
+                        text = stringResource(CoreR.string.patreon),
+                        style = MaterialTheme.typography.labelLarge
                     )
                 }
-                IconButton(onClick = { onLinkClicked("https://paypal.me/magiskdonate") }) {
+                FilledTonalButton(
+                    onClick = { onLinkClicked("https://paypal.me/magiskdonate") },
+                    contentPadding = ButtonDefaults.ButtonWithIconContentPadding
+                ) {
                     Icon(
                         painter = painterResource(CoreR.drawable.ic_paypal),
-                        contentDescription = stringResource(CoreR.string.paypal),
-                        modifier = Modifier.size(32.dp)
+                        contentDescription = null,
+                        modifier = Modifier.size(ButtonDefaults.IconSize),
+                    )
+                    Spacer(Modifier.width(ButtonDefaults.IconSpacing))
+                    Text(
+                        text = stringResource(CoreR.string.paypal),
+                        style = MaterialTheme.typography.labelLarge
                     )
                 }
             }
@@ -766,7 +826,7 @@ private fun DevelopersCard(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
     ) {
         Column {
@@ -799,7 +859,8 @@ private fun DevelopersCard(
                 if (index < developers.lastIndex) {
                     HorizontalDivider(
                         thickness = 0.5.dp,
-                        modifier = Modifier.padding(horizontal = 18.dp)
+                        modifier = Modifier.padding(horizontal = 18.dp),
+                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
                     )
                 }
             }
