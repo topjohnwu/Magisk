@@ -149,25 +149,28 @@ void exec_module_scripts(Utf8CStr stage, const rust::Vec<ModuleInfo> &module_lis
     PFS_DONE()
 }
 
+// The pm/appops shell-outs used to `log -t Magisk` before and after each command, which
+// showed up in any `logcat -s Magisk` capture and outed the daemon by tag even on
+// repackaged managers. They also hard-coded `com.topjohnwu.magisk` for the appops target
+// so a repackaged manager still leaked the canonical name to dumpsys appops. The scripts
+// now redirect pm output to /dev/null and take the target package name from the caller.
 constexpr char install_script[] = R"EOF(
 APK=%s
-log -t Magisk "pm_install: $APK"
-log -t Magisk "pm_install: $(pm install -g -r $APK 2>&1)"
+pm install -g -r $APK >/dev/null 2>&1
 appops set %s REQUEST_INSTALL_PACKAGES allow
 rm -f $APK
 )EOF";
 
-void install_apk(Utf8CStr apk) {
+void install_apk(Utf8CStr apk, Utf8CStr pkg) {
     setfilecon(apk.c_str(), MAGISK_FILE_CON);
     char cmds[sizeof(install_script) + 4096];
-    ssprintf(cmds, sizeof(cmds), install_script, apk.c_str(), JAVA_PACKAGE_NAME);
+    ssprintf(cmds, sizeof(cmds), install_script, apk.c_str(), pkg.c_str());
     exec_command_async("/system/bin/sh", "-c", cmds);
 }
 
 constexpr char uninstall_script[] = R"EOF(
 PKG=%s
-log -t Magisk "pm_uninstall: $PKG"
-log -t Magisk "pm_uninstall: $(pm uninstall $PKG 2>&1)"
+pm uninstall $PKG >/dev/null 2>&1
 )EOF";
 
 void uninstall_pkg(Utf8CStr pkg) {
@@ -179,8 +182,7 @@ void uninstall_pkg(Utf8CStr pkg) {
 constexpr char clear_script[] = R"EOF(
 PKG=%s
 USER=%d
-log -t Magisk "pm_clear: $PKG (user=$USER)"
-log -t Magisk "pm_clear: $(pm clear --user $USER $PKG 2>&1)"
+pm clear --user $USER $PKG >/dev/null 2>&1
 )EOF";
 
 void clear_pkg(const char *pkg, int user_id) {

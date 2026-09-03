@@ -328,7 +328,7 @@ impl ManagerInfo {
                 Ok(())
             }();
             if result.is_ok() {
-                install_apk(tmp_apk);
+                install_apk(tmp_apk, cstr!(APP_PACKAGE_NAME));
             }
         }
     }
