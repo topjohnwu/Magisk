@@ -182,7 +182,7 @@ fun SuRequestScreen(
             Spacer(Modifier.height(16.dp))
 
             Text(
-                text = "${stringResource(CoreR.string.request_timeout)}: $sliderLabel",
+                text = "${stringResource(CoreR.string.grant)}: $sliderLabel",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier
