@@ -94,7 +94,6 @@ fun DenyListScreen(
                 title = { Text(stringResource(CoreR.string.denylist)) },
                 navigationIcon = {
                     IconButton(
-                        modifier = Modifier.padding(start = 16.dp),
                         onClick = onBack
                     ) {
                         Icon(
@@ -150,7 +149,6 @@ fun DenyListScreen(
 
                     Box {
                         IconButton(
-                            modifier = Modifier.padding(end = 16.dp),
                             onClick = { showFilterMenu = true },
                         ) {
                             Icon(
