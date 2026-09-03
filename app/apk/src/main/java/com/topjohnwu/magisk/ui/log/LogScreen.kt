@@ -114,7 +114,6 @@ fun LogScreen(
                             }
                         }
                         IconButton(
-                            modifier = Modifier.padding(end = 16.dp),
                             onClick = {
                                 if (pagerState.currentPage == 0) viewModel.clearLog()
                                 else viewModel.clearMagiskLog()

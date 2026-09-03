@@ -88,7 +88,6 @@ fun SuperuserDetailScreen(
                 title = { Text(stringResource(CoreR.string.settings)) },
                 navigationIcon = {
                     IconButton(
-                        modifier = Modifier.padding(start = 16.dp),
                         onClick = onBack
                     ) {
                         Icon(

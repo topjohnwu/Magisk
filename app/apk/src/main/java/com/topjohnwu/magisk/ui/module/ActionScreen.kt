@@ -45,7 +45,6 @@ fun ActionScreen(
                 title = { Text(actionName) },
                 navigationIcon = {
                     IconButton(
-                        modifier = Modifier.padding(start = 16.dp),
                         onClick = onBack
                     ) {
                         Icon(
@@ -57,7 +56,6 @@ fun ActionScreen(
                 actions = {
                     if (finished) {
                         IconButton(
-                            modifier = Modifier.padding(end = 16.dp),
                             onClick = saveLog
                         ) {
                             Icon(

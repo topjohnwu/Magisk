@@ -349,7 +349,6 @@ private fun RebootButton(
 
     Box(modifier = modifier) {
         IconButton(
-            modifier = Modifier.padding(end = 16.dp),
             onClick = { showMenu = true },
         ) {
             Icon(

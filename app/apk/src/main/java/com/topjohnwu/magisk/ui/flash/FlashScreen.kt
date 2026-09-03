@@ -66,7 +66,6 @@ fun FlashScreen(
                 title = { Text("${stringResource(CoreR.string.flash_screen_title)} - $statusText") },
                 navigationIcon = {
                     IconButton(
-                        modifier = Modifier.padding(start = 16.dp),
                         onClick = onBack
                     ) {
                         Icon(
@@ -78,7 +77,6 @@ fun FlashScreen(
                 actions = {
                     if (finished) {
                         IconButton(
-                            modifier = Modifier.padding(end = 4.dp),
                             onClick = saveLog
                         ) {
                             Icon(
@@ -89,7 +87,6 @@ fun FlashScreen(
                     }
                     if (flashState == FlashViewModel.State.SUCCESS && showReboot) {
                         IconButton(
-                            modifier = Modifier.padding(end = 16.dp),
                             onClick = { viewModel.restartPressed() }
                         ) {
                             Icon(
