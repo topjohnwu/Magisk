@@ -54,6 +54,7 @@ class SuRequestActivity : ComponentActivity(), UntrackedActivity {
         }
         setTheme(R.style.Floating)
         super.onCreate(savedInstanceState)
+        setFinishOnTouchOutside(false)
 
         onBackPressedDispatcher.addCallback(this) { viewModel.denyPressed() }
         viewModel.finishActivity = { finish() }
@@ -97,6 +98,11 @@ class SuRequestActivity : ComponentActivity(), UntrackedActivity {
 
     override fun finish() {
         super.finishAndRemoveTask()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        viewModel.activityDestroyed()
     }
 
     private object EmptyAccessibilityDelegate : View.AccessibilityDelegate() {
