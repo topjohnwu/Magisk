@@ -15,11 +15,14 @@ import com.topjohnwu.magisk.core.model.su.SuPolicy.Companion.ALLOW
 import com.topjohnwu.magisk.core.model.su.SuPolicy.Companion.DENY
 import com.topjohnwu.magisk.core.su.SuRequestHandler
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit.SECONDS
 
 class SuRequestViewModel(
@@ -51,6 +54,7 @@ class SuRequestViewModel(
     private val millis = SECONDS.toMillis(Config.suDefaultTimeout.toLong())
     private var timer = SuTimer(millis, 1000)
     private var initialized = false
+    private var responded = false
 
     fun setSelectedItemPosition(position: Int) {
         _uiState.update { it.copy(selectedItemPosition = position) }
@@ -112,23 +116,49 @@ class SuRequestViewModel(
                 isSharedUid = isSharedUid,
                 selectedItemPosition = selectedPos,
                 useTapjackProtection = Config.suTapjack,
+                grantEnabled = false,
             )
+        }
+        viewModelScope.launch {
+            delay(1000)
+            _uiState.update { it.copy(grantEnabled = true) }
         }
         timer.start()
         initialized = true
     }
 
+    fun activityDestroyed() {
+        if (initialized && !responded) {
+            respond(DENY)
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        timer.cancel()
+        if (initialized && !responded) {
+            responded = true
+            val pos = _uiState.value.selectedItemPosition
+            runBlocking(Dispatchers.IO) {
+                handler.respond(DENY, Config.Value.TIMEOUT_LIST[pos])
+            }
+        }
+    }
+
     private fun respond(action: Int) {
-        if (!initialized) return
+        if (!initialized || responded) return
+        responded = true
         timer.cancel()
 
         val pos = _uiState.value.selectedItemPosition
         val pkg = _uiState.value.packageName
         timeoutPrefs.edit { putInt(pkg, pos) }
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             handler.respond(action, Config.Value.TIMEOUT_LIST[pos])
-            finishActivity()
+            withContext(Dispatchers.Main) {
+                finishActivity()
+            }
         }
     }
 
@@ -138,14 +168,13 @@ class SuRequestViewModel(
     }
 
     private inner class SuTimer(
-        private val millis: Long,
+        millis: Long,
         interval: Long
     ) : CountDownTimer(millis, interval) {
 
         override fun onTick(remains: Long) {
             _uiState.update {
                 it.copy(
-                    grantEnabled = it.grantEnabled || remains <= millis - 1000,
                     denyCountdown = (remains / 1000).toInt() + 1
                 )
             }
