@@ -25,6 +25,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -126,7 +127,7 @@ fun SuperuserDetailScreen(
         ) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(24.dp),
+                shape = RoundedCornerShape(20.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
             ) {
                 Row(
@@ -177,12 +178,14 @@ fun SuperuserDetailScreen(
                         checked = item.isRestricted,
                         onCheckedChange = { viewModel.toggleRestrict(item) }
                     )
+                    HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
                 }
                 SettingsSwitch(
                     title = stringResource(CoreR.string.superuser_toggle_notification),
                     checked = item.notification,
                     onCheckedChange = { viewModel.updateNotify(item) }
                 )
+                HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
                 SettingsSwitch(
                     title = stringResource(CoreR.string.logs),
                     checked = item.logging,
@@ -218,12 +221,12 @@ private fun RevokeButton(
 ) {
     Button(
         onClick = onClick,
-        colors = ButtonDefaults.buttonColors(
+        colors = ButtonDefaults.filledTonalButtonColors(
             containerColor = MaterialTheme.colorScheme.errorContainer,
             contentColor = MaterialTheme.colorScheme.onErrorContainer
         ),
-        shape = RoundedCornerShape(20.dp),
-        contentPadding = PaddingValues(vertical = 12.dp),
+        shape = ButtonDefaults.shape,
+        contentPadding = ButtonDefaults.ButtonWithIconContentPadding,
         modifier = modifier.fillMaxWidth()
     ) {
         Icon(
