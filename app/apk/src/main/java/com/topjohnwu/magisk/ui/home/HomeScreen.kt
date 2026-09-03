@@ -843,7 +843,7 @@ private fun DevelopersCard(
                         style = MaterialTheme.typography.bodyLarge
                     )
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         dev.links.forEach { link ->
                             IconButton(onClick = { onLinkClicked(link.url) }) {

@@ -385,11 +385,15 @@ fun Modifier.verticalScrollbar(
                     LayoutDirection.Ltr -> down.position.x >= (width - paddingEnd - hitWidthPx)
                 }
 
-                if (isHit && down.position.y in paddingTop..(height - paddingBottom)) {
+                val trackHeight = height - paddingTop - paddingBottom
+                val thumbH = (trackHeight * adapter.thumbRatio).coerceAtLeast(minThumbHeightPx)
+                val thumbOffset = paddingTop + (trackHeight - thumbH) * adapter.offsetRatio
+                val hitPaddingY = 16.dp.toPx()
+                val isOverThumb = down.position.y in (thumbOffset - hitPaddingY)..(thumbOffset + thumbH + hitPaddingY)
+
+                if (alphaAnim.value > 0f && isHit && isOverThumb) {
                     down.consume()
                     isDragging = true
-                    val trackHeight = height - paddingTop - paddingBottom
-                    val thumbH = (trackHeight * adapter.thumbRatio).coerceAtLeast(minThumbHeightPx)
                     val initialFraction = calculateFraction(down.position.y, height, thumbH)
                     dragFraction = initialFraction
 
@@ -522,11 +526,20 @@ fun Modifier.horizontalScrollbar(
 
                 val isHit = down.position.y >= (height - paddingBottom - hitHeightPx)
 
-                if (isHit && down.position.x in paddingStart..(width - paddingEnd)) {
+                val trackWidth = width - paddingStart - paddingEnd
+                val thumbW = (trackWidth * adapter.thumbRatio).coerceAtLeast(minThumbWidthPx)
+                val offset = (trackWidth - thumbW) * adapter.offsetRatio
+                val thumbLeft = when (layoutDirection) {
+                    LayoutDirection.Ltr -> paddingStart + offset
+                    LayoutDirection.Rtl -> width - paddingEnd - offset - thumbW
+                }
+                val thumbRight = thumbLeft + thumbW
+                val hitPaddingX = 16.dp.toPx()
+                val isOverThumb = down.position.x in (thumbLeft - hitPaddingX)..(thumbRight + hitPaddingX)
+
+                if (alphaAnim.value > 0f && isHit && isOverThumb) {
                     down.consume()
                     isDragging = true
-                    val trackWidth = width - paddingStart - paddingEnd
-                    val thumbW = (trackWidth * adapter.thumbRatio).coerceAtLeast(minThumbWidthPx)
                     val initialFraction = calculateFraction(down.position.x, width, thumbW)
                     dragFraction = initialFraction
 
