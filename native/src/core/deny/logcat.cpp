@@ -277,6 +277,7 @@ static void process_events_buffer(struct log_msg *msg) {
                     break;
                 case LOG_ID_MAIN:
                     process_main_buffer(&msg);
+                    break;
                 default:
                     break;
             }
