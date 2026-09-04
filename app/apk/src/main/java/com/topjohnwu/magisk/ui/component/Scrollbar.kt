@@ -29,6 +29,7 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Dp
@@ -72,7 +73,7 @@ fun rememberScrollbarAdapter(scrollState: ScrollState): ScrollbarStateAdapter {
                 }
 
             override suspend fun drag(block: suspend (onScroll: suspend (Float) -> Unit) -> Unit) {
-                scrollState.scroll(MutatePriority.UserInput) {
+                scrollState.scroll(MutatePriority.PreventUserInput) {
                     block { fraction ->
                         val target = (fraction.coerceIn(0f, 1f) * scrollState.maxValue).roundToInt()
                         scrollBy((target - scrollState.value).toFloat())
@@ -82,7 +83,7 @@ fun rememberScrollbarAdapter(scrollState: ScrollState): ScrollbarStateAdapter {
 
             override suspend fun scrollTo(fraction: Float) {
                 val target = (fraction.coerceIn(0f, 1f) * scrollState.maxValue).roundToInt()
-                scrollState.scroll(MutatePriority.UserInput) {
+                scrollState.scroll(MutatePriority.PreventUserInput) {
                     scrollBy((target - scrollState.value).toFloat())
                 }
             }
@@ -135,22 +136,35 @@ fun rememberScrollbarAdapter(lazyListState: LazyListState): ScrollbarStateAdapte
                     return (currentOffset / maxOffset).coerceIn(0f, 1f)
                 }
 
+            private fun calculateTarget(fraction: Float): Pair<Int, Int>? {
+                val layoutInfo = lazyListState.layoutInfo
+                val totalItems = layoutInfo.totalItemsCount
+                val visibleItems = layoutInfo.visibleItemsInfo
+                if (totalItems == 0 || visibleItems.isEmpty()) return null
+                val viewportHeight = (layoutInfo.viewportEndOffset - layoutInfo.viewportStartOffset).toFloat()
+                val avgItemSize = visibleItems.sumOf { it.size }.toFloat() / visibleItems.size
+                val totalEstimatedHeight = avgItemSize * totalItems
+                val maxOffset = (totalEstimatedHeight - viewportHeight).coerceAtLeast(0f)
+                val targetScrollOffset = fraction.coerceIn(0f, 1f) * maxOffset
+                val exactItem = if (avgItemSize > 0f) targetScrollOffset / avgItemSize else 0f
+                val targetIndex = exactItem.toInt().coerceIn(0, totalItems - 1)
+                val remainder = exactItem - targetIndex
+                val offset = (remainder * avgItemSize).roundToInt().coerceAtLeast(0)
+                return Pair(targetIndex, offset)
+            }
+
             override suspend fun drag(block: suspend (onScroll: suspend (Float) -> Unit) -> Unit) {
-                lazyListState.scroll(MutatePriority.UserInput) {}
+                lazyListState.scroll(MutatePriority.PreventUserInput) {}
                 block { fraction ->
-                    val totalItems = lazyListState.layoutInfo.totalItemsCount
-                    if (totalItems > 0) {
-                        val targetIndex = (fraction.coerceIn(0f, 1f) * (totalItems - 1)).roundToInt().coerceIn(0, totalItems - 1)
-                        lazyListState.scrollToItem(targetIndex)
+                    calculateTarget(fraction)?.let { (index, offset) ->
+                        lazyListState.scrollToItem(index, offset)
                     }
                 }
             }
 
             override suspend fun scrollTo(fraction: Float) {
-                val totalItems = lazyListState.layoutInfo.totalItemsCount
-                if (totalItems > 0) {
-                    val targetIndex = (fraction.coerceIn(0f, 1f) * (totalItems - 1)).roundToInt().coerceIn(0, totalItems - 1)
-                    lazyListState.scrollToItem(targetIndex)
+                calculateTarget(fraction)?.let { (index, offset) ->
+                    lazyListState.scrollToItem(index, offset)
                 }
             }
         }
@@ -376,7 +390,7 @@ fun Modifier.verticalScrollbar(
             }
 
             awaitEachGesture {
-                val down = awaitFirstDown(requireUnconsumed = false)
+                val down = awaitFirstDown(pass = PointerEventPass.Initial, requireUnconsumed = false)
                 val width = size.width.toFloat()
                 val height = size.height.toFloat()
 
@@ -387,13 +401,13 @@ fun Modifier.verticalScrollbar(
 
                 val trackHeight = height - paddingTop - paddingBottom
                 val thumbH = (trackHeight * adapter.thumbRatio).coerceAtLeast(minThumbHeightPx)
-                val thumbOffset = paddingTop + (trackHeight - thumbH) * adapter.offsetRatio
-                val hitPaddingY = 16.dp.toPx()
-                val isOverThumb = down.position.y in (thumbOffset - hitPaddingY)..(thumbOffset + thumbH + hitPaddingY)
+                val availableHeight = trackHeight - thumbH
+                if (availableHeight <= 0f) return@awaitEachGesture
 
-                if (alphaAnim.value > 0f && isHit && isOverThumb) {
+                if (isHit && down.position.y in paddingTop..(height - paddingBottom)) {
                     down.consume()
                     isDragging = true
+                    coroutineScope.launch { alphaAnim.snapTo(1f) }
                     val initialFraction = calculateFraction(down.position.y, height, thumbH)
                     dragFraction = initialFraction
 
@@ -411,16 +425,18 @@ fun Modifier.verticalScrollbar(
                     val pointerId = down.id
                     try {
                         while (true) {
-                            val event = awaitPointerEvent()
+                            val event = awaitPointerEvent(pass = PointerEventPass.Initial)
                             val change = event.changes.firstOrNull { it.id == pointerId } ?: break
                             if (!change.pressed) break
                             change.consume()
+
                             val fraction = calculateFraction(change.position.y, height, thumbH)
                             dragFraction = fraction
                             channel.trySend(fraction)
                         }
                     } finally {
                         channel.close()
+                        job.cancel()
                         isDragging = false
                     }
                 }
@@ -520,7 +536,7 @@ fun Modifier.horizontalScrollbar(
             }
 
             awaitEachGesture {
-                val down = awaitFirstDown(requireUnconsumed = false)
+                val down = awaitFirstDown(pass = PointerEventPass.Initial, requireUnconsumed = false)
                 val width = size.width.toFloat()
                 val height = size.height.toFloat()
 
@@ -528,18 +544,13 @@ fun Modifier.horizontalScrollbar(
 
                 val trackWidth = width - paddingStart - paddingEnd
                 val thumbW = (trackWidth * adapter.thumbRatio).coerceAtLeast(minThumbWidthPx)
-                val offset = (trackWidth - thumbW) * adapter.offsetRatio
-                val thumbLeft = when (layoutDirection) {
-                    LayoutDirection.Ltr -> paddingStart + offset
-                    LayoutDirection.Rtl -> width - paddingEnd - offset - thumbW
-                }
-                val thumbRight = thumbLeft + thumbW
-                val hitPaddingX = 16.dp.toPx()
-                val isOverThumb = down.position.x in (thumbLeft - hitPaddingX)..(thumbRight + hitPaddingX)
+                val availableWidth = trackWidth - thumbW
+                if (availableWidth <= 0f) return@awaitEachGesture
 
-                if (alphaAnim.value > 0f && isHit && isOverThumb) {
+                if (isHit && down.position.x in paddingStart..(width - paddingEnd)) {
                     down.consume()
                     isDragging = true
+                    coroutineScope.launch { alphaAnim.snapTo(1f) }
                     val initialFraction = calculateFraction(down.position.x, width, thumbW)
                     dragFraction = initialFraction
 
@@ -557,16 +568,18 @@ fun Modifier.horizontalScrollbar(
                     val pointerId = down.id
                     try {
                         while (true) {
-                            val event = awaitPointerEvent()
+                            val event = awaitPointerEvent(pass = PointerEventPass.Initial)
                             val change = event.changes.firstOrNull { it.id == pointerId } ?: break
                             if (!change.pressed) break
                             change.consume()
+
                             val fraction = calculateFraction(change.position.x, width, thumbW)
                             dragFraction = fraction
                             channel.trySend(fraction)
                         }
                     } finally {
                         channel.close()
+                        job.cancel()
                         isDragging = false
                     }
                 }
