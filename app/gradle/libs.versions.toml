@@ -1,7 +1,7 @@
 [versions]
 kotlin = "2.4.10"
-android = "9.3.2"
-android-tools = "32.3.2"
+android = "9.4.0"
+android-tools = "32.4.0"
 ksp = "2.3.11"
 rikka = "1.3.0"
 navigation = "2.10.0"
