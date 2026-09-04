@@ -2,25 +2,39 @@ package com.topjohnwu.magisk.ui
 
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivity
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ShortNavigationBar
 import androidx.compose.material3.ShortNavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.VMFactory
@@ -70,6 +84,8 @@ fun MainScreen(
     }
     val initialPage = visibleTabs.indexOf(Tab.entries[initialTab]).coerceAtLeast(0)
     val pagerState = rememberPagerState(initialPage = initialPage, pageCount = { visibleTabs.size })
+    var moduleFabAction by remember { mutableStateOf<(() -> Unit)?>(null) }
+    val isModulesTab = visibleTabs.getOrNull(pagerState.currentPage) == Tab.MODULES
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -87,6 +103,25 @@ fun MainScreen(
                             )
                         },
                         label = { Text(stringResource(tab.titleRes)) },
+                    )
+                }
+            }
+        },
+        floatingActionButton = {
+            AnimatedVisibility(
+                visible = isModulesTab && moduleFabAction != null,
+                enter = scaleIn() + fadeIn(),
+                exit = scaleOut() + fadeOut(),
+            ) {
+                FloatingActionButton(
+                    onClick = { moduleFabAction?.invoke() },
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = stringResource(CoreR.string.module_action_install_external),
+                        modifier = Modifier.size(28.dp),
                     )
                 }
             }
@@ -144,7 +179,10 @@ fun MainScreen(
                         if (isCurrentPage) vm.startLoading()
                     }
                     CollectNavEvents(vm, navigator)
-                    ModuleScreen(vm)
+                    ModuleScreen(
+                        viewModel = vm,
+                        onRegisterFab = { moduleFabAction = it },
+                    )
                 }
                 Tab.SETTINGS -> {
                     val vm: SettingsViewModel = viewModel(factory = VMFactory)

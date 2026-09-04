@@ -46,6 +46,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -86,7 +87,8 @@ import com.topjohnwu.magisk.core.R as CoreR
 @Composable
 fun ModuleScreen(
     viewModel: ModuleViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onRegisterFab: (((() -> Unit)?) -> Unit)? = null,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -119,6 +121,13 @@ fun ModuleScreen(
         }
     }
 
+    DisposableEffect(onRegisterFab) {
+        onRegisterFab?.invoke { filePicker.launch("application/zip") }
+        onDispose {
+            onRegisterFab?.invoke(null)
+        }
+    }
+
     if (showOnlineDialog && pendingOnlineModule != null) {
         OnlineModuleDialog(
             item = pendingOnlineModule!!,
@@ -148,18 +157,20 @@ fun ModuleScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { filePicker.launch("application/zip") },
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                content = {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = stringResource(CoreR.string.module_action_install_external),
-                        modifier = Modifier.size(28.dp),
-                    )
-                },
-            )
+            if (onRegisterFab == null) {
+                FloatingActionButton(
+                    onClick = { filePicker.launch("application/zip") },
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    content = {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = stringResource(CoreR.string.module_action_install_external),
+                            modifier = Modifier.size(28.dp),
+                        )
+                    },
+                )
+            }
         }
     ) { padding ->
         if (uiState.loading) {
@@ -210,9 +221,8 @@ fun ModuleScreen(
                 .fillMaxSize()
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
                 .padding(padding)
-                .verticalScrollbar(listState, contentPadding = PaddingValues(top = 4.dp, bottom = 80.dp))
-                .padding(horizontal = 12.dp),
-            contentPadding = PaddingValues(top = 4.dp, bottom = 80.dp),
+                .verticalScrollbar(listState, contentPadding = PaddingValues(top = 4.dp, bottom = 80.dp)),
+            contentPadding = PaddingValues(start = 12.dp, top = 4.dp, end = 12.dp, bottom = 80.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             item { Spacer(Modifier.height(4.dp)) }

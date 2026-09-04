@@ -64,6 +64,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.state.ToggleableState
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
@@ -160,7 +161,8 @@ fun DenyListScreen(
                         }
                         DropdownMenu(
                             expanded = showFilterMenu,
-                            onDismissRequest = { showFilterMenu = false }
+                            onDismissRequest = { showFilterMenu = false },
+                            offset = DpOffset(x = (-8).dp, y = 0.dp),
                         ) {
                             DropdownMenuItem(
                                 text = { Text(stringResource(CoreR.string.show_system_app)) },
@@ -222,9 +224,8 @@ fun DenyListScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .nestedScroll(scrollBehavior.nestedScrollConnection)
-                        .verticalScrollbar(listState, contentPadding = PaddingValues(vertical = 8.dp))
-                        .padding(horizontal = 12.dp),
-                    contentPadding = PaddingValues(vertical = 8.dp),
+                        .verticalScrollbar(listState, contentPadding = PaddingValues(vertical = 8.dp)),
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(
@@ -296,9 +297,7 @@ private fun DenyAppCard(
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp)),
+        modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
     ) {
