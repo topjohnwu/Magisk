@@ -276,13 +276,19 @@ fun LoadingDialog(
 fun MagiskDialog(
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
+    dismissOnClickOutside: Boolean = true,
+    dismissOnBackPress: Boolean = true,
     title: @Composable (() -> Unit)? = null,
     confirmButton: @Composable (() -> Unit)? = null,
     dismissButton: @Composable (() -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
     AlertDialog(
-        properties = DialogProperties(usePlatformDefaultWidth = false),
+        properties = DialogProperties(
+            dismissOnClickOutside = dismissOnClickOutside,
+            dismissOnBackPress = dismissOnBackPress,
+            usePlatformDefaultWidth = false
+        ),
         modifier = modifier
             .windowInsetsPadding(WindowInsets.systemBars)
             .padding(horizontal = 24.dp, vertical = 24.dp)
@@ -310,6 +316,8 @@ fun MagiskDialog(
     onDismissRequest: () -> Unit,
     title: String? = null,
     modifier: Modifier = Modifier,
+    dismissOnClickOutside: Boolean = true,
+    dismissOnBackPress: Boolean = true,
     confirmText: String? = null,
     onConfirm: (() -> Unit)? = null,
     confirmEnabled: Boolean = true,
@@ -325,6 +333,8 @@ fun MagiskDialog(
             { Text(text = title, style = MaterialTheme.typography.titleLarge) }
         } else null,
         modifier = modifier,
+        dismissOnClickOutside = dismissOnClickOutside,
+        dismissOnBackPress = dismissOnBackPress,
         confirmButton = if (confirmText != null || onConfirm != null) {
             {
                 TextButton(

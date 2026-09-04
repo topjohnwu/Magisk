@@ -82,6 +82,7 @@ fun SuRequestScreen(
 
     MagiskDialog(
         modifier = modifier,
+        dismissOnClickOutside = false,
         onDismissRequest = { viewModel.denyPressed() },
         title = {
             Row(
