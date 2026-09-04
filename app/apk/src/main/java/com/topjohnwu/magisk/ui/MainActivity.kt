@@ -151,7 +151,7 @@ class MainActivity : ComponentActivity(), SplashScreenHost {
                                             vm.startFlashing()
                                         }
                                     }
-                                    FlashScreen(vm, action = key.action, onBack = { navigator.pop() })
+                                    FlashScreen(vm, onBack = { navigator.pop() })
                                 }
                                 entry<Route.SuperuserDetail> { key ->
                                     val vm: SuperuserViewModel = viewModel(
