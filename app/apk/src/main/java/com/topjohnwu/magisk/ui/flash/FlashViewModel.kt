@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.ui.flash
 
 import android.net.Uri
-import androidx.compose.runtime.mutableStateListOf
 import androidx.core.net.toFile
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.arch.BaseViewModel
@@ -50,8 +49,6 @@ class FlashViewModel : BaseViewModel() {
     var flashAction: String = ""
     var flashUri: Uri? = null
 
-    // --- TerminalScreen mode (FLASH_ZIP) ---
-
     private var emulator: TerminalEmulator? = null
     private val emulatorReady = CompletableDeferred<TerminalEmulator>()
 
@@ -60,29 +57,27 @@ class FlashViewModel : BaseViewModel() {
         emulatorReady.complete(emu)
     }
 
-    // --- LazyColumn mode (MagiskInstaller) ---
-
-    val consoleItems = mutableStateListOf<String>()
     private val logItems = mutableListOf<String>().synchronized()
     private val outItems = object : CallbackList<String>() {
         override fun onAddElement(e: String?) {
             e ?: return
-            consoleItems.add(e)
+            emulator?.appendLineOnMain(e)
             logItems.add(e)
         }
     }
 
-    // --- Shared ---
+    // --- Actions ---
 
     fun startFlashing() {
         val action = flashAction
         val uri = flashUri
 
         viewModelScope.launch {
+            val emu = emulatorReady.await()
             when (action) {
                 Const.Value.FLASH_ZIP -> {
                     uri ?: return@launch
-                    flashZip(uri)
+                    flashZip(emu, uri)
                 }
                 Const.Value.UNINSTALL -> {
                     _showReboot.value = false
@@ -126,9 +121,7 @@ class FlashViewModel : BaseViewModel() {
         _flashState.value = if (success) State.SUCCESS else State.FAILED
     }
 
-    private suspend fun flashZip(uri: Uri) {
-        val emu = emulatorReady.await()
-
+    private suspend fun flashZip(emu: TerminalEmulator, uri: Uri) {
         val installDir = File(AppContext.cacheDir, "flash")
         val result = withContext(Dispatchers.IO) {
             try {
@@ -191,7 +184,7 @@ class FlashViewModel : BaseViewModel() {
             val file = MediaStoreUtils.getFile(name)
             file.uri.outputStream().bufferedWriter().use { writer ->
                 val transcript = emulator?.screen?.transcriptText
-                if (transcript != null) {
+                if (flashAction == Const.Value.FLASH_ZIP && transcript != null) {
                     writer.write(transcript)
                 } else {
                     synchronized(logItems) {

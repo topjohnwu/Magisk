@@ -1,38 +1,24 @@
 package com.topjohnwu.magisk.ui.flash
 
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.ui.component.rememberExternalStoragePermissionLauncher
-import com.topjohnwu.magisk.ui.component.verticalScrollbar
 import com.topjohnwu.magisk.ui.terminal.TerminalScreen
 import com.topjohnwu.magisk.core.R as CoreR
 
@@ -40,14 +26,12 @@ import com.topjohnwu.magisk.core.R as CoreR
 @Composable
 fun FlashScreen(
     viewModel: FlashViewModel,
-    action: String,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val flashState by viewModel.flashState.collectAsStateWithLifecycle()
     val showReboot by viewModel.showReboot.collectAsStateWithLifecycle()
     val finished = flashState != FlashViewModel.State.FLASHING
-    val useTerminal = action == Const.Value.FLASH_ZIP
     val saveLog = rememberExternalStoragePermissionLauncher {
         viewModel.saveLog()
     }
@@ -100,43 +84,11 @@ fun FlashScreen(
             )
         }
     ) { padding ->
-        if (useTerminal) {
-            TerminalScreen(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding),
-                onEmulatorCreated = { viewModel.onEmulatorCreated(it) },
-            )
-        } else {
-            val items = viewModel.consoleItems
-            val listState = rememberLazyListState()
-
-            LaunchedEffect(items.size) {
-                if (items.isNotEmpty()) {
-                    listState.animateScrollToItem(items.size - 1)
-                }
-            }
-
-            LazyColumn(
-                state = listState,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .verticalScrollbar(listState, contentPadding = PaddingValues(vertical = 4.dp))
-                    .horizontalScroll(rememberScrollState())
-                    .padding(horizontal = 8.dp, vertical = 4.dp)
-            ) {
-                itemsIndexed(items) { _, line ->
-                    Text(
-                        text = line,
-                        fontFamily = FontFamily.Monospace,
-                        fontSize = 12.sp,
-                        lineHeight = 16.sp,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            }
-        }
+        TerminalScreen(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding),
+            onEmulatorCreated = { viewModel.onEmulatorCreated(it) },
+        )
     }
 }
