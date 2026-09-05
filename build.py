@@ -9,6 +9,7 @@ import stat
 import subprocess
 import sys
 import tarfile
+import time
 import urllib.request
 from pathlib import Path
 from zipfile import ZipFile
@@ -518,6 +519,50 @@ def cargo_cli():
         sys.exit(proc.returncode)
 
 
+class ProgressStream:
+    """Wrapper around a stream that tracks read bytes and reports progress."""
+
+    def __init__(self, response, total_size: int):
+        self.response = response
+        self.total = total_size
+        self.read_bytes = 0
+        self.last_update = 0.0
+        self.is_tty = sys.stdout.isatty()
+
+    def read(self, size: int = -1) -> bytes:
+        chunk = self.response.read(size)
+        if chunk:
+            self.read_bytes += len(chunk)
+            self._update()
+        return chunk
+
+    def _update(self):
+        now = time.time()
+        if self.is_tty and (
+            now - self.last_update >= 0.1 or self.read_bytes >= self.total
+        ):
+            self.last_update = now
+            read_mb = self.read_bytes / (1024 * 1024)
+            if self.total > 0:
+                total_mb = self.total / (1024 * 1024)
+                pct = (self.read_bytes / self.total) * 100
+                bar_len = 30
+                filled = min(bar_len, int(bar_len * self.read_bytes / self.total))
+                bar = "=" * filled + (">" if filled < bar_len else "")
+                bar = bar.ljust(bar_len)
+                print(
+                    f"\r[{bar}] {pct:5.1f}% ({read_mb:5.1f} / {total_mb:.1f} MB)",
+                    end="",
+                    flush=True,
+                )
+            else:
+                print(f"\rDownloading: {read_mb:.1f} MB", end="", flush=True)
+
+    def finish(self):
+        if self.is_tty:
+            print()
+
+
 def setup_ndk():
     url = f"https://github.com/topjohnwu/ondk/releases/download/{ondk_version}/ondk-{ondk_version}-{os_name}.tar.xz"
     ndk_archive = url.split("/")[-1]
@@ -526,11 +571,16 @@ def setup_ndk():
     header(f"* Downloading and extracting {ndk_archive}")
     rm_rf(ondk_path)
     with urllib.request.urlopen(url) as response:
-        with tarfile.open(mode="r|xz", fileobj=response) as tar:
-            if hasattr(tarfile, "data_filter"):
-                tar.extractall(paths().ndk.parent, filter="tar")
-            else:
-                tar.extractall(paths().ndk.parent)
+        total_size = int(response.headers.get("Content-Length", 0))
+        progress = ProgressStream(response, total_size)
+        try:
+            with tarfile.open(mode="r|xz", fileobj=progress) as tar:
+                if hasattr(tarfile, "data_filter"):
+                    tar.extractall(paths().ndk.parent, filter="tar")
+                else:
+                    tar.extractall(paths().ndk.parent)
+        finally:
+            progress.finish()
 
     rm_rf(paths().ndk)
     mv(ondk_path, paths().ndk)
