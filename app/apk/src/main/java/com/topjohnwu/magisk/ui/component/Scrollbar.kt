@@ -380,14 +380,7 @@ fun Modifier.verticalScrollbar(
             val paddingEnd = contentPadding.calculateEndPadding(layoutDirection).toPx()
             val hitWidthPx = hitTargetWidth.toPx()
             val minThumbHeightPx = minThumbHeight.toPx()
-
-            fun calculateFraction(y: Float, height: Float, thumbH: Float): Float {
-                val trackHeight = height - paddingTop - paddingBottom
-                val availableHeight = trackHeight - thumbH
-                return if (availableHeight > 0f) {
-                    ((y - paddingTop - thumbH / 2f) / availableHeight).coerceIn(0f, 1f)
-                } else 0f
-            }
+            val hitPaddingY = 16.dp.toPx()
 
             awaitEachGesture {
                 val down = awaitFirstDown(pass = PointerEventPass.Initial, requireUnconsumed = false)
@@ -404,11 +397,22 @@ fun Modifier.verticalScrollbar(
                 val availableHeight = trackHeight - thumbH
                 if (availableHeight <= 0f) return@awaitEachGesture
 
-                if (isHit && down.position.y in paddingTop..(height - paddingBottom)) {
+                val thumbTop = paddingTop + availableHeight * adapter.offsetRatio
+                val isOverThumb = down.position.y in (thumbTop - hitPaddingY)..(thumbTop + thumbH + hitPaddingY)
+
+                if (alphaAnim.value > 0f && isHit && isOverThumb) {
                     down.consume()
                     isDragging = true
                     coroutineScope.launch { alphaAnim.snapTo(1f) }
-                    val initialFraction = calculateFraction(down.position.y, height, thumbH)
+
+                    val grabOffsetY = down.position.y - thumbTop
+
+                    fun calculateFraction(y: Float): Float {
+                        val targetThumbTop = y - grabOffsetY
+                        return ((targetThumbTop - paddingTop) / availableHeight).coerceIn(0f, 1f)
+                    }
+
+                    val initialFraction = calculateFraction(down.position.y)
                     dragFraction = initialFraction
 
                     val channel = Channel<Float>(Channel.CONFLATED)
@@ -430,7 +434,7 @@ fun Modifier.verticalScrollbar(
                             if (!change.pressed) break
                             change.consume()
 
-                            val fraction = calculateFraction(change.position.y, height, thumbH)
+                            val fraction = calculateFraction(change.position.y)
                             dragFraction = fraction
                             channel.trySend(fraction)
                         }
@@ -522,18 +526,7 @@ fun Modifier.horizontalScrollbar(
             val paddingEnd = contentPadding.calculateEndPadding(layoutDirection).toPx()
             val hitHeightPx = hitTargetHeight.toPx()
             val minThumbWidthPx = minThumbWidth.toPx()
-
-            fun calculateFraction(x: Float, width: Float, thumbW: Float): Float {
-                val trackWidth = width - paddingStart - paddingEnd
-                val availableWidth = trackWidth - thumbW
-                return if (availableWidth > 0f) {
-                    val rawX = when (layoutDirection) {
-                        LayoutDirection.Ltr -> x - paddingStart - thumbW / 2f
-                        LayoutDirection.Rtl -> (width - paddingEnd - x) - thumbW / 2f
-                    }
-                    (rawX / availableWidth).coerceIn(0f, 1f)
-                } else 0f
-            }
+            val hitPaddingX = 16.dp.toPx()
 
             awaitEachGesture {
                 val down = awaitFirstDown(pass = PointerEventPass.Initial, requireUnconsumed = false)
@@ -547,11 +540,31 @@ fun Modifier.horizontalScrollbar(
                 val availableWidth = trackWidth - thumbW
                 if (availableWidth <= 0f) return@awaitEachGesture
 
-                if (isHit && down.position.x in paddingStart..(width - paddingEnd)) {
+                val offset = availableWidth * adapter.offsetRatio
+                val thumbLeft = when (layoutDirection) {
+                    LayoutDirection.Ltr -> paddingStart + offset
+                    LayoutDirection.Rtl -> width - paddingEnd - offset - thumbW
+                }
+                val thumbRight = thumbLeft + thumbW
+                val isOverThumb = down.position.x in (thumbLeft - hitPaddingX)..(thumbRight + hitPaddingX)
+
+                if (alphaAnim.value > 0f && isHit && isOverThumb) {
                     down.consume()
                     isDragging = true
                     coroutineScope.launch { alphaAnim.snapTo(1f) }
-                    val initialFraction = calculateFraction(down.position.x, width, thumbW)
+
+                    val grabOffsetX = down.position.x - thumbLeft
+
+                    fun calculateFraction(x: Float): Float {
+                        val targetThumbLeft = x - grabOffsetX
+                        val rawOffset = when (layoutDirection) {
+                            LayoutDirection.Ltr -> targetThumbLeft - paddingStart
+                            LayoutDirection.Rtl -> width - paddingEnd - targetThumbLeft - thumbW
+                        }
+                        return (rawOffset / availableWidth).coerceIn(0f, 1f)
+                    }
+
+                    val initialFraction = calculateFraction(down.position.x)
                     dragFraction = initialFraction
 
                     val channel = Channel<Float>(Channel.CONFLATED)
@@ -573,7 +586,7 @@ fun Modifier.horizontalScrollbar(
                             if (!change.pressed) break
                             change.consume()
 
-                            val fraction = calculateFraction(change.position.x, width, thumbW)
+                            val fraction = calculateFraction(change.position.x)
                             dragFraction = fraction
                             channel.trySend(fraction)
                         }
