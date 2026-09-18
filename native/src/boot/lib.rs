@@ -80,7 +80,7 @@ pub mod ffi {
 
         fn check_fmt(buf: &[u8]) -> FileFormat;
         fn compress_bytes(format: FileFormat, in_bytes: &[u8], out_fd: i32);
-        fn decompress_bytes(format: FileFormat, in_bytes: &[u8], out_fd: i32);
+        fn decompress_bytes(format: FileFormat, in_bytes: &[u8], out_fd: i32) -> bool;
         fn fmt2name(fmt: FileFormat) -> *const c_char;
         fn fmt_compressed(fmt: FileFormat) -> bool;
         fn fmt_compressed_any(fmt: FileFormat) -> bool;

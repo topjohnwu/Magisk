@@ -270,14 +270,15 @@ pub fn compress_bytes(format: FileFormat, in_bytes: &[u8], out_fd: RawFd) {
     }();
 }
 
-pub fn decompress_bytes(format: FileFormat, in_bytes: &[u8], out_fd: RawFd) {
+pub fn decompress_bytes(format: FileFormat, in_bytes: &[u8], out_fd: RawFd) -> bool {
     let mut out_file = unsafe { ManuallyDrop::new(File::from_raw_fd(out_fd)) };
 
-    let _ = || -> LoggedResult<()> {
+    (|| -> LoggedResult<()> {
         let mut decoder = get_decoder(format, in_bytes)?;
         std::io::copy(decoder.as_mut(), out_file.deref_mut())?;
         Ok(())
-    }();
+    })()
+    .is_ok()
 }
 
 // Command-line entry points
