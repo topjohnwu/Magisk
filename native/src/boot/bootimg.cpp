@@ -28,8 +28,8 @@ static int find_dtb_offset(const void *buf, size_t len) {
     return find_dtb_offset({static_cast<const uint8_t *>(buf), len});
 }
 
-static void decompress(FileFormat type, int fd, const void *in, size_t size) {
-    decompress_bytes(type, byte_view { in, size }, fd);
+static bool decompress(FileFormat type, int fd, const void *in, size_t size) {
+    return decompress_bytes(type, byte_view { in, size }, fd);
 }
 
 static off_t compress_len(FileFormat type, byte_view in, int fd) {
@@ -472,7 +472,11 @@ int split_image_dtb(Utf8CStr filename, bool skip_decomp) {
         FileFormat fmt = check_fmt_lg(img.data(), img.size());
         if (!skip_decomp && fmt_compressed(fmt)) {
             int fd = creat(KERNEL_FILE, 0644);
-            decompress(fmt, fd, img.data(), off);
+            if (!decompress(fmt, fd, img.data(), off)) {
+                close(fd);
+                unlink(KERNEL_FILE);
+                return 1;
+            }
             close(fd);
         } else {
             dump(img.data(), off, KERNEL_FILE);
@@ -495,7 +499,11 @@ int unpack(Utf8CStr image, bool skip_decomp, bool hdr) {
     if (!skip_decomp && fmt_compressed(boot.k_fmt)) {
         if (boot.hdr->kernel_size() != 0) {
             int fd = creat(KERNEL_FILE, 0644);
-            decompress(boot.k_fmt, fd, boot.kernel, boot.hdr->kernel_size());
+            if (!decompress(boot.k_fmt, fd, boot.kernel, boot.hdr->kernel_size())) {
+                close(fd);
+                unlink(KERNEL_FILE);
+                return RETURN_ERROR;
+            }
             close(fd);
         }
     } else {
@@ -519,7 +527,10 @@ int unpack(Utf8CStr image, bool skip_decomp, bool hdr) {
             owned_fd fd = xopenat(dirfd, file_name, O_CREAT | O_TRUNC | O_WRONLY | O_CLOEXEC, 0644);
             FileFormat fmt = check_fmt_lg(boot.ramdisk + it.ramdisk_offset, it.ramdisk_size);
             if (!skip_decomp && fmt_compressed(fmt)) {
-                decompress(fmt, fd, boot.ramdisk + it.ramdisk_offset, it.ramdisk_size);
+                if (!decompress(fmt, fd, boot.ramdisk + it.ramdisk_offset, it.ramdisk_size)) {
+                    unlinkat(dirfd, file_name, 0);
+                    return RETURN_ERROR;
+                }
             } else {
                 xwrite(fd, boot.ramdisk + it.ramdisk_offset, it.ramdisk_size);
             }
@@ -527,7 +538,11 @@ int unpack(Utf8CStr image, bool skip_decomp, bool hdr) {
     } else if (!skip_decomp && fmt_compressed(boot.r_fmt)) {
         if (boot.hdr->ramdisk_size() != 0) {
             int fd = creat(RAMDISK_FILE, 0644);
-            decompress(boot.r_fmt, fd, boot.ramdisk, boot.hdr->ramdisk_size());
+            if (!decompress(boot.r_fmt, fd, boot.ramdisk, boot.hdr->ramdisk_size())) {
+                close(fd);
+                unlink(RAMDISK_FILE);
+                return RETURN_ERROR;
+            }
             close(fd);
         }
     } else {
@@ -541,7 +556,11 @@ int unpack(Utf8CStr image, bool skip_decomp, bool hdr) {
     if (!skip_decomp && fmt_compressed(boot.e_fmt)) {
         if (boot.hdr->extra_size() != 0) {
             int fd = creat(EXTRA_FILE, 0644);
-            decompress(boot.e_fmt, fd, boot.extra, boot.hdr->extra_size());
+            if (!decompress(boot.e_fmt, fd, boot.extra, boot.hdr->extra_size())) {
+                close(fd);
+                unlink(EXTRA_FILE);
+                return RETURN_ERROR;
+            }
             close(fd);
         }
     } else {
