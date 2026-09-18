@@ -1,25 +1,38 @@
 package com.topjohnwu.magisk.ui.component
 
+import android.text.Selection
+import android.text.Spannable
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
+import android.view.MotionEvent
+import android.view.ViewConfiguration
 import android.widget.TextView
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AlertDialog
+import androidx.compose.foundation.verticalScroll
+import kotlin.math.abs
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -281,34 +294,96 @@ fun MagiskDialog(
     title: @Composable (() -> Unit)? = null,
     confirmButton: @Composable (() -> Unit)? = null,
     dismissButton: @Composable (() -> Unit)? = null,
+    neutralButton: @Composable (() -> Unit)? = null,
+    scrollable: Boolean = false,
     content: @Composable () -> Unit,
 ) {
-    AlertDialog(
+    Dialog(
+        onDismissRequest = onDismissRequest,
         properties = DialogProperties(
             dismissOnClickOutside = dismissOnClickOutside,
             dismissOnBackPress = dismissOnBackPress,
             usePlatformDefaultWidth = false
-        ),
-        modifier = modifier
-            .windowInsetsPadding(WindowInsets.systemBars)
-            .padding(horizontal = 24.dp, vertical = 24.dp)
-            .widthIn(max = 560.dp),
-        onDismissRequest = onDismissRequest,
-        shape = RoundedCornerShape(28.dp),
-        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-        title = title,
-        text = {
-            ProvideTextStyle(value = MaterialTheme.typography.bodyMedium) {
-                content()
+        )
+    ) {
+        Surface(
+            shape = RoundedCornerShape(28.dp),
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+            tonalElevation = 6.dp,
+            modifier = modifier
+                .windowInsetsPadding(WindowInsets.systemBars)
+                .padding(horizontal = 24.dp, vertical = 24.dp)
+                .widthIn(min = 280.dp, max = 560.dp)
+        ) {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                title?.let {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 24.dp, end = 24.dp, top = 24.dp, bottom = 16.dp)
+                    ) {
+                        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+                            ProvideTextStyle(MaterialTheme.typography.titleLarge) {
+                                it()
+                            }
+                        }
+                    }
+                }
+                val hasButtons = confirmButton != null || dismissButton != null || neutralButton != null
+                val contentModifier = Modifier
+                    .weight(1f, fill = false)
+                    .fillMaxWidth()
+                    .then(
+                        if (scrollable) {
+                            val scrollState = rememberScrollState()
+                            Modifier
+                                .verticalScrollbar(
+                                    scrollState,
+                                    contentPadding = PaddingValues(top = 4.dp, bottom = 4.dp, end = 4.dp)
+                                )
+                                .verticalScroll(scrollState)
+                        } else Modifier
+                    )
+                    .padding(
+                        start = 24.dp,
+                        end = 24.dp,
+                        top = if (title == null) 24.dp else 0.dp,
+                        bottom = if (hasButtons) 0.dp else 24.dp
+                    )
+                Box(modifier = contentModifier) {
+                    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+                        ProvideTextStyle(MaterialTheme.typography.bodyMedium) {
+                            content()
+                        }
+                    }
+                }
+                if (hasButtons) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 24.dp, end = 24.dp, bottom = 24.dp, top = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        if (neutralButton != null) {
+                            neutralButton()
+                            Spacer(Modifier.weight(1f))
+                        } else {
+                            Spacer(Modifier.weight(1f))
+                        }
+                        if (dismissButton != null) {
+                            dismissButton()
+                        }
+                        if (dismissButton != null && confirmButton != null) {
+                            Spacer(Modifier.width(8.dp))
+                        }
+                        if (confirmButton != null) {
+                            confirmButton()
+                        }
+                    }
+                }
             }
-        },
-        confirmButton = {
-            confirmButton?.invoke()
-        },
-        dismissButton = dismissButton?.let {
-            { it() }
         }
-    )
+    }
 }
 
 @Composable
@@ -325,6 +400,7 @@ fun MagiskDialog(
     onDismiss: (() -> Unit)? = null,
     neutralText: String? = null,
     onNeutral: (() -> Unit)? = null,
+    scrollable: Boolean = false,
     content: @Composable () -> Unit,
 ) {
     MagiskDialog(
@@ -348,31 +424,27 @@ fun MagiskDialog(
                 }
             }
         } else null,
-        dismissButton = if (dismissText != null || onDismiss != null || neutralText != null || onNeutral != null) {
+        dismissButton = if (dismissText != null || onDismiss != null) {
             {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    if (onDismiss != null || dismissText != null) {
-                        TextButton(onClick = { onDismiss?.invoke() }) {
-                            Text(
-                                text = dismissText ?: stringResource(android.R.string.cancel),
-                                style = MaterialTheme.typography.labelLarge,
-                            )
-                        }
-                    }
-                    if (neutralText != null && onNeutral != null) {
-                        if (onDismiss != null || dismissText != null) {
-                            Spacer(Modifier.weight(1f))
-                        }
-                        TextButton(onClick = onNeutral) {
-                            Text(
-                                text = neutralText,
-                                style = MaterialTheme.typography.labelLarge,
-                            )
-                        }
-                    }
+                TextButton(onClick = { onDismiss?.invoke() }) {
+                    Text(
+                        text = dismissText ?: stringResource(android.R.string.cancel),
+                        style = MaterialTheme.typography.labelLarge,
+                    )
                 }
             }
         } else null,
+        neutralButton = if (neutralText != null && onNeutral != null) {
+            {
+                TextButton(onClick = onNeutral) {
+                    Text(
+                        text = neutralText,
+                        style = MaterialTheme.typography.labelLarge,
+                    )
+                }
+            }
+        } else null,
+        scrollable = scrollable,
         content = content
     )
 }
@@ -392,6 +464,7 @@ fun ConfirmDialogContent(
         onConfirm = confirm,
         dismissText = visuals.dismiss,
         onDismiss = dismiss,
+        scrollable = true,
     ) {
         visuals.content?.let { content ->
             if (visuals.markdown) {
@@ -400,6 +473,95 @@ fun ConfirmDialogContent(
                 Text(text = content)
             }
         }
+    }
+}
+
+private class LinkClickMovementMethod : LinkMovementMethod() {
+    private var downX = 0f
+    private var downY = 0f
+    private var isDragging = false
+
+    override fun onTouchEvent(widget: TextView, buffer: Spannable, event: MotionEvent): Boolean {
+        val touchSlop = ViewConfiguration.get(widget.context).scaledTouchSlop
+
+        when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                downX = event.x
+                downY = event.y
+                isDragging = false
+
+                val link = findClickableSpan(widget, buffer, event.x, event.y)
+                return if (link != null) {
+                    Selection.setSelection(buffer, buffer.getSpanStart(link), buffer.getSpanEnd(link))
+                    true
+                } else {
+                    Selection.removeSelection(buffer)
+                    false
+                }
+            }
+            MotionEvent.ACTION_MOVE -> {
+                if (!isDragging) {
+                    val dx = abs(event.x - downX)
+                    val dy = abs(event.y - downY)
+                    if (dx > touchSlop || dy > touchSlop) {
+                        isDragging = true
+                        Selection.removeSelection(buffer)
+                    }
+                }
+                return false
+            }
+            MotionEvent.ACTION_UP -> {
+                val hasSelection = Selection.getSelectionStart(buffer) != -1
+                Selection.removeSelection(buffer)
+                if (!isDragging && hasSelection) {
+                    val link = findClickableSpan(widget, buffer, downX, downY)
+                    if (link != null) {
+                        link.onClick(widget)
+                        return true
+                    }
+                }
+                return false
+            }
+            MotionEvent.ACTION_CANCEL -> {
+                Selection.removeSelection(buffer)
+                isDragging = false
+                return false
+            }
+        }
+        return false
+    }
+
+    private fun findClickableSpan(widget: TextView, buffer: Spannable, x: Float, y: Float): ClickableSpan? {
+        val xInt = (x - widget.totalPaddingLeft + widget.scrollX).toInt()
+        val yInt = (y - widget.totalPaddingTop + widget.scrollY).toInt()
+
+        val layout = widget.layout ?: return null
+        if (yInt < 0 || yInt >= layout.height) return null
+
+        val line = layout.getLineForVertical(yInt)
+        if (xInt < layout.getLineLeft(line) || xInt > layout.getLineRight(line)) {
+            return null
+        }
+
+        val offset = layout.getOffsetForHorizontal(line, xInt.toFloat())
+        val links = buffer.getSpans(offset, offset, ClickableSpan::class.java)
+        if (links.isEmpty()) return null
+
+        val link = links[0]
+        val start = buffer.getSpanStart(link)
+        val end = buffer.getSpanEnd(link)
+
+        val lineStart = layout.getLineStart(line)
+        val lineEnd = layout.getLineEnd(line)
+        val linkLineStart = maxOf(start, lineStart)
+        val linkLineEnd = minOf(end, lineEnd)
+
+        val left = layout.getPrimaryHorizontal(linkLineStart)
+        val right = layout.getPrimaryHorizontal(linkLineEnd)
+        val minX = minOf(left, right)
+        val maxX = maxOf(left, right)
+
+        return if (xInt in minX.toInt()..maxX.toInt()) link else null
     }
 }
 
@@ -412,18 +574,21 @@ fun MarkdownText(
 ) {
     val contentColorArgb = color.toArgb()
     val linkColorArgb = linkColor.toArgb()
+    val movementMethod = remember { LinkClickMovementMethod() }
     AndroidView(
         factory = { context ->
             TextView(context).apply {
                 setTextColor(contentColorArgb)
                 setLinkTextColor(linkColorArgb)
                 ServiceLocator.markwon.setMarkdown(this, text)
+                this.movementMethod = movementMethod
             }
         },
         update = { textView ->
             textView.setTextColor(contentColorArgb)
             textView.setLinkTextColor(linkColorArgb)
             ServiceLocator.markwon.setMarkdown(textView, text)
+            textView.movementMethod = movementMethod
         },
         modifier = modifier.fillMaxWidth()
     )

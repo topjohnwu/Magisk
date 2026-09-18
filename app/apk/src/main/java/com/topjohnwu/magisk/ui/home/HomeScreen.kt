@@ -905,6 +905,7 @@ private fun ManagerInstallComposableDialog(
         onConfirm = onInstall,
         dismissText = stringResource(android.R.string.cancel),
         onDismiss = onDismiss,
+        scrollable = true,
     ) {
         MarkdownTextAsync {
             val text = Info.update.note

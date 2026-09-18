@@ -460,6 +460,7 @@ private fun OnlineModuleDialog(
         onDismiss = onDismiss,
         neutralText = stringResource(CoreR.string.download),
         onNeutral = { onDownload(false) },
+        scrollable = true,
     ) {
         MarkdownTextAsync {
             val str = svc.fetchString(item.changelog)
