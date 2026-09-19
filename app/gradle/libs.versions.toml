@@ -1,23 +1,23 @@
 [versions]
-kotlin = "2.4.10"
-android = "9.4.0"
-android-tools = "32.4.0"
-ksp = "2.3.11"
+kotlin = "2.4.20"
+android = "9.4.1"
+android-tools = "32.4.1"
+ksp = "2.3.12"
 rikka = "1.3.0"
-navigation = "2.10.0"
+navigation = "2.10.1"
 libsu = "6.0.0"
 okhttp = "5.5.0"
 retrofit = "3.0.0"
-room = "2.8.4"
+room = "2.8.5"
 lifecycle = "2.11.0"
-compose-ui = "1.12.0"
+compose-ui = "1.12.1"
 compose-m3 = "1.4.0"
 navigation3 = "1.1.7"
 navigationevent = "1.1.2"
-wire = "6.4.7"
+wire = "7.0.3"
 
 [libraries]
-bcpkix = { module = "org.bouncycastle:bcpkix-jdk18on", version = "1.85" }
+bcpkix = { module = "org.bouncycastle:bcpkix-jdk18on", version = "1.86" }
 commons-compress = { module = "org.apache.commons:commons-compress", version = "1.28.0" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 retrofit-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "retrofit" }
