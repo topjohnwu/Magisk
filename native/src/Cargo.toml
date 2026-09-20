@@ -16,7 +16,7 @@ magiskpolicy = { path = "sepolicy" }
 cxx = { path = "external/cxx-rs" }
 cxx-gen = { path = "external/cxx-rs/gen/lib" }
 libc = "0.2.189"
-cfg-if = "1.0.4"
+cfg-if = "1.0.5"
 num-traits = "0.2.19"
 num-derive = "0.5.1"
 thiserror = "2.0.20"
@@ -26,7 +26,7 @@ bytemuck = "1.25.2"
 fdt = "0.2.0-alpha2"
 const_format = "0.2.36"
 bit-set = "0.11.1"
-syn = "3.0.4"
+syn = "3.0.6"
 quote = "1.0.47"
 proc-macro2 = "1.0.107"
 pb-rs = { version = "0.10.0", default-features = false }
@@ -34,9 +34,9 @@ quick-protobuf = "0.8.1"
 flate2 = { version = "1.1.10", default-features = false }
 bzip2 = "0.6.1"
 lz4 = "1.28.1"
-lzma-rust2 = { version = "0.20.1", default-features = false }
+lzma-rust2 = { version = "0.21.0", default-features = false }
 nix = "0.31.3"
-bitflags = "2.13.1"
+bitflags = "2.13.2"
 
 # Rust crypto crates are tied together
 sha1 = "0.11.0"
@@ -47,7 +47,7 @@ p384 = "0.14.0"
 p521 = "0.14.0"
 rsa = "0.10.0-rc.18"
 x509-cert = "0.3.0"
-der = "0.8.1"
+der = "0.8.2"
 
 [patch.crates-io]
 pb-rs = { git = "https://github.com/topjohnwu/quick-protobuf.git" }
