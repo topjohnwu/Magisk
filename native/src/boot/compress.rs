@@ -14,7 +14,9 @@ use lz4::{
     BlockMode, BlockSize, ContentChecksum, Decoder as LZ4FrameDecoder, Encoder as LZ4FrameEncoder,
     EncoderBuilder as LZ4FrameEncoderBuilder,
 };
-use lzma_rust2::{CheckType, LzmaOptions, LzmaReader, LzmaWriter, XzOptions, XzReader, XzWriter};
+use lzma_rust2::{
+    CheckType, FilterType, LzmaOptions, LzmaReader, LzmaWriter, XzOptions, XzReader, XzWriter,
+};
 use std::cmp::min;
 use std::fmt::Write as FmtWrite;
 use std::fs::File;
@@ -206,6 +208,15 @@ impl<R: Read> Read for LZ4BlockDecoder<R> {
     }
 }
 
+#[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+const BCJ_FILTER: FilterType = FilterType::BcjX86;
+#[cfg(target_arch = "arm")]
+const BCJ_FILTER: FilterType = FilterType::BcjArmThumb;
+#[cfg(target_arch = "aarch64")]
+const BCJ_FILTER: FilterType = FilterType::BcjArm64;
+#[cfg(target_arch = "riscv64")]
+const BCJ_FILTER: FilterType = FilterType::BcjRiscv;
+
 // Top-level APIs
 
 pub fn get_encoder<'a, W: Write + 'a>(
@@ -216,6 +227,7 @@ pub fn get_encoder<'a, W: Write + 'a>(
         FileFormat::XZ => {
             let mut opt = XzOptions::with_preset(6);
             opt.set_check_sum_type(CheckType::Crc32);
+            opt.prepend_pre_filter(BCJ_FILTER, 0);
             Box::new(XzWriter::new(w, opt)?)
         }
         FileFormat::LZMA => Box::new(LzmaWriter::new_use_header(
@@ -264,6 +276,30 @@ pub fn compress_bytes(format: FileFormat, in_bytes: &[u8], out_fd: RawFd) {
 
     let _ = || -> LoggedResult<()> {
         let mut encoder = get_encoder(format, out_file.deref_mut())?;
+        std::io::copy(&mut Cursor::new(in_bytes), encoder.deref_mut())?;
+        encoder.finish()?;
+        Ok(())
+    }();
+}
+
+pub fn compress_bytes_kernel(format: FileFormat, in_bytes: &[u8], out_fd: RawFd) {
+    let mut out_file = unsafe { ManuallyDrop::new(File::from_raw_fd(out_fd)) };
+
+    let _ = || -> LoggedResult<()> {
+        let mut encoder = match format {
+            FileFormat::XZ => {
+                let mut opt = XzOptions::with_preset(6);
+                opt.set_check_sum_type(CheckType::Crc32);
+                let filter = match BCJ_FILTER {
+                    // ARM32 kernel uses ARM instructions, not thumb2
+                    FilterType::BcjArmThumb => FilterType::BcjArm,
+                    _ => BCJ_FILTER,
+                };
+                opt.prepend_pre_filter(filter, 0);
+                Box::new(XzWriter::new(out_file.deref_mut(), opt)?)
+            }
+            _ => get_encoder(format, out_file.deref_mut())?,
+        };
         std::io::copy(&mut Cursor::new(in_bytes), encoder.deref_mut())?;
         encoder.finish()?;
         Ok(())
