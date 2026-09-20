@@ -39,6 +39,13 @@ static off_t compress_len(FileFormat type, byte_view in, int fd) {
     return now - prev;
 }
 
+static off_t compress_len_kernel(FileFormat type, byte_view in, int fd) {
+    auto prev = lseek(fd, 0, SEEK_CUR);
+    compress_bytes_kernel(type, in, fd);
+    auto now = lseek(fd, 0, SEEK_CUR);
+    return now - prev;
+}
+
 static void dump(const void *buf, size_t size, const char *filename) {
     if (size == 0)
         return;
@@ -649,7 +656,7 @@ void repack(Utf8CStr src_img, Utf8CStr out_img, bool skip_comp) {
         mmap_data m(KERNEL_FILE);
         uint32_t payload_sz = 0;
         if (!skip_comp && !fmt_compressed_any(check_fmt(m.data(), m.size())) && fmt_compressed(boot.k_fmt)) {
-            payload_sz = compress_len(boot.k_fmt, m, fd);
+            payload_sz = compress_len_kernel(boot.k_fmt, m, fd);
             if (boot.flags[ZIMAGE_KERNEL] && boot.k_fmt != FileFormat::GZIP) {
                 // For non-gzip compression in zImage, size_append appends the 4-byte LE uncompressed size
                 uint32_t sz = m.size();
