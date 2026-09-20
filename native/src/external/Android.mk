@@ -3,12 +3,15 @@ LOCAL_PATH := $(call my-dir)
 # libxz.a
 include $(CLEAR_VARS)
 LOCAL_MODULE:= libxz
-LOCAL_C_INCLUDES := $(LOCAL_PATH)/xz-embedded
-LOCAL_EXPORT_C_INCLUDES := $(LOCAL_C_INCLUDES)
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/xz-embedded/linux/include/linux
+LOCAL_C_INCLUDES := $(LOCAL_EXPORT_C_INCLUDES) $(LOCAL_PATH)/xz_config
 LOCAL_SRC_FILES := \
-    xz-embedded/xz_crc32.c \
-    xz-embedded/xz_dec_lzma2.c \
-    xz-embedded/xz_dec_stream.c
+    xz-embedded/linux/lib/xz/xz_crc32.c \
+    xz-embedded/linux/lib/xz/xz_crc64.c \
+    xz-embedded/linux/lib/xz/xz_dec_bcj.c \
+    xz-embedded/linux/lib/xz/xz_dec_lzma2.c \
+    xz-embedded/linux/lib/xz/xz_dec_stream.c \
+    xz-embedded/linux/lib/xz/xz_sha256.c
 include $(BUILD_STATIC_LIBRARY)
 
 # liblz4.a
