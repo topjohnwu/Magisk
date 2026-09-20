@@ -672,7 +672,9 @@
 - [MagiskBoot] Handle special `lz4_legacy` format properly, should fix all LG devices
 - [Daemon] New universal logcat monitor is added, support plug-and-play to worker threads
 - [Daemon] Invincible mode: daemon will be restarted by init, everything should seamlessly through daemon restarts
-- [Daemon] Add new restorecon action, will go through and fix all Magisk files with selinux unlabeled to `system_file` context
+- [Daemon] Add new restorecon action, will go through and fix all Magisk files with selinux unlabeled to `system_fil
+
+  e` context
 - [Daemon] Add brute-force image resizing mode, should prevent the notorious Samsung crappy resize2fs from affecting the result
 - [resetprop] Add new "-p" flag, used to toggle whether alter/access the actual persist storage for persist props
 
