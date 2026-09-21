@@ -37,7 +37,7 @@ if [ ! -f /system/build.prop ]; then
 fi
 
 cd /data/local/tmp
-chmod 755 busybox
+chmod 755 busybox magisk*
 
 if [ -z "$FIRST_STAGE" ]; then
   export FIRST_STAGE=1
@@ -52,24 +52,6 @@ if [ -z "$FIRST_STAGE" ]; then
 fi
 
 pm install -r -g $(pwd)/magisk.apk
-
-# Extract files from APK
-unzip -oj magisk.apk 'assets/util_functions.sh' 'assets/stub.apk'
-. ./util_functions.sh
-
-api_level_arch_detect
-
-unzip -oj magisk.apk "lib/$ABI/*" -x "lib/$ABI/libbusybox.so"
-for file in lib*.so; do
-  chmod 755 $file
-  mv "$file" "${file:3:${#file}-6}"
-done
-
-if $IS64BIT && [ -e "/system/bin/linker" ]; then
-  unzip -oj magisk.apk "lib/$ABI32/libmagisk.so"
-  mv libmagisk.so magisk32
-  chmod 755 magisk32
-fi
 
 # Stop zygote (and previous setup if exists)
 magisk --stop 2>/dev/null
@@ -125,14 +107,19 @@ else
 fi
 
 # Magisk stuff
+MAGISKBIN=/data/adb/magisk
 mkdir -p $MAGISKBIN 2>/dev/null
 unzip -oj magisk.apk 'assets/*.sh' -d $MAGISKBIN
 mkdir /data/adb/modules 2>/dev/null
 mkdir /data/adb/post-fs-data.d 2>/dev/null
 mkdir /data/adb/service.d 2>/dev/null
 
-for file in magisk magisk32 magiskpolicy stub.apk; do
-  if [ ! -e $file ]; then continue; fi
+MAGISK_FILES="magisk magiskpolicy stub.apk"
+if [ -e /system/bin/linker ] && [ -e /system/bin/linker64 ]; then
+  MAGISK_FILES="$MAGISK_FILES magisk32"
+fi
+
+for file in $MAGISK_FILES; do
   chmod 755 ./$file
   cp -af ./$file $MAGISKTMP/$file
   cp -af ./$file $MAGISKBIN/$file

@@ -249,7 +249,7 @@ test_main() {
   local images=()
   for apk in "${apks[@]}"; do
     images+=("magisk-$(basename $apk .apk).img")
-    ./build.py -v avd_patch --apk "$apk" "$ramdisk" "${images[-1]}"
+    ./build.py -v patch --avd --apk "$apk" "$ramdisk" "${images[-1]}"
   done
 
   adb emu kill
