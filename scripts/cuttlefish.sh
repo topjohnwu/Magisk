@@ -87,7 +87,7 @@ test_main() {
   local images=()
   for apk in "${apks[@]}"; do
     images+=("magisk-$(basename $apk .apk).img")
-    ./build.py -v avd_patch --apk "$apk" "$CF_HOME/init_boot.img" "${images[-1]}"
+    ./build.py -v patch --apk "$apk" "$CF_HOME/init_boot.img" "${images[-1]}"
   done
 
   for i in "${!apks[@]}"; do

@@ -40,7 +40,7 @@ class Environment : BaseTest {
         @JvmStatic
         fun before() = BaseTest.prerequisite()
 
-        // Whether we're running with live setup (patches through live_setup.sh)
+        // Whether we're running with live setup (patches through avd_setup.sh)
         fun isLiveSetup(): Boolean {
             val liveMarker = ShellUtils.fastCmd("echo \$MAGISKTMP/.magisk/live")
             return RootUtils.fs.getFile(liveMarker).exists()

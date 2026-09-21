@@ -9,6 +9,7 @@ import stat
 import subprocess
 import sys
 import tarfile
+import tempfile
 import time
 import urllib.request
 from pathlib import Path
@@ -30,6 +31,10 @@ abi_alias = {
     "arm32": "armeabi-v7a",
     "arm64": "arm64-v8a",
     "x64": "x86_64",
+}
+abi32_map = {
+    "arm64-v8a": "armeabi-v7a",
+    "x86_64": "x86",
 }
 default_abis = support_abis.keys() - {"riscv64"}
 support_targets = {"magisk", "magiskinit", "magiskboot", "magiskpolicy", "resetprop"}
@@ -621,7 +626,7 @@ def setup_rustup():
 ##################
 
 
-def push_files(script: Path):
+def push_files(files: list[Path], push_apk: bool = False):
     if args.build:
         build_all()
 
@@ -635,53 +640,81 @@ def push_files(script: Path):
         name = "app-release.apk" if args.release else "app-debug.apk"
         apk = Path(config["outdir"], name)
 
-    # Extract busybox from APK
-    busybox = Path(config["outdir"], "busybox")
-    with ZipFile(apk) as zf:
-        with zf.open(f"lib/{abi}/libbusybox.so") as libbb:
-            with open(busybox, "wb") as bb:
-                bb.write(libbb.read())
+    if not apk.is_file():
+        error(f"Cannot find {apk}")
 
-    try:
-        proc = execv([adb_path(), "push", busybox, script, "/data/local/tmp"])
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        tmp = Path(tmp_dir)
+        to_push = list(files)
+
+        with ZipFile(apk) as zf:
+            # Extract stub.apk
+            stub = tmp / "stub.apk"
+            stub.write_bytes(zf.read("assets/stub.apk"))
+            to_push.append(stub)
+
+            # Extract assets/*.sh
+            for name in zf.namelist():
+                if name.startswith("assets/") and name.endswith(".sh") and name.count("/") == 1:
+                    dest = tmp / Path(name).name
+                    dest.write_bytes(zf.read(name))
+                    to_push.append(dest)
+
+            # Extract native libs for target ABI
+            prefix = f"lib/{abi}/"
+            for name in zf.namelist():
+                if name.startswith(prefix):
+                    base_name = Path(name).name
+                    if base_name.startswith("lib") and base_name.endswith(".so"):
+                        dest = tmp / base_name[3:-3]
+                        dest.write_bytes(zf.read(name))
+                        to_push.append(dest)
+
+            # Extract 32-bit magisk if exist in the APK
+            abi32 = abi32_map.get(abi)
+            if abi32:
+                magisk32_entry = f"lib/{abi32}/libmagisk.so"
+                if magisk32_entry in zf.namelist():
+                    dest = tmp / "magisk32"
+                    dest.write_bytes(zf.read(magisk32_entry))
+                    to_push.append(dest)
+
+        execv([adb_path(), "shell", "rm", "-rf", "/data/local/tmp/*"])
+        proc = execv([adb_path(), "push", *to_push, "/data/local/tmp"])
         if proc.returncode != 0:
             error("adb push failed!")
-    finally:
-        rm_rf(busybox)
 
-    proc = execv([adb_path(), "push", apk, "/data/local/tmp/magisk.apk"])
-    if proc.returncode != 0:
-        error("adb push failed!")
+        if push_apk:
+            proc = execv([adb_path(), "push", apk, "/data/local/tmp/magisk.apk"])
+            if proc.returncode != 0:
+                error("adb push failed!")
 
 
 def setup_avd():
     header("* Setting up emulator")
 
-    push_files(Path("scripts", "live_setup.sh"))
+    push_files([Path("scripts", "avd_setup.sh")], push_apk=True)
 
-    proc = execv([adb_path(), "shell", "sh", "/data/local/tmp/live_setup.sh"])
+    proc = execv([adb_path(), "shell", "sh", "/data/local/tmp/avd_setup.sh"])
     if proc.returncode != 0:
-        error("live_setup.sh failed!")
+        error("avd_setup.sh failed!")
 
 
-def patch_avd_file():
+def patch():
     input_file = Path(args.image)
     output = Path(args.output)
 
     header(f"* Patching {input_file.name}")
 
-    push_files(Path("scripts", "host_patch.sh"))
-
-    proc = execv([adb_path(), "push", input_file, "/data/local/tmp"])
-    if proc.returncode != 0:
-        error("adb push failed!")
+    script = "avd_patch.sh" if args.avd else "adb_patch.sh"
+    push_files([Path("scripts", script), input_file])
 
     src_file = f"/data/local/tmp/{input_file.name}"
     out_file = f"{src_file}.magisk"
 
-    proc = execv([adb_path(), "shell", "sh", "/data/local/tmp/host_patch.sh", src_file])
+    proc = execv([adb_path(), "shell", "sh", f"/data/local/tmp/{script}", src_file])
     if proc.returncode != 0:
-        error("host_patch.sh failed!")
+        error(f"{script} failed!")
 
     proc = execv([adb_path(), "pull", out_file, output])
     if proc.returncode != 0:
@@ -819,13 +852,16 @@ def parse_args():
         "-b", "--build", action="store_true", help="build before patching"
     )
 
-    avd_patch_parser = subparsers.add_parser(
-        "avd_patch", help="patch AVD ramdisk.img or init_boot.img"
+    patch_parser = subparsers.add_parser(
+        "patch", help="patch boot image or AVD ramdisk.img via ADB"
     )
-    avd_patch_parser.add_argument("image", help="path to ramdisk.img or init_boot.img")
-    avd_patch_parser.add_argument("output", help="output file name")
-    avd_patch_parser.add_argument("--apk", help="a Magisk APK to use")
-    avd_patch_parser.add_argument(
+    patch_parser.add_argument("image", help="path to image to patch")
+    patch_parser.add_argument("output", help="output file name")
+    patch_parser.add_argument("--apk", help="a Magisk APK to use")
+    patch_parser.add_argument(
+        "--avd", action="store_true", help="the input file is an AVD ramdisk.img"
+    )
+    patch_parser.add_argument(
         "-b", "--build", action="store_true", help="build before patching"
     )
 
@@ -865,7 +901,7 @@ def parse_args():
     stub_parser.set_defaults(func=build_stub)
     test_parser.set_defaults(func=build_test)
     emu_parser.set_defaults(func=setup_avd)
-    avd_patch_parser.set_defaults(func=patch_avd_file)
+    patch_parser.set_defaults(func=patch)
     clean_parser.set_defaults(func=cleanup)
     ndk_parser.set_defaults(func=setup_ndk)
 
