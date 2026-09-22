@@ -7,6 +7,8 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.focusGroup
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,6 +33,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -84,6 +90,9 @@ fun MainScreen(
     }
     val initialPage = visibleTabs.indexOf(Tab.entries[initialTab]).coerceAtLeast(0)
     val pagerState = rememberPagerState(initialPage = initialPage, pageCount = { visibleTabs.size })
+    val fabFocusRequester = remember { FocusRequester() }
+    val navModulesFocusRequester = remember { FocusRequester() }
+    val moduleContentFocusRequester = remember { FocusRequester() }
     var moduleFabAction by remember { mutableStateOf<(() -> Unit)?>(null) }
     val isModulesTab = visibleTabs.getOrNull(pagerState.currentPage) == Tab.MODULES
 
@@ -93,9 +102,20 @@ fun MainScreen(
         bottomBar = {
             ShortNavigationBar {
                 visibleTabs.forEachIndexed { index, tab ->
+                    val isModulesItem = tab == Tab.MODULES
                     ShortNavigationBarItem(
                         selected = pagerState.currentPage == index,
                         onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
+                        modifier = Modifier
+                            .then(
+                                if (isModulesItem) Modifier.focusRequester(navModulesFocusRequester)
+                                else Modifier
+                            )
+                            .focusProperties {
+                                if (isModulesTab && isModulesItem) {
+                                    up = fabFocusRequester
+                                }
+                            },
                         icon = {
                             Icon(
                                 imageVector = ImageVector.vectorResource(tab.iconRes),
@@ -115,6 +135,13 @@ fun MainScreen(
             ) {
                 FloatingActionButton(
                     onClick = { moduleFabAction?.invoke() },
+                    modifier = Modifier
+                        .focusRequester(fabFocusRequester)
+                        .focusProperties {
+                            up = moduleContentFocusRequester
+                            down = navModulesFocusRequester
+                            right = FocusRequester.Cancel
+                        },
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 ) {
@@ -133,66 +160,92 @@ fun MainScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding),
-            beyondViewportPageCount = visibleTabs.size - 1,
+            beyondViewportPageCount = 0,
             userScrollEnabled = true,
         ) { page ->
             val isCurrentPage = pagerState.currentPage == page
-            when (visibleTabs[page]) {
-                Tab.HOME -> {
-                    val vm: HomeViewModel = viewModel(factory = VMFactory)
-                    val installVm: InstallViewModel = viewModel(factory = VMFactory)
-                    LaunchedEffect(isCurrentPage) {
-                        if (isCurrentPage) vm.startLoading()
-                    }
-                    CollectNavEvents(vm, navigator)
-                    CollectNavEvents(installVm, navigator)
-                    HomeScreen(vm, installVm)
-                }
-                Tab.SUPERUSER -> {
-                    val activity = LocalActivity.current as? ComponentActivity
-                    val vm: SuperuserViewModel = superuserViewModel
-                        ?: if (activity != null) {
-                            viewModel(viewModelStoreOwner = activity, factory = VMFactory)
-                        } else {
-                            viewModel(factory = VMFactory)
+            val tab = visibleTabs[page]
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .focusProperties {
+                        onEnter = {
+                            if (!isCurrentPage) {
+                                cancelFocusChange()
+                            }
                         }
-                    LaunchedEffect(onAuthenticate) {
-                        if (onAuthenticate != null) {
-                            vm.authenticate = onAuthenticate
+                        onExit = {
+                            if (requestedFocusDirection == FocusDirection.Left ||
+                                requestedFocusDirection == FocusDirection.Right ||
+                                requestedFocusDirection == FocusDirection.Up
+                            ) {
+                                cancelFocusChange()
+                            }
+                        }
+                        if (tab == Tab.MODULES) {
+                            down = fabFocusRequester
                         }
                     }
-                    LaunchedEffect(isCurrentPage) {
-                        if (isCurrentPage) vm.startLoading()
-                    }
-                    SuperuserScreen(vm)
-                }
-                Tab.LOG -> {
-                    val vm: LogViewModel = viewModel(factory = VMFactory)
-                    LaunchedEffect(isCurrentPage) {
-                        if (isCurrentPage) vm.startLoading()
-                    }
-                    LogScreen(vm)
-                }
-                Tab.MODULES -> {
-                    val vm: ModuleViewModel = viewModel(factory = VMFactory)
-                    LaunchedEffect(isCurrentPage) {
-                        if (isCurrentPage) vm.startLoading()
-                    }
-                    CollectNavEvents(vm, navigator)
-                    ModuleScreen(
-                        viewModel = vm,
-                        onRegisterFab = { moduleFabAction = it },
-                    )
-                }
-                Tab.SETTINGS -> {
-                    val vm: SettingsViewModel = viewModel(factory = VMFactory)
-                    LaunchedEffect(onAuthenticate) {
-                        if (onAuthenticate != null) {
-                            vm.authenticate = onAuthenticate
+                    .focusGroup()
+            ) {
+                when (visibleTabs[page]) {
+                    Tab.HOME -> {
+                        val vm: HomeViewModel = viewModel(factory = VMFactory)
+                        val installVm: InstallViewModel = viewModel(factory = VMFactory)
+                        LaunchedEffect(isCurrentPage) {
+                            if (isCurrentPage) vm.startLoading()
                         }
+                        CollectNavEvents(vm, navigator)
+                        CollectNavEvents(installVm, navigator)
+                        HomeScreen(vm, installVm)
                     }
-                    CollectNavEvents(vm, navigator)
-                    SettingsScreen(vm)
+                    Tab.SUPERUSER -> {
+                        val activity = LocalActivity.current as? ComponentActivity
+                        val vm: SuperuserViewModel = superuserViewModel
+                            ?: if (activity != null) {
+                                viewModel(viewModelStoreOwner = activity, factory = VMFactory)
+                            } else {
+                                viewModel(factory = VMFactory)
+                            }
+                        LaunchedEffect(onAuthenticate) {
+                            if (onAuthenticate != null) {
+                                vm.authenticate = onAuthenticate
+                            }
+                        }
+                        LaunchedEffect(isCurrentPage) {
+                            if (isCurrentPage) vm.startLoading()
+                        }
+                        SuperuserScreen(vm)
+                    }
+                    Tab.LOG -> {
+                        val vm: LogViewModel = viewModel(factory = VMFactory)
+                        LaunchedEffect(isCurrentPage) {
+                            if (isCurrentPage) vm.startLoading()
+                        }
+                        LogScreen(vm)
+                    }
+                    Tab.MODULES -> {
+                        val vm: ModuleViewModel = viewModel(factory = VMFactory)
+                        LaunchedEffect(isCurrentPage) {
+                            if (isCurrentPage) vm.startLoading()
+                        }
+                        CollectNavEvents(vm, navigator)
+                        ModuleScreen(
+                            viewModel = vm,
+                            onRegisterFab = { moduleFabAction = it },
+                            contentFocusRequester = moduleContentFocusRequester,
+                        )
+                    }
+                    Tab.SETTINGS -> {
+                        val vm: SettingsViewModel = viewModel(factory = VMFactory)
+                        LaunchedEffect(onAuthenticate) {
+                            if (onAuthenticate != null) {
+                                vm.authenticate = onAuthenticate
+                            }
+                        }
+                        CollectNavEvents(vm, navigator)
+                        SettingsScreen(vm)
+                    }
                 }
             }
         }

@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.ui.log
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -49,6 +50,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
@@ -163,17 +166,38 @@ fun LogScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding),
-                beyondViewportPageCount = 1,
+                beyondViewportPageCount = 0,
             ) { page ->
-                when (page) {
-                    0 -> SuLogTab(
-                        logs = uiState.suLogs,
-                        nestedScrollConnection = scrollBehavior.nestedScrollConnection
-                    )
-                    1 -> MagiskLogTab(
-                        entries = uiState.magiskLogEntries,
-                        nestedScrollConnection = scrollBehavior.nestedScrollConnection
-                    )
+                val isCurrentLogPage = pagerState.currentPage == page
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .focusProperties {
+                            onEnter = {
+                                if (!isCurrentLogPage) {
+                                    cancelFocusChange()
+                                }
+                            }
+                            onExit = {
+                                if (requestedFocusDirection == FocusDirection.Left ||
+                                    requestedFocusDirection == FocusDirection.Right
+                                ) {
+                                    cancelFocusChange()
+                                }
+                            }
+                        }
+                        .focusGroup()
+                ) {
+                    when (page) {
+                        0 -> SuLogTab(
+                            logs = uiState.suLogs,
+                            nestedScrollConnection = scrollBehavior.nestedScrollConnection
+                        )
+                        1 -> MagiskLogTab(
+                            entries = uiState.magiskLogEntries,
+                            nestedScrollConnection = scrollBehavior.nestedScrollConnection
+                        )
+                    }
                 }
             }
         }

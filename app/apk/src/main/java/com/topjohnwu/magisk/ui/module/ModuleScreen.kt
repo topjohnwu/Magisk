@@ -57,6 +57,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
@@ -89,6 +91,7 @@ fun ModuleScreen(
     viewModel: ModuleViewModel,
     modifier: Modifier = Modifier,
     onRegisterFab: (((() -> Unit)?) -> Unit)? = null,
+    contentFocusRequester: FocusRequester? = null,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -194,7 +197,7 @@ fun ModuleScreen(
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
                     modifier = Modifier.padding(horizontal = 32.dp)
                 ) {
                     Icon(
@@ -231,9 +234,13 @@ fun ModuleScreen(
                 key = { it.module.id },
                 contentType = { "ModuleCard" }
             ) { item ->
+                val isLast = item == uiState.modules.lastOrNull()
                 ModuleCard(
                     item = item,
                     viewModel = viewModel,
+                    modifier = if (isLast && contentFocusRequester != null) {
+                        Modifier.focusRequester(contentFocusRequester)
+                    } else Modifier,
                     onUpdateClick = { onlineModule ->
                         if (onlineModule != null && Info.isConnected.value == true) {
                             pendingOnlineModule = onlineModule
