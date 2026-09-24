@@ -3,8 +3,6 @@
 #include <stdio.h>
 
 import core;
-import su;
-import zygisk;
 
 using namespace std;
 

@@ -16,7 +16,7 @@ module;
 #include <errno.h>
 #include <rust/cxx.h>
 
-module zygisk;
+module core;
 
 #if defined(__LP64__)
 #define ZLOGD(...) LOGD("zygisk64: " __VA_ARGS__)

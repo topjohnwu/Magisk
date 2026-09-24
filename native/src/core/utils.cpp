@@ -16,9 +16,9 @@ module;
 #include <errno.h>
 #include <rust/cxx.h>
 
-export module core;
+export module core:utils;
 export import base;
-export import sqlite;
+export import :sqlite;
 
 #define PLOGE(fmt, args...) LOGE(fmt " failed with %d: %s\n", ##args, errno, ::strerror(errno))
 

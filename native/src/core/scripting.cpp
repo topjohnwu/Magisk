@@ -12,8 +12,8 @@ module;
 #include <errno.h>
 #include <rust/cxx.h>
 
-export module scripting;
-export import core;
+export module core:scripting;
+export import :utils;
 
 using namespace std;
 

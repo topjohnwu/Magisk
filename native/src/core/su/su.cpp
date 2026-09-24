@@ -27,8 +27,8 @@ module;
 #include <flags.h>
 #include <rust/cxx.h>
 
-export module su;
-export import core;
+export module core:su;
+export import :utils;
 
 #define PLOGE(fmt, args...) LOGE(fmt " failed with %d: %s\n", ##args, errno, ::strerror(errno))
 

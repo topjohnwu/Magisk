@@ -13,9 +13,8 @@ module;
 #include <errno.h>
 #include <rust/cxx.h>
 
-export module deny;
-export import core;
-export import sqlite;
+export module core:deny;
+export import :utils;
 
 export {
 inline constexpr char ISOLATED_MAGIC[] = "isolated";

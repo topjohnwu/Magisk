@@ -13,7 +13,7 @@ module;
 #include <errno.h>
 #include <rust/cxx.h>
 
-module deny;
+module core;
 
 using namespace std;
 
