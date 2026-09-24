@@ -66,8 +66,9 @@ need integration testing. PCH and assembly filters are rejected for participatin
 targets. Run clean and build as separate invocations.
 
 Magisk's existing `.cpp` sources provide modules through
-`LOCAL_MODULE_SRC_FILES`; their filenames do not change. Handwritten API
-headers are merged into their existing implementation files, with functions
+`LOCAL_MODULE_SRC_FILES`; their filenames do not change. Module names are
+plain component names such as `base`, `core`, `sqlite` and `init`. Handwritten
+API headers are merged into their existing implementation files, with functions
 exported at their definitions and class methods defined in the class where
 possible. Rust ABI declarations, cross-file implementation declarations and
 forward declarations required by mutually dependent types remain.
@@ -77,8 +78,10 @@ Providers include the generated application declarations in their export
 blocks, so types and functions belong to their named module. Each generated
 `.cpp` is an implementation unit of that same module, implicitly importing its
 primary interface and importing additional C++ modules from Rust's `include!`
-metadata. Rust calls the generated `extern "C"` entry points; handwritten C++
-APIs do not retain their former global-module ABI.
+metadata (for example, `include!("core")`). Quoted include entries name modules;
+runtime header includes use angle brackets. Rust calls the generated
+`extern "C"` entry points; handwritten C++ APIs do not retain their former
+global-module ABI.
 
 The generated header has a separate implementation-only branch for CXX's
 runtime helpers. The bridge includes that branch in its global module fragment
@@ -92,7 +95,7 @@ updating CXX.
 Non-exported implementation details use module linkage, so imported class
 methods refer to the provider's state rather than copies of `static` variables.
 `MagiskInit` and `BootConfig`, their handwritten methods and their generated
-bridge now share the `magisk.init` module. The Zygisk SDK header, generated
+bridge now share the `init` module. The Zygisk SDK header, generated
 CXX/JNI headers and generated build flags remain.
 
 Rust libraries and their generated bindings must exist before invoking ndk-build,

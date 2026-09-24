@@ -27,8 +27,8 @@ module;
 #include <flags.h>
 #include <rust/cxx.h>
 
-export module magisk.su;
-export import magisk.core;
+export module su;
+export import core;
 
 #define PLOGE(fmt, args...) LOGE(fmt " failed with %d: %s\n", ##args, errno, ::strerror(errno))
 

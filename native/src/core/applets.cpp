@@ -2,9 +2,9 @@
 #include <sys/stat.h>
 #include <stdio.h>
 
-import magisk.core;
-import magisk.su;
-import magisk.zygisk;
+import core;
+import su;
+import zygisk;
 
 using namespace std;
 

@@ -13,7 +13,7 @@ module;
 #include <errno.h>
 #include <rust/cxx.h>
 
-module magisk.deny;
+module deny;
 
 using namespace std;
 

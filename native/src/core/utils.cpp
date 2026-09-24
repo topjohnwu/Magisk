@@ -16,9 +16,9 @@ module;
 #include <errno.h>
 #include <rust/cxx.h>
 
-export module magisk.core;
-export import magisk.base;
-export import magisk.sqlite;
+export module core;
+export import base;
+export import sqlite;
 
 #define PLOGE(fmt, args...) LOGE(fmt " failed with %d: %s\n", ##args, errno, ::strerror(errno))
 

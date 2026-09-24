@@ -14,7 +14,7 @@ module;
 #include <errno.h>
 #include <rust/cxx.h>
 
-module magisk.init;
+module init;
 
 #define PLOGE(fmt, args...) LOGE(fmt " failed with %d: %s\n", ##args, errno, ::strerror(errno))
 

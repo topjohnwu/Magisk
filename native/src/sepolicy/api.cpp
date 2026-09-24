@@ -12,7 +12,7 @@ module;
 #include <errno.h>
 #include <rust/cxx.h>
 
-module magisk.policy;
+module policy;
 
 using Str = rust::Str;
 using StrVec = rust::Vec<rust::Str>;

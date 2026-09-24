@@ -14,7 +14,7 @@ module;
 #include <errno.h>
 #include <rust/cxx.h>
 
-module magisk.core;
+module core;
 
 using namespace std;
 

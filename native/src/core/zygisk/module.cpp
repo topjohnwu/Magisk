@@ -18,9 +18,9 @@ module;
 #include <errno.h>
 #include <rust/cxx.h>
 
-export module magisk.zygisk;
-export import magisk.core;
-export import magisk.deny;
+export module zygisk;
+export import core;
+export import deny;
 
 #if defined(__LP64__)
 #define ZLOGD(...) LOGD("zygisk64: " __VA_ARGS__)

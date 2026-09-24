@@ -51,12 +51,13 @@ pub fn gen_cxx_binding(name: &str) {
     let mut includes = BTreeSet::new();
     let mut imports = BTreeSet::new();
     let mut declarations = String::new();
+    // Quoted include! entries name modules; runtime headers use angle brackets.
     for line in header.lines() {
         if let Some(module) = line
-            .strip_prefix("#include \"magisk.")
+            .strip_prefix("#include \"")
             .and_then(|s| s.strip_suffix('"'))
         {
-            imports.insert(format!("magisk.{module}"));
+            imports.insert(module.to_string());
         } else if line.starts_with("#include ") {
             includes.insert(line.to_string());
         } else if line != "#pragma once" {
@@ -65,14 +66,14 @@ pub fn gen_cxx_binding(name: &str) {
     }
     let (module, forward) = match name {
         "base-rs" => (
-            "magisk.base",
+            "base",
             "struct Utf8CStr;\nstruct FnBoolStrStr;\nstruct FnBoolStr;\n",
         ),
-        "core-rs" => ("magisk.core", ""),
-        "policy-rs" => ("magisk.policy", "class sepol_impl;\n"),
-        "boot-rs" => ("magisk.boot", "struct boot_img;\n"),
+        "core-rs" => ("core", ""),
+        "policy-rs" => ("policy", "class sepol_impl;\n"),
+        "boot-rs" => ("boot", "struct boot_img;\n"),
         "init-rs" => (
-            "magisk.init",
+            "init",
             "using kv_pairs = std::vector<std::pair<std::string, std::string>>;\n",
         ),
         _ => panic!("unknown CXX bridge {name}"),
@@ -107,7 +108,7 @@ pub fn gen_cxx_binding(name: &str) {
 
     let mut definitions = String::new();
     for line in implementation.lines() {
-        if line.starts_with("#include \"magisk.") {
+        if line.starts_with("#include \"") {
             continue;
         } else if line.starts_with("#include ") {
             includes.insert(line.to_string());
