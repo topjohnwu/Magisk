@@ -6,6 +6,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
+import android.content.res.Resources
 import android.os.Bundle
 import android.view.WindowManager
 import android.widget.Toast
@@ -80,9 +81,13 @@ class MainActivity : ComponentActivity(), SplashScreenHost {
     override fun onCreate(savedInstanceState: Bundle?) {
         extension.onCreate(savedInstanceState)
         splashController.preOnCreate()
-        theme.applyStyle(R.style.Main, true)
         super.onCreate(savedInstanceState)
         splashController.onCreate(savedInstanceState)
+    }
+
+    override fun onApplyThemeResource(theme: Resources.Theme, resid: Int, first: Boolean) {
+        super.onApplyThemeResource(theme, resid, first)
+        theme.applyStyle(R.style.Main, true)
     }
 
     override fun onResume() {
