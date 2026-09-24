@@ -138,14 +138,13 @@ bool fclone_attr(int src, int dest);
 
 } // extern "C"
 
-#define DISALLOW_COPY_AND_MOVE(clazz) \
-clazz(const clazz&) = delete;        \
-clazz(clazz &&) = delete;
-
-#define ALLOW_MOVE_ONLY(clazz) \
-clazz(const clazz&) = delete;  \
-clazz(clazz &&o) : clazz() { swap(o); }  \
-clazz& operator=(clazz &&o) { swap(o); return *this; }
+// Distinct owner types let the marker overlap storage in nested resource wrappers.
+template<class T>
+struct noncopyable {
+    noncopyable() = default;
+    noncopyable(const noncopyable&) = delete;
+    noncopyable& operator=(const noncopyable&) = delete;
+};
 
 // Bindings to &Utf8CStr in Rust
 extern "C" void cxx$utf8str$new(Utf8CStr *self, const void *s, size_t len);
@@ -182,7 +181,6 @@ private:
 };
 
 class mutex_guard {
-    DISALLOW_COPY_AND_MOVE(mutex_guard)
 public:
     explicit mutex_guard(pthread_mutex_t &m): mutex(&m) {
         pthread_mutex_lock(mutex);
@@ -195,16 +193,17 @@ public:
         if (mutex) pthread_mutex_unlock(mutex);
     }
 private:
+    [[no_unique_address, maybe_unused]] noncopyable<mutex_guard> no_copy;
     pthread_mutex_t *mutex;
 };
 
 template <class Func>
 class run_finally {
-    DISALLOW_COPY_AND_MOVE(run_finally)
 public:
     explicit run_finally(Func &&fn) : fn(std::move(fn)) {}
     ~run_finally() { fn(); }
 private:
+    [[no_unique_address, maybe_unused]] noncopyable<run_finally> no_copy;
     Func fn;
 };
 
@@ -279,8 +278,10 @@ struct byte_data : public byte_view {
     }
 };
 
-struct mmap_data : public byte_data {
-    ALLOW_MOVE_ONLY(mmap_data)
+// An empty base preserves standard layout with byte_data's inherited storage.
+struct mmap_data : public byte_data, private noncopyable<mmap_data> {
+    mmap_data(mmap_data &&o) : mmap_data() { swap(o); }
+    mmap_data& operator=(mmap_data &&o) { swap(o); return *this; }
 
     mmap_data() = default;
     explicit mmap_data(const char *name, bool rw = false) {
@@ -315,7 +316,8 @@ private:
 };
 
 struct owned_fd {
-    ALLOW_MOVE_ONLY(owned_fd)
+    owned_fd(owned_fd &&o) : owned_fd() { swap(o); }
+    owned_fd& operator=(owned_fd &&o) { swap(o); return *this; }
 
     owned_fd() : fd(-1) {}
     owned_fd(int fd) : fd(fd) {}
@@ -326,6 +328,7 @@ struct owned_fd {
     void swap(owned_fd &owned) { std::swap(fd, owned.fd); }
 
 private:
+    [[no_unique_address, maybe_unused]] noncopyable<owned_fd> no_copy;
     int fd;
 };
 
