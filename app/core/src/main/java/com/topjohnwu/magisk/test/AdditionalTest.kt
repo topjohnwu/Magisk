@@ -8,6 +8,7 @@ import androidx.test.uiautomator.Until
 import com.topjohnwu.magisk.core.model.module.LocalModule
 import com.topjohnwu.magisk.core.utils.RootUtils
 import com.topjohnwu.magisk.test.Environment.Companion.EMPTY_ZYGISK
+import com.topjohnwu.magisk.test.Environment.Companion.INIT_RC
 import com.topjohnwu.magisk.test.Environment.Companion.INVALID_ZYGISK
 import com.topjohnwu.magisk.test.Environment.Companion.MOUNT_TEST
 import com.topjohnwu.magisk.test.Environment.Companion.REMOVE_TEST
@@ -59,7 +60,7 @@ class AdditionalTest : BaseTest {
     fun testModuleCount() {
         var expected = 4
         if (Environment.mount()) expected++
-        if (Environment.preinit()) expected++
+        if (Environment.preinit()) expected += 2
         if (Environment.lsposed()) expected++
         if (Environment.shamiko()) expected++
         assertEquals("Module count incorrect", expected, modules.size)
@@ -115,6 +116,21 @@ class AdditionalTest : BaseTest {
         assertTrue(
             "Module sepolicy.rule is not applied",
             Shell.cmd("magiskpolicy --print-rules | grep -q magisk_test").exec().isSuccess
+        )
+    }
+
+    @Test
+    fun testInitRc() {
+        assumeTrue(Environment.preinit())
+
+        assertNotNull("$INIT_RC is not installed", modules.find { it.id == INIT_RC })
+        assertEquals(
+            "Module init.rc is not applied",
+            "1", Shell.cmd("getprop ro.debug.magisk.rc").exec().out.first()
+        )
+        assertEquals(
+            "Module product init.rc is not applied",
+            "1", Shell.cmd("getprop ro.debug.magisk.product.rc").exec().out.first()
         )
     }
 

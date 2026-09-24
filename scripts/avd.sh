@@ -175,6 +175,7 @@ parse_args() {
 
   # Dump global variables
   echo emu_args=\"$emu_args\"
+  echo AVD_TEST_LOG=\"$avd_test_log\"
   echo OPTIND=$OPTIND
 
   # Dump local variables
