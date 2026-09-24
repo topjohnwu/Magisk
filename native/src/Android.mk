@@ -118,14 +118,14 @@ LOCAL_MODULE_SRC_FILES := \
     core/scripting.cpp \
     core/su/su.cpp \
     core/deny/utils.cpp \
-    core/zygisk/module.cpp
+    core/zygisk/module.cpp \
+    core/core-rs.cpp
 LOCAL_SRC_FILES := \
     core/resetprop/sys.cpp \
     core/deny/cli.cpp \
     core/deny/logcat.cpp \
     core/zygisk/hook.cpp \
-    core/zygisk/entry.cpp \
-    core/core-rs.cpp
+    core/zygisk/entry.cpp
 LOCAL_EXPORT_LDLIBS := -llog
 include $(BUILD_STATIC_LIBRARY_MODULE)
 endif

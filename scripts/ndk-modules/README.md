@@ -67,7 +67,11 @@ targets. Run clean and build as separate invocations.
 
 Magisk's existing `.cpp` sources provide modules through
 `LOCAL_MODULE_SRC_FILES`; their filenames do not change. Module names are
-plain component names such as `base`, `core`, `sqlite` and `init`. Handwritten
+plain component names such as `base`, `core` and `init`. Core uses interface
+partitions `core:utils`, `core:sqlite`, `core:scripting`, `core:su`, `core:deny`
+and `core:zygisk`. Its primary interface re-exports them, so consumers only
+need `import core;`. Partitions import each other with `import :name;`, never
+the primary interface, keeping the dependency graph acyclic. Handwritten
 API headers are merged into their existing implementation files, with functions
 exported at their definitions and class methods defined in the class where
 possible. Rust ABI declarations, cross-file implementation declarations and
@@ -75,13 +79,15 @@ forward declarations required by mutually dependent types remain.
 
 The Rust CXX generator keeps its `*-rs.hpp` / `*-rs.cpp` output format.
 Providers include the generated application declarations in their export
-blocks, so types and functions belong to their named module. Each generated
-`.cpp` is an implementation unit of that same module, implicitly importing its
-primary interface and importing additional C++ modules from Rust's `include!`
-metadata (for example, `include!("core")`). Quoted include entries name modules;
-runtime header includes use angle brackets. Rust calls the generated
-`extern "C"` entry points; handwritten C++ APIs do not retain their former
-global-module ABI.
+blocks, so types and functions belong to their named module. The generated
+`core-rs.cpp` supplies core's primary interface and re-exports the partitions
+listed in Rust's `include!` metadata (for example, `include!(":deny")`). It is
+listed in `LOCAL_MODULE_SRC_FILES`; `core:utils` includes `core-rs.hpp` as before.
+Other generated `.cpp` files are implementation units of their named modules,
+implicitly importing their primary interface and importing additional modules
+from the same metadata. Quoted include entries name modules or relative
+partitions; runtime header includes use angle brackets. Rust calls the generated
+`extern "C"` entry points; handwritten C++ APIs use named-module ownership.
 
 The generated header has a separate implementation-only branch for CXX's
 runtime helpers. The bridge includes that branch in its global module fragment

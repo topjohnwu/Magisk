@@ -148,7 +148,7 @@ pub fn gen_cxx_binding(name: &str) {
             "} // namespace cxxbridge1\n} // namespace rust",
             "} // namespace cxxbridge1\n} // namespace rust\n} // extern C++",
         );
-    // The implementation imports these types from its primary interface.
+    // The bridge imports these types from its interface or partitions.
     // Reuse CXX's guards instead of defining the shared types a second time.
     let mut guards = String::new();
     for line in header.lines() {
@@ -162,12 +162,15 @@ pub fn gen_cxx_binding(name: &str) {
     let interface = format!(
         "#pragma once\n#ifdef MAGISK_CXX_BRIDGE_IMPL\n{prelude}\n{helpers}{guards}\n#else\n{header_includes}\n\n{forward}{declarations}\n#endif\n"
     );
+    // The core bridge is the primary interface, re-exporting its partitions.
+    // Other bridges are implementation units of their handwritten interfaces.
+    let export = if name == "core-rs" { "export " } else { "" };
     let imports = imports
         .into_iter()
-        .map(|m| format!("import {m};\n"))
+        .map(|m| format!("{export}import {m};\n"))
         .collect::<String>();
     let implementation = format!(
-        "module;\n#define MAGISK_CXX_BRIDGE_IMPL\n#include \"{name}.hpp\"\n#undef MAGISK_CXX_BRIDGE_IMPL\n\nmodule {module};\n{imports}\n{definitions}"
+        "module;\n#define MAGISK_CXX_BRIDGE_IMPL\n#include \"{name}.hpp\"\n#undef MAGISK_CXX_BRIDGE_IMPL\n\n{export}module {module};\n{imports}\n{definitions}"
     );
     write_if_diff(format!("{name}.hpp"), interface.as_bytes()).ok_or_exit();
     write_if_diff(format!("{name}.cpp"), implementation.as_bytes()).ok_or_exit();

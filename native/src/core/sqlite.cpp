@@ -12,7 +12,7 @@ module;
 #include <stdio.h>
 #include <errno.h>
 
-export module sqlite;
+export module core:sqlite;
 export import base;
 
 export {
