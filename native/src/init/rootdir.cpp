@@ -59,7 +59,7 @@ bool patch_rc_scripts(const char *src_path, const char *tmp_path, bool writable)
         return xopen_dir(src_path);
     }() : [&] {
         char buf[PATH_MAX] = {};
-        ssprintf(buf, sizeof(buf), concat<ROOTOVL, "%s">.value, src_path);
+        ssprintf(buf, sizeof(buf), ROOTOVL + "%s", src_path);
         xmkdirs(buf, 0755);
         return xopen_dir(buf);
     }();
@@ -132,7 +132,7 @@ bool patch_rc_scripts(const char *src_path, const char *tmp_path, bool writable)
                 LOGD("Inject zygote restart\n");
                 fprintf(dest_rc.get(), "%s", line.c_str());
                 fprintf(dest_rc.get(),
-                        concat<"    onrestart exec ", MAGISK_PROC_CON, " 0 0 -- %s/magisk --zygote-restart\n">.value, tmp_path);
+                        "    onrestart exec " + MAGISK_PROC_CON + " 0 0 -- %s/magisk --zygote-restart\n", tmp_path);
                 return true;
             }
             fprintf(dest_rc.get(), "%s", line.c_str());
@@ -155,21 +155,21 @@ void MagiskInit::patch_fissiond(const char *tmp_path) noexcept {
             LOGD("Patch @ %08zX [ro.build.system.fission_single_os] -> "
                  "[ro.build.system.xxxxxxxxxxxxxxxxx]\n", off);
         }
-        mkdirs(concat<ROOTOVL, "/system/bin">.value, 0755);
-        if (auto target_fissiond = xopen_file(concat<ROOTOVL, "/system/bin/fissiond">.value, "we")) {
+        mkdirs(ROOTOVL + "/system/bin", 0755);
+        if (auto target_fissiond = xopen_file(ROOTOVL + "/system/bin/fissiond", "we")) {
             fwrite(fissiond.data(), 1, fissiond.size(), target_fissiond.get());
-            clone_attr("/system/bin/fissiond", concat<ROOTOVL, "/system/bin/fissiond">.value);
+            clone_attr("/system/bin/fissiond", ROOTOVL + "/system/bin/fissiond");
         }
     }
     LOGD("hijack isolated\n");
     auto hijack = xopen_file("/sys/devices/system/cpu/isolated", "re");
-    mkfifo(concat<INTLROOT, "/isolated">.value, 0777);
-    xmount(concat<INTLROOT, "/isolated">.value, "/sys/devices/system/cpu/isolated", nullptr, MS_BIND, nullptr);
+    mkfifo(INTLROOT + "/isolated", 0777);
+    xmount(INTLROOT + "/isolated", "/sys/devices/system/cpu/isolated", nullptr, MS_BIND, nullptr);
     if (!xfork()) {
-        auto dest = xopen_file(concat<INTLROOT, "/isolated">.value, "we");
+        auto dest = xopen_file(INTLROOT + "/isolated", "we");
         LOGD("hijacked isolated\n");
         xumount2("/sys/devices/system/cpu/isolated", MNT_DETACH);
-        unlink(concat<INTLROOT, "/isolated">.value);
+        unlink(INTLROOT + "/isolated");
         string content = full_read(fileno(hijack.get()));
         {
             string target = "/dev/cells/cell2"s + tmp_path;
@@ -288,7 +288,7 @@ void MagiskInit::patch_ro_root() noexcept {
         // Recreate original sbin structure
         xmkdir(MIRRDIR, 0755);
         xmount("/", MIRRDIR, nullptr, MS_BIND, nullptr);
-        recreate_sbin(concat<MIRRDIR, "/sbin">.value, true);
+        recreate_sbin(MIRRDIR + "/sbin", true);
         xumount2(MIRRDIR, MNT_DETACH);
     } else {
         // Restore debug_ramdisk
@@ -306,7 +306,7 @@ void MagiskInit::patch_ro_root() noexcept {
         for (size_t off : init.patch("android,fstab", "xxx")) {
             LOGD("Patch @ %08zX [android,fstab] -> [xxx]\n", off);
         }
-        int dest = xopen(concat<ROOTOVL, "/init">.value, O_CREAT | O_WRONLY | O_CLOEXEC, 0);
+        int dest = xopen(ROOTOVL + "/init", O_CREAT | O_WRONLY | O_CLOEXEC, 0);
         xwrite(dest, init.data(), init.size());
         fclone_attr(src, dest);
         close(src);
@@ -314,9 +314,9 @@ void MagiskInit::patch_ro_root() noexcept {
     }
 
     load_overlay_rc(ROOTOVL);
-    if (access(concat<ROOTOVL, "/sbin">.value, F_OK) == 0) {
+    if (access(ROOTOVL + "/sbin", F_OK) == 0) {
         // Move files in overlay.d/sbin into tmp_dir
-        mv_path(concat<ROOTOVL, "/sbin">.value, ".");
+        mv_path(ROOTOVL + "/sbin", ".");
     }
 
     // Patch init.rc
