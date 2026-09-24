@@ -1,7 +1,10 @@
 #include <libgen.h>
 #include <sys/stat.h>
+#include <stdio.h>
 
-#include <core.hpp>
+import magisk.core;
+import magisk.su;
+import magisk.zygisk;
 
 using namespace std;
 

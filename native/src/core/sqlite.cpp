@@ -1,34 +1,129 @@
+module;
 #include <dlfcn.h>
+#include <rust/cxx.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <dirent.h>
+#include <fcntl.h>
+#include <pthread.h>
+#include <sys/socket.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <errno.h>
 
-#include <consts.hpp>
-#include <base.hpp>
-#include <sqlite.hpp>
+export module magisk.sqlite;
+export import magisk.base;
+
+export extern "C++" {
+#define SQLITE_OPEN_READWRITE        0x00000002  /* Ok for sqlite3_open_v2() */
+#define SQLITE_OPEN_CREATE           0x00000004  /* Ok for sqlite3_open_v2() */
+#define SQLITE_OPEN_NOMUTEX          0x00008000  /* Ok for sqlite3_open_v2() */
+
+#define SQLITE_OK           0   /* Successful result */
+#define SQLITE_ROW         100  /* sqlite3_step() has another row ready */
+#define SQLITE_DONE        101  /* sqlite3_step() has finished executing */
+
+struct sqlite3;
+struct sqlite3_stmt;
+struct DbValues;
+struct DbStatement;
+
+using StringSlice = rust::Slice<rust::String>;
+using sql_bind_callback = int(*)(void*, int, DbStatement&);
+using sql_exec_callback = void(*)(void*, StringSlice, const DbValues&);
+
+/************
+ * C++ APIs *
+ ************/
+
+using db_exec_callback = std::function<void(StringSlice, const DbValues&)>;
+
+struct DbArg {
+    enum {
+        INT,
+        TEXT,
+    } type;
+    union {
+        int64_t int_val;
+        rust::Str str_val;
+    };
+    DbArg(int64_t v) : type(INT), int_val(v) {}
+    DbArg(const char *v) : type(TEXT), str_val(v) {}
+};
+
+template<typename T>
+concept DbData = requires(T t, StringSlice s, DbValues &v) { t(s, v); };
+
+}
 
 using namespace std;
 
 #define DB_VERSION     12
 #define DB_VERSION_STR "12"
 
-// SQLite APIs
+// Module linkage lets imported methods use this single SQLite API table.
 
-static int (*sqlite3_open_v2)(const char *filename, sqlite3 **ppDb, int flags, const char *zVfs);
-static int (*sqlite3_close)(sqlite3 *db);
-const char *(*sqlite3_errstr)(int);
-static int (*sqlite3_prepare_v2)(sqlite3 *db, const char *zSql, int nByte, sqlite3_stmt **ppStmt, const char **pzTail);
-static int (*sqlite3_bind_parameter_count)(sqlite3_stmt*);
-static int (*sqlite3_bind_int64)(sqlite3_stmt*, int, int64_t);
-static int (*sqlite3_bind_text)(sqlite3_stmt*,int,const char*,int,void(*)(void*));
-static int (*sqlite3_column_count)(sqlite3_stmt *pStmt);
-static const char *(*sqlite3_column_name)(sqlite3_stmt*, int N);
-static const char *(*sqlite3_column_text)(sqlite3_stmt*, int iCol);
-static int (*sqlite3_column_int)(sqlite3_stmt*, int iCol);
-static int (*sqlite3_step)(sqlite3_stmt*);
-static int (*sqlite3_finalize)(sqlite3_stmt *pStmt);
+int (*sqlite3_open_v2)(const char *filename, sqlite3 **ppDb, int flags, const char *zVfs);
+int (*sqlite3_close)(sqlite3 *db);
+export extern "C++" const char *(*sqlite3_errstr)(int) = nullptr;
+int (*sqlite3_prepare_v2)(sqlite3 *db, const char *zSql, int nByte, sqlite3_stmt **ppStmt, const char **pzTail);
+int (*sqlite3_bind_parameter_count)(sqlite3_stmt*);
+int (*sqlite3_bind_int64)(sqlite3_stmt*, int, int64_t);
+int (*sqlite3_bind_text)(sqlite3_stmt*,int,const char*,int,void(*)(void*));
+int (*sqlite3_column_count)(sqlite3_stmt *pStmt);
+const char *(*sqlite3_column_name)(sqlite3_stmt*, int N);
+const char *(*sqlite3_column_text)(sqlite3_stmt*, int iCol);
+int (*sqlite3_column_int)(sqlite3_stmt*, int iCol);
+int (*sqlite3_step)(sqlite3_stmt*);
+int (*sqlite3_finalize)(sqlite3_stmt *pStmt);
+
+export extern "C++" struct DbValues {
+    const char *get_text(int index) const {
+        return sqlite3_column_text((sqlite3_stmt*) this, index);
+    }
+    rust::Str get_str(int index) const { return get_text(index); }
+    int get_int(int index) const {
+        return sqlite3_column_int((sqlite3_stmt*) this, index);
+    }
+    ~DbValues() = delete;
+};
+
+export extern "C++" struct DbStatement {
+    int bind_text(int index, rust::Str val) {
+        return sqlite3_bind_text(reinterpret_cast<sqlite3_stmt*>(this), index, val.data(), val.size(), nullptr);
+    }
+    int bind_int64(int index, int64_t val) {
+        return sqlite3_bind_int64(reinterpret_cast<sqlite3_stmt*>(this), index, val);
+    }
+    ~DbStatement() = delete;
+};
+
+export extern "C++" struct DbArgs {
+    DbArgs() : curr(0) {}
+    DbArgs(std::initializer_list<DbArg> list) : args(list), curr(0) {}
+    int operator()(int index, DbStatement &stmt) {
+        if (curr < args.size()) {
+            const auto &arg = args[curr++];
+            switch (arg.type) {
+                case DbArg::INT:
+                    return stmt.bind_int64(index, arg.int_val);
+                case DbArg::TEXT:
+                    return stmt.bind_text(index, arg.str_val);
+            }
+        }
+        return SQLITE_OK;
+    }
+    bool empty() const { return args.empty(); }
+private:
+    std::vector<DbArg> args;
+    size_t curr;
+};
 
 // Internal Android linker APIs
 
-static void (*android_get_LD_LIBRARY_PATH)(char *buffer, size_t buffer_size);
-static void (*android_update_LD_LIBRARY_PATH)(const char *ld_library_path);
+void (*android_get_LD_LIBRARY_PATH)(char *buffer, size_t buffer_size);
+void (*android_update_LD_LIBRARY_PATH)(const char *ld_library_path);
 
 #define DLERR(ptr) if (!(ptr)) { \
     LOGE("db: %s\n", dlerror()); \
@@ -47,7 +142,7 @@ constexpr char apex_path[] = "/apex/com.android.runtime/lib64:/apex/com.android.
 constexpr char apex_path[] = "/apex/com.android.runtime/lib:/apex/com.android.art/lib:/apex/com.android.i18n/lib:";
 #endif
 
-static bool load_sqlite() {
+bool load_sqlite() {
     static int dl_init = 0;
     if (dl_init)
         return dl_init > 0;
@@ -149,22 +244,6 @@ extern "C" int sql_exec_impl(
     return SQLITE_OK;
 }
 
-int DbValues::get_int(int index) const {
-    return sqlite3_column_int((sqlite3_stmt*) this, index);
-}
-
-const char *DbValues::get_text(int index) const {
-    return sqlite3_column_text((sqlite3_stmt*) this, index);
-}
-
-int DbStatement::bind_int64(int index, int64_t val) {
-    return sqlite3_bind_int64(reinterpret_cast<sqlite3_stmt*>(this), index, val);
-}
-
-int DbStatement::bind_text(int index, rust::Str val) {
-    return sqlite3_bind_text(reinterpret_cast<sqlite3_stmt*>(this), index, val.data(), val.size(), nullptr);
-}
-
 #define sql_chk_log_ret(ret, fn, ...) if (int rc = fn(__VA_ARGS__); rc != SQLITE_OK) { \
     LOGE("sqlite3(line:%d): %s\n", __LINE__, sqlite3_errstr(rc));                      \
     return ret;                                                                        \
@@ -172,7 +251,7 @@ int DbStatement::bind_text(int index, rust::Str val) {
 
 #define sql_chk_log(fn, ...) sql_chk_log_ret(nullptr, fn, __VA_ARGS__)
 
-sqlite3 *open_and_init_db() {
+export extern "C++" sqlite3 *open_and_init_db() {
     if (!load_sqlite()) {
         LOGE("sqlite3: Cannot load libsqlite.so\n");
         return nullptr;
@@ -310,7 +389,7 @@ extern "C" int sql_exec_rs(
         sql_bind_callback bind_cb, void *bind_cookie,
         sql_exec_callback exec_cb, void *exec_cookie);
 
-bool db_exec(const char *sql, DbArgs args, db_exec_callback exec_fn) {
+export extern "C++" bool db_exec(const char *sql, DbArgs args = {}, db_exec_callback exec_fn = {}) {
     using db_bind_callback = std::function<int(int, DbStatement&)>;
 
     db_bind_callback bind_fn = {};
@@ -333,15 +412,7 @@ bool db_exec(const char *sql, DbArgs args, db_exec_callback exec_fn) {
     return true;
 }
 
-int DbArgs::operator()(int index, DbStatement &stmt) {
-    if (curr < args.size()) {
-        const auto &arg = args[curr++];
-        switch (arg.type) {
-            case DbArg::INT:
-                return stmt.bind_int64(index, arg.int_val);
-            case DbArg::TEXT:
-                return stmt.bind_text(index, arg.str_val);
-        }
-    }
-    return SQLITE_OK;
+export extern "C++" template<DbData T>
+bool db_exec(const char *sql, DbArgs args, T &data) {
+    return db_exec(sql, std::move(args), (db_exec_callback) std::ref(data));
 }

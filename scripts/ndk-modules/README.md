@@ -16,8 +16,8 @@ include $(LOCAL_PATH)/path/to/ndk-modules/init.mk
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := example
-LOCAL_MODULE_SRC_FILES := math.cppm math_detail.cppm
-LOCAL_SRC_FILES := math_impl.cpp consumer.cpp
+LOCAL_MODULE_SRC_FILES := math.ixx math_detail.cxx
+LOCAL_SRC_FILES := math.cxx consumer.cxx
 include $(BUILD_SHARED_LIBRARY_MODULE)
 ```
 
@@ -30,12 +30,12 @@ implementation units (`module math;`); those generate only object files.
 The scanner checks this classification. List each source in only one group;
 module providers in the ordinary list and non-providers in the module list are
 errors. `CLEAR_VARS` clears both lists between targets. Module providers are
-compiled with `-x c++-module`, including when their extension is `.cpp` or `.ixx`.
+compiled with `-x c++-module`, including when their extension is `.cxx` or `.ixx`.
 Both groups are scanned for imports and scheduled by their actual dependencies,
 without a barrier that waits for every module before compiling any consumer.
-As with ordinary ndk-build sources, object paths must be distinct: use
-`math.cppm` and `math_impl.cpp`, or separate directories, instead of `math.cppm`
-and `math.cpp` in the same directory.
+Provider objects retain the source extension (`math.ixx.o`), so a definition-only
+`math.ixx` interface and a `math.cxx` implementation (`math.o`) can share a stem.
+Other sources keep ndk-build's ordinary object names; colliding paths are rejected.
 Clean when changing a source's extension while retaining its object path, to
 discard ndk-build dependency files that still refer to the old filename.
 
@@ -64,3 +64,27 @@ directory. The aggregate graph lives under `$(TARGET_OBJS)/cxx-modules`; `clean`
 removes it. The extension uses internal ndk-build functions, so new NDK versions
 need integration testing. PCH and assembly filters are rejected for participating
 targets. Run clean and build as separate invocations.
+
+Magisk's existing `.cpp` sources provide modules through
+`LOCAL_MODULE_SRC_FILES`; their filenames do not change. Handwritten API
+headers are merged into their existing implementation files, with functions
+exported at their definitions and class methods defined in the class where
+possible. Rust ABI declarations, cross-file implementation declarations and
+forward declarations required by mutually dependent types remain.
+
+The Rust CXX generator keeps its `*-rs.hpp` / `*-rs.cpp` output format. Providers
+include the generated headers. Bridge implementations include those headers
+and import the C++ modules listed in Rust's `include!` metadata, rather than
+requiring handwritten headers for the C++ APIs. The adapter supplies forward
+declarations and explicit template-specialization declarations, and uses
+`bit_cast` for CXX's trivially copyable Str/Slice views to avoid Clang's imported
+anonymous-friend mismatch. Revalidate the adapter when updating CXX.
+
+Public C++ declarations retain explicit C++ linkage for Rust compatibility.
+Non-exported implementation details use module linkage, so imported class
+methods refer to the provider's state rather than copies of `static` variables.
+The Zygisk SDK header, generated CXX/JNI headers and generated build flags remain.
+
+Rust libraries and their generated bindings must exist before invoking ndk-build,
+as in the existing hybrid build. Module scanning, BMI generation and compilation
+ordering are handled entirely by this extension inside ndk-build.

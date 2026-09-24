@@ -1,13 +1,40 @@
+module;
+#include <jni.h>
 #include <sys/mount.h>
 #include <android/dlext.h>
 #include <dlfcn.h>
 #include <poll.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <dirent.h>
+#include <fcntl.h>
+#include <pthread.h>
+#include <sys/socket.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <errno.h>
+#include <rust/cxx.h>
 
-#include <base.hpp>
-#include <core.hpp>
+module magisk.zygisk;
 
-#include "zygisk.hpp"
+#if defined(__LP64__)
+#define ZLOGD(...) LOGD("zygisk64: " __VA_ARGS__)
+#define ZLOGE(...) LOGE("zygisk64: " __VA_ARGS__)
+#define ZLOGI(...) LOGI("zygisk64: " __VA_ARGS__)
+#define ZLOGW(...) LOGW("zygisk64: " __VA_ARGS__)
+#else
+#define ZLOGD(...) LOGD("zygisk32: " __VA_ARGS__)
+#define ZLOGE(...) LOGE("zygisk32: " __VA_ARGS__)
+#define ZLOGI(...) LOGI("zygisk32: " __VA_ARGS__)
+#define ZLOGW(...) LOGW("zygisk32: " __VA_ARGS__)
+#endif
 
+// Extreme verbose logging
+// #define ZLOGV(...) ZLOGD(__VA_ARGS__)
+#define ZLOGV(...) (void*)0
+
+extern "C++" {
 using namespace std;
 
 using comp_entry = void(*)(int);
@@ -84,13 +111,16 @@ int zygisk_main(int argc, char *argv[]) {
 }
 
 // Entrypoint of code injection
+static bool initialize_zygisk(uint32_t) {
+    zygisk_logging();
+    hook_entry();
+    ZLOGD("load success\n");
+    return false;
+}
+
 extern "C" [[maybe_unused]] NativeBridgeCallbacks NativeBridgeItf {
     .version = 2,
     .padding = {},
-    .isCompatibleWith = [](auto) {
-        zygisk_logging();
-        hook_entry();
-        ZLOGD("load success\n");
-        return false;
-    },
+    .isCompatibleWith = initialize_zygisk,
 };
+}

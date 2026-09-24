@@ -1,13 +1,21 @@
+module;
 #include <unistd.h>
 #include <android/log.h>
 #include <sys/syscall.h>
-#include <string>
-#include <map>
+#include <sys/stat.h>
+#include <dirent.h>
+#include <fcntl.h>
+#include <pthread.h>
+#include <sys/socket.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <errno.h>
+#include <rust/cxx.h>
 
-#include <core.hpp>
+module magisk.deny;
 
-#include "deny.hpp"
-
+extern "C++" {
 using namespace std;
 
 struct logger_entry {
@@ -296,4 +304,5 @@ static void process_events_buffer(struct log_msg *msg) {
 void *logcat(void *) {
     check_zygote();
     run();
+}
 }

@@ -1,26 +1,35 @@
-#include <string>
-#include <vector>
+module;
 #include <sys/wait.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <dirent.h>
+#include <fcntl.h>
+#include <pthread.h>
+#include <sys/socket.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <errno.h>
+#include <rust/cxx.h>
 
-#include <consts.hpp>
-#include <base.hpp>
-#include <core.hpp>
+export module magisk.scripting;
+export import magisk.core;
 
 using namespace std;
 
 #define BBEXEC_CMD bbpath(), "sh"
 
-static const char *bbpath() {
+const char *bbpath() {
     static string path;
     path = get_magisk_tmp();
-    path += "/" BBPATH "/busybox";
+    path += concat<"/", BBPATH, "/busybox">.value;
     if (access(path.data(), X_OK) != 0) {
-        path = DATABIN "/busybox";
+        path = concat<DATABIN, "/busybox">.value;
     }
     return path.data();
 }
 
-static void set_script_env() {
+void set_script_env() {
     setenv("ASH_STANDALONE", "1", 1);
     char new_path[4096];
     ssprintf(new_path, sizeof(new_path), "%s:%s", getenv("PATH"), get_magisk_tmp());
@@ -29,7 +38,7 @@ static void set_script_env() {
         setenv("ZYGISK_ENABLED", "1", 1);
 };
 
-void exec_script(Utf8CStr script) {
+export extern "C++" void exec_script(Utf8CStr script) {
     exec_t exec {
         .pre_exec = set_script_env,
         .fork = fork_no_orphan
@@ -37,7 +46,7 @@ void exec_script(Utf8CStr script) {
     exec_command_sync(exec, BBEXEC_CMD, script.c_str());
 }
 
-static timespec pfs_timeout;
+timespec pfs_timeout;
 
 #define PFS_SETUP() \
 if (pfs) { \
@@ -74,10 +83,10 @@ if (pfs) { \
     exit(0); \
 }
 
-void exec_common_scripts(Utf8CStr stage) {
+export extern "C++" void exec_common_scripts(Utf8CStr stage) {
     LOGI("* Running %s.d scripts\n", stage.c_str());
     char path[4096];
-    char *name = path + sprintf(path, SECURE_DIR "/%s.d", stage.c_str());
+    char *name = path + sprintf(path, concat<SECURE_DIR, "/%s.d">.value, stage.c_str());
     auto dir = xopen_dir(path);
     if (!dir) return;
 
@@ -110,13 +119,13 @@ void exec_common_scripts(Utf8CStr stage) {
     PFS_DONE()
 }
 
-static bool operator>(const timespec &a, const timespec &b) {
+bool operator>(const timespec &a, const timespec &b) {
     if (a.tv_sec != b.tv_sec)
         return a.tv_sec > b.tv_sec;
     return a.tv_nsec > b.tv_nsec;
 }
 
-void exec_module_scripts(Utf8CStr stage, const rust::Vec<ModuleInfo> &module_list) {
+export extern "C++" void exec_module_scripts(Utf8CStr stage, const rust::Vec<ModuleInfo> &module_list) {
     LOGI("* Running module %s scripts\n", stage.c_str());
     if (module_list.empty())
         return;
@@ -134,7 +143,7 @@ void exec_module_scripts(Utf8CStr stage, const rust::Vec<ModuleInfo> &module_lis
 
     char path[4096];
     for (auto &m : module_list) {
-        sprintf(path, MODULEROOT "/%.*s/%s.sh", (int) m.name.size(), m.name.data(), stage.c_str());
+        sprintf(path, concat<MODULEROOT, "/%.*s/%s.sh">.value, (int) m.name.size(), m.name.data(), stage.c_str());
         if (access(path, F_OK) == -1)
             continue;
         LOGI("%.*s: exec [%s.sh]\n", (int) m.name.size(), m.name.data(), stage.c_str());
@@ -157,7 +166,7 @@ appops set %s REQUEST_INSTALL_PACKAGES allow
 rm -f $APK
 )EOF";
 
-void install_apk(Utf8CStr apk) {
+export extern "C++" void install_apk(Utf8CStr apk) {
     setfilecon(apk.c_str(), MAGISK_FILE_CON);
     char cmds[sizeof(install_script) + 4096];
     ssprintf(cmds, sizeof(cmds), install_script, apk.c_str(), JAVA_PACKAGE_NAME);
@@ -170,7 +179,7 @@ log -t Magisk "pm_uninstall: $PKG"
 log -t Magisk "pm_uninstall: $(pm uninstall $PKG 2>&1)"
 )EOF";
 
-void uninstall_pkg(Utf8CStr pkg) {
+export extern "C++" void uninstall_pkg(Utf8CStr pkg) {
     char cmds[sizeof(uninstall_script) + 256];
     ssprintf(cmds, sizeof(cmds), uninstall_script, pkg.c_str());
     exec_command_async("/system/bin/sh", "-c", cmds);
@@ -183,14 +192,14 @@ log -t Magisk "pm_clear: $PKG (user=$USER)"
 log -t Magisk "pm_clear: $(pm clear --user $USER $PKG 2>&1)"
 )EOF";
 
-void clear_pkg(const char *pkg, int user_id) {
+export extern "C++" void clear_pkg(const char *pkg, int user_id) {
     char cmds[sizeof(clear_script) + 288];
     ssprintf(cmds, sizeof(cmds), clear_script, pkg, user_id);
     exec_command_async("/system/bin/sh", "-c", cmds);
 }
 
 [[noreturn]] __printflike(2, 3)
-static void abort(FILE *fp, const char *fmt, ...) {
+void abort(FILE *fp, const char *fmt, ...) {
     va_list valist;
     va_start(valist, fmt);
     vfprintf(fp, fmt, valist);
@@ -205,12 +214,12 @@ install_module
 exit 0
 )EOF";
 
-void install_module(Utf8CStr file) {
+export extern "C++" void install_module(Utf8CStr file) {
     if (getuid() != 0)
         abort(stderr, "Run this command with root");
     if (access(DATABIN, F_OK) ||
         access(bbpath(), X_OK) ||
-        access(DATABIN "/util_functions.sh", F_OK))
+        access(concat<DATABIN, "/util_functions.sh">.value, F_OK))
         abort(stderr, "Incomplete Magisk install");
     if (access(file.c_str(), F_OK))
         abort(stderr, "'%s' does not exist", file.c_str());

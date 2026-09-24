@@ -1,12 +1,23 @@
-#include <set>
+module;
 #include <sys/mount.h>
 #include <sys/sysmacros.h>
 #include <libgen.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <dirent.h>
+#include <fcntl.h>
+#include <pthread.h>
+#include <sys/socket.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <errno.h>
+#include <rust/cxx.h>
 
-#include <base.hpp>
-#include <consts.hpp>
+export module magisk.init.mount;
+export import magisk.init.config;
 
-#include "init.hpp"
+#define PLOGE(fmt, args...) LOGE(fmt " failed with %d: %s\n", ##args, errno, ::strerror(errno))
 
 using namespace std;
 
@@ -19,13 +30,13 @@ struct devinfo {
     char devpath[PATH_MAX];
 };
 
-static vector<devinfo> dev_list;
+vector<devinfo> dev_list;
 
 // When this boolean is set, this means we are currently
 // running magiskinit on legacy SAR AVD emulator
-bool avd_hack = false;
+export extern "C++" bool avd_hack = false;
 
-static void parse_device(devinfo *dev, const char *uevent) {
+void parse_device(devinfo *dev, const char *uevent) {
     dev->partname[0] = '\0';
     dev->devpath[0] = '\0';
     dev->dmname[0] = '\0';
@@ -44,7 +55,7 @@ static void parse_device(devinfo *dev, const char *uevent) {
     });
 }
 
-void MagiskInit::collect_devices() const noexcept {
+extern "C++" void MagiskInit::collect_devices() const noexcept {
     char path[PATH_MAX];
     devinfo dev{};
     if (auto dir = xopen_dir("/sys/dev/block"); dir) {
@@ -71,7 +82,7 @@ void MagiskInit::collect_devices() const noexcept {
     }
 }
 
-uint64_t MagiskInit::find_block(const char *partname) const noexcept {
+extern "C++" uint64_t MagiskInit::find_block(const char *partname) const noexcept {
     if (dev_list.empty())
         collect_devices();
 
@@ -102,7 +113,7 @@ uint64_t MagiskInit::find_block(const char *partname) const noexcept {
     return 0;
 }
 
-void MagiskInit::mount_preinit_dir() noexcept {
+extern "C++" void MagiskInit::mount_preinit_dir() noexcept {
     if (preinit_dev.empty()) return;
     auto dev = find_block(preinit_dev.c_str());
     if (dev == 0) {
@@ -142,7 +153,7 @@ void MagiskInit::mount_preinit_dir() noexcept {
     }
 }
 
-bool MagiskInit::mount_system_root() noexcept {
+extern "C++" bool MagiskInit::mount_system_root() noexcept {
     LOGD("Mounting system_root\n");
 
     // there's no /dev in stub cpio
@@ -209,7 +220,7 @@ mount_root:
     return is_two_stage;
 }
 
-void MagiskInit::setup_tmp(const char *path) noexcept {
+extern "C++" void MagiskInit::setup_tmp(const char *path) noexcept {
     LOGD("Setup Magisk tmp at %s\n", path);
     chdir("/data");
 
@@ -239,7 +250,7 @@ void MagiskInit::setup_tmp(const char *path) noexcept {
         xmkdirs(SHELLPTS, 0755);
         xmount("devpts", SHELLPTS, "devpts", MS_NOSUID | MS_NOEXEC, "newinstance");
         xmount(nullptr, SHELLPTS, nullptr, MS_PRIVATE, nullptr);
-        if (access(SHELLPTS "/ptmx", F_OK)) {
+        if (access(concat<SHELLPTS, "/ptmx">.value, F_OK)) {
             umount2(SHELLPTS, MNT_DETACH);
             rmdir(SHELLPTS);
         }

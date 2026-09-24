@@ -1,11 +1,22 @@
+module;
 #include <dlfcn.h>
-
-#include <base.hpp>
-#include <core.hpp>
-
 #include <api/system_properties.h>
 #include <system_properties/prop_info.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <dirent.h>
+#include <fcntl.h>
+#include <pthread.h>
+#include <sys/socket.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <errno.h>
+#include <rust/cxx.h>
 
+module magisk.core;
+
+extern "C++" {
 using namespace std;
 
 // This has to keep in sync with SysProp in mod.rs
@@ -52,4 +63,5 @@ extern "C" SysProp get_sys_prop() {
         LOGE("resetprop: __system_properties_init error\n");
     }
     return prop;
+}
 }

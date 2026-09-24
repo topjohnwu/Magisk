@@ -20,8 +20,19 @@ MY_CXX_ORIGINAL_COMPILE_CPP = $(value compile-cpp-source)
 endef
 $(eval $(MY_CXX_SAVE_COMPILER))
 
+define MY_CXX_SAVE_OBJECT_NAME
+MY_CXX_ORIGINAL_OBJECT_NAME = $(value get-object-name)
+endef
+$(eval $(MY_CXX_SAVE_OBJECT_NAME))
+
+# Keep the interface suffix, allowing foo.ixx and foo.cxx in one target.
+get-object-name = $(strip $(if $(and $(MY_CXX_ENABLED.$(TARGET_OBJS).$(call strip-lib-prefix,$(LOCAL_MODULE))),$(call MY_CXX_IS_MODULE_SOURCE,$1)),\
+    $(patsubst %$(TARGET_OBJ_EXTENSION),%$(suffix $1)$(TARGET_OBJ_EXTENSION),$(call MY_CXX_ORIGINAL_OBJECT_NAME,$1)),\
+    $(call MY_CXX_ORIGINAL_OBJECT_NAME,$1)))
+
 compile-cpp-source = \
     $(if $(MY_CXX_ENABLED.$(TARGET_OBJS).$(LOCAL_MODULE)),\
+        $(eval LOCAL_OBJECTS := $(addprefix $(LOCAL_OBJS_DIR)/,$(filter %$(TARGET_OBJ_EXTENSION),$(foreach MY_CXX_FILE,$(LOCAL_SRC_FILES),$(call get-object-name,$(MY_CXX_FILE)))))) \
         $(eval MY_CXX_IS_MODULE := $(call MY_CXX_IS_MODULE_SOURCE,$1)) \
         $(if $(MY_CXX_IS_MODULE),\
             $(call add-src-files-target-cflags,$1,-x c++-module))) \
