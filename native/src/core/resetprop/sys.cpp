@@ -2,21 +2,8 @@ module;
 #include <dlfcn.h>
 #include <api/system_properties.h>
 #include <system_properties/prop_info.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <dirent.h>
-#include <fcntl.h>
-#include <pthread.h>
-#include <sys/socket.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <errno.h>
-#include <rust/cxx.h>
 
 module core;
-
-using namespace std;
 
 // This has to keep in sync with SysProp in mod.rs
 struct SysProp {

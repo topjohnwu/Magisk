@@ -17,17 +17,17 @@ module;
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/mount.h>
-#include <dirent.h>
-#include <pthread.h>
-#include <sys/socket.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
 #include <flags.h>
 #include <rust/cxx.h>
+#include <ctype.h>
+#include <signal.h>
 
 export module core:su;
+import std;
 export import :utils;
 
 #define PLOGE(fmt, args...) LOGE(fmt " failed with %d: %s\n", ##args, errno, ::strerror(errno))

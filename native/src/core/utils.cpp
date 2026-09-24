@@ -1,22 +1,18 @@
 module;
-#include <csignal>
-#include <libgen.h>
-#include <sys/mount.h>
 #include <sys/sysmacros.h>
 #include <linux/input.h>
-#include <sys/socket.h>
+#include <linux/fs.h>
+#include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <dirent.h>
 #include <fcntl.h>
-#include <pthread.h>
 #include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include <errno.h>
 #include <rust/cxx.h>
 
 export module core:utils;
+import std;
 export import base;
 export import :sqlite;
 

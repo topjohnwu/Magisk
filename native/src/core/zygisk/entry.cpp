@@ -1,22 +1,14 @@
 module;
-#include <jni.h>
-#include <sys/mount.h>
 #include <android/dlext.h>
 #include <dlfcn.h>
 #include <poll.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <dirent.h>
 #include <fcntl.h>
-#include <pthread.h>
-#include <sys/socket.h>
-#include <string.h>
 #include <stdlib.h>
-#include <stdio.h>
-#include <errno.h>
-#include <rust/cxx.h>
 
 module core;
+import std;
 
 #if defined(__LP64__)
 #define ZLOGD(...) LOGD("zygisk64: " __VA_ARGS__)

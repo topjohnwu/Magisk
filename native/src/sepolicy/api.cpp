@@ -1,18 +1,9 @@
 module;
 #include <sepol/policydb/policydb.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <dirent.h>
-#include <fcntl.h>
-#include <pthread.h>
-#include <sys/socket.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <errno.h>
 #include <rust/cxx.h>
 
 module policy;
+import std;
 
 using Str = rust::Str;
 using StrVec = rust::Vec<rust::Str>;

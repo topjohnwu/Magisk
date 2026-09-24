@@ -170,7 +170,7 @@ pub fn gen_cxx_binding(name: &str) {
         .map(|m| format!("{export}import {m};\n"))
         .collect::<String>();
     let implementation = format!(
-        "module;\n#define MAGISK_CXX_BRIDGE_IMPL\n#include \"{name}.hpp\"\n#undef MAGISK_CXX_BRIDGE_IMPL\n\n{export}module {module};\n{imports}\n{definitions}"
+        "module;\n#define MAGISK_CXX_BRIDGE_IMPL\n#include \"{name}.hpp\"\n#undef MAGISK_CXX_BRIDGE_IMPL\n\n{export}module {module};\nimport std;\n{imports}\n{definitions}"
     );
     write_if_diff(format!("{name}.hpp"), interface.as_bytes()).ok_or_exit();
     write_if_diff(format!("{name}.cpp"), implementation.as_bytes()).ok_or_exit();

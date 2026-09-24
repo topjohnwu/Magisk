@@ -1,21 +1,15 @@
 module;
-#include <vector>
 #include <sys/sysmacros.h>
-#include <sys/types.h>
 #include <linux/input.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <dirent.h>
-#include <pthread.h>
-#include <sys/socket.h>
 #include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <errno.h>
 #include <rust/cxx.h>
+#include <sys/ioctl.h>
 
 export module init;
+import std;
 export import base;
 
 export {
