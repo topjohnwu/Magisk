@@ -1,24 +1,18 @@
 module;
 #include <jni.h>
 #include <sys/mman.h>
-#include <sys/mount.h>
 #include <sys/resource.h>
 #include <dlfcn.h>
 #include <unwind.h>
 #include <lsplt.hpp>
-#include <sys/stat.h>
 #include <unistd.h>
-#include <dirent.h>
-#include <fcntl.h>
 #include <pthread.h>
-#include <sys/socket.h>
 #include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include <errno.h>
-#include <rust/cxx.h>
+#include <sched.h>
 
 module core;
+import std;
 
 #if defined(__LP64__)
 #define ZLOGD(...) LOGD("zygisk64: " __VA_ARGS__)

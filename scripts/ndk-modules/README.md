@@ -69,13 +69,19 @@ Magisk's existing `.cpp` sources provide modules through
 `LOCAL_MODULE_SRC_FILES`; their filenames do not change. Module names are
 plain component names such as `base`, `core` and `init`. Core uses interface
 partitions `core:utils`, `core:sqlite`, `core:scripting`, `core:su`, `core:deny`
-and `core:zygisk`. Its primary interface re-exports them, so consumers only
-need `import core;`. Partitions import each other with `import :name;`, never
+and `core:zygisk`. Its primary interface re-exports them, so consumers access
+core APIs through `import core;`. Partitions use `import :name;`, never
 the primary interface, keeping the dependency graph acyclic. Handwritten
-API headers are merged into their existing implementation files, with functions
-exported at their definitions and class methods defined in the class where
-possible. Rust ABI declarations, cross-file implementation declarations and
-forward declarations required by mutually dependent types remain.
+sources and generated bridges import `std` directly where needed; project
+modules do not re-export it. Global module fragments include only the C,
+platform and bridge headers needed by that source, plus C++ facilities absent
+from the `std` subset. Headers also included by a generated bridge, such as
+`<memory>`, are preloaded in the global fragment to keep their declarations in
+the global module. Handwritten API headers are merged into their existing
+implementation files, with functions exported at their definitions and class
+methods defined in the class where possible. Rust ABI declarations, cross-file
+implementation declarations and forward declarations required by mutually
+dependent types remain.
 
 The Rust CXX generator keeps its `*-rs.hpp` / `*-rs.cpp` output format.
 Providers include the generated application declarations in their export

@@ -1,19 +1,13 @@
 module;
-#include <sys/wait.h>
 #include <sys/mount.h>
-#include <sys/stat.h>
 #include <unistd.h>
-#include <dirent.h>
-#include <fcntl.h>
-#include <pthread.h>
-#include <sys/socket.h>
-#include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <errno.h>
 #include <rust/cxx.h>
+#include <sched.h>
 
 module core;
+import std;
 
 using namespace std;
 

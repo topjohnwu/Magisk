@@ -12,14 +12,17 @@ module;
 #include <fcntl.h>
 #include <pthread.h>
 #include <rust/cxx.h>
-#include <sys/socket.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
+#include <cctype>
+#include <sched.h>
+#include <signal.h>
+#include <stdarg.h>
 
 export module base;
-export import std;
+import std;
 
 export template<__SIZE_TYPE__ N>
 struct StringLiteral {

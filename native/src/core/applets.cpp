@@ -2,6 +2,7 @@
 #include <sys/stat.h>
 #include <stdio.h>
 
+import std;
 import core;
 
 using namespace std;
