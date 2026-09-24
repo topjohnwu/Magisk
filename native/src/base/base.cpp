@@ -27,67 +27,74 @@ import std;
 export template<__SIZE_TYPE__ N>
 struct StringLiteral {
     char value[N]{};
-    constexpr StringLiteral() = default;
+    consteval StringLiteral() = default;
     consteval StringLiteral(const char (&text)[N]) {
         for (__SIZE_TYPE__ i = 0; i < N; ++i) value[i] = text[i];
     }
+    constexpr const char *c_str() const [[clang::lifetimebound]] { return value; }
+    constexpr operator const char *() const [[clang::lifetimebound]] { return value; }
+    template<__SIZE_TYPE__ M>
+    consteval auto operator+(const StringLiteral<M> &rhs) const {
+        StringLiteral<N + M - 1> result;
+        for (__SIZE_TYPE__ i = 0; i < N - 1; ++i) result.value[i] = value[i];
+        for (__SIZE_TYPE__ i = 0; i < M; ++i) result.value[N - 1 + i] = rhs.value[i];
+        return result;
+    }
+    template<__SIZE_TYPE__ M>
+    consteval auto operator+(const char (&rhs)[M]) const {
+        return *this + StringLiteral<M>(rhs);
+    }
 };
 
-template<StringLiteral... Parts>
-consteval auto concat_literals() {
-    StringLiteral<((sizeof(Parts.value) - 1) + ...) + 1> result;
-    __SIZE_TYPE__ offset = 0;
-    auto append = [&](auto part) {
-        for (__SIZE_TYPE__ i = 0; i + 1 < sizeof(part.value); ++i)
-            result.value[offset++] = part.value[i];
-    };
-    (append(Parts), ...);
-    return result;
+export template<__SIZE_TYPE__ N, __SIZE_TYPE__ M>
+consteval auto operator+(const char (&lhs)[N], const StringLiteral<M> &rhs) {
+    return StringLiteral<N>(lhs) + rhs;
 }
 
-export template<StringLiteral... Parts>
-inline constexpr auto concat = concat_literals<Parts...>();
+export template<StringLiteral Text>
+consteval const auto &operator""_cs() { return Text; }
 
-export inline constexpr char JAVA_PACKAGE_NAME[] = "com.topjohnwu.magisk";
-export inline constexpr char SECURE_DIR[] = "/data/adb";
-export inline constexpr auto &MODULEROOT = concat<SECURE_DIR, "/modules">.value;
-export inline constexpr auto &DATABIN = concat<SECURE_DIR, "/magisk">.value;
-export inline constexpr auto &MAGISKDB = concat<SECURE_DIR, "/magisk.db">.value;
+// References keep the constinit strings usable in constant expressions.
+export inline constinit const auto &JAVA_PACKAGE_NAME = "com.topjohnwu.magisk"_cs;
+export inline constinit const auto &SECURE_DIR = "/data/adb"_cs;
+export inline constinit const auto &MODULEROOT = SECURE_DIR + "/modules";
+export inline constinit const auto &DATABIN = SECURE_DIR + "/magisk";
+export inline constinit const auto &MAGISKDB = SECURE_DIR + "/magisk.db";
 // tmpfs paths
-export inline constexpr char INTLROOT[] = ".magisk";
-export inline constexpr auto &MIRRDIR = concat<INTLROOT, "/mirror">.value;
-export inline constexpr auto &PREINITMIRR = concat<INTLROOT, "/preinit">.value;
-export inline constexpr auto &DEVICEDIR = concat<INTLROOT, "/device">.value;
-export inline constexpr auto &PREINITDEV = concat<DEVICEDIR, "/preinit">.value;
-export inline constexpr auto &WORKERDIR = concat<INTLROOT, "/worker">.value;
-export inline constexpr auto &BBPATH = concat<INTLROOT, "/busybox">.value;
-export inline constexpr auto &ROOTOVL = concat<INTLROOT, "/rootdir">.value;
-export inline constexpr auto &SHELLPTS = concat<INTLROOT, "/pts">.value;
-export inline constexpr auto &MAIN_CONFIG = concat<INTLROOT, "/config">.value;
-export inline constexpr auto &MAIN_SOCKET = concat<DEVICEDIR, "/socket">.value;
-export inline constexpr auto POST_FS_DATA_WAIT_TIME = 40;
-export inline constexpr auto POST_FS_DATA_SCRIPT_MAX_TIME = 35;
+export inline constinit const auto &INTLROOT = ".magisk"_cs;
+export inline constinit const auto &MIRRDIR = INTLROOT + "/mirror";
+export inline constinit const auto &PREINITMIRR = INTLROOT + "/preinit";
+export inline constinit const auto &DEVICEDIR = INTLROOT + "/device";
+export inline constinit const auto &PREINITDEV = DEVICEDIR + "/preinit";
+export inline constinit const auto &WORKERDIR = INTLROOT + "/worker";
+export inline constinit const auto &BBPATH = INTLROOT + "/busybox";
+export inline constinit const auto &ROOTOVL = INTLROOT + "/rootdir";
+export inline constinit const auto &SHELLPTS = INTLROOT + "/pts";
+export inline constinit const auto &MAIN_CONFIG = INTLROOT + "/config";
+export inline constinit const auto &MAIN_SOCKET = DEVICEDIR + "/socket";
+export inline constinit const auto POST_FS_DATA_WAIT_TIME = 40;
+export inline constinit const auto POST_FS_DATA_SCRIPT_MAX_TIME = 35;
 // Unconstrained domain the daemon and root processes run in
-export inline constexpr char SEPOL_PROC_DOMAIN[] = "magisk";
-export inline constexpr auto &MAGISK_PROC_CON = concat<"u:r:", SEPOL_PROC_DOMAIN, ":s0">.value;
+export inline constinit const auto &SEPOL_PROC_DOMAIN = "magisk"_cs;
+export inline constinit const auto &MAGISK_PROC_CON = "u:r:" + SEPOL_PROC_DOMAIN + ":s0";
 // Unconstrained file type that anyone can access
-export inline constexpr char SEPOL_FILE_TYPE[] = "magisk_file";
-export inline constexpr auto &MAGISK_FILE_CON = concat<"u:object_r:", SEPOL_FILE_TYPE, ":s0">.value;
-export inline constexpr char PLAT_POLICY_DIR[] = "/system/etc/selinux/";
-export inline constexpr char VEND_POLICY_DIR[] = "/vendor/etc/selinux/";
-export inline constexpr char PROD_POLICY_DIR[] = "/product/etc/selinux/";
-export inline constexpr char ODM_POLICY_DIR[] = "/odm/etc/selinux/";
-export inline constexpr char SYSEXT_POLICY_DIR[] = "/system_ext/etc/selinux/";
-export inline constexpr auto &SPLIT_PLAT_CIL = concat<PLAT_POLICY_DIR, "plat_sepolicy.cil">.value;
-export inline constexpr char SELINUX_MNT[] = "/sys/fs/selinux";
-export inline constexpr auto &SELINUX_VERSION = concat<SELINUX_MNT, "/policyvers">.value;
-export inline constexpr char DEFAULT_DT_DIR[] = "/proc/device-tree/firmware/android";
-export inline constexpr char REDIR_PATH[] = "/data/magiskinit";
-export inline constexpr char PRELOAD_LIB[] = "/dev/preload.so";
-export inline constexpr char PRELOAD_POLICY[] = "/dev/sepolicy";
-export inline constexpr char PRELOAD_ACK[] = "/dev/ack";
+export inline constinit const auto &SEPOL_FILE_TYPE = "magisk_file"_cs;
+export inline constinit const auto &MAGISK_FILE_CON = "u:object_r:" + SEPOL_FILE_TYPE + ":s0";
+export inline constinit const auto &PLAT_POLICY_DIR = "/system/etc/selinux/"_cs;
+export inline constinit const auto &VEND_POLICY_DIR = "/vendor/etc/selinux/"_cs;
+export inline constinit const auto &PROD_POLICY_DIR = "/product/etc/selinux/"_cs;
+export inline constinit const auto &ODM_POLICY_DIR = "/odm/etc/selinux/"_cs;
+export inline constinit const auto &SYSEXT_POLICY_DIR = "/system_ext/etc/selinux/"_cs;
+export inline constinit const auto &SPLIT_PLAT_CIL = PLAT_POLICY_DIR + "plat_sepolicy.cil";
+export inline constinit const auto &SELINUX_MNT = "/sys/fs/selinux"_cs;
+export inline constinit const auto &SELINUX_VERSION = SELINUX_MNT + "/policyvers";
+export inline constinit const auto &DEFAULT_DT_DIR = "/proc/device-tree/firmware/android"_cs;
+export inline constinit const auto &REDIR_PATH = "/data/magiskinit"_cs;
+export inline constinit const auto &PRELOAD_LIB = "/dev/preload.so"_cs;
+export inline constinit const auto &PRELOAD_POLICY = "/dev/sepolicy"_cs;
+export inline constinit const auto &PRELOAD_ACK = "/dev/ack"_cs;
 
-export inline constexpr const char *applet_names[] = { "su", "resetprop", nullptr };
+export inline constinit const char *const applet_names[] = { "su", "resetprop", nullptr };
 
 #define PLOGE(fmt, args...) LOGE(fmt " failed with %d: %s\n", ##args, errno, ::strerror(errno))
 
@@ -164,6 +171,8 @@ struct Utf8CStr {
     Utf8CStr(const char *s, size_t len) : repr{} {
         cxx$utf8str$new(this, s, len);
     }
+    template<__SIZE_TYPE__ N>
+    Utf8CStr(const StringLiteral<N> &s [[clang::lifetimebound]]) : Utf8CStr(s.c_str()) {}
 
     Utf8CStr() : Utf8CStr("", 1) {};
     Utf8CStr(const Utf8CStr &o) = default;

@@ -83,6 +83,23 @@ methods defined in the class where possible. Rust ABI declarations, cross-file
 implementation declarations and forward declarations required by mutually
 dependent types remain.
 
+Shared string constants use the `_cs` literal and `consteval` concatenation:
+
+```cpp
+inline constinit const auto &SECURE_DIR = "/data/adb"_cs;
+inline constinit const auto &DATABIN = SECURE_DIR + "/magisk";
+```
+
+The references keep constant-initialized strings usable in constant expressions
+and give concatenated constants static storage. `+` accepts ordinary string
+literals on either side. Implicit `const char*` conversion supports C APIs;
+use `.c_str()` for C varargs, which do not apply user-defined conversions.
+Clang's format-string diagnostics are limited for formats passed through this
+implicit conversion.
+An unnamed concatenation lives until the end of its full expression. Bind it
+to a static `constinit const auto &` before retaining its pointer. Lifetime
+annotations diagnose pointers or views escaping a temporary.
+
 The Rust CXX generator keeps its `*-rs.hpp` / `*-rs.cpp` output format.
 Providers include the generated application declarations in their export
 blocks, so types and functions belong to their named module. The generated

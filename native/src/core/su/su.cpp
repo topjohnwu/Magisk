@@ -347,7 +347,7 @@ export void exec_root_shell(int client, int pid, SuRequest &req, MntNsMode mode)
     if (infd < 0 || outfd < 0 || errfd < 0) {
         string pts;
         string ptmx;
-        auto magiskpts = get_magisk_tmp() + std::string{concat<"/", SHELLPTS>.value, sizeof(concat<"/", SHELLPTS>.value) - 1};
+        auto magiskpts = get_magisk_tmp() + std::string{"/" + SHELLPTS};
         if (access(magiskpts.data(), F_OK)) {
             pts = "/dev/pts";
             ptmx = "/dev/ptmx";

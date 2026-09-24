@@ -22,9 +22,9 @@ using namespace std;
 const char *bbpath() {
     static string path;
     path = get_magisk_tmp();
-    path += concat<"/", BBPATH, "/busybox">.value;
+    path += "/" + BBPATH + "/busybox";
     if (access(path.data(), X_OK) != 0) {
-        path = concat<DATABIN, "/busybox">.value;
+        path = DATABIN + "/busybox";
     }
     return path.data();
 }
@@ -86,7 +86,7 @@ if (pfs) { \
 export void exec_common_scripts(Utf8CStr stage) {
     LOGI("* Running %s.d scripts\n", stage.c_str());
     char path[4096];
-    char *name = path + sprintf(path, concat<SECURE_DIR, "/%s.d">.value, stage.c_str());
+    char *name = path + sprintf(path, SECURE_DIR + "/%s.d", stage.c_str());
     auto dir = xopen_dir(path);
     if (!dir) return;
 
@@ -143,7 +143,7 @@ export void exec_module_scripts(Utf8CStr stage, const rust::Vec<ModuleInfo> &mod
 
     char path[4096];
     for (auto &m : module_list) {
-        sprintf(path, concat<MODULEROOT, "/%.*s/%s.sh">.value, (int) m.name.size(), m.name.data(), stage.c_str());
+        sprintf(path, MODULEROOT + "/%.*s/%s.sh", (int) m.name.size(), m.name.data(), stage.c_str());
         if (access(path, F_OK) == -1)
             continue;
         LOGI("%.*s: exec [%s.sh]\n", (int) m.name.size(), m.name.data(), stage.c_str());
@@ -169,7 +169,7 @@ rm -f $APK
 export void install_apk(Utf8CStr apk) {
     setfilecon(apk.c_str(), MAGISK_FILE_CON);
     char cmds[sizeof(install_script) + 4096];
-    ssprintf(cmds, sizeof(cmds), install_script, apk.c_str(), JAVA_PACKAGE_NAME);
+    ssprintf(cmds, sizeof(cmds), install_script, apk.c_str(), JAVA_PACKAGE_NAME.c_str());
     exec_command_async("/system/bin/sh", "-c", cmds);
 }
 
@@ -219,7 +219,7 @@ export void install_module(Utf8CStr file) {
         abort(stderr, "Run this command with root");
     if (access(DATABIN, F_OK) ||
         access(bbpath(), X_OK) ||
-        access(concat<DATABIN, "/util_functions.sh">.value, F_OK))
+        access(DATABIN + "/util_functions.sh", F_OK))
         abort(stderr, "Incomplete Magisk install");
     if (access(file.c_str(), F_OK))
         abort(stderr, "'%s' does not exist", file.c_str());

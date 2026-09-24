@@ -93,9 +93,9 @@ export void write_string(int fd, string_view str) {
 export const char *get_magisk_tmp() {
     static const char *path = nullptr;
     if (path == nullptr) {
-        if (access(concat<"/debug_ramdisk/", INTLROOT>.value, F_OK) == 0) {
+        if (access("/debug_ramdisk/" + INTLROOT, F_OK) == 0) {
             path = "/debug_ramdisk";
-        } else if (access(concat<"/sbin/", INTLROOT>.value, F_OK) == 0) {
+        } else if (access("/sbin/" + INTLROOT, F_OK) == 0) {
             path = "/sbin";
         } else {
             path = "";

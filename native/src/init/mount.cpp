@@ -248,7 +248,7 @@ void MagiskInit::setup_tmp(const char *path) noexcept {
         xmkdirs(SHELLPTS, 0755);
         xmount("devpts", SHELLPTS, "devpts", MS_NOSUID | MS_NOEXEC, "newinstance");
         xmount(nullptr, SHELLPTS, nullptr, MS_PRIVATE, nullptr);
-        if (access(concat<SHELLPTS, "/ptmx">.value, F_OK)) {
+        if (access(SHELLPTS + "/ptmx", F_OK)) {
             umount2(SHELLPTS, MNT_DETACH);
             rmdir(SHELLPTS);
         }
