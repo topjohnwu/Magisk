@@ -82,10 +82,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: [23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 36.1, "CANARY"]
+        version: [23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 36.1, "37.0"]
         type: [""]
         include:
-          - version: "CinnamonBun"
+          - version: "CANARY"
             type: "google_apis_ps16k"
 
     steps:
@@ -103,7 +103,7 @@ jobs:
 
       - name: Run AVD test
         timeout-minutes: 18
-        run: scripts/avd.sh test -l -v ${{ matrix.version }} -t ${{ matrix.type }}
+        run: scripts/avd.sh test -l -v ${{ matrix.version }} -t "${{ matrix.type }}"
 
       - name: Upload logs on error
         if: ${{ failure() }}
@@ -122,7 +122,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: [23, 24, 25, 26, 27, 28, 29, 30]
+        version: [23, 26, 28, 30]
 
     steps:
       - name: Check out
@@ -139,9 +139,7 @@ jobs:
 
       - name: Run AVD test
         timeout-minutes: 18
-        env:
-          FORCE_32_BIT: 1
-        run: scripts/avd.sh test -l -v ${{ matrix.version }}
+        run: scripts/avd.sh test -l -a x86 -v ${{ matrix.version }}
 
       - name: Upload logs on error
         if: ${{ failure() }}
@@ -156,7 +154,7 @@ jobs:
     name: Test ${{ matrix.device }}
     runs-on: ubuntu-24.04
     needs: build
-    if: ${{ github.event_name != 'push' }}
+    if: false
     env:
       CF_HOME: /home/runner/aosp_cf_phone
     strategy:

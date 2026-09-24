@@ -16,26 +16,15 @@
     <string name="loading">Duke u ngarkuar…</string>
     <string name="update">Përditëso</string>
     <string name="not_available">N/A</string>
-    <string name="hide">Fshih</string>
-    <string name="restore">Rikthe</string>
-    <string name="home_package">Paketa</string>
-    <string name="home_app_title">Aplikacioni</string>
-    <string name="home_core_title">Bërthama</string>
-    <string name="reinstall">Rinstalo</string>
+    <string name="hide">Fshih</string>    <string name="home_package">Paketa</string>
+    <string name="home_app_title">Aplikacioni</string>    <string name="reinstall">Rinstalo</string>
     <string name="home_notice_content">Shkarkoni Magisk VETËM nga faqja zyrtare në GitHub. Skedarët nga burime të panjohura mund të jenë të dëmshëm!</string>
     <string name="home_support_title">Na mbështetni</string>
     <string name="home_follow_title">Na ndiqni</string>
     <string name="home_item_source">Burimi</string>
-    <string name="home_support_content">Magisk është dhe do të jetë gjithmonë falas dhe me kod të hapur. Megjithatë, ju mund të tregoni vlerësimin tuaj duke bërë një donacion.</string>
-    <string name="donate">Dhuro</string>
-    <string name="documents">Dokumentet</string>
-    <string name="report_bugs">Raporto gabimet</string>
-    <string name="home_status_title">Statusi</string>
-    <string name="home_installed_version">I instaluar</string>
+    <string name="home_support_content">Magisk është dhe do të jetë gjithmonë falas dhe me kod të hapur. Megjithatë, ju mund të tregoni vlerësimin tuaj duke bërë një donacion.</string>    <string name="home_installed_version">I instaluar</string>
     <string name="home_latest_version">I fundit</string>
-    <string name="invalid_update_channel">Kanal përditësimi i pavlefshëm</string>
-    <string name="uninstall">Çinstalo</string>
-    <string name="uninstall_magisk_title">Çinstalo Magisk</string>
+    <string name="invalid_update_channel">Kanal përditësimi i pavlefshëm</string>    <string name="uninstall_magisk_title">Çinstalo Magisk</string>
     <string name="uninstall_magisk_msg">Të gjitha modulet do të çaktivizohen/hiqen!\nRoot do të hiqet!\nÇdo hapësirë ruajtëse e brendshme e çkoduar përmes Magisk do të ri-enkriptohet!</string>
 
     <!--Install-->
@@ -47,12 +36,7 @@
     <string name="install_next">Tjetër</string>
     <string name="install_start">Le t\'ia fillojmë</string>
     <string name="manager_download_install">Shtypni për të shkarkuar dhe instaluar</string>
-    <string name="direct_install">Instalim direkt (I rekomanduar)</string>
-    <string name="direct_install_summary">Instalo Magisk drejtpërdrejt në particionin boot</string>
-    <string name="install_inactive_slot">Instalo në slotin joaktiv (Pas OTA)</string>
-    <string name="install_inactive_slot_summary">Instalo në slotin joaktiv pas një përditësimi OTA</string>
-    <string name="select_patch_file_summary">Arnimi i një imazhi raw, ODIN tar, ose skedari payload.bin</string>
-    <string name="install_inactive_slot_msg">Pajisja juaj do të DETYROHET të ndizet në slotin aktual joaktiv pas rinisjes!\nPërdoreni këtë opsion vetëm pasi të ketë përfunduar OTA.\nVazhdoni?</string>
+    <string name="direct_install">Instalim direkt (I rekomanduar)</string>    <string name="install_inactive_slot">Instalo në slotin joaktiv (Pas OTA)</string>    <string name="install_inactive_slot_msg">Pajisja juaj do të DETYROHET të ndizet në slotin aktual joaktiv pas rinisjes!\nPërdoreni këtë opsion vetëm pasi të ketë përfunduar OTA.\nVazhdoni?</string>
     <string name="setup_title">Konfigurim shtesë</string>
     <string name="select_patch_file">Zgjidhni dhe arnoni një skedar</string>
     <string name="patch_file_msg">Zgjidhni një imazh raw (*.img), një ODIN tarfile (*.tar) ose një payload.bin (*.bin)</string>
@@ -98,12 +82,7 @@
     <string name="log_data_magisk_none">Regjistrat e Magisk janë bosh, kjo është e çuditshme.</string>
     <string name="menuSaveLog">Ruaj regjistrin</string>
     <string name="menuClearLog">Pastro regjistrin tani</string>
-    <string name="logs_cleared">Regjistri u pastrua me sukses</string>
-    <string name="save_log">Ruaj regjistrin</string>
-    <string name="clear_log">Pastro regjistrin</string>
-    <string name="back">Mbrapa</string>
-    <string name="superuser_setting">Cilësimet e Superpërdoruesit</string>
-    <string name="enabled">Aktivizuar</string>
+    <string name="logs_cleared">Regjistri u pastrua me sukses</string>    <string name="back">Mbrapa</string>    <string name="enabled">Aktivizuar</string>
     <string name="disabled">Çaktivizuar</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">UID i synuar: %1$d</string>
@@ -246,9 +225,7 @@
     <string name="reboot">Rinis</string>
     <string name="close">Mbyll</string>
     <string name="release_notes">Shënimet e versionit</string>
-    <string name="flashing">Duke u flash-uar…</string>
-    <string name="running">Duke u ekzekutuar…</string>
-    <string name="done">U krye!</string>
+    <string name="flashing">Duke u flash-uar…</string>    <string name="done">U krye!</string>
     <string name="done_action">U krye veprimi i %1$s</string>
     <string name="failure">Dështoi!</string>
     <string name="hide_app_title">Duke fshehur aplikacionin Magisk…</string>

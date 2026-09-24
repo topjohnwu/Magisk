@@ -138,14 +138,14 @@ Supported actions:
     If [format] is not specified, then gzip will be used.
     If [outfile] is not specified, then <infile> will be replaced
     with another file suffixed with a matching file extension.
-    Supported formats: gzip zopfli xz lzma bzip2 lz4 lz4_legacy lz4_lg 
+    Supported formats: gzip xz lzma bzip2 lz4 lz4_legacy lz4_lg
 
   decompress <infile> [outfile]
     Detect format and decompress <infile> to [outfile].
     <infile>/[outfile] can be '-' to be STDIN/STDOUT.
     If [outfile] is not specified, then <infile> will be replaced
     with another file removing its archive format file extension.
-    Supported formats: gzip zopfli xz lzma bzip2 lz4 lz4_legacy lz4_lg 
+    Supported formats: gzip xz lzma bzip2 lz4 lz4_legacy lz4_lg
 ```
 
 ### magiskinit

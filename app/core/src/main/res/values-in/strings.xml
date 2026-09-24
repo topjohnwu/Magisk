@@ -16,26 +16,20 @@
     <string name="loading">Memuat…</string>
     <string name="update">Perbarui</string>
     <string name="not_available">N/A</string>
+    <string name="not_installed">Tidak terpasang</string>
     <string name="hide">Tutup</string>
-    <string name="restore">Pulihkan</string>
     <string name="home_package">Paket</string>
     <string name="home_app_title">Aplikasi</string>
-    <string name="home_core_title">Inti</string>
     <string name="reinstall">Pasang ulang</string>
     <string name="home_notice_content">Unduh Magisk HANYA dari halaman GitHub resmi. Berkas dari sumber yang tidak dikenal dapat berbahaya!</string>
     <string name="home_support_title">Dukung Kami</string>
     <string name="home_follow_title">Ikuti Kami</string>
     <string name="home_item_source">Sumber</string>
-    <string name="home_support_content">Magisk akan selalu menjadi aplikasi gratis dan serta bersumber terbuka. Bagaimanapun juga, Anda dapat menunjukan kepedulian Anda kepada kami dengan memberikan sedikit donasi.</string>
-    <string name="donate">Donasi</string>
-    <string name="documents">Dokumentasi</string>
-    <string name="report_bugs">Laporkan bug</string>
-    <string name="home_status_title">Status</string>
+    <string name="home_support_content">Magisk gratis dan sumber terbuka, sekarang dan selamanya. Namun, Anda dapat menunjukkan kepedulian Anda kepada kami dengan memberikan donasi.</string>
     <string name="home_installed_version">Terpasang</string>
     <string name="home_latest_version">Terbaru</string>
     <string name="invalid_update_channel">Saluran pembaruan tidak valid</string>
-    <string name="uninstall">Hapus</string>
-    <string name="uninstall_magisk_title">Hapus Magisk</string>
+    <string name="uninstall_magisk_title">Copot Magisk</string>
     <string name="uninstall_magisk_msg">Semua modul akan dinonaktifkan/dihapus!\nRoot akan dihapus!\nSemua data internal yang tidak dienkripsi melalui penggunaan Magisk akan dienkripsi ulang!</string>
 
     <!--Install-->
@@ -46,13 +40,16 @@
     <string name="install_method_title">Metode</string>
     <string name="install_next">Berikutnya</string>
     <string name="install_start">Mulai</string>
-    <string name="manager_download_install">Sentuh untuk mengunduh dan memasang</string>
-    <string name="direct_install">Langsung pasang (Disarankan)</string>
-    <string name="install_inactive_slot">Pasang ke slot nonaktif (Setelah OTA)</string>
-    <string name="install_inactive_slot_msg">Perangkat Anda akan DIPAKSA untuk boot ke slot nonaktif saat ini setelah dimulai ulang!\nGunakan opsi ini hanya setelah OTA selesai.\nLanjutkan?</string>
+    <string name="manager_download_install">Ketuk untuk mengunduh dan memasang</string>
+    <string name="direct_install">Pasang langsung (Disarankan)</string>
+    <string name="install_inactive_slot">Pasang ke slot tidak aktif (Setelah OTA)</string>
+    <string name="install_inactive_slot_msg">Perangkat Anda akan DIPAKSA untuk boot ke slot tidak aktif saat ini setelah dimulai ulang!\nGunakan opsi ini hanya setelah OTA selesai.\nLanjutkan?</string>
     <string name="setup_title">Penyiapan tambahan</string>
     <string name="select_patch_file">Pilih dan tambal berkas</string>
-    <string name="patch_file_msg">Pilih mentahan image (*.img) atau berkas tar ODIN (*.tar) atau payload.bin (*.bin)</string>
+    <string name="patch_file_msg">Pilih berkas image mentah (*.img) atau tar ODIN (*.tar) atau payload.bin (*.bin)</string>
+    <string name="download_patch_file">Unduh dan tambal berkas</string>
+    <string name="download_dialog_title">Masukkan URL image</string>
+    <string name="download_dialog_msg">Image OTA penuh atau image pabrik</string>
     <string name="reboot_delay_toast">Memulai ulang dalam 5 detik…</string>
     <string name="flash_screen_title">Pemasangan</string>
 
@@ -74,10 +71,10 @@
     <string name="su_deny_toast">%1$s ditolak izin superuser</string>
     <string name="su_snack_grant">Izin superuser %1$s diberikan</string>
     <string name="su_snack_deny">Izin superuser %1$s ditolak</string>
-    <string name="su_snack_notif_on">Notifikasi %1$s aktif</string>
-    <string name="su_snack_notif_off">Notifikasi %1$s nonaktif</string>
-    <string name="su_snack_log_on">Pencatatan log %1$s aktif</string>
-    <string name="su_snack_log_off">Pencatatan log %1$s nonaktif</string>
+    <string name="su_snack_notif_on">Notifikasi %1$s diaktifkan</string>
+    <string name="su_snack_notif_off">Notifikasi %1$s dinonaktifkan</string>
+    <string name="su_snack_log_on">Pencatatan log %1$s diaktifkan</string>
+    <string name="su_snack_log_off">Pencatatan log %1$s dinonaktifkan</string>
     <string name="su_revoke_title">Cabut?</string>
     <string name="su_revoke_msg">Konfirmasi untuk mencabut izin %1$s</string>
     <string name="toast">Pesan singkat</string>
@@ -93,10 +90,7 @@
     <string name="menuSaveLog">Simpan log</string>
     <string name="menuClearLog">Bersihkan log</string>
     <string name="logs_cleared">Log berhasil dibersihkan</string>
-    <string name="save_log">Simpan log</string>
-    <string name="clear_log">Bersihkan log</string>
     <string name="back">Kembali</string>
-    <string name="superuser_setting">Setelan Superuser</string>
     <string name="enabled">Aktif</string>
     <string name="disabled">Nonaktif</string>
     <string name="pid">PID: %1$d</string>
@@ -104,6 +98,8 @@
     <string name="target_pid">PID Target: %s</string>
     <string name="selinux_context">Konteks SELinux: %s</string>
     <string name="supp_group">Grup tambahan: %s</string>
+    <string name="granted">Diizinkan</string>
+    <string name="denied">Ditolak</string>
 
     <!--MagiskHide-->
     <string name="show_system_app">Tampilkan aplikasi sistem</string>
@@ -140,9 +136,9 @@
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Mode tema</string>
-    <string name="settings_dark_mode_message">Pilih mode yang paling sesuai dengan gaya Anda!</string>
+    <string name="settings_dark_mode_message">Pilih mode tema yang paling sesuai dengan gaya Anda!</string>
     <string name="settings_dark_mode_light">Selalu terang</string>
-    <string name="settings_dark_mode_system">Ikuti sistem</string>
+    <string name="settings_dark_mode_system">Sistem</string>
     <string name="settings_dark_mode_dark">Selalu gelap</string>
     <string name="settings_download_path_title">Lokasi unduhan</string>
     <string name="settings_download_path_message">Berkas akan disimpan ke %1$s</string>
@@ -151,7 +147,7 @@
     <string name="settings_restore_app_title">Pulihkan aplikasi Magisk</string>
     <string name="settings_restore_app_summary">Tampilkan kembali aplikasi yang disembunyikan dan pulihkan APK aslinya</string>
     <string name="language">Bahasa</string>
-    <string name="system_default">(Bawaan sistem)</string>
+    <string name="system_default">(Sistem)</string>
     <string name="settings_check_update_title">Periksa pembaruan</string>
     <string name="settings_check_update_summary">Memeriksa pembaruan secara berkala di latar belakang</string>
     <string name="settings_update_channel_title">Saluran pembaruan</string>
@@ -174,7 +170,7 @@
     <string name="settings_su_app_adb">Aplikasi dan ADB</string>
     <string name="settings_su_app">Hanya Aplikasi</string>
     <string name="settings_su_adb">Hanya ADB</string>
-    <string name="settings_su_disable">Dinonaktifkan</string>
+    <string name="settings_su_disable">Nonaktif</string>
     <string name="settings_su_request_10">10 detik</string>
     <string name="settings_su_request_15">15 detik</string>
     <string name="settings_su_request_20">20 detik</string>
@@ -230,7 +226,7 @@
     <string name="download_file_error">Kesalahan saat mengunduh berkas</string>
     <string name="magisk_update_title">Pembaruan Magisk tersedia!</string>
     <string name="updated_title">Magisk diperbarui</string>
-    <string name="updated_text">Ketuk untuk buka aplikasi</string>
+    <string name="updated_text">Ketuk untuk membuka aplikasi</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">Ya</string>
@@ -241,13 +237,12 @@
     <string name="close">Tutup</string>
     <string name="release_notes">Catatan rilis</string>
     <string name="flashing">Memasang…</string>
-    <string name="running">Memproses…</string>
     <string name="done">Selesai!</string>
     <string name="done_action">Aksi %1$s selesai</string>
     <string name="failure">Gagal!</string>
     <string name="hide_app_title">Menyembunyikan aplikasi Magisk…</string>
     <string name="open_link_failed_toast">Tidak ditemukan aplikasi untuk membuka tautan</string>
-    <string name="complete_uninstall">Penghapusan penuh</string>
+    <string name="complete_uninstall">Pencopotan penuh</string>
     <string name="restore_img">Pulihkan image</string>
     <string name="restore_img_msg">Memulihkan…</string>
     <string name="restore_done">Memulihkan selesai!</string>

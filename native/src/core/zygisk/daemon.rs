@@ -107,19 +107,21 @@ impl ZygiskState {
         Ok(())
     }
 
-    pub fn reset(&mut self, mut restore: bool) {
+    pub fn reset(&mut self, restore: bool) {
         if restore {
+            // boot-complete: reset the crash counter but KEEP the native bridge prop set, so that
+            // zygote partitions that spawn lazily AFTER boot-complete (e.g. Meta Quest's
+            // per-trust-level partition zygotes, which fork untrusted apps) still load the zygisk
+            // loader. Clearing it here is why untrusted apps were never injected on such devices.
             self.start_count = 1;
-        } else {
-            self.sockets = (None, None);
-            self.start_count += 1;
-            if self.start_count > 3 {
-                warn!("zygote crashed too many times, rolling-back");
-                restore = true;
-            }
+            self.set_prop();
+            return;
         }
 
-        if restore {
+        self.sockets = (None, None);
+        self.start_count += 1;
+        if self.start_count > 3 {
+            warn!("zygote crashed too many times, rolling-back");
             self.restore_prop();
         } else {
             self.set_prop();

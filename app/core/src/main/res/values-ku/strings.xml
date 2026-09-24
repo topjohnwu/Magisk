@@ -214,9 +214,7 @@
     <string name="reboot">ڕێستارت</string>
     <string name="close">داخستن</string>
     <string name="release_notes">نێبینییەکان</string>
-    <string name="flashing">فلاش کردن</string>
-    <string name="running">کار کردن...</string>
-    <string name="done">تەواو!</string>
+    <string name="flashing">فلاش کردن</string>    <string name="done">تەواو!</string>
     <string name="done_action">کارکردنی %1$s تەواو بوو</string>
     <string name="failure">Failed!</string>
     <string name="hide_app_title">شاردنەوەی ئەپی ماجیسک…</string>

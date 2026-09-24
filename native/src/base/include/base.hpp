@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <fcntl.h>
+#include <pthread.h>
 #include <functional>
 
 #include <rust/cxx.h>

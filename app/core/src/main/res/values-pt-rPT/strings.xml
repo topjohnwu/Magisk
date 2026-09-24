@@ -212,9 +212,7 @@
     <string name="reboot">Reiniciar</string>
     <string name="close">Fechar</string>
     <string name="release_notes">Notas da atualização</string>
-    <string name="flashing">Flashando…</string>
-    <string name="running">A executar…</string>
-    <string name="done">Concluído!</string>
+    <string name="flashing">Flashando…</string>    <string name="done">Concluído!</string>
     <string name="done_action">Ação de execução de %1$s concluída</string>
     <string name="failure">Falhou!</string>
     <string name="hide_app_title">A ocultar o app do Magisk…</string>

@@ -225,6 +225,9 @@ impl MagiskInit {
 
                 let mut sepol = SePolicy::from_file(preload_policy());
 
+                // Keep a copy of the original policy for future use
+                preload_policy().copy_to(MOCK_LOAD)?;
+
                 // Remove the files before loading the policy
                 preload_policy().remove()?;
                 preload_ack().remove()?;

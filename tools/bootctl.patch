@@ -1,32 +1,67 @@
-# How to build the bootctl bundled within the Magisk app:
+##################################################################################
+# How to build the prebuilt bootctl executable:
 #
-# 1. Checkout and sync the AOSP tree:
+# 1. Checkout and sync the AOSP tree with the tag android-14.0.0_r1:
 #    https://source.android.com/setup/build/downloading
-# 2. Build for arm64:
-#    lunch aosp_arm64-eng
-# 3. Apply patches:
-#    cd system/extras; patch -p1 < bootctl.patch
+# 2. Apply patches:
+#    `patch -p1 -d system/extras -i bootctl.patch`
+# 3. Build for arm, arm64, x86, and x86_64:
+#    `lunch aosp_<abi>-eng`
 # 4. Build the executable:
-#    m bootctl
+#    `m bootctl`
+#
+# Despite built from the Android 14 branch, the executable is usable on API 31+.
+##################################################################################
 
 diff --git a/bootctl/Android.bp b/bootctl/Android.bp
-index f63871cf..8a551bbe 100644
+index 106ff863..0e139989 100644
 --- a/bootctl/Android.bp
 +++ b/bootctl/Android.bp
-@@ -26,11 +26,15 @@ cc_binary {
+@@ -26,13 +26,23 @@ cc_binary {
          "-Werror",
      ],
 
 -    shared_libs: [
++    ldflags: [
++        "-Wl,-z,max-page-size=16384",
++    ],
++
 +    static_libs: [
          "android.hardware.boot@1.0",
          "android.hardware.boot@1.1",
          "android.hardware.boot@1.2",
+         "android.hardware.boot-V1-ndk",
+         "libboot_control_client",
 +    ],
 +    shared_libs: [
          "libhidlbase",
          "libutils",
++        "libbase",
 +        "libcutils",
 +        "liblog",
++        "libbinder_ndk",
      ],
  }
+diff --git a/bootctl/bootctl.cpp b/bootctl/bootctl.cpp
+index 1bf91815..e9c2d7bb 100644
+--- a/bootctl/bootctl.cpp
++++ b/bootctl/bootctl.cpp
+@@ -174,7 +174,9 @@ static int do_set_snapshot_merge_status(BootControlClient* module, BootControlVe
+     return handle_return(ret, "Failed to set snapshot merge status: %s\n");
+ }
+
+-std::ostream& operator<<(std::ostream& os, MergeStatus state) {
++std::ostream& operator<<(std::ostream& os, MergeStatus state);
++#if 0
++{
+     switch (state) {
+         case MergeStatus::CANCELLED:
+             return os << "cancelled";
+@@ -190,6 +192,7 @@ std::ostream& operator<<(std::ostream& os, MergeStatus state) {
+             return os;
+     }
+ }
++#endif
+
+ static int do_get_snapshot_merge_status(BootControlClient* module) {
+     MergeStatus ret = module->getSnapshotMergeStatus();

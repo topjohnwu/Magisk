@@ -3,7 +3,6 @@ package com.topjohnwu.magisk.core.su
 import android.content.Context
 import android.os.Bundle
 import android.widget.Toast
-import com.topjohnwu.magisk.core.AppContext
 import com.topjohnwu.magisk.core.BuildConfig
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.R
@@ -71,12 +70,11 @@ object SuCallbackHandler {
             }
         }.getOrNull() ?: createSuLog(fromUid, toUid, pid, command, policy, target, seContext, gids)
 
-        runBlocking { ServiceLocator.logRepo.insert(log) }
-
-        if (notify || Config.suNotification == Config.Value.NOTIFICATION_STATUS_BAR)
+        if (notify)
             notify(context, log.action >= SuPolicy.ALLOW, log.appName)
+
+        runBlocking { ServiceLocator.logRepo.insert(log) }
         SuEvents.notifyLogUpdated()
-        SuEvents.notifyPolicyChanged()
     }
 
     private fun handleNotify(context: Context, data: Bundle) {
@@ -91,19 +89,6 @@ object SuCallbackHandler {
         }.getOrNull() ?: "[UID] $uid"
 
         notify(context, policy >= SuPolicy.ALLOW, appName)
-        SuEvents.notifyPolicyChanged()
-    }
-
-    fun notify(granted: Boolean, appName: String) {
-        when (Config.suNotification) {
-            Config.Value.NOTIFICATION_TOAST -> {
-                val resId = if (granted) R.string.su_allow_toast else R.string.su_deny_toast
-                AppContext.toast(AppContext.getString(resId, appName), Toast.LENGTH_SHORT)
-            }
-            Config.Value.NOTIFICATION_STATUS_BAR -> {
-                Notifications.suNotification(granted, appName)
-            }
-        }
     }
 
     private fun notify(context: Context, granted: Boolean, appName: String) {

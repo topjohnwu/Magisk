@@ -23,8 +23,8 @@ setup_env() {
   sudo dpkg -i ./cuttlefish-base_*_*64.deb || sudo apt-get install -f
   rm cuttlefish-base_*_*64.deb
   sudo usermod -aG kvm,cvdnetwork,render $USER
-  yes | "$sdk" --licenses > /dev/null
-  "$sdk" --channel=3 platform-tools
+  ensure_android_cli
+  "$android" sdk install --canary platform-tools
   adb kill-server
   adb start-server
 }
@@ -87,7 +87,7 @@ test_main() {
   local images=()
   for apk in "${apks[@]}"; do
     images+=("magisk-$(basename $apk .apk).img")
-    ./build.py -v avd_patch --apk "$apk" "$CF_HOME/init_boot.img" "${images[-1]}"
+    ./build.py -v patch --apk "$apk" "$CF_HOME/init_boot.img" "${images[-1]}"
   done
 
   for i in "${!apks[@]}"; do

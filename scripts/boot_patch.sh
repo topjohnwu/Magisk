@@ -55,8 +55,6 @@ if [ -z $SOURCEDMODE ]; then
   cd "$(getdir "${BASH_SOURCE:-$0}")"
   # Load utility functions
   . ./util_functions.sh
-  # Check if 64-bit
-  api_level_arch_detect
 fi
 
 BOOTIMAGE="$1"

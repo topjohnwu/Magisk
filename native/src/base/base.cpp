@@ -20,17 +20,6 @@ static_assert(BLKGETSIZE64 == 0x80081272);
 static_assert(BLKGETSIZE64 == 0x80041272);
 #endif
 
-// Override libc++ new implementation to optimize final build size
-
-void* operator new(std::size_t s) { return std::malloc(s); }
-void* operator new[](std::size_t s) { return std::malloc(s); }
-void  operator delete(void *p) { std::free(p); }
-void  operator delete[](void *p) { std::free(p); }
-void* operator new(std::size_t s, const std::nothrow_t&) noexcept { return std::malloc(s); }
-void* operator new[](std::size_t s, const std::nothrow_t&) noexcept { return std::malloc(s); }
-void  operator delete(void *p, const std::nothrow_t&) noexcept { std::free(p); }
-void  operator delete[](void *p, const std::nothrow_t&) noexcept { std::free(p); }
-
 rust::Vec<size_t> byte_data::patch(byte_view from, byte_view to) const {
     rust::Vec<size_t> v;
     if (ptr == nullptr)

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Base.V23.Theme.Foundation.Light" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="android:windowBackground">?colorSurface</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="dialogTheme">@style/ThemeOverlay.Foundation.Dialog</item>
+        <item name="android:statusBarColor">#40bdbdbd</item>
+        <item name="android:navigationBarColor">#38000000</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+
+    <style name="Base.V23.Theme.Foundation" parent="Theme.MaterialComponents.NoActionBar">
+        <item name="android:windowBackground">?colorSurface</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="dialogTheme">@style/ThemeOverlay.Foundation.Dialog</item>
+        <item name="android:statusBarColor">#60000000</item>
+        <item name="android:navigationBarColor">#60000000</item>
+    </style>
+
+    <style name="Theme.Foundation.Light" parent="Base.V23.Theme.Foundation.Light" />
+
+    <style name="Theme.Foundation" parent="Base.V23.Theme.Foundation" />
+
+    <style name="Base.V23.ThemeOverlay.Foundation.Dialog" parent="ThemeOverlay.MaterialComponents.Dialog">
+        <item name="android:windowMinWidthMajor">@dimen/abc_dialog_min_width_major</item>
+        <item name="android:windowMinWidthMinor">@dimen/abc_dialog_min_width_minor</item>
+    </style>
+
+    <style name="ThemeOverlay.Foundation.Dialog" parent="Base.V23.ThemeOverlay.Foundation.Dialog" />
+
+</resources>

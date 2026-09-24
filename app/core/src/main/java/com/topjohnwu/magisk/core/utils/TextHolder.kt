@@ -39,4 +39,4 @@ abstract class TextHolder {
 
 fun Int.asText(): TextHolder = TextHolder.Resource(this)
 fun Int.asText(vararg params: Any): TextHolder = TextHolder.ResourceArgs(this, *params)
-fun String.asText(): TextHolder = TextHolder.Str(this.toString())
+fun String.asText(): TextHolder = TextHolder.Str(this)

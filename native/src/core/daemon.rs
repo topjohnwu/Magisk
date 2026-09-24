@@ -226,25 +226,21 @@ impl MagiskD {
             | RequestCode::ZYGOTE_RESTART
             | RequestCode::SQLITE_CMD
             | RequestCode::DENYLIST
-            | RequestCode::STOP_DAEMON => {
-                if !is_root {
-                    client.write_pod(&RespondCode::ROOT_REQUIRED.repr).log_ok();
-                    return;
-                }
+            | RequestCode::STOP_DAEMON
+                if !is_root =>
+            {
+                client.write_pod(&RespondCode::ROOT_REQUIRED.repr).log_ok();
+                return;
             }
-            RequestCode::REMOVE_MODULES => {
-                if !is_root && !is_shell {
-                    // Only allow root and ADB shell to remove modules
-                    client.write_pod(&RespondCode::ACCESS_DENIED.repr).log_ok();
-                    return;
-                }
+            RequestCode::REMOVE_MODULES if !is_root && !is_shell => {
+                // Only allow root and ADB shell to remove modules
+                client.write_pod(&RespondCode::ACCESS_DENIED.repr).log_ok();
+                return;
             }
-            RequestCode::ZYGISK => {
-                if !is_zygote {
-                    // Invalid client context
-                    client.write_pod(&RespondCode::ACCESS_DENIED.repr).log_ok();
-                    return;
-                }
+            RequestCode::ZYGISK if !is_zygote => {
+                // Invalid client context
+                client.write_pod(&RespondCode::ACCESS_DENIED.repr).log_ok();
+                return;
             }
             _ => {}
         }

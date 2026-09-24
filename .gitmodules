@@ -19,3 +19,6 @@
 [submodule "crt0"]
 	path = native/src/external/crt0
 	url = https://github.com/topjohnwu/crt0.git
+[submodule "xz-embedded"]
+	path = native/src/external/xz-embedded
+	url = https://github.com/tukaani-project/xz-embedded.git

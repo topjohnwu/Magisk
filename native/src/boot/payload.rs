@@ -1,5 +1,5 @@
 use crate::compress::get_decoder;
-use crate::ffi::check_fmt;
+use crate::format::check_fmt;
 use crate::proto::update_metadata::DeltaArchiveManifest;
 use crate::proto::update_metadata::mod_InstallOperation::Type;
 use base::{LoggedError, LoggedResult, ReadSeekExt, ResultExt, WriteExt, error};

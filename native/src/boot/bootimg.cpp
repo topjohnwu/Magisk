@@ -20,13 +20,28 @@ using namespace std;
 #define RETURN_CHROMEOS 2
 #define RETURN_VENDOR   3
 
-static void decompress(FileFormat type, int fd, const void *in, size_t size) {
-    decompress_bytes(type, byte_view { in, size }, fd);
+static FileFormat check_fmt(const void *buf, size_t len) {
+    return check_fmt({static_cast<const uint8_t *>(buf), len});
+}
+
+static int find_dtb_offset(const void *buf, size_t len) {
+    return find_dtb_offset({static_cast<const uint8_t *>(buf), len});
+}
+
+static bool decompress(FileFormat type, int fd, const void *in, size_t size) {
+    return decompress_bytes(type, byte_view { in, size }, fd);
 }
 
 static off_t compress_len(FileFormat type, byte_view in, int fd) {
     auto prev = lseek(fd, 0, SEEK_CUR);
     compress_bytes(type, in, fd);
+    auto now = lseek(fd, 0, SEEK_CUR);
+    return now - prev;
+}
+
+static off_t compress_len_kernel(FileFormat type, byte_view in, int fd) {
+    auto prev = lseek(fd, 0, SEEK_CUR);
+    compress_bytes_kernel(type, in, fd);
     auto now = lseek(fd, 0, SEEK_CUR);
     return now - prev;
 }
@@ -51,55 +66,6 @@ static size_t restore(int fd, const char *filename) {
 static bool check_env(const char *name) {
     const char *val = getenv(name);
     return val != nullptr && val == "true"sv;
-}
-
-static bool guess_lzma(const uint8_t *buf, size_t len) {
-    // 0     : (pb * 5 + lp) * 9 + lc
-    // 1 - 4 : dict size, must be 2^n
-    // 5 - 12: all 0xFF
-    if (len <= 13) return false;
-    if (memcmp(buf, "\x5d", 1) != 0) return false;
-    uint32_t dict_sz = 0;
-    memcpy(&dict_sz, buf + 1, sizeof(dict_sz));
-    if (dict_sz == 0 || (dict_sz & (dict_sz - 1)) != 0) return false;
-    if (memcmp(buf + 5, "\xff\xff\xff\xff\xff\xff\xff\xff", 8) != 0) return false;
-    return true;
-}
-
-FileFormat check_fmt(const void *buf, size_t len) {
-    if (CHECKED_MATCH(CHROMEOS_MAGIC)) {
-        return FileFormat::CHROMEOS;
-    } else if (CHECKED_MATCH(BOOT_MAGIC)) {
-        return FileFormat::AOSP;
-    } else if (CHECKED_MATCH(VENDOR_BOOT_MAGIC)) {
-        return FileFormat::AOSP_VENDOR;
-    } else if (CHECKED_MATCH(GZIP1_MAGIC) || CHECKED_MATCH(GZIP2_MAGIC)) {
-        return FileFormat::GZIP;
-    } else if (CHECKED_MATCH(LZOP_MAGIC)) {
-        return FileFormat::LZOP;
-    } else if (CHECKED_MATCH(XZ_MAGIC)) {
-        return FileFormat::XZ;
-    } else if (guess_lzma(static_cast<const uint8_t *>(buf), len)) {
-        return FileFormat::LZMA;
-    } else if (CHECKED_MATCH(BZIP_MAGIC)) {
-        return FileFormat::BZIP2;
-    } else if (CHECKED_MATCH(LZ41_MAGIC) || CHECKED_MATCH(LZ42_MAGIC)) {
-        return FileFormat::LZ4;
-    } else if (CHECKED_MATCH(LZ4_LEG_MAGIC)) {
-        return FileFormat::LZ4_LEGACY;
-    } else if (CHECKED_MATCH(MTK_MAGIC)) {
-        return FileFormat::MTK;
-    } else if (CHECKED_MATCH(DTB_MAGIC)) {
-        return FileFormat::DTB;
-    } else if (CHECKED_MATCH(DHTB_MAGIC)) {
-        return FileFormat::DHTB;
-    } else if (CHECKED_MATCH(TEGRABLOB_MAGIC)) {
-        return FileFormat::BLOB;
-    } else if (len >= 0x28 && memcmp(&((char *)buf)[0x24], ZIMAGE_MAGIC, 4) == 0) {
-        return FileFormat::ZIMAGE;
-    } else {
-        return FileFormat::UNKNOWN;
-    }
 }
 
 void dyn_img_hdr::print() const {
@@ -241,77 +207,6 @@ boot_img::~boot_img() {
     delete hdr;
 }
 
-struct [[gnu::packed]] fdt_header {
-    struct fdt32_t {
-        uint32_t byte0: 8;
-        uint32_t byte1: 8;
-        uint32_t byte2: 8;
-        uint32_t byte3: 8;
-
-        constexpr operator uint32_t() const {
-            return bit_cast<uint32_t>(fdt32_t {
-                .byte0 = byte3,
-                .byte1 = byte2,
-                .byte2 = byte1,
-                .byte3 = byte0
-            });
-        }
-    };
-
-    struct node_header {
-        fdt32_t tag;
-        char name[0];
-    };
-
-    fdt32_t magic;			 /* magic word FDT_MAGIC */
-    fdt32_t totalsize;		 /* total size of DT block */
-    fdt32_t off_dt_struct;		 /* offset to structure */
-    fdt32_t off_dt_strings;		 /* offset to strings */
-    fdt32_t off_mem_rsvmap;		 /* offset to memory reserve map */
-    fdt32_t version;		 /* format version */
-    fdt32_t last_comp_version;	 /* last compatible version */
-
-    /* version 2 fields below */
-    fdt32_t boot_cpuid_phys;	 /* Which physical CPU id we're
-					    booting on */
-    /* version 3 fields below */
-    fdt32_t size_dt_strings;	 /* size of the strings block */
-
-    /* version 17 fields below */
-    fdt32_t size_dt_struct;		 /* size of the structure block */
-};
-
-static int find_dtb_offset(const uint8_t *buf, unsigned sz) {
-    const uint8_t * const end = buf + sz;
-
-    for (auto curr = buf; curr < end; curr += sizeof(fdt_header)) {
-        curr = static_cast<uint8_t*>(memmem(curr, end - curr, DTB_MAGIC, sizeof(fdt_header::fdt32_t)));
-        if (curr == nullptr)
-            return -1;
-
-        auto fdt_hdr = reinterpret_cast<const fdt_header *>(curr);
-
-        // Check that fdt_header.totalsize does not overflow kernel image size or is empty dtb
-        // https://github.com/torvalds/linux/commit/7b937cc243e5b1df8780a0aa743ce800df6c68d1
-        uint32_t totalsize = fdt_hdr->totalsize;
-        if (totalsize > end - curr || totalsize <= 0x48)
-            continue;
-
-        // Check that fdt_header.off_dt_struct does not overflow kernel image size
-        uint32_t off_dt_struct = fdt_hdr->off_dt_struct;
-        if (off_dt_struct > end - curr)
-            continue;
-
-        // Check that fdt_node_header.tag of first node is FDT_BEGIN_NODE
-        auto fdt_node_hdr = reinterpret_cast<const fdt_header::node_header *>(curr + off_dt_struct);
-        if (fdt_node_hdr->tag != 0x1u)
-            continue;
-
-        return curr - buf;
-    }
-    return -1;
-}
-
 static FileFormat check_fmt_lg(const uint8_t *buf, unsigned sz) {
     FileFormat fmt = check_fmt(buf, sz);
     if (fmt == FileFormat::LZ4_LEGACY) {
@@ -406,49 +301,6 @@ const uint8_t *boot_img::parse_hdr(const uint8_t *addr, FileFormat type) {
     return addr;
 }
 
-void boot_img::parse_zimage() {
-    z_info.hdr = reinterpret_cast<const zimage_hdr *>(kernel);
-
-    const uint8_t* piggy = nullptr;
-    // Skip 0x28, which includes zimage header
-    for (const uint8_t* curr = kernel + 0x28; curr < kernel + hdr->kernel_size(); curr++) {
-        if (check_fmt_lg(curr, hdr->kernel_size() - (curr - kernel)) != FileFormat::UNKNOWN) {
-            piggy = curr;
-            break;
-        }
-    }
-
-    if (piggy != nullptr) {
-        fprintf(stderr, "ZIMAGE_KERNEL\n");
-        z_info.hdr_sz = piggy - kernel;
-
-        // Find end of piggy
-        uint32_t piggy_size = z_info.hdr->end - z_info.hdr->start;
-        uint32_t piggy_end = piggy_size;
-        uint32_t offsets[16];
-        memcpy(offsets, kernel + piggy_size - sizeof(offsets), sizeof(offsets));
-        for (int i = 15; i >= 0; --i) {
-            if (offsets[i] > (piggy_size - 0xFF) && offsets[i] < piggy_size) {
-                piggy_end = offsets[i];
-                break;
-            }
-        }
-
-        if (piggy_end == piggy_size) {
-            fprintf(stderr, "! Could not find end of zImage piggy, keeping raw kernel\n");
-        } else {
-            flags[ZIMAGE_KERNEL] = true;
-            z_info.tail = byte_view(kernel + piggy_end, hdr->kernel_size() - piggy_end);
-            // Shift the kernel pointer and resize
-            kernel += z_info.hdr_sz;
-            hdr->kernel_size() = piggy_end - z_info.hdr_sz;
-            k_fmt = check_fmt_lg(kernel, hdr->kernel_size());
-        }
-    } else {
-        fprintf(stderr, "! Could not find zImage piggy, keeping raw kernel\n");
-    }
-}
-
 static const char *vendor_ramdisk_type(int type) {
     switch (type) {
     case VENDOR_RAMDISK_TYPE_PLATFORM:
@@ -478,7 +330,6 @@ std::span<const vendor_ramdisk_table_entry_v4> boot_img::vendor_ramdisk_tbl() co
     }
     return span(reinterpret_cast<table_entry *>(vendor_ramdisk_table), hdr->vendor_ramdisk_table_entry_num());
 }
-
 
 #define assert_off() \
 if ((addr + off) > (map.data() + map_end)) {      \
@@ -545,7 +396,18 @@ bool boot_img::parse_image(const uint8_t *addr, FileFormat type) {
             k_fmt = check_fmt_lg(kernel, hdr->kernel_size());
         }
         if (k_fmt == FileFormat::ZIMAGE) {
-            parse_zimage();
+            z_info = ZImage::parse(byte_view(kernel, hdr->kernel_size()));
+            if (z_info != nullptr) {
+                fprintf(stderr, "ZIMAGE_KERNEL\n");
+                flags[ZIMAGE_KERNEL] = true;
+                kernel = z_info->piggy.data();
+                if (z_info->fmt != FileFormat::GZIP) {
+                    hdr->kernel_size() = z_info->piggy.size() - sizeof(uint32_t);
+                } else {
+                    hdr->kernel_size() = z_info->piggy.size();
+                }
+                k_fmt = z_info->fmt;
+            }
         }
         fprintf(stderr, "%-*s [%s]\n", PADDING, "KERNEL_FMT", fmt2name(k_fmt));
     }
@@ -617,7 +479,11 @@ int split_image_dtb(Utf8CStr filename, bool skip_decomp) {
         FileFormat fmt = check_fmt_lg(img.data(), img.size());
         if (!skip_decomp && fmt_compressed(fmt)) {
             int fd = creat(KERNEL_FILE, 0644);
-            decompress(fmt, fd, img.data(), off);
+            if (!decompress(fmt, fd, img.data(), off)) {
+                close(fd);
+                unlink(KERNEL_FILE);
+                return 1;
+            }
             close(fd);
         } else {
             dump(img.data(), off, KERNEL_FILE);
@@ -640,7 +506,11 @@ int unpack(Utf8CStr image, bool skip_decomp, bool hdr) {
     if (!skip_decomp && fmt_compressed(boot.k_fmt)) {
         if (boot.hdr->kernel_size() != 0) {
             int fd = creat(KERNEL_FILE, 0644);
-            decompress(boot.k_fmt, fd, boot.kernel, boot.hdr->kernel_size());
+            if (!decompress(boot.k_fmt, fd, boot.kernel, boot.hdr->kernel_size())) {
+                close(fd);
+                unlink(KERNEL_FILE);
+                return RETURN_ERROR;
+            }
             close(fd);
         }
     } else {
@@ -664,7 +534,10 @@ int unpack(Utf8CStr image, bool skip_decomp, bool hdr) {
             owned_fd fd = xopenat(dirfd, file_name, O_CREAT | O_TRUNC | O_WRONLY | O_CLOEXEC, 0644);
             FileFormat fmt = check_fmt_lg(boot.ramdisk + it.ramdisk_offset, it.ramdisk_size);
             if (!skip_decomp && fmt_compressed(fmt)) {
-                decompress(fmt, fd, boot.ramdisk + it.ramdisk_offset, it.ramdisk_size);
+                if (!decompress(fmt, fd, boot.ramdisk + it.ramdisk_offset, it.ramdisk_size)) {
+                    unlinkat(dirfd, file_name, 0);
+                    return RETURN_ERROR;
+                }
             } else {
                 xwrite(fd, boot.ramdisk + it.ramdisk_offset, it.ramdisk_size);
             }
@@ -672,7 +545,11 @@ int unpack(Utf8CStr image, bool skip_decomp, bool hdr) {
     } else if (!skip_decomp && fmt_compressed(boot.r_fmt)) {
         if (boot.hdr->ramdisk_size() != 0) {
             int fd = creat(RAMDISK_FILE, 0644);
-            decompress(boot.r_fmt, fd, boot.ramdisk, boot.hdr->ramdisk_size());
+            if (!decompress(boot.r_fmt, fd, boot.ramdisk, boot.hdr->ramdisk_size())) {
+                close(fd);
+                unlink(RAMDISK_FILE);
+                return RETURN_ERROR;
+            }
             close(fd);
         }
     } else {
@@ -686,7 +563,11 @@ int unpack(Utf8CStr image, bool skip_decomp, bool hdr) {
     if (!skip_decomp && fmt_compressed(boot.e_fmt)) {
         if (boot.hdr->extra_size() != 0) {
             int fd = creat(EXTRA_FILE, 0644);
-            decompress(boot.e_fmt, fd, boot.extra, boot.hdr->extra_size());
+            if (!decompress(boot.e_fmt, fd, boot.extra, boot.hdr->extra_size())) {
+                close(fd);
+                unlink(EXTRA_FILE);
+                return RETURN_ERROR;
+            }
             close(fd);
         }
     } else {
@@ -767,43 +648,42 @@ void repack(Utf8CStr src_img, Utf8CStr out_img, bool skip_comp) {
         xwrite(fd, boot.k_hdr, sizeof(mtk_hdr));
     }
     if (boot.flags[ZIMAGE_KERNEL]) {
-        // Copy zImage headers
-        xwrite(fd, boot.z_info.hdr, boot.z_info.hdr_sz);
+        // Copy zImage headers stub
+        xwrite(fd, boot.z_info->head.data(), boot.z_info->head.size());
     }
+    uint32_t z_payload_sz = 0;
     if (access(KERNEL_FILE, R_OK) == 0) {
         mmap_data m(KERNEL_FILE);
+        uint32_t payload_sz = 0;
         if (!skip_comp && !fmt_compressed_any(check_fmt(m.data(), m.size())) && fmt_compressed(boot.k_fmt)) {
-            // Always use zopfli for zImage compression
-            auto fmt = (boot.flags[ZIMAGE_KERNEL] && boot.k_fmt == FileFormat::GZIP) ? FileFormat::ZOPFLI : boot.k_fmt;
-            hdr->kernel_size() = compress_len(fmt, m, fd);
+            payload_sz = compress_len_kernel(boot.k_fmt, m, fd);
+            if (boot.flags[ZIMAGE_KERNEL] && boot.k_fmt != FileFormat::GZIP) {
+                // For non-gzip compression in zImage, size_append appends the 4-byte LE uncompressed size
+                uint32_t sz = m.size();
+                xwrite(fd, &sz, sizeof(sz));
+                payload_sz += sizeof(sz);
+            }
+            hdr->kernel_size() = payload_sz;
         } else {
-            hdr->kernel_size() = xwrite(fd, m.data(), m.size());
+            payload_sz = xwrite(fd, m.data(), m.size());
+            hdr->kernel_size() = payload_sz;
         }
 
         if (boot.flags[ZIMAGE_KERNEL]) {
-            if (hdr->kernel_size() > boot.hdr->kernel_size()) {
-                fprintf(stderr, "! Recompressed kernel is too large, using original kernel\n");
-                ftruncate64(fd, lseek64(fd, - (off64_t) hdr->kernel_size(), SEEK_CUR));
-                xwrite(fd, boot.kernel, boot.hdr->kernel_size());
-            } else if (!skip_comp) {
-                // Pad zeros to make sure the zImage file size does not change
-                // Also ensure the last 4 bytes are the uncompressed vmlinux size
-                uint32_t sz = m.size();
-                write_zero(fd, boot.hdr->kernel_size() - hdr->kernel_size() - sizeof(sz));
-                xwrite(fd, &sz, sizeof(sz));
-            }
-
-            // zImage size shall remain the same
-            hdr->kernel_size() = boot.hdr->kernel_size();
+            z_payload_sz = payload_sz;
+            auto tail_buf = boot.z_info->new_tail(payload_sz);
+            xwrite(fd, tail_buf.data(), tail_buf.size());
+            hdr->kernel_size() = boot.z_info->head.size() + payload_sz + tail_buf.size();
         }
     } else if (boot.hdr->kernel_size() != 0) {
-        xwrite(fd, boot.kernel, boot.hdr->kernel_size());
-        hdr->kernel_size() = boot.hdr->kernel_size();
-    }
-    if (boot.flags[ZIMAGE_KERNEL]) {
-        // Copy zImage tail and adjust size accordingly
-        hdr->kernel_size() += boot.z_info.hdr_sz;
-        hdr->kernel_size() += xwrite(fd, boot.z_info.tail.data(), boot.z_info.tail.size());
+        if (boot.flags[ZIMAGE_KERNEL]) {
+            xwrite(fd, boot.z_info->piggy.data(), boot.z_info->piggy.size());
+            xwrite(fd, boot.z_info->tail.data(), boot.z_info->tail.size());
+            hdr->kernel_size() = boot.z_info->head.size() + boot.z_info->piggy.size() + boot.z_info->tail.size();
+        } else {
+            xwrite(fd, boot.kernel, boot.hdr->kernel_size());
+            hdr->kernel_size() = boot.hdr->kernel_size();
+        }
     }
 
     // kernel dtb
@@ -965,6 +845,13 @@ void repack(Utf8CStr src_img, Utf8CStr out_img, bool skip_comp) {
         auto m_hdr = reinterpret_cast<mtk_hdr *>(out.data() + off.ramdisk);
         m_hdr->size = hdr->ramdisk_size();
         hdr->ramdisk_size() += sizeof(mtk_hdr);
+    }
+
+    // zImage header stub
+    if (boot.flags[ZIMAGE_KERNEL] && z_payload_sz) {
+        auto head_stub = boot.z_info->new_head(z_payload_sz);
+        uint8_t *head_ptr = out.data() + off.kernel + (boot.flags[MTK_KERNEL] ? sizeof(mtk_hdr) : 0);
+        memcpy(head_ptr, head_stub.data(), head_stub.size());
     }
 
     // Make sure header size matches
