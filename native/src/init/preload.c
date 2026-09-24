@@ -2,7 +2,9 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include "init.hpp"
+static const char PRELOAD_LIB[] = "/dev/preload.so";
+static const char PRELOAD_POLICY[] = "/dev/sepolicy";
+static const char PRELOAD_ACK[] = "/dev/ack";
 
 __attribute__((constructor))
 static void preload_init() {

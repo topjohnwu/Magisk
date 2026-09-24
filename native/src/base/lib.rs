@@ -40,7 +40,7 @@ mod ffi {
     }
 
     unsafe extern "C++" {
-        include!("base.hpp");
+        include!("magisk.base");
 
         #[cxx_name = "Utf8CStr"]
         type Utf8CStrRef<'a> = &'a crate::cstr::Utf8CStr;

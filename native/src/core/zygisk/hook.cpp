@@ -1,16 +1,42 @@
+module;
+#include <jni.h>
 #include <sys/mman.h>
 #include <sys/mount.h>
 #include <sys/resource.h>
 #include <dlfcn.h>
 #include <unwind.h>
-#include <span>
-
 #include <lsplt.hpp>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <dirent.h>
+#include <fcntl.h>
+#include <pthread.h>
+#include <sys/socket.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <errno.h>
+#include <rust/cxx.h>
 
-#include <base.hpp>
+module magisk.zygisk;
 
-#include "zygisk.hpp"
-#include "module.hpp"
+#if defined(__LP64__)
+#define ZLOGD(...) LOGD("zygisk64: " __VA_ARGS__)
+#define ZLOGE(...) LOGE("zygisk64: " __VA_ARGS__)
+#define ZLOGI(...) LOGI("zygisk64: " __VA_ARGS__)
+#define ZLOGW(...) LOGW("zygisk64: " __VA_ARGS__)
+#else
+#define ZLOGD(...) LOGD("zygisk32: " __VA_ARGS__)
+#define ZLOGE(...) LOGE("zygisk32: " __VA_ARGS__)
+#define ZLOGI(...) LOGI("zygisk32: " __VA_ARGS__)
+#define ZLOGW(...) LOGW("zygisk32: " __VA_ARGS__)
+#endif
+
+// Extreme verbose logging
+// #define ZLOGV(...) ZLOGD(__VA_ARGS__)
+#define ZLOGV(...) (void*)0
+
+extern "C++" {
 #include "jni_hooks.hpp"
 
 using namespace std;
@@ -167,7 +193,7 @@ DCL_HOOK_FUNC(static int, unshare, int flags) {
     int res = old_unshare(flags);
     if (g_ctx && (flags & CLONE_NEWNS) != 0 && res == 0) {
         if (g_ctx->flags & DO_REVERT_UNMOUNT) {
-            revert_unmount();
+            revert_unmount(-1);
         }
         // Restore errno back to 0
         errno = 0;
@@ -535,7 +561,6 @@ int HookContext::hook_jni_methods(JNIEnv *env, jclass clazz, JNIMethods methods)
     return hook_count;
 }
 
-
 void HookContext::hook_jni_methods(JNIEnv *env, const char *clz, JNIMethods methods) const {
     jclass clazz;
     if (!runtime_callbacks || !env || !clz || !((clazz = env->FindClass(clz)))) {
@@ -655,4 +680,5 @@ void hook_entry() {
 
 void hookJniNativeMethods(JNIEnv *env, const char *clz, JNINativeMethod *methods, int numMethods) {
     g_hook->hook_jni_methods(env, clz, { methods, static_cast<size_t>(numMethods) });
+}
 }

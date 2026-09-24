@@ -5,6 +5,7 @@
  * Copyright 2008, Zinx Verituse (@zinxv)
  */
 
+module;
 #include <unistd.h>
 #include <getopt.h>
 #include <fcntl.h>
@@ -16,13 +17,20 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/mount.h>
-
-#include <algorithm>
-
-#include <consts.hpp>
-#include <base.hpp>
+#include <dirent.h>
+#include <pthread.h>
+#include <sys/socket.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <errno.h>
 #include <flags.h>
-#include <core.hpp>
+#include <rust/cxx.h>
+
+export module magisk.su;
+export import magisk.core;
+
+#define PLOGE(fmt, args...) LOGE(fmt " failed with %d: %s\n", ##args, errno, ::strerror(errno))
 
 using namespace std;
 
@@ -63,7 +71,7 @@ int quit_signals[] = { SIGALRM, SIGABRT, SIGHUP, SIGPIPE, SIGQUIT, SIGTERM, SIGI
     exit(status);
 }
 
-static void sighandler(int sig) {
+void sighandler(int sig) {
     // Close all standard I/O to cause the pumps to exit
     // so we can continue and retrieve the exit code.
     close(STDIN_FILENO);
@@ -78,7 +86,7 @@ static void sighandler(int sig) {
     }
 }
 
-static void setup_sighandlers(void (*handler)(int)) {
+void setup_sighandlers(void (*handler)(int)) {
     struct sigaction act{};
     act.sa_handler = handler;
     for (int i = 0; quit_signals[i]; ++i) {
@@ -86,7 +94,7 @@ static void setup_sighandlers(void (*handler)(int)) {
     }
 }
 
-int su_client_main(int argc, char *argv[]) {
+export extern "C++" int su_client_main(int argc, char *argv[]) {
     option long_opts[] = {
             { "command",                required_argument,  nullptr, 'c' },
             { "help",                   no_argument,        nullptr, 'h' },
@@ -246,7 +254,7 @@ int su_client_main(int argc, char *argv[]) {
     return read_int(fd);
 }
 
-static void drop_caps() {
+void drop_caps() {
     static auto last_valid_cap = []() {
         uint32_t cap = CAP_WAKE_ALARM;
         while (prctl(PR_CAPBSET_READ, cap) >= 0) {
@@ -274,7 +282,7 @@ static void drop_caps() {
     // Except CAP_SETUID in bounding set, it is a marker for restricted process
 }
 
-static bool proc_is_restricted(pid_t pid) {
+bool proc_is_restricted(pid_t pid) {
     char buf[32] = {};
     auto bnd = "CapBnd:"sv;
     uint32_t data[_LINUX_CAPABILITY_U32S_3] = {};
@@ -307,7 +315,7 @@ static bool proc_is_restricted(pid_t pid) {
     return equal;
 }
 
-static void set_identity(int uid, const rust::Vec<gid_t> &groups) {
+void set_identity(int uid, const rust::Vec<gid_t> &groups) {
     gid_t gid;
     if (!groups.empty()) {
         if (setgroups(groups.size(), groups.data())) {
@@ -325,7 +333,7 @@ static void set_identity(int uid, const rust::Vec<gid_t> &groups) {
     }
 }
 
-void exec_root_shell(int client, int pid, SuRequest &req, MntNsMode mode) {
+export extern "C++" void exec_root_shell(int client, int pid, SuRequest &req, MntNsMode mode) {
     // Become session leader
     xsetsid();
 
@@ -339,7 +347,7 @@ void exec_root_shell(int client, int pid, SuRequest &req, MntNsMode mode) {
     if (infd < 0 || outfd < 0 || errfd < 0) {
         string pts;
         string ptmx;
-        auto magiskpts = get_magisk_tmp() + "/"s SHELLPTS;
+        auto magiskpts = get_magisk_tmp() + std::string{concat<"/", SHELLPTS>.value, sizeof(concat<"/", SHELLPTS>.value) - 1};
         if (access(magiskpts.data(), F_OK)) {
             pts = "/dev/pts";
             ptmx = "/dev/ptmx";

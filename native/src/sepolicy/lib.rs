@@ -26,8 +26,8 @@ pub mod ffi {
     }
 
     unsafe extern "C++" {
-        include!("policy.hpp");
-        include!("../base/include/base.hpp");
+        include!("magisk.policy");
+        include!("magisk.base");
 
         #[cxx_name = "Utf8CStr"]
         type Utf8CStrRef<'a> = base::Utf8CStrRef<'a>;

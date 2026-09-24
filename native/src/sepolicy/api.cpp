@@ -1,7 +1,20 @@
-#include <base.hpp>
+module;
+#include <sepol/policydb/policydb.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <dirent.h>
+#include <fcntl.h>
+#include <pthread.h>
+#include <sys/socket.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <errno.h>
+#include <rust/cxx.h>
 
-#include "include/sepolicy.hpp"
+module magisk.policy;
 
+extern "C++" {
 using Str = rust::Str;
 using StrVec = rust::Vec<rust::Str>;
 using Xperms = rust::Vec<Xperm>;
@@ -171,4 +184,5 @@ void SePolicy::dontauditxperm(StrVec src, StrVec tgt, StrVec cls, Xperms xperm) 
         print_rule("dontauditxperm", args...);
         impl->add_xperm_rule(args..., AVTAB_XPERMS_DONTAUDIT);
     });
+}
 }

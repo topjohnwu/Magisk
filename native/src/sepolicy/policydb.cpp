@@ -1,14 +1,22 @@
-#include "include/sepolicy.hpp"
-
+module;
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-
 #include <cil/cil.h>
-
-#include <base.hpp>
+#include <dirent.h>
+#include <fcntl.h>
+#include <pthread.h>
+#include <sys/socket.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <errno.h>
 #include <flags.h>
+#include <rust/cxx.h>
 
+module magisk.policy;
+
+extern "C++" {
 using namespace std;
 
 #define SHALEN 64
@@ -38,7 +46,7 @@ static bool check_precompiled(const char *precompiled) {
     const char *actual_sha;
     char compiled_sha[128];
 
-    actual_sha = PLAT_POLICY_DIR "plat_and_mapping_sepolicy.cil.sha256";
+    actual_sha = concat<PLAT_POLICY_DIR, "plat_and_mapping_sepolicy.cil.sha256">.value;
     if (access(actual_sha, R_OK) == 0) {
         ok = true;
         sprintf(compiled_sha, "%s.plat_and_mapping.sha256", precompiled);
@@ -46,7 +54,7 @@ static bool check_precompiled(const char *precompiled) {
             return false;
     }
 
-    actual_sha = PLAT_POLICY_DIR "plat_sepolicy_and_mapping.sha256";
+    actual_sha = concat<PLAT_POLICY_DIR, "plat_sepolicy_and_mapping.sha256">.value;
     if (access(actual_sha, R_OK) == 0) {
         ok = true;
         sprintf(compiled_sha, "%s.plat_sepolicy_and_mapping.sha256", precompiled);
@@ -54,7 +62,7 @@ static bool check_precompiled(const char *precompiled) {
             return false;
     }
 
-    actual_sha = PROD_POLICY_DIR "product_sepolicy_and_mapping.sha256";
+    actual_sha = concat<PROD_POLICY_DIR, "product_sepolicy_and_mapping.sha256">.value;
     if (access(actual_sha, R_OK) == 0) {
         ok = true;
         sprintf(compiled_sha, "%s.product_sepolicy_and_mapping.sha256", precompiled);
@@ -62,7 +70,7 @@ static bool check_precompiled(const char *precompiled) {
             return false;
     }
 
-    actual_sha = SYSEXT_POLICY_DIR "system_ext_sepolicy_and_mapping.sha256";
+    actual_sha = concat<SYSEXT_POLICY_DIR, "system_ext_sepolicy_and_mapping.sha256">.value;
     if (access(actual_sha, R_OK) == 0) {
         ok = true;
         sprintf(compiled_sha, "%s.system_ext_sepolicy_and_mapping.sha256", precompiled);
@@ -124,9 +132,9 @@ SePolicy SePolicy::compile_split() noexcept {
     FILE *f;
     int policy_ver;
     const char *cil_file;
-#if MAGISK_DEBUG
-    cil_set_log_level(CIL_INFO);
-#endif
+    if constexpr (MAGISK_DEBUG) {
+        cil_set_log_level(CIL_INFO);
+    }
     cil_set_log_handler(+[](int lvl, const char *msg) {
         if (lvl == CIL_ERR) {
             LOGE("cil: %s", msg);
@@ -153,57 +161,57 @@ SePolicy SePolicy::compile_split() noexcept {
     cil_set_policy_version(db, policy_ver);
 
     // Get mapping version
-    f = xfopen(VEND_POLICY_DIR "plat_sepolicy_vers.txt", "re");
+    f = xfopen(concat<VEND_POLICY_DIR, "plat_sepolicy_vers.txt">.value, "re");
     fscanf(f, "%s", plat_ver);
     fclose(f);
 
     // plat
     load_cil(db, SPLIT_PLAT_CIL);
 
-    sprintf(path, PLAT_POLICY_DIR "mapping/%s.cil", plat_ver);
+    sprintf(path, concat<PLAT_POLICY_DIR, "mapping/%s.cil">.value, plat_ver);
     load_cil(db, path);
 
-    sprintf(path, PLAT_POLICY_DIR "mapping/%s.compat.cil", plat_ver);
+    sprintf(path, concat<PLAT_POLICY_DIR, "mapping/%s.compat.cil">.value, plat_ver);
     if (access(path, R_OK) == 0)
         load_cil(db, path);
 
     // system_ext
-    sprintf(path, SYSEXT_POLICY_DIR "mapping/%s.cil", plat_ver);
+    sprintf(path, concat<SYSEXT_POLICY_DIR, "mapping/%s.cil">.value, plat_ver);
     if (access(path, R_OK) == 0)
         load_cil(db, path);
 
-    sprintf(path, SYSEXT_POLICY_DIR "mapping/%s.compat.cil", plat_ver);
+    sprintf(path, concat<SYSEXT_POLICY_DIR, "mapping/%s.compat.cil">.value, plat_ver);
     if (access(path, R_OK) == 0)
         load_cil(db, path);
 
-    cil_file = SYSEXT_POLICY_DIR "system_ext_sepolicy.cil";
+    cil_file = concat<SYSEXT_POLICY_DIR, "system_ext_sepolicy.cil">.value;
     if (access(cil_file, R_OK) == 0)
         load_cil(db, cil_file);
 
     // product
-    sprintf(path, PROD_POLICY_DIR "mapping/%s.cil", plat_ver);
+    sprintf(path, concat<PROD_POLICY_DIR, "mapping/%s.cil">.value, plat_ver);
     if (access(path, R_OK) == 0)
         load_cil(db, path);
 
-    cil_file = PROD_POLICY_DIR "product_sepolicy.cil";
+    cil_file = concat<PROD_POLICY_DIR, "product_sepolicy.cil">.value;
     if (access(cil_file, R_OK) == 0)
         load_cil(db, cil_file);
 
     // vendor
-    cil_file = VEND_POLICY_DIR "nonplat_sepolicy.cil";
+    cil_file = concat<VEND_POLICY_DIR, "nonplat_sepolicy.cil">.value;
     if (access(cil_file, R_OK) == 0)
         load_cil(db, cil_file);
 
-    cil_file = VEND_POLICY_DIR "plat_pub_versioned.cil";
+    cil_file = concat<VEND_POLICY_DIR, "plat_pub_versioned.cil">.value;
     if (access(cil_file, R_OK) == 0)
         load_cil(db, cil_file);
 
-    cil_file = VEND_POLICY_DIR "vendor_sepolicy.cil";
+    cil_file = concat<VEND_POLICY_DIR, "vendor_sepolicy.cil">.value;
     if (access(cil_file, R_OK) == 0)
         load_cil(db, cil_file);
 
     // odm
-    cil_file = ODM_POLICY_DIR "odm_sepolicy.cil";
+    cil_file = concat<ODM_POLICY_DIR, "odm_sepolicy.cil">.value;
     if (access(cil_file, R_OK) == 0)
         load_cil(db, cil_file);
 
@@ -215,19 +223,14 @@ SePolicy SePolicy::compile_split() noexcept {
 }
 
 SePolicy SePolicy::from_split() noexcept {
-    const char *odm_pre = ODM_POLICY_DIR "precompiled_sepolicy";
-    const char *vend_pre = VEND_POLICY_DIR "precompiled_sepolicy";
+    const char *odm_pre = concat<ODM_POLICY_DIR, "precompiled_sepolicy">.value;
+    const char *vend_pre = concat<VEND_POLICY_DIR, "precompiled_sepolicy">.value;
     if (access(odm_pre, R_OK) == 0 && check_precompiled(odm_pre))
         return SePolicy::from_file(odm_pre);
     else if (access(vend_pre, R_OK) == 0 && check_precompiled(vend_pre))
         return SePolicy::from_file(vend_pre);
     else
         return SePolicy::compile_split();
-}
-
-sepol_impl::~sepol_impl() {
-    policydb_destroy(db);
-    free(db);
 }
 
 static int vec_write(void *v, const char *buf, int len) {
@@ -265,4 +268,5 @@ bool SePolicy::to_file(::Utf8CStr file) const noexcept {
 
     close(fd);
     return true;
+}
 }

@@ -142,7 +142,10 @@ pub mod ffi {
         #[cxx_name = "Utf8CStr"]
         type Utf8CStrRef<'a> = base::Utf8CStrRef<'a>;
 
-        include!("include/core.hpp");
+        include!("magisk.core");
+        include!("magisk.scripting");
+        include!("magisk.su");
+        include!("magisk.deny");
 
         #[cxx_name = "get_magisk_tmp_rs"]
         fn get_magisk_tmp() -> Utf8CStrRef<'static>;
@@ -168,7 +171,7 @@ pub mod ffi {
         fn denylist_handler(client: i32);
         fn scan_deny_apps();
 
-        include!("include/sqlite.hpp");
+        include!("magisk.sqlite");
 
         type sqlite3;
         type DbValues;

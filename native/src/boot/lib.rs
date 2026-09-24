@@ -59,7 +59,7 @@ pub mod ffi {
     }
 
     unsafe extern "C++" {
-        include!("magiskboot.hpp");
+        include!("magisk.boot");
 
         #[cxx_name = "Utf8CStr"]
         type Utf8CStrRef<'a> = base::Utf8CStrRef<'a>;
@@ -100,7 +100,7 @@ pub mod ffi {
 
     // BootImage FFI
     unsafe extern "C++" {
-        include!("bootimg.hpp");
+        include!("magisk.boot");
         #[cxx_name = "boot_img"]
         type BootImage;
 

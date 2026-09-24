@@ -1,21 +1,40 @@
+module;
 #include <sys/mount.h>
 #include <libgen.h>
-
-#include <sepolicy.hpp>
-#include <consts.hpp>
-#include <base.hpp>
 #include <xz.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <dirent.h>
+#include <fcntl.h>
+#include <pthread.h>
+#include <sys/socket.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <errno.h>
+#include <rust/cxx.h>
 
-#include "init.hpp"
+export module magisk.init.rootdir;
+export import magisk.init.config;
+import magisk.init.mount;
+export import magisk.policy;
+
+export extern "C++" {
+
+inline Utf8CStr split_plat_cil() { return SPLIT_PLAT_CIL; }
+inline Utf8CStr preload_lib() { return PRELOAD_LIB; }
+inline Utf8CStr preload_policy() { return PRELOAD_POLICY; }
+inline Utf8CStr preload_ack() { return PRELOAD_ACK; }
+}
 
 using namespace std;
 
-static vector<string> rc_list;
+vector<string> rc_list;
 
 #define NEW_INITRC_DIR  "/system/etc/init/hw"
 #define INIT_RC         "init.rc"
 
-static bool unxz(int fd, rust::Slice<const uint8_t> bytes) {
+bool unxz(int fd, rust::Slice<const uint8_t> bytes) {
     uint8_t out[8192];
     xz_crc32_init();
     size_t size = bytes.size();
@@ -41,7 +60,7 @@ static bool unxz(int fd, rust::Slice<const uint8_t> bytes) {
 }
 
 // When return true, run patch_fissiond
-static bool patch_rc_scripts(const char *src_path, const char *tmp_path, bool writable) {
+bool patch_rc_scripts(const char *src_path, const char *tmp_path, bool writable) {
     auto src_dir = xopen_dir(src_path);
     if (!src_dir) return false;
     int src_fd = dirfd(src_dir.get());
@@ -51,7 +70,7 @@ static bool patch_rc_scripts(const char *src_path, const char *tmp_path, bool wr
         return xopen_dir(src_path);
     }() : [&] {
         char buf[PATH_MAX] = {};
-        ssprintf(buf, sizeof(buf), ROOTOVL "%s", src_path);
+        ssprintf(buf, sizeof(buf), concat<ROOTOVL, "%s">.value, src_path);
         xmkdirs(buf, 0755);
         return xopen_dir(buf);
     }();
@@ -124,7 +143,7 @@ static bool patch_rc_scripts(const char *src_path, const char *tmp_path, bool wr
                 LOGD("Inject zygote restart\n");
                 fprintf(dest_rc.get(), "%s", line.c_str());
                 fprintf(dest_rc.get(),
-                        "    onrestart exec " MAGISK_PROC_CON " 0 0 -- %s/magisk --zygote-restart\n", tmp_path);
+                        concat<"    onrestart exec ", MAGISK_PROC_CON, " 0 0 -- %s/magisk --zygote-restart\n">.value, tmp_path);
                 return true;
             }
             fprintf(dest_rc.get(), "%s", line.c_str());
@@ -136,7 +155,7 @@ static bool patch_rc_scripts(const char *src_path, const char *tmp_path, bool wr
     return faccessat(src_fd, "init.fission_host.rc", F_OK, 0) == 0;
 }
 
-void MagiskInit::patch_fissiond(const char *tmp_path) noexcept {
+extern "C++" void MagiskInit::patch_fissiond(const char *tmp_path) noexcept {
     {
         LOGD("Patching fissiond\n");
         mmap_data fissiond("/system/bin/fissiond", false);
@@ -147,21 +166,21 @@ void MagiskInit::patch_fissiond(const char *tmp_path) noexcept {
             LOGD("Patch @ %08zX [ro.build.system.fission_single_os] -> "
                  "[ro.build.system.xxxxxxxxxxxxxxxxx]\n", off);
         }
-        mkdirs(ROOTOVL "/system/bin", 0755);
-        if (auto target_fissiond = xopen_file(ROOTOVL "/system/bin/fissiond", "we")) {
+        mkdirs(concat<ROOTOVL, "/system/bin">.value, 0755);
+        if (auto target_fissiond = xopen_file(concat<ROOTOVL, "/system/bin/fissiond">.value, "we")) {
             fwrite(fissiond.data(), 1, fissiond.size(), target_fissiond.get());
-            clone_attr("/system/bin/fissiond", ROOTOVL "/system/bin/fissiond");
+            clone_attr("/system/bin/fissiond", concat<ROOTOVL, "/system/bin/fissiond">.value);
         }
     }
     LOGD("hijack isolated\n");
     auto hijack = xopen_file("/sys/devices/system/cpu/isolated", "re");
-    mkfifo(INTLROOT "/isolated", 0777);
-    xmount(INTLROOT "/isolated", "/sys/devices/system/cpu/isolated", nullptr, MS_BIND, nullptr);
+    mkfifo(concat<INTLROOT, "/isolated">.value, 0777);
+    xmount(concat<INTLROOT, "/isolated">.value, "/sys/devices/system/cpu/isolated", nullptr, MS_BIND, nullptr);
     if (!xfork()) {
-        auto dest = xopen_file(INTLROOT "/isolated", "we");
+        auto dest = xopen_file(concat<INTLROOT, "/isolated">.value, "we");
         LOGD("hijacked isolated\n");
         xumount2("/sys/devices/system/cpu/isolated", MNT_DETACH);
-        unlink(INTLROOT "/isolated");
+        unlink(concat<INTLROOT, "/isolated">.value);
         string content = full_read(fileno(hijack.get()));
         {
             string target = "/dev/cells/cell2"s + tmp_path;
@@ -174,7 +193,7 @@ void MagiskInit::patch_fissiond(const char *tmp_path) noexcept {
     }
 }
 
-static void load_overlay_rc(const char *overlay) {
+void load_overlay_rc(const char *overlay) {
     auto dir = open_dir(overlay);
     if (!dir) return;
 
@@ -202,7 +221,7 @@ static void load_overlay_rc(const char *overlay) {
     }
 }
 
-static void recreate_sbin(const char *mirror, bool use_bind_mount) {
+void recreate_sbin(const char *mirror, bool use_bind_mount) {
     auto dp = xopen_dir(mirror);
     int src = dirfd(dp.get());
     char buf[4096];
@@ -231,7 +250,7 @@ static void recreate_sbin(const char *mirror, bool use_bind_mount) {
     }
 }
 
-static void extract_files(bool sbin) {
+void extract_files(bool sbin) {
     const char *magisk_xz = sbin ? "/sbin/magisk.xz" : "magisk.xz";
     const char *stub_xz = sbin ? "/sbin/stub.xz" : "stub.xz";
     const char *init_ld_xz = sbin ? "/sbin/init-ld.xz" : "init-ld.xz";
@@ -259,7 +278,7 @@ static void extract_files(bool sbin) {
     }
 }
 
-void MagiskInit::patch_ro_root() noexcept {
+extern "C++" void MagiskInit::patch_ro_root() noexcept {
     mount_list.emplace_back("/data");
     parse_config_file();
 
@@ -280,7 +299,7 @@ void MagiskInit::patch_ro_root() noexcept {
         // Recreate original sbin structure
         xmkdir(MIRRDIR, 0755);
         xmount("/", MIRRDIR, nullptr, MS_BIND, nullptr);
-        recreate_sbin(MIRRDIR "/sbin", true);
+        recreate_sbin(concat<MIRRDIR, "/sbin">.value, true);
         xumount2(MIRRDIR, MNT_DETACH);
     } else {
         // Restore debug_ramdisk
@@ -290,7 +309,6 @@ void MagiskInit::patch_ro_root() noexcept {
 
     xrename("overlay.d", ROOTOVL);
 
-    extern bool avd_hack;
     // Handle avd hack
     if (avd_hack) {
         int src = xopen("/init", O_RDONLY | O_CLOEXEC);
@@ -299,7 +317,7 @@ void MagiskInit::patch_ro_root() noexcept {
         for (size_t off : init.patch("android,fstab", "xxx")) {
             LOGD("Patch @ %08zX [android,fstab] -> [xxx]\n", off);
         }
-        int dest = xopen(ROOTOVL "/init", O_CREAT | O_WRONLY | O_CLOEXEC, 0);
+        int dest = xopen(concat<ROOTOVL, "/init">.value, O_CREAT | O_WRONLY | O_CLOEXEC, 0);
         xwrite(dest, init.data(), init.size());
         fclone_attr(src, dest);
         close(src);
@@ -307,9 +325,9 @@ void MagiskInit::patch_ro_root() noexcept {
     }
 
     load_overlay_rc(ROOTOVL);
-    if (access(ROOTOVL "/sbin", F_OK) == 0) {
+    if (access(concat<ROOTOVL, "/sbin">.value, F_OK) == 0) {
         // Move files in overlay.d/sbin into tmp_dir
-        mv_path(ROOTOVL "/sbin", ".");
+        mv_path(concat<ROOTOVL, "/sbin">.value, ".");
     }
 
     // Patch init.rc
@@ -337,7 +355,7 @@ void MagiskInit::patch_ro_root() noexcept {
 #define PRE_TMPSRC "/magisk"
 #define PRE_TMPDIR PRE_TMPSRC "/tmp"
 
-void MagiskInit::patch_rw_root() noexcept {
+extern "C++" void MagiskInit::patch_rw_root() noexcept {
     mount_list.emplace_back("/data");
     parse_config_file();
 
@@ -374,7 +392,7 @@ void MagiskInit::patch_rw_root() noexcept {
     cp_afc(REDIR_PATH, "/sbin/magisk");
 }
 
-int magisk_proxy_main(int, char *argv[]) {
+export extern "C++" int magisk_proxy_main(int, char *argv[]) {
     rust::setup_klog();
     LOGD("%s\n", __FUNCTION__);
 
@@ -400,7 +418,7 @@ int magisk_proxy_main(int, char *argv[]) {
     return 1;
 }
 
-static void unxz_init(const char *init_xz, const char *init) {
+void unxz_init(const char *init_xz, const char *init) {
     LOGD("unxz %s -> %s\n", init_xz, init);
     int fd = xopen(init, O_WRONLY | O_CREAT, 0777);
     unxz(fd, mmap_data{init_xz});
@@ -409,7 +427,7 @@ static void unxz_init(const char *init_xz, const char *init) {
     unlink(init_xz);
 }
 
-Utf8CStr backup_init() {
+export extern "C++" Utf8CStr backup_init() {
     if (access("/.backup/init.xz", F_OK) == 0)
         unxz_init("/.backup/init.xz", "/.backup/init");
     return "/.backup/init";
