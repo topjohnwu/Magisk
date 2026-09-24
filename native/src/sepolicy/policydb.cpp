@@ -16,7 +16,6 @@ module;
 
 module magisk.policy;
 
-extern "C++" {
 using namespace std;
 
 #define SHALEN 64
@@ -81,7 +80,7 @@ static bool check_precompiled(const char *precompiled) {
     return ok;
 }
 
-static void load_cil(struct cil_db *db, const char *file) {
+static void load_cil(cil_db_t *db, const char *file) {
     mmap_data d(file);
     cil_add_file(db, file, (const char *) d.data(), d.size());
     LOGD("cil_add [%s]\n", file);
@@ -268,5 +267,4 @@ bool SePolicy::to_file(::Utf8CStr file) const noexcept {
 
     close(fd);
     return true;
-}
 }

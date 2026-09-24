@@ -36,7 +36,6 @@ module magisk.zygisk;
 // #define ZLOGV(...) ZLOGD(__VA_ARGS__)
 #define ZLOGV(...) (void*)0
 
-extern "C++" {
 #include "jni_hooks.hpp"
 
 using namespace std;
@@ -318,7 +317,7 @@ inline void *unwind_get_region_start(_Unwind_Context *ctx) {
 // argument, which is the pointer to NativeBridgeRuntimeCallbacks.
 // For x86, whose abi uses stack to pass arguments, we can directly get the pointer to
 // NativeBridgeRuntimeCallbacks from the stack.
-static const NativeBridgeRuntimeCallbacks* find_runtime_callbacks(struct _Unwind_Context *ctx) {
+static const NativeBridgeRuntimeCallbacks* find_runtime_callbacks(struct ::_Unwind_Context *ctx) {
     // Find the writable memory region of libart.so, where the NativeBridgeRuntimeCallbacks is located.
     auto [start, end] = []()-> tuple<uintptr_t, uintptr_t> {
         for (const auto &map : lsplt::MapInfo::Scan()) {
@@ -680,5 +679,4 @@ void hook_entry() {
 
 void hookJniNativeMethods(JNIEnv *env, const char *clz, JNINativeMethod *methods, int numMethods) {
     g_hook->hook_jni_methods(env, clz, { methods, static_cast<size_t>(numMethods) });
-}
 }

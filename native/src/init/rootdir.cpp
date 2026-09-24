@@ -14,18 +14,10 @@ module;
 #include <errno.h>
 #include <rust/cxx.h>
 
-export module magisk.init.rootdir;
-export import magisk.init.config;
-import magisk.init.mount;
-export import magisk.policy;
+module magisk.init;
+import magisk.policy;
 
-export extern "C++" {
-
-inline Utf8CStr split_plat_cil() { return SPLIT_PLAT_CIL; }
-inline Utf8CStr preload_lib() { return PRELOAD_LIB; }
-inline Utf8CStr preload_policy() { return PRELOAD_POLICY; }
-inline Utf8CStr preload_ack() { return PRELOAD_ACK; }
-}
+extern bool avd_hack;
 
 using namespace std;
 
@@ -155,7 +147,7 @@ bool patch_rc_scripts(const char *src_path, const char *tmp_path, bool writable)
     return faccessat(src_fd, "init.fission_host.rc", F_OK, 0) == 0;
 }
 
-extern "C++" void MagiskInit::patch_fissiond(const char *tmp_path) noexcept {
+void MagiskInit::patch_fissiond(const char *tmp_path) noexcept {
     {
         LOGD("Patching fissiond\n");
         mmap_data fissiond("/system/bin/fissiond", false);
@@ -278,7 +270,7 @@ void extract_files(bool sbin) {
     }
 }
 
-extern "C++" void MagiskInit::patch_ro_root() noexcept {
+void MagiskInit::patch_ro_root() noexcept {
     mount_list.emplace_back("/data");
     parse_config_file();
 
@@ -355,7 +347,7 @@ extern "C++" void MagiskInit::patch_ro_root() noexcept {
 #define PRE_TMPSRC "/magisk"
 #define PRE_TMPDIR PRE_TMPSRC "/tmp"
 
-extern "C++" void MagiskInit::patch_rw_root() noexcept {
+void MagiskInit::patch_rw_root() noexcept {
     mount_list.emplace_back("/data");
     parse_config_file();
 
@@ -392,7 +384,7 @@ extern "C++" void MagiskInit::patch_rw_root() noexcept {
     cp_afc(REDIR_PATH, "/sbin/magisk");
 }
 
-export extern "C++" int magisk_proxy_main(int, char *argv[]) {
+int magisk_proxy_main(int, char *argv[]) {
     rust::setup_klog();
     LOGD("%s\n", __FUNCTION__);
 
@@ -427,7 +419,7 @@ void unxz_init(const char *init_xz, const char *init) {
     unlink(init_xz);
 }
 
-export extern "C++" Utf8CStr backup_init() {
+Utf8CStr backup_init() {
     if (access("/.backup/init.xz", F_OK) == 0)
         unxz_init("/.backup/init.xz", "/.backup/init");
     return "/.backup/init";

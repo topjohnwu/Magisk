@@ -18,10 +18,11 @@ module;
 
 export module magisk.core;
 export import magisk.base;
+export import magisk.sqlite;
 
 #define PLOGE(fmt, args...) LOGE(fmt " failed with %d: %s\n", ##args, errno, ::strerror(errno))
 
-export extern "C++" {
+export {
 #include "core-rs.hpp"
 
 inline constexpr int AID_ROOT = 0;
@@ -74,26 +75,26 @@ inline rust::String resolve_preinit_dir_rs(Utf8CStr base_dir) {
 
 using namespace std;
 
-export extern "C++" bool read_string(int fd, std::string &str) {
+export bool read_string(int fd, std::string &str) {
     str.clear();
     int len = read_int(fd);
     str.resize(len);
     return xxread(fd, str.data(), len) == len;
 }
 
-export extern "C++" string read_string(int fd) {
+export string read_string(int fd) {
     string str;
     read_string(fd, str);
     return str;
 }
 
-export extern "C++" void write_string(int fd, string_view str) {
+export void write_string(int fd, string_view str) {
     if (fd < 0) return;
     write_int(fd, str.size());
     xwrite(fd, str.data(), str.size());
 }
 
-export extern "C++" const char *get_magisk_tmp() {
+export const char *get_magisk_tmp() {
     static const char *path = nullptr;
     if (path == nullptr) {
         if (access(concat<"/debug_ramdisk/", INTLROOT>.value, F_OK) == 0) {
@@ -107,7 +108,7 @@ export extern "C++" const char *get_magisk_tmp() {
     return path;
 }
 
-export extern "C++" void unlock_blocks() {
+export void unlock_blocks() {
     int fd, dev, OFF = 0;
 
     auto dir = xopen_dir("/dev/block");
@@ -128,7 +129,7 @@ export extern "C++" void unlock_blocks() {
 
 #define test_bit(bit, array) (array[bit / 8] & (1 << (bit % 8)))
 
-export extern "C++" bool check_key_combo() {
+export bool check_key_combo() {
     uint8_t bitmask[(KEY_MAX + 1) / 8];
     vector<owned_fd> events;
     constexpr char name[] = "/dev/.ev";
@@ -171,4 +172,4 @@ export extern "C++" bool check_key_combo() {
     return true;
 }
 
-export extern "C++" inline Utf8CStr get_magisk_tmp_rs() { return get_magisk_tmp(); }
+export inline Utf8CStr get_magisk_tmp_rs() { return get_magisk_tmp(); }

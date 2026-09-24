@@ -72,18 +72,28 @@ exported at their definitions and class methods defined in the class where
 possible. Rust ABI declarations, cross-file implementation declarations and
 forward declarations required by mutually dependent types remain.
 
-The Rust CXX generator keeps its `*-rs.hpp` / `*-rs.cpp` output format. Providers
-include the generated headers. Bridge implementations include those headers
-and import the C++ modules listed in Rust's `include!` metadata, rather than
-requiring handwritten headers for the C++ APIs. The adapter supplies forward
-declarations and explicit template-specialization declarations, and uses
-`bit_cast` for CXX's trivially copyable Str/Slice views to avoid Clang's imported
-anonymous-friend mismatch. Revalidate the adapter when updating CXX.
+The Rust CXX generator keeps its `*-rs.hpp` / `*-rs.cpp` output format.
+Providers include the generated application declarations in their export
+blocks, so types and functions belong to their named module. Each generated
+`.cpp` is an implementation unit of that same module, implicitly importing its
+primary interface and importing additional C++ modules from Rust's `include!`
+metadata. Rust calls the generated `extern "C"` entry points; handwritten C++
+APIs do not retain their former global-module ABI.
 
-Public C++ declarations retain explicit C++ linkage for Rust compatibility.
+The generated header has a separate implementation-only branch for CXX's
+runtime helpers. The bridge includes that branch in its global module fragment
+because those helpers implement the global `rust/cxx.h` types. Only generated
+`rust::Vec` / `rust::Box` template-specialization declarations and definitions
+retain `extern "C++"` to match those existing global templates in Clang 21.
+The adapter also uses `bit_cast` for CXX's trivially copyable Str/Slice views to
+avoid Clang's imported anonymous-friend mismatch. Revalidate the adapter when
+updating CXX.
+
 Non-exported implementation details use module linkage, so imported class
 methods refer to the provider's state rather than copies of `static` variables.
-The Zygisk SDK header, generated CXX/JNI headers and generated build flags remain.
+`MagiskInit` and `BootConfig`, their handwritten methods and their generated
+bridge now share the `magisk.init` module. The Zygisk SDK header, generated
+CXX/JNI headers and generated build flags remain.
 
 Rust libraries and their generated bindings must exist before invoking ndk-build,
 as in the existing hybrid build. Module scanning, BMI generation and compilation

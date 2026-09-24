@@ -94,7 +94,7 @@ void setup_sighandlers(void (*handler)(int)) {
     }
 }
 
-export extern "C++" int su_client_main(int argc, char *argv[]) {
+export int su_client_main(int argc, char *argv[]) {
     option long_opts[] = {
             { "command",                required_argument,  nullptr, 'c' },
             { "help",                   no_argument,        nullptr, 'h' },
@@ -333,7 +333,7 @@ void set_identity(int uid, const rust::Vec<gid_t> &groups) {
     }
 }
 
-export extern "C++" void exec_root_shell(int client, int pid, SuRequest &req, MntNsMode mode) {
+export void exec_root_shell(int client, int pid, SuRequest &req, MntNsMode mode) {
     // Become session leader
     xsetsid();
 

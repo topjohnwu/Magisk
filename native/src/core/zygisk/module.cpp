@@ -69,7 +69,7 @@ case 5:                                \
     break;                             \
 }
 
-export extern "C++" {
+export {
 struct ZygiskContext;
 struct ZygiskModule;
 
@@ -706,7 +706,7 @@ inline constexpr char NBPROP[] = "ro.dalvik.vm.native.bridge";
 
 using namespace std;
 
-extern "C++" bool ZygiskModule::RegisterModuleImpl(ApiTable *api, long *module) {
+bool ZygiskModule::RegisterModuleImpl(ApiTable *api, long *module) {
     if (api == nullptr || module == nullptr)
         return false;
 
@@ -748,7 +748,7 @@ extern "C++" bool ZygiskModule::RegisterModuleImpl(ApiTable *api, long *module) 
     return true;
 }
 
-extern "C++" void ZygiskModule::setOption(zygisk::Option opt) {
+void ZygiskModule::setOption(zygisk::Option opt) {
     if (g_ctx == nullptr)
         return;
     switch (opt) {
@@ -761,7 +761,7 @@ extern "C++" void ZygiskModule::setOption(zygisk::Option opt) {
     }
 }
 
-extern "C++" uint32_t ZygiskModule::getFlags() {
+uint32_t ZygiskModule::getFlags() {
     return g_ctx ? (g_ctx->info_flags & ~PRIVATE_MASK) : 0;
 }
 
