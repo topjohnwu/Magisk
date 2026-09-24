@@ -47,9 +47,7 @@ pub mod ffi {
     }
 
     unsafe extern "C++" {
-        include!("magisk.init.config");
-        include!("magisk.init.mount");
-        include!("magisk.init.rootdir");
+        include!("magisk.init");
 
         #[cxx_name = "Utf8CStr"]
         type Utf8CStrRef<'a> = base::Utf8CStrRef<'a>;

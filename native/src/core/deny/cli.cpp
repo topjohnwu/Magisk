@@ -15,7 +15,6 @@ module;
 
 module magisk.deny;
 
-extern "C++" {
 using namespace std;
 
 [[noreturn]] static void usage() {
@@ -159,5 +158,4 @@ int denylist_cli(rust::Vec<rust::String> &args) {
 
 return_code:
     return req == DenyRequest::STATUS ? res != DenyResponse::ENFORCED : res != DenyResponse::OK;
-}
 }

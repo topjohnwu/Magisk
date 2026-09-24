@@ -34,7 +34,6 @@ module magisk.zygisk;
 // #define ZLOGV(...) ZLOGD(__VA_ARGS__)
 #define ZLOGV(...) (void*)0
 
-extern "C++" {
 using namespace std;
 
 using comp_entry = void(*)(int);
@@ -123,4 +122,3 @@ extern "C" [[maybe_unused]] NativeBridgeCallbacks NativeBridgeItf {
     .padding = {},
     .isCompatibleWith = initialize_zygisk,
 };
-}

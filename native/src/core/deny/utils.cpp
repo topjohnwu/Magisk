@@ -17,7 +17,7 @@ export module magisk.deny;
 export import magisk.core;
 export import magisk.sqlite;
 
-export extern "C++" {
+export {
 inline constexpr char ISOLATED_MAGIC[] = "isolated";
 inline constexpr char WEBVIEW_ZYGOTE_MAGIC[] = "webview_zygote";
 inline constexpr int WEBVIEW_ZYGOTE_UID = 1053;
@@ -78,7 +78,7 @@ unique_ptr<map<int, set<string_view>>> app_id_to_pkgs_;
 // Locks the data structures above
 pthread_mutex_t data_lock = PTHREAD_MUTEX_INITIALIZER;
 
-export extern "C++" atomic<bool> denylist_enforced = false;
+export atomic<bool> denylist_enforced = false;
 
 int get_app_id(const vector<int> &users, const string &pkg) {
     struct stat st{};
@@ -158,7 +158,7 @@ bool proc_name_match(int pid, string_view name) {
     return false;
 }
 
-export extern "C++" bool proc_context_match(int pid, string_view context) {
+export bool proc_context_match(int pid, string_view context) {
     char buf[PATH_MAX];
     char con[1024] = {0};
 
@@ -236,7 +236,7 @@ bool add_hide_set(const char *pkg, const char *proc) {
     return true;
 }
 
-export extern "C++" void scan_deny_apps() {
+export void scan_deny_apps() {
     if (!app_id_to_pkgs_)
         return;
 
@@ -334,7 +334,7 @@ int add_list(const char *pkg, const char *proc) {
     return db_exec(sql) ? DenyResponse::OK : DenyResponse::ERROR;
 }
 
-export extern "C++" int add_list(int client) {
+export int add_list(int client) {
     string pkg = read_string(client);
     string proc = read_string(client);
     return add_list(pkg.data(), proc.data());
@@ -378,13 +378,13 @@ int rm_list(const char *pkg, const char *proc) {
     return db_exec(sql) ? DenyResponse::OK : DenyResponse::ERROR;
 }
 
-export extern "C++" int rm_list(int client) {
+export int rm_list(int client) {
     string pkg = read_string(client);
     string proc = read_string(client);
     return rm_list(pkg.data(), proc.data());
 }
 
-export extern "C++" void ls_list(int client) {
+export void ls_list(int client) {
     {
         mutex_guard lock(data_lock);
         if (!ensure_data()) {
@@ -408,7 +408,7 @@ export extern "C++" void ls_list(int client) {
     close(client);
 }
 
-export extern "C++" int enable_deny() {
+export int enable_deny() {
     if (denylist_enforced) {
         return DenyResponse::OK;
     } else {
@@ -448,7 +448,7 @@ export extern "C++" int enable_deny() {
     return DenyResponse::OK;
 }
 
-export extern "C++" int disable_deny() {
+export int disable_deny() {
     if (denylist_enforced.exchange(false)) {
         LOGI("* Disable DenyList\n");
     }
@@ -456,14 +456,14 @@ export extern "C++" int disable_deny() {
     return DenyResponse::OK;
 }
 
-export extern "C++" void initialize_denylist() {
+export void initialize_denylist() {
     if (!denylist_enforced) {
         if (MagiskD::Get().get_db_setting(DbEntryKey::DenylistConfig))
             enable_deny();
     }
 }
 
-export extern "C++" bool is_deny_target(int uid, string_view process) {
+export bool is_deny_target(int uid, string_view process) {
     mutex_guard lock(data_lock);
     if (!ensure_data())
         return false;
@@ -489,7 +489,7 @@ export extern "C++" bool is_deny_target(int uid, string_view process) {
     return false;
 }
 
-export extern "C++" void update_deny_flags(int uid, rust::Str process, uint32_t &flags) {
+export void update_deny_flags(int uid, rust::Str process, uint32_t &flags) {
     if (is_deny_target(uid, { process.begin(), process.end() })) {
         flags |= +ZygiskStateFlags::ProcessOnDenyList;
     }

@@ -16,7 +16,6 @@ module;
 
 module magisk.core;
 
-extern "C++" {
 using namespace std;
 
 // This has to keep in sync with SysProp in mod.rs
@@ -63,5 +62,4 @@ extern "C" SysProp get_sys_prop() {
         LOGE("resetprop: __system_properties_init error\n");
     }
     return prop;
-}
 }

@@ -15,11 +15,18 @@ module;
 #include <errno.h>
 #include <rust/cxx.h>
 
-export module magisk.init.config;
+export module magisk.init;
 export import magisk.base;
 
-export extern "C++" {
+export {
 #include "init-rs.hpp"
+
+int magisk_proxy_main(int, char *argv[]);
+Utf8CStr backup_init();
+inline Utf8CStr split_plat_cil() { return SPLIT_PLAT_CIL; }
+inline Utf8CStr preload_lib() { return PRELOAD_LIB; }
+inline Utf8CStr preload_policy() { return PRELOAD_POLICY; }
+inline Utf8CStr preload_ack() { return PRELOAD_ACK; }
 }
 
 using namespace std;
@@ -131,7 +138,7 @@ bool check_key_combo() {
     return false;
 }
 
-extern "C++" void BootConfig::set(const kv_pairs &kv) noexcept {
+void BootConfig::set(const kv_pairs &kv) noexcept {
     for (const auto &[key, value] : kv) {
         if (key == "androidboot.slot_suffix") {
             // Many Amlogic devices are A-only but have slot_suffix...
@@ -183,7 +190,7 @@ if (access(file_name, R_OK) == 0) {                                 \
     }                                                               \
 }
 
-extern "C++" void BootConfig::init() noexcept {
+void BootConfig::init() noexcept {
     set(parse_cmdline(full_read("/proc/cmdline")));
     set(parse_bootconfig(full_read("/proc/bootconfig")));
 

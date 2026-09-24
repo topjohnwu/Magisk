@@ -14,7 +14,6 @@ module;
 
 module magisk.policy;
 
-extern "C++" {
 using Str = rust::Str;
 using StrVec = rust::Vec<rust::Str>;
 using Xperms = rust::Vec<Xperm>;
@@ -184,5 +183,4 @@ void SePolicy::dontauditxperm(StrVec src, StrVec tgt, StrVec cls, Xperms xperm) 
         print_rule("dontauditxperm", args...);
         impl->add_xperm_rule(args..., AVTAB_XPERMS_DONTAUDIT);
     });
-}
 }

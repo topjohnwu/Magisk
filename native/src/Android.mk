@@ -39,11 +39,11 @@ LOCAL_STATIC_LIBRARIES := \
     libxz \
     libinit-rs
 
-LOCAL_MODULE_SRC_FILES := \
+LOCAL_MODULE_SRC_FILES := init/getinfo.cpp
+LOCAL_SRC_FILES := \
     init/mount.cpp \
     init/rootdir.cpp \
-    init/getinfo.cpp
-LOCAL_SRC_FILES := init/init-rs.cpp
+    init/init-rs.cpp
 
 LOCAL_LDFLAGS := -static
 

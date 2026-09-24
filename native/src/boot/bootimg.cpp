@@ -58,7 +58,7 @@ using namespace std;
 #define AVB_FOOTER_MAGIC "AVBf"
 #define AVB_MAGIC "AVB0"
 
-export extern "C++" {
+export {
 #include "boot-rs.hpp"
 
 enum class FileFormat : uint8_t;
@@ -855,7 +855,7 @@ off += hdr->name##_size();              \
 off = align_to(off, hdr->page_size());  \
 assert_off()
 
-export extern "C++" struct boot_img {
+export struct boot_img {
     // Memory map of the whole image
     const mmap_data map;
 
@@ -1174,7 +1174,7 @@ export extern "C++" struct boot_img {
     bool verify() const noexcept;
 };
 
-export extern "C++" int split_image_dtb(Utf8CStr filename, bool skip_decomp = false) {
+export int split_image_dtb(Utf8CStr filename, bool skip_decomp = false) {
     mmap_data img(filename.c_str());
 
     if (int offset = find_dtb_offset(img.data(), img.size()); offset > 0) {
@@ -1200,7 +1200,7 @@ export extern "C++" int split_image_dtb(Utf8CStr filename, bool skip_decomp = fa
     }
 }
 
-export extern "C++" int unpack(Utf8CStr image, bool skip_decomp = false, bool hdr = false) {
+export int unpack(Utf8CStr image, bool skip_decomp = false, bool hdr = false) {
     const boot_img boot(image.c_str());
 
     if (hdr)
@@ -1297,7 +1297,7 @@ write_zero(fd, align_padding(lseek(fd, 0, SEEK_CUR) - off.header, page_size))
 
 #define file_align() file_align_with(boot.hdr->page_size())
 
-export extern "C++" void repack(Utf8CStr src_img, Utf8CStr out_img, bool skip_comp = false) {
+export void repack(Utf8CStr src_img, Utf8CStr out_img, bool skip_comp = false) {
     const boot_img boot(src_img.c_str());
     fprintf(stderr, "Repack to boot image: [%s]\n", out_img.c_str());
 
@@ -1641,7 +1641,7 @@ export extern "C++" void repack(Utf8CStr src_img, Utf8CStr out_img, bool skip_co
     close(fd);
 }
 
-export extern "C++" void cleanup() {
+export void cleanup() {
     unlink(HEADER_FILE);
     unlink(KERNEL_FILE);
     unlink(RAMDISK_FILE);

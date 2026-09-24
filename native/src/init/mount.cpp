@@ -14,8 +14,7 @@ module;
 #include <errno.h>
 #include <rust/cxx.h>
 
-export module magisk.init.mount;
-export import magisk.init.config;
+module magisk.init;
 
 #define PLOGE(fmt, args...) LOGE(fmt " failed with %d: %s\n", ##args, errno, ::strerror(errno))
 
@@ -34,7 +33,7 @@ vector<devinfo> dev_list;
 
 // When this boolean is set, this means we are currently
 // running magiskinit on legacy SAR AVD emulator
-export extern "C++" bool avd_hack = false;
+bool avd_hack = false;
 
 void parse_device(devinfo *dev, const char *uevent) {
     dev->partname[0] = '\0';
@@ -55,7 +54,7 @@ void parse_device(devinfo *dev, const char *uevent) {
     });
 }
 
-extern "C++" void MagiskInit::collect_devices() const noexcept {
+void MagiskInit::collect_devices() const noexcept {
     char path[PATH_MAX];
     devinfo dev{};
     if (auto dir = xopen_dir("/sys/dev/block"); dir) {
@@ -82,7 +81,7 @@ extern "C++" void MagiskInit::collect_devices() const noexcept {
     }
 }
 
-extern "C++" uint64_t MagiskInit::find_block(const char *partname) const noexcept {
+uint64_t MagiskInit::find_block(const char *partname) const noexcept {
     if (dev_list.empty())
         collect_devices();
 
@@ -113,7 +112,7 @@ extern "C++" uint64_t MagiskInit::find_block(const char *partname) const noexcep
     return 0;
 }
 
-extern "C++" void MagiskInit::mount_preinit_dir() noexcept {
+void MagiskInit::mount_preinit_dir() noexcept {
     if (preinit_dev.empty()) return;
     auto dev = find_block(preinit_dev.c_str());
     if (dev == 0) {
@@ -153,7 +152,7 @@ extern "C++" void MagiskInit::mount_preinit_dir() noexcept {
     }
 }
 
-extern "C++" bool MagiskInit::mount_system_root() noexcept {
+bool MagiskInit::mount_system_root() noexcept {
     LOGD("Mounting system_root\n");
 
     // there's no /dev in stub cpio
@@ -220,7 +219,7 @@ mount_root:
     return is_two_stage;
 }
 
-extern "C++" void MagiskInit::setup_tmp(const char *path) noexcept {
+void MagiskInit::setup_tmp(const char *path) noexcept {
     LOGD("Setup Magisk tmp at %s\n", path);
     chdir("/data");
 

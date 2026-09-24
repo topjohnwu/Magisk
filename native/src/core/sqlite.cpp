@@ -15,7 +15,7 @@ module;
 export module magisk.sqlite;
 export import magisk.base;
 
-export extern "C++" {
+export {
 #define SQLITE_OPEN_READWRITE        0x00000002  /* Ok for sqlite3_open_v2() */
 #define SQLITE_OPEN_CREATE           0x00000004  /* Ok for sqlite3_open_v2() */
 #define SQLITE_OPEN_NOMUTEX          0x00008000  /* Ok for sqlite3_open_v2() */
@@ -66,7 +66,7 @@ using namespace std;
 
 int (*sqlite3_open_v2)(const char *filename, sqlite3 **ppDb, int flags, const char *zVfs);
 int (*sqlite3_close)(sqlite3 *db);
-export extern "C++" const char *(*sqlite3_errstr)(int) = nullptr;
+export const char *(*sqlite3_errstr)(int) = nullptr;
 int (*sqlite3_prepare_v2)(sqlite3 *db, const char *zSql, int nByte, sqlite3_stmt **ppStmt, const char **pzTail);
 int (*sqlite3_bind_parameter_count)(sqlite3_stmt*);
 int (*sqlite3_bind_int64)(sqlite3_stmt*, int, int64_t);
@@ -78,7 +78,7 @@ int (*sqlite3_column_int)(sqlite3_stmt*, int iCol);
 int (*sqlite3_step)(sqlite3_stmt*);
 int (*sqlite3_finalize)(sqlite3_stmt *pStmt);
 
-export extern "C++" struct DbValues {
+export struct DbValues {
     const char *get_text(int index) const {
         return sqlite3_column_text((sqlite3_stmt*) this, index);
     }
@@ -89,7 +89,7 @@ export extern "C++" struct DbValues {
     ~DbValues() = delete;
 };
 
-export extern "C++" struct DbStatement {
+export struct DbStatement {
     int bind_text(int index, rust::Str val) {
         return sqlite3_bind_text(reinterpret_cast<sqlite3_stmt*>(this), index, val.data(), val.size(), nullptr);
     }
@@ -99,7 +99,7 @@ export extern "C++" struct DbStatement {
     ~DbStatement() = delete;
 };
 
-export extern "C++" struct DbArgs {
+export struct DbArgs {
     DbArgs() : curr(0) {}
     DbArgs(std::initializer_list<DbArg> list) : args(list), curr(0) {}
     int operator()(int index, DbStatement &stmt) {
@@ -251,7 +251,7 @@ extern "C" int sql_exec_impl(
 
 #define sql_chk_log(fn, ...) sql_chk_log_ret(nullptr, fn, __VA_ARGS__)
 
-export extern "C++" sqlite3 *open_and_init_db() {
+export sqlite3 *open_and_init_db() {
     if (!load_sqlite()) {
         LOGE("sqlite3: Cannot load libsqlite.so\n");
         return nullptr;
@@ -389,7 +389,7 @@ extern "C" int sql_exec_rs(
         sql_bind_callback bind_cb, void *bind_cookie,
         sql_exec_callback exec_cb, void *exec_cookie);
 
-export extern "C++" bool db_exec(const char *sql, DbArgs args = {}, db_exec_callback exec_fn = {}) {
+export bool db_exec(const char *sql, DbArgs args = {}, db_exec_callback exec_fn = {}) {
     using db_bind_callback = std::function<int(int, DbStatement&)>;
 
     db_bind_callback bind_fn = {};
@@ -412,7 +412,7 @@ export extern "C++" bool db_exec(const char *sql, DbArgs args = {}, db_exec_call
     return true;
 }
 
-export extern "C++" template<DbData T>
+export template<DbData T>
 bool db_exec(const char *sql, DbArgs args, T &data) {
     return db_exec(sql, std::move(args), (db_exec_callback) std::ref(data));
 }

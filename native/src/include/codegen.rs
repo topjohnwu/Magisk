@@ -63,16 +63,21 @@ pub fn gen_cxx_binding(name: &str) {
             writeln!(declarations, "{line}").ok_or_exit();
         }
     }
-    let forward = match name {
-        "base-rs" => "struct Utf8CStr;\nstruct FnBoolStrStr;\nstruct FnBoolStr;\n",
-        "core-rs" => "struct Utf8CStr;\nstruct sqlite3;\nstruct DbValues;\nstruct DbStatement;\n",
-        "policy-rs" => "struct Utf8CStr;\nclass sepol_impl;\n",
-        "boot-rs" => "struct Utf8CStr;\nstruct boot_img;\n",
-        "init-rs" => {
-            "struct Utf8CStr;\nusing kv_pairs = std::vector<std::pair<std::string, std::string>>;\n"
-        }
+    let (module, forward) = match name {
+        "base-rs" => (
+            "magisk.base",
+            "struct Utf8CStr;\nstruct FnBoolStrStr;\nstruct FnBoolStr;\n",
+        ),
+        "core-rs" => ("magisk.core", ""),
+        "policy-rs" => ("magisk.policy", "class sepol_impl;\n"),
+        "boot-rs" => ("magisk.boot", "struct boot_img;\n"),
+        "init-rs" => (
+            "magisk.init",
+            "using kv_pairs = std::vector<std::pair<std::string, std::string>>;\n",
+        ),
         _ => panic!("unknown CXX bridge {name}"),
     };
+    imports.remove(module);
     if name == "init-rs" {
         includes.insert("#include <vector>".to_string());
     }
@@ -90,14 +95,15 @@ pub fn gen_cxx_binding(name: &str) {
         explicit = line == "template <>";
     }
     if !specializations.is_empty() {
+        // These specialize the global rust/cxx.h templates, not application
+        // entities. Keep their declarations attached to that global template.
         writeln!(
             declarations,
-            "namespace rust {{ inline namespace cxxbridge1 {{\n{specializations}}}\n}}"
+            "extern \"C++\" {{ namespace rust {{ inline namespace cxxbridge1 {{\n{specializations}}}\n}}\n}}"
         )
         .ok_or_exit();
     }
-    let prelude = includes.iter().cloned().collect::<Vec<_>>().join("\n");
-    let interface = format!("#pragma once\n{prelude}\n\n{forward}{declarations}");
+    let header_includes = includes.iter().cloned().collect::<Vec<_>>().join("\n");
 
     let mut definitions = String::new();
     for line in implementation.lines() {
@@ -120,12 +126,48 @@ pub fn gen_cxx_binding(name: &str) {
         .replace("    Str str = Str::uninit{};\n    str.repr = repr;\n    return str;", "    return ::std::bit_cast<Str>(repr);")
         .replace("    return slice.repr;", "    return ::std::bit_cast<repr::Fat>(slice);")
         .replace("    return str.repr;", "    return ::std::bit_cast<repr::Fat>(str);");
+    // CXX's runtime helpers define members of the global rust/cxx.h types.
+    // Include them in the bridge implementation's global module fragment;
+    // application declarations and definitions belong to the named module.
+    let Some(first_declaration) = header.lines().find(|line| {
+        line.starts_with("enum class ") || line.starts_with("struct ") || line.starts_with("using ")
+    }) else {
+        panic!("missing CXX application declarations in {name}");
+    };
+    let Some(start) = definitions.find(first_declaration) else {
+        panic!("missing CXX implementation declarations in {name}");
+    };
+    let (helpers, definitions) = definitions.split_at(start);
+    let definitions = definitions
+        .replace(
+            "namespace rust {\ninline namespace cxxbridge1 {\n",
+            "extern \"C++\" {\nnamespace rust {\ninline namespace cxxbridge1 {\n",
+        )
+        .replace(
+            "} // namespace cxxbridge1\n} // namespace rust",
+            "} // namespace cxxbridge1\n} // namespace rust\n} // extern C++",
+        );
+    // The implementation imports these types from its primary interface.
+    // Reuse CXX's guards instead of defining the shared types a second time.
+    let mut guards = String::new();
+    for line in header.lines() {
+        if let Some(guard) = line.strip_prefix("#ifndef CXXBRIDGE1_")
+            && (guard.starts_with("STRUCT_") || guard.starts_with("ENUM_"))
+        {
+            writeln!(guards, "#define CXXBRIDGE1_{guard}").ok_or_exit();
+        }
+    }
     let prelude = includes.iter().cloned().collect::<Vec<_>>().join("\n");
+    let interface = format!(
+        "#pragma once\n#ifdef MAGISK_CXX_BRIDGE_IMPL\n{prelude}\n{helpers}{guards}\n#else\n{header_includes}\n\n{forward}{declarations}\n#endif\n"
+    );
     let imports = imports
         .into_iter()
         .map(|m| format!("import {m};\n"))
         .collect::<String>();
-    let implementation = format!("{prelude}\n#include \"{name}.hpp\"\n\n{imports}\n{definitions}");
+    let implementation = format!(
+        "module;\n#define MAGISK_CXX_BRIDGE_IMPL\n#include \"{name}.hpp\"\n#undef MAGISK_CXX_BRIDGE_IMPL\n\nmodule {module};\n{imports}\n{definitions}"
+    );
     write_if_diff(format!("{name}.hpp"), interface.as_bytes()).ok_or_exit();
     write_if_diff(format!("{name}.cpp"), implementation.as_bytes()).ok_or_exit();
 }

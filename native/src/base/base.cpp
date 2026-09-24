@@ -88,7 +88,7 @@ export inline constexpr const char *applet_names[] = { "su", "resetprop", nullpt
 
 #define PLOGE(fmt, args...) LOGE(fmt " failed with %d: %s\n", ##args, errno, ::strerror(errno))
 
-export extern "C++" {
+export {
 #include "base-rs.hpp"
 
 extern "C" {
@@ -410,7 +410,7 @@ static_assert(BLKGETSIZE64 == 0x80041272);
 #undef vsnprintf
 #undef strlcpy
 // Similar to vsnprintf, returning the number of bytes written.
-export extern "C++" __printflike(3, 0) int vssprintf(char *dest, size_t size, const char *fmt, va_list ap) {
+export __printflike(3, 0) int vssprintf(char *dest, size_t size, const char *fmt, va_list ap) {
     if (size > 0) {
         *dest = 0;
         return std::min(vsnprintf(dest, size, fmt, ap), (int) size - 1);
@@ -418,7 +418,7 @@ export extern "C++" __printflike(3, 0) int vssprintf(char *dest, size_t size, co
     return -1;
 }
 
-export extern "C++" __printflike(3, 4) int ssprintf(char *dest, size_t size, const char *fmt, ...) {
+export __printflike(3, 4) int ssprintf(char *dest, size_t size, const char *fmt, ...) {
     va_list va;
     va_start(va, fmt);
     int r = vssprintf(dest, size, fmt, va);
@@ -449,20 +449,20 @@ int fmt_and_log_with_rs(LogLevel level, const char *fmt, va_list ap) {
 
 // LTO will optimize out the NOP function
 #if MAGISK_DEBUG
-export extern "C++" __printflike(1, 2) void LOGD(const char *fmt, ...) { LOG_BODY(Debug) }
+export __printflike(1, 2) void LOGD(const char *fmt, ...) { LOG_BODY(Debug) }
 #else
-export extern "C++" __printflike(1, 2) void LOGD(const char *fmt, ...) {}
+export __printflike(1, 2) void LOGD(const char *fmt, ...) {}
 #endif
-export extern "C++" __printflike(1, 2) void LOGI(const char *fmt, ...) { LOG_BODY(Info) }
-export extern "C++" __printflike(1, 2) void LOGW(const char *fmt, ...) { LOG_BODY(Warn) }
-export extern "C++" __printflike(1, 2) void LOGE(const char *fmt, ...) { LOG_BODY(Error) }
+export __printflike(1, 2) void LOGI(const char *fmt, ...) { LOG_BODY(Info) }
+export __printflike(1, 2) void LOGW(const char *fmt, ...) { LOG_BODY(Warn) }
+export __printflike(1, 2) void LOGE(const char *fmt, ...) { LOG_BODY(Error) }
 
-export extern "C++" rust::Vec<size_t> mut_u8_patch(MutByteSlice buf, ByteSlice from, ByteSlice to) {
+export rust::Vec<size_t> mut_u8_patch(MutByteSlice buf, ByteSlice from, ByteSlice to) {
     byte_data data(buf);
     return data.patch(from, to);
 }
 
-export extern "C++" int fork_dont_care() {
+export int fork_dont_care() {
     if (int pid = xfork()) {
         waitpid(pid, nullptr, 0);
         return pid;
@@ -472,7 +472,7 @@ export extern "C++" int fork_dont_care() {
     return 0;
 }
 
-export extern "C++" int fork_no_orphan() {
+export int fork_no_orphan() {
     int pid = xfork();
     if (pid)
         return pid;
@@ -482,7 +482,7 @@ export extern "C++" int fork_no_orphan() {
     return 0;
 }
 
-export extern "C++" int exec_command(exec_t &exec) {
+export int exec_command(exec_t &exec) {
     auto pipefd = array<int, 2>{-1, -1};
     int outfd = -1;
 
@@ -528,7 +528,7 @@ export extern "C++" int exec_command(exec_t &exec) {
     exit(-1);
 }
 
-export extern "C++" int exec_command_sync(exec_t &exec) {
+export int exec_command_sync(exec_t &exec) {
     int pid = exec_command(exec);
     if (pid < 0)
         return -1;
@@ -551,12 +551,12 @@ export extern "C" int new_daemon_thread(thread_entry entry, void *arg = nullptr)
 
 char *argv0;
 size_t name_len;
-export extern "C++" void init_argv0(int argc, char **argv) {
+export void init_argv0(int argc, char **argv) {
     argv0 = argv[0];
     name_len = (argv[argc - 1] - argv[0]) + strlen(argv[argc - 1]) + 1;
 }
 
-export extern "C++" void set_nice_name(Utf8CStr name) {
+export void set_nice_name(Utf8CStr name) {
     memset(argv0, 0, name_len);
     strscpy(argv0, name.c_str(), name_len);
     prctl(PR_SET_NAME, name.c_str());
@@ -586,15 +586,15 @@ T parse_num(string_view s) {
  * Bionic's atoi runs through strtol().
  * Use our own implementation for faster conversion.
  */
-export extern "C++" int parse_int(string_view s) {
+export int parse_int(string_view s) {
     return parse_num<int, 10>(s);
 }
 
-export extern "C++" uint32_t parse_uint32_hex(string_view s) {
+export uint32_t parse_uint32_hex(string_view s) {
     return parse_num<uint32_t, 16>(s);
 }
 
-export extern "C++" int switch_mnt_ns(int pid) {
+export int switch_mnt_ns(int pid) {
     int ret = -1;
     int fd = syscall(__NR_pidfd_open, pid, 0);
     if (fd > 0) {
@@ -614,7 +614,7 @@ export extern "C++" int switch_mnt_ns(int pid) {
     return ret;
 }
 
-export extern "C++" string &replace_all(string &str, string_view from, string_view to) {
+export string &replace_all(string &str, string_view from, string_view to) {
     size_t pos = 0;
     while((pos = str.find(from, pos)) != string::npos) {
         str.replace(pos, from.length(), to);
@@ -638,7 +638,7 @@ auto split_impl(string_view s, string_view delims) {
     return result;
 }
 
-export extern "C++" vector<string> split(string_view s, string_view delims) {
+export vector<string> split(string_view s, string_view delims) {
     return split_impl<string>(s, delims);
 }
 
@@ -690,7 +690,7 @@ extern "C" void __vloge(const char* fmt, va_list ap) {
     fmt_and_log_with_rs(LogLevel::Error, fmt, ap);
 }
 
-export extern "C++" string full_read(int fd) {
+export string full_read(int fd) {
     string str;
     char buf[4096];
     for (ssize_t len; (len = xread(fd, buf, sizeof(buf))) > 0;)
@@ -698,7 +698,7 @@ export extern "C++" string full_read(int fd) {
     return str;
 }
 
-export extern "C++" string full_read(const char *filename) {
+export string full_read(const char *filename) {
     string str;
     if (int fd = xopen(filename, O_RDONLY | O_CLOEXEC); fd >= 0) {
         str = full_read(fd);
@@ -707,7 +707,7 @@ export extern "C++" string full_read(const char *filename) {
     return str;
 }
 
-export extern "C++" void write_zero(int fd, size_t size) {
+export void write_zero(int fd, size_t size) {
     char buf[4096] = {0};
     size_t len;
     while (size > 0) {
@@ -717,15 +717,15 @@ export extern "C++" void write_zero(int fd, size_t size) {
     }
 }
 
-export extern "C++" sDIR make_dir(DIR *dp) {
+export sDIR make_dir(DIR *dp) {
     return sDIR(dp, [](DIR *dp){ return dp ? closedir(dp) : 1; });
 }
 
-export extern "C++" sFILE make_file(FILE *fp) {
+export sFILE make_file(FILE *fp) {
     return sFILE(fp, [](FILE *fp){ return fp ? fclose(fp) : 1; });
 }
 
-export extern "C++" string resolve_preinit_dir(const char *base_dir) {
+export string resolve_preinit_dir(const char *base_dir) {
     string dir = base_dir;
     if (access((dir + "/unencrypted").data(), F_OK) == 0) {
         dir += "/unencrypted/magisk";
@@ -739,27 +739,27 @@ export extern "C++" string resolve_preinit_dir(const char *base_dir) {
     return dir;
 }
 
-export extern "C++" template <class ...Args>
+export template <class ...Args>
 int exec_command(exec_t &exec, Args &&...args) {
     const char *argv[] = {args..., nullptr};
     exec.argv = argv;
     return exec_command(exec);
 }
 
-export extern "C++" template <class ...Args>
+export template <class ...Args>
 int exec_command_sync(exec_t &exec, Args &&...args) {
     const char *argv[] = {args..., nullptr};
     exec.argv = argv;
     return exec_command_sync(exec);
 }
 
-export extern "C++" template <class ...Args>
+export template <class ...Args>
 int exec_command_sync(Args &&...args) {
     exec_t exec;
     return exec_command_sync(exec, args...);
 }
 
-export extern "C++" template <class ...Args>
+export template <class ...Args>
 void exec_command_async(Args &&...args) {
     const char *argv[] = {args..., nullptr};
     exec_t exec {
@@ -769,26 +769,26 @@ void exec_command_async(Args &&...args) {
     exec_command(exec);
 }
 
-export extern "C++" inline sDIR open_dir(const char *path) {
+export inline sDIR open_dir(const char *path) {
     return make_dir(opendir(path));
 }
 
-export extern "C++" inline sDIR xopen_dir(const char *path) {
+export inline sDIR xopen_dir(const char *path) {
     return make_dir(xopendir(path));
 }
 
-export extern "C++" inline sDIR xopen_dir(int dirfd) {
+export inline sDIR xopen_dir(int dirfd) {
     return make_dir(xfdopendir(dirfd));
 }
 
-export extern "C++" inline sFILE open_file(const char *path, const char *mode) {
+export inline sFILE open_file(const char *path, const char *mode) {
     return make_file(fopen(path, mode));
 }
 
-export extern "C++" inline sFILE xopen_file(const char *path, const char *mode) {
+export inline sFILE xopen_file(const char *path, const char *mode) {
     return make_file(xfopen(path, mode));
 }
 
-export extern "C++" inline sFILE xopen_file(int fd, const char *mode) {
+export inline sFILE xopen_file(int fd, const char *mode) {
     return make_file(xfdopen(fd, mode));
 }

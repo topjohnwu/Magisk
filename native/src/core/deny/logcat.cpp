@@ -15,7 +15,6 @@ module;
 
 module magisk.deny;
 
-extern "C++" {
 using namespace std;
 
 struct logger_entry {
@@ -88,17 +87,17 @@ extern "C" {
 
 [[gnu::weak]] struct logger_list *android_logger_list_alloc(int mode, unsigned int tail, pid_t pid);
 [[gnu::weak]] void android_logger_list_free(struct logger_list *list);
-[[gnu::weak]] int android_logger_list_read(struct logger_list *list, struct log_msg *log_msg);
+[[gnu::weak]] int android_logger_list_read(struct logger_list *list, log_msg *log_msg);
 [[gnu::weak]] struct logger *android_logger_open(struct logger_list *list, log_id_t id);
-[[gnu::weak]] int android_log_processLogBuffer(struct logger_entry *buf, AndroidLogEntry *entry);
+[[gnu::weak]] int android_log_processLogBuffer(logger_entry *buf, AndroidLogEntry *entry);
 
 }
 
 // zygote pid -> mnt ns
-static map<int, struct stat> zygote_map;
+static map<int, struct ::stat> zygote_map;
 bool logcat_exit;
 
-static int read_ns(const int pid, struct stat *st) {
+static int read_ns(const int pid, struct ::stat *st) {
     char path[32];
     sprintf(path, "/proc/%d/ns/mnt", pid);
     return stat(path, st);
@@ -304,5 +303,4 @@ static void process_events_buffer(struct log_msg *msg) {
 void *logcat(void *) {
     check_zygote();
     run();
-}
 }

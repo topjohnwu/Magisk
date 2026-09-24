@@ -38,7 +38,7 @@ void set_script_env() {
         setenv("ZYGISK_ENABLED", "1", 1);
 };
 
-export extern "C++" void exec_script(Utf8CStr script) {
+export void exec_script(Utf8CStr script) {
     exec_t exec {
         .pre_exec = set_script_env,
         .fork = fork_no_orphan
@@ -83,7 +83,7 @@ if (pfs) { \
     exit(0); \
 }
 
-export extern "C++" void exec_common_scripts(Utf8CStr stage) {
+export void exec_common_scripts(Utf8CStr stage) {
     LOGI("* Running %s.d scripts\n", stage.c_str());
     char path[4096];
     char *name = path + sprintf(path, concat<SECURE_DIR, "/%s.d">.value, stage.c_str());
@@ -125,7 +125,7 @@ bool operator>(const timespec &a, const timespec &b) {
     return a.tv_nsec > b.tv_nsec;
 }
 
-export extern "C++" void exec_module_scripts(Utf8CStr stage, const rust::Vec<ModuleInfo> &module_list) {
+export void exec_module_scripts(Utf8CStr stage, const rust::Vec<ModuleInfo> &module_list) {
     LOGI("* Running module %s scripts\n", stage.c_str());
     if (module_list.empty())
         return;
@@ -166,7 +166,7 @@ appops set %s REQUEST_INSTALL_PACKAGES allow
 rm -f $APK
 )EOF";
 
-export extern "C++" void install_apk(Utf8CStr apk) {
+export void install_apk(Utf8CStr apk) {
     setfilecon(apk.c_str(), MAGISK_FILE_CON);
     char cmds[sizeof(install_script) + 4096];
     ssprintf(cmds, sizeof(cmds), install_script, apk.c_str(), JAVA_PACKAGE_NAME);
@@ -179,7 +179,7 @@ log -t Magisk "pm_uninstall: $PKG"
 log -t Magisk "pm_uninstall: $(pm uninstall $PKG 2>&1)"
 )EOF";
 
-export extern "C++" void uninstall_pkg(Utf8CStr pkg) {
+export void uninstall_pkg(Utf8CStr pkg) {
     char cmds[sizeof(uninstall_script) + 256];
     ssprintf(cmds, sizeof(cmds), uninstall_script, pkg.c_str());
     exec_command_async("/system/bin/sh", "-c", cmds);
@@ -192,7 +192,7 @@ log -t Magisk "pm_clear: $PKG (user=$USER)"
 log -t Magisk "pm_clear: $(pm clear --user $USER $PKG 2>&1)"
 )EOF";
 
-export extern "C++" void clear_pkg(const char *pkg, int user_id) {
+export void clear_pkg(const char *pkg, int user_id) {
     char cmds[sizeof(clear_script) + 288];
     ssprintf(cmds, sizeof(cmds), clear_script, pkg, user_id);
     exec_command_async("/system/bin/sh", "-c", cmds);
@@ -214,7 +214,7 @@ install_module
 exit 0
 )EOF";
 
-export extern "C++" void install_module(Utf8CStr file) {
+export void install_module(Utf8CStr file) {
     if (getuid() != 0)
         abort(stderr, "Run this command with root");
     if (access(DATABIN, F_OK) ||
