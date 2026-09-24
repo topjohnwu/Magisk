@@ -14,7 +14,7 @@ module;
 #include <flags.h>
 #include <rust/cxx.h>
 
-module magisk.policy;
+module policy;
 
 using namespace std;
 

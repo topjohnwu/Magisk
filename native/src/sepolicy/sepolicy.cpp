@@ -14,8 +14,8 @@ module;
 #include <stdio.h>
 #include <errno.h>
 
-export module magisk.policy;
-export import magisk.base;
+export module policy;
+export import base;
 
 export {
 #include "policy-rs.hpp"

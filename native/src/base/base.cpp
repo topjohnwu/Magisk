@@ -18,7 +18,7 @@ module;
 #include <stdio.h>
 #include <errno.h>
 
-export module magisk.base;
+export module base;
 export import std;
 
 export template<__SIZE_TYPE__ N>

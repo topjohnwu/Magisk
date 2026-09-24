@@ -12,8 +12,8 @@ module;
 #include <stdio.h>
 #include <errno.h>
 
-export module magisk.sqlite;
-export import magisk.base;
+export module sqlite;
+export import base;
 
 export {
 #define SQLITE_OPEN_READWRITE        0x00000002  /* Ok for sqlite3_open_v2() */

@@ -13,8 +13,8 @@ module;
 #include <stdio.h>
 #include <errno.h>
 
-export module magisk.boot;
-export import magisk.base;
+export module boot;
+export import base;
 
 using namespace std;
 

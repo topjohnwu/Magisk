@@ -15,8 +15,8 @@ module;
 #include <errno.h>
 #include <rust/cxx.h>
 
-export module magisk.init;
-export import magisk.base;
+export module init;
+export import base;
 
 export {
 #include "init-rs.hpp"

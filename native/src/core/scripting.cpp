@@ -12,8 +12,8 @@ module;
 #include <errno.h>
 #include <rust/cxx.h>
 
-export module magisk.scripting;
-export import magisk.core;
+export module scripting;
+export import core;
 
 using namespace std;
 

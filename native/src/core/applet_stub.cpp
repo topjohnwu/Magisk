@@ -1,6 +1,6 @@
 #include <sys/stat.h>
 
-import magisk.core;
+import core;
 
 int main(int argc, char *argv[]) {
     if (argc < 1)

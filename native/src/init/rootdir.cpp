@@ -14,8 +14,8 @@ module;
 #include <errno.h>
 #include <rust/cxx.h>
 
-module magisk.init;
-import magisk.policy;
+module init;
+import policy;
 
 extern bool avd_hack;
 

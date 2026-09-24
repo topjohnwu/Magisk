@@ -13,9 +13,9 @@ module;
 #include <errno.h>
 #include <rust/cxx.h>
 
-export module magisk.deny;
-export import magisk.core;
-export import magisk.sqlite;
+export module deny;
+export import core;
+export import sqlite;
 
 export {
 inline constexpr char ISOLATED_MAGIC[] = "isolated";
