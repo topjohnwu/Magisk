@@ -23,6 +23,7 @@ def scan(args):
     parser.add_argument("--source", required=True)
     parser.add_argument("--object", required=True)
     parser.add_argument("--module", required=True)
+    parser.add_argument("--module-interface", action="store_true")
     parser.add_argument("--visible", required=True)
     parser.add_argument("flags", nargs=argparse.REMAINDER)
     config = parser.parse_args(shlex.split(args.args.read_text()))
@@ -48,6 +49,18 @@ def scan(args):
     rules = json.loads(result.stdout)["rules"]
     if len(rules) != 1:
         raise ValueError(f"Expected one dependency rule for {config.source}")
+    provides_module = bool(rules[0].get("provides"))
+    if config.module_interface and not provides_module:
+        raise ValueError(
+            f"{config.source} is in LOCAL_MODULE_SRC_FILES but does not provide "
+            "a named module or partition; put implementation units and consumers "
+            "in LOCAL_SRC_FILES"
+        )
+    if provides_module and not config.module_interface:
+        raise ValueError(
+            f"{config.source} provides a named module or partition; "
+            "list it in LOCAL_MODULE_SRC_FILES instead of LOCAL_SRC_FILES"
+        )
     record = {
         "module": config.module,
         "visible": config.visible.split(","),
