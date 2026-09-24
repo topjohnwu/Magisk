@@ -13,6 +13,7 @@ endif
 MY_CXX_SCAN_ARGS := \
     --compiler $(TARGET_CXX) --source $(_SRC) --object $(_OBJ) \
     --module $(LOCAL_MODULE) \
+    $(if $(MY_CXX_IS_MODULE),--module-interface) \
     --visible $(subst $(space),$(comma),$(strip $(call module-get-all-dependencies,$(LOCAL_MODULE)))) \
     -- $(_FLAGS)
 
@@ -34,7 +35,7 @@ $(_OBJ): PRIVATE_CFLAGS += @$(_OBJ).modules.rsp
 $(_OBJ): $(MY_CXX_SCAN)
 $(_OBJ).commands.json: PRIVATE_COMPILE_COMMAND_ARG += @$(_OBJ).modules.rsp
 $(_OBJ).commands.json: $(_OBJ).modules.rsp
-$(MY_CXX_TIDY_TARGET): PRIVATE_CFLAGS += @$(_OBJ).modules.rsp
+$(MY_CXX_TIDY_TARGET): PRIVATE_CFLAGS += $(if $(MY_CXX_IS_MODULE),-x c++-module) @$(_OBJ).modules.rsp
 
 MY_CXX_INPUTS.$(MY_CXX_GRAPH) := $(MY_CXX_INPUTS.$(MY_CXX_GRAPH)) $(MY_CXX_SCAN)
 $(MY_CXX_GRAPH).list: MY_CXX_INPUTS := $(MY_CXX_INPUTS.$(MY_CXX_GRAPH))
