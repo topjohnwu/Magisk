@@ -119,6 +119,7 @@ LOCAL_MODULE_SRC_FILES := \
     core/su/su.cpp \
     core/deny/utils.cpp \
     core/zygisk/module.cpp \
+    core/zygisk/jni_hooks.cpp \
     core/core-rs.cpp
 LOCAL_SRC_FILES := \
     core/resetprop/sys.cpp \
