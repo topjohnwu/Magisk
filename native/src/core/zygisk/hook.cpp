@@ -99,7 +99,7 @@ constexpr const char *kForkServer = "nativeForkSystemServer";
 using JNIMethods = std::span<JNINativeMethod>;
 using JNIMethodsDyn = std::pair<unique_ptr<JNINativeMethod[]>, size_t>;
 
-struct HookContext : JniHookDefinitions {
+struct HookContext {
 
     vector<tuple<dev_t, ino_t, const char *, void **>> plt_backup;
     const NativeBridgeRuntimeCallbacks *runtime_callbacks = nullptr;
@@ -137,10 +137,6 @@ private:
 
 ZygiskContext *g_ctx;
 static HookContext *g_hook;
-
-JniHookDefinitions *get_defs() {
-    return g_hook;
-}
 
 // -----------------------------------------------------------------
 

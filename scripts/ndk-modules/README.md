@@ -145,9 +145,11 @@ C++ outputs when switching layouts to discard old module dependencies.
 
 The checked-in JNI wrappers are generated as `core/zygisk/jni_hooks.cpp`, an
 internal partition named `core:zygisk.jni`. It imports `:zygisk`; `hook.cpp`
-imports this partition instead of including a header. `get_defs()` uses module
-linkage to reach the hook context without introducing an import cycle. JNI
-method tables and wrappers remain internal to `core`. Regenerate the source
+imports this partition instead of including a header. Each method table is a
+reference to a static array in a deducing-this factory lambda. Callbacks use
+`Self{}()[i].fnPtr` to read the same array that `hook.cpp` updates; no separate
+initializer or `get_defs()` is needed. Tables and wrappers remain internal
+to `core`. Regenerate the source
 from the repository root with
 `scripts/env.py python3 native/src/core/zygisk/gen_jni_hooks.py`.
 
