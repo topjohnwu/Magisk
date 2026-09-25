@@ -413,8 +413,9 @@ def cleanup():
         rm_rf(Path("native", "out", "rust"))
         rm(Path("native", "src", "boot", "proto", "mod.rs"))
         rm(Path("native", "src", "boot", "proto", "update_metadata.rs"))
-        for rs_gen in glob.glob("native/**/*-rs.*pp", recursive=True):
-            rm(Path(rs_gen))
+        for pattern in ("*-rs.*pp", "*-rs.ixx", "*-cxx.cpp"):
+            for rs_gen in glob.glob(f"native/**/{pattern}", recursive=True):
+                rm(Path(rs_gen))
 
     if "native" in targets:
         header("* Cleaning native")

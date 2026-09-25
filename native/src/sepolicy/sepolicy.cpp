@@ -8,11 +8,10 @@ module;
 
 export module policy;
 import std;
+export import :rs;
 export import base;
 
 export {
-#include "policy-rs.hpp"
-
 // Internal APIs, do not use directly
 
 using Str = rust::Str;

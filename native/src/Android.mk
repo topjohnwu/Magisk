@@ -39,11 +39,11 @@ LOCAL_STATIC_LIBRARIES := \
     libxz \
     libinit-rs
 
-LOCAL_MODULE_SRC_FILES := init/getinfo.cpp
+LOCAL_MODULE_SRC_FILES := init/init-rs.cpp init/getinfo.cpp
 LOCAL_SRC_FILES := \
     init/mount.cpp \
     init/rootdir.cpp \
-    init/init-rs.cpp
+    init/init-cxx.cpp
 
 LOCAL_LDFLAGS := -static
 
@@ -65,8 +65,8 @@ LOCAL_STATIC_LIBRARIES := \
     liblz4 \
     libboot-rs
 
-LOCAL_MODULE_SRC_FILES := boot/bootimg.cpp
-LOCAL_SRC_FILES := boot/boot-rs.cpp
+LOCAL_MODULE_SRC_FILES := boot/boot-rs.cpp boot/bootimg.cpp
+LOCAL_SRC_FILES := boot/boot-cxx.cpp
 
 LOCAL_LDFLAGS := -static
 
@@ -113,6 +113,7 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := libcore
 LOCAL_STATIC_LIBRARIES := libbase libsystemproperties liblsplt libmagisk-rs
 LOCAL_MODULE_SRC_FILES := \
+    core/module.cpp \
     core/utils.cpp \
     core/sqlite.cpp \
     core/scripting.cpp \
@@ -122,6 +123,7 @@ LOCAL_MODULE_SRC_FILES := \
     core/zygisk/jni_hooks.cpp \
     core/core-rs.cpp
 LOCAL_SRC_FILES := \
+    core/core-cxx.cpp \
     core/resetprop/sys.cpp \
     core/deny/cli.cpp \
     core/deny/logcat.cpp \
@@ -136,11 +138,11 @@ LOCAL_MODULE := libpolicy
 LOCAL_STATIC_LIBRARIES := \
     libbase \
     libsepol
-LOCAL_MODULE_SRC_FILES := sepolicy/sepolicy.cpp
+LOCAL_MODULE_SRC_FILES := sepolicy/policy-rs.cpp sepolicy/sepolicy.cpp
 LOCAL_SRC_FILES := \
     sepolicy/api.cpp \
     sepolicy/policydb.cpp \
-    sepolicy/policy-rs.cpp
+    sepolicy/policy-cxx.cpp
 include $(BUILD_STATIC_LIBRARY_MODULE)
 
 CWD := $(LOCAL_PATH)

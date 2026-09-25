@@ -13,14 +13,13 @@ module;
 
 export module core:utils;
 import std;
+export import :rs;
 export import base;
 export import :sqlite;
 
 #define PLOGE(fmt, args...) LOGE(fmt " failed with %d: %s\n", ##args, errno, ::strerror(errno))
 
 export {
-#include "core-rs.hpp"
-
 inline constexpr int AID_ROOT = 0;
 inline constexpr int AID_SHELL = 2000;
 inline constexpr int AID_USER_OFFSET = 100000;
