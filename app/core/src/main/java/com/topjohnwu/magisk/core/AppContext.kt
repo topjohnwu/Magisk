@@ -90,7 +90,7 @@ object AppContext : ContextWrapper(null),
             .setFlags(Shell.FLAG_MOUNT_MASTER)
             .setInitializers(ShellInit::class.java)
             .setContext(this)
-            .setTimeout(2)
+            .setTimeout(20)
         Shell.setDefaultBuilder(shellBuilder)
         Shell.EXECUTOR = Dispatchers.IO.asExecutor()
         RootUtils.bindTask = RootService.bindOrTask(
