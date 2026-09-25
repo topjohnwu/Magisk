@@ -13,8 +13,7 @@ module;
 
 module core;
 import std;
-
-#include "jni_hooks.hpp"
+import :zygisk.jni;
 
 using namespace std;
 
@@ -139,7 +138,7 @@ private:
 ZygiskContext *g_ctx;
 static HookContext *g_hook;
 
-static JniHookDefinitions *get_defs() {
+JniHookDefinitions *get_defs() {
     return g_hook;
 }
 

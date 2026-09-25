@@ -125,7 +125,15 @@ Non-exported implementation details use module linkage, so imported class
 methods refer to the provider's state rather than copies of `static` variables.
 `MagiskInit` and `BootConfig`, their handwritten methods and their generated
 bridge now share the `init` module. The Zygisk SDK header, generated
-CXX/JNI headers and generated build flags remain.
+CXX headers and generated build flags remain.
+
+The checked-in JNI wrappers are generated as `core/zygisk/jni_hooks.cpp`, an
+internal partition named `core:zygisk.jni`. It imports `:zygisk`; `hook.cpp`
+imports this partition instead of including a header. `get_defs()` uses module
+linkage to reach the hook context without introducing an import cycle. JNI
+method tables and wrappers remain internal to `core`. Regenerate the source
+from the repository root with
+`scripts/env.py python3 native/src/core/zygisk/gen_jni_hooks.py`.
 
 Rust libraries and their generated bindings must exist before invoking ndk-build,
 as in the existing hybrid build. Module scanning, BMI generation and compilation
