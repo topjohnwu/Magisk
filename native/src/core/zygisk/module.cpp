@@ -14,27 +14,35 @@ module;
 #include <stdlib.h>
 #include <rust/cxx.h>
 #include <signal.h>
+#include <stdarg.h>
+#include <flags.h>
 
 export module core:zygisk;
 import std;
 export import :utils;
 export import :deny;
 
-#if defined(__LP64__)
-#define ZLOGD(...) LOGD("zygisk64: " __VA_ARGS__)
-#define ZLOGE(...) LOGE("zygisk64: " __VA_ARGS__)
-#define ZLOGI(...) LOGI("zygisk64: " __VA_ARGS__)
-#define ZLOGW(...) LOGW("zygisk64: " __VA_ARGS__)
+constinit const std::string_view zygisk_log_prefix =
+        sizeof(void *) == 8 ? "zygisk64: " : "zygisk32: ";
+
+#define ZLOG_BODY(level) \
+    va_list args; \
+    va_start(args, fmt); \
+    fmt_and_log_with_rs(LogLevel::level, fmt, args, zygisk_log_prefix); \
+    va_end(args);
+
+#if MAGISK_DEBUG
+export __printflike(1, 2) void ZLOGD(const char *fmt, ...) { ZLOG_BODY(Debug) }
 #else
-#define ZLOGD(...) LOGD("zygisk32: " __VA_ARGS__)
-#define ZLOGE(...) LOGE("zygisk32: " __VA_ARGS__)
-#define ZLOGI(...) LOGI("zygisk32: " __VA_ARGS__)
-#define ZLOGW(...) LOGW("zygisk32: " __VA_ARGS__)
+export __printflike(1, 2) void ZLOGD(const char *fmt, ...) {}
 #endif
+export __printflike(1, 2) void ZLOGE(const char *fmt, ...) { ZLOG_BODY(Error) }
+export __printflike(1, 2) void ZLOGI(const char *fmt, ...) { ZLOG_BODY(Info) }
+export __printflike(1, 2) void ZLOGW(const char *fmt, ...) { ZLOG_BODY(Warn) }
+#undef ZLOG_BODY
 
 // Extreme verbose logging
-// #define ZLOGV(...) ZLOGD(__VA_ARGS__)
-#define ZLOGV(...) (void*)0
+export inline constinit const bool ZLOG_VERBOSE = false;
 
 using namespace std;
 
@@ -491,7 +499,7 @@ struct ZygiskContext {
     }
     void nativeForkAndSpecialize_pre() {
         process = env->GetStringUTFChars(args.app->nice_name, nullptr);
-        ZLOGV("pre  forkAndSpecialize [%s]\n", process);
+        if constexpr (ZLOG_VERBOSE) ZLOGD("pre  forkAndSpecialize [%s]\n", process);
         flags |= APP_FORK_AND_SPECIALIZE;
 
         fork_pre();
@@ -502,24 +510,24 @@ struct ZygiskContext {
     }
     void nativeForkAndSpecialize_post() {
         if (is_child()) {
-            ZLOGV("post forkAndSpecialize [%s]\n", process);
+            if constexpr (ZLOG_VERBOSE) ZLOGD("post forkAndSpecialize [%s]\n", process);
             app_specialize_post();
         }
         fork_post();
     }
     void nativeSpecializeAppProcess_pre() {
         process = env->GetStringUTFChars(args.app->nice_name, nullptr);
-        ZLOGV("pre  specialize [%s]\n", process);
+        if constexpr (ZLOG_VERBOSE) ZLOGD("pre  specialize [%s]\n", process);
         // App specialize does not check FD
         flags |= SKIP_CLOSE_LOG_PIPE;
         app_specialize_pre();
     }
     void nativeSpecializeAppProcess_post() {
-        ZLOGV("post specialize [%s]\n", process);
+        if constexpr (ZLOG_VERBOSE) ZLOGD("post specialize [%s]\n", process);
         app_specialize_post();
     }
     void nativeForkSystemServer_pre() {
-        ZLOGV("pre  forkSystemServer\n");
+        if constexpr (ZLOG_VERBOSE) ZLOGD("pre  forkSystemServer\n");
         flags |= SERVER_FORK_AND_SPECIALIZE;
         process = "system_server";
 
@@ -531,7 +539,7 @@ struct ZygiskContext {
     }
     void nativeForkSystemServer_post() {
         if (is_child()) {
-            ZLOGV("post forkSystemServer\n");
+            if constexpr (ZLOG_VERBOSE) ZLOGD("post forkSystemServer\n");
             server_specialize_post();
         }
         fork_post();

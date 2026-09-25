@@ -443,12 +443,17 @@ export extern "C" size_t strscpy(char *dest, const char *src, size_t size) {
     return std::min(strlcpy(dest, src, size), size - 1);
 }
 
-int fmt_and_log_with_rs(LogLevel level, const char *fmt, va_list ap) {
+export __printflike(2, 0) int fmt_and_log_with_rs(
+        LogLevel level, const char *fmt, va_list ap, std::string_view prefix = {}) {
     constexpr int sz = 4096;
     char buf[sz];
-    buf[0] = '\0';
+    int offset = std::min(prefix.size(), sizeof(buf) - 1);
+    if (offset) memcpy(buf, prefix.data(), offset);
+    buf[offset] = '\0';
     // Fortify logs when a fatal error occurs. Do not run through fortify again
-    int len = std::min(__call_bypassing_fortify(vsnprintf)(buf, sz, fmt, ap), sz - 1);
+    int len = __call_bypassing_fortify(vsnprintf)(buf + offset, sz - offset, fmt, ap);
+    if (len < 0) return len;
+    len = offset + std::min(len, sz - offset - 1);
     log_with_rs(level, Utf8CStr(buf, len + 1));
     return len;
 }

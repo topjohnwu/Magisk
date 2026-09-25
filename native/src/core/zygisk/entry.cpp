@@ -10,22 +10,6 @@ module;
 module core;
 import std;
 
-#if defined(__LP64__)
-#define ZLOGD(...) LOGD("zygisk64: " __VA_ARGS__)
-#define ZLOGE(...) LOGE("zygisk64: " __VA_ARGS__)
-#define ZLOGI(...) LOGI("zygisk64: " __VA_ARGS__)
-#define ZLOGW(...) LOGW("zygisk64: " __VA_ARGS__)
-#else
-#define ZLOGD(...) LOGD("zygisk32: " __VA_ARGS__)
-#define ZLOGE(...) LOGE("zygisk32: " __VA_ARGS__)
-#define ZLOGI(...) LOGI("zygisk32: " __VA_ARGS__)
-#define ZLOGW(...) LOGW("zygisk32: " __VA_ARGS__)
-#endif
-
-// Extreme verbose logging
-// #define ZLOGV(...) ZLOGD(__VA_ARGS__)
-#define ZLOGV(...) (void*)0
-
 using namespace std;
 
 using comp_entry = void(*)(int);
