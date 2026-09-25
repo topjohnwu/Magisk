@@ -13,6 +13,9 @@ selinux = []
 workspace = true
 
 [build-dependencies]
+syn = { workspace = true, features = ["full"] }
+quote = { workspace = true }
+proc-macro2 = { workspace = true }
 cxx-gen = { workspace = true }
 
 [dependencies]

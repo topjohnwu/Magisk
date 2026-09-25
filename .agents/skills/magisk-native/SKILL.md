@@ -11,7 +11,7 @@ Guidelines and workflows for developing and building native C, C++, and Rust com
 
 - **General Guidelines:** Always follow the top-level [`AGENTS.md`](../../../AGENTS.md) and [`magisk-git`](../magisk-git/SKILL.md) for general repository rules, environment execution setup, and commit control policies.
 - **Working Directory:** Execute commands from repo root via `./build.py`. Standalone tool executions (e.g. `cargo`, `rustc`, `ndk-build`) MUST be prefixed with `scripts/env.py`.
-- **Codegen Requirement:** ALWAYS run `./build.py gen` before editing native sources to generate FFI bindings, headers, and flags (`flags.h`, `flags.rs`, `*-rs.hpp`, `*-rs.cpp`, protobuf generated modules) without performing a full build.
+- **Codegen Requirement:** ALWAYS run `./build.py gen` before editing native sources to generate FFI module sources and flags (`flags.h`, `flags.rs`, `*-rs.cpp`, `*-cxx.cpp`, protobuf generated modules) without performing a full build.
 
 ## 2. Component Architecture
 
@@ -37,23 +37,23 @@ The build process follows a two-stage hybrid pipeline orchestrated by `build.py`
 ```
 1. dump_flags_native()    -->  Outputs flags.h & flags.rs to native/out/generated/
 2. build_rust_src()       -->  Cargo build outputs lib<tgt>.a for each target ABI
-                               Cargo build.rs runs cxx_gen to produce *-rs.hpp / *-rs.cpp
+                               Cargo build.rs runs cxx_gen to produce *-rs.cpp Rust APIs + *-cxx.cpp C wrappers
                                Cargo build.rs runs pb-rs to generate Protobuf bindings
                                Static libraries moved to native/out/<arch>/lib<tgt>-rs.a
 3. build_cpp_src()        -->  ndk-build runs using Android.mk & Application.mk
                                Android-rs.mk imports lib<tgt>-rs.a as PREBUILT_STATIC_LIBRARY
-                               Compiles C/C++ sources + *-rs.cpp bridge files + cxx.cc
+                               Compiles C/C++ sources + *-rs.cpp / *-cxx.cpp bridge files + cxx.cc
 4. clean_elf()            -->  tools/elf-cleaner strips incompatible ELF dynamic tags
 ```
 
 ## 4. FFI Architecture & Mechanics
 
-- **Bridge Engine:** C++/Rust FFI uses `cxx` (`cxx-rs`) via `#[cxx::bridge]` modules declared in crate `lib.rs` files.
-- **Header & Source Generation:**
-  - `codegen.rs` (`gen_cxx_binding()`) invokes `cxx_gen` in crate `build.rs` scripts.
-  - Automatically generates C++ bridge headers (`*-rs.hpp`) and source wrappers (`*-rs.cpp`) directly in each crate directory.
+- **Bridge Engine:** C++/Rust FFI uses the unchanged `cxx` dependency through the local `#[base::derive::bridge]` attribute (`#[derive::bridge]` inside base). The attribute handles `import!` metadata and delegates Rust expansion to `#[cxx::bridge]`.
+- **Bridge Source Generation:**
+  - `codegen.rs` (`gen_cxx_binding()`) invokes `cxx_gen` in crate `build.rs` scripts. `include/bridge.rs` shares metadata parsing with the attribute macro; `include/cxx.rs` splits the pinned generator's output by call direction without modifying the cxx submodule.
+  - Generates two C++ sources per crate, each compiled once per ABI/configuration: `*-rs.cpp` provides the `<component>:rs` module partition with Rust APIs and their C++ definitions; `*-cxx.cpp` is an ordinary translation unit importing the business module and defining its C ABI wrappers for Rust. No bridge header or `.ixx` is generated.
   - Generates bindings for `base-rs`, `core-rs`, `init-rs`, `boot-rs`, and `policy-rs`.
-- **Linking:** Generated `*-rs.cpp` bridge code and `cxx.cc` are compiled directly by `ndk-build` alongside native C++ source files, linking against the compiled Rust static library (`lib<tgt>-rs.a`).
+- **Linking:** Generated `*-rs.cpp`, `*-cxx.cpp` and `cxx.cc` are compiled directly by `ndk-build` alongside native C++ source files, linking against the compiled Rust static library (`lib<tgt>-rs.a`).
 
 ## 5. Build Targets & Commands (from Root)
 

@@ -74,10 +74,8 @@ core APIs through `import core;`. Partitions use `import :name;`, never
 the primary interface, keeping the dependency graph acyclic. Handwritten
 sources and generated bridges import `std` directly where needed; project
 modules do not re-export it. Global module fragments include only the C,
-platform and bridge headers needed by that source, plus C++ facilities absent
-from the `std` subset. Headers also included by a generated bridge, such as
-`<memory>`, are preloaded in the global fragment to keep their declarations in
-the global module. Handwritten API headers are merged into their existing
+platform and runtime headers needed by that source, plus C++ facilities absent
+from the `std` subset. Handwritten API headers are merged into their existing
 implementation files, with functions exported at their definitions and class
 methods defined in the class where possible. Rust ABI declarations, cross-file
 implementation declarations and forward declarations required by mutually
@@ -100,32 +98,50 @@ An unnamed concatenation lives until the end of its full expression. Bind it
 to a static `constinit const auto &` before retaining its pointer. Lifetime
 annotations diagnose pointers or views escaping a temporary.
 
-The Rust CXX generator keeps its `*-rs.hpp` / `*-rs.cpp` output format.
-Providers include the generated application declarations in their export
-blocks, so types and functions belong to their named module. The generated
-`core-rs.cpp` supplies core's primary interface and re-exports the partitions
-listed in Rust's `include!` metadata (for example, `include!(":deny")`). It is
-listed in `LOCAL_MODULE_SRC_FILES`; `core:utils` includes `core-rs.hpp` as before.
-Other generated `.cpp` files are implementation units of their named modules,
-implicitly importing their primary interface and importing additional modules
-from the same metadata. Quoted include entries name modules or relative
-partitions; runtime header includes use angle brackets. Rust calls the generated
-`extern "C"` entry points; handwritten C++ APIs use named-module ownership.
+The local CXX adapter writes two `.cpp` files per bridge, each compiled once
+per ABI/configuration. `*-rs.cpp` provides `<component>:rs`, exporting the Rust
+types and C++ APIs that call Rust, including their definitions. It belongs in
+`LOCAL_MODULE_SRC_FILES`. `*-cxx.cpp` is an ordinary translation unit that imports
+the complete business module and defines the C ABI wrappers called by Rust; it
+belongs in `LOCAL_SRC_FILES`. Rust Box/Vec operations stay with the Rust APIs;
+C++ smart pointer operations stay with the C wrappers.
 
-The generated header has a separate implementation-only branch for CXX's
-runtime helpers. The bridge includes that branch in its global module fragment
-because those helpers implement the global `rust/cxx.h` types. Only generated
-`rust::Vec` / `rust::Box` template-specialization declarations and definitions
-retain `extern "C++"` to match those existing global templates in Clang 21.
+Rust bindings use `#[base::derive::bridge]` (`#[derive::bridge]` inside base).
+This local attribute translates module metadata and delegates Rust expansion to
+the unchanged `cxx::bridge` macro. The same parser in `include/bridge.rs` prepares
+the input to stock `cxx_gen`. `include/cxx.rs` separates its generated definitions
+by C linkage, keeping namespaces and function bodies intact. Unsupported output
+forms fail generation instead of silently producing incomplete bindings.
+
+`include!` keeps its header semantics and order. `import!("base")` names a module
+or partition and defaults to a private import; `export = true` re-exports it from
+the Rust API partition. An import of the enclosing business module is used only
+by the C wrapper, to avoid importing it back into `:rs`. Ordinary translation
+units import the primary interface rather than its partitions.
+
+`base/types.cpp` supplies `base:types`, keeping the definitions and inline methods
+of `StringLiteral`, `Utf8CStr` and the function adapters together. The generated
+`base:rs` can then use these complete types before `base.cpp` is compiled.
+`core/module.cpp` supplies the primary core interface and re-exports its
+partitions. Boot's Rust verification entry is a free function taking a reference;
+`boot_img::verify()` calls it inline, keeping the complete class in `bootimg.cpp`.
+
+CXX runtime headers precede the imports. Ordinary wrappers also define runtime
+helpers before imports so Clang can merge them with imported definitions.
+In the Rust API module, runtime helpers
+and generated `rust::Vec` / `rust::Box` specializations use `extern "C++"` to
+match the global `rust/cxx.h` types and templates in Clang 21.
 The adapter also uses `bit_cast` for CXX's trivially copyable Str/Slice views to
-avoid Clang's imported anonymous-friend mismatch. Revalidate the adapter when
-updating CXX.
+avoid Clang's imported anonymous-friend mismatch. Revalidate the output splitter
+and runtime adaptation when updating the pinned CXX dependency.
 
 Non-exported implementation details use module linkage, so imported class
 methods refer to the provider's state rather than copies of `static` variables.
-`MagiskInit` and `BootConfig`, their handwritten methods and their generated
-bridge now share the `init` module. The Zygisk SDK header, generated
-CXX headers and generated build flags remain.
+`MagiskInit` and `BootConfig`, their handwritten methods and their Rust APIs
+share the `init` module. The Zygisk SDK header, generated CXX partitions and
+generated build flags remain. Stale `*-rs.hpp` / `*-rs.ixx` files are
+removed during generation; unchanged output keeps its timestamp. Clean native
+C++ outputs when switching layouts to discard old module dependencies.
 
 The checked-in JNI wrappers are generated as `core/zygisk/jni_hooks.cpp`, an
 internal partition named `core:zygisk.jni`. It imports `:zygisk`; `hook.cpp`

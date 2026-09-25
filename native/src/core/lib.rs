@@ -43,7 +43,7 @@ mod thread;
 mod zygisk;
 
 #[allow(clippy::needless_lifetimes)]
-#[cxx::bridge]
+#[base::derive::bridge]
 pub mod ffi {
     #[repr(i32)]
     enum RequestCode {
@@ -142,12 +142,9 @@ pub mod ffi {
         #[cxx_name = "Utf8CStr"]
         type Utf8CStrRef<'a> = base::Utf8CStrRef<'a>;
 
-        // The generated core interface re-exports these partitions.
-        include!(":utils");
-        include!(":scripting");
-        include!(":su");
-        include!(":deny");
-        include!(":zygisk");
+        import!("base", export = true);
+
+        import!("core");
 
         #[cxx_name = "get_magisk_tmp_rs"]
         fn get_magisk_tmp() -> Utf8CStrRef<'static>;
@@ -173,7 +170,7 @@ pub mod ffi {
         fn denylist_handler(client: i32);
         fn scan_deny_apps();
 
-        include!(":sqlite");
+        import!(":sqlite", export = true);
 
         type sqlite3;
         type DbValues;

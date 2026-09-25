@@ -8,6 +8,6 @@ path = "lib.rs"
 proc-macro = true
 
 [dependencies]
-syn = { workspace = true }
+syn = { workspace = true, features = ["full"] }
 quote = { workspace = true }
 proc-macro2 = { workspace = true }

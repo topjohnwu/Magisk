@@ -281,10 +281,10 @@ impl BootImage {
 
         sig.verify(self.payload()).log()
     }
+}
 
-    pub fn verify_for_cxx(&self) -> bool {
-        self.verify(None).is_ok()
-    }
+pub(crate) fn verify_for_cxx(image: &BootImage) -> bool {
+    image.verify(None).is_ok()
 }
 
 enum Bytes {

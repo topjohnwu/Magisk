@@ -10,6 +10,7 @@ module;
 
 export module boot;
 import std;
+export import :rs;
 export import base;
 
 using namespace std;
@@ -55,8 +56,6 @@ using namespace std;
 #define AVB_MAGIC "AVB0"
 
 export {
-#include "boot-rs.hpp"
-
 enum class FileFormat : uint8_t;
 
 /******************
@@ -1167,7 +1166,7 @@ export struct boot_img {
     uint64_t tail_off() const { return tail.data() - map.data(); }
 
     // Implemented in Rust
-    bool verify() const noexcept;
+    bool verify() const noexcept { return verify_for_cxx(*this); }
 };
 
 export int split_image_dtb(Utf8CStr filename, bool skip_decomp = false) {

@@ -1,6 +1,6 @@
 // This file hosts shared build script logic
 
-use std::collections::BTreeSet;
+use std::collections::BTreeMap;
 use std::fmt::{Display, Write as _};
 use std::fs::File;
 use std::io::Write;
@@ -8,6 +8,9 @@ use std::path::Path;
 use std::{fs, io, process};
 
 use cxx_gen::{Include, IncludeKind, Opt};
+
+mod bridge;
+mod cxx;
 
 trait ResultExt<T> {
     fn ok_or_exit(self) -> T;
@@ -37,6 +40,16 @@ fn write_if_diff<P: AsRef<Path>>(path: P, bytes: &[u8]) -> io::Result<()> {
     f.write_all(bytes)
 }
 
+fn parse_import(line: &str) -> Option<(&str, bool)> {
+    let path = line.strip_prefix("#include \"")?.strip_suffix('"')?;
+    if let Some(module) = path.strip_prefix(bridge::EXPORT_IMPORT) {
+        Some((module, true))
+    } else {
+        path.strip_prefix(bridge::IMPORT)
+            .map(|module| (module, false))
+    }
+}
+
 pub fn gen_cxx_binding(name: &str) {
     println!("cargo:rerun-if-changed=lib.rs");
     let mut opt = Opt::default();
@@ -45,30 +58,37 @@ pub fn gen_cxx_binding(name: &str) {
         path: "rust/cxx.h".to_string(),
         kind: IncludeKind::Bracketed,
     });
-    let code = cxx_gen::generate_header_and_cc_with_path("lib.rs", &opt);
-    let header = String::from_utf8(code.header).ok_or_exit();
-    let implementation = String::from_utf8(code.implementation).ok_or_exit();
-    let mut includes = BTreeSet::new();
-    let mut imports = BTreeSet::new();
+    let source = fs::read_to_string("lib.rs").ok_or_exit();
+    let source = bridge::source(&source).ok_or_exit();
+    let code = cxx_gen::generate_header_and_cc(source, &opt).ok_or_exit();
+    let code = cxx::split(code).ok_or_exit();
+    let header = code.declarations;
+    let implementation = code.rust_api.definitions;
+    let helpers = code.rust_api.helpers;
+    let rust_preamble = code.rust_api.preamble;
+    let wrappers = code.cxx_wrappers.definitions;
+    let wrapper_helpers = code.cxx_wrappers.helpers;
+    let wrapper_preamble = code.cxx_wrappers.preamble;
+    let mut includes = Vec::new();
+    let mut imports = BTreeMap::new();
     let mut declarations = String::new();
-    // Quoted include! entries name modules; runtime headers use angle brackets.
+    // Preserve header order and keep module imports separate from textual includes.
     for line in header.lines() {
-        if let Some(module) = line
-            .strip_prefix("#include \"")
-            .and_then(|s| s.strip_suffix('"'))
-        {
-            imports.insert(module.to_string());
+        if let Some((module, export)) = parse_import(line) {
+            imports
+                .entry(module.to_string())
+                .and_modify(|value| *value |= export)
+                .or_insert(export);
         } else if line.starts_with("#include ") {
-            includes.insert(line.to_string());
+            includes.push(line.to_string());
         } else if line != "#pragma once" {
             writeln!(declarations, "{line}").ok_or_exit();
         }
     }
+    // The Rust API partition cannot import its own business interface back.
+    // Forward-declare opaque C++ types that are only passed by reference.
     let (module, forward) = match name {
-        "base-rs" => (
-            "base",
-            "struct Utf8CStr;\nstruct FnBoolStrStr;\nstruct FnBoolStr;\n",
-        ),
+        "base-rs" => ("base", ""),
         "core-rs" => ("core", ""),
         "policy-rs" => ("policy", "class sepol_impl;\n"),
         "boot-rs" => ("boot", "struct boot_img;\n"),
@@ -79,8 +99,15 @@ pub fn gen_cxx_binding(name: &str) {
         _ => panic!("unknown CXX bridge {name}"),
     };
     imports.remove(module);
+    let interface_imports = imports
+        .iter()
+        .map(|(dependency, export)| {
+            let export = if *export { "export " } else { "" };
+            format!("{export}import {dependency};\n")
+        })
+        .collect::<String>();
     if name == "init-rs" {
-        includes.insert("#include <vector>".to_string());
+        includes.push("#include <vector>".to_string());
     }
     // Interface bodies may instantiate these views before the bridge's
     // implementation is compiled. Publish the generated specializations first.
@@ -104,16 +131,12 @@ pub fn gen_cxx_binding(name: &str) {
         )
         .ok_or_exit();
     }
-    let header_includes = includes.iter().cloned().collect::<Vec<_>>().join("\n");
-
-    let mut definitions = String::new();
-    for line in implementation.lines() {
-        if line.starts_with("#include \"") {
-            continue;
-        } else if line.starts_with("#include ") {
-            includes.insert(line.to_string());
-        } else {
-            writeln!(definitions, "{line}").ok_or_exit();
+    for line in rust_preamble.lines() {
+        if line.starts_with("#include ")
+            && parse_import(line).is_none()
+            && !includes.iter().any(|include| include == line)
+        {
+            includes.push(line.to_string());
         }
     }
     // CXX's anonymous-namespace impl<T> friend belongs to the header's TU.
@@ -121,25 +144,20 @@ pub fn gen_cxx_binding(name: &str) {
     // These views are trivially copyable and have the exact Fat representation;
     // bit_cast preserves the generator's unchecked representation copy without
     // accessing private members (and checks both properties at compile time).
-    includes.insert("#include <bit>".to_string());
-    let definitions = definitions
+    if !includes.iter().any(|include| include == "#include <bit>") {
+        includes.push("#include <bit>".to_string());
+    }
+    let adapt_views = |definitions: String| {
+        definitions
         .replace("    Slice<T> slice = typename Slice<T>::uninit{};\n    slice.repr = repr;\n    return slice;", "    return ::std::bit_cast<Slice<T>>(repr);")
         .replace("    Str str = Str::uninit{};\n    str.repr = repr;\n    return str;", "    return ::std::bit_cast<Str>(repr);")
         .replace("    return slice.repr;", "    return ::std::bit_cast<repr::Fat>(slice);")
-        .replace("    return str.repr;", "    return ::std::bit_cast<repr::Fat>(str);");
-    // CXX's runtime helpers define members of the global rust/cxx.h types.
-    // Include them in the bridge implementation's global module fragment;
-    // application declarations and definitions belong to the named module.
-    let Some(first_declaration) = header.lines().find(|line| {
-        line.starts_with("enum class ") || line.starts_with("struct ") || line.starts_with("using ")
-    }) else {
-        panic!("missing CXX application declarations in {name}");
+        .replace("    return str.repr;", "    return ::std::bit_cast<repr::Fat>(str);")
     };
-    let Some(start) = definitions.find(first_declaration) else {
-        panic!("missing CXX implementation declarations in {name}");
-    };
-    let (helpers, definitions) = definitions.split_at(start);
-    let definitions = definitions
+    let helpers = adapt_views(helpers);
+    // Keep CXX's runtime helpers attached to the global rust/cxx.h types.
+    // Application declarations and definitions belong to the named module.
+    let definitions = implementation
         .replace(
             "namespace rust {\ninline namespace cxxbridge1 {\n",
             "extern \"C++\" {\nnamespace rust {\ninline namespace cxxbridge1 {\n",
@@ -148,30 +166,43 @@ pub fn gen_cxx_binding(name: &str) {
             "} // namespace cxxbridge1\n} // namespace rust",
             "} // namespace cxxbridge1\n} // namespace rust\n} // extern C++",
         );
-    // The bridge imports these types from its interface or partitions.
-    // Reuse CXX's guards instead of defining the shared types a second time.
-    let mut guards = String::new();
-    for line in header.lines() {
-        if let Some(guard) = line.strip_prefix("#ifndef CXXBRIDGE1_")
-            && (guard.starts_with("STRUCT_") || guard.starts_with("ENUM_"))
+    let prelude = includes.join("\n");
+    // Declarations and their Rust-facing definitions share one translation unit.
+    let rust_api = format!(
+        "module;\n{prelude}\n\nexport module {module}:rs;\nimport std;\n{interface_imports}\nextern \"C++\" {{\n{helpers}\n}}\n\nexport {{\n{forward}{declarations}\n}}\n\n{definitions}"
+    );
+    for line in wrapper_preamble.lines() {
+        if line.starts_with("#include ")
+            && parse_import(line).is_none()
+            && !includes.iter().any(|include| include == line)
         {
-            writeln!(guards, "#define CXXBRIDGE1_{guard}").ok_or_exit();
+            includes.push(line.to_string());
         }
     }
-    let prelude = includes.iter().cloned().collect::<Vec<_>>().join("\n");
-    let interface = format!(
-        "#pragma once\n#ifdef MAGISK_CXX_BRIDGE_IMPL\n{prelude}\n{helpers}{guards}\n#else\n{header_includes}\n\n{forward}{declarations}\n#endif\n"
-    );
-    // The core bridge is the primary interface, re-exporting its partitions.
-    // Other bridges are implementation units of their handwritten interfaces.
-    let export = if name == "core-rs" { "export " } else { "" };
+    let helpers = adapt_views(wrapper_helpers);
+    let prelude = includes.join("\n");
     let imports = imports
-        .into_iter()
-        .map(|m| format!("{export}import {m};\n"))
+        .into_keys()
+        .filter(|m| !m.starts_with(':'))
+        .map(|m| format!("import {m};\n"))
         .collect::<String>();
-    let implementation = format!(
-        "module;\n#define MAGISK_CXX_BRIDGE_IMPL\n#include \"{name}.hpp\"\n#undef MAGISK_CXX_BRIDGE_IMPL\n\n{export}module {module};\nimport std;\n{imports}\n{definitions}"
-    );
-    write_if_diff(format!("{name}.hpp"), interface.as_bytes()).ok_or_exit();
-    write_if_diff(format!("{name}.cpp"), implementation.as_bytes()).ok_or_exit();
+    // Define global runtime helpers before importing their definitions from BMIs.
+    let wrappers =
+        format!("{prelude}\n\n{helpers}\nimport {module};\nimport std;\n{imports}\n{wrappers}");
+    let component = name
+        .strip_suffix("-rs")
+        .expect("bridge name must end in -rs");
+    write_if_diff(format!("{name}.cpp"), rust_api.as_bytes()).ok_or_exit();
+    write_if_diff(format!("{component}-cxx.cpp"), wrappers.as_bytes()).ok_or_exit();
+    for ext in ["hpp", "ixx"] {
+        fs::remove_file(format!("{name}.{ext}"))
+            .or_else(|e| {
+                if e.kind() == io::ErrorKind::NotFound {
+                    Ok(())
+                } else {
+                    Err(e)
+                }
+            })
+            .ok_or_exit();
+    }
 }

@@ -29,6 +29,9 @@ dependencies = [
  "nix",
  "num-derive",
  "num-traits",
+ "proc-macro2",
+ "quote",
+ "syn 3.0.6",
  "thiserror",
 ]
 
@@ -627,7 +630,10 @@ dependencies = [
  "num-derive",
  "num-traits",
  "pb-rs",
+ "proc-macro2",
  "quick-protobuf",
+ "quote",
+ "syn 3.0.6",
  "thiserror",
 ]
 
@@ -652,11 +658,14 @@ dependencies = [
  "p384",
  "p521",
  "pb-rs",
+ "proc-macro2",
  "quick-protobuf",
+ "quote",
  "rsa",
  "sha1",
  "sha2",
  "size",
+ "syn 3.0.6",
  "x509-cert",
 ]
 
@@ -669,6 +678,9 @@ dependencies = [
  "cxx-gen",
  "magiskpolicy",
  "num-traits",
+ "proc-macro2",
+ "quote",
+ "syn 3.0.6",
 ]
 
 [[package]]
@@ -678,6 +690,9 @@ dependencies = [
  "base",
  "cxx",
  "cxx-gen",
+ "proc-macro2",
+ "quote",
+ "syn 3.0.6",
 ]
 
 [[package]]

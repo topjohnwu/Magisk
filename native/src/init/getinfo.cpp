@@ -10,11 +10,10 @@ module;
 
 export module init;
 import std;
+export import :rs;
 export import base;
 
 export {
-#include "init-rs.hpp"
-
 int magisk_proxy_main(int, char *argv[]);
 Utf8CStr backup_init();
 inline Utf8CStr split_plat_cil() { return SPLIT_PLAT_CIL; }

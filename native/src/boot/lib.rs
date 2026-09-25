@@ -5,7 +5,7 @@ pub use base;
 use compress::{compress_bytes, compress_bytes_kernel, decompress_bytes};
 use dtb::find_dtb_offset_for_cxx;
 use format::{check_fmt, fmt_compressed, fmt_compressed_any, fmt2name};
-use sign::{SHA, get_sha, sha256_hash, sign_payload_for_cxx};
+use sign::{SHA, get_sha, sha256_hash, sign_payload_for_cxx, verify_for_cxx};
 use std::env;
 
 mod cli;
@@ -21,7 +21,7 @@ mod proto;
 mod sign;
 mod zimage;
 
-#[cxx::bridge]
+#[base::derive::bridge]
 pub mod ffi {
     enum FileFormat {
         UNKNOWN,
@@ -59,7 +59,8 @@ pub mod ffi {
     }
 
     unsafe extern "C++" {
-        include!("boot");
+        import!("boot");
+        import!("base", export = true);
 
         #[cxx_name = "Utf8CStr"]
         type Utf8CStrRef<'a> = base::Utf8CStrRef<'a>;
@@ -100,7 +101,7 @@ pub mod ffi {
 
     // BootImage FFI
     unsafe extern "C++" {
-        include!("boot");
+        import!("boot");
         #[cxx_name = "boot_img"]
         type BootImage;
 
@@ -116,8 +117,7 @@ pub mod ffi {
         fn new(img: Utf8CStrRef) -> UniquePtr<BootImage>;
     }
     extern "Rust" {
-        #[cxx_name = "verify"]
-        fn verify_for_cxx(self: &BootImage) -> bool;
+        fn verify_for_cxx(image: &BootImage) -> bool;
     }
 }
 
