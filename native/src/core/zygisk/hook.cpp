@@ -5,11 +5,7 @@ module;
 #include <dlfcn.h>
 #include <unwind.h>
 #include <lsplt.hpp>
-#include <unistd.h>
 #include <pthread.h>
-#include <string.h>
-#include <errno.h>
-#include <sched.h>
 
 module core;
 import std;

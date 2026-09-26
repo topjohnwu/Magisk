@@ -3,14 +3,7 @@ module;
 #include <sys/sysmacros.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <dirent.h>
-#include <string.h>
-#include <strings.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <errno.h>
 #include <rust/cxx.h>
-#include <limits.h>
 
 module init;
 import std;
@@ -60,9 +53,9 @@ void MagiskInit::collect_devices() const noexcept {
         for (dirent *entry; (entry = readdir(dir.get()));) {
             if (entry->d_name == "."sv || entry->d_name == ".."sv)
                 continue;
-            sprintf(path, "/sys/dev/block/%s/uevent", entry->d_name);
+            sys::sprintf(path, "/sys/dev/block/%s/uevent", entry->d_name);
             parse_device(&dev, path);
-            sprintf(path, "/sys/dev/block/%s/dm/name", entry->d_name);
+            sys::sprintf(path, "/sys/dev/block/%s/dm/name", entry->d_name);
             if (access(path, F_OK) == 0) {
                 auto name = rtrim(full_read(path));
                 strscpy(dev.dmname, name.data(), sizeof(dev.dmname));
@@ -73,7 +66,7 @@ void MagiskInit::collect_devices() const noexcept {
                 // use androidboot.partition_map as partname fallback.
                 strscpy(dev.partname, it->value.data(), sizeof(dev.partname));
             }
-            sprintf(path, "/sys/dev/block/%s", entry->d_name);
+            sys::sprintf(path, "/sys/dev/block/%s", entry->d_name);
             xrealpath(path, dev.devpath, sizeof(dev.devpath));
             dev_list.push_back(dev);
         }
@@ -171,7 +164,7 @@ bool MagiskInit::mount_system_root() noexcept {
 
         // Try normal partname
         char sys_part[32];
-        sprintf(sys_part, "system%s", config.slot.data());
+        sys::sprintf(sys_part, "system%s", config.slot.data());
         dev = find_block(sys_part);
         if (dev > 0)
             goto mount_root;

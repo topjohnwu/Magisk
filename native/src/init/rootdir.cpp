@@ -1,14 +1,9 @@
 module;
 #include <sys/mount.h>
 #include <xz.h>
-#include <sys/stat.h>
 #include <unistd.h>
-#include <dirent.h>
 #include <fcntl.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include <rust/cxx.h>
-#include <limits.h>
 
 module init;
 import std;
@@ -42,7 +37,7 @@ bool unxz(int fd, rust::Slice<const uint8_t> bytes) {
         ret = xz_dec_run(dec, &b);
         if (ret != XZ_OK && ret != XZ_STREAM_END)
             return false;
-        write(fd, out, b.out_pos);
+        sys::write(fd, out, b.out_pos);
         b.out_pos = 0;
     } while (b.in_pos != size);
     return true;
@@ -157,7 +152,7 @@ void MagiskInit::patch_fissiond(const char *tmp_path) noexcept {
         }
         mkdirs(ROOTOVL + "/system/bin", 0755);
         if (auto target_fissiond = xopen_file(ROOTOVL + "/system/bin/fissiond", "we")) {
-            fwrite(fissiond.data(), 1, fissiond.size(), target_fissiond.get());
+            sys::fwrite(fissiond.data(), 1, fissiond.size(), target_fissiond.get());
             clone_attr("/system/bin/fissiond", ROOTOVL + "/system/bin/fissiond");
         }
     }
@@ -222,7 +217,7 @@ void recreate_sbin(const char *mirror, bool use_bind_mount) {
             xreadlinkat(src, entry->d_name, buf, sizeof(buf));
             xsymlink(buf, sbin_path.data());
         } else {
-            sprintf(buf, "%s/%s", mirror, entry->d_name);
+            sys::sprintf(buf, "%s/%s", mirror, entry->d_name);
             if (use_bind_mount) {
                 auto mode = st.st_mode & 0777;
                 // Create dummy

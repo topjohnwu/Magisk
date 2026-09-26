@@ -1,9 +1,9 @@
 module;
 #include <rust/cxx.h>
-#include <string.h>
 
 export module base:types;
 import std;
+import :utils;
 
 export template<__SIZE_TYPE__ N>
 struct StringLiteral {

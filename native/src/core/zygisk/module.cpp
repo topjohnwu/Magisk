@@ -7,14 +7,7 @@ module;
 #include <jni.h>
 #include "api.hpp"
 #include <sys/stat.h>
-#include <unistd.h>
-#include <dirent.h>
-#include <pthread.h>
-#include <string.h>
-#include <stdlib.h>
 #include <rust/cxx.h>
-#include <signal.h>
-#include <stdarg.h>
 #include <flags.h>
 
 export module core:zygisk;
@@ -296,12 +289,12 @@ struct ZygiskModule {
     void tryUnload() const {
         if (unload) dlclose(handle);
     }
-    void clearApi() { memset(&api, 0, sizeof(api)); }
+    void clearApi() { sys::memset(&api, 0, sizeof(api)); }
 
     ZygiskModule(int id, void *handle, void *entry)
         : id(id), handle(handle), entry{entry}, api{}, mod{nullptr} {
         // Make sure all pointers are null
-        memset(&api, 0, sizeof(api));
+        sys::memset(&api, 0, sizeof(api));
         api.base.impl = this;
         api.base.registerModule = &ZygiskModule::RegisterModuleImpl;
     }

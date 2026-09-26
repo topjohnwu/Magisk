@@ -1,5 +1,3 @@
-#include <sys/stat.h>
-
 import core;
 
 int main(int argc, char *argv[]) {
@@ -7,6 +5,6 @@ int main(int argc, char *argv[]) {
         return 1;
     cmdline_logging();
     init_argv0(argc, argv);
-    umask(0);
+    sys::umask(0);
     return APPLET_STUB_MAIN(argc, argv);
 }

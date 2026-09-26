@@ -2,9 +2,6 @@ module;
 #include <memory>
 #include <rust/cxx.h>
 #include <sepol/policydb/policydb.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
 
 export module policy;
 import std;
@@ -60,7 +57,7 @@ template <size_t T>
 size_t copy_str(std::array<char, T> &dest, rust::Str src) {
     if (T == 0) return 0;
     size_t len = std::min(T - 1, src.size());
-    memcpy(dest.data(), src.data(), len);
+    sys::memcpy(dest.data(), src.data(), len);
     dest[len] = '\0';
     return len;
 }
@@ -68,7 +65,7 @@ size_t copy_str(std::array<char, T> &dest, rust::Str src) {
 char *dup_str(rust::Str src) {
     size_t len = src.size();
     char *s = static_cast<char *>(malloc(len + 1));
-    memcpy(s, src.data(), len);
+    sys::memcpy(s, src.data(), len);
     s[len] = '\0';
     return s;
 }
@@ -542,7 +539,7 @@ export class sepol_impl {
                     }
                 }
                 if (driver_node) {
-                    memset(driver_node->datum.xperms->perms, 0, sizeof(avtab_extended_perms_t::perms));
+                    sys::memset(driver_node->datum.xperms->perms, 0, sizeof(avtab_extended_perms_t::perms));
                 }
             }
 
@@ -586,7 +583,7 @@ export class sepol_impl {
                     driver_node = new_driver_node();
                 }
                 // Fill the driver perms
-                memset(driver_node->datum.xperms->perms, ~0, sizeof(avtab_extended_perms_t::perms));
+                sys::memset(driver_node->datum.xperms->perms, ~0, sizeof(avtab_extended_perms_t::perms));
 
                 if (ioctl_driver(p.low) != ioctl_driver(p.high)) {
                     for (int i = ioctl_driver(p.low); i <= ioctl_driver(p.high); ++i) {
@@ -598,7 +595,7 @@ export class sepol_impl {
                     if (node == nullptr) {
                         node = new_func_node(driver);
                         // Fill the func perms
-                        memset(node->datum.xperms->perms, ~0, sizeof(avtab_extended_perms_t::perms));
+                        sys::memset(node->datum.xperms->perms, ~0, sizeof(avtab_extended_perms_t::perms));
                         node_list[driver] = node;
                     }
                     xperm_clear(driver, driver_node->datum.xperms->perms);
@@ -730,7 +727,7 @@ export class sepol_impl {
             last->next = trans;
         } else {
             filename_trans_key_t *new_key = auto_cast(malloc(sizeof(*new_key)));
-            memcpy(new_key, &key, sizeof(key));
+            sys::memcpy(new_key, &key, sizeof(key));
             new_key->name = strdup(key.name);
             hashtab_insert(db->filename_trans, (hashtab_key_t) new_key, trans);
         }
@@ -767,8 +764,8 @@ export class sepol_impl {
             o_ctx->next = fs->head;
             fs->head = o_ctx;
         }
-        memset(o_ctx->context, 0, sizeof(o_ctx->context));
-        memcpy(&o_ctx->context[0], ctx, sizeof(*ctx));
+        sys::memset(o_ctx->context, 0, sizeof(o_ctx->context));
+        sys::memcpy(&o_ctx->context[0], ctx, sizeof(*ctx));
         free(ctx);
 
         return true;

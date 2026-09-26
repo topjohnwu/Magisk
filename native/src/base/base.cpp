@@ -1,28 +1,17 @@
 module;
-#include <sys/wait.h>
 #include <sys/prctl.h>
-#include <sys/mman.h>
 #include <android/log.h>
 #include <linux/fs.h>
 #include <syscall.h>
 #include <flags.h>
-#include <sys/stat.h>
 #include <unistd.h>
-#include <dirent.h>
 #include <fcntl.h>
 #include <pthread.h>
 #include <rust/cxx.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <errno.h>
-#include <cctype>
-#include <sched.h>
-#include <signal.h>
-#include <stdarg.h>
 
 export module base;
 import std;
+export import :utils;
 export import :rs;
 
 // References keep the constinit strings usable in constant expressions.
@@ -214,8 +203,8 @@ struct byte_data : public byte_view {
             p = static_cast<uint8_t *>(memmem(p, eof - p, from.data(), from.size()));
             if (p == nullptr)
                 return v;
-            memset(p, 0, from.size());
-            memcpy(p, to.data(), to.size());
+            sys::memset(p, 0, from.size());
+            sys::memcpy(p, to.data(), to.size());
             v.push_back(p - ptr);
             p += from.size();
         }
@@ -281,7 +270,7 @@ using thread_entry = void *(*)(void *);
 
 inline std::string rtrim(std::string &&s) {
     s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
-        return !std::isspace(ch) && ch != '\0';
+        return !sys::isspace(ch) && ch != '\0';
     }).base(), s.end());
     return std::move(s);
 }
@@ -342,7 +331,7 @@ static_assert(BLKGETSIZE64 == 0x80041272);
 export __printflike(3, 0) int vssprintf(char *dest, size_t size, const char *fmt, va_list ap) {
     if (size > 0) {
         *dest = 0;
-        return std::min(vsnprintf(dest, size, fmt, ap), (int) size - 1);
+        return std::min(sys::vsnprintf(dest, size, fmt, ap), (int) size - 1);
     }
     return -1;
 }
@@ -357,7 +346,7 @@ export __printflike(3, 4) int ssprintf(char *dest, size_t size, const char *fmt,
 
 // Silently truncate to the buffer size and return the number of bytes written.
 export extern "C" size_t strscpy(char *dest, const char *src, size_t size) {
-    return std::min(strlcpy(dest, src, size), size - 1);
+    return std::min(sys::strlcpy(dest, src, size), size - 1);
 }
 
 export __printflike(2, 0) int fmt_and_log_with_rs(
@@ -365,7 +354,7 @@ export __printflike(2, 0) int fmt_and_log_with_rs(
     constexpr int sz = 4096;
     char buf[sz];
     int offset = std::min(prefix.size(), sizeof(buf) - 1);
-    if (offset) memcpy(buf, prefix.data(), offset);
+    if (offset) sys::memcpy(buf, prefix.data(), offset);
     buf[offset] = '\0';
     // Fortify logs when a fatal error occurs. Do not run through fortify again
     int len = __call_bypassing_fortify(vsnprintf)(buf + offset, sz - offset, fmt, ap);
@@ -491,7 +480,7 @@ export void init_argv0(int argc, char **argv) {
 }
 
 export void set_nice_name(Utf8CStr name) {
-    memset(argv0, 0, name_len);
+    sys::memset(argv0, 0, name_len);
     strscpy(argv0, name.c_str(), name_len);
     prctl(PR_SET_NAME, name.c_str());
 }
@@ -500,10 +489,10 @@ template<typename T, int base>
 T parse_num(string_view s) {
     T val = 0;
     for (char c : s) {
-        if (isdigit(c)) {
+        if (sys::isdigit(c)) {
             c -= '0';
-        } else if (base > 10 && isalpha(c)) {
-            c -= isupper(c) ? 'A' - 10 : 'a' - 10;
+        } else if (base > 10 && sys::isalpha(c)) {
+            c -= sys::isupper(c) ? 'A' - 10 : 'a' - 10;
         } else {
             return -1;
         }
@@ -538,7 +527,7 @@ export int switch_mnt_ns(int pid) {
     if (ret < 0) {
         char mnt[32];
         ssprintf(mnt, sizeof(mnt), "/proc/%d/ns/mnt", pid);
-        fd = open(mnt, O_RDONLY);
+        fd = sys::open(mnt, O_RDONLY);
         if (fd < 0) return 1; // Maybe process died..
 
         // Switch to its namespace
@@ -646,7 +635,7 @@ export void write_zero(int fd, size_t size) {
     size_t len;
     while (size > 0) {
         len = sizeof(buf) > size ? size : sizeof(buf);
-        write(fd, buf, len);
+        sys::write(fd, buf, len);
         size -= len;
     }
 }

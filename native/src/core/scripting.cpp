@@ -1,15 +1,8 @@
 module;
-#include <sys/wait.h>
 #include <unistd.h>
 #include <dirent.h>
 #include <fcntl.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include <rust/cxx.h>
-#include <signal.h>
-#include <stdarg.h>
-#include <time.h>
 
 export module core:scripting;
 import std;
@@ -86,7 +79,7 @@ if (pfs) { \
 export void exec_common_scripts(Utf8CStr stage) {
     LOGI("* Running %s.d scripts\n", stage.c_str());
     char path[4096];
-    char *name = path + sprintf(path, SECURE_DIR + "/%s.d", stage.c_str());
+    char *name = path + sys::sprintf(path, SECURE_DIR + "/%s.d", stage.c_str());
     auto dir = xopen_dir(path);
     if (!dir) return;
 
@@ -106,7 +99,7 @@ export void exec_common_scripts(Utf8CStr stage) {
             if (faccessat(dfd, entry->d_name, X_OK, 0) != 0)
                 continue;
             LOGI("%s.d: exec [%s]\n", stage.c_str(), entry->d_name);
-            strcpy(name, entry->d_name);
+            sys::strcpy(name, entry->d_name);
             exec_t exec {
                 .pre_exec = set_script_env,
                 .fork = pfs ? xfork : fork_dont_care
@@ -143,7 +136,7 @@ export void exec_module_scripts(Utf8CStr stage, const rust::Vec<ModuleInfo> &mod
 
     char path[4096];
     for (auto &m : module_list) {
-        sprintf(path, MODULEROOT + "/%.*s/%s.sh", (int) m.name.size(), m.name.data(), stage.c_str());
+        sys::sprintf(path, MODULEROOT + "/%.*s/%s.sh", (int) m.name.size(), m.name.data(), stage.c_str());
         if (access(path, F_OK) == -1)
             continue;
         LOGI("%.*s: exec [%s.sh]\n", (int) m.name.size(), m.name.data(), stage.c_str());

@@ -2,13 +2,9 @@ module;
 #include <sys/sysmacros.h>
 #include <linux/input.h>
 #include <linux/fs.h>
-#include <sys/ioctl.h>
-#include <sys/stat.h>
 #include <unistd.h>
 #include <dirent.h>
 #include <fcntl.h>
-#include <string.h>
-#include <errno.h>
 #include <rust/cxx.h>
 
 export module core:utils;
@@ -113,7 +109,7 @@ export void unlock_blocks() {
 
     for (dirent *entry; (entry = readdir(dir.get()));) {
         if (entry->d_type == DT_BLK) {
-            if ((fd = openat(dev, entry->d_name, O_RDONLY | O_CLOEXEC)) < 0)
+            if ((fd = sys::openat(dev, entry->d_name, O_RDONLY | O_CLOEXEC)) < 0)
                 continue;
             if (ioctl(fd, BLKROSET, &OFF) < 0)
                 PLOGE("unlock %s", entry->d_name);
@@ -133,11 +129,11 @@ export bool check_key_combo() {
     for (int minor = 64; minor < 96; ++minor) {
         if (xmknod(name, S_IFCHR | 0444, makedev(13, minor)))
             continue;
-        int fd = open(name, O_RDONLY | O_CLOEXEC);
+        int fd = sys::open(name, O_RDONLY | O_CLOEXEC);
         unlink(name);
         if (fd < 0)
             continue;
-        memset(bitmask, 0, sizeof(bitmask));
+        sys::memset(bitmask, 0, sizeof(bitmask));
         ioctl(fd, EVIOCGBIT(EV_KEY, sizeof(bitmask)), bitmask);
         if (test_bit(KEY_VOLUMEDOWN, bitmask))
             events.emplace_back(fd);
@@ -151,7 +147,7 @@ export bool check_key_combo() {
     for (int i = 0; i < 300; ++i) {
         bool pressed = false;
         for (int fd : events) {
-            memset(bitmask, 0, sizeof(bitmask));
+            sys::memset(bitmask, 0, sizeof(bitmask));
             ioctl(fd, EVIOCGKEY(sizeof(bitmask)), bitmask);
             if (test_bit(KEY_VOLUMEDOWN, bitmask)) {
                 pressed = true;

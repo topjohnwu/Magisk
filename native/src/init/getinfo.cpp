@@ -2,11 +2,8 @@ module;
 #include <sys/sysmacros.h>
 #include <linux/input.h>
 #include <fcntl.h>
-#include <sys/stat.h>
 #include <unistd.h>
-#include <string.h>
 #include <rust/cxx.h>
-#include <sys/ioctl.h>
 
 export module init;
 import std;
@@ -94,11 +91,11 @@ bool check_key_combo() {
     for (int minor = 64; minor < 96; ++minor) {
         if (xmknod(name, S_IFCHR | 0444, makedev(13, minor)))
             continue;
-        int fd = open(name, O_RDONLY | O_CLOEXEC);
+        int fd = sys::open(name, O_RDONLY | O_CLOEXEC);
         unlink(name);
         if (fd < 0)
             continue;
-        memset(bitmask, 0, sizeof(bitmask));
+        sys::memset(bitmask, 0, sizeof(bitmask));
         ioctl(fd, EVIOCGBIT(EV_KEY, sizeof(bitmask)), bitmask);
         if (test_bit(KEY_VOLUMEUP, bitmask))
             events.push_back(fd);
@@ -114,7 +111,7 @@ bool check_key_combo() {
     int count = 0;
     for (int i = 0; i < 500; ++i) {
         for (const int &fd : events) {
-            memset(bitmask, 0, sizeof(bitmask));
+            sys::memset(bitmask, 0, sizeof(bitmask));
             ioctl(fd, EVIOCGKEY(sizeof(bitmask)), bitmask);
             if (test_bit(KEY_VOLUMEUP, bitmask)) {
                 count++;

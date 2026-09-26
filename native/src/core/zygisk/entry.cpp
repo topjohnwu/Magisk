@@ -2,10 +2,7 @@ module;
 #include <android/dlext.h>
 #include <dlfcn.h>
 #include <poll.h>
-#include <sys/stat.h>
-#include <unistd.h>
 #include <fcntl.h>
-#include <stdlib.h>
 
 module core;
 import std;
@@ -56,7 +53,7 @@ static void zygiskd(int socket) {
     // Start accepting requests
     pollfd pfd = { socket, POLLIN, 0 };
     for (;;) {
-        poll(&pfd, 1, -1);
+        sys::poll(&pfd, 1, -1);
         if (pfd.revents && !(pfd.revents & POLLIN)) {
             // Something bad happened in magiskd, terminate zygiskd
             exit(0);

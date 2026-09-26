@@ -9,22 +9,13 @@ module;
 #include <unistd.h>
 #include <getopt.h>
 #include <fcntl.h>
-#include <pwd.h>
 #include <linux/securebits.h>
 #include <sys/capability.h>
 #include <sys/prctl.h>
 #include <sched.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <sys/mount.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <errno.h>
 #include <flags.h>
 #include <rust/cxx.h>
-#include <ctype.h>
-#include <signal.h>
 
 export module core:su;
 import std;
@@ -117,10 +108,10 @@ export int su_client_main(int argc, char *argv[]) {
     for (int i = 0; i < argc; i++) {
         // Replace -cn and -z with -Z for backwards compatibility
         if (strcmp(argv[i], "-cn") == 0 || strcmp(argv[i], "-z") == 0)
-            strcpy(argv[i], "-Z");
+            sys::strcpy(argv[i], "-Z");
         // Replace -mm with -M for supporting getopt_long
         else if (strcmp(argv[i], "-mm") == 0)
-            strcpy(argv[i], "-M");
+            sys::strcpy(argv[i], "-M");
     }
 
     bool interactive = false;
@@ -293,7 +284,7 @@ bool proc_is_restricted(pid_t pid) {
         if (line.starts_with(bnd)) {
             auto p = line.begin();
             advance(p, bnd.size());
-            while (isspace(*p)) advance(p, 1);
+            while (sys::isspace(*p)) advance(p, 1);
             line.remove_prefix(distance(line.begin(), p));
             for (int i = 0; i < _LINUX_CAPABILITY_U32S_3; i++) {
                 auto cap = line.substr((_LINUX_CAPABILITY_U32S_3 - 1 - i) * 8, 8);
@@ -425,7 +416,7 @@ export void exec_root_shell(int client, int pid, SuRequest &req, MntNsMode mode)
     }
 
     // Setup environment
-    umask(022);
+    sys::umask(022);
     char path[32];
     ssprintf(path, sizeof(path), "/proc/%d/cwd", pid);
     char cwd[4096];
