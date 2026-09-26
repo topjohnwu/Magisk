@@ -1,11 +1,7 @@
 module;
-#include <sys/stat.h>
 #include <unistd.h>
 #include <cil/cil.h>
 #include <fcntl.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include <flags.h>
 #include <rust/cxx.h>
 
@@ -43,7 +39,7 @@ static bool check_precompiled(const char *precompiled) {
     if (static constinit const auto &actual_sha = PLAT_POLICY_DIR + "plat_and_mapping_sepolicy.cil.sha256";
         access(actual_sha, R_OK) == 0) {
         ok = true;
-        sprintf(compiled_sha, "%s.plat_and_mapping.sha256", precompiled);
+        sys::sprintf(compiled_sha, "%s.plat_and_mapping.sha256", precompiled);
         if (!cmp_sha256(actual_sha, compiled_sha))
             return false;
     }
@@ -51,7 +47,7 @@ static bool check_precompiled(const char *precompiled) {
     if (static constinit const auto &actual_sha = PLAT_POLICY_DIR + "plat_sepolicy_and_mapping.sha256";
         access(actual_sha, R_OK) == 0) {
         ok = true;
-        sprintf(compiled_sha, "%s.plat_sepolicy_and_mapping.sha256", precompiled);
+        sys::sprintf(compiled_sha, "%s.plat_sepolicy_and_mapping.sha256", precompiled);
         if (!cmp_sha256(actual_sha, compiled_sha))
             return false;
     }
@@ -59,7 +55,7 @@ static bool check_precompiled(const char *precompiled) {
     if (static constinit const auto &actual_sha = PROD_POLICY_DIR + "product_sepolicy_and_mapping.sha256";
         access(actual_sha, R_OK) == 0) {
         ok = true;
-        sprintf(compiled_sha, "%s.product_sepolicy_and_mapping.sha256", precompiled);
+        sys::sprintf(compiled_sha, "%s.product_sepolicy_and_mapping.sha256", precompiled);
         if (!cmp_sha256(actual_sha, compiled_sha) != 0)
             return false;
     }
@@ -67,7 +63,7 @@ static bool check_precompiled(const char *precompiled) {
     if (static constinit const auto &actual_sha = SYSEXT_POLICY_DIR + "system_ext_sepolicy_and_mapping.sha256";
         access(actual_sha, R_OK) == 0) {
         ok = true;
-        sprintf(compiled_sha, "%s.system_ext_sepolicy_and_mapping.sha256", precompiled);
+        sys::sprintf(compiled_sha, "%s.system_ext_sepolicy_and_mapping.sha256", precompiled);
         if (!cmp_sha256(actual_sha, compiled_sha) != 0)
             return false;
     }
@@ -161,19 +157,19 @@ SePolicy SePolicy::compile_split() noexcept {
     // plat
     load_cil(db, SPLIT_PLAT_CIL);
 
-    sprintf(path, PLAT_POLICY_DIR + "mapping/%s.cil", plat_ver);
+    sys::sprintf(path, PLAT_POLICY_DIR + "mapping/%s.cil", plat_ver);
     load_cil(db, path);
 
-    sprintf(path, PLAT_POLICY_DIR + "mapping/%s.compat.cil", plat_ver);
+    sys::sprintf(path, PLAT_POLICY_DIR + "mapping/%s.compat.cil", plat_ver);
     if (access(path, R_OK) == 0)
         load_cil(db, path);
 
     // system_ext
-    sprintf(path, SYSEXT_POLICY_DIR + "mapping/%s.cil", plat_ver);
+    sys::sprintf(path, SYSEXT_POLICY_DIR + "mapping/%s.cil", plat_ver);
     if (access(path, R_OK) == 0)
         load_cil(db, path);
 
-    sprintf(path, SYSEXT_POLICY_DIR + "mapping/%s.compat.cil", plat_ver);
+    sys::sprintf(path, SYSEXT_POLICY_DIR + "mapping/%s.compat.cil", plat_ver);
     if (access(path, R_OK) == 0)
         load_cil(db, path);
 
@@ -182,7 +178,7 @@ SePolicy SePolicy::compile_split() noexcept {
         load_cil(db, cil_file);
 
     // product
-    sprintf(path, PROD_POLICY_DIR + "mapping/%s.cil", plat_ver);
+    sys::sprintf(path, PROD_POLICY_DIR + "mapping/%s.cil", plat_ver);
     if (access(path, R_OK) == 0)
         load_cil(db, path);
 

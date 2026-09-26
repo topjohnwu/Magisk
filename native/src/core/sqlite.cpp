@@ -1,8 +1,6 @@
 module;
 #include <dlfcn.h>
 #include <rust/cxx.h>
-#include <unistd.h>
-#include <string.h>
 
 export module core:sqlite;
 import std;
@@ -152,7 +150,7 @@ bool load_sqlite() {
 
         // Inject APEX into LD_LIBRARY_PATH
         char ld_path[4096];
-        memcpy(ld_path, apex_path, sizeof(apex_path));
+        sys::memcpy(ld_path, apex_path, sizeof(apex_path));
         constexpr int len = sizeof(apex_path) - 1;
         android_get_LD_LIBRARY_PATH(ld_path + len, sizeof(ld_path) - len);
         android_update_LD_LIBRARY_PATH(ld_path);

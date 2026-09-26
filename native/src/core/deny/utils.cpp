@@ -1,13 +1,7 @@
 module;
-#include <sys/stat.h>
 #include <unistd.h>
-#include <dirent.h>
 #include <pthread.h>
-#include <stdio.h>
 #include <rust/cxx.h>
-#include <ctype.h>
-#include <limits.h>
-#include <signal.h>
 
 export module core:deny;
 import std;
@@ -144,9 +138,9 @@ bool str_starts_with(string_view a, string_view b) { return a.starts_with(b); }
 template<bool str_op(string_view, string_view) = str_eql>
 bool proc_name_match(int pid, string_view name) {
     char buf[4019];
-    sprintf(buf, "/proc/%d/cmdline", pid);
+    sys::sprintf(buf, "/proc/%d/cmdline", pid);
     if (auto fp = open_file(buf, "re")) {
-        fgets(buf, sizeof(buf), fp.get());
+        sys::fgets(buf, sizeof(buf), fp.get());
         if (str_op(buf, name)) {
             return true;
         }
@@ -158,7 +152,7 @@ export bool proc_context_match(int pid, string_view context) {
     char buf[PATH_MAX];
     char con[1024] = {0};
 
-    sprintf(buf, "/proc/%d", pid);
+    sys::sprintf(buf, "/proc/%d", pid);
     if (lgetfilecon(buf, byte_data{ con, sizeof(con) })) {
         return string_view(con).starts_with(context);
     }
@@ -184,7 +178,7 @@ bool validate(const char *pkg, const char *proc) {
     if (str_eql(pkg, ISOLATED_MAGIC)) {
         pkg_valid = true;
         for (char c; (c = *proc); ++proc) {
-            if (isalnum(c) || c == '_' || c == '.')
+            if (sys::isalnum(c) || c == '_' || c == '.')
                 continue;
             if (c == ':')
                 break;
@@ -196,7 +190,7 @@ bool validate(const char *pkg, const char *proc) {
         proc_valid = str_eql(proc, WEBVIEW_ZYGOTE_MAGIC);
     } else {
         for (char c; (c = *pkg); ++pkg) {
-            if (isalnum(c) || c == '_')
+            if (sys::isalnum(c) || c == '_')
                 continue;
             if (c == '.') {
                 pkg_valid = true;
@@ -207,7 +201,7 @@ bool validate(const char *pkg, const char *proc) {
         }
 
         for (char c; (c = *proc); ++proc) {
-            if (isalnum(c) || c == '_' || c == ':' || c == '.')
+            if (sys::isalnum(c) || c == '_' || c == ':' || c == '.')
                 continue;
             proc_valid = false;
             break;

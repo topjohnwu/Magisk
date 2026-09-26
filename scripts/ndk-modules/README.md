@@ -81,6 +81,15 @@ methods defined in the class where possible. Rust ABI declarations, cross-file
 implementation declarations and forward declarations required by mutually
 dependent types remain.
 
+`base:utils` re-exports shared C/POSIX declarations with `using` declarations.
+`base` re-exports the partition, so consumers keep their normal component
+imports. Bionic's static inline overloads are wrapped in `sys`, preserving
+caller-side object-size, diagnostic and format attributes. Non-variadic
+wrappers are always inlined and delegate runtime checks to Bionic; `sprintf`
+uses a regular inline variadic wrapper, as Bionic does. Macro constants and
+platform-specific APIs still require their headers. The FORTIFY logging path
+continues to call the unfortified `vsnprintf` to avoid recursive diagnostics.
+
 Shared string constants use the `_cs` literal and `consteval` concatenation:
 
 ```cpp

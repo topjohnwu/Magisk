@@ -4,9 +4,6 @@ module;
 #include <rust/cxx.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
 
 export module boot;
 import std;
@@ -523,17 +520,17 @@ struct dyn_img_hdr {
     void load_hdr_file() {
         parse_prop_file(HEADER_FILE, [=, this](Utf8CStr key, Utf8CStr value) -> bool {
             if (key == "name" && name()) {
-                memset(name(), 0, 16);
-                memcpy(name(), value.data(), value.length() > 15 ? 15 : value.length());
+                sys::memset(name(), 0, 16);
+                sys::memcpy(name(), value.data(), value.length() > 15 ? 15 : value.length());
             } else if (key == "cmdline") {
-                memset(cmdline(), 0, BOOT_ARGS_SIZE);
-                memset(extra_cmdline(), 0, BOOT_EXTRA_ARGS_SIZE);
+                sys::memset(cmdline(), 0, BOOT_ARGS_SIZE);
+                sys::memset(extra_cmdline(), 0, BOOT_EXTRA_ARGS_SIZE);
                 if (value.length() > BOOT_ARGS_SIZE) {
-                    memcpy(cmdline(), value.data(), BOOT_ARGS_SIZE);
+                    sys::memcpy(cmdline(), value.data(), BOOT_ARGS_SIZE);
                     auto len = std::min(value.length() - BOOT_ARGS_SIZE, (size_t) BOOT_EXTRA_ARGS_SIZE);
-                    memcpy(extra_cmdline(), value.data() + BOOT_ARGS_SIZE, len);
+                    sys::memcpy(extra_cmdline(), value.data() + BOOT_ARGS_SIZE, len);
                 } else {
-                    memcpy(cmdline(), value.data(), value.length());
+                    sys::memcpy(cmdline(), value.data(), value.length());
                 }
             } else if (key == "os_version") {
                 int patch_level = os_version() & 0x7ff;
@@ -580,7 +577,7 @@ explicit                                \
 name(const void *p, ssize_t sz = -1) {  \
     if (sz < 0) sz = sizeof(hdr);       \
     raw = calloc(sizeof(hdr), 1);       \
-    memcpy(raw, p, sz);                 \
+    sys::memcpy(raw, p, sz);            \
 }                                       \
 size_t hdr_size() const override {      \
     return sizeof(hdr);                 \
@@ -812,7 +809,7 @@ FileFormat check_fmt_lg(const uint8_t *buf, unsigned sz) {
         uint32_t off = 4;
         uint32_t block_sz;
         while (off + sizeof(block_sz) <= sz) {
-            memcpy(&block_sz, buf + off, sizeof(block_sz));
+            sys::memcpy(&block_sz, buf + off, sizeof(block_sz));
             off += sizeof(block_sz);
             if (off + block_sz > sz)
                 return FileFormat::LZ4_LG;
@@ -1323,7 +1320,7 @@ export void repack(Utf8CStr src_img, Utf8CStr out_img, bool skip_comp = false) {
      ***************/
 
     // Create new image
-    int fd = open(out_img.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0644);
+    int fd = sys::open(out_img.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0644);
 
     // Copy non-standard headers
     if (boot.flags[DHTB_FLAG]) {
@@ -1550,7 +1547,7 @@ export void repack(Utf8CStr src_img, Utf8CStr out_img, bool skip_comp = false) {
     if (boot.flags[ZIMAGE_KERNEL] && z_payload_sz) {
         auto head_stub = boot.z_info->new_head(z_payload_sz);
         uint8_t *head_ptr = out.data() + off.kernel + (boot.flags[MTK_KERNEL] ? sizeof(mtk_hdr) : 0);
-        memcpy(head_ptr, head_stub.data(), head_stub.size());
+        sys::memcpy(head_ptr, head_stub.data(), head_stub.size());
     }
 
     // Make sure header size matches
@@ -1584,7 +1581,7 @@ export void repack(Utf8CStr src_img, Utf8CStr out_img, bool skip_comp = false) {
             ctx->update(byte_view(out.data() + off.dtb, size));
             ctx->update(byte_view(&size, sizeof(size)));
         }
-        memset(id, 0, BOOT_ID_SIZE);
+        sys::memset(id, 0, BOOT_ID_SIZE);
         ctx->finalize_into(byte_data(id, ctx->output_size()));
     }
 
@@ -1594,15 +1591,15 @@ export void repack(Utf8CStr src_img, Utf8CStr out_img, bool skip_comp = false) {
     // Copy main header
     if (boot.flags[AMONET_FLAG]) {
         auto real_hdr_sz = std::min(hdr->hdr_space() - AMONET_MICROLOADER_SZ, hdr->hdr_size());
-        memcpy(out.data() + off.header + AMONET_MICROLOADER_SZ, hdr->raw_hdr(), real_hdr_sz);
+        sys::memcpy(out.data() + off.header + AMONET_MICROLOADER_SZ, hdr->raw_hdr(), real_hdr_sz);
     } else {
-        memcpy(out.data() + off.header, hdr->raw_hdr(), hdr->hdr_size());
+        sys::memcpy(out.data() + off.header, hdr->raw_hdr(), hdr->hdr_size());
     }
 
     if (boot.flags[AVB_FLAG]) {
         // Copy and patch AVB structures
         auto footer = reinterpret_cast<AvbFooter*>(out.data() + out.size() - sizeof(AvbFooter));
-        memcpy(footer, boot.avb_footer, sizeof(AvbFooter));
+        sys::memcpy(footer, boot.avb_footer, sizeof(AvbFooter));
         footer->original_image_size = __builtin_bswap64(aosp_img_size);
         footer->vbmeta_offset = __builtin_bswap64(off.vbmeta);
         if (check_env("PATCHVBMETAFLAG")) {
