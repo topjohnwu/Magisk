@@ -1,12 +1,14 @@
-#include <set>
+module;
 #include <sys/mount.h>
 #include <sys/sysmacros.h>
-#include <libgen.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <rust/cxx.h>
 
-#include <base.hpp>
-#include <consts.hpp>
+module init;
+import std;
 
-#include "init.hpp"
+#define PLOGE(fmt, args...) LOGE(fmt " failed with %d: %s\n", ##args, errno, ::strerror(errno))
 
 using namespace std;
 
@@ -19,13 +21,13 @@ struct devinfo {
     char devpath[PATH_MAX];
 };
 
-static vector<devinfo> dev_list;
+vector<devinfo> dev_list;
 
 // When this boolean is set, this means we are currently
 // running magiskinit on legacy SAR AVD emulator
 bool avd_hack = false;
 
-static void parse_device(devinfo *dev, const char *uevent) {
+void parse_device(devinfo *dev, const char *uevent) {
     dev->partname[0] = '\0';
     dev->devpath[0] = '\0';
     dev->dmname[0] = '\0';
@@ -51,9 +53,9 @@ void MagiskInit::collect_devices() const noexcept {
         for (dirent *entry; (entry = readdir(dir.get()));) {
             if (entry->d_name == "."sv || entry->d_name == ".."sv)
                 continue;
-            sprintf(path, "/sys/dev/block/%s/uevent", entry->d_name);
+            sys::sprintf(path, "/sys/dev/block/%s/uevent", entry->d_name);
             parse_device(&dev, path);
-            sprintf(path, "/sys/dev/block/%s/dm/name", entry->d_name);
+            sys::sprintf(path, "/sys/dev/block/%s/dm/name", entry->d_name);
             if (access(path, F_OK) == 0) {
                 auto name = rtrim(full_read(path));
                 strscpy(dev.dmname, name.data(), sizeof(dev.dmname));
@@ -64,7 +66,7 @@ void MagiskInit::collect_devices() const noexcept {
                 // use androidboot.partition_map as partname fallback.
                 strscpy(dev.partname, it->value.data(), sizeof(dev.partname));
             }
-            sprintf(path, "/sys/dev/block/%s", entry->d_name);
+            sys::sprintf(path, "/sys/dev/block/%s", entry->d_name);
             xrealpath(path, dev.devpath, sizeof(dev.devpath));
             dev_list.push_back(dev);
         }
@@ -162,7 +164,7 @@ bool MagiskInit::mount_system_root() noexcept {
 
         // Try normal partname
         char sys_part[32];
-        sprintf(sys_part, "system%s", config.slot.data());
+        sys::sprintf(sys_part, "system%s", config.slot.data());
         dev = find_block(sys_part);
         if (dev > 0)
             goto mount_root;
@@ -239,7 +241,7 @@ void MagiskInit::setup_tmp(const char *path) noexcept {
         xmkdirs(SHELLPTS, 0755);
         xmount("devpts", SHELLPTS, "devpts", MS_NOSUID | MS_NOEXEC, "newinstance");
         xmount(nullptr, SHELLPTS, nullptr, MS_PRIVATE, nullptr);
-        if (access(SHELLPTS "/ptmx", F_OK)) {
+        if (access(SHELLPTS + "/ptmx", F_OK)) {
             umount2(SHELLPTS, MNT_DETACH);
             rmdir(SHELLPTS);
         }

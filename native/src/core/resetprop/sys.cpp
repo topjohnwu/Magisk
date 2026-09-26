@@ -1,12 +1,9 @@
+module;
 #include <dlfcn.h>
-
-#include <base.hpp>
-#include <core.hpp>
-
 #include <api/system_properties.h>
 #include <system_properties/prop_info.h>
 
-using namespace std;
+module core;
 
 // This has to keep in sync with SysProp in mod.rs
 struct SysProp {

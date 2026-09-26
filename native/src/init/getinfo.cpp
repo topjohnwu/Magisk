@@ -1,12 +1,23 @@
+module;
 #include <sys/sysmacros.h>
-#include <sys/types.h>
 #include <linux/input.h>
 #include <fcntl.h>
-#include <vector>
+#include <unistd.h>
+#include <rust/cxx.h>
 
-#include <base.hpp>
+export module init;
+import std;
+export import :rs;
+export import base;
 
-#include "init.hpp"
+export {
+int magisk_proxy_main(int, char *argv[]);
+Utf8CStr backup_init();
+inline Utf8CStr split_plat_cil() { return SPLIT_PLAT_CIL; }
+inline Utf8CStr preload_lib() { return PRELOAD_LIB; }
+inline Utf8CStr preload_policy() { return PRELOAD_POLICY; }
+inline Utf8CStr preload_ack() { return PRELOAD_ACK; }
+}
 
 using namespace std;
 
@@ -15,7 +26,7 @@ template<char... cs> using chars = integer_sequence<char, cs...>;
 // If quoted, parsing ends when we find char in [breaks]
 // If not quoted, parsing ends when we find char in [breaks] + [escapes]
 template<char... escapes, char... breaks>
-static string extract_quoted_str_until(chars<escapes...>, chars<breaks...>,
+string extract_quoted_str_until(chars<escapes...>, chars<breaks...>,
         string_view str, size_t &pos, bool &quoted) {
     string result;
     char match_array[] = {escapes..., breaks..., '"'};
@@ -40,7 +51,7 @@ static string extract_quoted_str_until(chars<escapes...>, chars<breaks...>,
 // Parse string into key value pairs.
 // The string format: [delim][key][padding][eq][padding][value][delim]
 template<char delim, char eq, char... padding>
-static kv_pairs parse_impl(chars<padding...>, string_view str) {
+kv_pairs parse_impl(chars<padding...>, string_view str) {
     kv_pairs kv;
     char skip_array[] = {eq, padding...};
     string_view skip(skip_array, std::size(skip_array));
@@ -59,19 +70,19 @@ static kv_pairs parse_impl(chars<padding...>, string_view str) {
     return kv;
 }
 
-static kv_pairs parse_cmdline(string_view str) {
+kv_pairs parse_cmdline(string_view str) {
     return parse_impl<' ', '='>(chars<>{}, str);
 }
-static kv_pairs parse_bootconfig(string_view str) {
+kv_pairs parse_bootconfig(string_view str) {
     return parse_impl<'\n', '='>(chars<' '>{}, str);
 }
-static kv_pairs parse_partition_map(std::string_view str) {
+kv_pairs parse_partition_map(std::string_view str) {
     return parse_impl<';', ','>(chars<>{}, str);
 }
 
 #define test_bit(bit, array) (array[bit / 8] & (1 << (bit % 8)))
 
-static bool check_key_combo() {
+bool check_key_combo() {
     LOGD("Running in recovery mode, waiting for key...\n");
     uint8_t bitmask[(KEY_MAX + 1) / 8];
     vector<int> events;
@@ -80,11 +91,11 @@ static bool check_key_combo() {
     for (int minor = 64; minor < 96; ++minor) {
         if (xmknod(name, S_IFCHR | 0444, makedev(13, minor)))
             continue;
-        int fd = open(name, O_RDONLY | O_CLOEXEC);
+        int fd = sys::open(name, O_RDONLY | O_CLOEXEC);
         unlink(name);
         if (fd < 0)
             continue;
-        memset(bitmask, 0, sizeof(bitmask));
+        sys::memset(bitmask, 0, sizeof(bitmask));
         ioctl(fd, EVIOCGBIT(EV_KEY, sizeof(bitmask)), bitmask);
         if (test_bit(KEY_VOLUMEUP, bitmask))
             events.push_back(fd);
@@ -100,7 +111,7 @@ static bool check_key_combo() {
     int count = 0;
     for (int i = 0; i < 500; ++i) {
         for (const int &fd : events) {
-            memset(bitmask, 0, sizeof(bitmask));
+            sys::memset(bitmask, 0, sizeof(bitmask));
             ioctl(fd, EVIOCGKEY(sizeof(bitmask)), bitmask);
             if (test_bit(KEY_VOLUMEUP, bitmask)) {
                 count++;

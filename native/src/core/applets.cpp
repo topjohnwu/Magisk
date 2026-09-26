@@ -1,7 +1,7 @@
 #include <libgen.h>
-#include <sys/stat.h>
 
-#include <core.hpp>
+import std;
+import core;
 
 using namespace std;
 
@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
 
     Utf8CStr argv0 = basename(argv[0]);
 
-    umask(0);
+    sys::umask(0);
 
     if (argv[0][0] == '\0') {
         // When argv[0] is an empty string, we're calling private applets

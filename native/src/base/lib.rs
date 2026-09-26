@@ -27,7 +27,7 @@ mod mount;
 mod result;
 mod xwrap;
 
-#[cxx::bridge]
+#[derive::bridge]
 mod ffi {
     #[derive(Copy, Clone)]
     #[repr(i32)]
@@ -40,7 +40,8 @@ mod ffi {
     }
 
     unsafe extern "C++" {
-        include!("base.hpp");
+        import!("base");
+        import!(":types", export = true);
 
         #[cxx_name = "Utf8CStr"]
         type Utf8CStrRef<'a> = &'a crate::cstr::Utf8CStr;

@@ -16,7 +16,7 @@ mod rootdir;
 mod selinux;
 mod twostage;
 
-#[cxx::bridge]
+#[base::derive::bridge]
 pub mod ffi {
     #[derive(Debug)]
     struct KeyValue {
@@ -47,7 +47,8 @@ pub mod ffi {
     }
 
     unsafe extern "C++" {
-        include!("init.hpp");
+        import!("init");
+        import!("base", export = true);
 
         #[cxx_name = "Utf8CStr"]
         type Utf8CStrRef<'a> = base::Utf8CStrRef<'a>;

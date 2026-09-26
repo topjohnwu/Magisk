@@ -1,13 +1,12 @@
-#include "include/sepolicy.hpp"
-
-#include <sys/types.h>
-#include <sys/stat.h>
+module;
 #include <unistd.h>
-
 #include <cil/cil.h>
-
-#include <base.hpp>
+#include <fcntl.h>
 #include <flags.h>
+#include <rust/cxx.h>
+
+module policy;
+import std;
 
 using namespace std;
 
@@ -35,37 +34,36 @@ static bool cmp_sha256(const char *a, const char *b) {
 
 static bool check_precompiled(const char *precompiled) {
     bool ok = false;
-    const char *actual_sha;
     char compiled_sha[128];
 
-    actual_sha = PLAT_POLICY_DIR "plat_and_mapping_sepolicy.cil.sha256";
-    if (access(actual_sha, R_OK) == 0) {
+    if (static constinit const auto &actual_sha = PLAT_POLICY_DIR + "plat_and_mapping_sepolicy.cil.sha256";
+        access(actual_sha, R_OK) == 0) {
         ok = true;
-        sprintf(compiled_sha, "%s.plat_and_mapping.sha256", precompiled);
+        sys::sprintf(compiled_sha, "%s.plat_and_mapping.sha256", precompiled);
         if (!cmp_sha256(actual_sha, compiled_sha))
             return false;
     }
 
-    actual_sha = PLAT_POLICY_DIR "plat_sepolicy_and_mapping.sha256";
-    if (access(actual_sha, R_OK) == 0) {
+    if (static constinit const auto &actual_sha = PLAT_POLICY_DIR + "plat_sepolicy_and_mapping.sha256";
+        access(actual_sha, R_OK) == 0) {
         ok = true;
-        sprintf(compiled_sha, "%s.plat_sepolicy_and_mapping.sha256", precompiled);
+        sys::sprintf(compiled_sha, "%s.plat_sepolicy_and_mapping.sha256", precompiled);
         if (!cmp_sha256(actual_sha, compiled_sha))
             return false;
     }
 
-    actual_sha = PROD_POLICY_DIR "product_sepolicy_and_mapping.sha256";
-    if (access(actual_sha, R_OK) == 0) {
+    if (static constinit const auto &actual_sha = PROD_POLICY_DIR + "product_sepolicy_and_mapping.sha256";
+        access(actual_sha, R_OK) == 0) {
         ok = true;
-        sprintf(compiled_sha, "%s.product_sepolicy_and_mapping.sha256", precompiled);
+        sys::sprintf(compiled_sha, "%s.product_sepolicy_and_mapping.sha256", precompiled);
         if (!cmp_sha256(actual_sha, compiled_sha) != 0)
             return false;
     }
 
-    actual_sha = SYSEXT_POLICY_DIR "system_ext_sepolicy_and_mapping.sha256";
-    if (access(actual_sha, R_OK) == 0) {
+    if (static constinit const auto &actual_sha = SYSEXT_POLICY_DIR + "system_ext_sepolicy_and_mapping.sha256";
+        access(actual_sha, R_OK) == 0) {
         ok = true;
-        sprintf(compiled_sha, "%s.system_ext_sepolicy_and_mapping.sha256", precompiled);
+        sys::sprintf(compiled_sha, "%s.system_ext_sepolicy_and_mapping.sha256", precompiled);
         if (!cmp_sha256(actual_sha, compiled_sha) != 0)
             return false;
     }
@@ -73,7 +71,7 @@ static bool check_precompiled(const char *precompiled) {
     return ok;
 }
 
-static void load_cil(struct cil_db *db, const char *file) {
+static void load_cil(cil_db_t *db, const char *file) {
     mmap_data d(file);
     cil_add_file(db, file, (const char *) d.data(), d.size());
     LOGD("cil_add [%s]\n", file);
@@ -123,10 +121,9 @@ SePolicy SePolicy::compile_split() noexcept {
     sepol_policydb_t *pdb = nullptr;
     FILE *f;
     int policy_ver;
-    const char *cil_file;
-#if MAGISK_DEBUG
-    cil_set_log_level(CIL_INFO);
-#endif
+    if constexpr (MAGISK_DEBUG) {
+        cil_set_log_level(CIL_INFO);
+    }
     cil_set_log_handler(+[](int lvl, const char *msg) {
         if (lvl == CIL_ERR) {
             LOGE("cil: %s", msg);
@@ -153,58 +150,58 @@ SePolicy SePolicy::compile_split() noexcept {
     cil_set_policy_version(db, policy_ver);
 
     // Get mapping version
-    f = xfopen(VEND_POLICY_DIR "plat_sepolicy_vers.txt", "re");
+    f = xfopen(VEND_POLICY_DIR + "plat_sepolicy_vers.txt", "re");
     fscanf(f, "%s", plat_ver);
     fclose(f);
 
     // plat
     load_cil(db, SPLIT_PLAT_CIL);
 
-    sprintf(path, PLAT_POLICY_DIR "mapping/%s.cil", plat_ver);
+    sys::sprintf(path, PLAT_POLICY_DIR + "mapping/%s.cil", plat_ver);
     load_cil(db, path);
 
-    sprintf(path, PLAT_POLICY_DIR "mapping/%s.compat.cil", plat_ver);
+    sys::sprintf(path, PLAT_POLICY_DIR + "mapping/%s.compat.cil", plat_ver);
     if (access(path, R_OK) == 0)
         load_cil(db, path);
 
     // system_ext
-    sprintf(path, SYSEXT_POLICY_DIR "mapping/%s.cil", plat_ver);
+    sys::sprintf(path, SYSEXT_POLICY_DIR + "mapping/%s.cil", plat_ver);
     if (access(path, R_OK) == 0)
         load_cil(db, path);
 
-    sprintf(path, SYSEXT_POLICY_DIR "mapping/%s.compat.cil", plat_ver);
+    sys::sprintf(path, SYSEXT_POLICY_DIR + "mapping/%s.compat.cil", plat_ver);
     if (access(path, R_OK) == 0)
         load_cil(db, path);
 
-    cil_file = SYSEXT_POLICY_DIR "system_ext_sepolicy.cil";
-    if (access(cil_file, R_OK) == 0)
+    if (static constinit const auto &cil_file = SYSEXT_POLICY_DIR + "system_ext_sepolicy.cil";
+        access(cil_file, R_OK) == 0)
         load_cil(db, cil_file);
 
     // product
-    sprintf(path, PROD_POLICY_DIR "mapping/%s.cil", plat_ver);
+    sys::sprintf(path, PROD_POLICY_DIR + "mapping/%s.cil", plat_ver);
     if (access(path, R_OK) == 0)
         load_cil(db, path);
 
-    cil_file = PROD_POLICY_DIR "product_sepolicy.cil";
-    if (access(cil_file, R_OK) == 0)
+    if (static constinit const auto &cil_file = PROD_POLICY_DIR + "product_sepolicy.cil";
+        access(cil_file, R_OK) == 0)
         load_cil(db, cil_file);
 
     // vendor
-    cil_file = VEND_POLICY_DIR "nonplat_sepolicy.cil";
-    if (access(cil_file, R_OK) == 0)
+    if (static constinit const auto &cil_file = VEND_POLICY_DIR + "nonplat_sepolicy.cil";
+        access(cil_file, R_OK) == 0)
         load_cil(db, cil_file);
 
-    cil_file = VEND_POLICY_DIR "plat_pub_versioned.cil";
-    if (access(cil_file, R_OK) == 0)
+    if (static constinit const auto &cil_file = VEND_POLICY_DIR + "plat_pub_versioned.cil";
+        access(cil_file, R_OK) == 0)
         load_cil(db, cil_file);
 
-    cil_file = VEND_POLICY_DIR "vendor_sepolicy.cil";
-    if (access(cil_file, R_OK) == 0)
+    if (static constinit const auto &cil_file = VEND_POLICY_DIR + "vendor_sepolicy.cil";
+        access(cil_file, R_OK) == 0)
         load_cil(db, cil_file);
 
     // odm
-    cil_file = ODM_POLICY_DIR "odm_sepolicy.cil";
-    if (access(cil_file, R_OK) == 0)
+    if (static constinit const auto &cil_file = ODM_POLICY_DIR + "odm_sepolicy.cil";
+        access(cil_file, R_OK) == 0)
         load_cil(db, cil_file);
 
     if (cil_compile(db))
@@ -215,19 +212,14 @@ SePolicy SePolicy::compile_split() noexcept {
 }
 
 SePolicy SePolicy::from_split() noexcept {
-    const char *odm_pre = ODM_POLICY_DIR "precompiled_sepolicy";
-    const char *vend_pre = VEND_POLICY_DIR "precompiled_sepolicy";
+    static constinit const auto &odm_pre = ODM_POLICY_DIR + "precompiled_sepolicy";
+    static constinit const auto &vend_pre = VEND_POLICY_DIR + "precompiled_sepolicy";
     if (access(odm_pre, R_OK) == 0 && check_precompiled(odm_pre))
         return SePolicy::from_file(odm_pre);
     else if (access(vend_pre, R_OK) == 0 && check_precompiled(vend_pre))
         return SePolicy::from_file(vend_pre);
     else
         return SePolicy::compile_split();
-}
-
-sepol_impl::~sepol_impl() {
-    policydb_destroy(db);
-    free(db);
 }
 
 static int vec_write(void *v, const char *buf, int len) {

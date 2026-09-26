@@ -1,12 +1,11 @@
-#include <unistd.h>
+module;
 #include <android/log.h>
 #include <sys/syscall.h>
-#include <string>
-#include <map>
+#include <fcntl.h>
+#include <sched.h>
 
-#include <core.hpp>
-
-#include "deny.hpp"
+module core;
+import std;
 
 using namespace std;
 
@@ -80,26 +79,26 @@ extern "C" {
 
 [[gnu::weak]] struct logger_list *android_logger_list_alloc(int mode, unsigned int tail, pid_t pid);
 [[gnu::weak]] void android_logger_list_free(struct logger_list *list);
-[[gnu::weak]] int android_logger_list_read(struct logger_list *list, struct log_msg *log_msg);
+[[gnu::weak]] int android_logger_list_read(struct logger_list *list, log_msg *log_msg);
 [[gnu::weak]] struct logger *android_logger_open(struct logger_list *list, log_id_t id);
-[[gnu::weak]] int android_log_processLogBuffer(struct logger_entry *buf, AndroidLogEntry *entry);
+[[gnu::weak]] int android_log_processLogBuffer(logger_entry *buf, AndroidLogEntry *entry);
 
 }
 
 // zygote pid -> mnt ns
-static map<int, struct stat> zygote_map;
+static map<int, struct ::stat> zygote_map;
 bool logcat_exit;
 
-static int read_ns(const int pid, struct stat *st) {
+static int read_ns(const int pid, struct ::stat *st) {
     char path[32];
-    sprintf(path, "/proc/%d/ns/mnt", pid);
+    sys::sprintf(path, "/proc/%d/ns/mnt", pid);
     return stat(path, st);
 }
 
 static int parse_ppid(int pid) {
     char path[32];
     int ppid;
-    sprintf(path, "/proc/%d/stat", pid);
+    sys::sprintf(path, "/proc/%d/stat", pid);
     auto stat = open_file(path, "re");
     if (!stat) return -1;
     // PID COMM STATE PPID .....
@@ -109,7 +108,7 @@ static int parse_ppid(int pid) {
 
 static void check_zygote() {
     zygote_map.clear();
-    int proc = open("/proc", O_RDONLY | O_CLOEXEC);
+    int proc = sys::open("/proc", O_RDONLY | O_CLOEXEC);
     auto proc_dir = xopen_dir(proc);
     if (!proc_dir) return;
     struct stat st{};
@@ -175,9 +174,9 @@ static void process_main_buffer(struct log_msg *msg) {
     ready = false;
 
     char cmdline[1024];
-    sprintf(cmdline, "/proc/%d/cmdline", msg->entry.pid);
+    sys::sprintf(cmdline, "/proc/%d/cmdline", msg->entry.pid);
     if (auto f = open_file(cmdline, "re")) {
-        fgets(cmdline, sizeof(cmdline), f.get());
+        sys::fgets(cmdline, sizeof(cmdline), f.get());
     } else {
         return;
     }

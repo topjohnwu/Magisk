@@ -11,7 +11,7 @@ mod cli;
 mod rules;
 mod statement;
 
-#[cxx::bridge]
+#[base::derive::bridge]
 pub mod ffi {
     #[derive(Debug, PartialEq)]
     struct Xperm {
@@ -26,8 +26,8 @@ pub mod ffi {
     }
 
     unsafe extern "C++" {
-        include!("policy.hpp");
-        include!("../base/include/base.hpp");
+        import!("policy");
+        import!("base", export = true);
 
         #[cxx_name = "Utf8CStr"]
         type Utf8CStrRef<'a> = base::Utf8CStrRef<'a>;

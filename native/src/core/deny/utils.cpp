@@ -1,17 +1,55 @@
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/inotify.h>
+module;
 #include <unistd.h>
-#include <fcntl.h>
-#include <dirent.h>
-#include <set>
-#include <map>
+#include <pthread.h>
+#include <rust/cxx.h>
 
-#include <consts.hpp>
-#include <sqlite.hpp>
-#include <core.hpp>
+export module core:deny;
+import std;
+export import :utils;
 
-#include "deny.hpp"
+export {
+inline constexpr char ISOLATED_MAGIC[] = "isolated";
+inline constexpr char WEBVIEW_ZYGOTE_MAGIC[] = "webview_zygote";
+inline constexpr int WEBVIEW_ZYGOTE_UID = 1053;
+
+namespace DenyRequest {
+enum : int {
+    ENFORCE,
+    DISABLE,
+    ADD,
+    REMOVE,
+    LIST,
+    STATUS,
+
+    END
+};
+}
+
+namespace DenyResponse {
+enum : int {
+    OK,
+    ENFORCED,
+    NOT_ENFORCED,
+    ITEM_EXIST,
+    ITEM_NOT_EXIST,
+    INVALID_PKG,
+    NO_NS,
+    ERROR,
+
+    END
+};
+}
+
+// CLI entries
+
+void *logcat(void *arg);
+extern bool logcat_exit;
+
+// Denylist
+int denylist_cli(rust::Vec<rust::String> &args);
+void denylist_handler(int client);
+
+}
 
 using namespace std;
 
@@ -20,23 +58,23 @@ using namespace std;
 // If package name == WEBVIEW_ZYGOTE_MAGIC, or app ID == 1053, it means webview zygote
 
 // Package name -> list of process names
-static unique_ptr<map<string, set<string, StringCmp>, StringCmp>> pkg_to_procs_;
+unique_ptr<map<string, set<string, StringCmp>, StringCmp>> pkg_to_procs_;
 #define pkg_to_procs (*pkg_to_procs_)
 
 // app ID -> list of pkg names (string_view points to a pkg_to_procs key)
-static unique_ptr<map<int, set<string_view>>> app_id_to_pkgs_;
+unique_ptr<map<int, set<string_view>>> app_id_to_pkgs_;
 #define app_id_to_pkgs (*app_id_to_pkgs_)
 
 // Locks the data structures above
-static pthread_mutex_t data_lock = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t data_lock = PTHREAD_MUTEX_INITIALIZER;
 
-atomic<bool> denylist_enforced = false;
+export atomic<bool> denylist_enforced = false;
 
-static int get_app_id(const vector<int> &users, const string &pkg) {
+int get_app_id(const vector<int> &users, const string &pkg) {
     struct stat st{};
     char buf[PATH_MAX];
     for (const auto &user_id: users) {
-        ssprintf(buf, sizeof(buf), "%s/%d/%s", APP_DATA_DIR, user_id, pkg.data());
+        ssprintf(buf, sizeof(buf), "%s/%d/%s", APP_DATA_DIR(), user_id, pkg.data());
         if (stat(buf, &st) == 0) {
             return to_app_id(st.st_uid);
         }
@@ -44,8 +82,8 @@ static int get_app_id(const vector<int> &users, const string &pkg) {
     return 0;
 }
 
-static void collect_users(vector<int> &users) {
-    auto data_dir = xopen_dir(APP_DATA_DIR);
+void collect_users(vector<int> &users) {
+    auto data_dir = xopen_dir(APP_DATA_DIR());
     if (!data_dir)
         return;
     dirent *entry;
@@ -54,7 +92,7 @@ static void collect_users(vector<int> &users) {
     }
 }
 
-static int get_app_id(const string &pkg) {
+int get_app_id(const string &pkg) {
     if (pkg == ISOLATED_MAGIC)
         return -1;
     if (pkg == WEBVIEW_ZYGOTE_MAGIC)
@@ -64,7 +102,7 @@ static int get_app_id(const string &pkg) {
     return get_app_id(users, pkg);
 }
 
-static void update_app_id(int app_id, const string &pkg, bool remove) {
+void update_app_id(int app_id, const string &pkg, bool remove) {
     if (app_id <= 0)
         return;
     if (remove) {
@@ -80,10 +118,10 @@ static void update_app_id(int app_id, const string &pkg, bool remove) {
 }
 
 // Leave /proc fd opened as we're going to read from it repeatedly
-static DIR *procfp;
+DIR *procfp;
 
 template<class F>
-static void crawl_procfs(const F &fn) {
+void crawl_procfs(const F &fn) {
     rewinddir(procfp);
     dirent *dp;
     int pid;
@@ -94,15 +132,15 @@ static void crawl_procfs(const F &fn) {
     }
 }
 
-static bool str_eql(string_view a, string_view b) { return a == b; }
-static bool str_starts_with(string_view a, string_view b) { return a.starts_with(b); }
+bool str_eql(string_view a, string_view b) { return a == b; }
+bool str_starts_with(string_view a, string_view b) { return a.starts_with(b); }
 
 template<bool str_op(string_view, string_view) = str_eql>
-static bool proc_name_match(int pid, string_view name) {
+bool proc_name_match(int pid, string_view name) {
     char buf[4019];
-    sprintf(buf, "/proc/%d/cmdline", pid);
+    sys::sprintf(buf, "/proc/%d/cmdline", pid);
     if (auto fp = open_file(buf, "re")) {
-        fgets(buf, sizeof(buf), fp.get());
+        sys::fgets(buf, sizeof(buf), fp.get());
         if (str_op(buf, name)) {
             return true;
         }
@@ -110,11 +148,11 @@ static bool proc_name_match(int pid, string_view name) {
     return false;
 }
 
-bool proc_context_match(int pid, string_view context) {
+export bool proc_context_match(int pid, string_view context) {
     char buf[PATH_MAX];
     char con[1024] = {0};
 
-    sprintf(buf, "/proc/%d", pid);
+    sys::sprintf(buf, "/proc/%d", pid);
     if (lgetfilecon(buf, byte_data{ con, sizeof(con) })) {
         return string_view(con).starts_with(context);
     }
@@ -122,7 +160,7 @@ bool proc_context_match(int pid, string_view context) {
 }
 
 template<bool matcher(int, string_view) = &proc_name_match>
-static void kill_process(const char *name, bool multi = false) {
+void kill_process(const char *name, bool multi = false) {
     crawl_procfs([=](int pid) -> bool {
         if (matcher(pid, name)) {
             kill(pid, SIGKILL);
@@ -133,14 +171,14 @@ static void kill_process(const char *name, bool multi = false) {
     });
 }
 
-static bool validate(const char *pkg, const char *proc) {
+bool validate(const char *pkg, const char *proc) {
     bool pkg_valid = false;
     bool proc_valid = true;
 
     if (str_eql(pkg, ISOLATED_MAGIC)) {
         pkg_valid = true;
         for (char c; (c = *proc); ++proc) {
-            if (isalnum(c) || c == '_' || c == '.')
+            if (sys::isalnum(c) || c == '_' || c == '.')
                 continue;
             if (c == ':')
                 break;
@@ -152,7 +190,7 @@ static bool validate(const char *pkg, const char *proc) {
         proc_valid = str_eql(proc, WEBVIEW_ZYGOTE_MAGIC);
     } else {
         for (char c; (c = *pkg); ++pkg) {
-            if (isalnum(c) || c == '_')
+            if (sys::isalnum(c) || c == '_')
                 continue;
             if (c == '.') {
                 pkg_valid = true;
@@ -163,7 +201,7 @@ static bool validate(const char *pkg, const char *proc) {
         }
 
         for (char c; (c = *proc); ++proc) {
-            if (isalnum(c) || c == '_' || c == ':' || c == '.')
+            if (sys::isalnum(c) || c == '_' || c == ':' || c == '.')
                 continue;
             proc_valid = false;
             break;
@@ -172,7 +210,7 @@ static bool validate(const char *pkg, const char *proc) {
     return pkg_valid && proc_valid;
 }
 
-static bool add_hide_set(const char *pkg, const char *proc) {
+bool add_hide_set(const char *pkg, const char *proc) {
     auto p = pkg_to_procs[pkg].emplace(proc);
     if (!p.second)
         return false;
@@ -188,7 +226,7 @@ static bool add_hide_set(const char *pkg, const char *proc) {
     return true;
 }
 
-void scan_deny_apps() {
+export void scan_deny_apps() {
     if (!app_id_to_pkgs_)
         return;
 
@@ -221,12 +259,12 @@ void scan_deny_apps() {
     }
 }
 
-static void clear_data() {
+void clear_data() {
     pkg_to_procs_.reset(nullptr);
     app_id_to_pkgs_.reset(nullptr);
 }
 
-static bool ensure_data() {
+bool ensure_data() {
     if (pkg_to_procs_)
         return true;
 
@@ -259,7 +297,7 @@ error:
     return false;
 }
 
-static int add_list(const char *pkg, const char *proc) {
+int add_list(const char *pkg, const char *proc) {
     if (proc[0] == '\0')
         proc = pkg;
 
@@ -286,13 +324,13 @@ static int add_list(const char *pkg, const char *proc) {
     return db_exec(sql) ? DenyResponse::OK : DenyResponse::ERROR;
 }
 
-int add_list(int client) {
+export int add_list(int client) {
     string pkg = read_string(client);
     string proc = read_string(client);
     return add_list(pkg.data(), proc.data());
 }
 
-static int rm_list(const char *pkg, const char *proc) {
+int rm_list(const char *pkg, const char *proc) {
     {
         mutex_guard lock(data_lock);
         if (!ensure_data())
@@ -330,13 +368,13 @@ static int rm_list(const char *pkg, const char *proc) {
     return db_exec(sql) ? DenyResponse::OK : DenyResponse::ERROR;
 }
 
-int rm_list(int client) {
+export int rm_list(int client) {
     string pkg = read_string(client);
     string proc = read_string(client);
     return rm_list(pkg.data(), proc.data());
 }
 
-void ls_list(int client) {
+export void ls_list(int client) {
     {
         mutex_guard lock(data_lock);
         if (!ensure_data()) {
@@ -360,7 +398,7 @@ void ls_list(int client) {
     close(client);
 }
 
-int enable_deny() {
+export int enable_deny() {
     if (denylist_enforced) {
         return DenyResponse::OK;
     } else {
@@ -389,7 +427,7 @@ int enable_deny() {
         }
 
         // On Android Q+, also kill blastula pool and all app zygotes
-        if (SDK_INT >= 29) {
+        if (SDK_INT() >= 29) {
             kill_process("usap32", true);
             kill_process("usap64", true);
             kill_process<&proc_context_match>("u:r:app_zygote:s0", true);
@@ -400,7 +438,7 @@ int enable_deny() {
     return DenyResponse::OK;
 }
 
-int disable_deny() {
+export int disable_deny() {
     if (denylist_enforced.exchange(false)) {
         LOGI("* Disable DenyList\n");
     }
@@ -408,14 +446,14 @@ int disable_deny() {
     return DenyResponse::OK;
 }
 
-void initialize_denylist() {
+export void initialize_denylist() {
     if (!denylist_enforced) {
         if (MagiskD::Get().get_db_setting(DbEntryKey::DenylistConfig))
             enable_deny();
     }
 }
 
-bool is_deny_target(int uid, string_view process) {
+export bool is_deny_target(int uid, string_view process) {
     mutex_guard lock(data_lock);
     if (!ensure_data())
         return false;
@@ -441,7 +479,7 @@ bool is_deny_target(int uid, string_view process) {
     return false;
 }
 
-void update_deny_flags(int uid, rust::Str process, uint32_t &flags) {
+export void update_deny_flags(int uid, rust::Str process, uint32_t &flags) {
     if (is_deny_target(uid, { process.begin(), process.end() })) {
         flags |= +ZygiskStateFlags::ProcessOnDenyList;
     }

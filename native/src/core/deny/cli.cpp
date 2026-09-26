@@ -1,9 +1,10 @@
-#include <sys/wait.h>
+module;
 #include <sys/mount.h>
+#include <rust/cxx.h>
+#include <sched.h>
 
-#include <core.hpp>
-
-#include "deny.hpp"
+module core;
+import std;
 
 using namespace std;
 
@@ -28,7 +29,7 @@ Actions:
 
 void denylist_handler(int client) {
     if (client < 0) {
-        revert_unmount();
+        revert_unmount(-1);
         return;
     }
 
@@ -89,7 +90,7 @@ int denylist_cli(rust::Vec<rust::String> &args) {
     else if (argv[0] == "exec"sv && argc > 1) {
         xunshare(CLONE_NEWNS);
         xmount(nullptr, "/", nullptr, MS_PRIVATE | MS_REC, nullptr);
-        revert_unmount();
+        revert_unmount(-1);
         execvp(argv[1], (char **) argv.data() + 1);
         exit(1);
     } else {

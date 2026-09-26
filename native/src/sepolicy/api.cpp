@@ -1,6 +1,9 @@
-#include <base.hpp>
+module;
+#include <sepol/policydb/policydb.h>
+#include <rust/cxx.h>
 
-#include "include/sepolicy.hpp"
+module policy;
+import std;
 
 using Str = rust::Str;
 using StrVec = rust::Vec<rust::Str>;

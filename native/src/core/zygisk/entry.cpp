@@ -1,12 +1,11 @@
-#include <sys/mount.h>
+module;
 #include <android/dlext.h>
 #include <dlfcn.h>
 #include <poll.h>
+#include <fcntl.h>
 
-#include <base.hpp>
-#include <core.hpp>
-
-#include "zygisk.hpp"
+module core;
+import std;
 
 using namespace std;
 
@@ -54,7 +53,7 @@ static void zygiskd(int socket) {
     // Start accepting requests
     pollfd pfd = { socket, POLLIN, 0 };
     for (;;) {
-        poll(&pfd, 1, -1);
+        sys::poll(&pfd, 1, -1);
         if (pfd.revents && !(pfd.revents & POLLIN)) {
             // Something bad happened in magiskd, terminate zygiskd
             exit(0);
@@ -84,13 +83,15 @@ int zygisk_main(int argc, char *argv[]) {
 }
 
 // Entrypoint of code injection
+static bool initialize_zygisk(uint32_t) {
+    zygisk_logging();
+    hook_entry();
+    ZLOGD("load success\n");
+    return false;
+}
+
 extern "C" [[maybe_unused]] NativeBridgeCallbacks NativeBridgeItf {
     .version = 2,
     .padding = {},
-    .isCompatibleWith = [](auto) {
-        zygisk_logging();
-        hook_entry();
-        ZLOGD("load success\n");
-        return false;
-    },
+    .isCompatibleWith = initialize_zygisk,
 };

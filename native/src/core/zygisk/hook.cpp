@@ -1,17 +1,15 @@
+module;
+#include <jni.h>
 #include <sys/mman.h>
-#include <sys/mount.h>
 #include <sys/resource.h>
 #include <dlfcn.h>
 #include <unwind.h>
-#include <span>
-
 #include <lsplt.hpp>
+#include <pthread.h>
 
-#include <base.hpp>
-
-#include "zygisk.hpp"
-#include "module.hpp"
-#include "jni_hooks.hpp"
+module core;
+import std;
+import :zygisk.jni;
 
 using namespace std;
 
@@ -97,7 +95,7 @@ constexpr const char *kForkServer = "nativeForkSystemServer";
 using JNIMethods = std::span<JNINativeMethod>;
 using JNIMethodsDyn = std::pair<unique_ptr<JNINativeMethod[]>, size_t>;
 
-struct HookContext : JniHookDefinitions {
+struct HookContext {
 
     vector<tuple<dev_t, ino_t, const char *, void **>> plt_backup;
     const NativeBridgeRuntimeCallbacks *runtime_callbacks = nullptr;
@@ -136,10 +134,6 @@ private:
 ZygiskContext *g_ctx;
 static HookContext *g_hook;
 
-static JniHookDefinitions *get_defs() {
-    return g_hook;
-}
-
 // -----------------------------------------------------------------
 
 #define DCL_HOOK_FUNC(ret, func, ...) \
@@ -167,7 +161,7 @@ DCL_HOOK_FUNC(static int, unshare, int flags) {
     int res = old_unshare(flags);
     if (g_ctx && (flags & CLONE_NEWNS) != 0 && res == 0) {
         if (g_ctx->flags & DO_REVERT_UNMOUNT) {
-            revert_unmount();
+            revert_unmount(-1);
         }
         // Restore errno back to 0
         errno = 0;
@@ -196,7 +190,7 @@ DCL_HOOK_FUNC(static void, android_log_close) {
 // It should be safe to assume all dlclose's in libnativebridge are for zygisk_loader
 DCL_HOOK_FUNC(static int, dlclose, void *handle) {
     if (!g_hook->self_handle) {
-        ZLOGV("dlclose zygisk_loader\n");
+        if constexpr (ZLOG_VERBOSE) ZLOGD("dlclose zygisk_loader\n");
         g_hook->post_native_bridge_load(handle);
     }
     return 0;
@@ -212,11 +206,11 @@ DCL_HOOK_FUNC(static int, pthread_attr_destroy, void *target) {
     if (gettid() != getpid())
         return res;
 
-    ZLOGV("pthread_attr_destroy\n");
+    if constexpr (ZLOG_VERBOSE) ZLOGD("pthread_attr_destroy\n");
     if (g_hook->should_unmap) {
         g_hook->restore_plt_hook();
         if (g_hook->should_unmap) {
-            ZLOGV("dlclosing self\n");
+            if constexpr (ZLOG_VERBOSE) ZLOGD("dlclosing self\n");
             void *self_handle = g_hook->self_handle;
             delete g_hook;
 
@@ -292,12 +286,12 @@ inline void *unwind_get_region_start(_Unwind_Context *ctx) {
 // argument, which is the pointer to NativeBridgeRuntimeCallbacks.
 // For x86, whose abi uses stack to pass arguments, we can directly get the pointer to
 // NativeBridgeRuntimeCallbacks from the stack.
-static const NativeBridgeRuntimeCallbacks* find_runtime_callbacks(struct _Unwind_Context *ctx) {
+static const NativeBridgeRuntimeCallbacks* find_runtime_callbacks(struct ::_Unwind_Context *ctx) {
     // Find the writable memory region of libart.so, where the NativeBridgeRuntimeCallbacks is located.
     auto [start, end] = []()-> tuple<uintptr_t, uintptr_t> {
         for (const auto &map : lsplt::MapInfo::Scan()) {
             if (map.path.ends_with("/libart.so") && map.perms == (PROT_WRITE | PROT_READ)) {
-                ZLOGV("libart.so: start=%p, end=%p\n",
+                if constexpr (ZLOG_VERBOSE) ZLOGD("libart.so: start=%p, end=%p\n",
                       reinterpret_cast<void *>(map.start), reinterpret_cast<void *>(map.end));
                 return {map.start, map.end};
             }
@@ -308,7 +302,7 @@ static const NativeBridgeRuntimeCallbacks* find_runtime_callbacks(struct _Unwind
     // r19-r28 are callee-saved registers
     for (int i = 19; i <= 28; ++i) {
         auto val = static_cast<uintptr_t>(_Unwind_GetGR(ctx, i));
-        ZLOGV("r%d = %p\n", i, reinterpret_cast<void *>(val));
+        if constexpr (ZLOG_VERBOSE) ZLOGD("r%d = %p\n", i, reinterpret_cast<void *>(val));
         if (val >= start && val < end)
             return reinterpret_cast<const NativeBridgeRuntimeCallbacks*>(val);
     }
@@ -316,7 +310,7 @@ static const NativeBridgeRuntimeCallbacks* find_runtime_callbacks(struct _Unwind
     // r4-r10 are callee-saved registers
     for (int i = 4; i <= 10; ++i) {
         auto val = static_cast<uintptr_t>(_Unwind_GetGR(ctx, i));
-        ZLOGV("r%d = %p\n", i, reinterpret_cast<void *>(val));
+        if constexpr (ZLOG_VERBOSE) ZLOGD("r%d = %p\n", i, reinterpret_cast<void *>(val));
         if (val >= start && val < end)
             return reinterpret_cast<const NativeBridgeRuntimeCallbacks*>(val);
     }
@@ -327,14 +321,14 @@ static const NativeBridgeRuntimeCallbacks* find_runtime_callbacks(struct _Unwind
     // 2 pointer sizes above ebp is the return address
     // 3 pointer sizes above ebp is the 2nd arg
     auto val = *reinterpret_cast<uintptr_t *>(ebp + 3 * sizeof(void *));
-    ZLOGV("ebp + 3 * ptr_size = %p\n", reinterpret_cast<void *>(val));
+    if constexpr (ZLOG_VERBOSE) ZLOGD("ebp + 3 * ptr_size = %p\n", reinterpret_cast<void *>(val));
     if (val >= start && val < end)
         return reinterpret_cast<const NativeBridgeRuntimeCallbacks*>(val);
 #elif defined(__x86_64__)
     // r12-r15 and rbx are callee-saved registers, but the compiler is likely to use them reversely
     for (int i : {3, 15, 14, 13, 12}) {
         auto val = static_cast<uintptr_t>(_Unwind_GetGR(ctx, i));
-        ZLOGV("r%d = %p\n", i, reinterpret_cast<void *>(val));
+        if constexpr (ZLOG_VERBOSE) ZLOGD("r%d = %p\n", i, reinterpret_cast<void *>(val));
         if (val >= start && val < end)
             return reinterpret_cast<const NativeBridgeRuntimeCallbacks*>(val);
     }
@@ -342,7 +336,7 @@ static const NativeBridgeRuntimeCallbacks* find_runtime_callbacks(struct _Unwind
     // x8-x9, x18-x27 callee-saved registers
     for (int i : {8, 9, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27}) {
         auto val = static_cast<uintptr_t>(_Unwind_GetGR(ctx, i));
-        ZLOGV("x%d = %p\n", i, reinterpret_cast<void *>(val));
+        if constexpr (ZLOG_VERBOSE) ZLOGD("x%d = %p\n", i, reinterpret_cast<void *>(val));
         if (val >= start && val < end)
             return reinterpret_cast<const NativeBridgeRuntimeCallbacks*>(val);
     }
@@ -366,12 +360,12 @@ void HookContext::post_native_bridge_load(void *handle) {
         void *fp = unwind_get_region_start(ctx);
         Dl_info info{};
         dladdr(fp, &info);
-        ZLOGV("backtrace: %p %s\n", fp, info.dli_fname ?: "???");
+        if constexpr (ZLOG_VERBOSE) ZLOGD("backtrace: %p %s\n", fp, info.dli_fname ?: "???");
         if (info.dli_fname && std::string_view(info.dli_fname).ends_with("/libnativebridge.so")) {
             auto payload = reinterpret_cast<trace_arg *>(arg);
             payload->load_native_bridge = reinterpret_cast<method_sig>(fp);
             payload->callbacks = find_runtime_callbacks(ctx);
-            ZLOGV("NativeBridgeRuntimeCallbacks: %p\n", payload->callbacks);
+            if constexpr (ZLOG_VERBOSE) ZLOGD("NativeBridgeRuntimeCallbacks: %p\n", payload->callbacks);
             return _URC_END_OF_STACK;
         }
         return _URC_NO_REASON;
@@ -520,7 +514,7 @@ int HookContext::hook_jni_methods(JNIEnv *env, jclass clazz, JNIMethods methods)
                 for (const auto &old_method : old_methods) {
                     if (strcmp(old_method.name, new_method.name) == 0 &&
                         strcmp(old_method.signature, new_method.signature) == 0) {
-                        ZLOGV("replace %s %s %p -> %p\n",
+                        if constexpr (ZLOG_VERBOSE) ZLOGD("replace %s %s %p -> %p\n",
                             method.name, method.signature, old_method.fnPtr, method.fnPtr);
                         method.fnPtr = old_method.fnPtr;
                         ++hook_count;
@@ -534,7 +528,6 @@ int HookContext::hook_jni_methods(JNIEnv *env, jclass clazz, JNIMethods methods)
     }
     return hook_count;
 }
-
 
 void HookContext::hook_jni_methods(JNIEnv *env, const char *clz, JNIMethods methods) const {
     jclass clazz;
