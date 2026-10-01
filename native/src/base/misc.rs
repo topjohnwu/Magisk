@@ -9,10 +9,6 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicPtr, Ordering};
 use std::{fmt, slice, str};
 
-pub fn errno() -> &'static mut i32 {
-    unsafe { &mut *libc::__errno() }
-}
-
 // When len is 0, don't care whether buf is null or not
 #[inline]
 pub unsafe fn slice_from_ptr<'a, T>(buf: *const T, len: usize) -> &'a [T] {

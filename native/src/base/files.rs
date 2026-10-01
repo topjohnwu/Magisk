@@ -1,6 +1,6 @@
 use crate::{
     Directory, FsPathFollow, LibcReturn, LoggedResult, OsError, OsResult, Utf8CStr, Utf8CStrBuf,
-    cstr, errno, error,
+    cstr, error,
 };
 use bytemuck::{Pod, bytes_of, bytes_of_mut};
 use libc::{c_uint, makedev, mode_t};
@@ -433,7 +433,7 @@ impl Utf8CStr {
             path.mkdir(mode)?;
         }
 
-        *errno() = 0;
+        Errno::set_raw(0);
         Ok(())
     }
 

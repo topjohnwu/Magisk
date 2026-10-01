@@ -1,6 +1,6 @@
 use crate::cxx_extern::readlinkat;
 use crate::{
-    FsPathBuilder, LibcReturn, LoggedResult, OsError, OsResult, Utf8CStr, Utf8CStrBuf, cstr, errno,
+    FsPathBuilder, LibcReturn, LoggedResult, OsError, OsResult, Utf8CStr, Utf8CStrBuf, cstr,
     fd_path, fd_set_attr,
 };
 use libc::{dirent, mode_t};
@@ -159,10 +159,10 @@ impl Directory {
     }
 
     pub fn read(&mut self) -> OsResult<'static, Option<DirEntry<'_>>> {
-        *errno() = 0;
+        Errno::set_raw(0);
         let e = unsafe { libc::readdir(self.inner.as_ptr()) };
         if e.is_null() {
-            return if *errno() != 0 {
+            return if Errno::last_raw() != 0 {
                 Err(OsError::last_os_error("readdir", None, None))
             } else {
                 Ok(None)
