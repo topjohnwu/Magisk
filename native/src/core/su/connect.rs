@@ -2,11 +2,11 @@ use super::SuInfo;
 use super::db::RootSettings;
 use crate::consts::{INTERNAL_DIR, MAGISK_FILE_CON};
 use crate::daemon::to_user_id;
-use crate::ffi::{SuPolicy, SuRequest, get_magisk_tmp};
+use crate::ffi::{SuPolicy, SuRequest, fork_dont_care, get_magisk_tmp};
 use crate::socket::IpcRead;
 use ExtraVal::{Bool, Int, IntList, Str};
 use base::{
-    BytesExt, FileAttr, LibcReturn, LoggedResult, ResultExt, Utf8CStrBuf, cstr, error, fork_dont_care,
+    BytesExt, FileAttr, LibcReturn, LoggedResult, ResultExt, Utf8CStrBuf, cstr, error,
 };
 use nix::fcntl::OFlag;
 use nix::poll::{PollFd, PollFlags, PollTimeout};

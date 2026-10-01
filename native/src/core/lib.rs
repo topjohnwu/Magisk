@@ -25,6 +25,11 @@ use std::os::fd::FromRawFd;
 use su::{get_pty_num, pump_tty};
 use zygisk::zygisk_should_load_module;
 
+pub type ThreadEntry = extern "C" fn(usize) -> usize;
+unsafe extern "C" {
+    pub fn new_daemon_thread(entry: ThreadEntry, arg: usize);
+}
+
 mod bootstages;
 #[path = "../include/consts.rs"]
 mod consts;
@@ -150,6 +155,8 @@ pub mod ffi {
         fn resolve_preinit_dir(base_dir: Utf8CStrRef) -> String;
         fn check_key_combo() -> bool;
         fn unlock_blocks();
+        fn fork_dont_care() -> i32;
+        fn set_nice_name(name: Utf8CStrRef);
         fn update_deny_flags(uid: i32, process: &str, flags: &mut u32);
         fn initialize_denylist();
         fn switch_mnt_ns(pid: i32) -> i32;

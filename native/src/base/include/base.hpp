@@ -188,9 +188,6 @@ rust::Vec<size_t> mut_u8_patch(MutByteSlice buf, ByteSlice from, ByteSlice to);
 uint32_t parse_uint32_hex(std::string_view s);
 int parse_int(std::string_view s);
 
-using thread_entry = void *(*)(void *);
-extern "C" int new_daemon_thread(thread_entry entry, void *arg = nullptr);
-
 static inline std::string rtrim(std::string &&s) {
     s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
         return !std::isspace(ch) && ch != '\0';
@@ -198,11 +195,6 @@ static inline std::string rtrim(std::string &&s) {
     return std::move(s);
 }
 
-int fork_dont_care();
-int fork_no_orphan();
-void init_argv0(int argc, char **argv);
-void set_nice_name(Utf8CStr name);
-int switch_mnt_ns(int pid);
 std::string &replace_all(std::string &str, std::string_view from, std::string_view to);
 std::vector<std::string> split(std::string_view s, std::string_view delims);
 
@@ -218,43 +210,6 @@ extern "C" size_t strscpy(char *dest, const char *src, size_t size);
 #define vsnprintf  __use_vssprintf_instead__
 #define snprintf   __use_ssprintf_instead__
 #define strlcpy    __use_strscpy_instead__
-
-struct exec_t {
-    bool err = false;
-    int fd = -2;
-    void (*pre_exec)() = nullptr;
-    int (*fork)() = xfork;
-    const char **argv = nullptr;
-};
-
-int exec_command(exec_t &exec);
-template <class ...Args>
-int exec_command(exec_t &exec, Args &&...args) {
-    const char *argv[] = {args..., nullptr};
-    exec.argv = argv;
-    return exec_command(exec);
-}
-int exec_command_sync(exec_t &exec);
-template <class ...Args>
-int exec_command_sync(exec_t &exec, Args &&...args) {
-    const char *argv[] = {args..., nullptr};
-    exec.argv = argv;
-    return exec_command_sync(exec);
-}
-template <class ...Args>
-int exec_command_sync(Args &&...args) {
-    exec_t exec;
-    return exec_command_sync(exec, args...);
-}
-template <class ...Args>
-void exec_command_async(Args &&...args) {
-    const char *argv[] = {args..., nullptr};
-    exec_t exec {
-        .fork = fork_dont_care,
-        .argv = argv,
-    };
-    exec_command(exec);
-}
 
 template <typename T>
 constexpr auto operator+(T e) noexcept ->

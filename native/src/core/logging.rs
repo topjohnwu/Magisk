@@ -1,10 +1,11 @@
 use crate::consts::{LOG_PIPE, LOGFILE};
 use crate::ffi::get_magisk_tmp;
 use crate::logging::LogFile::{Actual, Buffer};
+use crate::new_daemon_thread;
 use base::const_format::concatcp;
 use base::{
     FsPathBuilder, LogLevel, LoggedResult, ReadExt, ResultExt, Utf8CStr, Utf8CStrBuf, WriteExt,
-    cstr, libc, new_daemon_thread, raw_cstr, update_logger,
+    cstr, libc, raw_cstr, update_logger,
 };
 use bytemuck::{Pod, Zeroable, bytes_of, write_zeroes};
 use libc::{PIPE_BUF, c_char, localtime_r, sigtimedwait, time_t, timespec, tm};

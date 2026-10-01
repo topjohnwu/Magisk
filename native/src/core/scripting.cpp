@@ -29,6 +29,89 @@ static void set_script_env() {
         setenv("ZYGISK_ENABLED", "1", 1);
 };
 
+struct exec_t {
+    bool err = false;
+    int fd = -2;
+    void (*pre_exec)() = nullptr;
+    int (*fork)() = xfork;
+    const char **argv = nullptr;
+};
+
+static int exec_command(exec_t &exec) {
+    auto pipefd = array<int, 2>{-1, -1};
+    int outfd = -1;
+
+    if (exec.fd == -1) {
+        if (xpipe2(pipefd, O_CLOEXEC) == -1)
+            return -1;
+        outfd = pipefd[1];
+    } else if (exec.fd >= 0) {
+        outfd = exec.fd;
+    }
+
+    int pid = exec.fork();
+    if (pid < 0) {
+        close(pipefd[0]);
+        close(pipefd[1]);
+        return -1;
+    } else if (pid) {
+        if (exec.fd == -1) {
+            exec.fd = pipefd[0];
+            close(pipefd[1]);
+        }
+        return pid;
+    }
+
+    // Unblock all signals
+    sigset_t set;
+    sigfillset(&set);
+    pthread_sigmask(SIG_UNBLOCK, &set, nullptr);
+
+    if (outfd >= 0) {
+        xdup2(outfd, STDOUT_FILENO);
+        if (exec.err)
+            xdup2(outfd, STDERR_FILENO);
+        close(outfd);
+    }
+
+    // Call the pre-exec callback
+    if (exec.pre_exec)
+        exec.pre_exec();
+
+    execve(exec.argv[0], (char **) exec.argv, environ);
+    PLOGE("execve %s", exec.argv[0]);
+    exit(-1);
+}
+
+template <class ...Args>
+static int exec_command(exec_t &exec, Args &&...args) {
+    const char *argv[] = {args..., nullptr};
+    exec.argv = argv;
+    return exec_command(exec);
+}
+
+template <class ...Args>
+static int exec_command_sync(exec_t &exec, Args &&...args) {
+    const char *argv[] = {args..., nullptr};
+    exec.argv = argv;
+    int pid = exec_command(exec);
+    if (pid < 0)
+        return -1;
+    int status;
+    waitpid(pid, &status, 0);
+    return WEXITSTATUS(status);
+}
+
+template <class ...Args>
+static void exec_command_async(Args &&...args) {
+    const char *argv[] = {args..., nullptr};
+    exec_t exec {
+        .fork = fork_dont_care,
+        .argv = argv,
+    };
+    exec_command(exec);
+}
+
 void exec_script(Utf8CStr script) {
     exec_t exec {
         .pre_exec = set_script_env,
