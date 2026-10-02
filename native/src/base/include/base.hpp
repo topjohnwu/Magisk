@@ -47,6 +47,7 @@ int xmkdirs(const char *pathname, mode_t mode);
 ssize_t xsendfile(int out_fd, int in_fd, off_t *offset, size_t count);
 pid_t xfork();
 int xmknod(const char * pathname, mode_t mode, dev_t dev);
+int xpipe2(int fds[2], int flags);
 
 // Utils
 

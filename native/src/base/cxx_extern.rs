@@ -8,7 +8,6 @@ use std::os::fd::{BorrowedFd, FromRawFd, RawFd};
 
 use crate::ffi::{FnBoolStr, FnBoolStrStr};
 use crate::files::map_file_at;
-pub(crate) use crate::xwrap::*;
 use crate::{
     BufReadExt, ResultExt, Utf8CStr, clone_attr, cstr, fclone_attr, map_fd, map_file,
     slice_from_ptr,

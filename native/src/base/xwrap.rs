@@ -103,9 +103,10 @@ unsafe extern "C" fn xxread(fd: RawFd, buf: *mut u8, bufsz: usize) -> isize {
         .map_or(-1, |_| data.len() as isize)
 }
 
-pub(crate) fn xpipe2(fds: &mut [i32; 2], flags: i32) -> i32 {
+#[unsafe(no_mangle)]
+unsafe extern "C" fn xpipe2(fds: *mut i32, flags: i32) -> i32 {
     unsafe {
-        libc::pipe2(fds.as_mut_ptr(), flags)
+        libc::pipe2(fds, flags)
             .into_os_result("pipe2", None, None)
             .log()
             .unwrap_or(-1)

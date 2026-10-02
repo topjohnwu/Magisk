@@ -38,11 +38,11 @@ struct exec_t {
 };
 
 static int exec_command(exec_t &exec) {
-    auto pipefd = array<int, 2>{-1, -1};
+    auto pipefd = array{-1, -1};
     int outfd = -1;
 
     if (exec.fd == -1) {
-        if (xpipe2(pipefd, O_CLOEXEC) == -1)
+        if (xpipe2(pipefd.data(), O_CLOEXEC) == -1)
             return -1;
         outfd = pipefd[1];
     } else if (exec.fd >= 0) {

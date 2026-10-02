@@ -61,7 +61,6 @@ mod ffi {
         fn parse_prop_file_rs(name: Utf8CStrRef, f: &FnBoolStrStr);
         #[cxx_name = "file_readline"]
         fn file_readline_for_cxx(fd: i32, f: &FnBoolStr);
-        fn xpipe2(fds: &mut [i32; 2], flags: i32) -> i32;
     }
 
     #[namespace = "rust"]
@@ -74,4 +73,3 @@ mod ffi {
         fn map_fd_for_cxx(fd: i32, sz: usize, rw: bool) -> &'static mut [u8];
     }
 }
-
