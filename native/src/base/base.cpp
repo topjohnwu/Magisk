@@ -1,5 +1,4 @@
 #include <sys/mman.h>
-#include <android/log.h>
 
 #include <base.hpp>
 #include <flags.h>
@@ -122,6 +121,8 @@ static int fmt_and_log_with_rs(LogLevel level, const char *fmt, va_list ap) {
     return len;
 }
 
+#if __has_include(<android/log.h>)
+#include <android/log.h>
 // Used to override external C library logging
 extern "C" int magisk_log_print(int prio, const char *tag, const char *fmt, ...) {
     LogLevel level;
@@ -158,6 +159,7 @@ extern "C" int magisk_log_print(int prio, const char *tag, const char *fmt, ...)
     va_end(argv);
     return ret;
 }
+#endif // __has_include(<android/log.h>)
 
 #define LOG_BODY(level)   \
     va_list argv;         \
@@ -174,11 +176,6 @@ void LOGD(const char *fmt, ...) {}
 void LOGI(const char *fmt, ...) { LOG_BODY(Info) }
 void LOGW(const char *fmt, ...) { LOG_BODY(Warn) }
 void LOGE(const char *fmt, ...) { LOG_BODY(Error) }
-
-// Export raw symbol to fortify compat
-extern "C" void __vloge(const char* fmt, va_list ap) {
-    fmt_and_log_with_rs(LogLevel::Error, fmt, ap);
-}
 
 string full_read(int fd) {
     string str;
