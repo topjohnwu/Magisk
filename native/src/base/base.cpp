@@ -1,21 +1,10 @@
 #include <sys/mman.h>
 #include <android/log.h>
-#include <linux/fs.h>
 
 #include <base.hpp>
 #include <flags.h>
 
 using namespace std;
-
-#ifndef __call_bypassing_fortify
-#define __call_bypassing_fortify(fn) (&fn)
-#endif
-
-#ifdef __LP64__
-static_assert(BLKGETSIZE64 == 0x80081272);
-#else
-static_assert(BLKGETSIZE64 == 0x80041272);
-#endif
 
 rust::Vec<size_t> byte_data::patch(byte_view from, byte_view to) const {
     rust::Vec<size_t> v;
@@ -128,7 +117,7 @@ static int fmt_and_log_with_rs(LogLevel level, const char *fmt, va_list ap) {
     char buf[sz];
     buf[0] = '\0';
     // Fortify logs when a fatal error occurs. Do not run through fortify again
-    int len = std::min(__call_bypassing_fortify(vsnprintf)(buf, sz, fmt, ap), sz - 1);
+    int len = std::min((&vsnprintf)(buf, sz, fmt, ap), sz - 1);
     log_with_rs(level, Utf8CStr(buf, len + 1));
     return len;
 }

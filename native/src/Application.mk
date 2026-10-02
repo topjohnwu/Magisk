@@ -1,5 +1,5 @@
 APP_BUILD_SCRIPT := src/Android.mk
-APP_CFLAGS       := -Wall -Oz -fomit-frame-pointer
+APP_CFLAGS       := -Wall -Oz -fomit-frame-pointer -D_FILE_OFFSET_BITS=64
 APP_CPPFLAGS     := -std=c++23
 APP_STL          := none
 APP_PLATFORM     := android-23

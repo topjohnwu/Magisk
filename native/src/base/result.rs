@@ -270,6 +270,15 @@ impl<T> LibcReturn for *mut T {
     }
 }
 
+impl<T> LibcReturn for std::io::Result<T> {
+    type Value = T;
+
+    #[inline(always)]
+    fn check_err(self) -> nix::Result<Self::Value> {
+        self.map_err(|e| e.raw_os_error().map_or_else(Errno::last, Errno::from_raw))
+    }
+}
+
 impl<T> LibcReturn for nix::Result<T> {
     type Value = T;
 

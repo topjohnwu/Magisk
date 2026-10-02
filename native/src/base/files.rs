@@ -757,11 +757,6 @@ impl Drop for MappedFile {
     }
 }
 
-unsafe extern "C" {
-    // Don't use the declaration from the libc crate as request should be u32 not i32
-    fn ioctl(fd: RawFd, request: u32, ...) -> i32;
-}
-
 // We mark the returned slice static because it is valid until explicitly unmapped
 pub(crate) fn map_file(path: &Utf8CStr, rw: bool) -> OsResult<'_, &'static mut [u8]> {
     map_file_at(AT_FDCWD, path, rw)
@@ -772,27 +767,21 @@ pub(crate) fn map_file_at<'a>(
     path: &'a Utf8CStr,
     rw: bool,
 ) -> OsResult<'a, &'static mut [u8]> {
-    #[cfg(target_pointer_width = "64")]
-    const BLKGETSIZE64: u32 = 0x80081272;
-
-    #[cfg(target_pointer_width = "32")]
-    const BLKGETSIZE64: u32 = 0x80041272;
-
     let flag = if rw { OFlag::O_RDWR } else { OFlag::O_RDONLY };
     let fd = nix::fcntl::openat(dirfd, path, flag | OFlag::O_CLOEXEC, Mode::empty())
         .into_os_result("openat", Some(path), None)?;
-    let attr = fd_get_attr(fd.as_raw_fd())?;
+    let mut file = File::from(fd);
+    let attr = fd_get_attr(file.as_raw_fd())?;
     let sz = if attr.is_block_device() {
-        let mut sz = 0_u64;
-        unsafe {
-            ioctl(fd.as_raw_fd(), BLKGETSIZE64, &mut sz).check_os_err("ioctl", Some(path), None)?;
-        }
-        sz
+        // Use the seek function from std::fs instead of nix so that the API is consistent
+        // across all Unix OS (lseek64 does not exist on macOS).
+        file.seek(SeekFrom::End(0))
+            .into_os_result("lseek", Some(path), None)?
     } else {
         attr.st.st_size as u64
     };
 
-    map_fd(fd.as_fd(), sz as usize, rw).map_err(|e| e.set_args(Some(path), None))
+    map_fd(file.as_fd(), sz as usize, rw).map_err(|e| e.set_args(Some(path), None))
 }
 
 pub(crate) fn map_fd(fd: BorrowedFd, sz: usize, rw: bool) -> OsResult<'static, &'static mut [u8]> {
