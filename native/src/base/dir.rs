@@ -1,7 +1,7 @@
 use crate::cxx_extern::readlinkat;
 use crate::{
     FsPathBuilder, LibcReturn, LoggedResult, OsError, OsResult, Utf8CStr, Utf8CStrBuf, cstr,
-    fd_path, fd_set_attr,
+    fd_get_attr, fd_set_attr,
 };
 use libc::{dirent, mode_t};
 use nix::errno::Errno;
@@ -35,8 +35,9 @@ impl DirEntry<'_> {
         }
     }
 
-    pub fn resolve_path(&self, buf: &mut dyn Utf8CStrBuf) -> OsResult<'static, ()> {
-        self.dir.path_at(self.name(), buf)
+    pub fn get_stat(&self) -> OsResult<'_, libc::stat> {
+        nix::sys::stat::fstatat(self.dir, self.name(), AtFlags::AT_SYMLINK_NOFOLLOW)
+            .into_os_result("fstatat", Some(self.name()), None)
     }
 
     pub fn is_dir(&self) -> bool {
@@ -141,12 +142,6 @@ impl Directory {
             Mode::from_bits_truncate(mode),
         )
         .into_os_result("openat", Some(name), None)
-    }
-
-    fn path_at(&self, name: &Utf8CStr, buf: &mut dyn Utf8CStrBuf) -> OsResult<'static, ()> {
-        self.resolve_path(buf)?;
-        buf.append_path(name);
-        Ok(())
     }
 }
 
@@ -258,10 +253,6 @@ impl Directory {
         nix::sys::stat::fstatat(self, path, AtFlags::AT_SYMLINK_NOFOLLOW).is_ok()
     }
 
-    pub fn resolve_path(&self, buf: &mut dyn Utf8CStrBuf) -> OsResult<'static, ()> {
-        fd_path(self.as_raw_fd(), buf)
-    }
-
     pub fn rename_at<'a>(
         &self,
         old: &'a Utf8CStr,
@@ -272,6 +263,38 @@ impl Directory {
     }
 }
 
+pub fn post_order_walk<F: FnMut(&DirEntry, &Utf8CStr) -> LoggedResult<WalkResult>>(
+    path: &Utf8CStr,
+    mut f: F,
+) -> LoggedResult<WalkResult> {
+    let mut dir = Directory::open(path)?;
+    let mut buf = cstr::buf::default();
+    buf.append_path(path);
+    while buf.ends_with('/') && buf.len() > 1 {
+        buf.truncate(buf.len() - 1);
+    }
+    dir.post_order_walk_impl(Some(&mut buf), &mut |e, p| match p {
+        Some(p) => f(e, p),
+        None => unreachable!(),
+    })
+}
+
+pub fn pre_order_walk<F: FnMut(&DirEntry, &Utf8CStr) -> LoggedResult<WalkResult>>(
+    path: &Utf8CStr,
+    mut f: F,
+) -> LoggedResult<WalkResult> {
+    let mut dir = Directory::open(path)?;
+    let mut buf = cstr::buf::default();
+    buf.append_path(path);
+    while buf.ends_with('/') && buf.len() > 1 {
+        buf.truncate(buf.len() - 1);
+    }
+    dir.pre_order_walk_impl(Some(&mut buf), &mut |e, p| match p {
+        Some(p) => f(e, p),
+        None => unreachable!(),
+    })
+}
+
 // High-level helper methods, composed of multiple operations.
 // We should treat these as application logic and log ASAP, so return LoggedResult.
 impl Directory {
@@ -279,14 +302,14 @@ impl Directory {
         &mut self,
         mut f: F,
     ) -> LoggedResult<WalkResult> {
-        self.post_order_walk_impl(&mut f)
+        self.post_order_walk_impl(None, &mut |e, _| f(e))
     }
 
     pub fn pre_order_walk<F: FnMut(&DirEntry) -> LoggedResult<WalkResult>>(
         &mut self,
         mut f: F,
     ) -> LoggedResult<WalkResult> {
-        self.pre_order_walk_impl(&mut f)
+        self.pre_order_walk_impl(None, &mut |e, _| f(e))
     }
 
     pub fn remove_all(mut self) -> LoggedResult<()> {
@@ -297,9 +320,17 @@ impl Directory {
         Ok(())
     }
 
-    pub fn copy_into(&mut self, dir: &Directory) -> LoggedResult<()> {
-        let mut buf = cstr::buf::default();
-        self.copy_into_impl(dir, &mut buf)
+    pub fn copy_into(
+        &mut self,
+        dir: &Directory,
+        src_path: &Utf8CStr,
+        dest_path: &Utf8CStr,
+    ) -> LoggedResult<()> {
+        let mut src_buf = cstr::buf::default();
+        let mut dest_buf = cstr::buf::default();
+        src_buf.push_str(src_path.as_str());
+        dest_buf.push_str(dest_path.as_str());
+        self.copy_into_impl(dir, &mut src_buf, &mut dest_buf)
     }
 
     pub fn move_into(&mut self, dir: &Directory) -> LoggedResult<()> {
@@ -317,28 +348,39 @@ impl Directory {
     }
 
     pub fn link_into(&mut self, dir: &Directory) -> LoggedResult<()> {
-        let mut buf = cstr::buf::default();
-        self.link_into_impl(dir, &mut buf)
+        self.link_into_impl(dir)
     }
 }
 
 impl Directory {
-    fn post_order_walk_impl<F: FnMut(&DirEntry) -> LoggedResult<WalkResult>>(
+    fn post_order_walk_impl<F: FnMut(&DirEntry, Option<&Utf8CStr>) -> LoggedResult<WalkResult>>(
         &mut self,
+        mut path: Option<&mut dyn Utf8CStrBuf>,
         f: &mut F,
     ) -> LoggedResult<WalkResult> {
         use WalkResult::*;
+        let base_len = path.as_ref().map(|b| b.len()).unwrap_or(0);
         loop {
             match self.read()? {
                 None => return Ok(Continue),
                 Some(ref e) => {
+                    if let Some(buf) = path.as_mut() {
+                        buf.truncate(base_len);
+                        buf.append_path(e.name());
+                    }
                     if e.is_dir() {
                         let mut dir = e.open_as_dir()?;
-                        if let Abort = dir.post_order_walk_impl(f)? {
+                        let sub_path = path.as_mut().map(|b| &mut **b as &mut dyn Utf8CStrBuf);
+                        if let Abort = dir.post_order_walk_impl(sub_path, f)? {
                             return Ok(Abort);
                         }
+                        if let Some(buf) = path.as_mut() {
+                            buf.truncate(base_len);
+                            buf.append_path(e.name());
+                        }
                     }
-                    match f(e)? {
+                    let entry_path = path.as_ref().map(|b| b.as_ref());
+                    match f(e, entry_path)? {
                         Abort => return Ok(Abort),
                         Skip => return Ok(Continue),
                         Continue => {}
@@ -348,26 +390,37 @@ impl Directory {
         }
     }
 
-    fn pre_order_walk_impl<F: FnMut(&DirEntry) -> LoggedResult<WalkResult>>(
+    fn pre_order_walk_impl<F: FnMut(&DirEntry, Option<&Utf8CStr>) -> LoggedResult<WalkResult>>(
         &mut self,
+        mut path: Option<&mut dyn Utf8CStrBuf>,
         f: &mut F,
     ) -> LoggedResult<WalkResult> {
         use WalkResult::*;
+        let base_len = path.as_ref().map(|b| b.len()).unwrap_or(0);
         loop {
             match self.read()? {
                 None => return Ok(Continue),
-                Some(ref e) => match f(e)? {
-                    Abort => return Ok(Abort),
-                    Skip => continue,
-                    Continue => {
-                        if e.is_dir() {
-                            let mut dir = e.open_as_dir()?;
-                            if let Abort = dir.pre_order_walk_impl(f)? {
-                                return Ok(Abort);
+                Some(ref e) => {
+                    if let Some(buf) = path.as_mut() {
+                        buf.truncate(base_len);
+                        buf.append_path(e.name());
+                    }
+                    let entry_path = path.as_ref().map(|b| b.as_ref());
+                    match f(e, entry_path)? {
+                        Abort => return Ok(Abort),
+                        Skip => continue,
+                        Continue => {
+                            if e.is_dir() {
+                                let mut dir = e.open_as_dir()?;
+                                let sub_path =
+                                    path.as_mut().map(|b| &mut **b as &mut dyn Utf8CStrBuf);
+                                if let Abort = dir.pre_order_walk_impl(sub_path, f)? {
+                                    return Ok(Abort);
+                                }
                             }
                         }
                     }
-                },
+                }
             }
         }
     }
@@ -375,16 +428,22 @@ impl Directory {
     fn copy_into_impl(
         &mut self,
         dest_dir: &Directory,
-        buf: &mut dyn Utf8CStrBuf,
+        src_buf: &mut dyn Utf8CStrBuf,
+        dest_buf: &mut dyn Utf8CStrBuf,
     ) -> LoggedResult<()> {
+        let src_len = src_buf.len();
+        let dest_len = dest_buf.len();
         while let Some(ref e) = self.read()? {
-            e.resolve_path(buf)?;
-            let attr = buf.get_attr()?;
+            src_buf.truncate(src_len);
+            dest_buf.truncate(dest_len);
+            src_buf.append_path(e.name());
+            dest_buf.append_path(e.name());
             if e.is_dir() {
                 dest_dir.mkdir_at(e.name(), 0o777)?;
                 let mut src = e.open_as_dir()?;
                 let dest = dest_dir.open_as_dir_at(e.name())?;
-                src.copy_into_impl(&dest, buf)?;
+                let attr = fd_get_attr(src.as_raw_fd())?;
+                src.copy_into_impl(&dest, src_buf, dest_buf)?;
                 fd_set_attr(dest.as_raw_fd(), &attr)?;
             } else if e.is_file() {
                 let mut src = e.open_as_file(OFlag::O_RDONLY)?;
@@ -393,31 +452,28 @@ impl Directory {
                     OFlag::O_WRONLY | OFlag::O_CREAT | OFlag::O_TRUNC,
                     0o777,
                 )?;
+                let attr = fd_get_attr(src.as_raw_fd())?;
                 std::io::copy(&mut src, &mut dest)?;
                 fd_set_attr(dest.as_raw_fd(), &attr)?;
             } else if e.is_symlink() {
-                e.read_link(buf)?;
-                dest_dir.create_symlink_at(e.name(), buf)?;
-                dest_dir.path_at(e.name(), buf)?;
-                buf.set_attr(&attr)?;
+                let attr = src_buf.get_attr()?;
+                let mut link_buf = cstr::buf::default();
+                e.read_link(&mut link_buf)?;
+                dest_dir.create_symlink_at(e.name(), &link_buf)?;
+                dest_buf.set_attr(&attr)?;
             }
         }
         Ok(())
     }
 
-    fn link_into_impl(
-        &mut self,
-        dest_dir: &Directory,
-        buf: &mut dyn Utf8CStrBuf,
-    ) -> LoggedResult<()> {
+    fn link_into_impl(&mut self, dest_dir: &Directory) -> LoggedResult<()> {
         while let Some(ref e) = self.read()? {
             if e.is_dir() {
                 dest_dir.mkdir_at(e.name(), 0o777)?;
-                e.resolve_path(buf)?;
-                let attr = buf.get_attr()?;
                 let mut src = e.open_as_dir()?;
+                let attr = fd_get_attr(src.as_raw_fd())?;
                 let dest = dest_dir.open_as_dir_at(e.name())?;
-                src.link_into_impl(&dest, buf)?;
+                src.link_into_impl(&dest)?;
                 fd_set_attr(dest.as_raw_fd(), &attr)?;
             } else {
                 nix::unistd::linkat(e.dir, e.name(), dest_dir, e.name(), AtFlags::empty())

@@ -17,21 +17,6 @@ use cfg_if::cfg_if;
 use libc::{c_char, mode_t};
 use nix::fcntl::OFlag;
 
-#[unsafe(no_mangle)]
-unsafe extern "C" fn canonical_path(path: *const c_char, buf: *mut u8, bufsz: usize) -> isize {
-    unsafe {
-        match Utf8CStr::from_ptr(path) {
-            Ok(path) => {
-                let mut buf = cstr::buf::wrap_ptr(buf, bufsz);
-                path.realpath(&mut buf)
-                    .log()
-                    .map_or(-1_isize, |_| buf.len() as isize)
-            }
-            Err(_) => -1,
-        }
-    }
-}
-
 #[unsafe(export_name = "mkdirs")]
 unsafe extern "C" fn mkdirs_for_cxx(path: *const c_char, mode: mode_t) -> i32 {
     unsafe {

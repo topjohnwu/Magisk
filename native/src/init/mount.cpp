@@ -16,7 +16,6 @@ struct devinfo {
     char devname[32];
     char partname[32];
     char dmname[32];
-    char devpath[PATH_MAX];
 };
 
 static vector<devinfo> dev_list;
@@ -27,7 +26,6 @@ bool avd_hack = false;
 
 static void parse_device(devinfo *dev, const char *uevent) {
     dev->partname[0] = '\0';
-    dev->devpath[0] = '\0';
     dev->dmname[0] = '\0';
     dev->devname[0] = '\0';
     parse_prop_file(uevent, [=](Utf8CStr key, Utf8CStr value) -> bool {
@@ -38,7 +36,7 @@ static void parse_device(devinfo *dev, const char *uevent) {
         else if (key == "DEVNAME")
             strscpy(dev->devname, value.c_str(), sizeof(dev->devname));
         else if (key == "PARTNAME")
-            strscpy(dev->partname, value.c_str(), sizeof(dev->devname));
+            strscpy(dev->partname, value.c_str(), sizeof(dev->partname));
 
         return true;
     });
@@ -64,8 +62,6 @@ void MagiskInit::collect_devices() const noexcept {
                 // use androidboot.partition_map as partname fallback.
                 strscpy(dev.partname, it->value.data(), sizeof(dev.partname));
             }
-            sprintf(path, "/sys/dev/block/%s", entry->d_name);
-            xrealpath(path, dev.devpath, sizeof(dev.devpath));
             dev_list.push_back(dev);
         }
     }
@@ -84,8 +80,6 @@ uint64_t MagiskInit::find_block(const char *partname) const noexcept {
                 name = dev.dmname;
             else if (strcasecmp(dev.devname, partname) == 0)
                 name = dev.devname;
-            else if (std::string_view(dev.devpath).ends_with("/"s + partname))
-                name = dev.devpath;
             else
                 continue;
 

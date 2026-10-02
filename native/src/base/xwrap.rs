@@ -1,7 +1,7 @@
 // Functions in this file are only for exporting to C++, DO NOT USE IN RUST
 
 use crate::cxx_extern::readlinkat;
-use crate::{Directory, LibcReturn, ResultExt, Utf8CStr, cstr, slice_from_ptr, slice_from_ptr_mut};
+use crate::{Directory, LibcReturn, ResultExt, Utf8CStr, slice_from_ptr, slice_from_ptr_mut};
 use libc::{c_char, c_uint, c_ulong, c_void, dev_t, mode_t, off_t};
 use std::ffi::CStr;
 use std::fs::File;
@@ -17,21 +17,6 @@ fn ptr_to_str<'a>(ptr: *const c_char) -> Option<&'a str> {
         None
     } else {
         unsafe { CStr::from_ptr(ptr) }.to_str().ok()
-    }
-}
-
-#[unsafe(no_mangle)]
-unsafe extern "C" fn xrealpath(path: *const c_char, buf: *mut u8, bufsz: usize) -> isize {
-    unsafe {
-        match Utf8CStr::from_ptr(path) {
-            Ok(path) => {
-                let mut buf = cstr::buf::wrap_ptr(buf, bufsz);
-                path.realpath(&mut buf)
-                    .log()
-                    .map_or(-1, |_| buf.len() as isize)
-            }
-            Err(_) => -1,
-        }
     }
 }
 

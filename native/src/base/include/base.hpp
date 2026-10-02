@@ -46,13 +46,11 @@ int xmkdir(const char *pathname, mode_t mode);
 int xmkdirs(const char *pathname, mode_t mode);
 ssize_t xsendfile(int out_fd, int in_fd, off_t *offset, size_t count);
 pid_t xfork();
-ssize_t xrealpath(const char * __restrict__ path, char * __restrict__ buf, size_t bufsiz);
 int xmknod(const char * pathname, mode_t mode, dev_t dev);
 
 // Utils
 
 int mkdirs(const char *path, mode_t mode);
-ssize_t canonical_path(const char * __restrict__ path, char * __restrict__ buf, size_t bufsiz);
 bool rm_rf(const char *path);
 bool cp_afc(const char *src, const char *dest);
 bool mv_path(const char *src, const char *dest);

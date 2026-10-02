@@ -4,7 +4,7 @@ use crate::ffi::{DbEntryKey, get_magisk_tmp, install_apk, uninstall_pkg};
 use base::WalkResult::{Abort, Continue, Skip};
 use base::{
     BufReadExt, Directory, FsPathBuilder, LoggedResult, ReadExt, ResultExt, Utf8CStrBuf,
-    Utf8CString, cstr, error, fd_get_attr, warn,
+    Utf8CString, cstr, error, fd_get_attr, pre_order_walk, warn,
 };
 use bit_set::BitSet;
 use nix::fcntl::OFlag;
@@ -150,15 +150,15 @@ fn read_certificate(apk: &mut File, version: i32) -> Vec<u8> {
 }
 
 fn find_apk_path(pkg: &str) -> LoggedResult<Utf8CString> {
-    let mut buf = cstr::buf::default();
-    Directory::open(cstr!("/data/app"))?.pre_order_walk(|e| {
+    let mut buf = Utf8CString::default();
+    pre_order_walk(cstr!("/data/app"), |e, path| {
         if !e.is_dir() {
             return Ok(Skip);
         }
         let name_bytes = e.name().as_bytes();
-        if name_bytes.starts_with(pkg.as_bytes()) && name_bytes[pkg.len()] == b'-' {
+        if name_bytes.starts_with(pkg.as_bytes()) && name_bytes.get(pkg.len()) == Some(&b'-') {
             // Found the APK path, we can abort now
-            e.resolve_path(&mut buf)?;
+            buf.append_path(path).append_path("base.apk");
             return Ok(Abort);
         }
         if name_bytes.starts_with(b"~~") {
@@ -166,10 +166,7 @@ fn find_apk_path(pkg: &str) -> LoggedResult<Utf8CString> {
         }
         Ok(Skip)
     })?;
-    if !buf.is_empty() {
-        buf.push_str("/base.apk");
-    }
-    Ok(buf.to_owned())
+    Ok(buf)
 }
 
 enum Status {
@@ -492,19 +489,12 @@ impl MagiskD {
                     Ok(dir) => dir,
                 };
                 // For each package
-                loop {
-                    match user_dir.read()? {
-                        None => break,
-                        Some(e) => {
-                            let mut entry_path = cstr::buf::default();
-                            e.resolve_path(&mut entry_path)?;
-                            let attr = entry_path.get_attr()?;
-                            let app_id = to_app_id(attr.st.st_uid as i32);
-                            if (AID_APP_START..=AID_APP_END).contains(&app_id) {
-                                let app_no = app_id - AID_APP_START;
-                                list.insert(app_no as usize);
-                            }
-                        }
+                while let Some(e) = user_dir.read()? {
+                    let st = e.get_stat()?;
+                    let app_id = to_app_id(st.st_uid as i32);
+                    if (AID_APP_START..=AID_APP_END).contains(&app_id) {
+                        let app_no = app_id - AID_APP_START;
+                        list.insert(app_no as usize);
                     }
                 }
             }

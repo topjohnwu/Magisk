@@ -420,9 +420,10 @@ void exec_root_shell(int client, int pid, SuRequest &req, MntNsMode mode) {
     umask(022);
     char path[32];
     ssprintf(path, sizeof(path), "/proc/%d/cwd", pid);
-    char cwd[4096];
-    if (canonical_path(path, cwd, sizeof(cwd)) > 0)
+    if (auto cwd = realpath(path, nullptr)) {
         chdir(cwd);
+        free(cwd);
+    }
     ssprintf(path, sizeof(path), "/proc/%d/environ", pid);
     auto env = full_read(path);
     clearenv();

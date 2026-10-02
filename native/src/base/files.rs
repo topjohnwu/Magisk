@@ -148,13 +148,6 @@ fn open_fd(path: &Utf8CStr, flags: OFlag, mode: mode_t) -> OsResult<'_, OwnedFd>
     )
 }
 
-pub fn fd_path(fd: RawFd, buf: &mut dyn Utf8CStrBuf) -> OsResult<'static, ()> {
-    let path = cstr::buf::new::<64>()
-        .join_path("/proc/self/fd")
-        .join_path_fmt(fd);
-    path.read_link(buf).map_err(|e| e.set_args(None, None))
-}
-
 pub struct FileAttr {
     pub st: libc::stat,
     #[cfg(feature = "selinux")]
@@ -264,29 +257,6 @@ impl Utf8CStr {
             Ok(_) | Err(Errno::EEXIST) => Ok(()),
             Err(e) => Err(OsError::new(e, "mkdir", Some(self), None)),
         }
-    }
-
-    // Inspired by https://android.googlesource.com/platform/bionic/+/master/libc/bionic/realpath.cpp
-    pub fn realpath(&self, buf: &mut dyn Utf8CStrBuf) -> OsResult<'_, ()> {
-        let fd = self.open(OFlag::O_PATH | OFlag::O_CLOEXEC)?;
-        let mut skip_check = false;
-
-        let st1 = match nix::sys::stat::fstat(&fd) {
-            Ok(st) => st,
-            Err(_) => {
-                // This will only fail on Linux < 3.6
-                skip_check = true;
-                unsafe { mem::zeroed() }
-            }
-        };
-
-        fd_path(fd.as_raw_fd(), buf)?;
-
-        let st2 = nix::sys::stat::stat(buf.as_cstr()).into_os_result("stat", Some(self), None)?;
-        if !skip_check && (st2.st_dev != st1.st_dev || st2.st_ino != st1.st_ino) {
-            return Err(OsError::new(Errno::ENOENT, "realpath", Some(self), None));
-        }
-        Ok(())
     }
 
     pub fn get_attr(&self) -> OsResult<'_, FileAttr> {
@@ -443,7 +413,7 @@ impl Utf8CStr {
             path.mkdir(0o777)?;
             let mut src = Directory::open(self)?;
             let dest = Directory::open(path)?;
-            src.copy_into(&dest)?;
+            src.copy_into(&dest, self, path)?;
         } else {
             // It's OK if remove failed
             path.remove().ok();
