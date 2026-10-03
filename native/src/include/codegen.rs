@@ -39,7 +39,6 @@ fn write_if_diff<P: AsRef<Path>>(path: P, bytes: &[u8]) -> io::Result<()> {
 pub fn gen_cxx_binding(name: &str) {
     println!("cargo:rerun-if-changed=lib.rs");
     let mut opt = Opt::default();
-    opt.cxx_impl_annotations = Some("[[gnu::always_inline]]".to_string());
     opt.include.push(Include {
         path: "rust/cxx.h".to_string(),
         kind: IncludeKind::Bracketed,

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstring>
 #include <base.hpp>
 
 #define HEADER_FILE     "header"

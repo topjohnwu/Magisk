@@ -5,9 +5,16 @@
 #include <dirent.h>
 #include <fcntl.h>
 #include <pthread.h>
+#include <cstdarg>
+#include <cstring>
+#include <memory>
 #include <functional>
 
 #include <rust/cxx.h>
+
+#ifndef __printflike
+#define __printflike(a, b) __attribute__((__format__(__printf__, a, b)))
+#endif
 
 void LOGD(const char *fmt, ...) __printflike(1, 2);
 void LOGI(const char *fmt, ...) __printflike(1, 2);

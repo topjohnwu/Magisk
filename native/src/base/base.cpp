@@ -107,7 +107,15 @@ int ssprintf(char *dest, size_t size, const char *fmt, ...) {
 
 #undef strlcpy
 size_t strscpy(char *dest, const char *src, size_t size) {
-    return std::min(strlcpy(dest, src, size), size - 1);
+    if (size == 0) return 0;
+    size_t len = strlen(src);
+    if (len >= size) {
+        memcpy(dest, src, size - 1);
+        dest[size - 1] = '\0';
+        return size - 1;
+    }
+    memcpy(dest, src, len + 1);
+    return len;
 }
 
 #undef vsnprintf

@@ -12,6 +12,7 @@ fn main() {
         build
             .cpp(true)
             .std("c++23")
+            .define("_GNU_SOURCE", None)
             .include("include")
             .include("../include")
             .include("../../out/generated")
