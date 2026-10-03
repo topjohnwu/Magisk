@@ -230,19 +230,14 @@ sepol_impl::~sepol_impl() {
     free(db);
 }
 
-static int vec_write(void *v, const char *buf, int len) {
-    auto vec = static_cast<vector<char> *>(v);
-    vec->insert(vec->end(), buf, buf + len);
-    return len;
-}
-
 bool SePolicy::to_file(::Utf8CStr file) const noexcept {
     // No partial writes are allowed to /sys/fs/selinux/load, thus the reason why we
     // first dump everything into memory, then directly call write system call
-    vector<char> out;
-    FILE *fp = funopen(&out, nullptr, vec_write, nullptr, nullptr);
-    // Since we're directly writing to memory, disable buffering
-    setbuf(fp, nullptr);
+    char *buf = nullptr;
+    size_t len = 0;
+    FILE *fp = open_memstream(&buf, &len);
+    if (!fp)
+        return false;
 
     policy_file_t pf;
     policy_file_init(&pf);
@@ -251,18 +246,22 @@ bool SePolicy::to_file(::Utf8CStr file) const noexcept {
     if (policydb_write(impl->db, &pf)) {
         LOGE("Fail to create policy image\n");
         fclose(fp);
+        free(buf);
         return false;
     }
     fclose(fp);
 
     int fd = xopen(file.data(), O_WRONLY | O_CREAT | O_CLOEXEC, 0644);
-    if (fd < 0)
+    if (fd < 0) {
+        free(buf);
         return false;
+    }
     if (struct stat st{}; xfstat(fd, &st) == 0 && st.st_size > 0) {
         ftruncate(fd, 0);
     }
-    xwrite(fd, out.data(), out.size());
+    xwrite(fd, buf, len);
 
     close(fd);
+    free(buf);
     return true;
 }
