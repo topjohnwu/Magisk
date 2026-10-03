@@ -9,6 +9,7 @@ use sign::{SHA, get_sha, sha256_hash, sign_payload_for_cxx};
 use std::env;
 
 mod cli;
+pub use cli::main;
 mod compress;
 mod cpio;
 mod dtb;

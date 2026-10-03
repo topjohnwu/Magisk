@@ -230,7 +230,7 @@ def build_rust_src(targets: set[str]):
     os.chdir(Path("native", "src"))
 
     # Start building the build commands
-    cmds = ["cargo", "build"]
+    cmds = ["cargo", "build", "--lib"]
     if args.release:
         cmds.append("-r")
         profile = "release"

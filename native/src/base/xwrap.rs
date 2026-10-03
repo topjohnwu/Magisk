@@ -2,7 +2,7 @@
 
 use crate::cxx_extern::readlinkat;
 use crate::{Directory, LibcReturn, ResultExt, Utf8CStr, slice_from_ptr, slice_from_ptr_mut};
-use libc::{c_char, c_uint, c_ulong, c_void, dev_t, mode_t, off_t};
+use libc::{c_char, c_uint, c_void, dev_t, mode_t, off_t};
 use std::ffi::CStr;
 use std::fs::File;
 use std::io::{Read, Write};
@@ -17,6 +17,70 @@ fn ptr_to_str<'a>(ptr: *const c_char) -> Option<&'a str> {
         None
     } else {
         unsafe { CStr::from_ptr(ptr) }.to_str().ok()
+    }
+}
+
+#[cfg(any(target_os = "linux", target_os = "android"))]
+mod linux {
+    use crate::xwrap::ptr_to_str;
+    use crate::{LibcReturn, ResultExt};
+    use std::ffi::{c_char, c_void};
+    use std::os::fd::RawFd;
+
+    #[unsafe(no_mangle)]
+    extern "C" fn xsetns(fd: RawFd, nstype: i32) -> i32 {
+        unsafe {
+            libc::setns(fd, nstype)
+                .into_os_result("setns", None, None)
+                .log()
+                .unwrap_or(-1)
+        }
+    }
+
+    #[unsafe(no_mangle)]
+    extern "C" fn xunshare(flags: i32) -> i32 {
+        unsafe {
+            libc::unshare(flags)
+                .into_os_result("unshare", None, None)
+                .log()
+                .unwrap_or(-1)
+        }
+    }
+
+    #[unsafe(no_mangle)]
+    unsafe extern "C" fn xpipe2(fds: *mut i32, flags: i32) -> i32 {
+        unsafe {
+            libc::pipe2(fds, flags)
+                .into_os_result("pipe2", None, None)
+                .log()
+                .unwrap_or(-1)
+        }
+    }
+
+    #[unsafe(no_mangle)]
+    unsafe extern "C" fn xmount(
+        src: *const c_char,
+        target: *const c_char,
+        fstype: *const c_char,
+        flags: libc::c_ulong,
+        data: *const c_void,
+    ) -> i32 {
+        unsafe {
+            libc::mount(src, target, fstype, flags, data)
+                .into_os_result("mount", ptr_to_str(src), ptr_to_str(target))
+                .log()
+                .unwrap_or(-1)
+        }
+    }
+
+    #[unsafe(no_mangle)]
+    unsafe extern "C" fn xumount2(target: *const c_char, flags: i32) -> i32 {
+        unsafe {
+            libc::umount2(target, flags)
+                .into_os_result("umount2", ptr_to_str(target), None)
+                .log()
+                .unwrap_or(-1)
+        }
     }
 }
 
@@ -104,36 +168,6 @@ unsafe extern "C" fn xxread(fd: RawFd, buf: *mut u8, bufsz: usize) -> isize {
 }
 
 #[unsafe(no_mangle)]
-unsafe extern "C" fn xpipe2(fds: *mut i32, flags: i32) -> i32 {
-    unsafe {
-        libc::pipe2(fds, flags)
-            .into_os_result("pipe2", None, None)
-            .log()
-            .unwrap_or(-1)
-    }
-}
-
-#[unsafe(no_mangle)]
-extern "C" fn xsetns(fd: RawFd, nstype: i32) -> i32 {
-    unsafe {
-        libc::setns(fd, nstype)
-            .into_os_result("setns", None, None)
-            .log()
-            .unwrap_or(-1)
-    }
-}
-
-#[unsafe(no_mangle)]
-extern "C" fn xunshare(flags: i32) -> i32 {
-    unsafe {
-        libc::unshare(flags)
-            .into_os_result("unshare", None, None)
-            .log()
-            .unwrap_or(-1)
-    }
-}
-
-#[unsafe(no_mangle)]
 unsafe extern "C" fn xopendir(path: *const c_char) -> *mut libc::DIR {
     unsafe {
         libc::opendir(path)
@@ -203,32 +237,6 @@ unsafe extern "C" fn xsymlink(target: *const c_char, linkpath: *const c_char) ->
 }
 
 #[unsafe(no_mangle)]
-unsafe extern "C" fn xmount(
-    src: *const c_char,
-    target: *const c_char,
-    fstype: *const c_char,
-    flags: c_ulong,
-    data: *const c_void,
-) -> i32 {
-    unsafe {
-        libc::mount(src, target, fstype, flags, data)
-            .into_os_result("mount", ptr_to_str(src), ptr_to_str(target))
-            .log()
-            .unwrap_or(-1)
-    }
-}
-
-#[unsafe(no_mangle)]
-unsafe extern "C" fn xumount2(target: *const c_char, flags: i32) -> i32 {
-    unsafe {
-        libc::umount2(target, flags)
-            .into_os_result("umount2", ptr_to_str(target), None)
-            .log()
-            .unwrap_or(-1)
-    }
-}
-
-#[unsafe(no_mangle)]
 unsafe extern "C" fn xrename(oldname: *const c_char, newname: *const c_char) -> i32 {
     unsafe {
         libc::rename(oldname, newname)
@@ -265,11 +273,56 @@ unsafe extern "C" fn xsendfile(
     offset: *mut off_t,
     count: usize,
 ) -> isize {
+    #[cfg(any(target_os = "linux", target_os = "android"))]
     unsafe {
         libc::sendfile(out_fd, in_fd, offset, count)
             .into_os_result("sendfile", None, None)
             .log()
             .unwrap_or(-1)
+    }
+    #[cfg(not(any(target_os = "linux", target_os = "android")))]
+    unsafe {
+        let mut total = 0;
+        let mut buf = [0u8; 65536];
+        if !offset.is_null() {
+            let cur = libc::lseek(in_fd, *offset, libc::SEEK_SET);
+            if cur < 0 {
+                return (-1isize)
+                    .into_os_result("lseek", None, None)
+                    .log()
+                    .unwrap_or(-1);
+            }
+        }
+        while total < count {
+            let to_read = std::cmp::min(buf.len(), count - total);
+            let nread = libc::read(in_fd, buf.as_mut_ptr().cast(), to_read);
+            if nread < 0 {
+                return nread.into_os_result("read", None, None).log().unwrap_or(-1);
+            }
+            if nread == 0 {
+                break;
+            }
+            let mut written = 0;
+            while written < nread {
+                let nwrite = libc::write(
+                    out_fd,
+                    buf.as_ptr().add(written as usize).cast(),
+                    (nread - written) as usize,
+                );
+                if nwrite < 0 {
+                    return nwrite
+                        .into_os_result("write", None, None)
+                        .log()
+                        .unwrap_or(-1);
+                }
+                written += nwrite;
+            }
+            total += nread as usize;
+        }
+        if !offset.is_null() {
+            *offset += total as off_t;
+        }
+        total as isize
     }
 }
 

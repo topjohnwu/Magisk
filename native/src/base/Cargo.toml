@@ -14,6 +14,7 @@ workspace = true
 
 [build-dependencies]
 cxx-gen = { workspace = true }
+cc = { workspace = true }
 
 [dependencies]
 derive = { workspace = true }

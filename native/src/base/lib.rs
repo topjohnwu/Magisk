@@ -14,6 +14,8 @@ pub use ffi::Utf8CStrRef;
 pub use files::*;
 pub use logging::*;
 pub use misc::*;
+#[cfg(any(target_os = "linux", target_os = "android"))]
+pub use mount::*;
 pub use result::*;
 
 pub mod argh;
@@ -23,6 +25,7 @@ mod dir;
 mod files;
 mod logging;
 mod misc;
+#[cfg(any(target_os = "linux", target_os = "android"))]
 mod mount;
 mod result;
 mod xwrap;

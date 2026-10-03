@@ -10,6 +10,7 @@ version = "0.0.0"
 edition = "2024"
 
 [workspace.dependencies]
+cc = "1.0"
 base = { path = "base" }
 derive = { path = "base/derive" }
 magiskpolicy = { path = "sepolicy" }

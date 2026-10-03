@@ -26,4 +26,32 @@ fn main() {
             .build(),
     )
     .unwrap();
+
+    let target_os = std::env::var("CARGO_CFG_TARGET_OS").unwrap_or_default();
+    if target_os != "android" {
+        // Compile liblz4 C sources to satisfy lz4-sys extern symbols on host
+        let mut lz4_build = cc::Build::new();
+        lz4_build
+            .include("../external/lz4/lib")
+            .file("../external/lz4/lib/lz4.c")
+            .file("../external/lz4/lib/lz4frame.c")
+            .file("../external/lz4/lib/lz4hc.c")
+            .file("../external/lz4/lib/xxhash.c")
+            .warnings(false)
+            .compile("lz4");
+
+        // Compile magiskboot C++ sources
+        let mut build = cc::Build::new();
+        build
+            .cpp(true)
+            .std("c++23")
+            .include("../include")
+            .include("../base/include")
+            .include("../external/cxx-rs/include")
+            .include("../../out/generated")
+            .file("bootimg.cpp")
+            .file("boot-rs.cpp")
+            .warnings(false)
+            .compile("boot_cxx");
+    }
 }

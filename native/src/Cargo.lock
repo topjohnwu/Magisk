@@ -20,6 +20,7 @@ version = "0.0.0"
 dependencies = [
  "bitflags",
  "bytemuck",
+ "cc",
  "cfg-if",
  "const_format",
  "cxx",
@@ -639,6 +640,7 @@ dependencies = [
  "bytemuck",
  "byteorder",
  "bzip2",
+ "cc",
  "cxx",
  "cxx-gen",
  "der",

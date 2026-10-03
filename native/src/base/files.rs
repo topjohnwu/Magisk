@@ -3,17 +3,18 @@ use crate::{
     cstr, error,
 };
 use bytemuck::{Pod, bytes_of, bytes_of_mut};
-use libc::{c_uint, makedev, mode_t};
+use libc::mode_t;
 use nix::errno::Errno;
 use nix::fcntl::{AT_FDCWD, OFlag};
 use nix::sys::stat::{FchmodatFlags, Mode};
 use nix::unistd::{AccessFlags, Gid, Uid};
 use num_traits::AsPrimitive;
 use std::cmp::min;
+#[cfg(any(target_os = "linux", target_os = "android"))]
 use std::ffi::CStr;
 use std::fmt::Display;
 use std::fs::File;
-use std::io::{BufRead, BufReader, Read, Seek, SeekFrom, Write};
+use std::io::{BufRead, Read, Seek, SeekFrom, Write};
 use std::mem::MaybeUninit;
 use std::os::fd::{AsFd, BorrowedFd};
 use std::os::unix::ffi::OsStrExt;
@@ -172,7 +173,7 @@ impl FileAttr {
     #[inline(always)]
     #[allow(clippy::unnecessary_cast)]
     fn is(&self, mode: mode_t) -> bool {
-        (self.st.st_mode & libc::S_IFMT as c_uint) as mode_t == mode
+        (self.st.st_mode as mode_t & libc::S_IFMT as mode_t) == mode
     }
 
     pub fn is_dir(&self) -> bool {
@@ -208,6 +209,7 @@ impl FileAttr {
     }
 }
 
+#[cfg(any(target_os = "linux", target_os = "android"))]
 const XATTR_NAME_SELINUX: &CStr = c"security.selinux";
 
 // Low-level methods, we should track the caller when error occurs, so return OsResult.
@@ -297,6 +299,7 @@ impl Utf8CStr {
         Ok(())
     }
 
+    #[cfg(any(target_os = "linux", target_os = "android"))]
     pub fn get_secontext(&self, con: &mut dyn Utf8CStrBuf) -> OsResult<'_, ()> {
         con.clear();
         let result = unsafe {
@@ -319,6 +322,7 @@ impl Utf8CStr {
         }
     }
 
+    #[cfg(any(target_os = "linux", target_os = "android"))]
     pub fn set_secontext<'a>(&'a self, con: &'a Utf8CStr) -> OsResult<'a, ()> {
         unsafe {
             libc::lsetxattr(
@@ -525,6 +529,7 @@ impl FsPathFollow {
         Ok(())
     }
 
+    #[cfg(any(target_os = "linux", target_os = "android"))]
     pub fn get_secontext(&self, con: &mut dyn Utf8CStrBuf) -> OsResult<'_, ()> {
         con.clear();
         let result = unsafe {
@@ -547,6 +552,7 @@ impl FsPathFollow {
         }
     }
 
+    #[cfg(any(target_os = "linux", target_os = "android"))]
     pub fn set_secontext<'a>(&'a self, con: &'a Utf8CStr) -> OsResult<'a, ()> {
         unsafe {
             libc::setxattr(
@@ -638,6 +644,7 @@ pub fn fd_set_attr(fd: RawFd, attr: &FileAttr) -> OsResult<'_, ()> {
     Ok(())
 }
 
+#[cfg(any(target_os = "linux", target_os = "android"))]
 pub fn fd_get_secontext(fd: RawFd, con: &mut dyn Utf8CStrBuf) -> OsResult<'static, ()> {
     con.clear();
     let result = unsafe {
@@ -660,6 +667,7 @@ pub fn fd_get_secontext(fd: RawFd, con: &mut dyn Utf8CStrBuf) -> OsResult<'stati
     }
 }
 
+#[cfg(any(target_os = "linux", target_os = "android"))]
 pub fn fd_set_secontext(fd: RawFd, con: &Utf8CStr) -> OsResult<'_, ()> {
     unsafe {
         libc::fsetxattr(
@@ -774,83 +782,4 @@ pub(crate) fn map_fd(fd: BorrowedFd, sz: usize, rw: bool) -> OsResult<'static, &
         }
         Ok(slice::from_raw_parts_mut(ptr.cast(), sz))
     }
-}
-
-#[allow(dead_code)]
-pub struct MountInfo {
-    pub id: u32,
-    pub parent: u32,
-    pub device: u64,
-    pub root: String,
-    pub target: String,
-    pub vfs_option: String,
-    pub shared: u32,
-    pub master: u32,
-    pub propagation_from: u32,
-    pub unbindable: bool,
-    pub fs_type: String,
-    pub source: String,
-    pub fs_option: String,
-}
-
-#[allow(clippy::useless_conversion)]
-fn parse_mount_info_line(line: &str) -> Option<MountInfo> {
-    let mut iter = line.split_whitespace();
-    let id = iter.next()?.parse().ok()?;
-    let parent = iter.next()?.parse().ok()?;
-    let (maj, min) = iter.next()?.split_once(':')?;
-    let maj = maj.parse().ok()?;
-    let min = min.parse().ok()?;
-    let device = makedev(maj, min).into();
-    let root = iter.next()?.to_string();
-    let target = iter.next()?.to_string();
-    let vfs_option = iter.next()?.to_string();
-    let mut optional = iter.next()?;
-    let mut shared = 0;
-    let mut master = 0;
-    let mut propagation_from = 0;
-    let mut unbindable = false;
-    while optional != "-" {
-        if let Some(peer) = optional.strip_prefix("master:") {
-            master = peer.parse().ok()?;
-        } else if let Some(peer) = optional.strip_prefix("shared:") {
-            shared = peer.parse().ok()?;
-        } else if let Some(peer) = optional.strip_prefix("propagate_from:") {
-            propagation_from = peer.parse().ok()?;
-        } else if optional == "unbindable" {
-            unbindable = true;
-        }
-        optional = iter.next()?;
-    }
-    let fs_type = iter.next()?.to_string();
-    let source = iter.next()?.to_string();
-    let fs_option = iter.next()?.to_string();
-    Some(MountInfo {
-        id,
-        parent,
-        device,
-        root,
-        target,
-        vfs_option,
-        shared,
-        master,
-        propagation_from,
-        unbindable,
-        fs_type,
-        source,
-        fs_option,
-    })
-}
-
-pub fn parse_mount_info(pid: &str) -> Vec<MountInfo> {
-    let mut res = vec![];
-    let mut path = format!("/proc/{pid}/mountinfo");
-    if let Ok(file) = Utf8CStr::from_string(&mut path).open(OFlag::O_RDONLY | OFlag::O_CLOEXEC) {
-        BufReader::new(file).for_each_line(|line| {
-            parse_mount_info_line(line)
-                .map(|info| res.push(info))
-                .is_some()
-        });
-    }
-    res
 }
