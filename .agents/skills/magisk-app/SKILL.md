@@ -1,6 +1,6 @@
 ---
 name: magisk-app
-description: Guidelines, architecture, development conventions, and build workflows for the Magisk Android application (app/ subproject). Use when working on, modifying, building, or testing code in app/ or any of its submodules (:core, :apk, :shared, :stub, :stub-res, :test, :build-logic, :apk-legacy).
+description: Guidelines, architecture, development conventions, and build workflows for the Magisk Android application (app/ subproject). Use when working on, modifying, building, or testing code in app/ or any of its submodules (:core, :apk, :shared, :stub, :stub-res, :test, :build-logic).
 ---
 
 # Magisk App Subproject Guidelines
@@ -23,12 +23,10 @@ Multi-module Gradle project structure:
 - **`:stub-res`** (`stub-res/`): Stub-specific Android resources.
 - **`:test`** (`test/`): Application testing target.
 - **`:build-logic`** (`build-logic/`): Custom Gradle plugins and build logic.
-- **`:apk-legacy`** (`apk-legacy/`): Legacy app APK (View-based UI). **Maintenance mode:** Do NOT modify unless explicitly requested.
 
 ## 3. Development Guidelines
 
-- **Target Modules:** All active app development occurs in `:core` and `:apk`. Do NOT make changes to `:apk-legacy` unless explicitly requested.
-- **Legacy Compatibility:** When modifying `:core` and `:shared`, make sure the `:apk-legacy` module is still buildable.
+- **Target Modules:** All active app development occurs in `:core` and `:apk`.
 - **Language & UI:** Written in Kotlin/Java. **Prefer Kotlin for all new code.** Uses Jetpack Compose for UI (prefer over View XML).
 - **String Resources:** Default strings in `core/src/main/res/values/strings.xml` and `stub-res/src/main/res/values/strings.xml`. Translations go in `values-[lang]/strings.xml`.
 - **Data Stack:** Room, KSP, Wire (Protocol Buffers), Moshi.
@@ -38,7 +36,6 @@ Multi-module Gradle project structure:
 ### From `app/` directory (prefixed with `../scripts/env.py`):
 - **Build App (`:apk` Debug):** `../scripts/env.py ./gradlew :apk:assembleDebug`
 - **Build Stub APK:** `../scripts/env.py ./gradlew :stub:assembleDebug`
-- **Build Legacy APK (`:apk-legacy` Debug):** `../scripts/env.py ./gradlew :apk-legacy:assembleDebug`
 - **Run Lint:** `../scripts/env.py ./gradlew lint` (or `../scripts/env.py ./gradlew :apk:lintDebug`)
 - **Run Unit Tests:** `../scripts/env.py ./gradlew test`
 - **Clean Artifacts:** `../scripts/env.py ./gradlew clean`
@@ -46,5 +43,4 @@ Multi-module Gradle project structure:
 ### From repository root (via `build.py`):
 - **Build App (`:apk`):** `./build.py app`
 - **Build Stub App:** `./build.py stub`
-- **Build Legacy App (`:apk-legacy`):** `./build.py app-legacy`
 - **Run App Tests:** `./build.py test`
