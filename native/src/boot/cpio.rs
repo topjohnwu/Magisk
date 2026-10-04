@@ -15,7 +15,7 @@ use std::process::exit;
 use std::str;
 
 use crate::check_env;
-use crate::compress::{get_decoder, get_encoder};
+use crate::compress::{get_decoder, get_encoder_bcj_detection};
 use crate::ffi::FileFormat;
 use crate::patch::{patch_encryption, patch_verity};
 use base::libc::{
@@ -700,7 +700,7 @@ impl CpioEntry {
             return false;
         }
         let Ok(data) = || -> std::io::Result<Vec<u8>> {
-            let mut encoder = get_encoder(FileFormat::XZ, Vec::new())?;
+            let mut encoder = get_encoder_bcj_detection(FileFormat::XZ, Vec::new(), &self.data)?;
             encoder.write_all(&self.data)?;
             encoder.finish()
         }() else {

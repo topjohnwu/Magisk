@@ -1,5 +1,6 @@
 use crate::ffi::FileFormat;
 use base::{Utf8CStr, cstr, libc};
+use lzma_rust2::FilterType;
 use std::fmt::{Display, Formatter};
 use std::str::FromStr;
 
@@ -217,4 +218,51 @@ pub fn check_fmt(buf: &[u8]) -> FileFormat {
     } else {
         FileFormat::UNKNOWN
     }
+}
+
+fn is_raw_arm32(buf: &[u8]) -> bool {
+    // Only inspect the first 256 bytes (up to 64 instructions)
+    let sample = &buf[..buf.len().min(256)];
+    if sample.len() < 64 {
+        return false;
+    }
+    let words = sample.chunks_exact(4);
+    let count = words.len();
+    let arm_cond_count = words
+        .filter(|chunk| {
+            let top_nibble = chunk[3] >> 4;
+            top_nibble == 0xE || top_nibble == 0xF
+        })
+        .count();
+
+    arm_cond_count * 100 / count >= 75
+}
+
+pub fn detect_bcj_filter(buf: &[u8]) -> Option<FilterType> {
+    if buf.len() >= 20 && buf.starts_with(b"\x7fELF") {
+        let e_machine = match buf[5] {
+            1 => u16::from_le_bytes([buf[18], buf[19]]),
+            2 => u16::from_be_bytes([buf[18], buf[19]]),
+            _ => return None,
+        };
+        return match e_machine {
+            0x03 | 0x3E => Some(FilterType::BcjX86),
+            0x28 => Some(FilterType::BcjArmThumb),
+            0xB7 => Some(FilterType::BcjArm64),
+            0xF3 => Some(FilterType::BcjRiscv),
+            _ => None,
+        };
+    }
+
+    if buf.len() >= 0x3C && &buf[0x38..0x3C] == b"ARM\x64" {
+        return Some(FilterType::BcjArm64);
+    }
+    if buf.len() >= 0x34 && &buf[0x30..0x34] == b"RSC\x05" {
+        return Some(FilterType::BcjRiscv);
+    }
+    if is_raw_arm32(buf) {
+        return Some(FilterType::BcjArm);
+    }
+
+    None
 }
