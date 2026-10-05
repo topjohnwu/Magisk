@@ -246,6 +246,9 @@ impl MagiskD {
     }
 
     pub fn get_db_setting(&self, key: DbEntryKey) -> i32 {
+        if self.is_headless && key == DbEntryKey::SuMultiuserMode {
+            return MultiuserMode::User as i32;
+        }
         // Get default values
         let mut val = match key {
             DbEntryKey::RootAccess => RootAccess::default() as i32,
@@ -277,6 +280,9 @@ impl MagiskD {
         };
         self.db_exec_with_rows("SELECT * FROM settings", &[], &mut cfg)
             .sql_result()?;
+        if self.is_headless {
+            cfg.multiuser_mode = MultiuserMode::User;
+        }
         Ok(cfg)
     }
 

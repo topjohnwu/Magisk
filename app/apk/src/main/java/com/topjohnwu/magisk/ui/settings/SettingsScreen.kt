@@ -440,30 +440,32 @@ private fun SuperuserSection(
             color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
         )
 
-        // Multiuser Mode
-        val multiuserEntries = remember {
-            resources.getStringArray(CoreR.array.multiuser_mode).toList()
-        }
-        val multiuserDescriptions = remember {
-            resources.getStringArray(CoreR.array.multiuser_summary).toList()
-        }
-        var multiuserMode by remember { mutableIntStateOf(Config.suMultiuserMode) }
-        SettingsDropdown(
-            title = stringResource(CoreR.string.multiuser_mode),
-            summary = multiuserDescriptions.getOrElse(multiuserMode) { "" },
-            items = multiuserEntries,
-            selectedIndex = multiuserMode,
-            enabled = Const.USER_ID == 0,
-            onSelectedIndexChange = {
-                multiuserMode = it
-                Config.suMultiuserMode = it
+        if (!Info.isHeadlessSystemUser) {
+            // Multiuser Mode
+            val multiuserEntries = remember {
+                resources.getStringArray(CoreR.array.multiuser_mode).toList()
             }
-        )
+            val multiuserDescriptions = remember {
+                resources.getStringArray(CoreR.array.multiuser_summary).toList()
+            }
+            var multiuserMode by remember { mutableIntStateOf(Config.suMultiuserMode) }
+            SettingsDropdown(
+                title = stringResource(CoreR.string.multiuser_mode),
+                summary = multiuserDescriptions.getOrElse(multiuserMode) { "" },
+                items = multiuserEntries,
+                selectedIndex = multiuserMode,
+                enabled = Const.USER_ID == 0,
+                onSelectedIndexChange = {
+                    multiuserMode = it
+                    Config.suMultiuserMode = it
+                }
+            )
 
-        HorizontalDivider(
-            modifier = Modifier.padding(horizontal = 16.dp),
-            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
-        )
+            HorizontalDivider(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+            )
+        }
 
         // Mount Namespace Mode
         val namespaceEntries = remember {

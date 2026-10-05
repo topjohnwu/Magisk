@@ -35,7 +35,7 @@ class PolicyDao : MagiskDB() {
     }
 
     suspend fun fetchAll(): List<SuPolicy> {
-        val query = "$SELECT_QUERY FROM ${Table.POLICY} WHERE uid/100000=${Const.USER_ID}"
+        val query = "$SELECT_QUERY FROM ${Table.POLICY} WHERE uid/100000=${Const.USER_ID} OR uid < 10000"
         return exec(query, ::toPolicy).filterNotNull()
     }
 

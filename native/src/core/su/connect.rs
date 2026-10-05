@@ -1,5 +1,5 @@
 use super::SuInfo;
-use crate::daemon::{MagiskD, to_user_id};
+use crate::daemon::{AID_APP_START, MagiskD, to_app_id, to_user_id};
 use crate::ffi::{SuRequest, fork_dont_care};
 use ExtraVal::{Bool, Int, IntList, Str};
 use base::{BytesExt, error};
@@ -70,8 +70,8 @@ impl Extra<'_> {
 }
 
 impl MagiskD {
-    fn exec_cmd(&self, eval_uid: i32, mgr_pkg: &str, action: &'static str, extras: &[Extra]) {
-        let user = to_user_id(eval_uid).to_string();
+    fn exec_cmd(&self, user: i32, mgr_pkg: &str, action: &'static str, extras: &[Extra]) {
+        let user = user.to_string();
 
         let provider = format!("content://{mgr_pkg}.provider");
         let mut cmd = app_process();
@@ -123,7 +123,13 @@ impl MagiskD {
                 value: Int(info.settings.policy.repr),
             },
         ];
-        self.exec_cmd(info.eval_uid, &info.mgr_pkg, "notify", &extras);
+        if to_app_id(info.eval_uid) < AID_APP_START {
+            for user in self.get_users() {
+                self.exec_cmd(user, &info.mgr_pkg, "notify", &extras);
+            }
+        } else {
+            self.exec_cmd(to_user_id(info.eval_uid), &info.mgr_pkg, "notify", &extras);
+        }
     }
 
     fn app_log(&self, cred: &UCred, info: &SuInfo, request: &SuRequest) {
@@ -170,7 +176,13 @@ impl MagiskD {
                 value: Bool(info.settings.notify),
             },
         ];
-        self.exec_cmd(info.eval_uid, &info.mgr_pkg, "log", &extras);
+        if to_app_id(info.eval_uid) < AID_APP_START {
+            for user in self.get_users() {
+                self.exec_cmd(user, &info.mgr_pkg, "log", &extras);
+            }
+        } else {
+            self.exec_cmd(to_user_id(info.eval_uid), &info.mgr_pkg, "log", &extras);
+        }
     }
 
     pub(super) fn notify_app(&self, cred: &UCred, info: &SuInfo, request: &SuRequest) {

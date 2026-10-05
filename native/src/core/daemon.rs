@@ -65,6 +65,7 @@ pub struct MagiskD {
     pub cached_su_info: AtomicArc<SuInfo>,
     pub sdk_int: i32,
     pub is_emulator: bool,
+    pub is_headless: bool,
     is_recovery: bool,
     exe_attr: FileAttr,
 }
@@ -311,6 +312,7 @@ fn daemon_entry() {
     let is_emulator = get_prop(cstr!("ro.kernel.qemu")) == "1"
         || get_prop(cstr!("ro.boot.qemu")) == "1"
         || get_prop(cstr!("ro.product.device")).contains("vsoc");
+    let is_headless = get_prop(cstr!("ro.fw.mu.headless_system_user")) == "true";
 
     // Load config status
     let magisk_tmp = get_magisk_tmp();
@@ -395,6 +397,7 @@ fn daemon_entry() {
     let daemon = MagiskD {
         sdk_int,
         is_emulator,
+        is_headless,
         is_recovery,
         exe_attr,
         ..Default::default()

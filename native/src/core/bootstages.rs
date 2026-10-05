@@ -1,5 +1,6 @@
 use crate::consts::{APP_PACKAGE_NAME, BBPATH, DATABIN, MODULEROOT, SECURE_DIR};
 use crate::daemon::MagiskD;
+use crate::db::MultiuserMode;
 use crate::ffi::{
     DbEntryKey, RequestCode, check_key_combo, exec_common_scripts, exec_module_scripts,
     get_magisk_tmp, initialize_denylist,
@@ -124,6 +125,11 @@ impl MagiskD {
         }
 
         self.prune_su_access();
+
+        if self.is_headless {
+            self.set_db_setting(DbEntryKey::SuMultiuserMode, MultiuserMode::User as i32)
+                .log_ok();
+        }
 
         if !self.setup_magisk_env() {
             error!("* Magisk environment incomplete, abort");
