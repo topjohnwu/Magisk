@@ -1,4 +1,3 @@
-use super::connect::SuAppContext;
 use super::db::RootSettings;
 use crate::daemon::{AID_ROOT, AID_SHELL, MagiskD, to_app_id, to_user_id};
 use crate::db::{DbSettings, MultiuserMode, RootAccess};
@@ -12,7 +11,6 @@ use std::time::{Duration, Instant};
 
 #[allow(unused_imports)]
 use std::os::fd::AsRawFd;
-use std::sync::nonpoison::Mutex;
 
 const DEFAULT_SHELL: &str = "/system/bin/sh";
 
@@ -32,17 +30,13 @@ impl Default for SuRequest {
     }
 }
 
+#[derive(Clone)]
 pub struct SuInfo {
     pub(super) uid: i32,
     pub(super) eval_uid: i32,
     pub(super) mgr_pkg: String,
-    pub(super) mgr_uid: i32,
+    pub(super) settings: RootSettings,
     cfg: DbSettings,
-    access: Mutex<AccessInfo>,
-}
-
-struct AccessInfo {
-    settings: RootSettings,
     timestamp: Instant,
 }
 
@@ -51,18 +45,9 @@ impl Default for SuInfo {
         SuInfo {
             uid: -1,
             eval_uid: -1,
-            cfg: Default::default(),
             mgr_pkg: Default::default(),
-            mgr_uid: -1,
-            access: Default::default(),
-        }
-    }
-}
-
-impl Default for AccessInfo {
-    fn default() -> Self {
-        AccessInfo {
             settings: Default::default(),
+            cfg: Default::default(),
             timestamp: Instant::now(),
         }
     }
@@ -70,37 +55,28 @@ impl Default for AccessInfo {
 
 impl SuInfo {
     fn allow(uid: i32) -> SuInfo {
-        let access = RootSettings {
+        let settings = RootSettings {
             policy: SuPolicy::Allow,
             log: false,
             notify: false,
         };
         SuInfo {
             uid,
-            access: Mutex::new(AccessInfo::new(access)),
+            settings,
             ..Default::default()
         }
     }
 
     fn deny(uid: i32) -> SuInfo {
-        let access = RootSettings {
+        let settings = RootSettings {
             policy: SuPolicy::Deny,
             log: false,
             notify: false,
         };
         SuInfo {
             uid,
-            access: Mutex::new(AccessInfo::new(access)),
-            ..Default::default()
-        }
-    }
-}
-
-impl AccessInfo {
-    fn new(settings: RootSettings) -> AccessInfo {
-        AccessInfo {
             settings,
-            timestamp: Instant::now(),
+            ..Default::default()
         }
     }
 
@@ -108,8 +84,11 @@ impl AccessInfo {
         self.timestamp.elapsed() < Duration::from_secs(3)
     }
 
-    fn refresh(&mut self) {
-        self.timestamp = Instant::now();
+    fn refresh(&self) -> SuInfo {
+        SuInfo {
+            timestamp: Instant::now(),
+            ..self.clone()
+        }
     }
 }
 
@@ -132,27 +111,14 @@ impl MagiskD {
         };
 
         let info = self.get_su_info(cred.uid as i32);
-        {
-            let mut access = info.access.lock();
 
-            // Talk to su manager
-            let mut app = SuAppContext {
-                cred,
-                request: &req,
-                info: &info,
-                settings: &mut access.settings,
-                sdk_int: self.sdk_int(),
-            };
-            app.connect_app();
+        // Talk to su manager
+        self.notify_app(&cred, &info, &req);
 
-            // Before unlocking, refresh the timestamp
-            access.refresh();
-
-            if access.settings.policy == SuPolicy::Restrict {
-                req.drop_cap = true;
-            }
-
-            if access.settings.policy == SuPolicy::Deny {
+        match info.settings.policy {
+            SuPolicy::Restrict => req.drop_cap = true,
+            SuPolicy::Allow => {}
+            _ => {
                 warn!("su: request rejected ({})", info.uid);
                 client.write_pod(&SuPolicy::Deny.repr).ok();
                 return;
@@ -204,8 +170,10 @@ impl MagiskD {
         }
 
         let cached = self.cached_su_info.load();
-        if cached.uid == uid && cached.access.lock().is_fresh() {
-            return cached;
+        if cached.uid == uid && cached.is_fresh() {
+            let info = Arc::new(cached.refresh());
+            self.cached_su_info.store(info.clone());
+            return info;
         }
 
         let info = self.build_su_info(uid);
@@ -230,16 +198,10 @@ impl MagiskD {
                 _ => uid,
             };
 
-            let mut access = RootSettings::default();
-            self.get_root_settings(eval_uid, &mut access)?;
+            let mut settings = RootSettings::default();
+            self.get_root_settings(eval_uid, &mut settings)?;
 
-            // We need to talk to the manager, get the app info
-            let (mgr_uid, mgr_pkg) =
-                if access.policy == SuPolicy::Query || access.log || access.notify {
-                    self.get_manager(to_user_id(eval_uid), true)
-                } else {
-                    (-1, String::new())
-                };
+            let (mgr_uid, mgr_pkg) = self.get_manager(to_user_id(eval_uid), true);
 
             // If it's the manager, allow it silently
             if to_app_id(uid) == to_app_id(mgr_uid) {
@@ -263,19 +225,14 @@ impl MagiskD {
                 _ => {}
             };
 
-            // If still not determined, check if manager exists
-            if access.policy == SuPolicy::Query && mgr_uid < 0 {
-                return Ok(Arc::new(SuInfo::deny(uid)));
-            }
-
             // Finally, the SuInfo
             Ok(Arc::new(SuInfo {
                 uid,
                 eval_uid,
                 mgr_pkg,
-                mgr_uid,
+                settings,
                 cfg,
-                access: Mutex::new(AccessInfo::new(access)),
+                timestamp: Instant::now(),
             }))
         }();
 

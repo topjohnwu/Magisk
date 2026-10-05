@@ -1,20 +1,11 @@
 use super::SuInfo;
-use super::db::RootSettings;
-use crate::consts::{INTERNAL_DIR, MAGISK_FILE_CON};
-use crate::daemon::to_user_id;
-use crate::ffi::{SuPolicy, SuRequest, fork_dont_care, get_magisk_tmp};
-use crate::socket::IpcRead;
+use crate::daemon::{MagiskD, to_user_id};
+use crate::ffi::{SuRequest, fork_dont_care};
 use ExtraVal::{Bool, Int, IntList, Str};
-use base::{
-    BytesExt, FileAttr, LibcReturn, LoggedResult, ResultExt, Utf8CStrBuf, cstr, error,
-};
-use nix::fcntl::OFlag;
-use nix::poll::{PollFd, PollFlags, PollTimeout};
+use base::{BytesExt, error};
 use nix::sys::signal::SigSet;
 use num_traits::AsPrimitive;
 use std::fmt::Write;
-use std::fs::File;
-use std::os::fd::AsFd;
 use std::os::unix::net::UCred;
 use std::os::unix::process::CommandExt;
 use std::process::{Command, exit};
@@ -101,47 +92,36 @@ impl Extra<'_> {
     }
 }
 
-pub(super) struct SuAppContext<'a> {
-    pub(super) cred: UCred,
-    pub(super) request: &'a SuRequest,
-    pub(super) info: &'a SuInfo,
-    pub(super) settings: &'a mut RootSettings,
-    pub(super) sdk_int: i32,
-}
+impl MagiskD {
+    fn exec_cmd(&self, eval_uid: i32, mgr_pkg: &str, action: &'static str, extras: &[Extra]) {
+        let user = to_user_id(eval_uid).to_string();
 
-impl SuAppContext<'_> {
-    fn exec_cmd(&self, action: &'static str, extras: &[Extra], use_provider: bool) {
-        let user = to_user_id(self.info.eval_uid);
-        let user = user.to_string();
+        let provider = format!("content://{mgr_pkg}.provider");
+        let mut cmd = app_process();
+        cmd.args([
+            "/system/bin",
+            "com.android.commands.content.Content",
+            "call",
+            "--uri",
+            &provider,
+            "--user",
+            &user,
+            "--method",
+            action,
+        ]);
+        if self.sdk_int() >= 30 {
+            extras.iter().for_each(|e| e.add_bind(&mut cmd))
+        } else {
+            extras.iter().for_each(|e| e.add_bind_legacy(&mut cmd))
+        }
+        cmd.env("CLASSPATH", "/system/framework/content.jar");
 
-        if use_provider {
-            let provider = format!("content://{}.provider", self.info.mgr_pkg);
-            let mut cmd = app_process();
-            cmd.args([
-                "/system/bin",
-                "com.android.commands.content.Content",
-                "call",
-                "--uri",
-                &provider,
-                "--user",
-                &user,
-                "--method",
-                action,
-            ]);
-            if self.sdk_int >= 30 {
-                extras.iter().for_each(|e| e.add_bind(&mut cmd))
-            } else {
-                extras.iter().for_each(|e| e.add_bind_legacy(&mut cmd))
-            }
-            cmd.env("CLASSPATH", "/system/framework/content.jar");
-
-            if let Ok(output) = cmd.output()
-                && !output.stderr.contains(b"Error")
-                && !output.stdout.contains(b"Error")
-            {
-                // The provider call succeed
-                return;
-            }
+        if let Ok(output) = cmd.output()
+            && !output.stderr.contains(b"Error")
+            && !output.stdout.contains(b"Error")
+        {
+            // The provider call succeed
+            return;
         }
 
         let mut cmd = app_process();
@@ -150,7 +130,7 @@ impl SuAppContext<'_> {
             "com.android.commands.am.Am",
             "start",
             "-p",
-            &self.info.mgr_pkg,
+            mgr_pkg,
             "--user",
             &user,
             "-a",
@@ -174,122 +154,58 @@ impl SuAppContext<'_> {
         }
     }
 
-    fn app_request(&mut self) {
-        let mut fifo = cstr::buf::new::<64>();
-        fifo.write_fmt(format_args!(
-            "{}/{}/su_request_{}",
-            get_magisk_tmp(),
-            INTERNAL_DIR,
-            self.cred.pid.unwrap_or(-1)
-        ))
-        .ok();
-
-        let fd = || -> LoggedResult<File> {
-            let mut attr = FileAttr::new();
-            attr.st.st_mode = 0o600;
-            attr.st.st_uid = self.info.mgr_uid.as_();
-            attr.st.st_gid = self.info.mgr_uid.as_();
-            attr.con.push_str(MAGISK_FILE_CON);
-
-            fifo.mkfifo(0o600)?;
-            fifo.set_attr(&attr)?;
-
-            let extras = [
-                Extra {
-                    key: "fifo",
-                    value: Str(&fifo),
-                },
-                Extra {
-                    key: "uid",
-                    value: Int(self.info.eval_uid),
-                },
-                Extra {
-                    key: "pid",
-                    value: Int(self.cred.pid.unwrap_or(-1)),
-                },
-            ];
-            self.exec_cmd("request", &extras, false);
-
-            // Open with O_RDWR to prevent FIFO open block
-            let fd = fifo.open(OFlag::O_RDWR | OFlag::O_CLOEXEC)?;
-            let mut pfd = [PollFd::new(fd.as_fd(), PollFlags::POLLIN)];
-
-            // Wait for data input for at most 70 seconds
-            nix::poll::poll(
-                &mut pfd,
-                PollTimeout::try_from(70 * 1000).unwrap_or(PollTimeout::NONE),
-            )
-            .check_os_err("poll", None, None)?;
-            Ok(fd)
-        }();
-
-        fifo.remove().log_ok();
-
-        if let Ok(mut fd) = fd {
-            self.settings.policy = SuPolicy {
-                repr: fd
-                    .read_decodable::<i32>()
-                    .log()
-                    .map(i32::from_be)
-                    .unwrap_or(SuPolicy::Deny.repr),
-            };
-        } else {
-            self.settings.policy = SuPolicy::Deny;
-        };
-    }
-
-    fn app_notify(&self) {
+    fn app_notify(&self, cred: &UCred, info: &SuInfo) {
         let extras = [
             Extra {
                 key: "from.uid",
-                value: Int(self.cred.uid.as_()),
+                value: Int(cred.uid.as_()),
             },
             Extra {
                 key: "pid",
-                value: Int(self.cred.pid.unwrap_or(-1).as_()),
+                value: Int(cred.pid.unwrap_or(-1).as_()),
             },
             Extra {
                 key: "policy",
-                value: Int(self.settings.policy.repr),
+                value: Int(info.settings.policy.repr),
             },
         ];
-        self.exec_cmd("notify", &extras, true);
+        self.exec_cmd(info.eval_uid, &info.mgr_pkg, "notify", &extras);
     }
 
-    fn app_log(&self) {
-        let command = if self.request.command.is_empty() {
-            &self.request.shell
+    fn app_log(&self, cred: &UCred, info: &SuInfo, request: &SuRequest) {
+        let command = if request.command.is_empty() {
+            &request.shell
         } else {
-            &self.request.command
+            &request.command
         };
         let extras = [
             Extra {
                 key: "from.uid",
-                value: Int(self.cred.uid.as_()),
+                value: Int(cred.uid.as_()),
             },
             Extra {
                 key: "to.uid",
-                value: Int(self.request.target_uid),
+                value: Int(request.target_uid),
             },
             Extra {
                 key: "pid",
-                value: Int(self.cred.pid.unwrap_or(-1).as_()),
+                value: Int(cred.pid.unwrap_or(-1).as_()),
             },
             Extra {
                 key: "policy",
-                value: Int(self.settings.policy.repr),
+                value: Int(info.settings.policy.repr),
             },
             Extra {
                 key: "target",
-                value: Int(self.request.target_pid),
+                value: Int(request.target_pid),
             },
             Extra {
                 key: "context",
-                value: Str(&self.request.context),
+                value: Str(&request.context),
             },
             Extra {
                 key: "gids",
-                value: IntList(&self.request.gids),
+                value: IntList(&request.gids),
             },
             Extra {
                 key: "command",
@@ -297,19 +213,18 @@ impl SuAppContext<'_> {
             },
             Extra {
                 key: "notify",
-                value: Bool(self.settings.notify),
+                value: Bool(info.settings.notify),
             },
         ];
-        self.exec_cmd("log", &extras, true);
+        self.exec_cmd(info.eval_uid, &info.mgr_pkg, "log", &extras);
     }
 
-    pub(super) fn connect_app(&mut self) {
-        // If policy is undetermined, show dialog for user consent
-        if self.settings.policy == SuPolicy::Query {
-            self.app_request();
+    pub(super) fn notify_app(&self, cred: &UCred, info: &SuInfo, request: &SuRequest) {
+        if info.mgr_pkg.is_empty() {
+            return;
         }
 
-        if !self.settings.log && !self.settings.notify {
+        if !info.settings.log && !info.settings.notify {
             return;
         }
 
@@ -318,10 +233,10 @@ impl SuAppContext<'_> {
         }
 
         // Notify su usage to application
-        if self.settings.log {
-            self.app_log();
-        } else if self.settings.notify {
-            self.app_notify();
+        if info.settings.log {
+            self.app_log(cred, info, request);
+        } else if info.settings.notify {
+            self.app_notify(cred, info);
         }
 
         exit(0);
