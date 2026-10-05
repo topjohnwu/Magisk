@@ -27,6 +27,10 @@ sealed interface Route : NavKey, Parcelable {
 
     @Parcelize
     @Serializable
+    data object SuperuserGrant : Route
+
+    @Parcelize
+    @Serializable
     data class Action(
         val id: String,
         val name: String,

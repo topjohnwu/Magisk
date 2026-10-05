@@ -57,6 +57,8 @@ import com.topjohnwu.magisk.ui.navigation.Navigator
 import com.topjohnwu.magisk.ui.navigation.Route
 import com.topjohnwu.magisk.ui.navigation.rememberNavigator
 import com.topjohnwu.magisk.ui.superuser.SuperuserDetailScreen
+import com.topjohnwu.magisk.ui.superuser.SuperuserGrantScreen
+import com.topjohnwu.magisk.ui.superuser.SuperuserGrantViewModel
 import com.topjohnwu.magisk.ui.superuser.SuperuserViewModel
 import com.topjohnwu.magisk.view.Shortcuts
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -174,6 +176,19 @@ class MainActivity : ComponentActivity(), SplashScreenHost {
                                         onAuthenticate = { action ->
                                             extension.withAuthentication { if (it) action() }
                                         }
+                                    )
+                                }
+                                entry<Route.SuperuserGrant> { _ ->
+                                    val vm: SuperuserGrantViewModel = viewModel(factory = VMFactory)
+                                    LaunchedEffect(Unit) {
+                                        vm.authenticate = { onSuccess ->
+                                            extension.withAuthentication { if (it) onSuccess() }
+                                        }
+                                        vm.startLoading()
+                                    }
+                                    SuperuserGrantScreen(
+                                        viewModel = vm,
+                                        onBack = { navigator.pop() },
                                     )
                                 }
                                 entry<Route.Action> { key ->
