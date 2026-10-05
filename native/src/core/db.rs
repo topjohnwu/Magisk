@@ -55,7 +55,7 @@ where
     }
 }
 
-#[derive(Default)]
+#[derive(Copy, Clone, Default)]
 pub struct DbSettings {
     pub root_access: RootAccess,
     pub multiuser_mode: MultiuserMode,
@@ -66,7 +66,7 @@ pub struct DbSettings {
 }
 
 #[repr(i32)]
-#[derive(Default, FromPrimitive)]
+#[derive(Copy, Clone, Default, FromPrimitive)]
 pub enum RootAccess {
     Disabled,
     AppsOnly,
@@ -76,7 +76,7 @@ pub enum RootAccess {
 }
 
 #[repr(i32)]
-#[derive(Default, FromPrimitive)]
+#[derive(Copy, Clone, Default, FromPrimitive)]
 pub enum MultiuserMode {
     #[default]
     OwnerOnly,

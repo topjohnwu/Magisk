@@ -8,10 +8,11 @@ use base::ResultExt;
 
 impl Default for SuPolicy {
     fn default() -> Self {
-        SuPolicy::Query
+        SuPolicy::Deny
     }
 }
 
+#[derive(Copy, Clone)]
 pub struct RootSettings {
     pub policy: SuPolicy,
     pub log: bool,
@@ -21,7 +22,7 @@ pub struct RootSettings {
 impl Default for RootSettings {
     fn default() -> Self {
         RootSettings {
-            policy: SuPolicy::Query,
+            policy: SuPolicy::Deny,
             log: true,
             notify: true,
         }
