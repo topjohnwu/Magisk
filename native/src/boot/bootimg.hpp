@@ -646,6 +646,7 @@ struct boot_img {
 
     byte_view payload;
     byte_view tail;
+    byte_view samsung_signer;
 
     // MTK headers
     const mtk_hdr *k_hdr = nullptr;

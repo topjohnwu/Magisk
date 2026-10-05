@@ -438,6 +438,12 @@ bool boot_img::parse_image(const uint8_t *addr, FileFormat type) {
         if (tail.size() >= 16 && BUFFER_MATCH(tail.data(), SEANDROID_MAGIC)) {
             fprintf(stderr, "SAMSUNG_SEANDROID\n");
             flags[SEANDROID_FLAG] = true;
+            auto signer_off = tail_off() + 16;
+            if (signer_off <= map.size() && map.size() - signer_off >= 512 &&
+                BUFFER_MATCH(map.data() + signer_off, SAMSUNG_SIGNER_MAGIC)) {
+                fprintf(stderr, "SAMSUNG_SIGNER\n");
+                samsung_signer = byte_view(map.data() + signer_off, 512);
+            }
         } else if (tail.size() >= 16 && BUFFER_MATCH(tail.data(), LG_BUMP_MAGIC)) {
             fprintf(stderr, "LG_BUMP_IMAGE\n");
             flags[LG_BUMP_FLAG] = true;
@@ -791,6 +797,9 @@ void repack(Utf8CStr src_img, Utf8CStr out_img, bool skip_comp) {
     // Proprietary stuffs
     if (boot.flags[SEANDROID_FLAG]) {
         xwrite(fd, SEANDROID_MAGIC, 16);
+        if (boot.samsung_signer.size()) {
+            xwrite(fd, boot.samsung_signer.data(), boot.samsung_signer.size());
+        }
         if (boot.flags[DHTB_FLAG]) {
             xwrite(fd, "\xFF\xFF\xFF\xFF", 4);
         }
