@@ -32,29 +32,6 @@ enum ExtraVal<'a> {
 }
 
 impl Extra<'_> {
-    fn add_intent(&self, cmd: &mut Command) {
-        match self.value {
-            Int(i) => {
-                cmd.args(["--ei", self.key, &i.to_string()]);
-            }
-            Bool(b) => {
-                cmd.args(["--ez", self.key, &b.to_string()]);
-            }
-            Str(s) => {
-                cmd.args(["--es", self.key, s]);
-            }
-            IntList(list) => {
-                cmd.args(["--es", self.key]);
-                let mut tmp = String::new();
-                list.iter().for_each(|i| {
-                    write!(&mut tmp, "{i},").ok();
-                });
-                tmp.pop();
-                cmd.arg(&tmp);
-            }
-        }
-    }
-
     fn add_bind(&self, cmd: &mut Command) {
         let mut tmp: String;
         match self.value {
@@ -116,41 +93,18 @@ impl MagiskD {
         }
         cmd.env("CLASSPATH", "/system/framework/content.jar");
 
-        if let Ok(output) = cmd.output()
-            && !output.stderr.contains(b"Error")
-            && !output.stdout.contains(b"Error")
-        {
-            // The provider call succeed
-            return;
-        }
-
-        let mut cmd = app_process();
-        cmd.args([
-            "/system/bin",
-            "com.android.commands.am.Am",
-            "start",
-            "-p",
-            mgr_pkg,
-            "--user",
-            &user,
-            "-a",
-            "android.intent.action.VIEW",
-            "-f",
-            // FLAG_ACTIVITY_NEW_TASK|FLAG_ACTIVITY_MULTIPLE_TASK|
-            // FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS|FLAG_INCLUDE_STOPPED_PACKAGES
-            "0x18800020",
-            "--es",
-            "action",
-            action,
-        ]);
-        extras.iter().for_each(|e| e.add_intent(&mut cmd));
-        cmd.env("CLASSPATH", "/system/framework/am.jar");
-
-        // Async start activity
-        if fork_dont_care() == 0 {
-            let err = cmd.exec();
-            error!("exec app_process: {err}");
-            exit(1);
+        match cmd.output() {
+            Ok(output) => {
+                if output.stderr.contains(b"Error") || output.stdout.contains(b"Error") {
+                    error!(
+                        "content call failed: {}",
+                        String::from_utf8_lossy(&output.stderr)
+                    );
+                }
+            }
+            Err(e) => {
+                error!("failed to execute content call: {e}");
+            }
         }
     }
 
