@@ -225,20 +225,29 @@ impl Cpio {
         let mut pos = 0_usize;
         while pos < data.len() {
             let hdr_sz = size_of::<CpioHeader>();
-            let hdr = from_bytes::<CpioHeader>(&data[pos..(pos + hdr_sz)]);
+            let hdr = data[pos..]
+                .get(..hdr_sz)
+                .ok_or_log_msg(|w| w.write_str("truncated cpio header"))?;
+            let hdr = from_bytes::<CpioHeader>(hdr);
             if &hdr.magic != b"070701" {
                 return log_err!("invalid cpio magic");
             }
             pos += hdr_sz;
             let name_sz = x8u(&hdr.namesize)? as usize;
-            let name = Utf8CStr::from_bytes(&data[pos..(pos + name_sz)])?.to_string();
+            let name = data[pos..]
+                .get(..name_sz)
+                .ok_or_log_msg(|w| w.write_str("truncated cpio name"))?;
+            let name = Utf8CStr::from_bytes(name)?.to_string();
             pos += name_sz;
             pos = align_4(pos);
+            let file_data = data
+                .get(pos..)
+                .ok_or_log_msg(|w| w.write_str("truncated cpio name padding"))?;
             if name == "." || name == ".." {
                 continue;
             }
             if name == "TRAILER!!!" {
-                match data[pos..].find(b"070701") {
+                match file_data.find(b"070701") {
                     Some(x) => pos += x,
                     None => break,
                 }
@@ -251,11 +260,17 @@ impl Cpio {
                 gid: x8u(&hdr.gid)?.as_(),
                 rdevmajor: x8u(&hdr.rdevmajor)?.as_(),
                 rdevminor: x8u(&hdr.rdevminor)?.as_(),
-                data: data[pos..(pos + file_sz)].to_vec(),
+                data: file_data
+                    .get(..file_sz)
+                    .ok_or_log_msg(|w| w.write_str("truncated cpio data"))?
+                    .to_vec(),
             });
             pos += file_sz;
             cpio.entries.insert(name, entry);
             pos = align_4(pos);
+            if pos > data.len() {
+                return log_err!("truncated cpio data padding");
+            }
         }
         Ok(cpio)
     }
@@ -850,4 +865,69 @@ fn norm_path(path: &str) -> String {
 
 fn parse_mode(s: &str) -> Result<mode_t, String> {
     mode_t::from_str_radix(s, 8).map_err(|e| e.to_string())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn entry(name: &str, data: &[u8]) -> Vec<u8> {
+        let fields = [
+            1,
+            0o100644,
+            0,
+            0,
+            1,
+            0,
+            data.len(),
+            0,
+            0,
+            0,
+            0,
+            name.len() + 1,
+            0,
+        ];
+        let mut record = b"070701".to_vec();
+        for field in fields {
+            record.extend_from_slice(format!("{field:08x}").as_bytes());
+        }
+        record.extend_from_slice(name.as_bytes());
+        record.push(0);
+        record.resize(align_4(record.len()), 0);
+        record.extend_from_slice(data);
+        record.resize(align_4(record.len()), 0);
+        record
+    }
+
+    #[test]
+    fn truncated_records() {
+        for record in [entry("init", b"abc"), entry("TRAILER!!!", b"")] {
+            for end in 1..record.len() {
+                assert!(Cpio::load_from_data(&record[..end]).is_err(), "end={end}");
+            }
+        }
+        for offset in [54, 94] {
+            let mut record = entry("init", b"abc");
+            record[offset..offset + 8].copy_from_slice(b"ffffffff");
+            assert!(Cpio::load_from_data(&record).is_err());
+        }
+    }
+
+    #[test]
+    fn valid_and_concatenated_archives() {
+        assert!(Cpio::load_from_data(&[]).is_ok_and(|cpio| cpio.entries.is_empty()));
+        let mut data = entry(".", b"");
+        data.extend(entry("init", b"abc"));
+        data.extend(entry("TRAILER!!!", b""));
+        let cpio =
+            Cpio::load_from_data(&data).unwrap_or_else(|_| panic!("failed to load valid archive"));
+        assert_eq!(cpio.entries.len(), 1);
+        assert_eq!(cpio.entries["init"].data, b"abc");
+        data.extend_from_slice(&[0; 32]);
+        data.extend(entry("init", b"xyz"));
+        data.extend(entry("TRAILER!!!", b""));
+        let cpio = Cpio::load_from_data(&data)
+            .unwrap_or_else(|_| panic!("failed to load concatenated archives"));
+        assert_eq!(cpio.entries["init"].data, b"xyz");
+    }
 }
