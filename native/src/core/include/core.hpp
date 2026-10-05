@@ -42,6 +42,7 @@ extern "C" int new_daemon_thread(thread_entry entry, void *arg = nullptr);
 
 template<typename T> requires(std::is_trivially_copyable_v<T>)
 T read_any(int fd) {
+    if (fd < 0) return -1;
     T val;
     if (xxread(fd, &val, sizeof(val)) != sizeof(val))
         return -1;
