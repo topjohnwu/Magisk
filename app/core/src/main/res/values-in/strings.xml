@@ -12,7 +12,7 @@
 
     <!--Home-->
     <string name="no_connection">Koneksi tidak tersedia</string>
-    <string name="app_changelog">Catatan perubahan</string>
+    <string name="app_changelog">Log perubahan</string>
     <string name="loading">Memuat…</string>
     <string name="update">Perbarui</string>
     <string name="not_available">N/A</string>
@@ -33,7 +33,7 @@
     <string name="uninstall_magisk_msg">Semua modul akan dinonaktifkan/dihapus!\nRoot akan dihapus!\nSemua data internal yang tidak dienkripsi melalui penggunaan Magisk akan dienkripsi ulang!</string>
 
     <!--Install-->
-    <string name="keep_force_encryption">Pertahankan enkripsi paksa</string>
+    <string name="keep_force_encryption">Pertahankan paksa enkripsi</string>
     <string name="keep_dm_verity">Pertahankan AVB 2.0/dm-verity</string>
     <string name="recovery_mode">Mode Recovery</string>
     <string name="install_options_title">Opsi</string>
@@ -49,48 +49,39 @@
     <string name="patch_file_msg">Pilih berkas image mentah (*.img) atau tar ODIN (*.tar) atau payload.bin (*.bin)</string>
     <string name="download_patch_file">Unduh dan tambal berkas</string>
     <string name="download_dialog_title">Masukkan URL image</string>
-    <string name="download_dialog_msg">Image OTA penuh atau image pabrik</string>
+    <string name="download_dialog_msg">Image OTA lengkap atau image pabrik</string>
     <string name="reboot_delay_toast">Memulai ulang dalam 5 detik…</string>
     <string name="flash_screen_title">Pemasangan</string>
 
     <!--Superuser-->
-    <string name="su_request_title">Aplikasi ini meminta izin root. Ini memberikan akses penuh ke perangkat Anda. Tolak jika Anda tidak yakin!</string>
-    <string name="touch_filtered_warning">Magisk tidak dapat memverifikasi respons Anda, karena ada aplikasi yang menutupi permintaan superuser.</string>
     <string name="deny">Tolak</string>
-    <string name="prompt">Ajukan</string>
     <string name="restrict">Batasi</string>
     <string name="grant">Izinkan</string>
-    <string name="su_warning">Berikan akses penuh ke perangkat Anda.\nTolak jika Anda tidak yakin!</string>
-    <string name="forever">Selamanya</string>
-    <string name="once">Sekali</string>
-    <string name="tenmin">10 menit</string>
-    <string name="twentymin">20 menit</string>
-    <string name="thirtymin">30 menit</string>
-    <string name="sixtymin">60 menit</string>
-    <string name="su_allow_toast">%1$s diberikan izin superuser</string>
-    <string name="su_deny_toast">%1$s ditolak izin superuser</string>
-    <string name="su_snack_grant">Izin superuser %1$s diberikan</string>
-    <string name="su_snack_deny">Izin superuser %1$s ditolak</string>
+    <string name="superuser_grant">Izinkan superuser</string>
+    <string name="su_allow_toast">%1$s diberi hak akses superuser</string>
+    <string name="su_deny_toast">%1$s ditolak hak akses superuser</string>
+    <string name="su_snack_grant">Hak akses superuser %1$s diberikan</string>
+    <string name="su_snack_deny">Hak akses superuser %1$s ditolak</string>
     <string name="su_snack_notif_on">Notifikasi %1$s diaktifkan</string>
     <string name="su_snack_notif_off">Notifikasi %1$s dinonaktifkan</string>
     <string name="su_snack_log_on">Pencatatan log %1$s diaktifkan</string>
     <string name="su_snack_log_off">Pencatatan log %1$s dinonaktifkan</string>
     <string name="su_revoke_title">Cabut?</string>
-    <string name="su_revoke_msg">Konfirmasi untuk mencabut izin %1$s</string>
+    <string name="su_revoke_msg">Konfirmasi untuk mencabut hak akses superuser %1$s</string>
     <string name="toast">Pesan singkat</string>
     <string name="notification">Notifikasi</string>
     <string name="none">Tidak ada</string>
+    <string name="back">Kembali</string>
     <string name="superuser_toggle_notification">Notifikasi</string>
     <string name="superuser_toggle_revoke">Cabut</string>
-    <string name="superuser_policy_none">Belum ada aplikasi yang meminta izin superuser.</string>
+    <string name="superuser_policy_none">Belum ada aplikasi yang meminta izin superuser</string>
 
     <!--Logs-->
-    <string name="log_data_none">Belum ada log. Coba gunakan aplikasi root Anda lebih sering.</string>
+    <string name="log_data_none">Tidak ada log. Coba gunakan aplikasi root Anda lebih sering.</string>
     <string name="log_data_magisk_none">Log Magisk kosong, ini aneh.</string>
     <string name="menuSaveLog">Simpan log</string>
     <string name="menuClearLog">Bersihkan log</string>
     <string name="logs_cleared">Log berhasil dibersihkan</string>
-    <string name="back">Kembali</string>
     <string name="enabled">Aktif</string>
     <string name="disabled">Nonaktif</string>
     <string name="pid">PID: %1$d</string>
@@ -103,8 +94,8 @@
 
     <!--MagiskHide-->
     <string name="show_system_app">Tampilkan aplikasi sistem</string>
-    <string name="show_os_app">Tampilkan aplikasi OS</string>
-    <string name="hide_filter_hint">Saring berdasarkan nama</string>
+    <string name="show_os_app">Tampilkan aplikasi inti</string>
+    <string name="hide_filter_hint">Filter berdasarkan nama</string>
     <string name="sort_by_name">Nama</string>
     <string name="sort_by_package_name">Nama paket</string>
     <string name="sort_by_install_time">Waktu pemasangan</string>
@@ -115,7 +106,7 @@
 
     <!--Module-->
     <string name="no_info_provided">(Info tidak tersedia)</string>
-    <string name="reboot_userspace">Mulai ulang cepat</string>
+    <string name="reboot_userspace">Mulai ulang lunak</string>
     <string name="reboot_recovery">Mulai ulang ke Recovery</string>
     <string name="reboot_bootloader">Mulai ulang ke Bootloader</string>
     <string name="reboot_download">Mulai ulang ke Download</string>
@@ -145,7 +136,7 @@
     <string name="settings_hide_app_title">Sembunyikan aplikasi Magisk</string>
     <string name="settings_hide_app_summary">Pasang aplikasi proxy dengan ID paket acak dan label aplikasi khusus</string>
     <string name="settings_restore_app_title">Pulihkan aplikasi Magisk</string>
-    <string name="settings_restore_app_summary">Tampilkan kembali aplikasi yang disembunyikan dan pulihkan APK aslinya</string>
+    <string name="settings_restore_app_summary">Tampilkan kembali aplikasi dan pulihkan APK asli</string>
     <string name="language">Bahasa</string>
     <string name="system_default">(Sistem)</string>
     <string name="settings_check_update_title">Periksa pembaruan</string>
@@ -171,20 +162,10 @@
     <string name="settings_su_app">Hanya Aplikasi</string>
     <string name="settings_su_adb">Hanya ADB</string>
     <string name="settings_su_disable">Nonaktif</string>
-    <string name="settings_su_request_10">10 detik</string>
-    <string name="settings_su_request_15">15 detik</string>
-    <string name="settings_su_request_20">20 detik</string>
-    <string name="settings_su_request_30">30 detik</string>
-    <string name="settings_su_request_45">45 detik</string>
-    <string name="settings_su_request_60">60 detik</string>
     <string name="superuser_access">Akses superuser</string>
-    <string name="auto_response">Respons otomatis</string>
-    <string name="request_timeout">Batas waktu permintaan</string>
     <string name="superuser_notification">Notifikasi superuser</string>
     <string name="settings_su_reauth_title">Otentikasikan ulang setelah pembaruan</string>
     <string name="settings_su_reauth_summary">Minta izin akses superuser lagi setelah memperbarui aplikasi</string>
-    <string name="settings_su_tapjack_title">Perlindungan tapjacking</string>
-    <string name="settings_su_tapjack_summary">Dialog permintaan superuser tidak akan merespons input saat tertutup oleh jendela atau overlay lain</string>
     <string name="settings_su_auth_title">Otentikasi pengguna</string>
     <string name="settings_su_auth_summary">Minta otentikasi pengguna selama permintaan superuser</string>
     <string name="settings_su_auth_insecure">Tidak ada metode otentikasi yang dikonfigurasi pada perangkat</string>
@@ -208,25 +189,28 @@
     <string name="settings_owner_manage">Dikelola pemilik perangkat</string>
     <string name="settings_user_independent">Independen per pengguna</string>
     <string name="owner_only_summary">Hanya pemilik yang memiliki akses root</string>
-    <string name="owner_manage_summary">Hanya pemilik yang dapat mengelola akses root dan menerima permintaan</string>
-    <string name="user_independent_summary">Setiap pengguna memiliki aturan root terpisah</string>
+    <string name="owner_manage_summary">Hanya pemilik yang dapat mengelola akses root dan menerima permintaan izin</string>
+    <string name="user_independent_summary">Setiap pengguna memiliki aturan root terpisah masing-masing</string>
     <string name="mount_namespace_mode">Ruang nama mount</string>
     <string name="settings_ns_global">Global</string>
-    <string name="settings_ns_requester">Diwariskan</string>
-    <string name="settings_ns_isolate">Terpisah</string>
+    <string name="settings_ns_requester">Diwarisi</string>
+    <string name="settings_ns_isolate">Terisolasi</string>
     <string name="global_summary">Semua sesi root menggunakan ruang nama mount global</string>
     <string name="requester_summary">Sesi root akan mewarisi ruang nama dari pemintanya</string>
-    <string name="isolate_summary">Setiap sesi root akan memiliki ruang nama tersendiri</string>
+    <string name="isolate_summary">Setiap sesi root akan memiliki ruang nama terisolasi sendiri</string>
 
     <!--Notifications-->
     <string name="update_channel">Pembaruan Magisk</string>
     <string name="progress_channel">Notifikasi kemajuan</string>
     <string name="updated_channel">Pembaruan selesai</string>
+    <string name="su_notification_channel">Notifikasi superuser</string>
     <string name="download_complete">Unduhan selesai</string>
     <string name="download_file_error">Kesalahan saat mengunduh berkas</string>
     <string name="magisk_update_title">Pembaruan Magisk tersedia!</string>
     <string name="updated_title">Magisk diperbarui</string>
-    <string name="updated_text">Ketuk untuk membuka aplikasi</string>
+    <string name="updated_text">Ketuk untuk buka aplikasi</string>
+    <string name="su_notification_granted_title">Superuser diberikan</string>
+    <string name="su_notification_denied_title">Superuser ditolak</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">Ya</string>
@@ -250,7 +234,7 @@
     <string name="setup_fail">Penyiapan gagal</string>
     <string name="env_fix_title">Perlu penyiapan tambahan</string>
     <string name="env_fix_msg">Perangkat Anda memerlukan penyiapan tambahan agar Magisk dapat berfungsi dengan benar. Apakah Anda ingin melanjutkan dan memulai ulang?</string>
-    <string name="env_full_fix_msg">Perangkat Anda perlu melakukan pemasangan ulang Magisk agar berfungsi dengan benar. Harap pasang ulang Magisk melalui aplikasi, mode recovery tidak dapat memperoleh informasi perangkat yang benar.</string>
+    <string name="env_full_fix_msg">Perangkat Anda memerlukan pemasangan ulang Magisk agar berfungsi dengan benar. Harap pasang ulang Magisk melalui aplikasi, mode recovery tidak dapat memperoleh informasi perangkat yang benar.</string>
     <string name="setup_msg">Menyiapkan lingkungan…</string>
     <string name="unsupport_magisk_title">Versi Magisk tidak didukung</string>
     <string name="unsupport_magisk_msg">Versi aplikasi ini tidak mendukung versi Magisk yang lebih rendah dari %1$s.\n\nAplikasi akan berperilaku seolah-olah tidak ada Magisk yang terpasang. Harap perbarui Magisk sesegera mungkin.</string>
@@ -258,7 +242,7 @@
     <string name="unsupport_system_app_msg">Menjalankan aplikasi ini sebagai aplikasi sistem tidak didukung. Harap kembalikan ke aplikasi pengguna.</string>
     <string name="unsupport_other_su_msg">Sebuah biner \"su\" bukan berasal dari Magisk telah terdeteksi. Harap hapus solusi root yang bersaing dan/atau pasang ulang Magisk.</string>
     <string name="unsupport_external_storage_msg">Magisk dipasang ke penyimpanan eksternal. Harap pindahkan aplikasi ke penyimpanan internal.</string>
-    <string name="unsupport_nonroot_stub_msg">Aplikasi Magisk tersembunyi tidak dapat berfungsi lagi karena akses root hilang. Harap pulihkan APK asli.</string>
+    <string name="unsupport_nonroot_stub_msg">Aplikasi Magisk yang tersembunyi tidak dapat berfungsi lagi karena akses root hilang. Harap pulihkan APK asli.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Berikan izin penyimpanan untuk mengaktifkan fungsi ini</string>
     <string name="post_notifications_denied">Berikan izin notifikasi untuk mengaktifkan fungsi ini</string>
@@ -267,7 +251,7 @@
     <string name="add_shortcut_msg">Setelah menyembunyikan aplikasi ini, nama dan ikonnya mungkin sulit dikenali. Apakah Anda ingin menambahkan pintasan ke layar utama?</string>
     <string name="app_not_found">Tidak ditemukan aplikasi untuk menangani tindakan ini</string>
     <string name="reboot_apply_change">Mulai ulang untuk menerapkan perubahan</string>
-    <string name="restore_app_confirmation">Ini akan mengembalikan aplikasi tersembunyi ke aslinya. Apakah Anda benar-benar ingin melakukan ini?</string>
+    <string name="restore_app_confirmation">Ini akan mengembalikan aplikasi yang tersembunyi ke aslinya. Apakah Anda benar-benar ingin melakukan ini?</string>
 
 </resources>
 
