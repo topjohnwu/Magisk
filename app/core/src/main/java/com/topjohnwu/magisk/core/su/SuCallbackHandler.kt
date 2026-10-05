@@ -36,7 +36,13 @@ object SuCallbackHandler {
 
         when (action) {
             LOG -> handleLogging(context, data)
-            NOTIFY -> handleNotify(context, data)
+            NOTIFY -> {
+                if (data.getBoolean("log", false)) {
+                    handleLogging(context, data)
+                } else if (data.getBoolean("notify", true)) {
+                    handleNotify(context, data)
+                }
+            }
         }
     }
 
