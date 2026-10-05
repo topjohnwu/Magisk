@@ -4,7 +4,7 @@ import com.topjohnwu.magisk.core.data.magiskdb.MagiskDB
 
 class SuPolicy(
     val uid: Int,
-    var policy: Int = QUERY,
+    var policy: Int = DENY,
     var remain: Long = -1L,
     var logging: Boolean = true,
     var notification: Boolean = true,

@@ -396,23 +396,6 @@ private fun SuperuserSection(
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
     ) {
-        // Tapjack (SDK < S)
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
-            var tapjack by remember { mutableStateOf(Config.suTapjack) }
-            SettingsSwitch(
-                title = stringResource(CoreR.string.settings_su_tapjack_title),
-                summary = stringResource(CoreR.string.settings_su_tapjack_summary),
-                checked = tapjack,
-                onCheckedChange = {
-                    tapjack = it
-                    Config.suTapjack = it
-                }
-            )
-            HorizontalDivider(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
-            )
-        }
 
         // Authentication
         var suAuth by remember { mutableStateOf(Config.suAuth) }
@@ -498,52 +481,6 @@ private fun SuperuserSection(
             onSelectedIndexChange = {
                 mntNamespaceMode = it
                 Config.suMntNamespaceMode = it
-            }
-        )
-
-        HorizontalDivider(
-            modifier = Modifier.padding(horizontal = 16.dp),
-            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
-        )
-
-        // Automatic Response
-        val autoResponseEntries = remember {
-            resources.getStringArray(CoreR.array.auto_response).toList()
-        }
-        var autoResponse by remember { mutableIntStateOf(Config.suAutoResponse) }
-        SettingsDropdown(
-            title = stringResource(CoreR.string.auto_response),
-            items = autoResponseEntries,
-            selectedIndex = autoResponse,
-            onSelectedIndexChange = { newIndex ->
-                val doIt = {
-                    autoResponse = newIndex
-                    Config.suAutoResponse = newIndex
-                }
-                if (Config.suAuth) viewModel.withAuth(doIt) else doIt()
-            }
-        )
-
-        HorizontalDivider(
-            modifier = Modifier.padding(horizontal = 16.dp),
-            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
-        )
-
-        // Request Timeout
-        val timeoutEntries = remember {
-            resources.getStringArray(CoreR.array.request_timeout).toList()
-        }
-        val timeoutValues = remember { listOf(10, 15, 20, 30, 45, 60) }
-        var timeoutIndex by remember {
-            mutableIntStateOf(timeoutValues.indexOf(Config.suDefaultTimeout).coerceAtLeast(0))
-        }
-        SettingsDropdown(
-            title = stringResource(CoreR.string.request_timeout),
-            items = timeoutEntries,
-            selectedIndex = timeoutIndex,
-            onSelectedIndexChange = {
-                timeoutIndex = it
-                Config.suDefaultTimeout = timeoutValues[it]
             }
         )
 

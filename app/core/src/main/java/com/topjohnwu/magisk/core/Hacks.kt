@@ -51,5 +51,4 @@ val shouldKeepResources = listOf(
     R.string.app_changelog,
     R.string.home_item_source,
     R.drawable.ic_more,
-    R.array.allow_timeout,
 )

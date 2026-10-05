@@ -138,28 +138,15 @@ private abstract class ManifestUpdater: DefaultTask() {
         )
 
         cmpList.add("""
-            |<activity
-            |    android:name="x.COMPONENT_PLACEHOLDER_3"
-            |    android:directBootAware="true"
-            |    android:exported="false"
-            |    android:taskAffinity="">
-            |    <intent-filter>
-            |        <action android:name="android.intent.action.VIEW"/>
-            |        <category android:name="android.intent.category.DEFAULT"/>
-            |    </intent-filter>
-            |</activity>""".ind(2)
-        )
-
-        cmpList.add("""
             |<service
-            |    android:name="x.COMPONENT_PLACEHOLDER_4"
+            |    android:name="x.COMPONENT_PLACEHOLDER_3"
             |    android:exported="false"
             |    android:foregroundServiceType="dataSync" />""".ind(2)
         )
 
         cmpList.add("""
             |<service
-            |    android:name="x.COMPONENT_PLACEHOLDER_5"
+            |    android:name="x.COMPONENT_PLACEHOLDER_4"
             |    android:exported="false"
             |    android:permission="android.permission.BIND_JOB_SERVICE" />""".ind(2)
         )

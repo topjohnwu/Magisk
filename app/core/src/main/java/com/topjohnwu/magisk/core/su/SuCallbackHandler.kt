@@ -18,7 +18,6 @@ import timber.log.Timber
 
 object SuCallbackHandler {
 
-    const val REQUEST = "request"
     const val LOG = "log"
     const val NOTIFY = "notify"
 

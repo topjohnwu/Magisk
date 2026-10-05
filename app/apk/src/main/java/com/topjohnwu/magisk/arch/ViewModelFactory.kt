@@ -14,7 +14,6 @@ import com.topjohnwu.magisk.ui.module.ModuleViewModel
 import com.topjohnwu.magisk.ui.settings.SettingsViewModel
 import com.topjohnwu.magisk.ui.superuser.SuperuserGrantViewModel
 import com.topjohnwu.magisk.ui.superuser.SuperuserViewModel
-import com.topjohnwu.magisk.ui.surequest.SuRequestViewModel
 
 val VMFactory: ViewModelProvider.Factory = viewModelFactory {
     initializer { HomeViewModel(ServiceLocator.networkService) }
@@ -22,7 +21,6 @@ val VMFactory: ViewModelProvider.Factory = viewModelFactory {
     initializer { SuperuserViewModel(ServiceLocator.policyDB) }
     initializer { SuperuserGrantViewModel(ServiceLocator.policyDB) }
     initializer { InstallViewModel(ServiceLocator.networkService) }
-    initializer { SuRequestViewModel(ServiceLocator.policyDB, ServiceLocator.timeoutPrefs) }
     initializer { DenyListViewModel() }
     initializer { FlashViewModel() }
     initializer { ActionViewModel() }

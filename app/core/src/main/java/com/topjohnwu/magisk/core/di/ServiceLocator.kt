@@ -20,7 +20,6 @@ import io.noties.markwon.utils.NoCopySpannableFactory
 object ServiceLocator {
 
     val deContext by lazy { AppContext.deviceProtectedContext }
-    val timeoutPrefs by lazy { deContext.getSharedPreferences("su_timeout", 0) }
 
     // Database
     val policyDB = PolicyDao()
