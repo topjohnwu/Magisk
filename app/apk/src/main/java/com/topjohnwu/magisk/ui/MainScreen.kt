@@ -92,9 +92,13 @@ fun MainScreen(
     val pagerState = rememberPagerState(initialPage = initialPage, pageCount = { visibleTabs.size })
     val fabFocusRequester = remember { FocusRequester() }
     val navModulesFocusRequester = remember { FocusRequester() }
+    val navSuperuserFocusRequester = remember { FocusRequester() }
     val moduleContentFocusRequester = remember { FocusRequester() }
+    val superuserContentFocusRequester = remember { FocusRequester() }
     var moduleFabAction by remember { mutableStateOf<(() -> Unit)?>(null) }
+    var superuserFabAction by remember { mutableStateOf<(() -> Unit)?>(null) }
     val isModulesTab = visibleTabs.getOrNull(pagerState.currentPage) == Tab.MODULES
+    val isSuperuserTab = visibleTabs.getOrNull(pagerState.currentPage) == Tab.SUPERUSER
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -103,16 +107,18 @@ fun MainScreen(
             ShortNavigationBar {
                 visibleTabs.forEachIndexed { index, tab ->
                     val isModulesItem = tab == Tab.MODULES
+                    val isSuperuserItem = tab == Tab.SUPERUSER
                     ShortNavigationBarItem(
                         selected = pagerState.currentPage == index,
                         onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
                         modifier = Modifier
                             .then(
                                 if (isModulesItem) Modifier.focusRequester(navModulesFocusRequester)
+                                else if (isSuperuserItem) Modifier.focusRequester(navSuperuserFocusRequester)
                                 else Modifier
                             )
                             .focusProperties {
-                                if (isModulesTab && isModulesItem) {
+                                if ((isModulesTab && isModulesItem) || (isSuperuserTab && isSuperuserItem)) {
                                     up = fabFocusRequester
                                 }
                             },
@@ -128,18 +134,22 @@ fun MainScreen(
             }
         },
         floatingActionButton = {
+            val showFab = (isModulesTab && moduleFabAction != null) || (isSuperuserTab && superuserFabAction != null)
             AnimatedVisibility(
-                visible = isModulesTab && moduleFabAction != null,
+                visible = showFab,
                 enter = scaleIn() + fadeIn(),
                 exit = scaleOut() + fadeOut(),
             ) {
                 FloatingActionButton(
-                    onClick = { moduleFabAction?.invoke() },
+                    onClick = {
+                        if (isModulesTab) moduleFabAction?.invoke()
+                        else if (isSuperuserTab) superuserFabAction?.invoke()
+                    },
                     modifier = Modifier
                         .focusRequester(fabFocusRequester)
                         .focusProperties {
-                            up = moduleContentFocusRequester
-                            down = navModulesFocusRequester
+                            up = if (isModulesTab) moduleContentFocusRequester else superuserContentFocusRequester
+                            down = if (isModulesTab) navModulesFocusRequester else navSuperuserFocusRequester
                             right = FocusRequester.Cancel
                         },
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -147,7 +157,10 @@ fun MainScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
-                        contentDescription = stringResource(CoreR.string.module_action_install_external),
+                        contentDescription = stringResource(
+                            if (isModulesTab) CoreR.string.module_action_install_external
+                            else CoreR.string.superuser_grant
+                        ),
                         modifier = Modifier.size(28.dp),
                     )
                 }
@@ -182,7 +195,7 @@ fun MainScreen(
                                 cancelFocusChange()
                             }
                         }
-                        if (tab == Tab.MODULES) {
+                        if (tab == Tab.MODULES || tab == Tab.SUPERUSER) {
                             down = fabFocusRequester
                         }
                     }
@@ -215,7 +228,12 @@ fun MainScreen(
                         LaunchedEffect(isCurrentPage) {
                             if (isCurrentPage) vm.startLoading()
                         }
-                        SuperuserScreen(vm)
+                        CollectNavEvents(vm, navigator)
+                        SuperuserScreen(
+                            viewModel = vm,
+                            onRegisterFab = { superuserFabAction = it },
+                            contentFocusRequester = superuserContentFocusRequester,
+                        )
                     }
                     Tab.LOG -> {
                         val vm: LogViewModel = viewModel(factory = VMFactory)
