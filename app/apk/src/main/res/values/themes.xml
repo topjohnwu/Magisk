@@ -3,9 +3,4 @@
 
     <style name="Main" parent="android:Theme.Material.Light.NoActionBar" />
 
-    <style name="Floating" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
-    </style>
-
 </resources>

@@ -54,20 +54,10 @@
     <string name="flash_screen_title">Installation</string>
 
     <!--Superuser-->
-    <string name="su_request_title">Superuser request</string>
-    <string name="touch_filtered_warning">Because an app is obscuring a Superuser request, Magisk can\'t verify your response.</string>
     <string name="deny">Deny</string>
-    <string name="prompt">Prompt</string>
     <string name="restrict">Restrict</string>
     <string name="grant">Grant</string>
     <string name="superuser_grant">Grant Superuser</string>
-    <string name="su_warning">Grants full access to your device.\nDeny if you\'re not sure!</string>
-    <string name="forever">Forever</string>
-    <string name="once">Once</string>
-    <string name="tenmin">10 mins</string>
-    <string name="twentymin">20 mins</string>
-    <string name="thirtymin">30 mins</string>
-    <string name="sixtymin">60 mins</string>
     <string name="su_allow_toast">%1$s was granted Superuser rights</string>
     <string name="su_deny_toast">%1$s was denied Superuser rights</string>
     <string name="su_snack_grant">Superuser rights of %1$s are granted</string>
@@ -170,20 +160,10 @@
     <string name="settings_su_app">Apps only</string>
     <string name="settings_su_adb">ADB only</string>
     <string name="settings_su_disable">Disabled</string>
-    <string name="settings_su_request_10">10 seconds</string>
-    <string name="settings_su_request_15">15 seconds</string>
-    <string name="settings_su_request_20">20 seconds</string>
-    <string name="settings_su_request_30">30 seconds</string>
-    <string name="settings_su_request_45">45 seconds</string>
-    <string name="settings_su_request_60">60 seconds</string>
     <string name="superuser_access">Superuser access</string>
-    <string name="auto_response">Automatic response</string>
-    <string name="request_timeout">Request timeout</string>
     <string name="superuser_notification">Superuser notification</string>
     <string name="settings_su_reauth_title">Reauthenticate after upgrade</string>
     <string name="settings_su_reauth_summary">Ask for Superuser permissions again after upgrading apps</string>
-    <string name="settings_su_tapjack_title">Tapjacking protection</string>
-    <string name="settings_su_tapjack_summary">The Superuser prompt dialog won\'t respond to input while obscured by any other window or overlay</string>
     <string name="settings_su_auth_title">User authentication</string>
     <string name="settings_su_auth_summary">Ask for user authentication during Superuser requests</string>
     <string name="settings_su_auth_insecure">No authentication method is configured on the device</string>

@@ -206,27 +206,7 @@ public class DynLoad {
         {
             var src = stub.activities;
             var dest = app.activities;
-
-            final ActivityInfo sa;
-            final ActivityInfo da;
-            final ActivityInfo sb;
-            final ActivityInfo db;
-            if (src[0].exported) {
-                sa = src[0];
-                sb = src[1];
-            } else {
-                sa = src[1];
-                sb = src[0];
-            }
-            if (dest[0].exported) {
-                da = dest[0];
-                db = dest[1];
-            } else {
-                da = dest[1];
-                db = dest[0];
-            }
-            mapping.put(sa.name, da.name);
-            mapping.put(sb.name, db.name);
+            mapping.put(src[0].name, dest[0].name);
         }
 
         {
