@@ -20,7 +20,10 @@ extern const char *(*sqlite3_errstr)(int);
 // Transparent wrappers of sqlite3_stmt
 struct DbValues {
     const char *get_text(int index) const;
-    rust::Str get_str(int index) const { return get_text(index); }
+    rust::Str get_str(int index) const {
+        auto text = get_text(index);
+        return text ? rust::Str(text) : rust::Str();
+    }
     int get_int(int index) const;
     ~DbValues() = delete;
 };
