@@ -235,8 +235,8 @@ void exec_module_scripts(Utf8CStr stage, const rust::Vec<ModuleInfo> &module_lis
 constexpr char install_script[] = R"EOF(
 APK=%s
 log -t Magisk "pm_install: $APK"
-log -t Magisk "pm_install: $(pm install -g -r $APK 2>&1)"
-appops set %s REQUEST_INSTALL_PACKAGES allow
+log -t Magisk "pm_install: $(pm install --user all -g -r $APK 2>&1)"
+appops set --user all %s REQUEST_INSTALL_PACKAGES allow
 rm -f $APK
 )EOF";
 
@@ -250,7 +250,7 @@ void install_apk(Utf8CStr apk) {
 constexpr char uninstall_script[] = R"EOF(
 PKG=%s
 log -t Magisk "pm_uninstall: $PKG"
-log -t Magisk "pm_uninstall: $(pm uninstall $PKG 2>&1)"
+log -t Magisk "pm_uninstall: $(pm uninstall --user all $PKG 2>&1)"
 )EOF";
 
 void uninstall_pkg(Utf8CStr pkg) {

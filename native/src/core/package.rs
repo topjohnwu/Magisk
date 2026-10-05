@@ -469,6 +469,12 @@ impl MagiskD {
 
     pub fn ensure_manager(&self) {
         let mut info = self.manager_info.lock();
+        for user in self.get_users() {
+            let (_, pkg) = info.get_manager(self, user, false);
+            if !pkg.is_empty() {
+                return;
+            }
+        }
         let _ = info.get_manager(self, 0, true);
     }
 

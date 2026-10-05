@@ -35,17 +35,21 @@ impl MagiskD {
 
         let mut buf = cstr::buf::default();
 
-        let app_bin_dir = buf
-            .append_path(self.app_data_dir())
-            .append_path("0")
-            .append_path(APP_PACKAGE_NAME)
-            .append_path("install");
+        for user in self.get_users() {
+            buf.append_path(self.app_data_dir())
+                .append_path_fmt(user)
+                .append_path(APP_PACKAGE_NAME)
+                .append_path("install");
+            if buf.exists() {
+                break;
+            }
+        }
 
         // Alternative binaries paths
-        let alt_bin_dirs = &[
+        let alt_bin_dirs = [
             cstr!("/cache/data_adb/magisk"),
             cstr!("/data/magisk"),
-            app_bin_dir,
+            &buf,
         ];
         for dir in alt_bin_dirs {
             if dir.exists() {
