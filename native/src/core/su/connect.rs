@@ -108,31 +108,7 @@ impl MagiskD {
         }
     }
 
-    fn app_notify(&self, cred: &UCred, info: &SuInfo) {
-        let extras = [
-            Extra {
-                key: "from.uid",
-                value: Int(cred.uid.as_()),
-            },
-            Extra {
-                key: "pid",
-                value: Int(cred.pid.unwrap_or(-1).as_()),
-            },
-            Extra {
-                key: "policy",
-                value: Int(info.settings.policy.repr),
-            },
-        ];
-        if to_app_id(info.eval_uid) < AID_APP_START {
-            for user in self.get_users() {
-                self.exec_cmd(user, &info.mgr_pkg, "notify", &extras);
-            }
-        } else {
-            self.exec_cmd(to_user_id(info.eval_uid), &info.mgr_pkg, "notify", &extras);
-        }
-    }
-
-    fn app_log(&self, cred: &UCred, info: &SuInfo, request: &SuRequest) {
+    fn app_notify(&self, cred: &UCred, info: &SuInfo, request: &SuRequest) {
         let command = if request.command.is_empty() {
             &request.shell
         } else {
@@ -175,13 +151,17 @@ impl MagiskD {
                 key: "notify",
                 value: Bool(info.settings.notify),
             },
+            Extra {
+                key: "log",
+                value: Bool(info.settings.log),
+            },
         ];
         if to_app_id(info.eval_uid) < AID_APP_START {
             for user in self.get_users() {
-                self.exec_cmd(user, &info.mgr_pkg, "log", &extras);
+                self.exec_cmd(user, &info.mgr_pkg, "notify", &extras);
             }
         } else {
-            self.exec_cmd(to_user_id(info.eval_uid), &info.mgr_pkg, "log", &extras);
+            self.exec_cmd(to_user_id(info.eval_uid), &info.mgr_pkg, "notify", &extras);
         }
     }
 
@@ -199,11 +179,7 @@ impl MagiskD {
         }
 
         // Notify su usage to application
-        if info.settings.log {
-            self.app_log(cred, info, request);
-        } else if info.settings.notify {
-            self.app_notify(cred, info);
-        }
+        self.app_notify(cred, info, request);
 
         exit(0);
     }
