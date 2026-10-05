@@ -502,4 +502,27 @@ impl MagiskD {
         }();
         list
     }
+
+    pub fn get_users(&self) -> Vec<i32> {
+        let mut users = Vec::new();
+        let _ = || -> LoggedResult<()> {
+            let mut app_data_dir = Directory::open(self.app_data_dir())?;
+            while let Some(e) = app_data_dir.read()? {
+                if e.is_dir()
+                    && let Ok(user) = e.name().parse::<i32>()
+                    && user >= 0
+                {
+                    users.push(user);
+                }
+            }
+            Ok(())
+        }();
+        if !users.contains(&0) {
+            users.push(0);
+        }
+        users.sort_unstable();
+        users.dedup();
+        users
+    }
 }
+

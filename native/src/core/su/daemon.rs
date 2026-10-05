@@ -1,5 +1,5 @@
 use super::db::RootSettings;
-use crate::daemon::{AID_ROOT, AID_SHELL, MagiskD, to_app_id, to_user_id};
+use crate::daemon::{AID_APP_START, AID_ROOT, AID_SHELL, MagiskD, to_app_id, to_user_id};
 use crate::db::{DbSettings, MultiuserMode, RootAccess};
 use crate::ffi::{SuPolicy, SuRequest, exec_root_shell};
 use crate::socket::IpcRead;
@@ -201,7 +201,17 @@ impl MagiskD {
             let mut settings = RootSettings::default();
             self.get_root_settings(eval_uid, &mut settings)?;
 
-            let (mgr_uid, mgr_pkg) = self.get_manager(to_user_id(eval_uid), true);
+            let (mut mgr_uid, mut mgr_pkg) = self.get_manager(to_user_id(eval_uid), true);
+            if mgr_pkg.is_empty() && to_app_id(eval_uid) < AID_APP_START {
+                for user in self.get_users() {
+                    let (id, pkg) = self.get_manager(user, true);
+                    if !pkg.is_empty() {
+                        mgr_uid = id;
+                        mgr_pkg = pkg;
+                        break;
+                    }
+                }
+            }
 
             // If it's the manager, allow it silently
             if to_app_id(uid) == to_app_id(mgr_uid) {

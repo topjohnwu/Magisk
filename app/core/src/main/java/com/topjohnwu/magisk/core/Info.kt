@@ -60,6 +60,10 @@ object Info {
             || getProperty("ro.kernel.qemu", "0") == "1"
             || getProperty("ro.boot.qemu", "0") == "1"
 
+    val isHeadlessSystemUser by lazy {
+        getProperty("ro.fw.mu.headless_system_user", "false").toBoolean()
+    }
+
     val isConnected = MutableLiveData(false)
 
     val showSuperUser: Boolean get() {
