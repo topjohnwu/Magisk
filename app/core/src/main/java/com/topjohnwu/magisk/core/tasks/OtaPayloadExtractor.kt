@@ -18,9 +18,9 @@ class OtaPayloadExtractor(
     private val outFile: File,
     private val console: MutableList<String>,
     private val logs: MutableList<String>,
-) {
+) : ImageExtractor {
     @Throws(IOException::class)
-    fun consume(channel: DataChannel) {
+    override suspend fun extract(channel: DataChannel) {
         channel.use {
             val manifest = readPayloadHeader(it)
             val dataBase = channel.position()

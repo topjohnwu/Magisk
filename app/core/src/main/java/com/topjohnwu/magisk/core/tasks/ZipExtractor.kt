@@ -16,9 +16,9 @@ class ZipExtractor(
     private val outFile: File,
     private val console: MutableList<String>,
     private val logs: MutableList<String>,
-) {
+) : ImageExtractor {
     @Throws(IOException::class)
-    fun consume(channel: DataChannel) {
+    override suspend fun extract(channel: DataChannel) {
         ZipFile.builder()
             .setSeekableByteChannel(channel)
             .setIgnoreLocalFileHeader(true)
@@ -49,7 +49,7 @@ class ZipExtractor(
     }
 
     @Throws(IOException::class)
-    private fun extractFromOTAPackage(
+    private suspend fun extractFromOTAPackage(
         payload: ZipArchiveEntry,
         channel: DataChannel,
     ) {
@@ -58,7 +58,7 @@ class ZipExtractor(
         }
 
         OtaPayloadExtractor(outFile, console, logs)
-            .consume(channel.slice(payload.dataOffset, payload.size))
+            .extract(channel.slice(payload.dataOffset, payload.size))
     }
 
     @Throws(IOException::class)

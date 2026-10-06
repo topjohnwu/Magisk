@@ -40,16 +40,29 @@ import java.security.SecureRandom
 import java.util.Locale
 import java.util.concurrent.atomic.AtomicBoolean
 
+interface WholeFilePatcher {
+    @Throws(IOException::class)
+    suspend fun start(channel: DataChannel): ExtendedFile
+
+    @Throws(IOException::class)
+    suspend fun finish(patched: ExtendedFile)
+}
+
+interface ImageExtractor {
+    @Throws(IOException::class)
+    suspend fun extract(channel: DataChannel)
+}
+
 abstract class MagiskInstallImpl protected constructor(
     protected val console: MutableList<String>,
     private val logs: MutableList<String>
 ) {
 
     private lateinit var installDir: ExtendedFile
-    private lateinit var srcBoot: ExtendedFile
+    private lateinit var targetImage: ExtendedFile
 
     private val shell = Shell.getShell()
-    private val useRootDir = shell.isRoot && Info.noDataExec
+    private val useRootFs = shell.isRoot && Info.noDataExec
     protected val context get() = ServiceLocator.deContext
 
     private val rootFS get() = RootUtils.fs
@@ -82,7 +95,7 @@ abstract class MagiskInstallImpl protected constructor(
             console.add("! Unable to detect target image")
             return false
         }
-        srcBoot = rootFS.getFile(bootPath)
+        targetImage = rootFS.getFile(bootPath)
         console.add("- Target image: $bootPath")
         return true
     }
@@ -169,7 +182,7 @@ abstract class MagiskInstallImpl protected constructor(
             return false
         }
 
-        if (useRootDir) {
+        if (useRootFs) {
             // Move everything to tmpfs to workaround Samsung bullshit
             rootFS.getFile(Const.TMPDIR).also {
                 arrayOf(
@@ -223,7 +236,7 @@ abstract class MagiskInstallImpl protected constructor(
                 val tarMagic = head.copyOfRange(257, 262)
 
                 return if (tarMagic.contentEquals("ustar".toByteArray())) {
-                    processArchive(input)
+                    processWholeFile(input)
                 } else {
                     extractAndProcessImage(input, magic)
                 }
@@ -237,14 +250,14 @@ abstract class MagiskInstallImpl protected constructor(
 
     // Patch the boot image in a tar archive, and output a new tar archive
     // with all the original entries and the patched boot image
-    private suspend fun processArchive(input: DataChannel): Boolean {
+    private suspend fun processWholeFile(input: DataChannel): Boolean {
         val outFile = MediaStoreUtils.getFile("$destName.tar")
         val outStream = outFile.uri.outputStream().buffered(1024 * 1024)
         val tar = TarProcessor(installDir, outStream, console, logs)
 
         // Process input file
         try {
-            srcBoot = tar.consume(input)
+            targetImage = tar.start(input)
         } catch (e: IOException) {
             runCatching { outStream.close() }
             outFile.delete()
@@ -282,15 +295,15 @@ abstract class MagiskInstallImpl protected constructor(
     // Extract the boot image from the input, and output the patched boot image
     private suspend fun extractAndProcessImage(input: DataChannel, magic: ByteArray): Boolean {
         // Process input file
-        srcBoot = installDir.getChildFile("boot.img")
+        targetImage = installDir.getChildFile("boot.img")
         try {
             if (magic.contentEquals("CrAU".toByteArray())) {
-                OtaPayloadExtractor(srcBoot, console, logs).consume(input)
+                OtaPayloadExtractor(targetImage, console, logs).extract(input)
             } else if (magic.contentEquals("PK\u0003\u0004".toByteArray())) {
-                ZipExtractor(srcBoot, console, logs).consume(input)
+                ZipExtractor(targetImage, console, logs).extract(input)
             } else {
                 console.add("- Copying image to cache")
-                input.stream().use { it.copyAndCloseOut(srcBoot.newOutputStream()) }
+                input.stream().use { it.copyAndCloseOut(targetImage.newOutputStream()) }
             }
         } catch (e: IOException) {
             console.add("! Process error")
@@ -328,7 +341,7 @@ abstract class MagiskInstallImpl protected constructor(
         console.add("****************************")
 
         // Fix up binaries
-        srcBoot.delete()
+        targetImage.delete()
         "cp_readlink $installDir".sh()
 
         return true
@@ -336,7 +349,7 @@ abstract class MagiskInstallImpl protected constructor(
 
     private fun patchBoot(): Boolean {
         val newBoot = installDir.getChildFile("new-boot.img")
-        if (!useRootDir) {
+        if (!useRootFs) {
             // Create output files before hand
             newBoot.createNewFile()
             File(installDir, "stock_boot.img").createNewFile()
@@ -349,7 +362,7 @@ abstract class MagiskInstallImpl protected constructor(
             "PATCHVBMETAFLAG=${Info.patchBootVbmeta} " +
             "RECOVERYMODE=${Config.recovery} " +
             "LEGACYSAR=${Info.legacySAR} " +
-            "sh boot_patch.sh $srcBoot")
+            "sh boot_patch.sh $targetImage")
         val isSuccess = cmds.sh().isSuccess
 
         shell.newJob().add("./magiskboot cleanup", "cd /").exec()
@@ -357,7 +370,7 @@ abstract class MagiskInstallImpl protected constructor(
         return isSuccess
     }
 
-    private fun flashBoot() = "direct_install $installDir $srcBoot".sh().isSuccess
+    private fun flashBoot() = "direct_install $installDir $targetImage".sh().isSuccess
 
     private fun postOTA(): Boolean {
         "post_ota".sh()
@@ -369,11 +382,9 @@ abstract class MagiskInstallImpl protected constructor(
         return true
     }
 
-    private fun Array<String>.eq() = shell.newJob().add(*this).to(console, logs).enqueue()
     private fun String.sh() = shell.newJob().add(this).to(console, logs).exec()
     private fun Array<String>.sh() = shell.newJob().add(*this).to(console, logs).exec()
     private fun String.fsh() = ShellUtils.fastCmd(shell, this)
-    private fun Array<String>.fsh() = ShellUtils.fastCmd(shell, *this)
 
     protected suspend fun patchFile(file: Uri) = extractFiles() && processFile(file)
 
@@ -386,7 +397,7 @@ abstract class MagiskInstallImpl protected constructor(
 
     protected suspend fun fixEnv() = extractFiles() && "fix_env $installDir".sh().isSuccess
 
-    protected fun restore() = findImage() && "restore_imgs $srcBoot".sh().isSuccess
+    protected fun restore() = findImage() && "restore_imgs $targetImage".sh().isSuccess
 
     protected fun uninstall() = "run_uninstaller $AppApkPath".sh().isSuccess
 
