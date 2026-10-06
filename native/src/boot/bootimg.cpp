@@ -17,7 +17,6 @@ using namespace std;
 
 #define RETURN_OK       0
 #define RETURN_ERROR    1
-#define RETURN_CHROMEOS 2
 #define RETURN_VENDOR   3
 
 static FileFormat check_fmt(const void *buf, size_t len) {
@@ -169,9 +168,9 @@ map(image), k_fmt(FileFormat::UNKNOWN), r_fmt(FileFormat::UNKNOWN), e_fmt(FileFo
         FileFormat fmt = check_fmt(addr, map.size());
         switch (fmt) {
         case FileFormat::CHROMEOS:
-            // chromeos require external signing
             flags[CHROMEOS_FLAG] = true;
-            addr += 65535;
+            fprintf(stderr, "CHROMEOS\n");
+            addr += chromeos_vblock_size() - 1;
             break;
         case FileFormat::DHTB:
             flags[DHTB_FLAG] = true;
@@ -576,7 +575,6 @@ int unpack(Utf8CStr image, bool skip_decomp, bool hdr) {
     // Dump bootconfig
     dump(boot.bootconfig, boot.hdr->bootconfig_size(), BOOTCONFIG_FILE);
 
-    if (boot.flags[CHROMEOS_FLAG]) return RETURN_CHROMEOS;
     if (boot.hdr->is_vendor()) return RETURN_VENDOR;
     return RETURN_OK;
 }
@@ -620,7 +618,10 @@ void repack(Utf8CStr src_img, Utf8CStr out_img, bool skip_comp) {
     int fd = open(out_img.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0644);
 
     // Copy non-standard headers
-    if (boot.flags[DHTB_FLAG]) {
+    if (boot.flags[CHROMEOS_FLAG]) {
+        // Preallocate the vblock, which is generated after the image is fully patched
+        write_zero(fd, chromeos_vblock_size());
+    } else if (boot.flags[DHTB_FLAG]) {
         xwrite(fd, boot.map.data(), sizeof(dhtb_hdr));
     } else if (boot.flags[BLOB_FLAG]) {
         xwrite(fd, boot.map.data(), sizeof(blob_hdr));
@@ -811,8 +812,16 @@ void repack(Utf8CStr src_img, Utf8CStr out_img, bool skip_comp) {
         xwrite(fd, boot.vbmeta, vbmeta_size);
     }
 
-    // Pad image to original size if not chromeos (as it requires post processing)
-    if (!boot.flags[CHROMEOS_FLAG]) {
+    uint32_t chromeos_kernel_sz = 0;
+    if (boot.flags[CHROMEOS_FLAG]) {
+        // The whole repacked image is the kernel payload of the ChromeOS kernel blob.
+        // Padding to the original size is done after signing.
+        chromeos_kernel_sz = lseek(fd, 0, SEEK_CUR) - off.header;
+        file_align_with(4096);
+        auto trailer = chromeos_blob_trailer();
+        xwrite(fd, trailer.data(), trailer.size());
+    } else {
+        // Pad image to original size
         off_t current = lseek(fd, 0, SEEK_CUR);
         if (current < boot.map.size()) {
             write_zero(fd, boot.map.size() - current);
@@ -924,6 +933,22 @@ void repack(Utf8CStr src_img, Utf8CStr out_img, bool skip_comp) {
         if (!sig.empty()) {
             lseek(fd, off.tail, SEEK_SET);
             xwrite(fd, sig.data(), sig.size());
+        }
+    }
+
+    if (boot.flags[CHROMEOS_FLAG]) {
+        // ChromeOS signature covers the whole image, so it has to be the very last step
+        auto vblock = sign_chromeos(byte_view(out.data() + off.header, chromeos_kernel_sz));
+        if (vblock.empty()) {
+            fprintf(stderr, "Failed to sign ChromeOS boot image\n");
+            exit(1);
+        }
+        memcpy(out.data(), vblock.data(), vblock.size());
+        // Pad image to original size after signing. Data beyond the signed
+        // kernel blob is not covered by the signature and is ignored.
+        off_t current = lseek(fd, 0, SEEK_END);
+        if (current < boot.map.size()) {
+            write_zero(fd, boot.map.size() - current);
         }
     }
 

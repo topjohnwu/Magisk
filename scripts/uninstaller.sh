@@ -61,8 +61,6 @@ chmod -R 755 $BINDIR
 
 cd $BINDIR
 
-CHROMEOS=false
-
 ui_print "- Unpacking boot image"
 # Dump image for MTD/NAND character device boot partitions
 if [ -c $BOOTIMAGE ]; then
@@ -75,10 +73,6 @@ fi
 case $? in
   1 )
     abort "! Unsupported/Unknown image format"
-    ;;
-  2 )
-    ui_print "- ChromeOS boot image detected"
-    CHROMEOS=true
     ;;
 esac
 
@@ -127,11 +121,6 @@ case $((STATUS & 3)) in
         rm -f ramdisk.cpio
       fi
       ./magiskboot repack $BOOTIMAGE
-      # Sign chromeos boot
-      if $CHROMEOS; then
-        ui_print "- Signing ChromeOS boot image"
-        ./magiskboot sign-chromeos new-boot.img || abort "! Unable to sign ChromeOS boot image"
-      fi
       ui_print "- Flashing restored boot image"
       flash_image new-boot.img $BOOTIMAGE || abort "! Insufficient partition size"
     fi

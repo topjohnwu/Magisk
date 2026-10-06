@@ -81,7 +81,6 @@ chmod -R 755 .
 # Unpack
 #########
 
-CHROMEOS=false
 VENDORBOOT=false
 
 ui_print "- Unpacking boot image"
@@ -89,10 +88,6 @@ ui_print "- Unpacking boot image"
 
 case $? in
   0 ) ;;
-  2 )
-    ui_print "- ChromeOS boot image detected"
-    CHROMEOS=true
-    ;;
   3 )
     ui_print "- Vendor boot image detected"
     VENDORBOOT=true
@@ -254,12 +249,6 @@ fi
 
 ui_print "- Repacking boot image"
 ./magiskboot repack "$BOOTIMAGE" || abort "! Unable to repack boot image"
-
-# Sign chromeos boot
-if $CHROMEOS; then
-  ui_print "- Signing ChromeOS boot image"
-  ./magiskboot sign-chromeos new-boot.img || abort "! Unable to sign ChromeOS boot image"
-fi
 
 # Restore the original boot partition path
 [ -e "$BOOTNAND" ] && BOOTIMAGE="$BOOTNAND"

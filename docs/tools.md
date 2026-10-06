@@ -37,7 +37,7 @@ Supported actions:
     dumped to the file 'header', which can be used to modify header
     configurations during repacking.
     Return values:
-    0:valid    1:error    2:chromeos    3:vendor_boot
+    0:valid    1:error    3:vendor_boot
 
   repack [-n] <origbootimg> [outbootimg]
     Repack boot image components using files from the current directory
@@ -52,6 +52,8 @@ Supported actions:
     If '-n' is provided, all compression operations will be skipped.
     If env variable PATCHVBMETAFLAG is set to true, all disable flags in
     the boot image's vbmeta header will be set.
+    ChromeOS boot images will be automatically re-signed with the
+    developer keys bundled in the executable.
 
   verify <bootimg> [x509.pem]
     Check whether the boot image is signed with AVB 1.0 signature.

@@ -2,7 +2,7 @@ use crate::compress::{compress_cmd, decompress_cmd};
 use crate::cpio::{cpio_commands, print_cpio_usage};
 use crate::dtb::{DtbAction, dtb_commands, print_dtb_usage};
 use crate::ffi::{BootImage, FileFormat, cleanup, repack, split_image_dtb, unpack};
-use crate::futility::sign_chromeos_image;
+use crate::futility::{CROS_ALIGN, align_up, chromeos_blob_trailer, sign_chromeos};
 use crate::patch::hexpatch;
 use crate::payload::extract_boot_from_payload;
 use crate::sign::{sha1_hash, sign_boot_image};
@@ -11,7 +11,7 @@ use base::libc::umask;
 use base::nix::fcntl::OFlag;
 use base::{
     CmdArgs, EarlyExitExt, LoggedResult, MappedFile, PositionalArgParser, ResultExt, Utf8CStr,
-    Utf8CString, WriteExt, argh, cmdline_logging, cstr, log_err,
+    Utf8CStrBuf, Utf8CString, WriteExt, argh, cmdline_logging, cstr, log_err,
 };
 use std::ffi::c_char;
 use std::io::{Seek, SeekFrom, Write};
@@ -216,7 +216,7 @@ Supported actions:
     dumped to the file 'header', which can be used to modify header
     configurations during repacking.
     Return values:
-    0:valid    1:error    2:chromeos    3:vendor_boot
+    0:valid    1:error    3:vendor_boot
 
   repack [-n] <origbootimg> [outbootimg]
     Repack boot image components using files from the current directory
@@ -231,6 +231,8 @@ Supported actions:
     If '-n' is provided, all compression operations will be skipped.
     If env variable PATCHVBMETAFLAG is set to true, all disable flags in
     the boot image's vbmeta header will be set.
+    ChromeOS boot images will be automatically re-signed with the
+    developer keys bundled in the executable.
 
   verify <bootimg> [x509.pem]
     Check whether the boot image is signed with AVB 1.0 signature.
@@ -343,11 +345,22 @@ fn sign_cmd(
 }
 
 fn sign_chromeos_cmd(image: &Utf8CStr, out: Option<&Utf8CStr>) -> LoggedResult<()> {
-    // Drop the mapped input before writing, as output can be the same file
-    let signed = sign_chromeos_image(MappedFile::open(image)?.as_ref())?;
     let out = out.unwrap_or(image);
-    let mut fd = out.create(OFlag::O_WRONLY | OFlag::O_TRUNC | OFlag::O_CLOEXEC, 0o644)?;
-    fd.write_all(&signed)?;
+    let kernel = MappedFile::open(image)?;
+    let kernel = kernel.as_ref();
+    let vblock = sign_chromeos(kernel)?;
+
+    // Write to a temporary file first, as the output can be the same file as the input
+    let mut tmp = cstr::buf::default();
+    tmp.push_str(out);
+    tmp.push_str(".tmp");
+    let mut fd = tmp.create(OFlag::O_WRONLY | OFlag::O_TRUNC | OFlag::O_CLOEXEC, 0o644)?;
+    fd.write_all(&vblock)?;
+    fd.write_all(kernel)?;
+    fd.write_zeros(align_up(kernel.len(), CROS_ALIGN) - kernel.len())?;
+    fd.write_all(&chromeos_blob_trailer())?;
+    drop(fd);
+    tmp.rename_to(out)?;
     Ok(())
 }
 
