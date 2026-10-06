@@ -20,7 +20,14 @@ extern const char *(*sqlite3_errstr)(int);
 // Transparent wrappers of sqlite3_stmt
 struct DbValues {
     const char *get_text(int index) const;
-    rust::Str get_str(int index) const { return get_text(index); }
+    rust::Str get_str(int index) const {
+        const char *text = get_text(index);
+        // sqlite3_column_text returns nullptr for NULL columns. Constructing a
+        // rust::Str from a null pointer is undefined behavior and will crash
+        // the daemon (e.g. `magisk --sqlite "SELECT sql FROM sqlite_master"`).
+        // Return an empty string for NULL values instead.
+        return text == nullptr ? rust::Str("") : rust::Str(text);
+    }
     int get_int(int index) const;
     ~DbValues() = delete;
 };
