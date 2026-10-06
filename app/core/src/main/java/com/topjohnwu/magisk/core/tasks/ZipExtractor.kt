@@ -142,7 +142,7 @@ class ZipExtractor(
 
             ZipMethod.DEFLATED.code -> {
                 InflaterInputStream(
-                    channel.sliceStream(entry.dataOffset, entry.size),
+                    channel.stream(entry.dataOffset, entry.size),
                     Inflater(true),
                     16 * 1024
                 ).use { input ->
