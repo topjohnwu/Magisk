@@ -107,18 +107,13 @@ object Notifications {
     private const val SU_NOTIFICATION_TIMEOUT_MS = 3_000L
 
     @SuppressLint("InlinedApi")
-    fun suNotification(granted: Boolean, appName: String) {
+    fun suNotification(granted: Boolean, text: String) {
         AppContext.apply {
             val flag = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
             val pending = PendingIntent.getActivity(this, 0, selfLaunchIntent(), flag)
             val title = getString(
                 if (granted) R.string.su_notification_granted_title
                 else R.string.su_notification_denied_title
-            )
-            val text = getString(
-                if (granted) R.string.su_allow_toast
-                else R.string.su_deny_toast,
-                appName
             )
             val builder = if (SDK_INT >= Build.VERSION_CODES.O) {
                 Notification.Builder(this, SU_CHANNEL)
