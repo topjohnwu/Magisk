@@ -36,7 +36,14 @@ public abstract class DataChannel implements SeekableByteChannel {
 
     public abstract DataChannel slice(long offset, long sliceSize);
 
-    public abstract InputStream sliceStream(long offset, long sliceSize) throws IOException;
+    public abstract InputStream stream(long offset, long sliceSize) throws IOException;
+
+    /**
+     * Create an InputStream of the entire channel. The caller must close it.
+     */
+    public InputStream stream() throws IOException {
+        return stream(0, size);
+    }
 
     @Override
     public int read(ByteBuffer dst) throws IOException {
@@ -142,7 +149,7 @@ public abstract class DataChannel implements SeekableByteChannel {
     }
 
     private int readDirectly(ByteBuffer dst, long position) throws IOException {
-        try (var channel = Channels.newChannel(sliceStream(position, dst.remaining()))) {
+        try (var channel = Channels.newChannel(stream(position, dst.remaining()))) {
             int totalBytesRead = 0;
             while (true) {
                 int bytesRead = channel.read(dst);
@@ -220,7 +227,7 @@ public abstract class DataChannel implements SeekableByteChannel {
         }
 
         @Override
-        public InputStream sliceStream(long offset, long sliceSize) throws IOException {
+        public InputStream stream(long offset, long sliceSize) throws IOException {
             long endPosition = Math.min(offset + sliceSize, size) + startOffset;
             var startPosition = startOffset + offset;
             var readLength = endPosition - startPosition;
@@ -284,7 +291,7 @@ public abstract class DataChannel implements SeekableByteChannel {
         }
 
         @Override
-        public InputStream sliceStream(long offset, long sliceSize) throws IOException {
+        public InputStream stream(long offset, long sliceSize) throws IOException {
             long endPosition = Math.min(offset + sliceSize, size) + startOffset;
             var startPosition = startOffset + offset;
 
