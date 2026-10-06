@@ -15,7 +15,7 @@ import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.ktx.copyAll
 import com.topjohnwu.magisk.core.ktx.writeTo
-import com.topjohnwu.magisk.core.utils.DataSourceChannel
+import com.topjohnwu.magisk.core.utils.DataChannel
 import com.topjohnwu.magisk.core.utils.DummyList
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.inputStream
@@ -37,7 +37,6 @@ import org.apache.commons.compress.compressors.lz4.FramedLZ4CompressorInputStrea
 import timber.log.Timber
 import java.io.File
 import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.io.FilterInputStream
 import java.io.IOException
 import java.io.InputStream
@@ -367,11 +366,9 @@ abstract class MagiskInstallImpl protected constructor(
 
                     try {
                         if (magic.contentEquals("CrAU".toByteArray())) {
-                            DataSourceChannel(channel).use { source ->
-                                Payload(source).extract(boot, console, logs)
-                            }
+                            OtaPayloadExtractor(boot, console, logs).consume(DataChannel.File(channel))
                         } else if (magic.contentEquals("PK\u0003\u0004".toByteArray())) {
-                            ExtractImage(boot, console, logs).consume(DataSourceChannel(channel))
+                            ZipExtractor(boot, console, logs).consume(DataChannel.File(channel))
                         } else {
                             console.add("- Copying image to cache")
                             src.copyAndCloseOut(boot.newOutputStream())
@@ -434,8 +431,8 @@ abstract class MagiskInstallImpl protected constructor(
         // Download image from url
         try {
             srcBoot = installDir.getChildFile("boot.img")
-            ExtractImage(srcBoot, console, logs)
-                .consume(DataSourceChannel(ServiceLocator.okhttp, url))
+            ZipExtractor(srcBoot, console, logs)
+                .consume(DataChannel.Http(ServiceLocator.okhttp, url))
         } catch (e: IOException) {
             console.add("! Error: " + e.message)
             Timber.e(e)

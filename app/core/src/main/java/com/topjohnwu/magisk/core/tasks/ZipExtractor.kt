@@ -1,6 +1,6 @@
 package com.topjohnwu.magisk.core.tasks
 
-import com.topjohnwu.magisk.core.utils.DataSourceChannel
+import com.topjohnwu.magisk.core.utils.DataChannel
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
 import org.apache.commons.compress.archivers.zip.ZipFile
 import org.apache.commons.compress.archivers.zip.ZipMethod
@@ -12,13 +12,13 @@ import java.nio.file.StandardOpenOption
 import java.util.zip.Inflater
 import java.util.zip.InflaterInputStream
 
-class ExtractImage(
+class ZipExtractor(
     private val outFile: File,
     private val console: MutableList<String>,
     private val logs: MutableList<String>,
 ) {
     @Throws(IOException::class)
-    fun consume(channel: DataSourceChannel) {
+    fun consume(channel: DataChannel) {
         ZipFile.builder()
             .setSeekableByteChannel(channel)
             .setIgnoreLocalFileHeader(true)
@@ -51,21 +51,20 @@ class ExtractImage(
     @Throws(IOException::class)
     private fun extractFromOTAPackage(
         payload: ZipArchiveEntry,
-        channel: DataSourceChannel,
+        channel: DataChannel,
     ) {
         if (payload.method != ZipMethod.STORED.code) {
             throw IOException("payload.bin is compressed, expected STORED method")
         }
 
-        channel.slice(payload.dataOffset, payload.size).use { payloadChannel ->
-            Payload(payloadChannel).extract(outFile, console, logs)
-        }
+        OtaPayloadExtractor(outFile, console, logs)
+            .consume(channel.slice(payload.dataOffset, payload.size))
     }
 
     @Throws(IOException::class)
     private fun extractFromFactoryImage(
         zipFile: ZipFile,
-        channel: DataSourceChannel,
+        channel: DataChannel,
     ) {
         console.add("- Processing as factory image package")
 
@@ -96,7 +95,7 @@ class ExtractImage(
     @Throws(IOException::class)
     private fun extractFromInnerImageZip(
         entry: ZipArchiveEntry,
-        channel: DataSourceChannel,
+        channel: DataChannel,
     ) {
         logs.add("Found inner image ZIP: ${entry.name}")
 
@@ -120,7 +119,7 @@ class ExtractImage(
     private fun extractImageFile(
         zipFile: ZipFile,
         entry: ZipArchiveEntry,
-        channel: DataSourceChannel,
+        channel: DataChannel,
     ) {
         console.add("- Found boot image entry: ${entry.name} (${entry.size} bytes)")
         console.add("- Downloading")
@@ -143,7 +142,7 @@ class ExtractImage(
 
             ZipMethod.DEFLATED.code -> {
                 InflaterInputStream(
-                    channel.streamRead(entry.dataOffset, entry.size),
+                    channel.sliceStream(entry.dataOffset, entry.size),
                     Inflater(true),
                     16 * 1024
                 ).use { input ->

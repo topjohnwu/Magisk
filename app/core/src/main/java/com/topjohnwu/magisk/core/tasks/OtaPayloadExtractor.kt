@@ -3,7 +3,7 @@ package com.topjohnwu.magisk.core.tasks
 import chromeos_update_engine.DeltaArchiveManifest
 import chromeos_update_engine.InstallOperation
 import chromeos_update_engine.PartitionUpdate
-import com.topjohnwu.magisk.core.utils.DataSourceChannel
+import com.topjohnwu.magisk.core.utils.DataChannel
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream
 import org.apache.commons.compress.compressors.xz.XZCompressorInputStream
 import java.io.File
@@ -14,40 +14,42 @@ import java.nio.channels.FileChannel
 import java.nio.file.StandardOpenOption
 import java.security.MessageDigest
 
-class Payload(private val channel: DataSourceChannel) {
-    private val manifest: DeltaArchiveManifest
-    private var dataBase = 0L
+class OtaPayloadExtractor(
+    private val outFile: File,
+    private val console: MutableList<String>,
+    private val logs: MutableList<String>,
+) {
+    @Throws(IOException::class)
+    fun consume(channel: DataChannel) {
+        channel.use {
+            val manifest = readPayloadHeader(it)
+            val dataBase = channel.position()
 
-    init {
-        manifest = readPayloadHeader()
+            val partition = findPartition(manifest)
+            console.add("- Found partition ${partition.partition_name}")
+
+            val actualHash = extractPartition(it, manifest, dataBase, partition)
+
+            val newPartitionInfo = partition.new_partition_info
+            if (newPartitionInfo?.hash == null) {
+                logs.add("Hash verification skipped")
+                return
+            }
+
+            fun toHex(bytes: ByteArray) = bytes.joinToString("") { "%02x".format(it) }
+
+            val expectedHash = newPartitionInfo.hash.toByteArray()
+            if (!expectedHash.contentEquals(actualHash)) {
+                throw IOException(
+                    "Hash mismatch, expected ${toHex(expectedHash)}, but got ${toHex(actualHash)}"
+                )
+            }
+            logs.add("Hash verification passed")
+        }
     }
 
     @Throws(IOException::class)
-    fun extract(outputFile: File, console: MutableList<String>, logger: MutableList<String>) {
-        val partition = findPartition()
-        console.add("- Found partition ${partition.partition_name}")
-
-        val actualHash = extractPartition(outputFile, partition, console)
-
-        val newPartitionInfo = partition.new_partition_info
-        if (newPartitionInfo?.hash == null) {
-            logger.add("Hash verification skipped")
-            return
-        }
-
-        fun toHex(bytes: ByteArray) = bytes.joinToString("") { "%02x".format(it) }
-
-        val expectedHash = newPartitionInfo.hash.toByteArray()
-        if (!expectedHash.contentEquals(actualHash)) {
-            throw IOException(
-                "Hash mismatch, expected ${toHex(expectedHash)}, but got ${toHex(actualHash)}"
-            )
-        }
-        logger.add("Hash verification passed")
-    }
-
-    @Throws(IOException::class)
-    private fun readPayloadHeader(): DeltaArchiveManifest {
+    private fun readPayloadHeader(channel: DataChannel): DeltaArchiveManifest {
         // Read magic
         val magicBuffer = ByteBuffer.allocate(4)
         channel.read(magicBuffer)
@@ -93,13 +95,11 @@ class Payload(private val channel: DataSourceChannel) {
         // Skip manifest signature
         channel.position(channel.position() + manifestSigLen)
 
-        dataBase = channel.position()
-
         return manifest
     }
 
     @Throws(IOException::class)
-    private fun findPartition(): PartitionUpdate {
+    private fun findPartition(manifest: DeltaArchiveManifest): PartitionUpdate {
         return manifest.partitions.find { it.partition_name == "init_boot" }
             ?: manifest.partitions.find { it.partition_name == "boot" }
             ?: throw IOException("boot partition not found in payload")
@@ -107,12 +107,13 @@ class Payload(private val channel: DataSourceChannel) {
 
     @Throws(IOException::class)
     private fun extractPartition(
-        outputFile: File,
+        channel: DataChannel,
+        manifest: DeltaArchiveManifest,
+        dataBase: Long,
         partition: PartitionUpdate,
-        console: MutableList<String>,
     ): ByteArray {
         FileChannel.open(
-            outputFile.toPath(),
+            outFile.toPath(),
             StandardOpenOption.CREATE,
             StandardOpenOption.WRITE,
             StandardOpenOption.READ,
@@ -126,7 +127,7 @@ class Payload(private val channel: DataSourceChannel) {
                 if (index % 5 == 0 || index == count - 1) {
                     console.add("- Downloading ${index + 1}/$count")
                 }
-                processOperation(outChannel, operation)
+                processOperation(outChannel, operation, channel, dataBase, manifest.block_size ?: 4096)
             }
 
             val digest = MessageDigest.getInstance("SHA-256")
@@ -137,7 +138,13 @@ class Payload(private val channel: DataSourceChannel) {
     }
 
     @Throws(IOException::class)
-    private fun processOperation(outChannel: FileChannel, operation: InstallOperation) {
+    private fun processOperation(
+        outChannel: FileChannel,
+        operation: InstallOperation,
+        channel: DataChannel,
+        dataBase: Long,
+        blockSize: Int,
+    ) {
         val dataType = operation.type
         if (dataType == InstallOperation.Type.ZERO) {
             return
@@ -148,7 +155,7 @@ class Payload(private val channel: DataSourceChannel) {
         dataBuffer.flip()
 
         val dstExtent = operation.dst_extents[0]
-        val outOffset = (dstExtent.start_block ?: 0L) * (manifest.block_size ?: 4096)
+        val outOffset = (dstExtent.start_block ?: 0L) * blockSize
 
         when (dataType) {
             InstallOperation.Type.REPLACE -> {
