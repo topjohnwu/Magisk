@@ -16,9 +16,11 @@
     <string name="loading">載入中……</string>
     <string name="update">更新</string>
     <string name="not_available">無</string>
+    <string name="not_installed">未安裝</string>
     <string name="hide">隱藏</string>
     <string name="home_package">套件</string>
     <string name="home_app_title">應用程式</string>
+    <string name="reinstall">重新安裝</string>
 
     <string name="home_notice_content">請從官方的 Github 網頁下載 Magisk。從未知來源下載的檔案可能懷有惡意！</string>
     <string name="home_support_title">支持開發</string>
@@ -46,6 +48,9 @@
     <string name="setup_title">修復安裝</string>
     <string name="select_patch_file">選擇並修補檔案</string>
     <string name="patch_file_msg">請選取未修改過的映像檔 (*.img) 或 Odin 的 TAR 檔案 (*.tar) 或 payload.bin (*.bin)</string>
+    <string name="download_patch_file">下載並修補映像檔</string>
+    <string name="download_dialog_title">輸入映像檔連結</string>
+    <string name="download_dialog_msg">完整 OTA 映像檔或原廠映像檔</string>
     <string name="reboot_delay_toast">將在 5 秒後重新啟動……</string>
     <string name="flash_screen_title">安裝</string>
 
@@ -53,8 +58,10 @@
     <string name="su_request_title">超級使用者要求</string>
     <string name="touch_filtered_warning">由於某個應用程式遮蔽了超級使用者要求的視窗，因此 Magisk 無法驗證您的回應</string>
     <string name="deny">拒絕</string>
+    <string name="restrict">受限</string>
     <string name="prompt">提示</string>
     <string name="grant">授予</string>
+    <string name="superuser_grant">授予超級使用者權限</string>
     <string name="su_warning">將授予本裝置使用 Root 權限。\n如果不確定，請拒絕！</string>
     <string name="forever">永久</string>
     <string name="once">僅此一次</string>
@@ -63,6 +70,7 @@
     <string name="thirtymin">30 分鐘</string>
     <string name="sixtymin">60 分鐘</string>
     <string name="su_allow_toast">已授予 %1$s 使用超級使用者的權限</string>
+    <string name="su_legacy_cmd">警告：偵測到不支援的命令列</string>
     <string name="su_deny_toast">已拒絕 %1$s 使用超級使用者的權限</string>
     <string name="su_snack_grant">已授予 %1$s 使用超級使用者的權限</string>
     <string name="su_snack_deny">已拒絕 %1$s 使用超級使用者的權限</string>
@@ -73,7 +81,9 @@
     <string name="su_revoke_title">撤銷權限？</string>
     <string name="su_revoke_msg">確定撤銷 %1$s 的權限？</string>
     <string name="toast">快顯通知</string>
+    <string name="notification">通知</string>
     <string name="none">無</string>
+    <string name="back">返回</string>
 
     <string name="superuser_toggle_notification">通知</string>
     <string name="superuser_toggle_revoke">撤銷</string>
@@ -87,13 +97,24 @@
     <string name="logs_cleared">已成功清除紀錄</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">目標 UID: %1$d</string>
+    <string name="target_pid">目標 PID: %s</string>
+    <string name="selinux_context">SELinux 上下文: %s</string>
+    <string name="supp_group">補充群組: %s</string>
+    <string name="granted">已授予</string>
+    <string name="denied">已拒絕</string>
 
     <!--SafetyNet-->
 
     <!-- MagiskHide -->
     <string name="show_system_app">顯示系統應用程式</string>
-    <string name="show_os_app">顯示作業系统</string>
+    <string name="show_os_app">顯示作業系統</string>
     <string name="hide_filter_hint">過濾名稱</string>
+    <string name="sort_by_name">依名稱排序</string>
+    <string name="sort_by_package_name">依套件名稱排序</string>
+    <string name="sort_by_install_time">依安裝時間排序</string>
+    <string name="sort_by_update_time">依更新時間排序</string>
+    <string name="sort_reverse">反向排序</string>
+    <string name="menu_sort">排序</string>
     <string name="hide_search">搜尋</string>
 
     <!--Module -->
@@ -103,8 +124,10 @@
     <string name="reboot_bootloader">重新啟動至 Bootloader</string>
     <string name="reboot_download">重新啟動至 Download</string>
     <string name="reboot_edl">重新啟動至 EDL</string>
+    <string name="reboot_safe_mode">安全模式</string>
     <string name="module_version_author">%1$s 來自 %2$s</string>
     <string name="module_state_remove">移除</string>
+    <string name="module_action">動作</string>
     <string name="module_state_restore">復原</string>
     <string name="module_action_install_external">從本機安裝</string>
     <string name="update_available">有可用的更新</string>
@@ -134,6 +157,7 @@
     <string name="settings_update_channel_title">更新頻道</string>
     <string name="settings_update_stable">穩定版</string>
     <string name="settings_update_beta">測試版</string>
+    <string name="settings_update_debug">除錯版</string>
     <string name="settings_update_custom">自訂頻道</string>
     <string name="settings_update_custom_msg">輸入一個自訂的網址</string>
     <string name="settings_zygisk_summary">在 Zygote 中執行 Magisk</string>
@@ -163,12 +187,26 @@
     <string name="superuser_notification">超級使用者通知</string>
     <string name="settings_su_reauth_title">更新後重新驗證</string>
     <string name="settings_su_reauth_summary">應用程式更新後，重新驗證超級使用者的要求</string>
+    <string name="settings_su_auth_title">使用者驗證</string>
+    <string name="settings_su_auth_summary">超級使用者請求時需要驗證身分</string>
+    <string name="settings_su_auth_insecure">裝置尚未設定任何驗證方式</string>
+    <string name="settings_su_restrict_title">限制 Root 權限</string>
+    <string name="settings_su_restrict_summary">預設限制新的超級使用者應用程式。警告：這會破壞大多數應用程式，請勿在不明所以的情況下啟用。</string>
     <string name="settings_su_tapjack_title">啟用點選攔截保護</string>
     <string name="settings_su_tapjack_summary">發現有其他應用程式重疊在超級使用者視窗上面時，不回應允許操作</string>
     <string name="settings_customization">客製化</string>
+    <string name="settings_color_mode">主題顏色</string>
+    <string name="color_mode_system">跟隨系統</string>
+    <string name="color_mode_light">淺色主題</string>
+    <string name="color_mode_dark">深色主題</string>
+    <string name="color_mode_monet_system">跟隨系統（動態取色）</string>
+    <string name="color_mode_monet_light">淺色主題（動態取色）</string>
+    <string name="color_mode_monet_dark">深色主題（動態取色）</string>
     <string name="setting_add_shortcut_summary">在主螢幕中新增一個精緻的捷徑。防止隱藏 Magisk 以後，其名稱與圖示將難以辨識</string>
     <string name="settings_doh_title">安全化的網域解析(DoH)</string>
     <string name="settings_doh_description">解決某些地區的 DNS 中毒問題</string>
+    <string name="settings_random_name_title">隨機輸出檔案名稱</string>
+    <string name="settings_random_name_description">隨機產生修補映像檔和 tar 檔案的輸出名稱，以防止被偵測</string>
 
     <string name="multiuser_mode">多重使用者模式</string>
     <string name="settings_owner_only">僅限裝置擁有者</string>
@@ -190,20 +228,27 @@
     <string name="update_channel">Magisk 更新</string>
     <string name="progress_channel">進度通知</string>
     <string name="updated_channel">更新完成</string>
+    <string name="su_notification_channel">超級使用者通知</string>
     <string name="download_complete">下載完成</string>
     <string name="download_file_error">下載錯誤</string>
     <string name="magisk_update_title">Magisk 有可用的更新！</string>
     <string name="updated_title">Magisk 已完成更新</string>
     <string name="updated_text">點選即可開啟應用程式</string>
+    <string name="su_notification_granted_title">已授予超級使用者權限</string>
+    <string name="su_notification_denied_title">已拒絕超級使用者權限</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">是</string>
     <string name="no">否</string>
+    <string name="enabled">已啟用</string>
+    <string name="disabled">已停用</string>
     <string name="repo_install_title">安裝 %1$s %2$s(%3$d)</string>
     <string name="download">下載</string>
     <string name="reboot">重新啟動</string>
+    <string name="close">關閉</string>
     <string name="release_notes">版本資訊</string>
     <string name="flashing">正在刷入……</string>
+    <string name="done_action">%1$s 的動作執行完成</string>
     <string name="done">完成！</string>
     <string name="failure">失敗！</string>
     <string name="hide_app_title">正在隱藏 Magisk……</string>
@@ -227,6 +272,7 @@
     <string name="unsupport_nonroot_stub_msg">應用程式無法在 Root 權限遺失的情況下以隱藏模式執行。請還原為原始套件。</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">授予儲存空間存取權以啟用此功能</string>
+    <string name="post_notifications_denied">請授予通知權限以使用此功能</string>
     <string name="install_unknown_denied">允許「安裝未知應用程式」以啟用此功能</string>
     <string name="add_shortcut_title">在主螢幕中新增捷徑</string>
     <string name="add_shortcut_msg">在隱藏應用程式以後，其名稱與圖示將難以辨識。請問您想要在主螢幕中新增一個精緻的捷徑嗎？</string>
