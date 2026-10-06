@@ -37,7 +37,7 @@ Supported actions:
     dumped to the file 'header', which can be used to modify header
     configurations during repacking.
     Return values:
-    0:valid    1:error    2:chromeos
+    0:valid    1:error    2:chromeos    3:vendor_boot
 
   repack [-n] <origbootimg> [outbootimg]
     Repack boot image components using files from the current directory
@@ -84,6 +84,8 @@ Supported actions:
     Supported commands:
       exists ENTRY
         Return 0 if ENTRY exists, else return 1
+      ls [-r] [PATH]
+        List PATH ("/" by default); specify [-r] to list recursively
       rm [-r] ENTRY
         Remove ENTRY, specify [-r] to remove recursively
       mkdir MODE ENTRY
@@ -98,13 +100,13 @@ Supported actions:
         Extract ENTRY to OUT, or extract all entries to current directory
       test
         Test the cpio's status
-        Return value is 0 or bitwise or-ed of following values:
-        0x1:Magisk    0x2:unsupported
+        Return values:
+        0:stock    1:Magisk    2:unsupported
       patch
         Apply ramdisk patches
         Configure with env variables: KEEPVERITY KEEPFORCEENCRYPT
-      backup ORIG
-        Create ramdisk backups from ORIG
+      backup ORIG [-n]
+        Create ramdisk backups from ORIG, specify [-n] to skip compression
       restore
         Restore ramdisk from ramdisk backup stored within incpio
 
@@ -123,8 +125,10 @@ Supported actions:
         Return values:
         0:valid    1:error
 
-  split <file>
-    Split image.*-dtb into kernel + kernel_dtb
+  split [-n] <file>
+    Split image.*-dtb into kernel + kernel_dtb.
+    If '-n' is provided, decompression operations will be skipped;
+    the kernel will remain untouched, split in its original format.
 
   sha1 <file>
     Print the SHA1 checksum for <file>
@@ -293,6 +297,7 @@ Options:
   -Z, --context CONTEXT         Change SELinux context
   -t, --target PID              PID to take mount namespace from
                                 pid 0 means magisk global mount namespace
+  -d, --drop-cap                Drop all Linux capabilities
   -m, -p,
   --preserve-environment        Preserve the entire environment
   -v, --version                 Display version number and exit
@@ -309,20 +314,34 @@ Argument: Pass it to the shell as is
 An applet of `magisk`. An advanced system property manipulation utility. Check the [Resetprop Details](details.md#resetprop) for more background information.
 
 ```
-Usage: resetprop [flags] [options...]
+Usage: resetprop [flags] [arguments...]
 
-Options:
-   -h, --help        show this message
+Read mode arguments:
    (no arguments)    print all properties
-   NAME              get property
-   NAME VALUE        set property entry NAME with VALUE
-   --file FILE       load props from FILE
-   --delete NAME     delete property
+   NAME              get property of NAME
 
-Flags:
-   -v      print verbose output to stderr
-   -n      set props without going through property_service
-           (this flag only affects setprop)
-   -p      read/write props from/to persistent storage
-           (this flag only affects getprop and delprop)
+Write mode arguments:
+   NAME VALUE        set property NAME as VALUE
+   -f,--file   FILE  load and set properties from FILE
+   -d,--delete NAME  delete property
+
+Wait mode arguments (toggled with -w):
+    NAME             wait until property NAME changes
+    NAME OLD_VALUE   if value of property NAME is not OLD_VALUE, get value
+                     or else wait until property NAME changes
+
+General flags:
+   -h,--help         show this message
+   -v,--verbose      print verbose output to stderr
+   -w                switch to wait mode
+   -c,--compact      compact property area (optional: context label)
+
+Read mode flags:
+   -p      also read persistent properties from storage
+   -P      only read persistent properties from storage
+   -Z      get property context instead of value
+
+Write mode flags:
+   -n      set properties bypassing property_service
+   -p      always write persistent prop changes to storage
 ```
