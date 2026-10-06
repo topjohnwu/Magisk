@@ -12,7 +12,6 @@ umask 022
 
 OUTFD=$2
 COMMONDIR=$INSTALLER/assets
-CHROMEDIR=$INSTALLER/assets/chromeos
 
 if [ ! -f $COMMONDIR/util_functions.sh ]; then
   echo "! Unable to extract zip file!"
@@ -54,7 +53,6 @@ BINDIR=$INSTALLER/lib/$ABI
 cd $BINDIR
 for file in lib*.so; do mv "$file" "${file:3:${#file}-6}"; done
 cd /
-cp -af $CHROMEDIR/. $BINDIR/chromeos
 chmod -R 755 $BINDIR
 
 ############
@@ -130,7 +128,10 @@ case $((STATUS & 3)) in
       fi
       ./magiskboot repack $BOOTIMAGE
       # Sign chromeos boot
-      $CHROMEOS && sign_chromeos
+      if $CHROMEOS; then
+        ui_print "- Signing ChromeOS boot image"
+        ./magiskboot sign-chromeos new-boot.img || abort "! Unable to sign ChromeOS boot image"
+      fi
       ui_print "- Flashing restored boot image"
       flash_image new-boot.img $BOOTIMAGE || abort "! Insufficient partition size"
     fi

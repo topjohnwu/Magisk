@@ -14,6 +14,7 @@ mod compress;
 mod cpio;
 mod dtb;
 mod format;
+mod futility;
 mod patch;
 mod payload;
 // Suppress warnings in generated code

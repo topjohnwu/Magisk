@@ -2,6 +2,7 @@ use crate::compress::{compress_cmd, decompress_cmd};
 use crate::cpio::{cpio_commands, print_cpio_usage};
 use crate::dtb::{DtbAction, dtb_commands, print_dtb_usage};
 use crate::ffi::{BootImage, FileFormat, cleanup, repack, split_image_dtb, unpack};
+use crate::futility::sign_chromeos_image;
 use crate::patch::hexpatch;
 use crate::payload::extract_boot_from_payload;
 use crate::sign::{sha1_hash, sign_boot_image};
@@ -28,7 +29,8 @@ enum Action {
     Unpack(Unpack),
     Repack(Repack),
     Verify(Verify),
-    Sign(Sign),
+    SignAvb1(SignAvb1),
+    SignChromeOs(SignChromeOs),
     Extract(Extract),
     HexPatch(HexPatch),
     Cpio(Cpio),
@@ -72,8 +74,8 @@ struct Verify {
 }
 
 #[derive(FromArgs)]
-#[argh(subcommand, name = "sign")]
-struct Sign {
+#[argh(subcommand, name = "sign-avb1")]
+struct SignAvb1 {
     #[argh(positional)]
     img: Utf8CString,
     #[argh(positional)]
@@ -82,6 +84,15 @@ struct Sign {
     cert: Option<Utf8CString>,
     #[argh(positional)]
     key: Option<Utf8CString>,
+}
+
+#[derive(FromArgs)]
+#[argh(subcommand, name = "sign-chromeos")]
+struct SignChromeOs {
+    #[argh(positional)]
+    img: Utf8CString,
+    #[argh(positional)]
+    out: Option<Utf8CString>,
 }
 
 #[derive(FromArgs)]
@@ -228,12 +239,17 @@ Supported actions:
     Return value:
     0:valid    1:error
 
-  sign <bootimg> [name] [x509.pem pk8]
+  sign-avb1 <bootimg> [name] [x509.pem pk8]
     Sign <bootimg> with AVB 1.0 signature.
     Optionally provide the name of the image (default: '/boot').
     Optionally provide the certificate/private key pair for signing.
     If the certificate/private key pair is not provided, the AOSP
     verity key bundled in the executable will be used.
+
+  sign-chromeos <bootimg> [outbootimg]
+    Sign <bootimg> with ChromeOS verified boot kernel signature, using
+    the developer keys bundled in the executable.
+    Output to [outbootimg], or overwrite <bootimg> if not specified.
 
   extract <payload.bin> [partition] [outfile]
     Extract [partition] from <payload.bin> to [outfile].
@@ -326,6 +342,15 @@ fn sign_cmd(
     Ok(())
 }
 
+fn sign_chromeos_cmd(image: &Utf8CStr, out: Option<&Utf8CStr>) -> LoggedResult<()> {
+    // Drop the mapped input before writing, as output can be the same file
+    let signed = sign_chromeos_image(MappedFile::open(image)?.as_ref())?;
+    let out = out.unwrap_or(image);
+    let mut fd = out.create(OFlag::O_WRONLY | OFlag::O_TRUNC | OFlag::O_CLOEXEC, 0o644)?;
+    fd.write_all(&signed)?;
+    Ok(())
+}
+
 fn boot_main(cmds: CmdArgs) -> LoggedResult<i32> {
     let mut cmds = cmds.0;
     if cmds.len() < 2 {
@@ -375,13 +400,16 @@ fn boot_main(cmds: CmdArgs) -> LoggedResult<i32> {
                 return log_err!();
             }
         }
-        Action::Sign(Sign {
+        Action::SignAvb1(SignAvb1 {
             img,
             name,
             cert,
             key,
         }) => {
             sign_cmd(&img, name.as_deref(), cert.as_deref(), key.as_deref())?;
+        }
+        Action::SignChromeOs(SignChromeOs { img, out }) => {
+            sign_chromeos_cmd(&img, out.as_deref())?;
         }
         Action::Extract(Extract {
             payload,

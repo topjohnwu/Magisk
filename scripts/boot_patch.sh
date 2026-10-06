@@ -22,8 +22,6 @@
 # magiskboot         binary    A tool to manipulate boot images.
 # init-ld            binary    The library that will be LD_PRELOAD of /init
 # stub.apk           binary    The stub Magisk app to embed into ramdisk.
-# chromeos           folder    This folder includes the utility and keys to sign
-#                  (optional)  chromeos boot images. Only used for Pixel C.
 #
 #######################################################################################
 
@@ -258,7 +256,10 @@ ui_print "- Repacking boot image"
 ./magiskboot repack "$BOOTIMAGE" || abort "! Unable to repack boot image"
 
 # Sign chromeos boot
-$CHROMEOS && sign_chromeos
+if $CHROMEOS; then
+  ui_print "- Signing ChromeOS boot image"
+  ./magiskboot sign-chromeos new-boot.img || abort "! Unable to sign ChromeOS boot image"
+fi
 
 # Restore the original boot partition path
 [ -e "$BOOTNAND" ] && BOOTIMAGE="$BOOTNAND"

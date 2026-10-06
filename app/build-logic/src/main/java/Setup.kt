@@ -178,12 +178,6 @@ fun Project.setupCoreLib() {
                     include("util_functions.sh", "boot_patch.sh", "addon.d.sh",
                         "app_functions.sh", "uninstaller.sh", "module_installer.sh")
                 }
-                into("chromeos") {
-                    from(rootFile("tools/futility"))
-                    from(rootFile("tools/keys")) {
-                        include("kernel_data_key.vbprivk", "kernel.keyblock")
-                    }
-                }
                 from(stubTask) {
                     include { it.name.endsWith(".apk") }
                     rename { "stub.apk" }

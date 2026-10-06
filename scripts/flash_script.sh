@@ -12,7 +12,6 @@ umask 022
 
 OUTFD=$2
 COMMONDIR=$INSTALLER/assets
-CHROMEDIR=$INSTALLER/assets/chromeos
 
 if [ ! -f $COMMONDIR/util_functions.sh ]; then
   echo "! Unable to extract zip file!"

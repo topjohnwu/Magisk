@@ -60,12 +60,17 @@ Supported actions:
     Return value:
     0:valid    1:error
 
-  sign <bootimg> [name] [x509.pem pk8]
+  sign-avb1 <bootimg> [name] [x509.pem pk8]
     Sign <bootimg> with AVB 1.0 signature.
     Optionally provide the name of the image (default: '/boot').
     Optionally provide the certificate/private key pair for signing.
     If the certificate/private key pair is not provided, the AOSP
     verity key bundled in the executable will be used.
+
+  sign-chromeos <bootimg> [outbootimg]
+    Sign <bootimg> with ChromeOS verified boot kernel signature, using
+    the developer keys bundled in the executable.
+    Output to [outbootimg], or overwrite <bootimg> if not specified.
 
   extract <payload.bin> [partition] [outfile]
     Extract [partition] from <payload.bin> to [outfile].
