@@ -210,6 +210,7 @@ end:
 
     // Connect to client
     owned_fd fd = connect_daemon(RequestCode::SUPERUSER);
+    if (fd < 0) exit(1);
 
     // Send request
     req.write_to_fd(fd);
