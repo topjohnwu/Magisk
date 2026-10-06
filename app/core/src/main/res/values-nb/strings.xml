@@ -48,18 +48,18 @@
     <string name="flash_screen_title">Installasjon</string>
 
     <!--Superuser-->
-    <string name="su_request_title">Superbrukerforespørsel</string>
-    <string name="touch_filtered_warning">Fordi et program tilslører en superbrukerforespørsel kan ikke Magisk bekrefte</string>
+
+
     <string name="deny">Avslå</string>
-    <string name="prompt">Spør</string>
+
     <string name="grant">Innvilg</string>
-    <string name="su_warning">Gir full tilgang til enheten din.\nAvslå hvis du ikke er sikker!</string>
-    <string name="forever">Permanent</string>
-    <string name="once">Én gang</string>
-    <string name="tenmin">10 min</string>
-    <string name="twentymin">20 min</string>
-    <string name="thirtymin">30 min</string>
-    <string name="sixtymin">60 min</string>
+
+
+
+
+
+
+
     <string name="su_allow_toast">%1$s ble innvilget superbruker-rettigheter</string>
     <string name="su_deny_toast">%1$s ble nektet superbruker-rettigheter</string>
     <string name="su_snack_grant">Superbruker-rettigheter for %1$s ble innvilget</string>
@@ -138,20 +138,20 @@
     <string name="settings_su_app">Kun programmer</string>
     <string name="settings_su_adb">Kun ADB</string>
     <string name="settings_su_disable">Avskrudd</string>
-    <string name="settings_su_request_10">10 sekunder</string>
-    <string name="settings_su_request_15">15 sekunder</string>
-    <string name="settings_su_request_20">20 sekunder</string>
-    <string name="settings_su_request_30">30 sekunder</string>
-    <string name="settings_su_request_45">45 sekunder</string>
-    <string name="settings_su_request_60">60 sekunder</string>
+
+
+
+
+
+
     <string name="superuser_access">Superbruker-tilgang</string>
-    <string name="auto_response">Automatisk svar</string>
-    <string name="request_timeout">Tidsavbrudd for forespørsel</string>
+
+
     <string name="superuser_notification">Superbruker-merknad</string>
     <string name="settings_su_reauth_title">Ny identitetsbekreftelse etter oppgradering</string>
     <string name="settings_su_reauth_summary">Identitetsbekreft superbrukertilganger etter programoppgraderinger</string>
-    <string name="settings_su_tapjack_title">Trykkstjelingsbeskyttelse</string>
-    <string name="settings_su_tapjack_summary">Superbrukings-forespørselsdialogen vil ikke svare på inndata mens den dekkes av et annet vindu eller lag</string>
+
+
     <string name="settings_customization">Tilpasning</string>
     <string name="setting_add_shortcut_summary">Legg til fin snarvei på hjemmeskjermen i fall navnet og ikonet er vanskelig å gjenkjenne etter skjuling av programmet</string>
     <string name="settings_doh_title">DNS over HTTPS</string>

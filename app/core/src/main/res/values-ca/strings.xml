@@ -48,18 +48,18 @@
     <string name="flash_screen_title">Instal·lació</string>
 
     <!--Superuser-->
-    <string name="su_request_title">Petició de superusuari</string>
-    <string name="touch_filtered_warning">Com que una aplicació està ofuscant la petició de superusuari, Magisk no pot verificar la seva resposta</string>
+
+
     <string name="deny">Denegar</string>
-    <string name="prompt">Preguntar</string>
+
     <string name="grant">Permetre</string>
-    <string name="su_warning">Permet accés total al seu dispositiu.\nDenegui si no n\'està segur!</string>
-    <string name="forever">Sempre</string>
-    <string name="once">Un cop </string>
-    <string name="tenmin">10 mins</string>
-    <string name="twentymin">20 mins</string>
-    <string name="thirtymin">30 mins</string>
-    <string name="sixtymin">60 mins</string>
+
+
+
+
+
+
+
     <string name="su_allow_toast">Permesos els drets de superusuari de %1$s</string>
     <string name="su_deny_toast">Denegats els drets de superusuari de %1$s</string>
     <string name="su_snack_grant">Drets de superusuari de %1$s permesos</string>
@@ -138,20 +138,20 @@
     <string name="settings_su_app">Només aplicacions</string>
     <string name="settings_su_adb">Només ADB</string>
     <string name="settings_su_disable">Deshabilitat</string>
-    <string name="settings_su_request_10">10 segons</string>
-    <string name="settings_su_request_15">15 segons</string>
-    <string name="settings_su_request_20">20 segons</string>
-    <string name="settings_su_request_30">30 segons</string>
-    <string name="settings_su_request_45">45 segons</string>
-    <string name="settings_su_request_60">60 segons</string>
+
+
+
+
+
+
     <string name="superuser_access">Accés de superusuari</string>
-    <string name="auto_response">Resposta automàtica</string>
-    <string name="request_timeout">Temps de petició</string>
+
+
     <string name="superuser_notification">Notificació de superusuari</string>
     <string name="settings_su_reauth_title">Demanar després d\'una actualització</string>
     <string name="settings_su_reauth_summary">Demanar permisos de superusuari novament si una aplicació és actualitzada o reinstal·lada</string>
-    <string name="settings_su_tapjack_title">Activa la protecció contra \'TapJacking\'</string>
-    <string name="settings_su_tapjack_summary">El diàleg per donar permisos de superusuari no respondrà mentre estigui ofuscat per alguna altra finestra o superposició</string>
+
+
     <string name="settings_customization">Personalització</string>
     <string name="setting_add_shortcut_summary">Afegeix una bonica drecera a la pantalla d\'inici en cas que el nom i la icona siguin difícils de reconèixer després d\'amagar l\'aplicació.</string>
     <string name="settings_doh_title">DNS sobre HTTPS</string>

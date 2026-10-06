@@ -49,18 +49,18 @@
     <string name="flash_screen_title">설치과정</string>
 
     <!--Superuser-->
-    <string name="su_request_title">슈퍼유저 요청</string>
-    <string name="touch_filtered_warning">앱이 슈퍼유저 요청을 가려, Magisk에서 응답을 확인할 수 없습니다.</string>
+
+
     <string name="deny">모두 거부</string>
-    <string name="prompt">물어보기</string>
+
     <string name="grant">모두 허용</string>
-    <string name="su_warning">기기에 대한 슈퍼유저 권한을 부여합니다.\n확실하지 않은 경우 거부하세요!</string>
-    <string name="forever">영구</string>
-    <string name="once">한 번만</string>
-    <string name="tenmin">10분</string>
-    <string name="twentymin">20분</string>
-    <string name="thirtymin">30분</string>
-    <string name="sixtymin">60분</string>
+
+
+
+
+
+
+
     <string name="su_allow_toast">%1$s에 슈퍼유저 권한이 허용됨</string>
     <string name="su_deny_toast">%1$s에 슈퍼유저 권한이 거부됨</string>
     <string name="su_snack_grant">%1$s의 슈퍼유저 권한이 허용됨</string>
@@ -147,20 +147,20 @@
     <string name="settings_su_app">앱만</string>
     <string name="settings_su_adb">ADB만</string>
     <string name="settings_su_disable">사용 안 함</string>
-    <string name="settings_su_request_10">10초</string>
-    <string name="settings_su_request_15">15초</string>
-    <string name="settings_su_request_20">20초</string>
-    <string name="settings_su_request_30">30초</string>
-    <string name="settings_su_request_45">45초</string>
-    <string name="settings_su_request_60">60초</string>
+
+
+
+
+
+
     <string name="superuser_access">슈퍼유저 액세스</string>
-    <string name="auto_response">슈퍼유저 요청</string>
-    <string name="request_timeout">요청 시간 제한</string>
+
+
     <string name="superuser_notification">슈퍼유저 알림</string>
     <string name="settings_su_reauth_title">업데이트 후 다시 승인</string>
     <string name="settings_su_reauth_summary">앱이 업데이트되면 권한 승인 요청을 다시 합니다.</string>
-    <string name="settings_su_tapjack_title">탭재킹 보호 활성화</string>
-    <string name="settings_su_tapjack_summary">슈퍼유저 프롬프트가 다른 창이나 오버레이로 가려지는 동안의 입력을 무시합니다.</string>
+
+
     <string name="settings_customization">커스터마이즈</string>
     <string name="setting_add_shortcut_summary">앱을 숨긴 후 아이콘과 이름을 알아보기 힘들 경우를 위해 알아보기 쉬운 바로가기를 홈 화면에 추가합니다.</string>
     <string name="settings_doh_title">DNS over HTTPS</string>

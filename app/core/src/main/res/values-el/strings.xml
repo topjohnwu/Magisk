@@ -50,18 +50,18 @@
     <string name="flash_screen_title">Εγκατάσταση</string>
 
     <!--Superuser-->
-    <string name="su_request_title">Αίτημα υπερχρήστη</string>
-    <string name="touch_filtered_warning">Επειδή μια εφαρμογή αποκρύπτει ένα αίτημα υπερχρήστη, το Magisk δεν μπορεί να επαληθεύσει την απάντησή σας</string>
+
+
     <string name="deny">Άρνηση</string>
-    <string name="prompt">Προτροπή</string>
+
     <string name="grant">Αποδοχή</string>
-    <string name="su_warning">Δίνει πλήρη πρόσβαση στη συσκευή σας.\nΑρνηθείτε αν δεν είστε σίγουρος/η!</string>
-    <string name="forever">Μόνιμα</string>
-    <string name="once">Μία φορά</string>
-    <string name="tenmin">10 λεπτά</string>
-    <string name="twentymin">20 λεπτά</string>
-    <string name="thirtymin">30 λεπτά</string>
-    <string name="sixtymin">60 λεπτά</string>
+
+
+
+
+
+
+
     <string name="su_allow_toast">Παραχωρήθηκαν δικαιώματα υπερχρήστη στο %1$s</string>
     <string name="su_deny_toast">Απορρίφθηκαν τα δικαιώματα υπερχρήστη του %1$s</string>
     <string name="su_snack_grant">Παραχορούνται δικαιώματα υπερχρήστη στο %1$s</string>
@@ -149,20 +149,20 @@
     <string name="settings_su_app">Εφαρμογές μόνο</string>
     <string name="settings_su_adb">ADB μόνο</string>
     <string name="settings_su_disable">Απενεργοποιημένο</string>
-    <string name="settings_su_request_10">10 δευτερόλεπτα</string>
-    <string name="settings_su_request_15">15 δευτερόλεπτα</string>
-    <string name="settings_su_request_20">20 δευτερόλεπτα</string>
-    <string name="settings_su_request_30">30 δευτερόλεπτα</string>
-    <string name="settings_su_request_45">45 δευτερόλεπτα</string>
-    <string name="settings_su_request_60">60 δευτερόλεπτα</string>
+
+
+
+
+
+
     <string name="superuser_access">Πρόσβαση Υπερχρήστη</string>
-    <string name="auto_response">Αυτόματη Απόκριση</string>
-    <string name="request_timeout">Χρονικό όριο Αιτήματος</string>
+
+
     <string name="superuser_notification">Ειδοποίηση Υπερχρήστη</string>
     <string name="settings_su_reauth_title">Επαναπιστοποίηση μετά από αναβάθμιση</string>
     <string name="settings_su_reauth_summary">Επαναπιστοποίηση αδειών υπερχρήστη μετά την αναβάθμιση μίας εφαρμογής</string>
-    <string name="settings_su_tapjack_title">Ενεργοποίηση προστασίας Tapjacking</string>
-    <string name="settings_su_tapjack_summary">Το παράθυρο διαλόγου προτροπής του υπερχρήστη δεν αποκρίνεται στην είσοδο ενώ κρύβεται από οποιοδήποτε άλλο παράθυρο</string>
+
+
     <string name="settings_customization">Προσαρμογή</string>
     <string name="setting_add_shortcut_summary">Προσθέστε μια όμορφη συντόμευση στην αρχική οθόνη σε περίπτωση που το όνομα και το εικονίδιο είναι δύσκολο να αναγνωριστούν αφού κρύψετε την εφαρμογή</string>
     <string name="settings_doh_title">DNS μέσω HTTPS</string>

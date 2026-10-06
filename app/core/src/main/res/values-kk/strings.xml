@@ -50,18 +50,18 @@
     <string name="flash_screen_title">Орнату</string>
 
     <!--Superuser-->
-    <string name="su_request_title">Superuser құқығына сұраным</string>
-    <string name="touch_filtered_warning">Өзге қолданба Magisk терезесін бүркегендіктен, Superuser құқығына сұраным қабылданбады</string>
+
+
     <string name="deny">Бас тарту</string>
-    <string name="prompt">Сұрау</string>
+
     <string name="grant">Беру</string>
-    <string name="su_warning">Құрылғыңызға шексіз рұқсат бергелі жатырсыз.\nСенімді болмасаңыз, бас тартыңыз!</string>
-    <string name="forever">Әрдайым</string>
-    <string name="once">Бір рет</string>
-    <string name="tenmin">10 минут</string>
-    <string name="twentymin">20 минут</string>
-    <string name="thirtymin">30 минут</string>
-    <string name="sixtymin">60 минут</string>
+
+
+
+
+
+
+
     <string name="su_allow_toast">%1$s Superuser құқығын алды</string>
     <string name="su_deny_toast">%1$s Superuser құқығын алмады</string>
     <string name="su_snack_grant">%1$s қолданбасына Superuser құқығы берілді</string>
@@ -155,20 +155,20 @@
     <string name="settings_su_app">Қолданбалар ғана</string>
     <string name="settings_su_adb">ADB ғана</string>
     <string name="settings_su_disable">Сөндірулі</string>
-    <string name="settings_su_request_10">10 секунд</string>
-    <string name="settings_su_request_15">15 секунд</string>
-    <string name="settings_su_request_20">20 секунд</string>
-    <string name="settings_su_request_30">30 секунд</string>
-    <string name="settings_su_request_45">45 секунд</string>
-    <string name="settings_su_request_60">60 секунд</string>
+
+
+
+
+
+
     <string name="superuser_access">Superuser құқығына рұқсат</string>
-    <string name="auto_response">Сұранымға әдепкі жауап</string>
-    <string name="request_timeout">Сұранымның күту уақыты</string>
+
+
     <string name="superuser_notification">Superuser мәлімдемесі</string>
     <string name="settings_su_reauth_title">Жаңартудан кейін қайта растау</string>
     <string name="settings_su_reauth_summary">Әлдебір қолданба жаңартылғаннан кейін оның Superuser құқығын қайта растау</string>
-    <string name="settings_su_tapjack_title">Қабаттасудан қорғау</string>
-    <string name="settings_su_tapjack_summary">Өзге қолданба Magisk терезесін бүркесе, Superuser құқығын беру батырмасы сөндіріледі (tapjacking шабуылына жол бермеу үшін)</string>
+
+
     <string name="settings_su_auth_title">Қолданушыны растау</string>
     <string name="settings_su_auth_summary">Superuser құқығына сұраным келгенде қолданушының құпиясөзін не биометриялық дерегін сұрау</string>
     <string name="settings_su_auth_insecure">Бұл құрылғыда аутентификация әдісі орнатылмаған</string>

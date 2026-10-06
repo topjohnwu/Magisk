@@ -49,18 +49,18 @@
     <string name="flash_screen_title">התקנה</string>
 
     <!--Superuser-->
-    <string name="su_request_title">בקשות משתמש על</string>
-    <string name="touch_filtered_warning">מכיוון שיישום מסתיר בקשה של משתמש על, Magisk לא יכול לאמת את תגובתך</string>
+
+
     <string name="deny">דחייה</string>
-    <string name="prompt">מיידי</string>
+
     <string name="grant">הענקה</string>
-    <string name="su_warning">מעניק גישה מלאה להתקן שלך.\nיש לדחות באי וודאות!</string>
-    <string name="forever">לצמיתות</string>
-    <string name="once">פעם אחת</string>
-    <string name="tenmin">10 דקות</string>
-    <string name="twentymin">20 דקות</string>
-    <string name="thirtymin">חצי שעה</string>
-    <string name="sixtymin">שעה</string>
+
+
+
+
+
+
+
     <string name="su_allow_toast">%1$s קיבל הרשאות משתמש על</string>
     <string name="su_deny_toast">%1$s נשללו הרשאות משתמש על</string>
     <string name="su_snack_grant">הרשאות משתמש על עבור %1$s הוענקו</string>
@@ -154,20 +154,20 @@
     <string name="settings_su_app">יישומים בלבד</string>
     <string name="settings_su_adb">ADB בלבד</string>
     <string name="settings_su_disable">מושבת</string>
-    <string name="settings_su_request_10">10 שניות</string>
-    <string name="settings_su_request_15">15 שניות</string>
-    <string name="settings_su_request_20">20 שניות</string>
-    <string name="settings_su_request_30">30 שניות</string>
-    <string name="settings_su_request_45">45 שניות</string>
-    <string name="settings_su_request_60">60 שניות</string>
+
+
+
+
+
+
     <string name="superuser_access">גישת משתמש על</string>
-    <string name="auto_response">תגובה אוטומטית</string>
-    <string name="request_timeout">בקשת פסק זמן</string>
+
+
     <string name="superuser_notification">התראות משתמש על</string>
     <string name="settings_su_reauth_title">אימות מחדש לאחר שדרוג</string>
     <string name="settings_su_reauth_summary">אימות מחדש הרשאות של משתמש על לאחר שדרוג יישום</string>
-    <string name="settings_su_tapjack_title">הגנת Tapjacking</string>
-    <string name="settings_su_tapjack_summary">תיבת הדו שיח של משתמש העל לא תגיב לקלט כשהיא מוסתרת על ידי חלון או שכבת על אחרת</string>
+
+
     <string name="settings_su_auth_title">אימות משתמש</string>
     <string name="settings_su_auth_summary">בקשת אימות משתמש במהלך בקשות משתמש על</string>
     <string name="settings_su_auth_insecure">לא מוגדרת שיטת אימות בהתקן</string>

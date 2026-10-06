@@ -48,18 +48,18 @@
     <string name="flash_screen_title">ინსტალაცია</string>
 
     <!--Superuser-->
-    <string name="su_request_title">სუპერმომხმარებლის ნებართვის მოთხოვნა</string>
-    <string name="touch_filtered_warning">სხვა აპი ხელს უშლის Magisk-ს თქვენი პასუხის დადასტურებაში</string>
+
+
     <string name="deny">აკრძალვა</string>
-    <string name="prompt">კითხვა</string>
+
     <string name="grant">დართვა</string>
-    <string name="su_warning">ანიჭებს სრულ წვდომას მოწყობილობასთან.\nაკრძალეთ თუ დარწმუნებული არ ხართ!</string>
-    <string name="forever">სამუდამოდ</string>
-    <string name="once">ერთჯერადად</string>
-    <string name="tenmin">10 წუთში</string>
-    <string name="twentymin">20 წუთში</string>
-    <string name="thirtymin">30 წუთში</string>
-    <string name="sixtymin">60 წუთში</string>
+
+
+
+
+
+
+
     <string name="su_allow_toast">%1$s-ს მიენიჭა სუპერმომხმარებლის ნებართვები</string>
     <string name="su_deny_toast">%1$s-ს აეკრძალა სუპერმომხმარებლის ნებართვები</string>
     <string name="su_snack_grant">%1$s-ის ნებართვები იქნა მინიჭებული</string>
@@ -138,20 +138,20 @@
     <string name="settings_su_app">მხოლოდ აპები</string>
     <string name="settings_su_adb">მხოლოდ ADB</string>
     <string name="settings_su_disable">გამორთულია</string>
-    <string name="settings_su_request_10">10 წამი</string>
-    <string name="settings_su_request_15">15 წამი</string>
-    <string name="settings_su_request_20">20 წამი</string>
-    <string name="settings_su_request_30">30 წამი</string>
-    <string name="settings_su_request_45">45 წამი</string>
-    <string name="settings_su_request_60">60 წამი</string>
+
+
+
+
+
+
     <string name="superuser_access">სუპერმომხმარებელთან წვდომა</string>
-    <string name="auto_response">ავტომატური პასუხი</string>
-    <string name="request_timeout">პასუხის ტაიმაუტი</string>
+
+
     <string name="superuser_notification">სუპერმომხმარებლის შეტყობინება</string>
     <string name="settings_su_reauth_title">რეაუტენთიფიკაცია განახლების შემდეგ</string>
     <string name="settings_su_reauth_summary">სუპერმომხმარებლის ნებართვის რეაუტენთიფიკაცია აპის განახლების შემდეგ</string>
-    <string name="settings_su_tapjack_title">Tapjacking-სგან თავის დაცვა</string> <!-- TODO: tapjacking has no direct translation; must make something up later -->
-    <string name="settings_su_tapjack_summary">superuser-ის დიალოგის ღილაკებზე დაჭერა არ იქნება შესაძლებელი თუ სხვა აპი არის მასზე გადახურული</string>
+     <!-- TODO: tapjacking has no direct translation; must make something up later -->
+
     <string name="settings_customization">პერსონალიზაცია</string>
     <string name="setting_add_shortcut_summary">ლამაზი ხატულის დამატება საწყისს ეკრანზე, იმ შემთხვევაში თუ აპის ამოცნობა არის რთული დამალვის შემდეგ</string>
     <string name="settings_doh_title">DNS HTTPS-ზე</string>

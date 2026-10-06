@@ -47,17 +47,17 @@
     <string name="flash_screen_title">Installatie</string>
 
     <!--Superuser-->
-    <string name="su_request_title">Superuserverzoek</string>
+
     <string name="deny">Weigeren</string>
-    <string name="prompt">Vraag</string>
+
     <string name="grant">Toestaan</string>
-    <string name="su_warning">Verleent volledige toegang tot je apparaat.\nBij twijfel, altijd weigeren!</string>
-    <string name="forever">Permanent</string>
-    <string name="once">Eenmalig</string>
-    <string name="tenmin">10 min</string>
-    <string name="twentymin">20 min</string>
-    <string name="thirtymin">30 min</string>
-    <string name="sixtymin">60 min</string>
+
+
+
+
+
+
+
     <string name="su_allow_toast">%1$s beschikt nu over superuserrechten</string>
     <string name="su_deny_toast">Superuserrecht van %1$s geweigerd</string>
     <string name="su_snack_grant">%1$s beschikt nu over superuserrechten</string>
@@ -129,15 +129,15 @@
     <string name="settings_su_app">Alleen apps</string>
     <string name="settings_su_adb">Alleen ADB</string>
     <string name="settings_su_disable">Uitgeschakeld</string>
-    <string name="settings_su_request_10">10 seconden</string>
-    <string name="settings_su_request_15">15 seconden</string>
-    <string name="settings_su_request_20">20 seconden</string>
-    <string name="settings_su_request_30">30 seconden</string>
-    <string name="settings_su_request_45">45 seconden</string>
-    <string name="settings_su_request_60">60 seconden</string>
+
+
+
+
+
+
     <string name="superuser_access">Superusertoegang</string>
-    <string name="auto_response">Automatisch antwoord</string>
-    <string name="request_timeout">Verzoektime-out</string>
+
+
     <string name="superuser_notification">Superusermelding</string>
     <string name="settings_su_reauth_title">Opnieuw goedkeuren na update</string>
     <string name="settings_su_reauth_summary">Superuserrechten opnieuw goedkeuren na app-updates.</string>

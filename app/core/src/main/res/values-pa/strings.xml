@@ -46,17 +46,17 @@
     <string name="flash_screen_title">ਇੰਸਟਾਲੇਸ਼ਨ</string>
 
     <!--Superuser-->
-    <string name="su_request_title">ਸੁਪਰਯੂਜ਼ਰ ਮੰਗ</string>
+
     <string name="deny">ਇਨਕਾਰ ਕਰੋ</string>
-    <string name="prompt">ਸੰਕੇਤ ਦਿਖਾਓ</string>
+
     <string name="grant">ਆਗਿਆ ਦਿਓ</string>
-    <string name="su_warning">ਇਹ ਤੁਹਾਡੀ ਡਿਵਾਈਸ ਤੇ ਪੂਰੀ ਪਹੁੰਚ ਦੀ ਆਗਿਆ ਦੇਵੇਗਾ,\n ਜੇ ਤੁਹਾਨੂੰ ਯਕੀਨ ਨਹੀਂ ਹੈ ਤਾਂ ਇਨਕਾਰ ਕਰੋ!</string>
-    <string name="forever">ਹਮੇਸ਼ਾ</string>
-    <string name="once">ਇਕ ਵਾਰ</string>
-    <string name="tenmin">10 ਮਿੰਟ</string>
-    <string name="twentymin">20 ਮਿੰਟ</string>
-    <string name="thirtymin">30 ਮਿੰਟ</string>
-    <string name="sixtymin">60 ਮਿੰਟ</string>
+
+
+
+
+
+
+
     <string name="su_allow_toast"> %1$s ਨੂੰ ਸੁਪਰਯੂਜ਼ਰ ਅਧਿਕਾਰ ਦਿੱਤੇ ਗਏ ਸਨ</string>
     <string name="su_deny_toast"> %1$s ਸੁਪਰਯੂਜ਼ਰ ਅਧਿਕਾਰਾਂ ਤੋਂ ਇਨਕਾਰ ਕੀਤਾ ਗਿਆ ਸੀ</string>
     <string name="su_snack_grant"> %1$s ਨੂੰ ਸੁਪਰਯੂਜ਼ਰ ਅਧਿਕਾਰ ਦਿੱਤੇ ਗਏ ਸਨ</string>
@@ -131,15 +131,15 @@
     <string name="settings_su_app">ਸਿਰਫ ਐਪਸ</string>
     <string name="settings_su_adb">ਸਿਰਫ ਐਡਬੀ</string>
     <string name="settings_su_disable">ਬੰਦ ਹੈ</string>
-    <string name="settings_su_request_10">10 ਸਕਿੰਟ</string>
-    <string name="settings_su_request_15">15 ਸਕਿੰਟ</string>
-    <string name="settings_su_request_20">20 ਸਕਿੰਟ</string>
-    <string name="settings_su_request_30">30 ਸਕਿੰਟ</string>
-    <string name="settings_su_request_45">45 ਸਕਿੰਟ</string>
-    <string name="settings_su_request_60">60 ਸਕਿੰਟ</string>
+
+
+
+
+
+
     <string name="superuser_access">ਸੁਪਰਯੂਜ਼ਰ ਐਕਸੈਸ</string>
-    <string name="auto_response">ਆਟੋਮੈਟਿਕ ਜਵਾਬ</string>
-    <string name="request_timeout">ਬੇਨਤੀ ਦਾ ਸਮਾਂ ਸਮਾਪਤ</string>
+
+
     <string name="superuser_notification">ਸੁਪਰਯੂਜ਼ਰ ਸੂਚਨਾ</string>
     <string name="settings_su_reauth_title">ਅਪਗ੍ਰੇਡ ਹੋਣ ਤੋਂ ਬਾਅਦ ਪ੍ਰਮਾਣਿਕਤਾ</string>
     <string name="settings_su_reauth_summary">ਇੱਕ ਐਪ ਦੇ ਅਪਡੇਟ ਹੋਣ ਤੋਂ ਬਾਅਦ ਸੁਪਰਯੂਜ਼ਰ ਆਗਿਆ ਪ੍ਰਮਾਣਿਤ ਕਰੋ</string>

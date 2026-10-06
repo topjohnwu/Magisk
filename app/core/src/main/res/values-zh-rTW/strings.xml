@@ -55,20 +55,20 @@
     <string name="flash_screen_title">安裝</string>
 
     <!--Superuser-->
-    <string name="su_request_title">超級使用者要求</string>
-    <string name="touch_filtered_warning">由於某個應用程式遮蔽了超級使用者要求的視窗，因此 Magisk 無法驗證您的回應</string>
+
+
     <string name="deny">拒絕</string>
     <string name="restrict">受限</string>
-    <string name="prompt">提示</string>
+
     <string name="grant">授予</string>
     <string name="superuser_grant">授予超級使用者權限</string>
-    <string name="su_warning">將授予本裝置使用 Root 權限。\n如果不確定，請拒絕！</string>
-    <string name="forever">永久</string>
-    <string name="once">僅此一次</string>
-    <string name="tenmin">10 分鐘</string>
-    <string name="twentymin">20 分鐘</string>
-    <string name="thirtymin">30 分鐘</string>
-    <string name="sixtymin">60 分鐘</string>
+
+
+
+
+
+
+
     <string name="su_allow_toast">已授予 %1$s 使用超級使用者的權限</string>
     <string name="su_legacy_cmd">警告：偵測到不支援的命令列</string>
     <string name="su_deny_toast">已拒絕 %1$s 使用超級使用者的權限</string>
@@ -175,15 +175,15 @@
     <string name="settings_su_app">僅限應用程式</string>
     <string name="settings_su_adb">僅限 ADB</string>
     <string name="settings_su_disable">停用</string>
-    <string name="settings_su_request_10">10 秒</string>
-    <string name="settings_su_request_15">15 秒</string>
-    <string name="settings_su_request_20">20 秒</string>
-    <string name="settings_su_request_30">30 秒</string>
-    <string name="settings_su_request_45">45 秒</string>
-    <string name="settings_su_request_60">60 秒</string>
+
+
+
+
+
+
     <string name="superuser_access">超級使用者存取權限</string>
-    <string name="auto_response">自動回應</string>
-    <string name="request_timeout">要求逾時</string>
+
+
     <string name="superuser_notification">超級使用者通知</string>
     <string name="settings_su_reauth_title">更新後重新驗證</string>
     <string name="settings_su_reauth_summary">應用程式更新後，重新驗證超級使用者的要求</string>
@@ -192,8 +192,8 @@
     <string name="settings_su_auth_insecure">裝置尚未設定任何驗證方式</string>
     <string name="settings_su_restrict_title">限制 Root 權限</string>
     <string name="settings_su_restrict_summary">預設限制新的超級使用者應用程式。警告：這會破壞大多數應用程式，請勿在不明所以的情況下啟用。</string>
-    <string name="settings_su_tapjack_title">啟用點選攔截保護</string>
-    <string name="settings_su_tapjack_summary">發現有其他應用程式重疊在超級使用者視窗上面時，不回應允許操作</string>
+
+
     <string name="settings_customization">客製化</string>
     <string name="settings_color_mode">主題顏色</string>
     <string name="color_mode_system">跟隨系統</string>

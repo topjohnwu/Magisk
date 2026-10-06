@@ -49,18 +49,18 @@
     <string name="flash_screen_title">Installimine</string>
 
     <!--Superuser-->
-    <string name="su_request_title">Superkasutaja taotlus</string>
-    <string name="touch_filtered_warning">Kuna rakendus varjab superkasutaja päringut, ei saa Magisk sinu vastust kinnitada</string>
+
+
     <string name="deny">Keela</string>
-    <string name="prompt">Küsi</string>
+
     <string name="grant">Luba</string>
-    <string name="su_warning">Annab täieliku ligipääsu sinu seadmele.\nKui sa pole kindel, keela!</string>
-    <string name="forever">Igavesti</string>
-    <string name="once">Üks kord</string>
-    <string name="tenmin">10 min</string>
-    <string name="twentymin">20 min</string>
-    <string name="thirtymin">30 min</string>
-    <string name="sixtymin">60 min</string>
+
+
+
+
+
+
+
     <string name="su_allow_toast">Rakendusele %1$s anti superkasutaja õigused</string>
     <string name="su_deny_toast">Rakendusel %1$s keelati superkasutaja õigused</string>
     <string name="su_snack_grant">Superkasutaja õigused antud rakendusele %1$s</string>
@@ -147,20 +147,20 @@
     <string name="settings_su_app">Ainult rakendused</string>
     <string name="settings_su_adb">Ainult ADB</string>
     <string name="settings_su_disable">Keelatud</string>
-    <string name="settings_su_request_10">10 sekundit</string>
-    <string name="settings_su_request_15">15 sekundit</string>
-    <string name="settings_su_request_20">20 sekundit</string>
-    <string name="settings_su_request_30">30 sekundit</string>
-    <string name="settings_su_request_45">45 sekundit</string>
-    <string name="settings_su_request_60">60 sekundit</string>
+
+
+
+
+
+
     <string name="superuser_access">Superkasutaja ligipääs</string>
-    <string name="auto_response">Automaatne vastus</string>
-    <string name="request_timeout">Taotluse ajalõpp</string>
+
+
     <string name="superuser_notification">Superkasutaja teavitus</string>
     <string name="settings_su_reauth_title">Taas-autendi peale uuendust</string>
     <string name="settings_su_reauth_summary">Pärast rakenduste uuendamist küsi superkasutaja luba uuesti</string>
-    <string name="settings_su_tapjack_title">Nupu varjamise kaitse</string>
-    <string name="settings_su_tapjack_summary">Superkasutaja taotluse hüpik ei reageeri vajutusele, kui seda katab mõni teine aken või ülekate</string>
+
+
     <string name="settings_customization">Kohandamine</string>
     <string name="setting_add_shortcut_summary">Lisa avakuvale ilus otsetee juhuks, kui nime ja ikooni on pärast rakenduse peitmist raske tuvastada</string>
     <string name="settings_doh_title">DNS üle HTTPSi</string>

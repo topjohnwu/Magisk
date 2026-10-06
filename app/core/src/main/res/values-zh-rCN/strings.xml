@@ -54,20 +54,20 @@
     <string name="flash_screen_title">安装</string>
 
     <!--Superuser-->
-    <string name="su_request_title">超级用户请求</string>
-    <string name="touch_filtered_warning">由于某个应用遮挡了超级用户请求界面，因此 Magisk 无法验证您的回应</string>
+
+
     <string name="deny">拒绝</string>
-    <string name="prompt">提示</string>
+
     <string name="restrict">受限</string>
     <string name="grant">允许</string>
     <string name="superuser_grant">授予超级用户权限</string>
-    <string name="su_warning">将授予对该设备的最高权限。\n如果不确定，请拒绝！</string>
-    <string name="forever">永久</string>
-    <string name="once">仅此一次</string>
-    <string name="tenmin">10 分钟</string>
-    <string name="twentymin">20 分钟</string>
-    <string name="thirtymin">30 分钟</string>
-    <string name="sixtymin">60 分钟</string>
+
+
+
+
+
+
+
     <string name="su_allow_toast">%1$s 已被授予超级用户权限</string>
     <string name="su_legacy_cmd">警告：检测到不支持的命令行</string>
     <string name="su_deny_toast">%1$s 已被拒绝超级用户权限</string>
@@ -171,20 +171,20 @@
     <string name="settings_su_app">仅应用</string>
     <string name="settings_su_adb">仅 ADB</string>
     <string name="settings_su_disable">已禁用</string>
-    <string name="settings_su_request_10">10 秒</string>
-    <string name="settings_su_request_15">15 秒</string>
-    <string name="settings_su_request_20">20 秒</string>
-    <string name="settings_su_request_30">30 秒</string>
-    <string name="settings_su_request_45">45 秒</string>
-    <string name="settings_su_request_60">60 秒</string>
+
+
+
+
+
+
     <string name="superuser_access">超级用户访问权限</string>
-    <string name="auto_response">自动响应</string>
-    <string name="request_timeout">请求超时</string>
+
+
     <string name="superuser_notification">超级用户通知</string>
     <string name="settings_su_reauth_title">更新后重新认证</string>
     <string name="settings_su_reauth_summary">应用更新后重新认证超级用户权限</string>
-    <string name="settings_su_tapjack_title">点按劫持保护</string>
-    <string name="settings_su_tapjack_summary">存在屏幕叠加层时，超级用户请求弹窗不响应允许操作</string>
+
+
     <string name="settings_su_auth_title">身份验证</string>
     <string name="settings_su_auth_summary">对超级用户请求验证身份</string>
     <string name="settings_su_auth_insecure">设备未配置验证方式</string>

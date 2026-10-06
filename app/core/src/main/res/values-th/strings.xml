@@ -79,15 +79,15 @@
     <string name="settings_su_app">แอปเท่านั้น</string>
     <string name="settings_su_adb">ADB เท่านั้น</string>
     <string name="settings_su_disable">ปิด</string>
-    <string name="settings_su_request_10">10 วินาที</string>
-    <string name="settings_su_request_15">15 วินาที</string>
-    <string name="settings_su_request_20">20 วินาที</string>
-    <string name="settings_su_request_30">30 วินาที</string>
-    <string name="settings_su_request_45">45 วินาที</string>
-    <string name="settings_su_request_60">60 วินาที</string>
+
+
+
+
+
+
     <string name="superuser_access">การเข้าถึง Superuser</string>
-    <string name="auto_response">การตอบกลับ</string>
-    <string name="request_timeout">เวลาการขอใช้งาน</string>
+
+
     <string name="superuser_notification">การแจ้งเตือน Superuser</string>
     <string name="settings_su_reauth_title">ขอสิทธิ์ใหม่หลังจากอัปเกรด</string>
     <string name="settings_su_reauth_summary">ขอสิทธิ์ superuser ใหม่หลังจากแอปถูกอัปเกรด</string>
@@ -109,17 +109,17 @@
     <string name="isolate_summary">Each root session will have its own isolated namespace.</string>
 
     <!--Superuser-->
-    <string name="su_request_title">การขอเข้าถึง Superuser</string>
+
     <string name="deny">ปฏิเสธ</string>
-    <string name="prompt">ถาม</string>
+
     <string name="grant">อนุญาต</string>
-    <string name="su_warning">จะให้การเข้าถึงอุปกรณ์ในทุกรูปแบบ กรุณาปฏิเสธหากคุณไม่มั่นใจ!</string>
-    <string name="forever">ตลอดกาล</string>
-    <string name="once">ครั้งเดียว</string>
-    <string name="tenmin">10 นาที</string>
-    <string name="twentymin">20 นาที</string>
-    <string name="thirtymin">30 นาที</string>
-    <string name="sixtymin">60 นาที</string>
+
+
+
+
+
+
+
     <string name="su_allow_toast">%1$s ถูกอนุญาตสิทธิ์ Superuser</string>
     <string name="su_deny_toast">%1$s ถูกปฏิเสธสิทธิ์ Superuser</string>
     <string name="su_snack_grant">สิทธิ์ Superuser ของ %1$s ถูกอนุญาต</string>

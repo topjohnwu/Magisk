@@ -50,18 +50,18 @@
     <string name="flash_screen_title">Quraşdırılma</string>
 
     <!--Superuser-->
-    <string name="su_request_title">Super İstifadəçi İcazəsi</string>
-    <string name="touch_filtered_warning">Hansısa tətbiq Super İstifadəçi icazəsini pozduğuna görə, Magisk göstərişinizi yerinə yetirə bilmir</string>
+
+
     <string name="deny">İmtina et</string>
-    <string name="prompt">İstək</string>
+
     <string name="grant">İcazə ver</string>
-    <string name="su_warning">Bu tətbiqə tam səlahiyyət verəcək.\nƏmin deyilsənsə imtina et!</string>
-    <string name="forever">Həmişə</string>
-    <string name="once">1 dəfəlik</string>
-    <string name="tenmin">10 dəqiqəlik</string>
-    <string name="twentymin">20 dəqiqəlik</string>
-    <string name="thirtymin">30 dəqiqəlik</string>
-    <string name="sixtymin">60 dəqiqəlik</string>
+
+
+
+
+
+
+
     <string name="su_allow_toast">%1$s Super İstifadəçi icazəsi aldı</string>
     <string name="su_deny_toast">%1$s Super İstifadəçi icazəsi ala bilmədi</string>
     <string name="su_snack_grant">%1$s üçün Super İstifadəçi haqları verilib</string>
@@ -153,20 +153,20 @@
     <string name="settings_su_app">Yalmız Tətbiqlər</string>
     <string name="settings_su_adb">Yalnız ADB</string>
     <string name="settings_su_disable">Heç Biri</string>
-    <string name="settings_su_request_10">10 saniyə</string>
-    <string name="settings_su_request_15">15 saniyə</string>
-    <string name="settings_su_request_20">20 saniyə</string>
-    <string name="settings_su_request_30">30 saniyə</string>
-    <string name="settings_su_request_45">45 saniyə</string>
-    <string name="settings_su_request_60">60 saniyə</string>
+
+
+
+
+
+
     <string name="superuser_access">Super istifadəçi İcazəsi</string>
-    <string name="auto_response">Avtomatik Cavab</string>
-    <string name="request_timeout">İstək Vaxtaşımı</string>
+
+
     <string name="superuser_notification">Super İstifadəçi Bildirişi</string>
     <string name="settings_su_reauth_title">Yüksəltdikdən sonra yenidən səlahiyətləndir</string>
     <string name="settings_su_reauth_summary">Tətbiqləri yüksəltdikdən sonra Super İstifadəçi icazəsi istə</string>
-    <string name="settings_su_tapjack_title">Saxta Ekran (Tapjacking) Qoruması</string>
-    <string name="settings_su_tapjack_summary">Super İstifadəçi icazə pəncərəsi digər pəncərələr tərəfindən əngəlləndikdə heçbir girişə cavab verməyəcək</string>
+
+
     <string name="settings_customization">Özəlləşdirmə</string>
     <string name="setting_add_shortcut_summary">Tətbiqi gizlətdikdən sonra tapmaq çətin olmasın deyə ana ekrana qısayol əlavə et</string>
     <string name="settings_doh_title">HTTPS üzərindən DNS</string>

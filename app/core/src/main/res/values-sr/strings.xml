@@ -48,19 +48,19 @@
     <string name="flash_screen_title">Инсталација</string>
 
     <!--Superuser-->
-    <string name="su_request_title">Ова апликација захтева коренску пермисију. Пружа потпун приступ Вашем уређају. Забраните ако нисте сигурни!</string>
-    <string name="touch_filtered_warning">Magisk не може да верификује Ваш одговор, јер апликација прикрива супер-кориснички захтев.</string>
+
+
     <string name="deny">Забрани</string>
-    <string name="prompt">Захтев</string>
+
     <string name="restrict">Ограничи</string>
     <string name="grant">Дозволи</string>
-    <string name="su_warning">Пружа потпун приступ Вашем уређају.\nЗабраните ако нисте сигурни!</string>
-    <string name="forever">Заувек</string>
-    <string name="once">Једном</string>
-    <string name="tenmin">10 мин</string>
-    <string name="twentymin">20 мин</string>
-    <string name="thirtymin">30 мин</string>
-    <string name="sixtymin">60 мин</string>
+
+
+
+
+
+
+
     <string name="su_allow_toast">%1$s је добио права на супер-корисника</string>
     <string name="su_deny_toast">%1$s није добио права на супер-корисника</string>
     <string name="su_snack_grant">Супер-корисничка права од %1$s су пружена</string>
@@ -166,20 +166,20 @@
     <string name="settings_su_app">Само апликације</string>
     <string name="settings_su_adb">Само ADB</string>
     <string name="settings_su_disable">Онемогућено</string>
-    <string name="settings_su_request_10">10 секунди</string>
-    <string name="settings_su_request_15">15 секунди</string>
-    <string name="settings_su_request_20">20 секунди</string>
-    <string name="settings_su_request_30">30 секунди</string>
-    <string name="settings_su_request_45">45 секунди</string>
-    <string name="settings_su_request_60">60 секунди</string>
+
+
+
+
+
+
     <string name="superuser_access">Приступ супер-корисника</string>
-    <string name="auto_response">Аутоматски одговор</string>
-    <string name="request_timeout">Истек захтева</string>
+
+
     <string name="superuser_notification">Нотификације супер-корисника</string>
     <string name="settings_su_reauth_title">Поново одобри након ажурирања</string>
     <string name="settings_su_reauth_summary">Поново тражи пермисије супер-корисника након ажурирања апликација</string>
-    <string name="settings_su_tapjack_title">Заштита од tapjacking-а</string>
-    <string name="settings_su_tapjack_summary">Prompt дијалог супер-корисника неће реаговати док је прикривен другим прозором или overlay-ем</string>
+
+
     <string name="settings_su_auth_title">Аутентификација корисника</string>
     <string name="settings_su_auth_summary">Тражи аутентификацију корисника током захтева супер-корисника</string>
     <string name="settings_su_auth_insecure">Ниједан метод аутентификације није подешен на уређају</string>

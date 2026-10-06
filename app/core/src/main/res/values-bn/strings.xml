@@ -50,18 +50,18 @@
     <string name="flash_screen_title">স্থাপন</string>
 
     <!--Superuser-->
-    <string name="su_request_title">সুপার ইউজার অনুরোধ/স্ট্রিং</string>
-    <string name="touch_filtered_warning">যেহেতু একটি অ্যাপ সুপার ব্যবহারকারীর অনুরোধকে অস্পষ্ট করছে, ম্যাজিস্ক আপনার প্রতিক্রিয়া যাচাই করতে পারে না</string>
+
+
     <string name="deny">অস্বীকার করুন</string>
-    <string name="prompt">শীঘ্র</string>
+
     <string name="grant">প্রদান</string>
-    <string name="su_warning">আপনার ডিভাইসে সম্পূর্ণ অ্যাক্সেস মঞ্জুর করে৷\nআপনি নিশ্চিত না হলে অস্বীকার করুন!</string>
-    <string name="forever">চিরতরে</string>
-    <string name="once">একদা</string>
-    <string name="tenmin">১০ মিনিট</string>
-    <string name="twentymin">২০ মিনিট</string>
-    <string name="thirtymin">৩০ মিনিট</string>
-    <string name="sixtymin">৬০ মিনিট</string>
+
+
+
+
+
+
+
     <string name="su_allow_toast">%1$s সুপার ইউজার অধিকার দেওয়া হয়েছিল</string>
     <string name="su_deny_toast">%1$s সুপার ইউজার অধিকার অস্বীকার করা হয়েছিল</string>
     <string name="su_snack_grant">%1$s-এর সুপার ব্যবহারকারীর অধিকার মঞ্জুর করা হয়েছে</string>
@@ -148,20 +148,20 @@
     <string name="settings_su_app">শুধুমাত্র অ্যাপস</string>
     <string name="settings_su_adb">শুধুমাত্র এডিবি</string>
     <string name="settings_su_disable">অক্ষম</string>
-    <string name="settings_su_request_10">১০ সেকেন্ড</string>
-    <string name="settings_su_request_15">১৫ সেকেন্ড</string>
-    <string name="settings_su_request_20">২০ সেকেন্ড</string>
-    <string name="settings_su_request_30">৩০ সেকেন্ড</string>
-    <string name="settings_su_request_45">৪৫ সেকেন্ড</string>
-    <string name="settings_su_request_60">৬০ সেকেন্ড</string>
+
+
+
+
+
+
     <string name="superuser_access">সুপার ইউজার অ্যাক্সেস</string>
-    <string name="auto_response">স্বয়ংক্রিয় প্রতিক্রিয়া</string>
-    <string name="request_timeout">অনুরোধের সময়সীমা শেষ</string>
+
+
     <string name="superuser_notification">সুপার ইউজার বিজ্ঞপ্তি</string>
     <string name="settings_su_reauth_title">আপগ্রেড করার পরে পুনরায় প্রমাণীকরণ করুন</string>
     <string name="settings_su_reauth_summary">অ্যাপগুলি আপগ্রেড করার পরে আবার সুপার ইউজার অনুমতির জন্য জিজ্ঞাসা করুন</string>
-    <string name="settings_su_tapjack_title">ট্যাপজ্যাকিং সুরক্ষা</string>
-    <string name="settings_su_tapjack_summary">সুপার ইউজার প্রম্পট ডায়ালগ অন্য কোনো উইন্ডো বা ওভারলে দ্বারা অস্পষ্ট থাকাকালীন ইনপুটটিতে সাড়া দেবে না</string>
+
+
     <string name="settings_customization">কাস্টমাইজেশন</string>
     <string name="setting_add_shortcut_summary">অ্যাপটি লুকানোর পরে নাম এবং আইকন সনাক্ত করা কঠিন হলে হোম স্ক্রিনে একটি সুন্দর শর্টকাট যোগ করুন</string>
     <string name="settings_doh_title">HTTPS এর উপর ডিএনএস</string>

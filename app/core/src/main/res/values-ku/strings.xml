@@ -50,18 +50,18 @@
     <string name="flash_screen_title">ڕێکخستن</string>
 
     <!--Superuser-->
-    <string name="su_request_title">داواکاری سوپەریوسەر</string>
-    <string name="touch_filtered_warning">ئەپێک لە سەر شاشەکەیە، ناتوانین دڵنیا بینەوە</string>
+
+
     <string name="deny">ڕەتکردنەوە</string>
-    <string name="prompt">داواکاری</string>
+
     <string name="grant">ڕێگەپێدان</string>
-    <string name="su_warning">ڕێگەپێدان بۆ تەواوی ئامێرەکەت، گەر دڵنیا نیت ڕەتی بکەوە</string>
-    <string name="forever">بۆ هەمیشە</string>
-    <string name="once">بۆ یەکجار</string>
-    <string name="tenmin">بۆ ١٠ خولەک</string>
-    <string name="twentymin">بۆ ٢٠ خولەک</string>
-    <string name="thirtymin">بۆ ٣٠ خولەک</string>
-    <string name="sixtymin">بۆ ٦٠ خولەک</string>
+
+
+
+
+
+
+
     <string name="su_allow_toast">%1$s ڕێگەپێدانی سوپەریوسەری بۆ زیادکرا</string>
     <string name="su_deny_toast">%1$s ڕێگەپێدانی سوپەریوسەر ڕەتکرایەوە</string>
     <string name="su_snack_grant">ڕێگەپێدانی سوپەریوسەری %1$s بۆ درا</string>
@@ -156,20 +156,20 @@
     <string name="settings_su_app">تەنها ئەپەکان</string>
     <string name="settings_su_adb">ADB تەنها</string>
     <string name="settings_su_disable">ناچالاک کراوە</string>
-    <string name="settings_su_request_10">10 چرکە</string>
-    <string name="settings_su_request_15">15 چرکە</string>
-    <string name="settings_su_request_20">20 چرکە</string>
-    <string name="settings_su_request_30">30 چرکە</string>
-    <string name="settings_su_request_45">45 چرکە</string>
-    <string name="settings_su_request_60">60 چرکە</string>
+
+
+
+
+
+
     <string name="superuser_access">دەسەڵاتی سوپەریوسەر</string>
-    <string name="auto_response">وەڵامدانەوەی خۆکارانە</string>
-    <string name="request_timeout">ماوەی وەڵامدانەوە</string>
+
+
     <string name="superuser_notification">ئاگەدارییەکانی سوپەریوسەر</string>
     <string name="settings_su_reauth_title">پرسیاربکەوە دوای هەر نوێکردنەوەیەک</string>
     <string name="settings_su_reauth_summary">دوای نوێکردنەوەی ئەپەکان دووبارە پرسیار بکەوە بۆ دەسەڵاتی سوپەریوسەر</string>
-    <string name="settings_su_tapjack_title">پارێزگاری کردن لە ئەگەری دەستلێدانی تر</string>
-    <string name="settings_su_tapjack_summary"> کاتێک ئەپێکی تر بەسەر شاشەکەوەیە، سوپەر یوسەر وەڵام ناداتەوە لە کردنی هەر بژاردەیەک لەبەر پارێزراوی</string>
+
+
     <string name="settings_su_auth_title">دڵنیاکردنەوەی کەسی</string>
     <string name="settings_su_auth_summary">داواکاری بکە بۆ دڵنیاکردنەوەی کەسی لەکاتی داواکاری سوپەریوسەر</string>
     <string name="settings_su_auth_insecure">هیچ دڵنیاکردنەوەیەک نییە</string>
@@ -247,4 +247,3 @@
     <string name="restore_app_confirmation">ئەمە ئەپە ڕەسەنەکە ئەهێنێتەوە، دڵنیایت لە کردنی؟</string>
 
 </resources>
-      

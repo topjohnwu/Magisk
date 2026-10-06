@@ -50,18 +50,18 @@
     <string name="flash_screen_title">Installieren</string>
 
     <!--Superuser-->
-    <string name="su_request_title">Superuser-Anfrage</string>
-    <string name="touch_filtered_warning">Weil eine App eine Superuser-Anfrage verdeckt, kann Magisk deine Antwort nicht verifizieren</string>
+
+
     <string name="deny">Verweigern</string>
-    <string name="prompt">Fragen</string>
+
     <string name="grant">Gewähren</string>
-    <string name="su_warning">Zugriff auf dein Gerät gewähren. Verweigere den Zugriff, wenn du nicht sicher bist!</string>
-    <string name="forever">Für immer</string>
-    <string name="once">Einmalig</string>
-    <string name="tenmin">10 Minuten</string>
-    <string name="twentymin">20 Minuten</string>
-    <string name="thirtymin">30 Minuten</string>
-    <string name="sixtymin">60 Minuten</string>
+
+
+
+
+
+
+
     <string name="su_allow_toast">%1$s wurden Superuser-Rechte gewährt</string>
     <string name="su_deny_toast">%1$s wurden Superuser-Rechte verweigert</string>
     <string name="su_snack_grant">Superuser-Rechte für %1$s gewährt</string>
@@ -154,20 +154,20 @@
     <string name="settings_su_app">Nur Apps</string>
     <string name="settings_su_adb">Nur ADB</string>
     <string name="settings_su_disable">Deaktiviert</string>
-    <string name="settings_su_request_10">10 Sekunden</string>
-    <string name="settings_su_request_15">15 Sekunden</string>
-    <string name="settings_su_request_20">20 Sekunden</string>
-    <string name="settings_su_request_30">30 Sekunden</string>
-    <string name="settings_su_request_45">45 Sekunden</string>
-    <string name="settings_su_request_60">60 Sekunden</string>
+
+
+
+
+
+
     <string name="superuser_access">Superuser-Zugriff</string>
-    <string name="auto_response">Automatisch beantworten</string>
-    <string name="request_timeout">Zeitlimit für Anfrage</string>
+
+
     <string name="superuser_notification">Superuser-Benachrichtigung</string>
     <string name="settings_su_reauth_title">Nach Aktualisierung erneut zertifizieren</string>
     <string name="settings_su_reauth_summary">Superuser-Berechtigungen nach App-Aktualisierung erneut authentifizieren</string>
-    <string name="settings_su_tapjack_title">Tapjacking-Schutz aktivieren</string>
-    <string name="settings_su_tapjack_summary">Das Dialogfeld der Superuser-Eingabeaufforderung reagiert nicht auf Eingaben, wenn es durch ein anderes Fenster oder Überlagerung verdeckt wird</string>
+
+
     <string name="settings_su_auth_title">Benutzerauthentifizierung</string>
     <string name="settings_su_auth_summary">Nachfrage nach Benutzerauthentifizierung bei Superuser-Anfragen</string>
     <string name="settings_su_auth_insecure">Auf dem Gerät ist keine Authentifizierungsmethode konfiguriert</string>>

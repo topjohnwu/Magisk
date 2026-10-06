@@ -46,18 +46,18 @@
     <string name="reboot_delay_toast">5 سیکنڈ میں ریبوٹ ہو رہا ہے…</string>
     <string name="flash_screen_title">انسٹالیشن</string>
 
-    <string name="su_request_title">سپر یوزر کی درخواست</string>
-    <string name="touch_filtered_warning">چونکہ ایک ایپ سپر یوزر کی درخواست کو دھندلا کر رہی ہے، اس لیے Magisk آپ کے جواب کی تصدیق نہیں کر سکتا</string>
+
+
     <string name="deny">منع کریں</string>
-    <string name="prompt">پوچھیں</string>
+
     <string name="grant">اجازت دیں</string>
-    <string name="su_warning">اپنے آلے تک مکمل رسائی کی اجازت دیں۔\nاگر آپ کو یقین نہیں ہے تو منع کریں!</string>
-    <string name="forever">ہمیشہ کے لیے</string>
-    <string name="once">ایک بار</string>
-    <string name="tenmin">10 منٹ</string>
-    <string name="twentymin">20 منٹ</string>
-    <string name="thirtymin">30 منٹ</string>
-    <string name="sixtymin">60 منٹ</string>
+
+
+
+
+
+
+
     <string name="su_allow_toast">%1$s کو سپر یوزر کے حقوق دیئے گئے</string>
     <string name="su_deny_toast">%1$s کو سپر یوزر کے حقوق سے انکار کر دیا گیا</string>
     <string name="su_snack_grant">%1$s کے سپر یوزر حقوق دیئے گئے</string>
@@ -145,20 +145,20 @@
     <string name="settings_su_app">صرف ایپس</string>
     <string name="settings_su_adb">صرف ADB</string>
     <string name="settings_su_disable">غیر فعال</string>
-    <string name="settings_su_request_10">10 سیکنڈ</string>
-    <string name="settings_su_request_15">15 سیکنڈ</string>
-    <string name="settings_su_request_20">20 سیکنڈ</string>
-    <string name="settings_su_request_30">30 سیکنڈ</string>
-    <string name="settings_su_request_45">45 سیکنڈ</string>
-    <string name="settings_su_request_60">60 سیکنڈ</string>
+
+
+
+
+
+
     <string name="superuser_access">سپر یوزر تک رسائی</string>
-    <string name="auto_response">خودکار جواب</string>
-    <string name="request_timeout">درخواست کا وقت ختم</string>
+
+
     <string name="superuser_notification">سپر یوزر اطلاع</string>
     <string name="settings_su_reauth_title">اپ گریڈ کے بعد دوبارہ تصدیق کریں</string>
     <string name="settings_su_reauth_summary">ایپس کو اپ گریڈ کرنے کے بعد دوبارہ سپر یوزر کی اجازتیں مانگیں</string>
-    <string name="settings_su_tapjack_title">ٹیپ جیکنگ سے تحفظ</string>
-    <string name="settings_su_tapjack_summary">سپر یوزر پرامپٹ ڈائیلاگ کسی دوسری ونڈو یا اوورلے سے دھندلا ہونے کے دوران ان پٹ کا جواب نہیں دے گا</string>
+
+
     <string name="settings_su_auth_title">صارف کی تصدیق</string>
     <string name="settings_su_auth_summary">سپر یوزر کی درخواستوں کے دوران صارف کی تصدیق طلب کریں</string>
     <string name="settings_su_auth_insecure">آلے پر کوئی تصدیقی طریقہ کار تشکیل نہیں دیا گیا ہے</string>
@@ -230,5 +230,3 @@
     <string name="restore_app_confirmation">یہ چھپی ہوئی ایپ کو اصل ایپ میں بحال کردے گا۔ کیا آپ واقعی ایسا کرنا چاہتے ہیں؟</string>
 
 </resources>
-
-      

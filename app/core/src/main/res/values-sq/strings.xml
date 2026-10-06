@@ -44,19 +44,19 @@
     <string name="flash_screen_title">Instalimi</string>
 
     <!--Superuser-->
-    <string name="su_request_title">Ky aplikacion po kërkon leje root. Kjo i jep akses të plotë pajisjes suaj. Mohoni nëse nuk jeni të sigurt!</string>
-    <string name="touch_filtered_warning">Për shkak se një aplikacion po mbulon kërkesën e Superpërdoruesit, Magisk nuk mund të verifikojë përgjigjen tuaj.</string>
+
+
     <string name="deny">Refuzo</string>
-    <string name="prompt">Pyet</string>
+
     <string name="restrict">Kufizo</string>
     <string name="grant">Lejo</string>
-    <string name="su_warning">Jep akses të plotë në pajisjen tuaj.\nRefuzojeni nëse nuk jeni të sigurt!</string>
-    <string name="forever">Përgjithmonë</string>
-    <string name="once">Një herë</string>
-    <string name="tenmin">10 min</string>
-    <string name="twentymin">20 min</string>
-    <string name="thirtymin">30 min</string>
-    <string name="sixtymin">60 min</string>
+
+
+
+
+
+
+
     <string name="su_allow_toast">%1$s iu dhanë të drejtat e Superpërdoruesit</string>
     <string name="su_deny_toast">%1$s iu mohuan të drejtat e Superpërdoruesit</string>
     <string name="su_snack_grant">Të drejtat e Superpërdoruesit për %1$s u lejuan</string>
@@ -160,20 +160,20 @@
     <string name="settings_su_app">Vetëm aplikacionet</string>
     <string name="settings_su_adb">Vetëm ADB</string>
     <string name="settings_su_disable">Çaktivizuar</string>
-    <string name="settings_su_request_10">10 sekonda</string>
-    <string name="settings_su_request_15">15 sekonda</string>
-    <string name="settings_su_request_20">20 sekonda</string>
-    <string name="settings_su_request_30">30 sekonda</string>
-    <string name="settings_su_request_45">45 sekonda</string>
-    <string name="settings_su_request_60">60 sekonda</string>
+
+
+
+
+
+
     <string name="superuser_access">Aksesi Superpërdorues</string>
-    <string name="auto_response">Përgjigje automatike</string>
-    <string name="request_timeout">Koha e kërkesës mbaroi</string>
+
+
     <string name="superuser_notification">Njoftimet e Superpërdoruesit</string>
     <string name="settings_su_reauth_title">Ri-autentikohu pas përditësimit</string>
     <string name="settings_su_reauth_summary">Kërko përsëri leje Superpërdoruesi pas përditësimit të aplikacioneve</string>
-    <string name="settings_su_tapjack_title">Mbrojtja nga Tapjacking</string>
-    <string name="settings_su_tapjack_summary">Dialogu i kërkesës për Superpërdorues nuk do t\'u përgjigjet prekjeve kur mbulohet nga ndonjë dritare ose shtresë tjetër</string>
+
+
     <string name="settings_su_auth_title">Autentikimi i përdoruesit</string>
     <string name="settings_su_auth_summary">Kërko autentikim të përdoruesit gjatë kërkesave për Superpërdorues</string>
     <string name="settings_su_auth_insecure">Asnjë metodë autentikimi nuk është konfiguruar në pajisje</string>

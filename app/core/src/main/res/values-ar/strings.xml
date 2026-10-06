@@ -47,19 +47,19 @@
     <string name="flash_screen_title">التثبيت</string>
 
     <!--Superuser-->
-    <string name="su_request_title">يطلب هذا التطبيق صلاحية الروت، يمنح وصولًا كاملًا إلى جهازك. ارفض إن لم تكن متأكدًا!</string>
-    <string name="touch_filtered_warning">يحجب أحد التطبيقات طلب صلاحية الروت، لذا لا يستطيع Magisk التحقق من استجابتك.</string>
+
+
     <string name="deny">رفض</string>
-    <string name="prompt">اسأل</string>
+
     <string name="restrict">تقييد</string>
     <string name="grant">منح</string>
-    <string name="su_warning">يمنح وصولًا كاملًا إلى جهازك.\nارفض إن لم تكن متأكدًا!</string>
-    <string name="forever">للأبد</string>
-    <string name="once">مرة واحدة</string>
-    <string name="tenmin">10 دقائق</string>
-    <string name="twentymin">20 دقيقة</string>
-    <string name="thirtymin">30 دقيقة</string>
-    <string name="sixtymin">60 دقيقة</string>
+
+
+
+
+
+
+
     <string name="su_allow_toast">تم منح %1$s صلاحيات الروت</string>
     <string name="su_deny_toast">تم رفض صلاحيات الروت لـ %1$s</string>
     <string name="su_snack_grant">تم منح صلاحيات الروت لـ %1$s</string>
@@ -165,20 +165,20 @@
     <string name="settings_su_app">التطبيقات فقط</string>
     <string name="settings_su_adb">ADB فقط</string>
     <string name="settings_su_disable">معطّل</string>
-    <string name="settings_su_request_10">10 ثوانٍ</string>
-    <string name="settings_su_request_15">15 ثانية</string>
-    <string name="settings_su_request_20">20 ثانية</string>
-    <string name="settings_su_request_30">30 ثانية</string>
-    <string name="settings_su_request_45">45 ثانية</string>
-    <string name="settings_su_request_60">60 ثانية</string>
+
+
+
+
+
+
     <string name="superuser_access">صلاحية الروت</string>
-    <string name="auto_response">الاستجابة التلقائية</string>
-    <string name="request_timeout">مهلة الطلب</string>
+
+
     <string name="superuser_notification">إشعار صلاحية الروت</string>
     <string name="settings_su_reauth_title">إعادة المصادقة بعد الترقية</string>
     <string name="settings_su_reauth_summary">طلب صلاحيات صلاحية الروت مجددًا بعد ترقية التطبيقات</string>
-    <string name="settings_su_tapjack_title">الحماية من اختطاف النقرات</string>
-    <string name="settings_su_tapjack_summary">لن يستجيب مربع حوار طلب صلاحية الروت للمدخلات إذا كان محجوبًا بأي نافذة أو طبقة عرض أخرى</string>
+
+
     <string name="settings_su_auth_title">مصادقة المستخدم</string>
     <string name="settings_su_auth_summary">طلب مصادقة المستخدم عند منح صلاحيات الروت</string>
     <string name="settings_su_auth_insecure">لا توجد وسيلة مصادقة مضبوطة على الجهاز</string>

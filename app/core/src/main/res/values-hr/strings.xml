@@ -47,17 +47,17 @@
     <string name="flash_screen_title">Instalacija</string>
 
     <!--Superuser-->
-    <string name="su_request_title">Superuser zahtjev</string>
+
     <string name="deny">Odbij</string>
-    <string name="prompt">Upit</string>
+
     <string name="grant">Odobri</string>
-    <string name="su_warning">Odobren puni pristup vašem uređaju.\nOdbijte ako niste sigurni!</string>
-    <string name="forever">Zauvijek</string>
-    <string name="once">Jednom</string>
-    <string name="tenmin">10 min</string>
-    <string name="twentymin">20 min</string>
-    <string name="thirtymin">30 min</string>
-    <string name="sixtymin">60 min</string>
+
+
+
+
+
+
+
     <string name="su_allow_toast">%1$s su dodijeljena Superuser prava</string>
     <string name="su_deny_toast">%1$s su odbijena Superuser prava</string>
     <string name="su_snack_grant">Superuser prava su dodijeljena za %1$s</string>
@@ -130,15 +130,15 @@
     <string name="settings_su_app">Samo aplikacije</string>
     <string name="settings_su_adb">Samo ADB</string>
     <string name="settings_su_disable">Onemogućeno</string>
-    <string name="settings_su_request_10">10 sekundi</string>
-    <string name="settings_su_request_15">15 sekundi</string>
-    <string name="settings_su_request_20">20 sekundi</string>
-    <string name="settings_su_request_30">30 sekundi</string>
-    <string name="settings_su_request_45">45 sekundi</string>
-    <string name="settings_su_request_60">60 sekundi</string>
+
+
+
+
+
+
     <string name="superuser_access">Superuser pristup</string>
-    <string name="auto_response">Automatski odgovor</string>
-    <string name="request_timeout">Vremensko ograničenje zahtjeva</string>
+
+
     <string name="superuser_notification">Superuser obavijest</string>
     <string name="settings_su_reauth_title">Ponovno provjerite autentičnost nakon ažuriranja</string>
     <string name="settings_su_reauth_summary">Ponovno provjerite autentičnost Superuser-a dopuštenja nakon ažuriranja aplikacije</string>

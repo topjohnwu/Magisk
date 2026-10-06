@@ -49,19 +49,19 @@
     <string name="flash_screen_title">نصب و راه اندازی</string>
 
     <!--Superuser-->
-    <string name="su_request_title">درخواست کاربر روت</string>
-    <string name="touch_filtered_warning">به دلیل اینکه یک برنامه در حال پوشاندن درخواست Superuser است، Magisk نمی‌تواند پاسخ شما را تأیید کند.</string>
+
+
     <string name="deny">رد کردن</string>
-    <string name="prompt">درخواست کردن</string>
+
     <string name="restrict">محدود کردن</string>
     <string name="grant">اجازه دادن</string>
-    <string name="su_warning">دسترسی کامل به دستگاه شما را اعطا می کند. \nاگر مطمئن نیستید رد کنید!</string>
-    <string name="forever">همیشه</string>
-    <string name="once">یکبار</string>
-    <string name="tenmin">10 دقیقه</string>
-    <string name="twentymin">20 دقیقه</string>
-    <string name="thirtymin">30 دقیقه</string>
-    <string name="sixtymin">60 دقیقه</string>
+
+
+
+
+
+
+
     <string name="su_allow_toast">%1$s اجازه دسترسی به روت داده شد</string>
     <string name="su_deny_toast">%1$s اجازه دسترسی به روت رد شد</string>
     <string name="su_snack_grant">دسترسی روت به %1$s داده شده است</string>
@@ -154,20 +154,20 @@
     <string name="settings_su_app">فقط برنامه ها</string>
     <string name="settings_su_adb">ADB فقط</string>
     <string name="settings_su_disable">غییرفعال شده</string>
-    <string name="settings_su_request_10">10 ثانیه</string>
-    <string name="settings_su_request_15">15 ثانیه</string>
-    <string name="settings_su_request_20">20 ثانیه</string>
-    <string name="settings_su_request_30">30 ثانیه</string>
-    <string name="settings_su_request_45">45 ثانیه</string>
-    <string name="settings_su_request_60">60 ثانیه</string>
+
+
+
+
+
+
     <string name="superuser_access">دسترسی روت</string>
-    <string name="auto_response">پاسخ خودکار</string>
-    <string name="request_timeout">مهلت زمانی درخواست</string>
+
+
     <string name="superuser_notification">اعلان روت</string>
     <string name="settings_su_reauth_title">احراز هویت دوباره پس از بروز رسانی</string>
     <string name="settings_su_reauth_summary">تأیید کردندوباره مجوزهای روت پس از ارتقاء برنامه</string>
-    <string name="settings_su_tapjack_title">محافظت در برابر Tapjacking</string>
-    <string name="settings_su_tapjack_summary">پنجره درخواست Superuser زمانی که توسط پنجره یا لایه دیگری پوشانده شود، به ورودی پاسخ نخواهد داد</string>
+
+
     <string name="settings_su_auth_title">احراز هویت کاربر</string>
     <string name="settings_su_auth_summary">درخواست احراز هویت کاربر هنگام درخواست Superuser</string>
     <string name="settings_su_auth_insecure">هیچ روش احراز هویتی روی دستگاه پیکربندی نشده است</string>

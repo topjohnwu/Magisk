@@ -46,18 +46,18 @@
     <string name="reboot_delay_toast">Reaniciando en 5 segundos…</string>
     <string name="flash_screen_title">Instalación</string>
     <!--Superuser-->
-    <string name="su_request_title">Solicitú de superusuariu</string>
-    <string name="touch_filtered_warning">Como una aplicación torga la solicitú de superusuariu, Magisk nun pue verificar la to rempuesta</string>
+
+
     <string name="deny">Negar</string>
-    <string name="prompt">Entrugar</string>
+
     <string name="grant">Conceder</string>
-    <string name="su_warning">Concede l\'accesu completu al preséu.\n¡Niégalu en casu de dulda!</string>
-    <string name="forever">Siempres</string>
-    <string name="once">Una vegada</string>
-    <string name="tenmin">10 minutos</string>
-    <string name="twentymin">20 minutos</string>
-    <string name="thirtymin">30 minutos</string>
-    <string name="sixtymin">60 minutos</string>
+
+
+
+
+
+
+
     <string name="su_allow_toast">A %1$s concediéronse-y los derechos de superusuariu</string>
     <string name="su_deny_toast">A %1$s negáronse-y los derechos de superusuariu</string>
     <string name="su_snack_grant">Concediéronse los derechos de superusuariu a %1$s</string>
@@ -146,20 +146,20 @@
     <string name="settings_su_app">Namás aplicaciones</string>
     <string name="settings_su_adb">Namás ADB</string>
     <string name="settings_su_disable">Non</string>
-    <string name="settings_su_request_10">10 segundos</string>
-    <string name="settings_su_request_15">15 segundos</string>
-    <string name="settings_su_request_20">20 segundos</string>
-    <string name="settings_su_request_30">30 segundos</string>
-    <string name="settings_su_request_45">45 segundos</string>
-    <string name="settings_su_request_60">60 segundos</string>
+
+
+
+
+
+
     <string name="superuser_access">Accesu de superusuariu</string>
-    <string name="auto_response">Rempuesta automática</string>
-    <string name="request_timeout">Tiempu d\'espera de les solicitúes</string>
+
+
     <string name="superuser_notification">Avisu de superusuariu</string>
     <string name="settings_su_reauth_title">Volver autenticar dempués d\'anovar</string>
     <string name="settings_su_reauth_summary">Vuelve pidir los permisos de superusuariu dempués d\'anovar les aplicaciones</string>
-    <string name="settings_su_tapjack_title">Proteición escontra\'l tapjacking</string>
-    <string name="settings_su_tapjack_summary">El diálogu de concesión de permisos de superusuariu nun respuende a la entrada mentanto lu torgue otra ventana o superposición</string>
+
+
     <string name="settings_su_auth_title">Autenticación d\'usuariu</string>
     <string name="settings_su_auth_summary">Pide l\'autenticación demientres les solicitúes de superusuariu</string>
     <string name="settings_su_auth_insecure">Nun se configuró nengún métodu d\'autenticación nel preséu</string>

@@ -50,18 +50,18 @@
     <string name="flash_screen_title">Įdiegimas</string>
 
     <!--Superuser-->
-    <string name="su_request_title">Supernaudotojo užklausa</string>
-    <string name="touch_filtered_warning">Programėlė užstoja supernaudotojo užklausą, todėl Magisk negali patvirtinti jūsų atsakymo</string>
+
+
     <string name="deny">Atmesti</string>
-    <string name="prompt">Klausti</string>
+
     <string name="grant">Leisti</string>
-    <string name="su_warning">Suteikia prieigą prie jūsų įrenginio.\nAtmeskite, jei nesate tikri!</string>
-    <string name="forever">Amžinai</string>
-    <string name="once">Kartą</string>
-    <string name="tenmin">10 minučių</string>
-    <string name="twentymin">20 minučių</string>
-    <string name="thirtymin">30 minučių</string>
-    <string name="sixtymin">60 minučių</string>
+
+
+
+
+
+
+
     <string name="su_allow_toast">%1$s suteiktos supernaudotojo teisės</string>
     <string name="su_deny_toast">%1$s atmestos supernaudotojo teisės</string>
     <string name="su_snack_grant">%1$s supernaudotojo teisės yra suteiktos</string>
@@ -151,20 +151,20 @@
     <string name="settings_su_app">Tik programėlės</string>
     <string name="settings_su_adb">Tik ADB</string>
     <string name="settings_su_disable">Išjungta</string>
-    <string name="settings_su_request_10">10 sekundžių</string>
-    <string name="settings_su_request_15">15 sekundžių</string>
-    <string name="settings_su_request_20">20 sekundžių</string>
-    <string name="settings_su_request_30">30 sekundžių</string>
-    <string name="settings_su_request_45">45 sekundės</string>
-    <string name="settings_su_request_60">60 sekundžių</string>
+
+
+
+
+
+
     <string name="superuser_access">Prieigos lygis</string>
-    <string name="auto_response">Automatinis atsakymas</string>
-    <string name="request_timeout">Atsakymo laukimas</string>
+
+
     <string name="superuser_notification">Supernaudotojo pranešimas</string>
     <string name="settings_su_reauth_title">Pakartotinis autentifikavimas</string>
     <string name="settings_su_reauth_summary">Iš naujo prašyti supernaudotojo teisių po programėlių naujinimo</string>
-    <string name="settings_su_tapjack_title">Bakstelėjimų perėmimo apsauga</string>
-    <string name="settings_su_tapjack_summary">Supernaudotojo užklausos langas bus neaktyvus, kol jis yra užstotas kito lango</string>
+
+
     <string name="settings_customization">Tinkinimas</string>
     <string name="setting_add_shortcut_summary">Pridėti nuorodą į pagrindinį ekraną, jei po programėlės paslėpimo yra sunku atpažinti jos pavadinimą ir piktogramą</string>
     <string name="settings_doh_title">DNS virš HTTPS</string>

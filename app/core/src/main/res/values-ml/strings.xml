@@ -50,18 +50,18 @@
     <string name="flash_screen_title">ഇൻസ്റ്റലേഷൻ</string>
 
     <!--Superuser-->
-    <string name="su_request_title">സൂപ്പർയൂസർ അഭ്യർത്ഥന</string>
-    <string name="touch_filtered_warning">ഒരു ആപ്പ് ഒരു സൂപ്പർയൂസർ അഭ്യർത്ഥന മറയ്ക്കുന്നതിനാൽ, മജിസ്‌ക്-ന് നിങ്ങളുടെ പ്രതികരണം പരിശോധിക്കാൻ കഴിയില്ല</string>
+
+
     <string name="deny">നിഷേധിക്കുക</string>
-    <string name="prompt">പ്രോംപ്റ്റ്</string>
+
     <string name="grant">അനുവദിക്കുക</string>
-    <string name="su_warning">നിങ്ങളുടെ ഉപകരണത്തിലേക്ക് പൂർണ്ണ ആക്‌സസ് നൽകും.\nനിങ്ങൾക്ക് ഉറപ്പില്ലെങ്കിൽ നിരസിക്കുക!</string>
-    <string name="forever">എന്നേക്കും</string>
-    <string name="once">ഒരിക്കൽ</string>
-    <string name="tenmin">10 മിനിറ്റ്</string>
-    <string name="twentymin">20 മിനിറ്റ്</string>
-    <string name="thirtymin">30 മിനിറ്റ്</string>
-    <string name="sixtymin">60 മിനിറ്റ്</string>
+
+
+
+
+
+
+
     <string name="su_allow_toast">%1$s-ന് സൂപ്പർയൂസർ അവകാശം ലഭിച്ചു</string>
     <string name="su_deny_toast">%1$s-ന് സൂപ്പർയൂസർ അവകാശം നിഷേധിച്ചു </string>
     <string name="su_snack_grant">%1$s-ന്റെ സൂപ്പർയൂസർ അവകാശം അനുവദിച്ചിരിക്കുന്നു </string>
@@ -149,20 +149,20 @@
     <string name="settings_su_app">ആപ്പുകൾ മാത്രം</string>
     <string name="settings_su_adb">ADB മാത്രം</string>
     <string name="settings_su_disable">അപ്രാപ്തമാക്കി</string>
-    <string name="settings_su_request_10">10 സെക്കന്റുകൾ</string>
-    <string name="settings_su_request_15">15 സെക്കന്റുകൾ</string>
-    <string name="settings_su_request_20">20 സെക്കന്റുകൾ</string>
-    <string name="settings_su_request_30">30 സെക്കന്റുകൾ</string>
-    <string name="settings_su_request_45">45 സെക്കന്റുകൾ</string>
-    <string name="settings_su_request_60">60 സെക്കന്റുകൾ</string>
+
+
+
+
+
+
     <string name="superuser_access">സൂപ്പർയൂസർ ആക്സസ്</string>
-    <string name="auto_response">സ്വയമേവ പ്രതികരണം</string>
-    <string name="request_timeout">അഭ്യർത്ഥന സമയപരിധി</string>
+
+
     <string name="superuser_notification">സൂപ്പർയൂസർ അറിയിപ്പ്</string>
     <string name="settings_su_reauth_title">അപ്‌ഗ്രേഡിന് ശേഷം വീണ്ടും പ്രാമാണീകരിക്കുക</string>
     <string name="settings_su_reauth_summary">ആപ്പുകൾ അപ്‌ഗ്രേഡ് ചെയ്‌തതിന് ശേഷം സൂപ്പർയൂസർ അനുമതികൾക്കായി വീണ്ടും ആവശ്യപ്പെടുക</string>
-    <string name="settings_su_tapjack_title">ടാപ്പ്ജാക്കിംഗ് സംരക്ഷണം</string>
-    <string name="settings_su_tapjack_summary">സൂപ്പർയൂസർ പ്രോംപ്റ്റ് ഡയലോഗ് മറ്റേതെങ്കിലും വിൻഡോയോ ഓവർലേയോ മറയ്ക്കുമ്പോൾ ഇൻപുട്ടിനോട് പ്രതികരിക്കില്</string>
+
+
     <string name="settings_customization">കസ്റ്റമയിസേഷൻ</string>
     <string name="setting_add_shortcut_summary">ആപ്പ് മറച്ചതിന് ശേഷം പേരും ഐക്കണും തിരിച്ചറിയാൻ പ്രയാസമാണെങ്കിൽ ഹോം സ്‌ക്രീനിലേക്ക് മനോഹരമായ ഒരു ഷോർട്ട്ക്കട് ചേർക്കുക</string>
     <string name="settings_doh_title">DNS ഓവർ HTTPS</string>

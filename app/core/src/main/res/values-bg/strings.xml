@@ -50,18 +50,18 @@
     <string name="flash_screen_title">Инсталиране</string>
 
     <!--Superuser-->
-    <string name="su_request_title">Запитване за достъп</string>
-    <string name="touch_filtered_warning">Тъй като друго приложение закрива заявката за достъп до правата на суперпотребителя, Magisk не може да потвърди вашия отговор</string>
+
+
     <string name="deny">Отказ</string>
-    <string name="prompt">Запитване</string>
+
     <string name="grant">Разрешаване</string>
-    <string name="su_warning">Дава пълен достъп до устройството.\nОткажете, ако не сте сигурни.</string>
-    <string name="forever">Винаги</string>
-    <string name="once">Веднъж</string>
-    <string name="tenmin">10 мин.</string>
-    <string name="twentymin">20 мин.</string>
-    <string name="thirtymin">30 мин.</string>
-    <string name="sixtymin">60 мин.</string>
+
+
+
+
+
+
+
     <string name="su_allow_toast">%1$s получи достъп до суперпотребителя</string>
     <string name="su_deny_toast">%1$s не получи достъп до суперпотребителя</string>
     <string name="su_snack_grant">Достъп до суперпотребителя е разрешен на %1$s</string>
@@ -151,20 +151,20 @@
     <string name="settings_su_app">Само приложения</string>
     <string name="settings_su_adb">Само ADB</string>
     <string name="settings_su_disable">Изключен</string>
-    <string name="settings_su_request_10">10 секунди</string>
-    <string name="settings_su_request_15">15 секунди</string>
-    <string name="settings_su_request_20">20 секунди</string>
-    <string name="settings_su_request_30">30 секунди</string>
-    <string name="settings_su_request_45">45 секунди</string>
-    <string name="settings_su_request_60">60 секунди</string>
+
+
+
+
+
+
     <string name="superuser_access">Достъп до суперпотребителя</string>
-    <string name="auto_response">Автоматичен отговор</string>
-    <string name="request_timeout">Време за запитване</string>
+
+
     <string name="superuser_notification">Известие за суперпотребителя</string>
     <string name="settings_su_reauth_title">Повторно запитване след обновяване</string>
     <string name="settings_su_reauth_summary">Повторно запитване за достъп до правата на суперпотребителя след обновяване на приложения</string>
-    <string name="settings_su_tapjack_title">Предпазване от измамно докосване</string>
-    <string name="settings_su_tapjack_summary">Прозорецът за достъп до суперпотребителя няма да реагира, докато е покрит от друг прозорец или слой</string>
+
+
     <string name="settings_customization">Приспособяване</string>
     <string name="setting_add_shortcut_summary">Добавя красив пряк път на началния екран ако името или текущата икона на скритото приложение са трудни за разпознаване</string>
     <string name="settings_doh_title">DNS през HTTPS</string>

@@ -50,18 +50,18 @@
     <string name="flash_screen_title">Inštalácia</string>
 
     <!--Superuser-->
-    <string name="su_request_title">Požiadavka superužívateľa</string>
-    <string name="touch_filtered_warning">Pretože aplikácia zakrýva požiadavku superužívateľa, Magisk nemôže overiť vašu odpoveď</string>
+
+
     <string name="deny">Zamietnuť</string>
-    <string name="prompt">Výzva</string>
+
     <string name="grant">Udeliť</string>
-    <string name="su_warning">Udelí úplný prístup k vášmu zariadeniu.\nZamietnite, ak si nie ste istý!</string>
-    <string name="forever">Navždy</string>
-    <string name="once">Raz</string>
-    <string name="tenmin">10 min</string>
-    <string name="twentymin">20 min</string>
-    <string name="thirtymin">30 min</string>
-    <string name="sixtymin">60 min</string>
+
+
+
+
+
+
+
     <string name="su_allow_toast">%1$s boli udelené práva Superužívateľa</string>
     <string name="su_deny_toast">%1$s boli zamietnuté práva Superužívateľa</string>
     <string name="su_snack_grant">Práva Superužívateľa pre %1$s sú udelené</string>
@@ -155,20 +155,20 @@
     <string name="settings_su_app">Iba aplikácie</string>
     <string name="settings_su_adb">Iba ADB</string>
     <string name="settings_su_disable">Zakázané</string>
-    <string name="settings_su_request_10">10 sekúnd</string>
-    <string name="settings_su_request_15">15 sekúnd</string>
-    <string name="settings_su_request_20">20 sekúnd</string>
-    <string name="settings_su_request_30">30 sekúnd</string>
-    <string name="settings_su_request_45">45 sekúnd</string>
-    <string name="settings_su_request_60">60 sekúnd</string>
+
+
+
+
+
+
     <string name="superuser_access">Prístup Superužívateľa</string>
-    <string name="auto_response">Automatická odpoveď</string>
-    <string name="request_timeout">Časový limit na odpoveď</string>
+
+
     <string name="superuser_notification">Upozornenia Superužívateľa</string>
     <string name="settings_su_reauth_title">Overenie autentifikácie po upgrade</string>
     <string name="settings_su_reauth_summary">Opätovne vyzve na udelenie oprávnení Superužívateľa po upgrade aplikácie</string>
-    <string name="settings_su_tapjack_title">Ochrana pred tapjackingom</string>
-    <string name="settings_su_tapjack_summary">Dialógové okno superužívateľa nebude reagovať na zadanie, ak je zakryté alebo prekryté iným oknom</string>
+
+
     <string name="settings_su_auth_title">Overenie používateľa</string>
     <string name="settings_su_auth_summary">Žiadosť o overenie používateľa počas požiadaviek Superužívateľa</string>
     <string name="settings_su_auth_insecure">V zariadení nie je nakonfigurovaná žiadna metóda overovania</string>

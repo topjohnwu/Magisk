@@ -50,18 +50,18 @@
     <string name="flash_screen_title">Instalare</string>
 
     <!--Superuser-->
-    <string name="su_request_title">Cerere de superutilizator</string>
-    <string name="touch_filtered_warning">Deoarece o aplicație ascunde o cerere de superutilizator, Magisk nu îți poate verifica răspunsul</string>
+
+
     <string name="deny">Refuză</string>
-    <string name="prompt">Solicită</string>
+
     <string name="grant">Acordă</string>
-    <string name="su_warning">Acordă acces complet la dispozitivul tău.\nRefuză dacă nu ești sigur!</string>
-    <string name="forever">Pentru totdeauna</string>
-    <string name="once">O singură dată</string>
-    <string name="tenmin">10 minute</string>
-    <string name="twentymin">20 de minute</string>
-    <string name="thirtymin">30 de minute</string>
-    <string name="sixtymin">60 de minute</string>
+
+
+
+
+
+
+
     <string name="su_allow_toast">Aplicației %1$s i-au fost acordate drepturi de superutilizator</string>
     <string name="su_deny_toast">Aplicației %1$s i-au fost refuzate drepturi de superutilizator</string>
     <string name="su_snack_grant">Drepturile de superutilizator pentru %1$s au fost acordate</string>
@@ -155,20 +155,20 @@
     <string name="settings_su_app">Doar aplicații</string>
     <string name="settings_su_adb">Doar ADB</string>
     <string name="settings_su_disable">Dezactivat</string>
-    <string name="settings_su_request_10">10 secunde</string>
-    <string name="settings_su_request_15">15 secunde</string>
-    <string name="settings_su_request_20">20 de secunde</string>
-    <string name="settings_su_request_30">30 de secunde</string>
-    <string name="settings_su_request_45">45 de secunde</string>
-    <string name="settings_su_request_60">60 de secunde</string>
+
+
+
+
+
+
     <string name="superuser_access">Acces pentru superutilizator</string>
-    <string name="auto_response">Răspuns automat</string>
-    <string name="request_timeout">Expirare pentru cerere</string>
+
+
     <string name="superuser_notification">Notificare de superutilizator</string>
     <string name="settings_su_reauth_title">Reautentificare după actualizare</string>
     <string name="settings_su_reauth_summary">Cere din nou permisiunile de superutilizator după actualizarea aplicațiilor</string>
-    <string name="settings_su_tapjack_title">Protecție față de tapjacking</string>
-    <string name="settings_su_tapjack_summary">Caseta de dialog pentru solicitarea permisiunilor de superutilizator nu va răspunde la input cât timp este ascunsă de orice altă fereastră sau suprapunere</string>
+
+
     <string name="settings_su_auth_title">Autentificarea utilizatorului</string>
     <string name="settings_su_auth_summary">Cere autentificarea utilizatorului în timpul cererilor de superutilizator</string>
     <string name="settings_su_auth_insecure">Nu este configurată nicio metodă de autentificare pe dispozitiv</string>

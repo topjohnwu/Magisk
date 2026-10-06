@@ -49,19 +49,19 @@
     <string name="flash_screen_title">Installation ho rahi hai</string>
 
     <!--Superuser-->
-    <string name="su_request_title">ROOT access maang rha hai</string>
-    <string name="touch_filtered_warning">Ek app Superuser request ko cover kar raha hai, isliye Magisk aapka response verify nahi kar sakta.</string>
+
+
     <string name="deny">Nahi</string>
-    <string name="prompt">Poocho</string>
+
     <string name="restrict">Restrict</string>
     <string name="grant">Haan Theek hai</string>
-    <string name="su_warning">Yeh full access dega device ko.\nAgar sure nahi ho toh deny kar do!</string>
-    <string name="forever">Hamesha ke liye</string>
-    <string name="once">Ek baar ke liye</string>
-    <string name="tenmin">10 mins</string>
-    <string name="twentymin">20 mins</string>
-    <string name="thirtymin">30 mins</string>
-    <string name="sixtymin">60 mins</string>
+
+
+
+
+
+
+
     <string name="su_allow_toast">%1$s ko ROOT access de diya gaya</string>
     <string name="su_deny_toast">%1$s ko ROOT access nahi diya gaya</string>
     <string name="su_snack_grant">%1$s ko ROOT access mila</string>
@@ -154,20 +154,20 @@
     <string name="settings_su_app">Sirf apps</string>
     <string name="settings_su_adb">Sirf ADB</string>
     <string name="settings_su_disable">Disable kiya gaya</string>
-    <string name="settings_su_request_10">10 seconds</string>
-    <string name="settings_su_request_15">15 seconds</string>
-    <string name="settings_su_request_20">20 seconds</string>
-    <string name="settings_su_request_30">30 seconds</string>
-    <string name="settings_su_request_45">45 seconds</string>
-    <string name="settings_su_request_60">60 seconds</string>
+
+
+
+
+
+
     <string name="superuser_access">ROOT access</string>
-    <string name="auto_response">Automatic response</string>
-    <string name="request_timeout">Request timeout</string>
+
+
     <string name="superuser_notification">ROOT notification</string>
     <string name="settings_su_reauth_title">Upgrade ke baad dobara permission puchho</string>
     <string name="settings_su_reauth_summary">App upgrade hone ke baad Superuser permission firse maangna</string>
-    <string name="settings_su_tapjack_title">Tapjacking se protection</string>
-    <string name="settings_su_tapjack_summary">Agar Superuser prompt kisi aur window ya overlay ke neeche chhup gaya ho, toh uspar tap kaam nahi karega</string>
+
+
     <string name="settings_su_auth_title">User authentication</string>
     <string name="settings_su_auth_summary">Superuser request ke time user se authentication maango</string>
     <string name="settings_su_auth_insecure">Device mein koi bhi authentication method set nahi hai</string>

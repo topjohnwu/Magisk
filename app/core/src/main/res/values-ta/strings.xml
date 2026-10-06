@@ -48,18 +48,18 @@
     <string name="flash_screen_title">நிறுவல்</string>
 
     <!--Superuser-->
-    <string name="su_request_title">சூப்பர் யூசர் கோரிக்கை</string>
-    <string name="touch_filtered_warning">ஒரு பயன்பாடு ஒரு சூப்பர் யூசர் கோரிக்கையை மறைப்பதால், மேகிஸ்கால் உங்கள் பதிலைச் சரிபார்க்க முடியாது</string>
+
+
     <string name="deny">மறு</string>
-    <string name="prompt">உடனடி</string>
+
     <string name="grant">வழங்கு</string>
-    <string name="su_warning">உங்கள் சாதனத்திற்கு முழு அணுகலை வழங்குகிறது.\nஉங்களுக்கு உறுதியாக தெரியவில்லை என்றால் மறுக்கவும்!</string>
-    <string name="forever">என்றென்றும்</string>
-    <string name="once">ஒருமுறை</string>
-    <string name="tenmin">10 நிமிடங்கள்</string>
-    <string name="twentymin">20 நிமிடங்கள்</string>
-    <string name="thirtymin">30 நிமிடங்கள்</string>
-    <string name="sixtymin">ஒரு மணி நேரம்</string>
+
+
+
+
+
+
+
     <string name="su_allow_toast">%1$s க்கு சூப்பர் யூசர் உரிமைகள் வழங்கப்பட்டன</string>
     <string name="su_deny_toast">%1$s க்கு சூப்பர் யூசர் உரிமைகள் மறுக்கப்பட்டன</string>
     <string name="su_snack_grant">%1$s இன் சூப்பர் யூசர் உரிமைகள் வழங்கப்படுகின்றன</string>
@@ -138,20 +138,20 @@
     <string name="settings_su_app">பயன்பாடுகள் மட்டும்</string>
     <string name="settings_su_adb">ADB மட்டும்</string>
     <string name="settings_su_disable">முடக்கப்பட்டது</string>
-    <string name="settings_su_request_10">10 வினாடிகள்</string>
-    <string name="settings_su_request_15">15 வினாடிகள்</string>
-    <string name="settings_su_request_20">20 வினாடிகள்</string>
-    <string name="settings_su_request_30">30 வினாடிகள்</string>
-    <string name="settings_su_request_45">45 வினாடிகள்</string>
-    <string name="settings_su_request_60">60 வினாடிகள்</string>
+
+
+
+
+
+
     <string name="superuser_access">சூப்பர் யூசர் அணுகல்</string>
-    <string name="auto_response">தானியங்கி பதில்</string>
-    <string name="request_timeout">கோரிக்கை முடிவு நேரம்</string>
+
+
     <string name="superuser_notification">சூப்பர் யூசர் அறிவிப்பு</string>
     <string name="settings_su_reauth_title">மேம்படுத்தப்பட்ட பிறகு மீண்டும் அங்கீகரிக்கவும்</string>
     <string name="settings_su_reauth_summary">பயன்பாட்டு மேம்படுத்தல்களுக்குப் பிறகு சூப்பர் யூசர் அனுமதிகளை மீண்டும் அங்கீகரிக்கவும்</string>
-    <string name="settings_su_tapjack_title">டாப்ஜாகிங் பாதுகாப்பை இயக்கு</string>
-    <string name="settings_su_tapjack_summary">வேறு எந்த சாளரத்தாலும் அல்லது மேலடுக்கினாலும் மறைக்கப்படும்போது சூப்பர் யூசர் வரியில் உரையாடல் உள்ளீட்டிற்கு பதிலளிக்காது</string>
+
+
     <string name="settings_customization">தனிப்பயனாக்கம்</string>
     <string name="setting_add_shortcut_summary">பயன்பாட்டை மறைத்தபின் பெயர் மற்றும் ஐகான் அடையாளம் காண கடினமாக இருந்தால் முகப்புத் திரையில் அழகான குறுக்குவழியைச் சேர்க்கவும்</string>
     <string name="settings_doh_title">HTTPS வழியாக டி.என்.எஸ்</string>

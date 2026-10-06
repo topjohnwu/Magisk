@@ -47,18 +47,18 @@
     <string name="flash_screen_title">Installation</string>
 
     <!--Superuser-->
-    <string name="su_request_title">Superuser-förfrågan</string>
-    <string name="touch_filtered_warning">Eftersom en app döljer, eller ritar över en begäran om superuser, så kan inte Magisk verifera ditt svar</string>
+
+
     <string name="deny">Neka</string>
-    <string name="prompt">Fråga</string>
+
     <string name="grant">Bevilja</string>
-    <string name="su_warning">Beviljar full tillgång till din enhet.\nNeka om du är osäker!</string>
-    <string name="forever">För alltid</string>
-    <string name="once">En gång</string>
-    <string name="tenmin">10 minuter</string>
-    <string name="twentymin">20 minuter</string>
-    <string name="thirtymin">30 minuter</string>
-    <string name="sixtymin">60 minuter</string>
+
+
+
+
+
+
+
     <string name="su_allow_toast">%1$s beviljades Superuser-rättigheter</string>
     <string name="su_deny_toast">%1$s nekades Superuser-rättigheter</string>
     <string name="su_snack_grant">Superuser-rättigheter till %1$s är beviljade</string>
@@ -137,20 +137,20 @@
     <string name="settings_su_app">Bara Appar</string>
     <string name="settings_su_adb">Bara ADB</string>
     <string name="settings_su_disable">Inaktiverad</string>
-    <string name="settings_su_request_10">10 sekunder</string>
-    <string name="settings_su_request_15">15 sekunder</string>
-    <string name="settings_su_request_20">20 sekunder</string>
-    <string name="settings_su_request_30">30 sekunder</string>
-    <string name="settings_su_request_45">45 sekunder</string>
-    <string name="settings_su_request_60">60 sekunder</string>
+
+
+
+
+
+
     <string name="superuser_access">Superuser-tillgång</string>
-    <string name="auto_response">Automatiskt svar</string>
-    <string name="request_timeout">Förfrågnings-timeout</string>
+
+
     <string name="superuser_notification">Superuser-avisering</string>
     <string name="settings_su_reauth_title">Återautentisera efter uppdatering</string>
     <string name="settings_su_reauth_summary">Återautentisera superuser-rättigheter efter en applikationsuppdatering</string>
-    <string name="settings_su_tapjack_title">Aktivera Tapjacking-skydd</string>
-    <string name="settings_su_tapjack_summary">Superuser-dialogrutan kommer inte att lyssna på någon input om den är dold eller övertäckt utav något annat fönster.</string>
+
+
     <string name="settings_customization">Anpassning</string>
     <string name="setting_add_shortcut_summary">Lägg till en snygg genväg på startskärmen om namnet och ikonen är svåra att känna igen efter att appen har döljts</string>
     <string name="settings_doh_title">DNS över HTTPS</string>

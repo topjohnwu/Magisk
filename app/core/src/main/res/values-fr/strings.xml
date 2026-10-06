@@ -50,18 +50,18 @@
     <string name="flash_screen_title">Installation</string>
 
     <!--Superuser-->
-    <string name="su_request_title">Demande d’accès super‑utilisateur</string>
-    <string name="touch_filtered_warning">Magisk ne peut vérifier votre réponse parce qu’une application masque une requête de super‑utilisateur</string>
+
+
     <string name="deny">Refuser</string>
-    <string name="prompt">Demander</string>
+
     <string name="grant">Accorder</string>
-    <string name="su_warning">Autoriser l’accès complet à votre appareil.\nRefusez en cas de doute !</string>
-    <string name="forever">Toujours</string>
-    <string name="once">Une fois</string>
-    <string name="tenmin">10 min</string>
-    <string name="twentymin">20 min</string>
-    <string name="thirtymin">30 min</string>
-    <string name="sixtymin">60 min</string>
+
+
+
+
+
+
+
     <string name="su_allow_toast">%1$s a obtenu les droits de super‑utilisateur</string>
     <string name="su_deny_toast">%1$s s’est vu refuser les droits de super‑utilisateur</string>
     <string name="su_snack_grant">Les droits de super‑utilisateur sont accordés à %1$s</string>
@@ -155,20 +155,20 @@
     <string name="settings_su_app">Applications uniquement</string>
     <string name="settings_su_adb">ADB uniquement</string>
     <string name="settings_su_disable">Désactivé</string>
-    <string name="settings_su_request_10">10 secondes</string>
-    <string name="settings_su_request_15">15 secondes</string>
-    <string name="settings_su_request_20">20 secondes</string>
-    <string name="settings_su_request_30">30 secondes</string>
-    <string name="settings_su_request_45">45 secondes</string>
-    <string name="settings_su_request_60">60 secondes</string>
+
+
+
+
+
+
     <string name="superuser_access">Accès super‑utilisateur</string>
-    <string name="auto_response">Réponse automatique</string>
-    <string name="request_timeout">Délai d’expiration de la demande</string>
+
+
     <string name="superuser_notification">Notification super‑utilisateur</string>
     <string name="settings_su_reauth_title">S’authentifier à nouveau après la mise à niveau</string>
     <string name="settings_su_reauth_summary">Redemander une authentification pour autoriser l’accès en super‑utilisateur après une mise à jour de l’application</string>
-    <string name="settings_su_tapjack_title">Activer la protection contre le détournement du tapotement</string>
-    <string name="settings_su_tapjack_summary">Le dialogue d’invite du super‑utilisateur ne répondra pas à la saisie lorsqu’il est masqué par une autre fenêtre ou une surcouche</string>
+
+
     <string name="settings_su_auth_title">Authentification utilisateur</string>
     <string name="settings_su_auth_summary">Demander l’authentification utilisateur lors de la requête super-utilisateur</string>
     <string name="settings_su_auth_insecure">Aucun méthode d’authentification utilisateur n’est configurée sur le périphérique</string>

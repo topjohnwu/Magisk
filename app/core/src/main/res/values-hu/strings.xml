@@ -50,18 +50,18 @@
     <string name="flash_screen_title">Telepítés</string>
 
     <!--Superuser-->
-    <string name="su_request_title">Superuser kérés</string>
-    <string name="touch_filtered_warning">Mivel egy alkalmazás eltakar egy Superuser kérést, a Magisk nem tudja ellenőrizni a válaszod</string>
+
+
     <string name="deny">Elutasít</string>
-    <string name="prompt">Kérdés</string>
+
     <string name="grant">Megenged</string>
-    <string name="su_warning">Teljes hozzáférést biztosít az eszközhöz.\nTagadd meg, ha nem vagy biztos benne!</string>
-    <string name="forever">Végleges</string>
-    <string name="once">Egyszeri</string>
-    <string name="tenmin">10 perc</string>
-    <string name="twentymin">20 perc</string>
-    <string name="thirtymin">30 perc</string>
-    <string name="sixtymin">60 perc</string>
+
+
+
+
+
+
+
     <string name="su_allow_toast">%1$s - Superuser jogokat kapott</string>
     <string name="su_deny_toast">%1$s - Superuser jogok megtagadva</string>
     <string name="su_snack_grant">%1$s - Superuser jogok megadva</string>
@@ -149,20 +149,20 @@
     <string name="settings_su_app">Csak Appok</string>
     <string name="settings_su_adb">Csak ADB</string>
     <string name="settings_su_disable">Kikapcsolva</string>
-    <string name="settings_su_request_10">10 mp</string>
-    <string name="settings_su_request_15">15 mp</string>
-    <string name="settings_su_request_20">20 mp</string>
-    <string name="settings_su_request_30">30 mp</string>
-    <string name="settings_su_request_45">45 mp</string>
-    <string name="settings_su_request_60">60 mp</string>
+
+
+
+
+
+
     <string name="superuser_access">Superuser hozzáférés</string>
-    <string name="auto_response">Automatikus válasz</string>
-    <string name="request_timeout">Kérés időtúllépése</string>
+
+
     <string name="superuser_notification">Superuser értesítés</string>
     <string name="settings_su_reauth_title">Frissítés után hitelesítse újra</string>
     <string name="settings_su_reauth_summary">Az appok frissítés után kérjenek ismét Superuser engedélyeket</string>
-    <string name="settings_su_tapjack_title">Tapjacking védelem</string>
-    <string name="settings_su_tapjack_summary">A Superuser kérés párbeszédpanel nem válaszol a bevitelre, ha más ablak vagy átfedés eltakarja</string>
+
+
     <string name="settings_customization">Testreszabás</string>
     <string name="setting_add_shortcut_summary">Adjon hozzá egy szép parancsikont a kezdőképernyőhöz arra az esetre, ha a nevet és az ikont nehéz felismerni az alkalmazás elrejtése után</string>
     <string name="settings_doh_title">DNS HTTPS-en keresztül</string>

@@ -50,18 +50,18 @@
     <string name="flash_screen_title">Instalacja</string>
 
     <!--Superuser-->
-    <string name="su_request_title">Żądanie dostępu do Superusera</string>
-    <string name="touch_filtered_warning">Ponieważ aplikacja zasłania żądanie o Superusera, Magisk nie może zweryfikować twojej odpowiedzi</string>
+
+
     <string name="deny">Odmów</string>
-    <string name="prompt">Zapytaj</string>
+
     <string name="grant">Zezwól</string>
-    <string name="su_warning">Udziela pełnego dostępu do urządzenia.\nOdmów, jeżeli nie jesteś pewien!</string>
-    <string name="forever">Zawsze</string>
-    <string name="once">Raz</string>
-    <string name="tenmin">10 min</string>
-    <string name="twentymin">20 min</string>
-    <string name="thirtymin">30 min</string>
-    <string name="sixtymin">60 min</string>
+
+
+
+
+
+
+
     <string name="su_allow_toast">%1$s otrzymał uprawnienia Superusera</string>
     <string name="su_deny_toast">%1$s odmówiono uprawnień Superusera</string>
     <string name="su_snack_grant">Przyznano uprawnienia Superusera dla %1$s</string>
@@ -154,20 +154,20 @@
     <string name="settings_su_app">Tylko aplikacje</string>
     <string name="settings_su_adb">Tylko ADB</string>
     <string name="settings_su_disable">Wyłączone</string>
-    <string name="settings_su_request_10">10 sekund</string>
-    <string name="settings_su_request_15">15 sekund</string>
-    <string name="settings_su_request_20">20 sekund</string>
-    <string name="settings_su_request_30">30 sekund</string>
-    <string name="settings_su_request_45">45 sekund</string>
-    <string name="settings_su_request_60">60 sekund</string>
+
+
+
+
+
+
     <string name="superuser_access">Dostęp do Superusera</string>
-    <string name="auto_response">Automatyczna reakcja</string>
-    <string name="request_timeout">Limit czasu żądania</string>
+
+
     <string name="superuser_notification">Powiadomienia Superusera</string>
     <string name="settings_su_reauth_title">Ponowienie uwierzytelniania po aktualizacji</string>
     <string name="settings_su_reauth_summary">Zapytaj ponownie o uprawnienia Superusera po uaktualnieniu aplikacji</string>
-    <string name="settings_su_tapjack_title">Ochrona przed Tapjackingiem (niezamierzonym kliknięciem)</string>
-    <string name="settings_su_tapjack_summary">Okno dialogowe z żądaniem Superusera nie będzie reagować na odpowiedź, jeżeli będzie zasłonięte przez inne okno lub nakładkę</string>
+
+
     <string name="settings_su_auth_title">Uwierzytelnianie użytkownika</string>
     <string name="settings_su_auth_summary">Pytaj o uwierzytelnienie użytkownika podczas żądań Superusera</string>
     <string name="settings_su_auth_insecure">Nie skonfigurowano żadnej metody uwierzytelniania na tym urządzeniu</string>

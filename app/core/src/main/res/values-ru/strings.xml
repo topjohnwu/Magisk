@@ -50,18 +50,18 @@
     <string name="flash_screen_title">Установка</string>
 
     <!--Superuser-->
-    <string name="su_request_title">Запрос прав суперпользователя</string>
-    <string name="touch_filtered_warning">Одно из приложений отображается поверх окна Magisk, выдача Root-прав недоступна</string>
+
+
     <string name="deny">Запретить</string>
-    <string name="prompt">Запросить</string>
+
     <string name="grant">Разрешить</string>
-    <string name="su_warning">Разрешить полный доступ к устройству?\nЕсли не уверены - отклоните данный запрос!</string>
-    <string name="forever">Навсегда</string>
-    <string name="once">Единожды</string>
-    <string name="tenmin">10 мин.</string>
-    <string name="twentymin">20 мин.</string>
-    <string name="thirtymin">30 мин.</string>
-    <string name="sixtymin">60 мин.</string>
+
+
+
+
+
+
+
     <string name="su_allow_toast">%1$s предоставлены права суперпользователя</string>
     <string name="su_deny_toast">%1$s отказано в правах суперпользователя</string>
     <string name="su_snack_grant">%1$s предоставлены права суперпользователя</string>
@@ -154,23 +154,23 @@
     <string name="settings_su_app">Только приложения</string>
     <string name="settings_su_adb">Только ADB</string>
     <string name="settings_su_disable">Отключён</string>
-    <string name="settings_su_request_10">10 секунд</string>
-    <string name="settings_su_request_15">15 секунд</string>
-    <string name="settings_su_request_20">20 секунд</string>
-    <string name="settings_su_request_30">30 секунд</string>
-    <string name="settings_su_request_45">45 секунд</string>
-    <string name="settings_su_request_60">60 секунд</string>
+
+
+
+
+
+
     <string name="superuser_access">Уровень доступа</string>
-    <string name="auto_response">Автоматический ответ</string>
-    <string name="request_timeout">Ожидание ответа</string>
+
+
     <string name="superuser_notification">Уведомления суперпользователя</string>
     <string name="settings_su_reauth_title">Повторная аутентификация</string>
     <string name="settings_su_reauth_summary">Повторный запрос прав суперпользователя после обновления приложений</string>
-    <string name="settings_su_tapjack_title">Защита от перехвата нажатий</string>
+
     <string name="settings_su_auth_title">Аутентификация пользователя</string>
     <string name="settings_su_auth_summary">Требовать аутентификацию пользователя при запросах Superuser</string>
     <string name="settings_su_auth_insecure">На устройстве не настроен метод аутентификации</string>
-    <string name="settings_su_tapjack_summary">Окно запроса прав суперпользователя будет неактивно пока активированы наложения экрана</string>
+
     <string name="settings_customization">Персонализация</string>
     <string name="setting_add_shortcut_summary">Добавить ярлык на рабочий стол для удобного восприятия приложения после его скрытия</string>
     <string name="settings_doh_title">DNS поверх HTTPS</string>

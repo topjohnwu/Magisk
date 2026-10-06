@@ -44,18 +44,18 @@
     <string name="reboot_delay_toast">Перазапуск праз 5 секунд…</string>
     <string name="flash_screen_title">Усталёўка</string>
     <!--Superuser-->
-    <string name="su_request_title">Запыт правоў суперкарыстальніка</string>
-    <string name="touch_filtered_warning">Праграма перакрывае запыт на выдачу правоў суперкарыстальніка, таму Magisk не можа апрацаваць ваш адказ</string>
+
+
     <string name="deny">Адмовіць</string>
-    <string name="prompt">Запытаць</string>
+
     <string name="grant">Даць</string>
-    <string name="su_warning">Даць поўны доступ да вашай прылады.\nКалі вы не ўпэўненыя, адхіліце запыт!</string>
-    <string name="forever">Назаўсёды</string>
-    <string name="once">Адзін раз</string>
-    <string name="tenmin">10 хвіл</string>
-    <string name="twentymin">20 хвіл</string>
-    <string name="thirtymin">30 хвіл</string>
-    <string name="sixtymin">60 хвіл</string>
+
+
+
+
+
+
+
     <string name="su_allow_toast">Праграме \"%1$s\" дадзеныя правы суперкарыстальніка</string>
     <string name="su_deny_toast">Праграме \"%1$s\" было адмоўлена ў правах суперкарыстальніка</string>
     <string name="su_snack_grant">Праграме \"%1$s\" дадзеныя правы суперкарыстальніка</string>
@@ -128,20 +128,20 @@
     <string name="settings_su_app">Толькі праграмы</string>
     <string name="settings_su_adb">Толькі ADB</string>
     <string name="settings_su_disable">Адключана</string>
-    <string name="settings_su_request_10">10 секунд</string>
-    <string name="settings_su_request_15">15 секунд</string>
-    <string name="settings_su_request_20">20 секунд</string>
-    <string name="settings_su_request_30">30 секунд</string>
-    <string name="settings_su_request_45">45 секунд</string>
-    <string name="settings_su_request_60">60 секунд</string>
+
+
+
+
+
+
     <string name="superuser_access">Доступ суперкарыстальніка</string>
-    <string name="auto_response">Аўтаматычны адказ</string>
-    <string name="request_timeout">Чаканне адказу</string>
+
+
     <string name="superuser_notification">Апавяшчэнне суперкарыстальніка</string>
     <string name="settings_su_reauth_title">Паўторная аўтэнтыфікацыя пасля абнаўлення</string>
     <string name="settings_su_reauth_summary">Паўторна запытваць правы суперкарыстальніка пасля абнаўлення праграмы</string>
-    <string name="settings_su_tapjack_title">Уключыць абарону ад перахоплівання ўводу</string>
-    <string name="settings_su_tapjack_summary">Дыялог выдачы правоў суперкарыстальніка не будзе адказваць на ўвод, калі па-над ім знаходзяцца іншыя вокны</string>
+
+
     <string name="settings_customization">Персаналізацыя</string>
     <string name="setting_add_shortcut_summary">Дадаць на хатні экран прыгожы цэтлік на той выпадак, калі пасля хавання праграмы будзе цяжка разглядзець значок і назву</string>
     <string name="settings_doh_title">DNS паверх HTTPS</string>

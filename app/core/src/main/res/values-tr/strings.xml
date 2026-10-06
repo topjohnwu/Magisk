@@ -44,19 +44,19 @@
     <string name="flash_screen_title">Kurulum</string>
 
     <!--Superuser-->
-    <string name="su_request_title">Bu uygulama root izni istiyor. Cihazınıza tam erişim sağlar. Emin değilseniz reddedin!</string>
-    <string name="touch_filtered_warning">Bir uygulama Süper Kullanıcı isteğini perdelendiği için Magisk yanıtınızı doğrulayamıyor.</string>
+
+
     <string name="deny">Reddet</string>
-    <string name="prompt">Sor</string>
+
     <string name="restrict">Kısıtla</string>
     <string name="grant">İzin Ver</string>
-    <string name="su_warning">Cihazınıza tam erişim sağlar.\nEmin değilseniz reddedin!</string>
-    <string name="forever">Süresiz</string>
-    <string name="once">Bir Kez</string>
-    <string name="tenmin">10 dk</string>
-    <string name="twentymin">20 dk</string>
-    <string name="thirtymin">30 dk</string>
-    <string name="sixtymin">60 dk</string>
+
+
+
+
+
+
+
     <string name="su_allow_toast">%1$s uygulamasına Süper Kullanıcı hakları verildi</string>
     <string name="su_deny_toast">%1$s uygulamasının Süper Kullanıcı hakları reddedildi</string>
     <string name="su_snack_grant">%1$s uygulamasının Süper Kullanıcı hakları onaylandı</string>
@@ -160,20 +160,20 @@
     <string name="settings_su_app">Sadece uygulamalar</string>
     <string name="settings_su_adb">Sadece ADB</string>
     <string name="settings_su_disable">Devre Dışı</string>
-    <string name="settings_su_request_10">10 saniye</string>
-    <string name="settings_su_request_15">15 saniye</string>
-    <string name="settings_su_request_20">20 saniye</string>
-    <string name="settings_su_request_30">30 saniye</string>
-    <string name="settings_su_request_45">45 saniye</string>
-    <string name="settings_su_request_60">60 saniye</string>
+
+
+
+
+
+
     <string name="superuser_access">Süper Kullanıcı erişimi</string>
-    <string name="auto_response">Otomatik yanıt</string>
-    <string name="request_timeout">İstek zaman aşımı</string>
+
+
     <string name="superuser_notification">Süper Kullanıcı bildirimi</string>
     <string name="settings_su_reauth_title">Yükseltmeden sonra yeniden kimlik doğrula</string>
     <string name="settings_su_reauth_summary">Uygulamaları yükselttikten sonra Süper Kullanıcı izinlerini tekrar sor</string>
-    <string name="settings_su_tapjack_title">Dokunma hırsızlığı (Tapjacking) koruması</string>
-    <string name="settings_su_tapjack_summary">Süper Kullanıcı onay penceresi, başka bir pencere veya katman tarafından perdelendiğinde dokunuşlara tepki vermez</string>
+
+
     <string name="settings_su_auth_title">Kullanıcı kimlik doğrulaması</string>
     <string name="settings_su_auth_summary">Süper Kullanıcı istekleri sırasında kullanıcı kimlik doğrulaması iste</string>
     <string name="settings_su_auth_insecure">Cihazda yapılandırılmış bir kimlik doğrulama yöntemi yok</string>

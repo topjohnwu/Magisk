@@ -47,19 +47,19 @@
     <string name="flash_screen_title">Installazione</string>
 
     <!--Superuser-->
-    <string name="su_request_title">Richiesta di accesso root</string>
-    <string name="touch_filtered_warning">Magisk non può verificare la tua risposta perché un\'app sta oscurando una richiesta di accesso root</string>
+
+
     <string name="deny">Nega</string>
-    <string name="prompt">Chiedi</string>
+
     <string name="restrict">Limita</string>
     <string name="grant">Consenti</string>
-    <string name="su_warning">Concede il pieno accesso al dispositivo.\nNega se non sei sicuro!</string>
-    <string name="forever">Sempre</string>
-    <string name="once">Una volta</string>
-    <string name="tenmin">10 minuti</string>
-    <string name="twentymin">20 minuti</string>
-    <string name="thirtymin">30 minuti</string>
-    <string name="sixtymin">60 minuti</string>
+
+
+
+
+
+
+
     <string name="su_allow_toast">%1$s ha ottenuto i permessi di root</string>
     <string name="su_deny_toast">%1$s non ha ottenuto i permessi di root</string>
     <string name="su_snack_grant">%1$s potrà ottenere i permessi di root</string>
@@ -165,20 +165,20 @@
     <string name="settings_su_app">Solo app</string>
     <string name="settings_su_adb">Solo ADB</string>
     <string name="settings_su_disable">Disabilitato</string>
-    <string name="settings_su_request_10">10 secondi</string>
-    <string name="settings_su_request_15">15 secondi</string>
-    <string name="settings_su_request_20">20 secondi</string>
-    <string name="settings_su_request_30">30 secondi</string>
-    <string name="settings_su_request_45">45 secondi</string>
-    <string name="settings_su_request_60">60 secondi</string>
+
+
+
+
+
+
     <string name="superuser_access">Accesso root</string>
-    <string name="auto_response">Azione predefinita</string>
-    <string name="request_timeout">Timeout richiesta</string>
+
+
     <string name="superuser_notification">Notifica di accesso root</string>
     <string name="settings_su_reauth_title">Riautentica dopo aggiornamento</string>
     <string name="settings_su_reauth_summary">Richiedi nuovamente i permessi di root dopo l\'aggiornamento di un\'app</string>
-    <string name="settings_su_tapjack_title">Protezione anti-tapjacking</string>
-    <string name="settings_su_tapjack_summary">La schermata di richiesta dei permessi di root non risponderà al tocco mentre è oscurata da altre finestre o elementi in sovraimpressione</string>
+
+
     <string name="settings_su_auth_title">Autenticazione utente</string>
     <string name="settings_su_auth_summary">Richiedi l\'autenticazione dell\'utente per le richieste di accesso root</string>
     <string name="settings_su_auth_insecure">Sul dispositivo non è configurato alcun metodo di autenticazione</string>

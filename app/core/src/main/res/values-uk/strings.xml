@@ -47,19 +47,19 @@
     <string name="flash_screen_title">Встановлення</string>
 
     <!--Superuser-->
-    <string name="su_request_title">Запит прав суперкористувача</string>
-    <string name="touch_filtered_warning">Magisk не може перевірити вашу відповідь, тому що застосунок заступає вікно запиту прав суперкористувача</string>
+
+
     <string name="deny">Відмовити</string>
-    <string name="prompt">Запитувати</string>
+
     <string name="restrict">Обмежити</string>
     <string name="grant">Надати</string>
-    <string name="su_warning">Надати повний доступ до пристрою.\nЯкщо не впевнені, відмовте в доступі!</string>
-    <string name="forever">Назавжди</string>
-    <string name="once">Одноразово</string>
-    <string name="tenmin">10 хв.</string>
-    <string name="twentymin">20 хв.</string>
-    <string name="thirtymin">30 хв.</string>
-    <string name="sixtymin">60 хв.</string>
+
+
+
+
+
+
+
     <string name="su_allow_toast">%1$s надані права суперкористувача</string>
     <string name="su_deny_toast">%1$s відмовлено в правах суперкористувача</string>
     <string name="su_snack_grant">%1$s надані права суперкористувача</string>
@@ -165,20 +165,20 @@
     <string name="settings_su_app">Застосунки</string>
     <string name="settings_su_adb">ADB</string>
     <string name="settings_su_disable">Вимкнено</string>
-    <string name="settings_su_request_10">10 секунд</string>
-    <string name="settings_su_request_15">15 секунд</string>
-    <string name="settings_su_request_20">20 секунд</string>
-    <string name="settings_su_request_30">30 секунд</string>
-    <string name="settings_su_request_45">45 секунд</string>
-    <string name="settings_su_request_60">60 секунд</string>
+
+
+
+
+
+
     <string name="superuser_access">Доступ суперкористувача</string>
-    <string name="auto_response">Автоматична відповідь</string>
-    <string name="request_timeout">Час запиту</string>
+
+
     <string name="superuser_notification">Сповіщення суперкористувача</string>
     <string name="settings_su_reauth_title">Повторна автентифікація</string>
     <string name="settings_su_reauth_summary">Перевидача прав суперкористувача після оновлення застосунку</string>
-    <string name="settings_su_tapjack_title">Увімкнути захист від підміни натискань</string>
-    <string name="settings_su_tapjack_summary">Діалогове вікно суперкористувача не буде отримувати ввід від користувача, коли вікно перекрито іншим застосунком чи вікном</string>
+
+
     <string name="settings_su_auth_title">Автентифікація користувача</string>
     <string name="settings_su_auth_summary">Запитувати автентифікацію користувача під час запитів суперкористувача</string>
     <string name="settings_su_auth_insecure">На пристрої не налаштовано жодного методу автентифікації</string>

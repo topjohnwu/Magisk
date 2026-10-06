@@ -49,19 +49,19 @@
     <string name="flash_screen_title">Instalação</string>
 
     <!--Superuser-->
-    <string name="su_request_title">Solicitação de SuperUsuário</string>
-    <string name="touch_filtered_warning">Como um app está ocultando uma solicitação de SuperUsuário, o Magisk não pode verificar sua resposta.</string>
+
+
     <string name="deny">Negar</string>
-    <string name="prompt">Perguntar</string>
+
     <string name="restrict">Restringir</string>
     <string name="grant">Permitir</string>
-    <string name="su_warning">Permite acesso total ao seu dispositivo.\nNão permita se você não tiver certeza do que está fazendo!</string>
-    <string name="forever">Sempre</string>
-    <string name="once">Uma vez</string>
-    <string name="tenmin">10 mins</string>
-    <string name="twentymin">20 mins</string>
-    <string name="thirtymin">30 mins</string>
-    <string name="sixtymin">60 mins</string>
+
+
+
+
+
+
+
     <string name="su_allow_toast">%1$s foi permitido o acesso de SuperUsuário</string>
     <string name="su_deny_toast">%1$s foi negado o acesso de SuperUsuário</string>
     <string name="su_snack_grant">Os acessos de SuperUsuário de %1$s foram permitidos</string>
@@ -154,20 +154,20 @@
     <string name="settings_su_app">Apenas apps</string>
     <string name="settings_su_adb">Apenas ADB</string>
     <string name="settings_su_disable">Desativado</string>
-    <string name="settings_su_request_10">10 segundos</string>
-    <string name="settings_su_request_15">15 segundos</string>
-    <string name="settings_su_request_20">20 segundos</string>
-    <string name="settings_su_request_30">30 segundos</string>
-    <string name="settings_su_request_45">45 segundos</string>
-    <string name="settings_su_request_60">60 segundos</string>
+
+
+
+
+
+
     <string name="superuser_access">Acesso de SuperUsuário</string>
-    <string name="auto_response">Resposta automática</string>
-    <string name="request_timeout">Tempo limite da solicitação</string>
+
+
     <string name="superuser_notification">Notificação de SuperUsuário</string>
     <string name="settings_su_reauth_title">Reautenticar após atualização</string>
     <string name="settings_su_reauth_summary">Solicite permissões de SuperUsuário novamente após atualizar os apps</string>
-    <string name="settings_su_tapjack_title">Proteção contra atividades sobrepostas</string>
-    <string name="settings_su_tapjack_summary">A caixa de diálogo do SuperUsuário não responderá à entrada enquanto estiver oculta por qualquer outra janela ou sobreposição</string>
+
+
     <string name="settings_su_auth_title">Autenticação de usuário</string>
     <string name="settings_su_auth_summary">Solicite autenticação de usuário durante solicitações de SuperUsuário</string>
     <string name="settings_su_auth_insecure">Nenhum método de autenticação está configurado no dispositivo</string>
