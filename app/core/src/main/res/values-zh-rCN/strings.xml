@@ -60,6 +60,7 @@
     <string name="prompt">提示</string>
     <string name="restrict">受限</string>
     <string name="grant">允许</string>
+    <string name="superuser_grant">授予超级用户权限</string>
     <string name="su_warning">将授予对该设备的最高权限。\n如果不确定，请拒绝！</string>
     <string name="forever">永久</string>
     <string name="once">仅此一次</string>
