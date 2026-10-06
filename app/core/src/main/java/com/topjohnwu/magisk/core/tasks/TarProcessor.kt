@@ -20,19 +20,19 @@ import java.nio.ByteBuffer
  * Patch boot images in tar firmware packages (e.g. Samsung AP tar files).
  *
  * A single-use, two-phase processor; the caller patches the boot image in between:
- * 1. [consume]: extract boot images from the input tar into [installDir], and copy all
+ * 1. [start]: extract boot images from the input tar into [workingDir], and copy all
  *    other entries to the output tar. Returns the image to be patched.
  * 2. [finish]: write the patched image to the output tar and finalize the archive.
  *
- * [consume] closes the input channel. The caller owns the output stream and is
+ * [start] closes the input channel. The caller owns the output stream and is
  * responsible for closing it.
  */
 class TarProcessor(
-    private val installDir: ExtendedFile,
+    private val workingDir: ExtendedFile,
     output: OutputStream,
     private val console: MutableList<String>,
     private val logs: MutableList<String>,
-) {
+) : WholeFilePatcher {
     class NoBootException : IOException()
 
     private val tarOut = TarArchiveOutputStream(output).apply {
@@ -44,7 +44,7 @@ class TarProcessor(
     private lateinit var target: BootItem
 
     @Throws(IOException::class)
-    suspend fun consume(channel: DataChannel): ExtendedFile = channel.use {
+    override suspend fun start(channel: DataChannel): ExtendedFile = channel.use {
         val tarIn = TarArchiveInputStream(it.stream().buffered(1024 * 1024))
         tarIn.use { processEntries(tarIn) }
     }
@@ -131,7 +131,7 @@ class TarProcessor(
                 if (boot != null) {
                     // Repack boot image to prevent auto restore
                     Shell.cmd(
-                        "cd $installDir",
+                        "cd $workingDir",
                         "chmod -R 755 .",
                         "./magiskboot unpack boot.img",
                         "./magiskboot repack boot.img",
@@ -155,7 +155,7 @@ class TarProcessor(
     }
 
     @Throws(IOException::class)
-    suspend fun finish(patched: ExtendedFile) {
+    override suspend fun finish(patched: ExtendedFile) {
         target.write(patched)
         tarOut.finish()
     }
@@ -168,7 +168,7 @@ class TarProcessor(
 
     private inner class BootItem(private val entry: TarArchiveEntry) {
         val name = entry.name.replace(".lz4", "")
-        val file: ExtendedFile = installDir.getChildFile(name)
+        val file: ExtendedFile = workingDir.getChildFile(name)
 
         // Write the image to the output tar, preserving the original entry's metadata
         suspend fun write(image: ExtendedFile = file) {
