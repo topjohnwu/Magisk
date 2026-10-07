@@ -186,6 +186,134 @@ run_action() {
   return $RES
 }
 
+# Patch the vendor_boot image of Aluminium OS recovery images to
+# disable data wipe and bypass AVB hash verification of boot partitions.
+# All temporary files are always removed regardless of the result.
+# $1 = install dir
+# $2 = vendor_boot image (absolute path), patched in-place
+patch_al_vendor_boot() {
+  cd "$1" || return 1
+
+  # Run in a subshell so errors can exit early without skipping cleanup
+  (
+  IMG=$2
+  CPIO=vendor_ramdisk/ramdisk.cpio
+  PS=system/bin/partition-script.sh
+  CLI=system/bin/avb_verify_cli
+
+  # Return value 3 indicates a vendor_boot image
+  ./magiskboot unpack "$IMG"
+  if [ $? -ne 3 ]; then
+    echo "! Invalid vendor_boot image"
+    exit 1
+  fi
+
+  if [ ! -f $CPIO ]; then
+    echo "! Unable to find vendor ramdisk"
+    exit 1
+  fi
+
+  if ./magiskboot cpio $CPIO "exists $CLI.real"; then
+    echo "! vendor_boot image is already patched"
+    exit 1
+  fi
+
+  if ! ./magiskboot cpio $CPIO "exists $PS" || ! ./magiskboot cpio $CPIO "exists $CLI"; then
+    echo "! Unsupported vendor ramdisk"
+    exit 1
+  fi
+
+  # Disable userdata wipe and TPM clear in partition-script.sh
+  echo "- Patching $PS"
+  ./magiskboot cpio $CPIO "extract $PS partition-script.sh"
+  sed -e 's/^\([[:space:]]*\)write_base_table()[[:space:]]*{/\1orig_write_base_table() {/' \
+  -e 's/^\([[:space:]]*\)load_base_vars()[[:space:]]*{/\1orig_load_base_vars() {/' \
+  partition-script.sh > partition-script.sh.new
+  if ! grep -q 'orig_write_base_table() {' partition-script.sh.new || ! grep -q 'orig_load_base_vars() {' partition-script.sh.new; then
+    echo "! Unable to patch $PS"
+    exit 1
+  fi
+  cat << 'EOF' >> partition-script.sh.new
+# ==============================================================================
+# Custom partition-script.sh Overrides (Disable Data Wipe)
+# ==============================================================================
+
+write_base_table() {
+  orig_write_base_table "$@"
+}
+
+load_base_vars() {
+  orig_load_base_vars
+
+  # recovery_media aborts if PARTITION_NUM_USERDATA or PARTITION_NUM_METADATA
+  # are unset, and normally formats metadata (mke2fs) and zeroes the first 2 MiB
+  # of userdata. Redirect both variables to the unused ota_recovery_b partition
+  # so those wipes hit ota_recovery_b, leaving the real userdata and metadata
+  # (which stores the FBE encryption key) untouched.
+  PARTITION_NUM_USERDATA="${PARTITION_NUM_OTA_RECOVERY_B}"
+  PARTITION_NUM_METADATA="${PARTITION_NUM_OTA_RECOVERY_B}"
+
+  # Unset PARTITION_NUM_PERSIST so its partition number in INSTALLABLE_PARTITIONS
+  # is not resolved by name_map and is skipped instead of being overwritten with
+  # factory persist.img.
+  unset PARTITION_NUM_PERSIST
+
+  # Unset security partition numbers so the post-install security reset phase
+  # skips zeroing desktop_security_persist and desktop_security_storage.
+  unset PARTITION_NUM_DESKTOP_SECURITY_PERSIST
+  unset PARTITION_NUM_DESKTOP_SECURITY_STORAGE
+
+  # Hold /dev/tpm0 open in the background. The Linux TPM character driver
+  # enforces single-open exclusivity (-EBUSY), preventing recovery_media from
+  # clearing the TPM or resetting Trusty MACs (treated as a non-fatal warning)
+  # and preserving hardware-backed FBE encryption keys.
+  sleep 86400 </dev/tpm0 >/dev/null 2>&1 &
+}
+EOF
+
+  # Collect all cpio commands and run them in one go
+  set -- "add 0755 $PS partition-script.sh.new"
+
+  # Remove pinned recovery media public keys
+  for KEY in system vendor; do
+    KEY=$KEY/etc/security/avb/recovery_media_public_key.bin
+    if ./magiskboot cpio $CPIO "exists $KEY"; then
+      echo "- Removing $KEY"
+      set -- "$@" "rm $KEY"
+    fi
+  done
+
+  # Wrap avb_verify_cli to drop the trusted public key argument and
+  # strip all Hash descriptors from its output, so boot partitions are
+  # flashed without verification and vbmeta is left untouched
+  echo "- Wrapping $CLI"
+  cat << 'EOF' > avb_verify_cli
+#!/system/bin/sh
+out="$(/system/bin/avb_verify_cli.real "$1" "$2")" || exit $?
+printf '%s\n' "$out" | sed -E 's/\{"Hash":\{[^}]*\}\},?//g; s/,\]/]/g'
+EOF
+
+  set -- "$@" "mv $CLI $CLI.real" "add 0755 $CLI avb_verify_cli"
+  if ! ./magiskboot cpio $CPIO "$@"; then
+    echo "! Unable to patch vendor ramdisk"
+    exit 1
+  fi
+
+  echo "- Repacking vendor_boot image"
+  if ! ./magiskboot repack "$IMG" new-vendor_boot.img; then
+    echo "! Unable to repack vendor_boot image"
+    exit 1
+  fi
+  cat new-vendor_boot.img > "$IMG"
+  )
+  local RES=$?
+
+  ./magiskboot cleanup
+  rm -f new-vendor_boot.img partition-script.sh partition-script.sh.new avb_verify_cli
+  cd /
+  return $RES
+}
+
 ##########################
 # Non-root util_functions
 ##########################

@@ -5,6 +5,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.tasks.OtaPayloadExtractor
 import com.topjohnwu.magisk.core.tasks.PatchFileClassifier
+import com.topjohnwu.magisk.core.tasks.RecoveryGptProcessor
 import com.topjohnwu.magisk.core.tasks.TarProcessor
 import com.topjohnwu.magisk.core.utils.DataChannel
 import com.topjohnwu.magisk.core.utils.ZipChannel
@@ -28,7 +29,10 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
+import java.io.OutputStream
 import java.nio.ByteBuffer
+import java.security.DigestInputStream
+import java.security.DigestOutputStream
 import java.security.MessageDigest
 import java.util.zip.CRC32
 import java.util.zip.ZipEntry
@@ -41,11 +45,17 @@ private const val OTA_IMAGE_URL =
     "https://dl.google.com/dl/android/aosp/yogi-ota-cd1a.261005.003.b1-7d7d9988.zip"
 private const val TAR_IMAGE_URL =
     "https://github.com/topjohnwu/magisk-files/releases/download/files/AP_F968B_trimmed.tar"
+private const val AL_RECOVERY_URL =
+    "https://dl.google.com/device/recovery/mica-user/16471258/recovery.zip"
 private const val INIT_BOOT_SIZE = 8388608L
 private const val INIT_BOOT_SHA256 =
     "01ef3679b997989281309e1c0ad96c433da206b822b8db8408f8b474f71405b8"
 private const val TAR_INIT_BOOT_SHA256 =
     "bd4b3629fd483701395540ed207e3d64cf51757d9a63a967d24ba8da86ae026c"
+private const val AL_INIT_BOOT_SHA256 =
+    "20fe3b6572a7b400ad6491c759d3baa3231cdd9961d43476ae64e7f43380329f"
+private const val AL_VENDOR_BOOT_SHA256 =
+    "a400d6b0a542eb226443d8f82a6c4b26eafe9e212955c668631b4bb9962c8059"
 
 @Keep
 @RunWith(AndroidJUnit4::class)
@@ -138,6 +148,76 @@ class AppTest : TestCommon {
             System.err.println("Console:\n" + console.joinToString("\n"))
             System.err.println("Logs:\n" + logs.joinToString("\n"))
             throw e
+        }
+    }
+
+    @Test
+    fun testRecoveryGptProcessor() = runBlocking(Dispatchers.IO) {
+        val dir = File(appContext.cacheDir, "test_gpt_dir")
+        dir.deleteRecursively()
+        dir.mkdirs()
+        val workingDir = FileSystemManager.getLocal().getFile(dir.path)
+        val console = mutableListOf<String>()
+        val logs = mutableListOf<String>()
+
+        var initBootVerified = false
+        var vendorBootVerified = false
+
+        // Verify the images without patching, so the output should be identical to the input
+        class VerifyProcessor(out: OutputStream) :
+            RecoveryGptProcessor(workingDir, out, console, logs) {
+
+            override suspend fun onInitBoot(image: ExtendedFile) {
+                assertEquals("Checksum mismatch for init_boot_a", AL_INIT_BOOT_SHA256, calculateSha256(image))
+                initBootVerified = true
+            }
+
+            override suspend fun onVendorBoot(image: ExtendedFile) {
+                assertEquals("Checksum mismatch for vendor_boot_b", AL_VENDOR_BOOT_SHA256, calculateSha256(image))
+                vendorBootVerified = true
+            }
+        }
+
+        try {
+            val inputDigest = MessageDigest.getInstance("SHA-256")
+            val outputDigest = MessageDigest.getInstance("SHA-256")
+
+            // The recovery image is too large to store on device. Stream and decompress
+            // the image on-the-fly, and only calculate checksums of the input and output.
+            DataChannel.Http(ServiceLocator.okhttp, AL_RECOVERY_URL).use { http ->
+                PatchFileClassifier(http).use { file ->
+                    assertEquals("Unexpected file type", PatchFileClassifier.Type.RecoveryGpt, file.type)
+                    val output = DigestOutputStream(FileOutputStream("/dev/null"), outputDigest)
+                    output.buffered(1024 * 1024).use { outStream ->
+                        val input = DigestInputStream(file.openStream(), inputDigest)
+                        val processor = VerifyProcessor(outStream)
+                        val bootImage = processor.start(input)
+
+                        assertTrue("Extracted init_boot_a should exist", bootImage.exists())
+                        assertEquals(
+                            "Extracted file size should be $INIT_BOOT_SIZE bytes",
+                            INIT_BOOT_SIZE,
+                            bootImage.length()
+                        )
+
+                        processor.finish(bootImage)
+                    }
+                }
+            }
+
+            assertTrue("init_boot_a was not processed", initBootVerified)
+            assertTrue("vendor_boot_b was not processed", vendorBootVerified)
+            assertArrayEquals(
+                "Output should be identical to the input",
+                inputDigest.digest(),
+                outputDigest.digest()
+            )
+        } catch (e: Throwable) {
+            System.err.println("Console:\n" + console.joinToString("\n"))
+            System.err.println("Logs:\n" + logs.joinToString("\n"))
+            throw e
+        } finally {
+            dir.deleteRecursively()
         }
     }
 

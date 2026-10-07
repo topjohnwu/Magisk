@@ -34,6 +34,8 @@ class PatchFileClassifier @Throws(IOException::class) constructor(
         BootZip,
         /** An A/B OTA payload, e.g. payload.bin in OTA packages */
         PayloadBin,
+        /** An Aluminium OS recovery image */
+        RecoveryGpt,
         /** A tar archive, e.g. Samsung firmware AP tar */
         Tar,
     }
@@ -99,6 +101,7 @@ class PatchFileClassifier @Throws(IOException::class) constructor(
 
             when {
                 head.matches(257, TAR_MAGIC) -> return Type.Tar
+                RecoveryGptProcessor.isGpt(head.copyOfRange(512, 1024)) -> return Type.RecoveryGpt
                 head.matches(0, PAYLOAD_MAGIC) -> return Type.PayloadBin
                 !head.matches(0, ZIP_MAGIC) -> return Type.RawFile
             }
@@ -118,6 +121,10 @@ class PatchFileClassifier @Throws(IOException::class) constructor(
                 entryNames.add(imageZip.name)
                 channel = zip.open(imageZip)
                 return@repeat
+            }
+
+            zip.find { it.name.endsWith("recovery_image.bin") }?.let {
+                return found(it, Type.RecoveryGpt)
             }
 
             throw IOException("No supported files found in zip")

@@ -31,6 +31,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.apache.commons.compress.archivers.zip.ZipFile
 import timber.log.Timber
+import java.io.Closeable
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
@@ -39,12 +40,15 @@ import java.security.SecureRandom
 import java.util.Locale
 import java.util.concurrent.atomic.AtomicBoolean
 
-interface WholeFilePatcher {
+interface WholeFilePatcher : Closeable {
     @Throws(IOException::class)
     suspend fun start(input: InputStream): ExtendedFile
 
     @Throws(IOException::class)
     suspend fun finish(patched: ExtendedFile)
+
+    // Release resources if the patching process is aborted before finish
+    override fun close() {}
 }
 
 interface ImageExtractor {
@@ -221,7 +225,17 @@ abstract class MagiskInstallImpl protected constructor(
                 PatchFileClassifier(input).use { file ->
                     logs.add("Input type: ${file.type}, payload: ${file.entryPath ?: "<input>"}")
                     return when (file.type) {
-                        PatchFileClassifier.Type.Tar -> processWholeFile(file.openStream())
+                        PatchFileClassifier.Type.Tar -> {
+                            processWholeFile(file.openStream(), "tar") { out ->
+                                TarProcessor(installDir, out, console, logs)
+                            }
+                        }
+                        PatchFileClassifier.Type.RecoveryGpt -> {
+                            file.entryPath?.let { console.add("- Processing $it") }
+                            processWholeFile(file.openStream(), "bin") { out ->
+                                RecoveryGptProcessor(installDir, out, console, logs)
+                            }
+                        }
                         PatchFileClassifier.Type.PayloadBin -> extractAndProcessImage { out ->
                             console.add("- Processing as OTA package")
                             OtaPayloadExtractor(out, console, logs).extract(file.openChannel())
@@ -244,17 +258,22 @@ abstract class MagiskInstallImpl protected constructor(
         }
     }
 
-    // Patch the boot image in a tar archive, and output a new tar archive
-    // with all the original entries and the patched boot image
-    private suspend fun processWholeFile(input: InputStream): Boolean {
-        val outFile = MediaStoreUtils.getFile("$destName.tar")
+    // Patch the boot image in a whole file (e.g. tar archive), and output a new file
+    // with all the original contents and the patched boot image
+    private suspend fun processWholeFile(
+        input: InputStream,
+        ext: String,
+        createPatcher: (OutputStream) -> WholeFilePatcher
+    ): Boolean {
+        val outFile = MediaStoreUtils.getFile("$destName.$ext")
         val outStream = outFile.uri.outputStream().buffered(1024 * 1024)
-        val tar = TarProcessor(installDir, outStream, console, logs)
+        val patcher = createPatcher(outStream)
 
         // Process input file
         try {
-            targetImage = tar.start(input)
+            targetImage = patcher.start(input)
         } catch (e: IOException) {
+            patcher.close()
             runCatching { outStream.close() }
             outFile.delete()
             if (e is TarProcessor.NoBootException)
@@ -266,6 +285,7 @@ abstract class MagiskInstallImpl protected constructor(
 
         // Patch file
         if (!patchBoot()) {
+            patcher.close()
             runCatching { outStream.close() }
             outFile.delete()
             return false
@@ -274,7 +294,7 @@ abstract class MagiskInstallImpl protected constructor(
         // Output file
         try {
             val newBoot = installDir.getChildFile("new-boot.img")
-            tar.finish(newBoot)
+            patcher.finish(newBoot)
             newBoot.delete()
         } catch (e: IOException) {
             console.add("! Failed to output to $outFile")
@@ -282,6 +302,7 @@ abstract class MagiskInstallImpl protected constructor(
             Timber.e(e)
             return false
         } finally {
+            patcher.close()
             outStream.close()
         }
 
