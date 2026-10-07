@@ -259,7 +259,7 @@ public abstract class DataChannel implements SeekableByteChannel {
             this.url = url;
             var request = new Request.Builder()
                     .url(url)
-                    .header("Range", "bytes=" + "-" + RANDOM_READ_CACHE_SIZE)
+                    .header("Range", "bytes=0-" + (RANDOM_READ_CACHE_SIZE - 1))
                     .build();
             try (var response = client.newCall(request).execute()) {
                 if (response.code() != 206) {
@@ -269,10 +269,12 @@ public abstract class DataChannel implements SeekableByteChannel {
                 if (contentRange == null) {
                     throw new IOException("Could not determine file size.");
                 }
-                var contentLength = contentRange.substring(contentRange.lastIndexOf('/') + 1);
-                size = Long.parseLong(contentLength);
+                int space = contentRange.indexOf(' ');
+                int dash = contentRange.indexOf('-');
+                int slash = contentRange.lastIndexOf('/');
+                cacheStart = Long.parseLong(contentRange.substring(space + 1, dash).trim());
+                size = Long.parseLong(contentRange.substring(slash + 1).trim());
                 cache = response.body().bytes();
-                cacheStart = size - cache.length;
             }
         }
 
