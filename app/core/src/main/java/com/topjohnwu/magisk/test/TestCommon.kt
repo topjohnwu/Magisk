@@ -9,7 +9,7 @@ import com.topjohnwu.magisk.core.utils.RootUtils
 import com.topjohnwu.superuser.Shell
 import org.junit.Assert.assertTrue
 
-interface BaseTest {
+interface TestCommon {
     val instrumentation: Instrumentation
         get() = InstrumentationRegistry.getInstrumentation()
     val appContext: Context get() = instrumentation.targetContext

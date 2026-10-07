@@ -33,12 +33,12 @@ import java.io.PrintStream
 
 @Keep
 @RunWith(AndroidJUnit4::class)
-class Environment : BaseTest {
+class Environment : TestCommon {
 
     companion object {
         @BeforeClass
         @JvmStatic
-        fun before() = BaseTest.prerequisite()
+        fun before() = TestCommon.prerequisite()
 
         // Whether we're running with live setup (patches through avd_setup.sh)
         fun isLiveSetup(): Boolean {

@@ -15,12 +15,12 @@ import org.junit.runner.RunWith
 
 @Keep
 @RunWith(AndroidJUnit4::class)
-class MagiskAppTest : BaseTest {
+class SmokeTest : TestCommon {
 
     companion object {
         @BeforeClass
         @JvmStatic
-        fun before() = BaseTest.prerequisite()
+        fun before() = TestCommon.prerequisite()
     }
 
     @Test

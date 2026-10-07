@@ -31,7 +31,7 @@ import java.util.regex.Pattern
 
 @Keep
 @RunWith(AndroidJUnit4::class)
-class AdditionalTest : BaseTest {
+class IntegrationTest : TestCommon {
 
     companion object {
         private const val SHELL_PKG = "com.android.shell"
@@ -43,7 +43,7 @@ class AdditionalTest : BaseTest {
         @BeforeClass
         @JvmStatic
         fun before() {
-            BaseTest.prerequisite()
+            TestCommon.prerequisite()
             runBlocking {
                 modules = LocalModule.installed()
             }
