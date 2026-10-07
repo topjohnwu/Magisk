@@ -164,8 +164,9 @@ void dyn_img_hdr::load_hdr_file() {
 boot_img::boot_img(const char *image) :
 map(image), k_fmt(FileFormat::UNKNOWN), r_fmt(FileFormat::UNKNOWN), e_fmt(FileFormat::UNKNOWN) {
     fprintf(stderr, "Parsing boot image: [%s]\n", image);
-    for (const uint8_t *addr = map.data(); addr < map.data() + map.size(); ++addr) {
-        FileFormat fmt = check_fmt(addr, map.size());
+    const uint8_t *eof = map.data() + map.size();
+    for (const uint8_t *addr = map.data(); addr < eof; ++addr) {
+        FileFormat fmt = check_fmt(addr, eof - addr);
         switch (fmt) {
         case FileFormat::CHROMEOS:
             flags[CHROMEOS_FLAG] = true;
@@ -450,7 +451,7 @@ bool boot_img::parse_image(const uint8_t *addr, FileFormat type) {
         if (BUFFER_MATCH(footer, AVB_FOOTER_MAGIC)) {
             avb_footer = static_cast<const AvbFooter*>(footer);
             // Double check if meta header exists
-            const void *meta = payload.data() + __builtin_bswap64(avb_footer->vbmeta_offset);
+            const void *meta = addr + __builtin_bswap64(avb_footer->vbmeta_offset);
             if (BUFFER_MATCH(meta, AVB_MAGIC)) {
                 fprintf(stderr, "VBMETA\n");
                 flags[AVB_FLAG] = true;
@@ -596,6 +597,7 @@ void repack(Utf8CStr src_img, Utf8CStr out_img, bool skip_comp) {
         uint32_t extra;
         uint32_t dtb;
         uint32_t tail;
+        uint32_t eof;
         uint32_t vbmeta;
     } off{};
 
@@ -789,6 +791,9 @@ void repack(Utf8CStr src_img, Utf8CStr out_img, bool skip_comp) {
         file_align();
     }
 
+    // This tail offset matches the tail byte_view
+    off.tail = lseek(fd, 0, SEEK_CUR);
+
     // Proprietary stuffs
     if (boot.flags[SEANDROID_FLAG]) {
         xwrite(fd, SEANDROID_MAGIC, 16);
@@ -799,8 +804,7 @@ void repack(Utf8CStr src_img, Utf8CStr out_img, bool skip_comp) {
         xwrite(fd, LG_BUMP_MAGIC, 16);
     }
 
-    off.tail = lseek(fd, 0, SEEK_CUR);
-    file_align();
+    off.eof = lseek(fd, 0, SEEK_CUR);
 
     // vbmeta
     if (boot.flags[AVB_FLAG]) {
@@ -812,20 +816,16 @@ void repack(Utf8CStr src_img, Utf8CStr out_img, bool skip_comp) {
         xwrite(fd, boot.vbmeta, vbmeta_size);
     }
 
-    uint32_t chromeos_kernel_sz = 0;
+    // chromeos blob trailer
     if (boot.flags[CHROMEOS_FLAG]) {
-        // The whole repacked image is the kernel payload of the ChromeOS kernel blob.
-        // Padding to the original size is done after signing.
-        chromeos_kernel_sz = lseek(fd, 0, SEEK_CUR) - off.header;
         file_align_with(4096);
         auto trailer = chromeos_blob_trailer();
         xwrite(fd, trailer.data(), trailer.size());
-    } else {
-        // Pad image to original size
-        off_t current = lseek(fd, 0, SEEK_CUR);
-        if (current < boot.map.size()) {
-            write_zero(fd, boot.map.size() - current);
-        }
+    }
+
+    // Pad image to original size
+    if (off_t current = lseek(fd, 0, SEEK_CUR); current < boot.map.size()) {
+        write_zero(fd, boot.map.size() - current);
     }
 
     /******************
@@ -833,6 +833,7 @@ void repack(Utf8CStr src_img, Utf8CStr out_img, bool skip_comp) {
      ******************/
 
     uint32_t aosp_img_size = off.tail - off.header;
+    uint32_t orig_img_size = off.eof - off.header;
 
     // Map output image as rw
     mmap_data out(fd, lseek(fd, 0, SEEK_END), true);
@@ -906,7 +907,7 @@ void repack(Utf8CStr src_img, Utf8CStr out_img, bool skip_comp) {
         // Copy and patch AVB structures
         auto footer = reinterpret_cast<AvbFooter*>(out.data() + out.size() - sizeof(AvbFooter));
         memcpy(footer, boot.avb_footer, sizeof(AvbFooter));
-        footer->original_image_size = __builtin_bswap64(aosp_img_size);
+        footer->original_image_size = __builtin_bswap64(orig_img_size);
         footer->vbmeta_offset = __builtin_bswap64(off.vbmeta);
         if (check_env("PATCHVBMETAFLAG")) {
             auto vbmeta = reinterpret_cast<AvbVBMetaImageHeader*>(out.data() + off.vbmeta);
@@ -917,8 +918,8 @@ void repack(Utf8CStr src_img, Utf8CStr out_img, bool skip_comp) {
     if (boot.flags[DHTB_FLAG]) {
         // DHTB header
         auto d_hdr = reinterpret_cast<dhtb_hdr *>(out.data());
-        d_hdr->size = aosp_img_size + 16 /* SEANDROID_MAGIC */ + 4 /* DHTB trailer */;
-        sha256_hash(byte_view(out.data() + sizeof(dhtb_hdr), d_hdr->size),
+        d_hdr->size = orig_img_size;
+        sha256_hash(byte_view(out.data() + off.header, orig_img_size),
                     byte_data(d_hdr->checksum, SHA256_DIGEST_SIZE));
     } else if (boot.flags[BLOB_FLAG]) {
         // Blob header
@@ -937,19 +938,13 @@ void repack(Utf8CStr src_img, Utf8CStr out_img, bool skip_comp) {
     }
 
     if (boot.flags[CHROMEOS_FLAG]) {
-        // ChromeOS signature covers the whole image, so it has to be the very last step
-        auto vblock = sign_chromeos(byte_view(out.data() + off.header, chromeos_kernel_sz));
+        byte_view payload(out.data() + off.header, aosp_img_size);
+        auto vblock = sign_chromeos(payload);
         if (vblock.empty()) {
             fprintf(stderr, "Failed to sign ChromeOS boot image\n");
             exit(1);
         }
         memcpy(out.data(), vblock.data(), vblock.size());
-        // Pad image to original size after signing. Data beyond the signed
-        // kernel blob is not covered by the signature and is ignored.
-        off_t current = lseek(fd, 0, SEEK_END);
-        if (current < boot.map.size()) {
-            write_zero(fd, boot.map.size() - current);
-        }
     }
 
     close(fd);
