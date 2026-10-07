@@ -315,6 +315,20 @@ live_test_main() {
   done
 }
 
+app_test_main() {
+  local apks=($(print_apks "$@"))
+  local pkg='com.topjohnwu.magisk.test'
+  local app="$pkg/$pkg.AppTestRunner"
+  for apk in "${apks[@]}"; do
+    # Cleanup
+    adb shell pm uninstall com.topjohnwu.magisk || true
+    adb install -r -g $apk
+    adb install -r -g out/test.apk
+    am_instrument '.AppTest' $app
+  done
+}
+
+
 case "$1" in
   test )
     shift
@@ -326,6 +340,11 @@ case "$1" in
     shift
     set -x
     live_test_main "$@"
+    ;;
+  app-test )
+    shift
+    set -x
+    app_test_main "$@"
     ;;
   run )
     shift
