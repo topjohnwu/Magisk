@@ -3,7 +3,6 @@ package com.topjohnwu.magisk.core.tasks
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.ktx.copyAll
-import com.topjohnwu.magisk.core.utils.DataChannel
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.nio.ExtendedFile
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry
@@ -24,7 +23,7 @@ import java.nio.ByteBuffer
  *    other entries to the output tar. Returns the image to be patched.
  * 2. [finish]: write the patched image to the output tar and finalize the archive.
  *
- * [start] closes the input channel. The caller owns the output stream and is
+ * [start] closes the input stream. The caller owns the output stream and is
  * responsible for closing it.
  */
 class TarProcessor(
@@ -44,9 +43,9 @@ class TarProcessor(
     private lateinit var target: BootItem
 
     @Throws(IOException::class)
-    override suspend fun start(channel: DataChannel): ExtendedFile = channel.use {
-        val tarIn = TarArchiveInputStream(it.stream().buffered(1024 * 1024))
-        tarIn.use { processEntries(tarIn) }
+    override suspend fun start(input: InputStream): ExtendedFile {
+        val tarIn = TarArchiveInputStream(input.buffered(1024 * 1024))
+        return tarIn.use { processEntries(tarIn) }
     }
 
     @Throws(IOException::class)
