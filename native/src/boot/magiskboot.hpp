@@ -22,6 +22,8 @@
 #define DTB_MAGIC       "\xd0\x0d\xfe\xed"
 #define LG_BUMP_MAGIC   "\x41\xa9\xe4\x67\x74\x4d\x1d\x1b\xa4\x29\xf2\xec\xea\x65\x52\x79"
 #define SEANDROID_MAGIC "SEANDROIDENFORCE"
+#define SIGNER_VER02_MAGIC "SignerVer02"
+#define SIGNER_VER02_SZ    512
 #define NOOKHD_RL_MAGIC "Red Loader"
 #define NOOKHD_GL_MAGIC "Green Loader"
 #define NOOKHD_GR_MAGIC "Green Recovery"
