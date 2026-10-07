@@ -3,23 +3,37 @@ package com.topjohnwu.magisk.test
 import androidx.annotation.Keep
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.topjohnwu.magisk.core.di.ServiceLocator
+import com.topjohnwu.magisk.core.tasks.OtaPayloadExtractor
+import com.topjohnwu.magisk.core.tasks.PatchFileClassifier
 import com.topjohnwu.magisk.core.tasks.TarProcessor
-import com.topjohnwu.magisk.core.tasks.ZipExtractor
 import com.topjohnwu.magisk.core.utils.DataChannel
+import com.topjohnwu.magisk.core.utils.ZipChannel
 import com.topjohnwu.superuser.nio.ExtendedFile
 import com.topjohnwu.superuser.nio.FileSystemManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.junit.After
+import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
+import java.io.IOException
 import java.io.InputStream
+import java.nio.ByteBuffer
 import java.security.MessageDigest
+import java.util.zip.CRC32
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
+import kotlin.random.Random
 
 private const val FACTORY_IMAGE_URL =
     "https://dl.google.com/dl/android/aosp/yogi-cd1a.261005.003.b1-factory-90f36052.zip"
@@ -55,13 +69,22 @@ class AppTest : TestCommon {
         tarWorkingDir.deleteRecursively()
     }
 
-    private fun testZipExtraction(url: String) = runBlocking(Dispatchers.IO) {
+    // Classify the file at url, and extract the boot image with the extractor
+    private fun testZipExtraction(
+        url: String,
+        expectedType: PatchFileClassifier.Type,
+        extract: suspend (PatchFileClassifier, MutableList<String>, MutableList<String>) -> Unit,
+    ) = runBlocking(Dispatchers.IO) {
         val console = mutableListOf<String>()
         val logs = mutableListOf<String>()
 
         try {
-            val channel = DataChannel.Http(ServiceLocator.okhttp, url)
-            ZipExtractor(outFile, console, logs).extract(channel)
+            DataChannel.Http(ServiceLocator.okhttp, url).use { channel ->
+                PatchFileClassifier(channel).use { file ->
+                    assertEquals("Unexpected file type", expectedType, file.type)
+                    extract(file, console, logs)
+                }
+            }
         } catch (e: Exception) {
             System.err.println("Console:\n" + console.joinToString("\n"))
             System.err.println("Logs:\n" + logs.joinToString("\n"))
@@ -76,10 +99,16 @@ class AppTest : TestCommon {
     }
 
     @Test
-    fun testFactoryZipExtraction() = testZipExtraction(FACTORY_IMAGE_URL)
+    fun testFactoryZipExtraction() =
+        testZipExtraction(FACTORY_IMAGE_URL, PatchFileClassifier.Type.BootZip) { file, _, _ ->
+            file.openStream().use { input -> outFile.outputStream().use { input.copyTo(it) } }
+        }
 
     @Test
-    fun testOtaZipExtraction() = testZipExtraction(OTA_IMAGE_URL)
+    fun testOtaZipExtraction() =
+        testZipExtraction(OTA_IMAGE_URL, PatchFileClassifier.Type.PayloadBin) { file, console, logs ->
+            OtaPayloadExtractor(outFile, console, logs).extract(file.openChannel())
+        }
 
     @Test
     fun testTarProcessor() = runBlocking(Dispatchers.IO) {
@@ -89,9 +118,13 @@ class AppTest : TestCommon {
 
         try {
             FileOutputStream("/dev/null").buffered(1024 * 1024).use { outStream ->
-                val channel = DataChannel.Http(ServiceLocator.okhttp, TAR_IMAGE_URL)
                 val tar = TarProcessor(workingDir, outStream, console, logs)
-                val bootImage = tar.start(channel)
+                val bootImage = DataChannel.Http(ServiceLocator.okhttp, TAR_IMAGE_URL).use { channel ->
+                    PatchFileClassifier(channel).use { file ->
+                        assertEquals("Unexpected file type", PatchFileClassifier.Type.Tar, file.type)
+                        tar.start(file.openStream())
+                    }
+                }
 
                 assertTrue("Extracted init_boot.img should exist", bootImage.exists())
                 assertEquals("Extracted file size should be $INIT_BOOT_SIZE bytes", INIT_BOOT_SIZE, bootImage.length())
@@ -105,6 +138,188 @@ class AppTest : TestCommon {
             System.err.println("Console:\n" + console.joinToString("\n"))
             System.err.println("Logs:\n" + logs.joinToString("\n"))
             throw e
+        }
+    }
+
+    @Test
+    fun testZipChannelEntries() {
+        val zip = buildZip(
+            ZipItem("dir/", ByteArray(0), ZipEntry.STORED),
+            ZipItem("dir/boot.img", testData(1000, 1), ZipEntry.STORED),
+            ZipItem("dir/sub/", ByteArray(0), ZipEntry.STORED),
+            ZipItem("payload.bin", testData(2000, 2), ZipEntry.DEFLATED),
+        )
+        val source = ByteArrayChannel(zip)
+        ZipChannel(source).use { zc ->
+            assertEquals(
+                "Directories should be excluded",
+                listOf("dir/boot.img", "payload.bin"),
+                zc.entries.map { it.name }
+            )
+            assertNotNull("getEntry should find files", zc.getEntry("payload.bin"))
+            assertNull("getEntry should return null for missing files", zc.getEntry("missing"))
+            assertEquals("dir/boot.img", zc.find { it.name.endsWith("boot.img") }?.name)
+            assertNull(zc.find { it.name.endsWith(".zip") })
+        }
+        assertTrue("ZipChannel should not close the source channel", source.isOpen)
+    }
+
+    @Test
+    fun testZipChannelStored() {
+        // Larger than all DataChannel cache thresholds
+        val data = testData(3 * 1024 * 1024 + 123, 3)
+        val zip = buildZip(
+            ZipItem("first.txt", "hello".toByteArray(), ZipEntry.DEFLATED),
+            ZipItem("image.img", data, ZipEntry.STORED),
+        )
+        ZipChannel(ByteArrayChannel(zip)).use { zc ->
+            val entry = zc.getEntry("image.img")!!
+
+            // Random access through open()
+            zc.open(entry).use { ch ->
+                assertEquals("Channel size mismatch", data.size.toLong(), ch.size())
+                for (offset in listOf(0, 1, 4095, 16 * 1024, 700 * 1024, data.size - 100)) {
+                    for (len in listOf(1, 100, 64 * 1024, 600 * 1024)) {
+                        val n = minOf(len, data.size - offset)
+                        val buf = ByteBuffer.allocate(n)
+                        assertEquals(n, ch.read(buf, offset.toLong()))
+                        assertArrayEquals(
+                            "Random read mismatch at $offset+$n",
+                            data.copyOfRange(offset, offset + n),
+                            buf.array()
+                        )
+                    }
+                }
+                assertEquals("Read beyond EOF", -1, ch.read(ByteBuffer.allocate(1), data.size.toLong()))
+                ch.stream().use { assertArrayEquals("Channel stream mismatch", data, it.readBytes()) }
+                ch.slice(1000, 5000).stream().use {
+                    assertArrayEquals("Slice mismatch", data.copyOfRange(1000, 6000), it.readBytes())
+                }
+            }
+
+            // Sequential access through openStream()
+            zc.openStream(entry).use { assertArrayEquals("Stream mismatch", data, it.readBytes()) }
+        }
+    }
+
+    @Test
+    fun testZipChannelDeflated() {
+        val random = testData(2 * 1024 * 1024, 4)
+        val text = "Magisk ".repeat(100000).toByteArray()
+        val zip = buildZip(
+            ZipItem("random.bin", random, ZipEntry.DEFLATED),
+            ZipItem("text.txt", text, ZipEntry.DEFLATED),
+        )
+        ZipChannel(ByteArrayChannel(zip)).use { zc ->
+            for ((name, data) in listOf("random.bin" to random, "text.txt" to text)) {
+                val entry = zc.getEntry(name)!!
+                assertEquals("Uncompressed size mismatch", data.size.toLong(), entry.size)
+                zc.openStream(entry).use {
+                    assertArrayEquals("Decompressed $name mismatch", data, it.readBytes())
+                }
+                assertThrows("open() should reject compressed entries", IOException::class.java) {
+                    zc.open(entry)
+                }
+            }
+            // Text compresses well, make sure it is really compressed
+            assertTrue(zc.getEntry("text.txt")!!.compressedSize < text.size / 10)
+        }
+    }
+
+    @Test
+    fun testZipChannelEmptyEntry() {
+        val zip = buildZip(
+            ZipItem("empty.stored", ByteArray(0), ZipEntry.STORED),
+            ZipItem("empty.deflated", ByteArray(0), ZipEntry.DEFLATED),
+        )
+        ZipChannel(ByteArrayChannel(zip)).use { zc ->
+            val stored = zc.getEntry("empty.stored")!!
+            assertThrows(IOException::class.java) { zc.open(stored) }
+            zc.openStream(stored).use { assertEquals(0, it.readBytes().size) }
+            zc.openStream(zc.getEntry("empty.deflated")!!).use { assertEquals(0, it.readBytes().size) }
+        }
+    }
+
+    @Test
+    fun testZipChannelNested() {
+        val boot = testData(512 * 1024, 5)
+        val payload = testData(256 * 1024, 6)
+        val inner = buildZip(
+            ZipItem("init_boot.img", boot, ZipEntry.DEFLATED),
+            ZipItem("payload.bin", payload, ZipEntry.STORED),
+        )
+        val outer = buildZip(
+            ZipItem("README", "readme".toByteArray(), ZipEntry.DEFLATED),
+            ZipItem("device/image-device-1234.zip", inner, ZipEntry.STORED),
+        )
+        ZipChannel(ByteArrayChannel(outer)).use { zc ->
+            val innerEntry = zc.find { it.name.endsWith(".zip") }!!
+            zc.open(innerEntry).use { innerChannel ->
+                ZipChannel(innerChannel).use { izc ->
+                    assertEquals(listOf("init_boot.img", "payload.bin"), izc.entries.map { it.name })
+                    izc.openStream(izc.getEntry("init_boot.img")!!).use {
+                        assertArrayEquals("Nested deflated entry mismatch", boot, it.readBytes())
+                    }
+                    izc.open(izc.getEntry("payload.bin")!!).use { ch ->
+                        val buf = ByteBuffer.allocate(1000)
+                        ch.read(buf, 5000)
+                        assertArrayEquals(
+                            "Nested stored entry mismatch",
+                            payload.copyOfRange(5000, 6000),
+                            buf.array()
+                        )
+                    }
+                }
+                assertTrue("Inner ZipChannel should not close its source", innerChannel.isOpen)
+            }
+        }
+    }
+
+    @Test
+    fun testZipChannelInvalid() {
+        assertThrows(IOException::class.java) {
+            ZipChannel(ByteArrayChannel(testData(4096, 7)))
+        }
+    }
+
+    private class ZipItem(val name: String, val data: ByteArray, val method: Int)
+
+    private fun buildZip(vararg items: ZipItem): ByteArray {
+        val bytes = ByteArrayOutputStream()
+        ZipOutputStream(bytes).use { zip ->
+            for (item in items) {
+                val entry = ZipEntry(item.name)
+                entry.method = item.method
+                if (item.method == ZipEntry.STORED) {
+                    // STORED entries require size and CRC to be set beforehand
+                    entry.size = item.data.size.toLong()
+                    entry.compressedSize = item.data.size.toLong()
+                    entry.crc = CRC32().apply { update(item.data) }.value
+                }
+                zip.putNextEntry(entry)
+                zip.write(item.data)
+                zip.closeEntry()
+            }
+        }
+        return bytes.toByteArray()
+    }
+
+    private fun testData(size: Int, seed: Long) = ByteArray(size).also { Random(seed).nextBytes(it) }
+
+    // An in-memory DataChannel
+    private class ByteArrayChannel(
+        private val data: ByteArray,
+        startOffset: Long = 0,
+        size: Long = data.size.toLong(),
+    ) : DataChannel(startOffset, size) {
+        override fun slice(offset: Long, sliceSize: Long): DataChannel {
+            require(offset >= 0 && sliceSize >= 0 && offset + sliceSize <= size)
+            return ByteArrayChannel(data, startOffset + offset, sliceSize)
+        }
+
+        override fun stream(offset: Long, sliceSize: Long): InputStream {
+            val len = minOf(offset + sliceSize, size) - offset
+            return ByteArrayInputStream(data, (startOffset + offset).toInt(), len.toInt())
         }
     }
 

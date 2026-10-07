@@ -35,14 +35,13 @@ import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
-import java.nio.ByteBuffer
 import java.security.SecureRandom
 import java.util.Locale
 import java.util.concurrent.atomic.AtomicBoolean
 
 interface WholeFilePatcher {
     @Throws(IOException::class)
-    suspend fun start(channel: DataChannel): ExtendedFile
+    suspend fun start(input: InputStream): ExtendedFile
 
     @Throws(IOException::class)
     suspend fun finish(patched: ExtendedFile)
@@ -219,19 +218,23 @@ abstract class MagiskInstallImpl protected constructor(
     private suspend fun processInput(input: DataChannel): Boolean {
         try {
             input.use {
-                val head = ByteArray(512)
-                if (input.read(ByteBuffer.wrap(head), 0) != head.size) {
-                    console.add("! Invalid input file")
-                    return false
-                }
-
-                val magic = head.copyOf(4)
-                val tarMagic = head.copyOfRange(257, 262)
-
-                return if (tarMagic.contentEquals("ustar".toByteArray())) {
-                    processWholeFile(input)
-                } else {
-                    extractAndProcessImage(input, magic)
+                PatchFileClassifier(input).use { file ->
+                    logs.add("Input type: ${file.type}, payload: ${file.entryPath ?: "<input>"}")
+                    return when (file.type) {
+                        PatchFileClassifier.Type.Tar -> processWholeFile(file.openStream())
+                        PatchFileClassifier.Type.PayloadBin -> extractAndProcessImage { out ->
+                            console.add("- Processing as OTA package")
+                            OtaPayloadExtractor(out, console, logs).extract(file.openChannel())
+                        }
+                        PatchFileClassifier.Type.BootZip -> extractAndProcessImage { out ->
+                            console.add("- Extracting: ${file.entryPath} (${file.size} bytes)")
+                            file.openStream().use { it.copyAndCloseOut(out.newOutputStream()) }
+                        }
+                        PatchFileClassifier.Type.RawFile -> extractAndProcessImage { out ->
+                            console.add("- Copying image to cache")
+                            file.openStream().use { it.copyAndCloseOut(out.newOutputStream()) }
+                        }
+                    }
                 }
             }
         } catch (e: IOException) {
@@ -243,7 +246,7 @@ abstract class MagiskInstallImpl protected constructor(
 
     // Patch the boot image in a tar archive, and output a new tar archive
     // with all the original entries and the patched boot image
-    private suspend fun processWholeFile(input: DataChannel): Boolean {
+    private suspend fun processWholeFile(input: InputStream): Boolean {
         val outFile = MediaStoreUtils.getFile("$destName.tar")
         val outStream = outFile.uri.outputStream().buffered(1024 * 1024)
         val tar = TarProcessor(installDir, outStream, console, logs)
@@ -286,18 +289,11 @@ abstract class MagiskInstallImpl protected constructor(
     }
 
     // Extract the boot image from the input, and output the patched boot image
-    private suspend fun extractAndProcessImage(input: DataChannel, magic: ByteArray): Boolean {
+    private suspend fun extractAndProcessImage(extract: suspend (ExtendedFile) -> Unit): Boolean {
         // Process input file
         targetImage = installDir.getChildFile("boot.img")
         try {
-            if (magic.contentEquals("CrAU".toByteArray())) {
-                OtaPayloadExtractor(targetImage, console, logs).extract(input)
-            } else if (magic.contentEquals("PK\u0003\u0004".toByteArray())) {
-                ZipExtractor(targetImage, console, logs).extract(input)
-            } else {
-                console.add("- Copying image to cache")
-                input.stream().use { it.copyAndCloseOut(targetImage.newOutputStream()) }
-            }
+            extract(targetImage)
         } catch (e: IOException) {
             console.add("! Process error")
             Timber.e(e)
