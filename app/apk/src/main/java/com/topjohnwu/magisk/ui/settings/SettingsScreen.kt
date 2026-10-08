@@ -3,10 +3,8 @@ package com.topjohnwu.magisk.ui.settings
 import android.os.Build
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -44,6 +42,7 @@ import com.topjohnwu.magisk.core.model.ColorMode
 import com.topjohnwu.magisk.core.utils.LocaleSetting
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.ui.ThemeState
+import com.topjohnwu.magisk.ui.component.AdaptiveColumns
 import com.topjohnwu.magisk.ui.component.MagiskDialog
 import com.topjohnwu.magisk.ui.component.SettingsArrow
 import com.topjohnwu.magisk.ui.component.SettingsDropdown
@@ -69,27 +68,37 @@ fun SettingsScreen(
             )
         }
     ) { padding ->
-        Column(
+        // Without root, the Magisk and Superuser sections are hidden, so move the
+        // App section to the second column to avoid leaving it empty.
+        val hasRootSections = Info.env.isActive || Info.showSuperUser
+        // Each section emits a title and a card, so wrap them in a Column to keep them together
+        AdaptiveColumns(
             modifier = Modifier
                 .fillMaxSize()
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
                 .padding(padding)
                 .verticalScrollbar(scrollState, contentPadding = PaddingValues(vertical = 12.dp))
                 .verticalScroll(scrollState)
-                .padding(horizontal = 16.dp, vertical = 12.dp)
-        ) {
-            CustomizationSection(viewModel = viewModel)
-            Spacer(Modifier.height(16.dp))
-            AppSettingsSection()
-            if (Info.env.isActive) {
-                Spacer(Modifier.height(16.dp))
-                MagiskSection(viewModel = viewModel)
-            }
-            if (Info.showSuperUser) {
-                Spacer(Modifier.height(16.dp))
-                SuperuserSection(viewModel = viewModel)
-            }
-        }
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            spacing = 16.dp,
+            first = {
+                Column { CustomizationSection(viewModel = viewModel) }
+                if (hasRootSections) {
+                    Column { AppSettingsSection() }
+                }
+            },
+            second = {
+                if (!hasRootSections) {
+                    Column { AppSettingsSection() }
+                }
+                if (Info.env.isActive) {
+                    Column { MagiskSection(viewModel = viewModel) }
+                }
+                if (Info.showSuperUser) {
+                    Column { SuperuserSection(viewModel = viewModel) }
+                }
+            },
+        )
     }
 }
 
