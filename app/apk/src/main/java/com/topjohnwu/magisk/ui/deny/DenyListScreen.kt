@@ -18,9 +18,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -199,6 +201,8 @@ fun DenyListScreen(
                 query = query,
                 onQueryChange = viewModel::setQuery,
                 modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .widthIn(max = 720.dp)
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 6.dp)
             )
@@ -218,15 +222,18 @@ fun DenyListScreen(
                     }
                 }
             } else {
-                val listState = rememberLazyListState()
-                LazyColumn(
-                    state = listState,
+                val gridState = rememberLazyStaggeredGridState()
+                // Staggered, as cards expand to show processes
+                LazyVerticalStaggeredGrid(
+                    columns = StaggeredGridCells.Adaptive(320.dp),
+                    state = gridState,
                     modifier = Modifier
                         .fillMaxSize()
                         .nestedScroll(scrollBehavior.nestedScrollConnection)
-                        .verticalScrollbar(listState, contentPadding = PaddingValues(vertical = 8.dp)),
+                        .verticalScrollbar(gridState, contentPadding = PaddingValues(vertical = 8.dp)),
                     contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalItemSpacing = 8.dp,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     items(
                         items = apps,
