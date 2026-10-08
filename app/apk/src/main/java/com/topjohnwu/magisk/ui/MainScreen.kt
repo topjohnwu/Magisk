@@ -222,9 +222,12 @@ fun MainScreen(
                             }
                         }
                         onExit = {
-                            if (requestedFocusDirection == FocusDirection.Up || (isBar &&
-                                (requestedFocusDirection == FocusDirection.Left ||
-                                    requestedFocusDirection == FocusDirection.Right))
+                            // With a rail, nothing is below the page, so don't let DPAD_DOWN
+                            // jump into the rail; leaving to the rail is done with DPAD_LEFT.
+                            val dir = requestedFocusDirection
+                            if (dir == FocusDirection.Up ||
+                                (!isBar && dir == FocusDirection.Down) ||
+                                (isBar && (dir == FocusDirection.Left || dir == FocusDirection.Right))
                             ) {
                                 cancelFocusChange()
                             }
