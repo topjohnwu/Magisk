@@ -51,6 +51,7 @@
     <string name="download_dialog_title">Enter image URL</string>
     <string name="download_dialog_msg">Full OTA image or factory image</string>
     <string name="download_googlebook_recovery_image">Download latest Googlebook recovery image</string>
+    <string name="download_pixel_factory_image">Download latest Pixel factory image</string>
     <string name="reboot_delay_toast">Rebooting in 5 seconds…</string>
     <string name="flash_screen_title">Installation</string>
 

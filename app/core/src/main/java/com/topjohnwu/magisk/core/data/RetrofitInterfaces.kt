@@ -30,6 +30,10 @@ interface RawUrl {
 
     @GET
     suspend fun fetchGooglebookRecoveryJson(@Url url: String): List<GooglebookRecoveryJson>
+
+    @GET
+    @Headers("Cookie: devsite_wall_acks=nexus-image-tos")
+    suspend fun fetchPixelFactoryImages(@Url url: String): String
 }
 
 interface GithubApiServices {

@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.test
 import androidx.annotation.Keep
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.topjohnwu.magisk.core.di.ServiceLocator
+import com.topjohnwu.magisk.core.repository.FirmwareCrawler
 import com.topjohnwu.magisk.core.tasks.OtaPayloadExtractor
 import com.topjohnwu.magisk.core.tasks.PatchFileClassifier
 import com.topjohnwu.magisk.core.tasks.RecoveryGptProcessor
@@ -360,6 +361,33 @@ class AppTest : TestCommon {
         assertThrows(IOException::class.java) {
             ZipChannel(ByteArrayChannel(testData(4096, 7)))
         }
+    }
+
+    @Test
+    fun testPixelProvider() = runBlocking(Dispatchers.IO) {
+        val svc = ServiceLocator.networkService
+
+        // Match latest
+        val candidate = FirmwareCrawler.PixelProvider.crawl(svc, "shiba", "Pixel 8")
+        assertNotNull(candidate)
+        assertTrue(candidate!!.url.startsWith("https://dl.google.com/dl/android/aosp/"))
+        assertTrue(candidate.url.endsWith(".zip"))
+        assertTrue(candidate.description.startsWith("Pixel 8 •"))
+
+        // Match specific build ID
+        val candidateSpecific =
+            FirmwareCrawler.PixelProvider.crawl(svc, "shiba", "Pixel 8", "UD1A.230803.022.A5")
+        assertNotNull(candidateSpecific)
+        assertTrue(candidateSpecific!!.url.contains("shiba-ud1a.230803.022.a5"))
+        assertTrue(candidateSpecific.description.contains("UD1A.230803.022.A5"))
+
+        // Non-pixel device should return null
+        val candidateNexus = FirmwareCrawler.PixelProvider.crawl(svc, "angler", "Nexus 6P")
+        assertNull(candidateNexus)
+
+        // Unknown device should return null
+        val candidateUnknown = FirmwareCrawler.PixelProvider.crawl(svc, "unknown", "Unknown")
+        assertNull(candidateUnknown)
     }
 
     private class ZipItem(val name: String, val data: ByteArray, val method: Int)

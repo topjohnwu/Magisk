@@ -63,6 +63,9 @@ object Info {
     val isGooglebook get() =
         AppContext.packageManager.hasSystemFeature("com.google.desktop.gms")
 
+    val isPixel get() =
+        Build.BRAND.equals("google", ignoreCase = true) && !isGooglebook && !isEmulator
+
     val isHeadlessSystemUser by lazy {
         getProperty("ro.fw.mu.headless_system_user", "false").toBoolean()
     }

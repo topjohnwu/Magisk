@@ -46,6 +46,8 @@ object Const {
         const val INVALID_URL = "https://example.com/"
         const val GOOGLEBOOK_RECOVERY_URL =
             "https://dl.google.com/dl/edgedl/device/recovery/production_recovery.json"
+        const val PIXEL_FACTORY_IMAGES_URL =
+            "https://developers.google.com/android/images"
     }
 
     object Key {
