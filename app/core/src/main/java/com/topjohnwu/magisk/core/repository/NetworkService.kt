@@ -51,6 +51,10 @@ class NetworkService(
         raw.fetchGooglebookRecoveryJson(Const.Url.GOOGLEBOOK_RECOVERY_URL)
     }
 
+    suspend fun fetchPixelFactoryImages() = safe {
+        raw.fetchPixelFactoryImages(Const.Url.PIXEL_FACTORY_IMAGES_URL)
+    }
+
     // Keep going through all release pages until we find a match
     private suspend inline fun findRelease(predicate: (Release) -> Boolean): Release? {
         var page = 1
