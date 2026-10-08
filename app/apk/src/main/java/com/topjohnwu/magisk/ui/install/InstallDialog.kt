@@ -8,10 +8,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
@@ -33,6 +38,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -42,6 +48,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.ImeAction
@@ -51,6 +58,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.window.core.layout.WindowWidthSizeClass
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.repository.FirmwareCrawler
@@ -116,6 +124,10 @@ fun InstallDialog(
         )
     }
 
+    // Full screen dialogs are only for compact windows; read this outside of the Dialog window
+    val fullScreen =
+        currentWindowAdaptiveInfo().windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.COMPACT
+
     if (show) {
         Dialog(
             onDismissRequest = onDismiss,
@@ -126,7 +138,14 @@ fun InstallDialog(
         ) {
             val scrollState = rememberScrollState()
             Scaffold(
-                modifier = modifier.fillMaxSize(),
+                modifier = if (fullScreen) modifier.fillMaxSize() else modifier
+                    .windowInsetsPadding(WindowInsets.systemBars)
+                    .padding(24.dp)
+                    .widthIn(max = 560.dp)
+                    .heightIn(max = 800.dp)
+                    .clip(RoundedCornerShape(28.dp)),
+                containerColor = if (fullScreen) MaterialTheme.colorScheme.background
+                    else MaterialTheme.colorScheme.surfaceContainerHigh,
                 topBar = {
                     TopAppBar(
                         title = { Text(stringResource(CoreR.string.install)) },
@@ -139,7 +158,8 @@ fun InstallDialog(
                             }
                         },
                         colors = TopAppBarDefaults.topAppBarColors(
-                            containerColor = MaterialTheme.colorScheme.surface
+                            containerColor = if (fullScreen) MaterialTheme.colorScheme.surface
+                                else MaterialTheme.colorScheme.surfaceContainerHigh
                         )
                     )
                 }
