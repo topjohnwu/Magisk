@@ -18,6 +18,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -105,6 +106,7 @@ fun MainScreen(
     val isBar = navType == NavigationSuiteType.ShortNavigationBarCompact ||
         navType == NavigationSuiteType.ShortNavigationBarMedium
     val showFab = (isModulesTab && moduleFabAction != null) || (isSuperuserTab && superuserFabAction != null)
+    val hasFabTab = Tab.MODULES in visibleTabs || Tab.SUPERUSER in visibleTabs
 
     // The explicit focus wiring below assumes the FAB sits above a bottom bar, so only apply
     // it in bar mode. With a rail, the default 2D focus search works as is.
@@ -143,7 +145,11 @@ fun MainScreen(
         primaryActionContent = {
             // In the rail header, keep the FAB slot even when the FAB is hidden so the rail
             // items don't jump on tab switches, and center the FAB in the collapsed rail.
-            Box(if (isBar) Modifier else Modifier.padding(start = 20.dp).heightIn(min = 56.dp)) {
+            // Skip the slot if no tab has a FAB (no root).
+            Box(
+                if (isBar || !hasFabTab) Modifier
+                else Modifier.padding(start = 20.dp).heightIn(min = 56.dp)
+            ) {
                 AnimatedVisibility(
                     visible = showFab,
                     enter = scaleIn() + fadeIn(),
@@ -167,6 +173,9 @@ fun MainScreen(
                         } else Modifier,
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        // M3: a FAB nested in the navigation rail has no elevation
+                        elevation = if (isBar) FloatingActionButtonDefaults.elevation()
+                            else FloatingActionButtonDefaults.bottomAppBarFabElevation(),
                     ) {
                         Icon(
                             imageVector = Icons.Default.Add,
