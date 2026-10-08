@@ -114,7 +114,7 @@ open class RecoveryGptProcessor(
                 image.delete()
             }
         } else {
-            logs.add("Copying: ${part.name}")
+            console.add("-- Copying   : ${part.name}")
             copy(part.size)
         }
     }
