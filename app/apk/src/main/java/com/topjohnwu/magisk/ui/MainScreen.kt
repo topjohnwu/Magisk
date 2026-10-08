@@ -9,10 +9,12 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
@@ -40,6 +42,8 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
@@ -102,7 +106,16 @@ fun MainScreen(
     val isModulesTab = visibleTabs.getOrNull(pagerState.currentPage) == Tab.MODULES
     val isSuperuserTab = visibleTabs.getOrNull(pagerState.currentPage) == Tab.SUPERUSER
 
-    val navType = NavigationSuiteScaffoldDefaults.navigationSuiteType(currentWindowAdaptiveInfo())
+    // The collapsed rail needs 520dp (44dp top space, 96dp FAB header, 5 items, 44dp bottom) to
+    // show every item. In shorter windows use the bar, like the library does below 480dp.
+    val systemBars = WindowInsets.systemBars
+    val railHeight = LocalWindowInfo.current.containerDpSize.height -
+        with(LocalDensity.current) { (systemBars.getTop(this) + systemBars.getBottom(this)).toDp() }
+    val navType = NavigationSuiteScaffoldDefaults.navigationSuiteType(currentWindowAdaptiveInfo()).let {
+        if (it == NavigationSuiteType.WideNavigationRailCollapsed && railHeight < 520.dp) {
+            NavigationSuiteType.ShortNavigationBarMedium
+        } else it
+    }
     val isBar = navType == NavigationSuiteType.ShortNavigationBarCompact ||
         navType == NavigationSuiteType.ShortNavigationBarMedium
     val showFab = (isModulesTab && moduleFabAction != null) || (isSuperuserTab && superuserFabAction != null)
