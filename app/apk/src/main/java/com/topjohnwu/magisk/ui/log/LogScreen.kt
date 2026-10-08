@@ -16,7 +16,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
@@ -138,7 +143,10 @@ fun LogScreen(
                 PrimaryTabRow(
                     selectedTabIndex = pagerState.currentPage,
                     containerColor = Color.Transparent,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .widthIn(max = 960.dp)
+                        .fillMaxWidth()
                 ) {
                     tabTitles.forEachIndexed { index, title ->
                         Tab(
@@ -227,15 +235,17 @@ private fun SuLogTab(
                 )
             }
         } else {
-            val listState = rememberLazyListState()
-            LazyColumn(
-                state = listState,
+            val gridState = rememberLazyGridState()
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(320.dp),
+                state = gridState,
                 modifier = Modifier
                     .weight(1f)
                     .nestedScroll(nestedScrollConnection)
-                    .verticalScrollbar(listState, contentPadding = PaddingValues(vertical = 12.dp)),
+                    .verticalScrollbar(gridState, contentPadding = PaddingValues(vertical = 12.dp)),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 items(
                     items = logs,
@@ -395,16 +405,19 @@ private fun MagiskLogTab(
                 state = listState,
                 modifier = Modifier
                     .weight(1f)
+                    .fillMaxWidth()
                     .nestedScroll(nestedScrollConnection)
                     .verticalScrollbar(listState, contentPadding = PaddingValues(vertical = 12.dp)),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                // A log reads top to bottom, so keep one column but cap its width
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 items(
                     items = entries,
                     contentType = { "MagiskLogCard" }
                 ) { entry ->
-                    MagiskLogCard(entry = entry)
+                    MagiskLogCard(entry = entry, modifier = Modifier.widthIn(max = 960.dp))
                 }
             }
         }
