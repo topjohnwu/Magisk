@@ -89,6 +89,7 @@ import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.tasks.AppMigration
 import com.topjohnwu.magisk.core.tasks.MagiskInstaller
 import com.topjohnwu.magisk.ui.MainActivity
+import com.topjohnwu.magisk.ui.component.AdaptiveColumns
 import com.topjohnwu.magisk.ui.component.MagiskDialog
 import com.topjohnwu.magisk.ui.component.MarkdownTextAsync
 import com.topjohnwu.magisk.ui.component.rememberLoadingDialog
@@ -268,7 +269,7 @@ fun HomeScreen(
             )
         }
     ) { padding ->
-        Column(
+        AdaptiveColumns(
             modifier = Modifier
                 .fillMaxSize()
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
@@ -276,51 +277,53 @@ fun HomeScreen(
                 .verticalScrollbar(scrollState, contentPadding = PaddingValues(vertical = 12.dp))
                 .verticalScroll(scrollState)
                 .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            if (uiState.isNoticeVisible) {
-                NoticeCard(onHide = viewModel::hideNotice)
-            }
+            spacing = 12.dp,
+            first = {
+                if (uiState.isNoticeVisible) {
+                    NoticeCard(onHide = viewModel::hideNotice)
+                }
 
-            CoreCard(
-                modifier = Modifier.fillMaxWidth(),
-                state = uiState.magiskState,
-                version = uiState.magiskInstalledVersion,
-                onInstallClicked = { showInstallDialog = true }
-            )
+                CoreCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    state = uiState.magiskState,
+                    version = uiState.magiskInstalledVersion,
+                    onInstallClicked = { showInstallDialog = true }
+                )
 
-            StatusCard()
+                StatusCard()
 
-            AppCard(
-                modifier = Modifier.fillMaxWidth(),
-                state = uiState.appState,
-                version = uiState.managerInstalledVersion,
-                remoteVersion = uiState.managerRemoteVersion,
-                progress = uiState.managerProgress,
-                isHidden = context.packageName != BuildConfig.APP_PACKAGE_NAME,
-                onManagerPressed = viewModel::onManagerPressed,
-                onHideRestorePressed = viewModel::onHideRestorePressed,
-            )
+                AppCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    state = uiState.appState,
+                    version = uiState.managerInstalledVersion,
+                    remoteVersion = uiState.managerRemoteVersion,
+                    progress = uiState.managerProgress,
+                    isHidden = context.packageName != BuildConfig.APP_PACKAGE_NAME,
+                    onManagerPressed = viewModel::onManagerPressed,
+                    onHideRestorePressed = viewModel::onHideRestorePressed,
+                )
+            },
+            second = {
+                Text(
+                    text = stringResource(CoreR.string.home_support_title),
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 4.dp)
+                )
 
-            Text(
-                text = stringResource(CoreR.string.home_support_title),
-                style = MaterialTheme.typography.labelLarge,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 4.dp)
-            )
+                SupportCard(onLinkClicked = viewModel::onLinkPressed)
 
-            SupportCard(onLinkClicked = viewModel::onLinkPressed)
-
-            Text(
-                text = stringResource(CoreR.string.home_follow_title),
-                style = MaterialTheme.typography.labelLarge,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 4.dp)
-            )
-            DevelopersCard(onLinkClicked = viewModel::onLinkPressed)
-        }
+                Text(
+                    text = stringResource(CoreR.string.home_follow_title),
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 4.dp)
+                )
+                DevelopersCard(onLinkClicked = viewModel::onLinkPressed)
+            },
+        )
     }
 
     InstallDialog(
