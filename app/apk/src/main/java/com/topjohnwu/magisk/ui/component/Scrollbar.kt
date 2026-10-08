@@ -12,6 +12,9 @@ import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -39,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.math.abs
 import kotlin.math.roundToInt
 
 interface ScrollbarStateAdapter {
@@ -128,11 +132,29 @@ fun rememberScrollbarAdapter(state: ScrollableState): ScrollbarStateAdapter {
                     } else 0f
                 }
 
-            override suspend fun drag(block: suspend (onScroll: suspend (Float) -> Unit) -> Unit) {
-                state.scroll(MutatePriority.PreventUserInput) {
-                    block { fraction ->
-                        info?.let { scrollBy(fraction.coerceIn(0f, 1f) * range - it.scrollOffset) }
+            private val itemCount: Int
+                get() = when (state) {
+                    is LazyListState -> state.layoutInfo.totalItemsCount
+                    is LazyGridState -> state.layoutInfo.totalItemsCount
+                    is LazyStaggeredGridState -> state.layoutInfo.totalItemsCount
+                    else -> 0
+                }
+
+            override suspend fun scrollTo(fraction: Float) {
+                val info = info ?: return
+                val target = fraction.coerceIn(0f, 1f) * range
+                val delta = target - info.scrollOffset
+                val count = itemCount
+                if (count > 0 && abs(delta) > info.viewportSize) {
+                    // Jump by index, as scrolling by a large delta composes every item in between
+                    val index = (target / info.contentSize * count).toInt().coerceIn(0, count - 1)
+                    when (state) {
+                        is LazyListState -> state.scrollToItem(index)
+                        is LazyGridState -> state.scrollToItem(index)
+                        is LazyStaggeredGridState -> state.scrollToItem(index)
                     }
+                } else {
+                    state.scroll(MutatePriority.PreventUserInput) { scrollBy(delta) }
                 }
             }
         }
