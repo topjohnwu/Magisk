@@ -176,7 +176,6 @@ fun SuperuserGrantScreen(
                 query = query,
                 onQueryChange = viewModel::setQuery,
                 modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
                     .widthIn(max = 720.dp)
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 6.dp)
