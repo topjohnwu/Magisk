@@ -176,8 +176,6 @@ class SuperuserViewModel(
                         }
                     )
                 }
-                val res = if (newPolicy >= SuPolicy.ALLOW) R.string.su_snack_grant else R.string.su_snack_deny
-                showSnackbar(AppContext.getString(res, item.appName))
             }
         }
 

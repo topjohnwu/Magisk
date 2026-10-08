@@ -10,7 +10,6 @@ import com.topjohnwu.magisk.arch.AsyncLoadViewModel
 import com.topjohnwu.magisk.core.AppContext
 import com.topjohnwu.magisk.core.BuildConfig
 import com.topjohnwu.magisk.core.Config
-import com.topjohnwu.magisk.core.R as CoreR
 import com.topjohnwu.magisk.core.data.magiskdb.PolicyDao
 import com.topjohnwu.magisk.core.ktx.concurrentMap
 import com.topjohnwu.magisk.core.ktx.getLabel
@@ -177,9 +176,6 @@ class SuperuserGrantViewModel(
                 }
 
                 SuEvents.notifyPolicyChanged()
-
-                val res = if (willGrant) CoreR.string.su_snack_grant else CoreR.string.su_snack_deny
-                showSnackbar(AppContext.getString(res, app.info.label))
             }
         }
 
