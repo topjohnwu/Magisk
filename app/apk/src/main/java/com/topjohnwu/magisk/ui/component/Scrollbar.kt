@@ -4,13 +4,14 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.MutatePriority
+import androidx.compose.foundation.ScrollIndicatorState
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -91,80 +92,47 @@ fun rememberScrollbarAdapter(scrollState: ScrollState): ScrollbarStateAdapter {
     }
 }
 
+// Works for any scrollable that reports a ScrollIndicatorState (lazy lists and grids).
+// For lazy layouts, the offset and content size are estimates.
 @Composable
-fun rememberScrollbarAdapter(lazyListState: LazyListState): ScrollbarStateAdapter {
-    return remember(lazyListState) {
+fun rememberScrollbarAdapter(state: ScrollableState): ScrollbarStateAdapter {
+    return remember(state) {
         object : ScrollbarStateAdapter {
-            override val isScrollable: Boolean
-                get() {
-                    val layoutInfo = lazyListState.layoutInfo
-                    val totalItems = layoutInfo.totalItemsCount
-                    if (totalItems == 0) return false
-                    val visibleItems = layoutInfo.visibleItemsInfo
-                    if (visibleItems.isEmpty()) return false
-                    if (visibleItems.size < totalItems) return true
-                    val viewportHeight = layoutInfo.viewportEndOffset - layoutInfo.viewportStartOffset
-                    val totalVisibleHeight = visibleItems.sumOf { it.size }
-                    return totalVisibleHeight > viewportHeight
+            // null if unsupported or not measured yet (values are Int.MAX_VALUE until then)
+            private val info: ScrollIndicatorState?
+                get() = state.scrollIndicatorState?.takeIf {
+                    it.scrollOffset != Int.MAX_VALUE &&
+                        it.contentSize != Int.MAX_VALUE &&
+                        it.viewportSize != Int.MAX_VALUE
                 }
+
+            private val range: Int
+                get() = info?.let { (it.contentSize - it.viewportSize).coerceAtLeast(0) } ?: 0
+
+            override val isScrollable: Boolean
+                get() = range > 0
 
             override val thumbRatio: Float
                 get() {
-                    val layoutInfo = lazyListState.layoutInfo
-                    val totalItems = layoutInfo.totalItemsCount
-                    val visibleItems = layoutInfo.visibleItemsInfo
-                    if (totalItems == 0 || visibleItems.isEmpty()) return 1f
-                    val viewportHeight = (layoutInfo.viewportEndOffset - layoutInfo.viewportStartOffset).toFloat()
-                    val avgItemSize = visibleItems.sumOf { it.size }.toFloat() / visibleItems.size
-                    val totalEstimatedHeight = avgItemSize * totalItems
-                    return if (totalEstimatedHeight > 0f) {
-                        (viewportHeight / totalEstimatedHeight).coerceIn(0.08f, 1f)
+                    val info = info ?: return 1f
+                    return if (range > 0) {
+                        (info.viewportSize.toFloat() / info.contentSize).coerceIn(0.08f, 1f)
                     } else 1f
                 }
 
             override val offsetRatio: Float
                 get() {
-                    val layoutInfo = lazyListState.layoutInfo
-                    val totalItems = layoutInfo.totalItemsCount
-                    val visibleItems = layoutInfo.visibleItemsInfo
-                    if (totalItems == 0 || visibleItems.isEmpty()) return 0f
-                    val viewportHeight = (layoutInfo.viewportEndOffset - layoutInfo.viewportStartOffset).toFloat()
-                    val avgItemSize = visibleItems.sumOf { it.size }.toFloat() / visibleItems.size
-                    val totalEstimatedHeight = avgItemSize * totalItems
-                    val maxOffset = (totalEstimatedHeight - viewportHeight).coerceAtLeast(1f)
-                    val currentOffset = lazyListState.firstVisibleItemIndex * avgItemSize + lazyListState.firstVisibleItemScrollOffset
-                    return (currentOffset / maxOffset).coerceIn(0f, 1f)
+                    val info = info ?: return 0f
+                    return if (range > 0) {
+                        (info.scrollOffset.toFloat() / range).coerceIn(0f, 1f)
+                    } else 0f
                 }
-
-            private fun calculateTarget(fraction: Float): Pair<Int, Int>? {
-                val layoutInfo = lazyListState.layoutInfo
-                val totalItems = layoutInfo.totalItemsCount
-                val visibleItems = layoutInfo.visibleItemsInfo
-                if (totalItems == 0 || visibleItems.isEmpty()) return null
-                val viewportHeight = (layoutInfo.viewportEndOffset - layoutInfo.viewportStartOffset).toFloat()
-                val avgItemSize = visibleItems.sumOf { it.size }.toFloat() / visibleItems.size
-                val totalEstimatedHeight = avgItemSize * totalItems
-                val maxOffset = (totalEstimatedHeight - viewportHeight).coerceAtLeast(0f)
-                val targetScrollOffset = fraction.coerceIn(0f, 1f) * maxOffset
-                val exactItem = if (avgItemSize > 0f) targetScrollOffset / avgItemSize else 0f
-                val targetIndex = exactItem.toInt().coerceIn(0, totalItems - 1)
-                val remainder = exactItem - targetIndex
-                val offset = (remainder * avgItemSize).roundToInt().coerceAtLeast(0)
-                return Pair(targetIndex, offset)
-            }
 
             override suspend fun drag(block: suspend (onScroll: suspend (Float) -> Unit) -> Unit) {
-                lazyListState.scroll(MutatePriority.PreventUserInput) {}
-                block { fraction ->
-                    calculateTarget(fraction)?.let { (index, offset) ->
-                        lazyListState.scrollToItem(index, offset)
+                state.scroll(MutatePriority.PreventUserInput) {
+                    block { fraction ->
+                        info?.let { scrollBy(fraction.coerceIn(0f, 1f) * range - it.scrollOffset) }
                     }
-                }
-            }
-
-            override suspend fun scrollTo(fraction: Float) {
-                calculateTarget(fraction)?.let { (index, offset) ->
-                    lazyListState.scrollToItem(index, offset)
                 }
             }
         }
@@ -275,7 +243,7 @@ fun Modifier.horizontalScrollbar(
 }
 
 fun Modifier.verticalScrollbar(
-    state: LazyListState,
+    state: ScrollableState,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     thumbColor: Color? = null,
 ): Modifier = composed {
