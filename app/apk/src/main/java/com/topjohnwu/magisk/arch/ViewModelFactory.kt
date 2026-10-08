@@ -20,7 +20,7 @@ val VMFactory: ViewModelProvider.Factory = viewModelFactory {
     initializer { LogViewModel(ServiceLocator.logRepo) }
     initializer { SuperuserViewModel(ServiceLocator.policyDB) }
     initializer { SuperuserGrantViewModel(ServiceLocator.policyDB) }
-    initializer { InstallViewModel(ServiceLocator.networkService) }
+    initializer { InstallViewModel(ServiceLocator.networkService, ServiceLocator.firmwareCrawler) }
     initializer { DenyListViewModel() }
     initializer { FlashViewModel() }
     initializer { ActionViewModel() }

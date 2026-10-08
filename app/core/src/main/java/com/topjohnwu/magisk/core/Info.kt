@@ -60,6 +60,9 @@ object Info {
             || getProperty("ro.kernel.qemu", "0") == "1"
             || getProperty("ro.boot.qemu", "0") == "1"
 
+    val isGooglebook get() =
+        AppContext.packageManager.hasSystemFeature("com.google.desktop.gms")
+
     val isHeadlessSystemUser by lazy {
         getProperty("ro.fw.mu.headless_system_user", "false").toBoolean()
     }
