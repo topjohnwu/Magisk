@@ -20,9 +20,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Undo
@@ -217,18 +218,20 @@ fun ModuleScreen(
             return@Scaffold
         }
 
-        val listState = rememberLazyListState()
-        LazyColumn(
-            state = listState,
+        val gridState = rememberLazyStaggeredGridState()
+        // Staggered, as cards expand; 360dp leaves room for the action buttons row
+        LazyVerticalStaggeredGrid(
+            columns = StaggeredGridCells.Adaptive(360.dp),
+            state = gridState,
             modifier = Modifier
                 .fillMaxSize()
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
                 .padding(padding)
-                .verticalScrollbar(listState, contentPadding = PaddingValues(top = 4.dp, bottom = 80.dp)),
-            contentPadding = PaddingValues(start = 12.dp, top = 4.dp, end = 12.dp, bottom = 80.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+                .verticalScrollbar(gridState, contentPadding = PaddingValues(top = 4.dp, bottom = 80.dp)),
+            contentPadding = PaddingValues(start = 12.dp, top = 16.dp, end = 12.dp, bottom = 92.dp),
+            verticalItemSpacing = 8.dp,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            item { Spacer(Modifier.height(4.dp)) }
             items(
                 items = uiState.modules,
                 key = { it.module.id },
@@ -249,7 +252,6 @@ fun ModuleScreen(
                     }
                 )
             }
-            item { Spacer(Modifier.height(4.dp)) }
         }
     }
 }
