@@ -9,9 +9,8 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
@@ -21,10 +20,12 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.ShortNavigationBar
-import androidx.compose.material3.ShortNavigationBarItem
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteItem
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -100,81 +101,92 @@ fun MainScreen(
     val isModulesTab = visibleTabs.getOrNull(pagerState.currentPage) == Tab.MODULES
     val isSuperuserTab = visibleTabs.getOrNull(pagerState.currentPage) == Tab.SUPERUSER
 
-    Scaffold(
+    val navType = NavigationSuiteScaffoldDefaults.navigationSuiteType(currentWindowAdaptiveInfo())
+    val isBar = navType == NavigationSuiteType.ShortNavigationBarCompact ||
+        navType == NavigationSuiteType.ShortNavigationBarMedium
+    val showFab = (isModulesTab && moduleFabAction != null) || (isSuperuserTab && superuserFabAction != null)
+
+    // The explicit focus wiring below assumes the FAB sits above a bottom bar, so only apply
+    // it in bar mode. With a rail, the default 2D focus search works as is.
+    NavigationSuiteScaffold(
         modifier = modifier.fillMaxSize(),
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-        bottomBar = {
-            ShortNavigationBar {
-                visibleTabs.forEachIndexed { index, tab ->
-                    val isModulesItem = tab == Tab.MODULES
-                    val isSuperuserItem = tab == Tab.SUPERUSER
-                    ShortNavigationBarItem(
-                        selected = pagerState.currentPage == index,
-                        onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
-                        modifier = Modifier
-                            .then(
-                                if (isModulesItem) Modifier.focusRequester(navModulesFocusRequester)
-                                else if (isSuperuserItem) Modifier.focusRequester(navSuperuserFocusRequester)
-                                else Modifier
-                            )
-                            .focusProperties {
-                                if ((isModulesTab && isModulesItem) || (isSuperuserTab && isSuperuserItem)) {
-                                    up = fabFocusRequester
-                                }
-                            },
-                        icon = {
-                            Icon(
-                                imageVector = ImageVector.vectorResource(tab.iconRes),
-                                contentDescription = stringResource(tab.titleRes),
-                            )
+        navigationSuiteType = navType,
+        navigationItems = {
+            visibleTabs.forEachIndexed { index, tab ->
+                val isModulesItem = tab == Tab.MODULES
+                val isSuperuserItem = tab == Tab.SUPERUSER
+                NavigationSuiteItem(
+                    navigationSuiteType = navType,
+                    selected = pagerState.currentPage == index,
+                    onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
+                    modifier = Modifier
+                        .then(
+                            if (isModulesItem) Modifier.focusRequester(navModulesFocusRequester)
+                            else if (isSuperuserItem) Modifier.focusRequester(navSuperuserFocusRequester)
+                            else Modifier
+                        )
+                        .focusProperties {
+                            if (isBar && ((isModulesTab && isModulesItem) || (isSuperuserTab && isSuperuserItem))) {
+                                up = fabFocusRequester
+                            }
                         },
-                        label = { Text(stringResource(tab.titleRes)) },
-                    )
+                    icon = {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(tab.iconRes),
+                            contentDescription = stringResource(tab.titleRes),
+                        )
+                    },
+                    label = { Text(stringResource(tab.titleRes)) },
+                )
+            }
+        },
+        primaryActionContent = {
+            // In the rail header, keep the FAB slot even when the FAB is hidden so the rail
+            // items don't jump on tab switches, and center the FAB in the collapsed rail.
+            Box(if (isBar) Modifier else Modifier.padding(start = 20.dp).heightIn(min = 56.dp)) {
+                AnimatedVisibility(
+                    visible = showFab,
+                    enter = scaleIn() + fadeIn(),
+                    exit = scaleOut() + fadeOut(),
+                ) {
+                    FloatingActionButton(
+                        onClick = {
+                            if (isModulesTab) moduleFabAction?.invoke()
+                            else if (isSuperuserTab) superuserFabAction?.invoke()
+                        },
+                        // In rail mode this slot is also composed (unplaced) by the scaffold,
+                        // so don't attach the focus requester there.
+                        modifier = if (isBar) {
+                            Modifier
+                                .focusRequester(fabFocusRequester)
+                                .focusProperties {
+                                    up = if (isModulesTab) moduleContentFocusRequester else superuserContentFocusRequester
+                                    down = if (isModulesTab) navModulesFocusRequester else navSuperuserFocusRequester
+                                    right = FocusRequester.Cancel
+                                }
+                        } else Modifier,
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = stringResource(
+                                if (isModulesTab) CoreR.string.module_action_install_external
+                                else CoreR.string.superuser_grant
+                            ),
+                            modifier = Modifier.size(28.dp),
+                        )
+                    }
                 }
             }
         },
-        floatingActionButton = {
-            val showFab = (isModulesTab && moduleFabAction != null) || (isSuperuserTab && superuserFabAction != null)
-            AnimatedVisibility(
-                visible = showFab,
-                enter = scaleIn() + fadeIn(),
-                exit = scaleOut() + fadeOut(),
-            ) {
-                FloatingActionButton(
-                    onClick = {
-                        if (isModulesTab) moduleFabAction?.invoke()
-                        else if (isSuperuserTab) superuserFabAction?.invoke()
-                    },
-                    modifier = Modifier
-                        .focusRequester(fabFocusRequester)
-                        .focusProperties {
-                            up = if (isModulesTab) moduleContentFocusRequester else superuserContentFocusRequester
-                            down = if (isModulesTab) navModulesFocusRequester else navSuperuserFocusRequester
-                            right = FocusRequester.Cancel
-                        },
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = stringResource(
-                            if (isModulesTab) CoreR.string.module_action_install_external
-                            else CoreR.string.superuser_grant
-                        ),
-                        modifier = Modifier.size(28.dp),
-                    )
-                }
-            }
-        }
-    ) { innerPadding ->
+    ) {
         HorizontalPager(
             state = pagerState,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .consumeWindowInsets(innerPadding),
+            modifier = Modifier.fillMaxSize(),
             beyondViewportPageCount = 0,
-            userScrollEnabled = true,
+            // With a rail, switch tabs only through the rail, not with trackpad swipes
+            userScrollEnabled = isBar,
         ) { page ->
             val isCurrentPage = pagerState.currentPage == page
             val tab = visibleTabs[page]
@@ -188,14 +200,14 @@ fun MainScreen(
                             }
                         }
                         onExit = {
-                            if (requestedFocusDirection == FocusDirection.Left ||
-                                requestedFocusDirection == FocusDirection.Right ||
-                                requestedFocusDirection == FocusDirection.Up
+                            if (requestedFocusDirection == FocusDirection.Up || (isBar &&
+                                (requestedFocusDirection == FocusDirection.Left ||
+                                    requestedFocusDirection == FocusDirection.Right))
                             ) {
                                 cancelFocusChange()
                             }
                         }
-                        if (tab == Tab.MODULES || tab == Tab.SUPERUSER) {
+                        if (isBar && (tab == Tab.MODULES || tab == Tab.SUPERUSER)) {
                             down = fabFocusRequester
                         }
                     }
