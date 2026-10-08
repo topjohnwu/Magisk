@@ -9,9 +9,11 @@ import com.topjohnwu.magisk.core.BuildConfig.APP_VERSION_CODE
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.ktx.toast
+import com.topjohnwu.magisk.core.repository.FirmwareCrawler
 import com.topjohnwu.magisk.core.repository.NetworkService
 import com.topjohnwu.magisk.ui.navigation.Route
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,7 +24,10 @@ import java.io.File
 import java.io.IOException
 import com.topjohnwu.magisk.core.R as CoreR
 
-class InstallViewModel(svc: NetworkService) : BaseViewModel() {
+class InstallViewModel(
+    svc: NetworkService,
+    crawler: FirmwareCrawler,
+) : BaseViewModel() {
 
     enum class Method { NONE, PATCH, DIRECT, INACTIVE_SLOT, DOWNLOAD }
 
@@ -33,6 +38,7 @@ class InstallViewModel(svc: NetworkService) : BaseViewModel() {
         val requestFilePicker: Boolean = false,
         val showSecondSlotWarning: Boolean = false,
         val showDownloadDialog: Boolean = false,
+        val candidate: FirmwareCrawler.Candidate? = null,
     )
 
     val isRooted get() = Info.isRooted
@@ -42,7 +48,13 @@ class InstallViewModel(svc: NetworkService) : BaseViewModel() {
     private val _uiState = MutableStateFlow(UiState())
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
+    private var candidateJob: Job? = null
+
     init {
+        candidateJob = viewModelScope.launch(Dispatchers.IO) {
+            val candidate = crawler.crawl()
+            _uiState.update { it.copy(candidate = candidate) }
+        }
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val noteFile = File(AppContext.cacheDir, "${APP_VERSION_CODE}.md")
@@ -73,7 +85,15 @@ class InstallViewModel(svc: NetworkService) : BaseViewModel() {
                 _uiState.update { it.copy(showSecondSlotWarning = true) }
             }
             Method.DOWNLOAD -> {
-                _uiState.update { it.copy(showDownloadDialog = true) }
+                val job = candidateJob
+                if (job != null && job.isActive) {
+                    viewModelScope.launch {
+                        job.join()
+                        _uiState.update { it.copy(showDownloadDialog = true) }
+                    }
+                } else {
+                    _uiState.update { it.copy(showDownloadDialog = true) }
+                }
             }
             else -> {}
         }

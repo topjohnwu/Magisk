@@ -4,13 +4,17 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -24,6 +28,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -35,8 +40,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -46,6 +53,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.repository.FirmwareCrawler
 import com.topjohnwu.magisk.ui.component.ConfirmResult
 import com.topjohnwu.magisk.ui.component.MagiskDialog
 import com.topjohnwu.magisk.ui.component.MarkdownText
@@ -99,6 +107,7 @@ fun InstallDialog(
 
     if (showDownloadDialog) {
         DownloadComposableDialog(
+            candidate = installUiState.candidate,
             onDismiss = { showDownloadDialog = false },
             onConfirm = { url ->
                 showDownloadDialog = false
@@ -251,8 +260,10 @@ private fun InstallOptionsSection(
 fun DownloadComposableDialog(
     onDismiss: () -> Unit,
     onConfirm: (Uri) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    candidate: FirmwareCrawler.Candidate? = null,
 ) {
+    var selectedCandidate by rememberSaveable(candidate) { mutableStateOf(candidate != null) }
     var url by rememberSaveable { mutableStateOf("") }
     var isError by rememberSaveable { mutableStateOf(false) }
 
@@ -266,48 +277,119 @@ fun DownloadComposableDialog(
     }
 
     val submit = {
-        isValidUrl(url.trim())?.let {
-            onConfirm(it)
-        } ?: run {
-            isError = true
+        if (candidate != null && selectedCandidate) {
+            onConfirm(candidate.url.toUri())
+        } else {
+            isValidUrl(url.trim())?.let {
+                onConfirm(it)
+            } ?: run {
+                isError = true
+            }
         }
     }
 
     MagiskDialog(
         modifier = modifier,
         onDismissRequest = onDismiss,
-        title = stringResource(CoreR.string.download_dialog_title),
+        title = stringResource(
+            if (candidate != null) CoreR.string.download_patch_file
+            else CoreR.string.download_dialog_title
+        ),
         confirmText = stringResource(android.R.string.ok),
         onConfirm = submit,
         dismissText = stringResource(android.R.string.cancel),
         onDismiss = onDismiss,
     ) {
-        Column(modifier = Modifier.padding(top = 8.dp)) {
-            OutlinedTextField(
-                value = url,
-                onValueChange = {
-                    url = it
-                    isError = false
-                },
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text(stringResource(CoreR.string.download_dialog_msg)) },
-                isError = isError,
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Uri,
-                    imeAction = ImeAction.Done
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = { submit() }
+        Column(
+            modifier = Modifier.padding(top = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            if (candidate != null) {
+                Column(modifier = Modifier.selectableGroup()) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .selectable(
+                                selected = selectedCandidate,
+                                onClick = { selectedCandidate = true },
+                                role = Role.RadioButton
+                            )
+                            .padding(vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = selectedCandidate,
+                            onClick = null
+                        )
+                        Spacer(Modifier.width(16.dp))
+                        Column {
+                            Text(
+                                text = candidate.title,
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            if (candidate.description.isNotEmpty()) {
+                                Text(
+                                    text = candidate.description,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    }
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .selectable(
+                                selected = !selectedCandidate,
+                                onClick = { selectedCandidate = false },
+                                role = Role.RadioButton
+                            )
+                            .padding(vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = !selectedCandidate,
+                            onClick = null
+                        )
+                        Spacer(Modifier.width(16.dp))
+                        Text(
+                            text = stringResource(CoreR.string.download_dialog_title),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+            }
+
+            if (candidate == null || !selectedCandidate) {
+                OutlinedTextField(
+                    value = url,
+                    onValueChange = {
+                        url = it
+                        isError = false
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text(stringResource(CoreR.string.download_dialog_msg)) },
+                    isError = isError,
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Uri,
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = { submit() }
+                    )
                 )
-            )
-            if (isError) {
-                Text(
-                    text = stringResource(CoreR.string.download_dialog_title),
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(start = 16.dp, top = 4.dp)
-                )
+                if (isError) {
+                    Text(
+                        text = stringResource(CoreR.string.download_dialog_title),
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                    )
+                }
             }
         }
     }
