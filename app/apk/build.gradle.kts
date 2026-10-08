@@ -50,6 +50,7 @@ dependencies {
     implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.compose.material3)
     implementation(libs.compose.material3.adaptive.navigation.suite)
+    implementation(libs.window.core)
     implementation(libs.material)
 
     // Navigation3
