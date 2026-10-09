@@ -156,22 +156,9 @@
     <string name="settings_app_name_hint">Nový název</string>
     <string name="settings_app_name_helper">Název aplikace bude nahrazen tímto názvem</string>
     <string name="settings_app_name_error">Neplatný formát</string>
-    <string name="settings_su_app_adb">Aplikace a ADB</string>
-    <string name="settings_su_app">Pouze aplikace</string>
-    <string name="settings_su_adb">Pouze ADB</string>
-    <string name="settings_su_disable">Zakázat</string>
-
-
-
-
-
-
-    <string name="superuser_access">Přístup SuperUsera</string>
 
 
     <string name="superuser_notification">Oznámení SuperUsera</string>
-    <string name="settings_su_reauth_title">Opětovné ověření po aktualizaci</string>
-    <string name="settings_su_reauth_summary">Opětovné ověření oprávnění SuperUsera po aktualizaci aplikace</string>
 
 
     <string name="settings_su_auth_title">Ověření uživatele</string>

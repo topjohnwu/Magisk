@@ -19,7 +19,6 @@ object Config : PreferenceConfig, DBConfig {
 
     object Key {
         // db configs
-        const val ROOT_ACCESS = "root_access"
         const val SU_MULTIUSER_MODE = "multiuser_mode"
         const val SU_MNT_NS = "mnt_ns"
         const val SU_BIOMETRIC = "su_biometric"
@@ -30,7 +29,6 @@ object Config : PreferenceConfig, DBConfig {
 
         // prefs
         const val SU_NOTIFICATION = "su_notification"
-        const val SU_REAUTH = "su_reauth"
         const val SU_RESTRICT = "su_restrict"
         const val CHECK_UPDATES = "check_update"
         const val RELEASE_CHANNEL = "release_channel"
@@ -45,7 +43,7 @@ object Config : PreferenceConfig, DBConfig {
         const val DOH = "doh"
         const val RAND_NAME = "rand_name"
 
-        val NO_MIGRATION = setOf(ASKED_HOME, SU_REAUTH)
+        val NO_MIGRATION = setOf(ASKED_HOME)
     }
 
     object OldValue {
@@ -65,12 +63,6 @@ object Config : PreferenceConfig, DBConfig {
         const val BETA_CHANNEL = 1
         const val DEBUG_CHANNEL = 2
         const val CUSTOM_CHANNEL = 3
-
-        // root access mode
-        const val ROOT_ACCESS_DISABLED = 0
-        const val ROOT_ACCESS_APPS_ONLY = 1
-        const val ROOT_ACCESS_ADB_ONLY = 2
-        const val ROOT_ACCESS_APPS_AND_ADB = 3
 
         // su multiuser
         const val MULTIUSER_MODE_OWNER_ONLY = 0
@@ -132,7 +124,6 @@ object Config : PreferenceConfig, DBConfig {
     var suManager by dbStrings(Key.SU_MANAGER, "", true)
     var keyStoreRaw by dbStrings(Key.KEYSTORE, "", true)
     var suNotification by preferenceStrInt(Key.SU_NOTIFICATION, Value.NOTIFICATION_TOAST)
-    var rootMode by dbSettings(Key.ROOT_ACCESS, Value.ROOT_ACCESS_APPS_AND_ADB)
     var suMntNamespaceMode by dbSettings(Key.SU_MNT_NS, Value.NAMESPACE_MODE_REQUESTER)
     var suMultiuserMode by dbSettings(Key.SU_MULTIUSER_MODE, Value.MULTIUSER_MODE_OWNER_ONLY)
     private var suBiometric by dbSettings(Key.SU_BIOMETRIC, false)
@@ -141,7 +132,6 @@ object Config : PreferenceConfig, DBConfig {
         set(value) {
             suBiometric = value
         }
-    var suReAuth by preference(Key.SU_REAUTH, false)
     var suRestrict by preference(Key.SU_RESTRICT, false)
 
     private const val SU_FINGERPRINT = "su_fingerprint"

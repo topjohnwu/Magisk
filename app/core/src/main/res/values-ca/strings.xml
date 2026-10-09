@@ -134,22 +134,9 @@
     <string name="settings_app_name_hint">Nou nom</string>
     <string name="settings_app_name_helper">Es refarà l\'aplicació amb aquest nom</string>
     <string name="settings_app_name_error">Format invàlid</string>
-    <string name="settings_su_app_adb">Aplicacions i ADB</string>
-    <string name="settings_su_app">Només aplicacions</string>
-    <string name="settings_su_adb">Només ADB</string>
-    <string name="settings_su_disable">Deshabilitat</string>
-
-
-
-
-
-
-    <string name="superuser_access">Accés de superusuari</string>
 
 
     <string name="superuser_notification">Notificació de superusuari</string>
-    <string name="settings_su_reauth_title">Demanar després d\'una actualització</string>
-    <string name="settings_su_reauth_summary">Demanar permisos de superusuari novament si una aplicació és actualitzada o reinstal·lada</string>
 
 
     <string name="settings_customization">Personalització</string>

@@ -150,22 +150,9 @@
     <string name="settings_app_name_hint">Novo nome</string>
     <string name="settings_app_name_helper">O app do Magisk será reinstalado com este nome</string>
     <string name="settings_app_name_error">Formato inválido</string>
-    <string name="settings_su_app_adb">Apps e ADB</string>
-    <string name="settings_su_app">Apenas apps</string>
-    <string name="settings_su_adb">Apenas ADB</string>
-    <string name="settings_su_disable">Desativado</string>
-
-
-
-
-
-
-    <string name="superuser_access">Acesso de SuperUsuário</string>
 
 
     <string name="superuser_notification">Notificação de SuperUsuário</string>
-    <string name="settings_su_reauth_title">Reautenticar após atualização</string>
-    <string name="settings_su_reauth_summary">Solicite permissões de SuperUsuário novamente após atualizar os apps</string>
 
 
     <string name="settings_su_auth_title">Autenticação de usuário</string>

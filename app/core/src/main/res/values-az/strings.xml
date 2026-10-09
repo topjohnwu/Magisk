@@ -149,22 +149,9 @@
     <string name="settings_app_name_hint">Yeni Ad</string>
     <string name="settings_app_name_helper">Tətbiq bu adla yenidən paketlənəcək</string>
     <string name="settings_app_name_error">Keçərsiz Format</string>
-    <string name="settings_su_app_adb">Tətbiqlər və ADB</string>
-    <string name="settings_su_app">Yalmız Tətbiqlər</string>
-    <string name="settings_su_adb">Yalnız ADB</string>
-    <string name="settings_su_disable">Heç Biri</string>
-
-
-
-
-
-
-    <string name="superuser_access">Super istifadəçi İcazəsi</string>
 
 
     <string name="superuser_notification">Super İstifadəçi Bildirişi</string>
-    <string name="settings_su_reauth_title">Yüksəltdikdən sonra yenidən səlahiyətləndir</string>
-    <string name="settings_su_reauth_summary">Tətbiqləri yüksəltdikdən sonra Super İstifadəçi icazəsi istə</string>
 
 
     <string name="settings_customization">Özəlləşdirmə</string>

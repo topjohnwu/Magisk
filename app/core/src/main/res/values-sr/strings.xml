@@ -162,22 +162,9 @@
     <string name="settings_app_name_hint">Ново име</string>
     <string name="settings_app_name_helper">Апл. ће бити спакована под овим именом</string>
     <string name="settings_app_name_error">Невалидан формат</string>
-    <string name="settings_su_app_adb">Апликације и ADB</string>
-    <string name="settings_su_app">Само апликације</string>
-    <string name="settings_su_adb">Само ADB</string>
-    <string name="settings_su_disable">Онемогућено</string>
-
-
-
-
-
-
-    <string name="superuser_access">Приступ супер-корисника</string>
 
 
     <string name="superuser_notification">Нотификације супер-корисника</string>
-    <string name="settings_su_reauth_title">Поново одобри након ажурирања</string>
-    <string name="settings_su_reauth_summary">Поново тражи пермисије супер-корисника након ажурирања апликација</string>
 
 
     <string name="settings_su_auth_title">Аутентификација корисника</string>

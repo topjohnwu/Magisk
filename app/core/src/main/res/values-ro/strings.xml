@@ -151,22 +151,9 @@
     <string name="settings_app_name_hint">Nume nou</string>
     <string name="settings_app_name_helper">Aplicația va fi reîmpachetată cu acest nume</string>
     <string name="settings_app_name_error">Format nevalid</string>
-    <string name="settings_su_app_adb">Aplicații și ADB</string>
-    <string name="settings_su_app">Doar aplicații</string>
-    <string name="settings_su_adb">Doar ADB</string>
-    <string name="settings_su_disable">Dezactivat</string>
-
-
-
-
-
-
-    <string name="superuser_access">Acces pentru superutilizator</string>
 
 
     <string name="superuser_notification">Notificare de superutilizator</string>
-    <string name="settings_su_reauth_title">Reautentificare după actualizare</string>
-    <string name="settings_su_reauth_summary">Cere din nou permisiunile de superutilizator după actualizarea aplicațiilor</string>
 
 
     <string name="settings_su_auth_title">Autentificarea utilizatorului</string>

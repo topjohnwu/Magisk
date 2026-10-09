@@ -82,22 +82,8 @@
     <string name="settings_hosts_summary">Поддршка за несистемски хостови за Adblock апликации.</string>
     <string name="settings_hosts_toast">Додаден е модул за несистемски хостови</string>
 
-    <string name="settings_su_app_adb">Апликации и АДБ</string>
-    <string name="settings_su_app">Само апликации</string>
-    <string name="settings_su_adb">Само АДБ</string>
-    <string name="settings_su_disable">Оневозможено</string>
-
-
-
-
-
-
-    <string name="superuser_access">Пристап за супер-корисник</string>
-
 
     <string name="superuser_notification">Супер-корисник известување</string>
-    <string name="settings_su_reauth_title">Повторна автентикација по надградба</string>
-    <string name="settings_su_reauth_summary">Повторна автентикација за супер-корисник дозвола по надградбата на апликацијата</string>
 
     <string name="multiuser_mode">Режим на повеќе корисници</string>
     <string name="settings_owner_only">Само сопственикот на уредот</string>

@@ -142,22 +142,9 @@
     <string name="settings_app_name_hint">Nome nuevu</string>
     <string name="settings_app_name_helper">L\'aplicación va volver empaquetase con esti nome</string>
     <string name="settings_app_name_error">El formatu nun ye válidu</string>
-    <string name="settings_su_app_adb">Aplicaciones y ADB</string>
-    <string name="settings_su_app">Namás aplicaciones</string>
-    <string name="settings_su_adb">Namás ADB</string>
-    <string name="settings_su_disable">Non</string>
-
-
-
-
-
-
-    <string name="superuser_access">Accesu de superusuariu</string>
 
 
     <string name="superuser_notification">Avisu de superusuariu</string>
-    <string name="settings_su_reauth_title">Volver autenticar dempués d\'anovar</string>
-    <string name="settings_su_reauth_summary">Vuelve pidir los permisos de superusuariu dempués d\'anovar les aplicaciones</string>
 
 
     <string name="settings_su_auth_title">Autenticación d\'usuariu</string>

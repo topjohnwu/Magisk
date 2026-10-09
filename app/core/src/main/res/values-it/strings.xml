@@ -161,22 +161,9 @@
     <string name="settings_app_name_hint">Nuovo nome</string>
     <string name="settings_app_name_helper">L\'app sarà ricreata con questo nome</string>
     <string name="settings_app_name_error">Formato non valido</string>
-    <string name="settings_su_app_adb">App e ADB</string>
-    <string name="settings_su_app">Solo app</string>
-    <string name="settings_su_adb">Solo ADB</string>
-    <string name="settings_su_disable">Disabilitato</string>
-
-
-
-
-
-
-    <string name="superuser_access">Accesso root</string>
 
 
     <string name="superuser_notification">Notifica di accesso root</string>
-    <string name="settings_su_reauth_title">Riautentica dopo aggiornamento</string>
-    <string name="settings_su_reauth_summary">Richiedi nuovamente i permessi di root dopo l\'aggiornamento di un\'app</string>
 
 
     <string name="settings_su_auth_title">Autenticazione utente</string>

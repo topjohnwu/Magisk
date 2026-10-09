@@ -159,14 +159,7 @@
     <string name="settings_app_name_hint">New name</string>
     <string name="settings_app_name_helper">App will be repackaged with this name</string>
     <string name="settings_app_name_error">Invalid format</string>
-    <string name="settings_su_app_adb">Apps and ADB</string>
-    <string name="settings_su_app">Apps only</string>
-    <string name="settings_su_adb">ADB only</string>
-    <string name="settings_su_disable">Disabled</string>
-    <string name="superuser_access">Superuser access</string>
     <string name="superuser_notification">Superuser notification</string>
-    <string name="settings_su_reauth_title">Reauthenticate after upgrade</string>
-    <string name="settings_su_reauth_summary">Ask for Superuser permissions again after upgrading apps</string>
     <string name="settings_su_auth_title">User authentication</string>
     <string name="settings_su_auth_summary">Ask for user authentication during Superuser requests</string>
     <string name="settings_su_auth_insecure">No authentication method is configured on the device</string>

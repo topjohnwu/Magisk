@@ -145,22 +145,9 @@
     <string name="settings_app_name_hint">アプリ名</string>
     <string name="settings_app_name_helper">プロキシアプリはこのアプリ名でインストールされます</string>
     <string name="settings_app_name_error">不正な形式</string>
-    <string name="settings_su_app_adb">アプリと ADB</string>
-    <string name="settings_su_app">アプリのみ</string>
-    <string name="settings_su_adb">ADB のみ</string>
-    <string name="settings_su_disable">無効</string>
-
-
-
-
-
-
-    <string name="superuser_access">スーパーユーザー権限を使用できるプログラム</string>
 
 
     <string name="superuser_notification">スーパーユーザー通知</string>
-    <string name="settings_su_reauth_title">アップグレード後の再認証</string>
-    <string name="settings_su_reauth_summary">アプリのアップグレード後にスーパーユーザー権限を再認証します</string>
 
 
     <string name="settings_su_auth_title">ユーザー認証</string>

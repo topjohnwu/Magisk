@@ -150,22 +150,9 @@
     <string name="settings_app_name_hint">Neuer Name</string>
     <string name="settings_app_name_helper">App wird unter diesem Namen neu gepackt</string>
     <string name="settings_app_name_error">Ungültiges Format</string>
-    <string name="settings_su_app_adb">Apps und ADB</string>
-    <string name="settings_su_app">Nur Apps</string>
-    <string name="settings_su_adb">Nur ADB</string>
-    <string name="settings_su_disable">Deaktiviert</string>
-
-
-
-
-
-
-    <string name="superuser_access">Superuser-Zugriff</string>
 
 
     <string name="superuser_notification">Superuser-Benachrichtigung</string>
-    <string name="settings_su_reauth_title">Nach Aktualisierung erneut zertifizieren</string>
-    <string name="settings_su_reauth_summary">Superuser-Berechtigungen nach App-Aktualisierung erneut authentifizieren</string>
 
 
     <string name="settings_su_auth_title">Benutzerauthentifizierung</string>

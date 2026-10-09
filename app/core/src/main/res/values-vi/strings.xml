@@ -145,22 +145,9 @@
     <string name="settings_app_name_hint">Tên mới</string>
     <string name="settings_app_name_helper">Ứng dụng sẽ được đóng gói lại với tên này</string>
     <string name="settings_app_name_error">Định dạng không hợp lệ</string>
-    <string name="settings_su_app_adb">Ứng dụng và ADB</string>
-    <string name="settings_su_app">Chỉ ứng dụng</string>
-    <string name="settings_su_adb">Chỉ ADB</string>
-    <string name="settings_su_disable">Vô hiệu hóa</string>
-
-
-
-
-
-
-    <string name="superuser_access">Quyền truy cập Superuser</string>
 
 
     <string name="superuser_notification">Thông báo của Superuser</string>
-    <string name="settings_su_reauth_title">Xác thực lại sau khi nâng cấp</string>
-    <string name="settings_su_reauth_summary">Xác thực lại quyền Superuser sau khi nâng cấp ứng dụng</string>
 
 
     <string name="settings_customization">Tùy biến</string>

@@ -85,7 +85,6 @@ pub mod ffi {
     }
 
     enum DbEntryKey {
-        RootAccess,
         SuMultiuserMode,
         SuMntNs,
         DenylistConfig,

@@ -141,22 +141,9 @@
     <string name="settings_app_name_hint">نیا نام</string>
     <string name="settings_app_name_helper">ایپ کو اس نام سے دوبارہ پیک کیا جائے گا</string>
     <string name="settings_app_name_error">غلط فارمیٹ</string>
-    <string name="settings_su_app_adb">ایپس اور ADB</string>
-    <string name="settings_su_app">صرف ایپس</string>
-    <string name="settings_su_adb">صرف ADB</string>
-    <string name="settings_su_disable">غیر فعال</string>
-
-
-
-
-
-
-    <string name="superuser_access">سپر یوزر تک رسائی</string>
 
 
     <string name="superuser_notification">سپر یوزر اطلاع</string>
-    <string name="settings_su_reauth_title">اپ گریڈ کے بعد دوبارہ تصدیق کریں</string>
-    <string name="settings_su_reauth_summary">ایپس کو اپ گریڈ کرنے کے بعد دوبارہ سپر یوزر کی اجازتیں مانگیں</string>
 
 
     <string name="settings_su_auth_title">صارف کی تصدیق</string>

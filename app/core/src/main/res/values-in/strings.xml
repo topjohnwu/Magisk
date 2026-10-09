@@ -158,14 +158,7 @@
     <string name="settings_app_name_hint">Nama baru</string>
     <string name="settings_app_name_helper">Aplikasi akan dikemas ulang dengan nama tersebut</string>
     <string name="settings_app_name_error">Format tidak valid</string>
-    <string name="settings_su_app_adb">Aplikasi dan ADB</string>
-    <string name="settings_su_app">Hanya Aplikasi</string>
-    <string name="settings_su_adb">Hanya ADB</string>
-    <string name="settings_su_disable">Nonaktif</string>
-    <string name="superuser_access">Akses superuser</string>
     <string name="superuser_notification">Notifikasi superuser</string>
-    <string name="settings_su_reauth_title">Otentikasikan ulang setelah pembaruan</string>
-    <string name="settings_su_reauth_summary">Minta izin akses superuser lagi setelah memperbarui aplikasi</string>
     <string name="settings_su_auth_title">Otentikasi pengguna</string>
     <string name="settings_su_auth_summary">Minta otentikasi pengguna selama permintaan superuser</string>
     <string name="settings_su_auth_insecure">Tidak ada metode otentikasi yang dikonfigurasi pada perangkat</string>

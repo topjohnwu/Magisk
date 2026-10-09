@@ -151,22 +151,9 @@
     <string name="settings_app_name_hint">Жаңа атау</string>
     <string name="settings_app_name_helper">Қолданбаның қайта құрылған нұсқасы осы атауға ие болады</string>
     <string name="settings_app_name_error">Жарамсыз пішім</string>
-    <string name="settings_su_app_adb">Қолданбалар мен ADB</string>
-    <string name="settings_su_app">Қолданбалар ғана</string>
-    <string name="settings_su_adb">ADB ғана</string>
-    <string name="settings_su_disable">Сөндірулі</string>
-
-
-
-
-
-
-    <string name="superuser_access">Superuser құқығына рұқсат</string>
 
 
     <string name="superuser_notification">Superuser мәлімдемесі</string>
-    <string name="settings_su_reauth_title">Жаңартудан кейін қайта растау</string>
-    <string name="settings_su_reauth_summary">Әлдебір қолданба жаңартылғаннан кейін оның Superuser құқығын қайта растау</string>
 
 
     <string name="settings_su_auth_title">Қолданушыны растау</string>

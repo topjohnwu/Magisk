@@ -145,22 +145,9 @@
     <string name="settings_app_name_hint">Νέο όνομα</string>
     <string name="settings_app_name_helper">Η εφαρμογή θα επανασυσκευαστεί με αυτό το όνομα</string>
     <string name="settings_app_name_error">Μη έγκυρη μορφή</string>
-    <string name="settings_su_app_adb">Εφαρμογές και ADB</string>
-    <string name="settings_su_app">Εφαρμογές μόνο</string>
-    <string name="settings_su_adb">ADB μόνο</string>
-    <string name="settings_su_disable">Απενεργοποιημένο</string>
-
-
-
-
-
-
-    <string name="superuser_access">Πρόσβαση Υπερχρήστη</string>
 
 
     <string name="superuser_notification">Ειδοποίηση Υπερχρήστη</string>
-    <string name="settings_su_reauth_title">Επαναπιστοποίηση μετά από αναβάθμιση</string>
-    <string name="settings_su_reauth_summary">Επαναπιστοποίηση αδειών υπερχρήστη μετά την αναβάθμιση μίας εφαρμογής</string>
 
 
     <string name="settings_customization">Προσαρμογή</string>

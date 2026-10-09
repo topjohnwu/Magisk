@@ -147,22 +147,9 @@
     <string name="settings_app_name_hint">Naujas pavadinimas</string>
     <string name="settings_app_name_helper">Programėlė bus perpakuota su šiuo pavadinimu</string>
     <string name="settings_app_name_error">Netinkamas formatas</string>
-    <string name="settings_su_app_adb">Programėlės ir ADB</string>
-    <string name="settings_su_app">Tik programėlės</string>
-    <string name="settings_su_adb">Tik ADB</string>
-    <string name="settings_su_disable">Išjungta</string>
-
-
-
-
-
-
-    <string name="superuser_access">Prieigos lygis</string>
 
 
     <string name="superuser_notification">Supernaudotojo pranešimas</string>
-    <string name="settings_su_reauth_title">Pakartotinis autentifikavimas</string>
-    <string name="settings_su_reauth_summary">Iš naujo prašyti supernaudotojo teisių po programėlių naujinimo</string>
 
 
     <string name="settings_customization">Tinkinimas</string>

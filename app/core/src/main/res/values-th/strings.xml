@@ -75,22 +75,8 @@
     <string name="settings_hosts_summary">การรองรับ Systemless hosts เพื่อแอพ Adblock ต่างๆ</string>
     <string name="settings_hosts_toast">ทำการเพิ่มโมดูล systemless hosts แล้ว</string>
 
-    <string name="settings_su_app_adb">แอปและ ADB</string>
-    <string name="settings_su_app">แอปเท่านั้น</string>
-    <string name="settings_su_adb">ADB เท่านั้น</string>
-    <string name="settings_su_disable">ปิด</string>
-
-
-
-
-
-
-    <string name="superuser_access">การเข้าถึง Superuser</string>
-
 
     <string name="superuser_notification">การแจ้งเตือน Superuser</string>
-    <string name="settings_su_reauth_title">ขอสิทธิ์ใหม่หลังจากอัปเกรด</string>
-    <string name="settings_su_reauth_summary">ขอสิทธิ์ superuser ใหม่หลังจากแอปถูกอัปเกรด</string>
 
     <string name="multiuser_mode">โหมดผู้ใช้หลายคน</string>
     <string name="settings_owner_only">เจ้าของอุปกรณ์เท่านั้น</string>

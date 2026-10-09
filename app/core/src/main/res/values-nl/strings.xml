@@ -125,22 +125,9 @@
     <string name="settings_app_name_hint">Nieuwe naam</string>
     <string name="settings_app_name_helper">De app wordt opnieuw ingepakt onder deze naam</string>
     <string name="settings_app_name_error">Onjuiste opmaak</string>
-    <string name="settings_su_app_adb">Apps en ADB</string>
-    <string name="settings_su_app">Alleen apps</string>
-    <string name="settings_su_adb">Alleen ADB</string>
-    <string name="settings_su_disable">Uitgeschakeld</string>
-
-
-
-
-
-
-    <string name="superuser_access">Superusertoegang</string>
 
 
     <string name="superuser_notification">Superusermelding</string>
-    <string name="settings_su_reauth_title">Opnieuw goedkeuren na update</string>
-    <string name="settings_su_reauth_summary">Superuserrechten opnieuw goedkeuren na app-updates.</string>
     <string name="settings_customization">Aanpassingen</string>
 
     <string name="multiuser_mode">Meerdere gebruikers</string>

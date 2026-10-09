@@ -144,22 +144,9 @@
     <string name="settings_app_name_hint">নতুন নাম</string>
     <string name="settings_app_name_helper">অ্যাপটি এই নামের সাথে পুনরায় প্যাকেজ করা হবে</string>
     <string name="settings_app_name_error">ভুল ফরম্যাট</string>
-    <string name="settings_su_app_adb">অ্যাপস এবং এডিবি</string>
-    <string name="settings_su_app">শুধুমাত্র অ্যাপস</string>
-    <string name="settings_su_adb">শুধুমাত্র এডিবি</string>
-    <string name="settings_su_disable">অক্ষম</string>
-
-
-
-
-
-
-    <string name="superuser_access">সুপার ইউজার অ্যাক্সেস</string>
 
 
     <string name="superuser_notification">সুপার ইউজার বিজ্ঞপ্তি</string>
-    <string name="settings_su_reauth_title">আপগ্রেড করার পরে পুনরায় প্রমাণীকরণ করুন</string>
-    <string name="settings_su_reauth_summary">অ্যাপগুলি আপগ্রেড করার পরে আবার সুপার ইউজার অনুমতির জন্য জিজ্ঞাসা করুন</string>
 
 
     <string name="settings_customization">কাস্টমাইজেশন</string>

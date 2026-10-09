@@ -143,22 +143,9 @@
     <string name="settings_app_name_hint">Uus nimi</string>
     <string name="settings_app_name_helper">Rakendus taaspakitakse selle nimega</string>
     <string name="settings_app_name_error">Sobimatu vorming</string>
-    <string name="settings_su_app_adb">Rakendused ja ADB</string>
-    <string name="settings_su_app">Ainult rakendused</string>
-    <string name="settings_su_adb">Ainult ADB</string>
-    <string name="settings_su_disable">Keelatud</string>
-
-
-
-
-
-
-    <string name="superuser_access">Superkasutaja ligipääs</string>
 
 
     <string name="superuser_notification">Superkasutaja teavitus</string>
-    <string name="settings_su_reauth_title">Taas-autendi peale uuendust</string>
-    <string name="settings_su_reauth_summary">Pärast rakenduste uuendamist küsi superkasutaja luba uuesti</string>
 
 
     <string name="settings_customization">Kohandamine</string>

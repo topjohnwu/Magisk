@@ -145,22 +145,9 @@
     <string name="settings_app_name_hint">Új név</string>
     <string name="settings_app_name_helper">Az alkalmazás ezzel a névvel lesz újracsomagolva</string>
     <string name="settings_app_name_error">Érvénytelen formátum</string>
-    <string name="settings_su_app_adb">Appok és ADB</string>
-    <string name="settings_su_app">Csak Appok</string>
-    <string name="settings_su_adb">Csak ADB</string>
-    <string name="settings_su_disable">Kikapcsolva</string>
-
-
-
-
-
-
-    <string name="superuser_access">Superuser hozzáférés</string>
 
 
     <string name="superuser_notification">Superuser értesítés</string>
-    <string name="settings_su_reauth_title">Frissítés után hitelesítse újra</string>
-    <string name="settings_su_reauth_summary">Az appok frissítés után kérjenek ismét Superuser engedélyeket</string>
 
 
     <string name="settings_customization">Testreszabás</string>

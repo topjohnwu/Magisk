@@ -145,22 +145,9 @@
     <string name="settings_app_name_hint">नया नाम</string>
     <string name="settings_app_name_helper">इस नाम से ऐप को फिर से इंस्टॉल किया जाएगा</string>
     <string name="settings_app_name_error">अवैध प्रारूप</string>
-    <string name="settings_su_app_adb">ऐप्स और एडीबी</string>
-    <string name="settings_su_app">केवल ऐप्स</string>
-    <string name="settings_su_adb">केवल एडीबी</string>
-    <string name="settings_su_disable">बंद है</string>
-
-
-
-
-
-
-    <string name="superuser_access">सुपरयूज़र एक्सेस</string>
 
 
     <string name="superuser_notification">सुपरयूज़र सूचना</string>
-    <string name="settings_su_reauth_title">अपग्रेड के बाद प्रमाणीकरण</string>
-    <string name="settings_su_reauth_summary">एक ऐप अपडेट होने के बाद सुपरयूज़र अनुमति प्रमाणित करें</string>
 
 
     <string name="settings_customization">कस्टमाईजेशन</string>

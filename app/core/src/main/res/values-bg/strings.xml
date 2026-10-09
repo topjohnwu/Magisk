@@ -147,22 +147,9 @@
     <string name="settings_app_name_hint">Ново име</string>
     <string name="settings_app_name_helper">Приложението ще бъде пакетирано с това име</string>
     <string name="settings_app_name_error">Форматът е недействителен</string>
-    <string name="settings_su_app_adb">Приложения и ADB</string>
-    <string name="settings_su_app">Само приложения</string>
-    <string name="settings_su_adb">Само ADB</string>
-    <string name="settings_su_disable">Изключен</string>
-
-
-
-
-
-
-    <string name="superuser_access">Достъп до суперпотребителя</string>
 
 
     <string name="superuser_notification">Известие за суперпотребителя</string>
-    <string name="settings_su_reauth_title">Повторно запитване след обновяване</string>
-    <string name="settings_su_reauth_summary">Повторно запитване за достъп до правата на суперпотребителя след обновяване на приложения</string>
 
 
     <string name="settings_customization">Приспособяване</string>

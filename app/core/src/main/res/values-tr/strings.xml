@@ -156,22 +156,9 @@
     <string name="settings_app_name_hint">Yeni isim</string>
     <string name="settings_app_name_helper">Uygulama bu isimle yeniden paketlenecek</string>
     <string name="settings_app_name_error">Geçersiz biçim</string>
-    <string name="settings_su_app_adb">Uygulamalar ve ADB</string>
-    <string name="settings_su_app">Sadece uygulamalar</string>
-    <string name="settings_su_adb">Sadece ADB</string>
-    <string name="settings_su_disable">Devre Dışı</string>
-
-
-
-
-
-
-    <string name="superuser_access">Süper Kullanıcı erişimi</string>
 
 
     <string name="superuser_notification">Süper Kullanıcı bildirimi</string>
-    <string name="settings_su_reauth_title">Yükseltmeden sonra yeniden kimlik doğrula</string>
-    <string name="settings_su_reauth_summary">Uygulamaları yükselttikten sonra Süper Kullanıcı izinlerini tekrar sor</string>
 
 
     <string name="settings_su_auth_title">Kullanıcı kimlik doğrulaması</string>

@@ -429,25 +429,6 @@ private fun SuperuserSection(
             color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
         )
 
-        // Access Mode
-        val accessEntries = remember {
-            resources.getStringArray(CoreR.array.su_access).toList()
-        }
-        var accessMode by remember { mutableIntStateOf(Config.rootMode) }
-        SettingsDropdown(
-            title = stringResource(CoreR.string.superuser_access),
-            items = accessEntries,
-            selectedIndex = accessMode,
-            onSelectedIndexChange = {
-                accessMode = it
-                Config.rootMode = it
-            }
-        )
-
-        HorizontalDivider(
-            modifier = Modifier.padding(horizontal = 16.dp),
-            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
-        )
 
         if (!Info.isHeadlessSystemUser) {
             // Multiuser Mode
@@ -515,23 +496,6 @@ private fun SuperuserSection(
             }
         )
 
-        // Reauthenticate (SDK < O)
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            HorizontalDivider(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
-            )
-            var reAuth by remember { mutableStateOf(Config.suReAuth) }
-            SettingsSwitch(
-                title = stringResource(CoreR.string.settings_su_reauth_title),
-                summary = stringResource(CoreR.string.settings_su_reauth_summary),
-                checked = reAuth,
-                onCheckedChange = {
-                    reAuth = it
-                    Config.suReAuth = it
-                }
-            )
-        }
 
         // Restrict (version >= 30.1)
         if (Const.Version.atLeast_30_1()) {

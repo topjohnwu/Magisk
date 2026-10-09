@@ -126,22 +126,9 @@
     <string name="settings_app_name_hint">Novi naziv</string>
     <string name="settings_app_name_helper">Aplikacija će se prepakirati na ovaj naziv</string>
     <string name="settings_app_name_error">Nevažeći format</string>
-    <string name="settings_su_app_adb">Aplikacije i ADB</string>
-    <string name="settings_su_app">Samo aplikacije</string>
-    <string name="settings_su_adb">Samo ADB</string>
-    <string name="settings_su_disable">Onemogućeno</string>
-
-
-
-
-
-
-    <string name="superuser_access">Superuser pristup</string>
 
 
     <string name="superuser_notification">Superuser obavijest</string>
-    <string name="settings_su_reauth_title">Ponovno provjerite autentičnost nakon ažuriranja</string>
-    <string name="settings_su_reauth_summary">Ponovno provjerite autentičnost Superuser-a dopuštenja nakon ažuriranja aplikacije</string>
     <string name="settings_customization">Prilagodba</string>
     <string name="setting_add_shortcut_summary">Dodajte lijepi prečac na početni zaslon u slučaju da je naziv i ikonu teško prepoznati nakon skrivanja aplikacije</string>
     <string name="settings_doh_title">DNS preko HTTPS-a</string>

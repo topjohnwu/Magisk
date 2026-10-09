@@ -134,22 +134,9 @@
     <string name="settings_app_name_hint">Nytt navn</string>
     <string name="settings_app_name_helper">Programmet vil bli ompakket til dette navnet</string>
     <string name="settings_app_name_error">Ugyldig format</string>
-    <string name="settings_su_app_adb">Programmer og ADB</string>
-    <string name="settings_su_app">Kun programmer</string>
-    <string name="settings_su_adb">Kun ADB</string>
-    <string name="settings_su_disable">Avskrudd</string>
-
-
-
-
-
-
-    <string name="superuser_access">Superbruker-tilgang</string>
 
 
     <string name="superuser_notification">Superbruker-merknad</string>
-    <string name="settings_su_reauth_title">Ny identitetsbekreftelse etter oppgradering</string>
-    <string name="settings_su_reauth_summary">Identitetsbekreft superbrukertilganger etter programoppgraderinger</string>
 
 
     <string name="settings_customization">Tilpasning</string>

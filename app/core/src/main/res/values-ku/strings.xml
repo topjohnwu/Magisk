@@ -152,22 +152,9 @@
     <string name="settings_app_name_hint">ناوی نوێ</string>
     <string name="settings_app_name_helper">ئەپەکە بەم ناوەوە دروست دەکرێتەوە</string>
     <string name="settings_app_name_error">هەڵەیە</string>
-    <string name="settings_su_app_adb">ئەپەکان و ADB</string>
-    <string name="settings_su_app">تەنها ئەپەکان</string>
-    <string name="settings_su_adb">ADB تەنها</string>
-    <string name="settings_su_disable">ناچالاک کراوە</string>
-
-
-
-
-
-
-    <string name="superuser_access">دەسەڵاتی سوپەریوسەر</string>
 
 
     <string name="superuser_notification">ئاگەدارییەکانی سوپەریوسەر</string>
-    <string name="settings_su_reauth_title">پرسیاربکەوە دوای هەر نوێکردنەوەیەک</string>
-    <string name="settings_su_reauth_summary">دوای نوێکردنەوەی ئەپەکان دووبارە پرسیار بکەوە بۆ دەسەڵاتی سوپەریوسەر</string>
 
 
     <string name="settings_su_auth_title">دڵنیاکردنەوەی کەسی</string>

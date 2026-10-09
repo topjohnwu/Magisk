@@ -150,22 +150,9 @@
     <string name="settings_app_name_hint">שם חדש</string>
     <string name="settings_app_name_helper">היישום יארז מחדש בשם זה</string>
     <string name="settings_app_name_error">פורמט לא חוקי</string>
-    <string name="settings_su_app_adb">יישומים ו-ADB</string>
-    <string name="settings_su_app">יישומים בלבד</string>
-    <string name="settings_su_adb">ADB בלבד</string>
-    <string name="settings_su_disable">מושבת</string>
-
-
-
-
-
-
-    <string name="superuser_access">גישת משתמש על</string>
 
 
     <string name="superuser_notification">התראות משתמש על</string>
-    <string name="settings_su_reauth_title">אימות מחדש לאחר שדרוג</string>
-    <string name="settings_su_reauth_summary">אימות מחדש הרשאות של משתמש על לאחר שדרוג יישום</string>
 
 
     <string name="settings_su_auth_title">אימות משתמש</string>

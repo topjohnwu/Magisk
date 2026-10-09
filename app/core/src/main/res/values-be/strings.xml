@@ -124,22 +124,9 @@
     <string name="settings_app_name_hint">Новая назва</string>
     <string name="settings_app_name_helper">Праграма будзе перапакаваная з гэтай назвай</string>
     <string name="settings_app_name_error">Хібны фармат</string>
-    <string name="settings_su_app_adb">Праграмы і ADB</string>
-    <string name="settings_su_app">Толькі праграмы</string>
-    <string name="settings_su_adb">Толькі ADB</string>
-    <string name="settings_su_disable">Адключана</string>
-
-
-
-
-
-
-    <string name="superuser_access">Доступ суперкарыстальніка</string>
 
 
     <string name="superuser_notification">Апавяшчэнне суперкарыстальніка</string>
-    <string name="settings_su_reauth_title">Паўторная аўтэнтыфікацыя пасля абнаўлення</string>
-    <string name="settings_su_reauth_summary">Паўторна запытваць правы суперкарыстальніка пасля абнаўлення праграмы</string>
 
 
     <string name="settings_customization">Персаналізацыя</string>

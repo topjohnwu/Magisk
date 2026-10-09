@@ -134,22 +134,9 @@
     <string name="settings_app_name_hint">ახალი სახელი</string>
     <string name="settings_app_name_helper">პროგრამას ეს პაკეტის სახელი ექნება</string>
     <string name="settings_app_name_error">არასწორი ფორმატი</string>
-    <string name="settings_su_app_adb">აპები და ADB</string>
-    <string name="settings_su_app">მხოლოდ აპები</string>
-    <string name="settings_su_adb">მხოლოდ ADB</string>
-    <string name="settings_su_disable">გამორთულია</string>
-
-
-
-
-
-
-    <string name="superuser_access">სუპერმომხმარებელთან წვდომა</string>
 
 
     <string name="superuser_notification">სუპერმომხმარებლის შეტყობინება</string>
-    <string name="settings_su_reauth_title">რეაუტენთიფიკაცია განახლების შემდეგ</string>
-    <string name="settings_su_reauth_summary">სუპერმომხმარებლის ნებართვის რეაუტენთიფიკაცია აპის განახლების შემდეგ</string>
      <!-- TODO: tapjacking has no direct translation; must make something up later -->
 
     <string name="settings_customization">პერსონალიზაცია</string>

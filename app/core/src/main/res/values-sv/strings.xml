@@ -133,22 +133,9 @@
     <string name="settings_app_name_hint">Nytt namn</string>
     <string name="settings_app_name_helper">Appen kommer att pacakas om till detta namn</string>
     <string name="settings_app_name_error">Ogiltigt format</string>
-    <string name="settings_su_app_adb">Appar och ADB</string>
-    <string name="settings_su_app">Bara Appar</string>
-    <string name="settings_su_adb">Bara ADB</string>
-    <string name="settings_su_disable">Inaktiverad</string>
-
-
-
-
-
-
-    <string name="superuser_access">Superuser-tillgång</string>
 
 
     <string name="superuser_notification">Superuser-avisering</string>
-    <string name="settings_su_reauth_title">Återautentisera efter uppdatering</string>
-    <string name="settings_su_reauth_summary">Återautentisera superuser-rättigheter efter en applikationsuppdatering</string>
 
 
     <string name="settings_customization">Anpassning</string>

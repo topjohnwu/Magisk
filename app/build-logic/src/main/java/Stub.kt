@@ -118,7 +118,6 @@ private abstract class ManifestUpdater: DefaultTask() {
             |        <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             |    </intent-filter>
             |    <intent-filter>
-            |        <action android:name="android.intent.action.PACKAGE_REPLACED" />
             |        <action android:name="android.intent.action.PACKAGE_FULLY_REMOVED" />
             |
             |        <data android:scheme="package" />

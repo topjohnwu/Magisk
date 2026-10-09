@@ -45,11 +45,7 @@ open class Receiver : BaseReceiver() {
                         DownloadEngine.start(context, it)
                     }
             }
-            Intent.ACTION_PACKAGE_REPLACED -> {
-                // This will only work pre-O
-                if (Config.suReAuth)
-                    getUid(intent)?.let { rmPolicy(it) }
-            }
+
             Intent.ACTION_UID_REMOVED -> {
                 getUid(intent)?.let { rmPolicy(it) }
             }

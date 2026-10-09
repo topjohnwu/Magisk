@@ -41,7 +41,6 @@ use std::time::Duration;
 pub static MAGISKD: OnceLock<MagiskD> = OnceLock::new();
 
 pub const AID_ROOT: i32 = 0;
-pub const AID_SHELL: i32 = 2000;
 pub const AID_APP_START: i32 = 10000;
 pub const AID_APP_END: i32 = 19999;
 pub const AID_USER_OFFSET: i32 = 100000;

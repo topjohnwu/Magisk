@@ -145,22 +145,9 @@
     <string name="settings_app_name_hint">പുതിയ പേര്</string>
     <string name="settings_app_name_helper">ആപ്പ് ഈ പേരിൽ വീണ്ടും പാക്ക് ചെയ്യും</string>
     <string name="settings_app_name_error">അസാധുവായ ഫോർമാറ്റ്</string>
-    <string name="settings_su_app_adb">ആപ്പുകളും ADB</string>
-    <string name="settings_su_app">ആപ്പുകൾ മാത്രം</string>
-    <string name="settings_su_adb">ADB മാത്രം</string>
-    <string name="settings_su_disable">അപ്രാപ്തമാക്കി</string>
-
-
-
-
-
-
-    <string name="superuser_access">സൂപ്പർയൂസർ ആക്സസ്</string>
 
 
     <string name="superuser_notification">സൂപ്പർയൂസർ അറിയിപ്പ്</string>
-    <string name="settings_su_reauth_title">അപ്‌ഗ്രേഡിന് ശേഷം വീണ്ടും പ്രാമാണീകരിക്കുക</string>
-    <string name="settings_su_reauth_summary">ആപ്പുകൾ അപ്‌ഗ്രേഡ് ചെയ്‌തതിന് ശേഷം സൂപ്പർയൂസർ അനുമതികൾക്കായി വീണ്ടും ആവശ്യപ്പെടുക</string>
 
 
     <string name="settings_customization">കസ്റ്റമയിസേഷൻ</string>

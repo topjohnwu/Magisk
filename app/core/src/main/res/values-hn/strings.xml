@@ -150,22 +150,9 @@
     <string name="settings_app_name_hint">Naya naam</string>
     <string name="settings_app_name_helper">App is naam ke saath repack hoga</string>
     <string name="settings_app_name_error">Naam ka format galat hai</string>
-    <string name="settings_su_app_adb">Apps aur ADB</string>
-    <string name="settings_su_app">Sirf apps</string>
-    <string name="settings_su_adb">Sirf ADB</string>
-    <string name="settings_su_disable">Disable kiya gaya</string>
-
-
-
-
-
-
-    <string name="superuser_access">ROOT access</string>
 
 
     <string name="superuser_notification">ROOT notification</string>
-    <string name="settings_su_reauth_title">Upgrade ke baad dobara permission puchho</string>
-    <string name="settings_su_reauth_summary">App upgrade hone ke baad Superuser permission firse maangna</string>
 
 
     <string name="settings_su_auth_title">User authentication</string>

@@ -150,22 +150,9 @@
     <string name="settings_app_name_hint">Nowa nazwa</string>
     <string name="settings_app_name_helper">Aplikacja zostanie przepakowana z tą nazwą</string>
     <string name="settings_app_name_error">Nieprawidłowy format</string>
-    <string name="settings_su_app_adb">Aplikacje i ADB</string>
-    <string name="settings_su_app">Tylko aplikacje</string>
-    <string name="settings_su_adb">Tylko ADB</string>
-    <string name="settings_su_disable">Wyłączone</string>
-
-
-
-
-
-
-    <string name="superuser_access">Dostęp do Superusera</string>
 
 
     <string name="superuser_notification">Powiadomienia Superusera</string>
-    <string name="settings_su_reauth_title">Ponowienie uwierzytelniania po aktualizacji</string>
-    <string name="settings_su_reauth_summary">Zapytaj ponownie o uprawnienia Superusera po uaktualnieniu aplikacji</string>
 
 
     <string name="settings_su_auth_title">Uwierzytelnianie użytkownika</string>

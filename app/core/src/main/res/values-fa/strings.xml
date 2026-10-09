@@ -150,22 +150,9 @@
     <string name="settings_app_name_hint">اسم جدید</string>
     <string name="settings_app_name_helper">برنامه به این نام تغییر خواهد کرد</string>
     <string name="settings_app_name_error">فرمت نامعتبر</string>
-    <string name="settings_su_app_adb">برنامه ها و ADB</string>
-    <string name="settings_su_app">فقط برنامه ها</string>
-    <string name="settings_su_adb">ADB فقط</string>
-    <string name="settings_su_disable">غییرفعال شده</string>
-
-
-
-
-
-
-    <string name="superuser_access">دسترسی روت</string>
 
 
     <string name="superuser_notification">اعلان روت</string>
-    <string name="settings_su_reauth_title">احراز هویت دوباره پس از بروز رسانی</string>
-    <string name="settings_su_reauth_summary">تأیید کردندوباره مجوزهای روت پس از ارتقاء برنامه</string>
 
 
     <string name="settings_su_auth_title">احراز هویت کاربر</string>

@@ -161,22 +161,9 @@
     <string name="settings_app_name_hint">الاسم الجديد</string>
     <string name="settings_app_name_helper">سيتم إعادة تعبئة التطبيق بهذا الاسم</string>
     <string name="settings_app_name_error">صيغة غير صالحة</string>
-    <string name="settings_su_app_adb">التطبيقات و ADB</string>
-    <string name="settings_su_app">التطبيقات فقط</string>
-    <string name="settings_su_adb">ADB فقط</string>
-    <string name="settings_su_disable">معطّل</string>
-
-
-
-
-
-
-    <string name="superuser_access">صلاحية الروت</string>
 
 
     <string name="superuser_notification">إشعار صلاحية الروت</string>
-    <string name="settings_su_reauth_title">إعادة المصادقة بعد الترقية</string>
-    <string name="settings_su_reauth_summary">طلب صلاحيات صلاحية الروت مجددًا بعد ترقية التطبيقات</string>
 
 
     <string name="settings_su_auth_title">مصادقة المستخدم</string>

@@ -156,22 +156,9 @@
     <string name="settings_app_name_hint">Emri i ri</string>
     <string name="settings_app_name_helper">Aplikacioni do të ri-paketohet me këtë emër</string>
     <string name="settings_app_name_error">Format i pavlefshëm</string>
-    <string name="settings_su_app_adb">Aplikacionet dhe ADB</string>
-    <string name="settings_su_app">Vetëm aplikacionet</string>
-    <string name="settings_su_adb">Vetëm ADB</string>
-    <string name="settings_su_disable">Çaktivizuar</string>
-
-
-
-
-
-
-    <string name="superuser_access">Aksesi Superpërdorues</string>
 
 
     <string name="superuser_notification">Njoftimet e Superpërdoruesit</string>
-    <string name="settings_su_reauth_title">Ri-autentikohu pas përditësimit</string>
-    <string name="settings_su_reauth_summary">Kërko përsëri leje Superpërdoruesi pas përditësimit të aplikacioneve</string>
 
 
     <string name="settings_su_auth_title">Autentikimi i përdoruesit</string>

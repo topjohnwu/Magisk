@@ -151,22 +151,9 @@
     <string name="settings_app_name_hint">Nový názov</string>
     <string name="settings_app_name_helper">Aplikácia bude prebalená s týmto názvom</string>
     <string name="settings_app_name_error">Neplatný formát</string>
-    <string name="settings_su_app_adb">Aplikácie a ADB</string>
-    <string name="settings_su_app">Iba aplikácie</string>
-    <string name="settings_su_adb">Iba ADB</string>
-    <string name="settings_su_disable">Zakázané</string>
-
-
-
-
-
-
-    <string name="superuser_access">Prístup Superužívateľa</string>
 
 
     <string name="superuser_notification">Upozornenia Superužívateľa</string>
-    <string name="settings_su_reauth_title">Overenie autentifikácie po upgrade</string>
-    <string name="settings_su_reauth_summary">Opätovne vyzve na udelenie oprávnení Superužívateľa po upgrade aplikácie</string>
 
 
     <string name="settings_su_auth_title">Overenie používateľa</string>

@@ -1,6 +1,6 @@
 use super::db::RootSettings;
-use crate::daemon::{AID_APP_START, AID_ROOT, AID_SHELL, MagiskD, to_app_id, to_user_id};
-use crate::db::{DbSettings, MultiuserMode, RootAccess};
+use crate::daemon::{AID_APP_START, AID_ROOT, MagiskD, to_app_id, to_user_id};
+use crate::db::{DbSettings, MultiuserMode};
 use crate::ffi::{SuPolicy, SuRequest, exec_root_shell};
 use crate::socket::IpcRead;
 use base::{LoggedResult, ResultExt, WriteExt, debug, error, exit_on_error, libc, warn};
@@ -206,23 +206,6 @@ impl MagiskD {
             if to_app_id(uid) == to_app_id(mgr_uid) {
                 return Ok(Arc::new(SuInfo::allow(uid)));
             }
-
-            // Check su access settings
-            match cfg.root_access {
-                RootAccess::Disabled => {
-                    warn!("Root access is disabled!");
-                    return Ok(Arc::new(SuInfo::deny(uid)));
-                }
-                RootAccess::AdbOnly if uid != AID_SHELL => {
-                    warn!("Root access limited to ADB only!");
-                    return Ok(Arc::new(SuInfo::deny(uid)));
-                }
-                RootAccess::AppsOnly if uid == AID_SHELL => {
-                    warn!("Root access is disabled for ADB!");
-                    return Ok(Arc::new(SuInfo::deny(uid)));
-                }
-                _ => {}
-            };
 
             // Finally, the SuInfo
             Ok(Arc::new(SuInfo {

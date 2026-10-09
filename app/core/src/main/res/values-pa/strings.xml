@@ -127,22 +127,9 @@
     <string name="settings_app_name_hint">ਨਵਾਂ ਨਾਮ</string>
     <string name="settings_app_name_helper">ਇਸ ਨਾਮ ਨਾਲ ਐਪ ਦੁਬਾਰਾ ਇੰਸਟਾਲ ਕੀਤਾ ਜਾਵੇਗਾ</string>
     <string name="settings_app_name_error">ਗਲਤ ਫਾਰਮੈਟ</string>
-    <string name="settings_su_app_adb">ਐਪਸ ਅਤੇ ਐਡਬੀ</string>
-    <string name="settings_su_app">ਸਿਰਫ ਐਪਸ</string>
-    <string name="settings_su_adb">ਸਿਰਫ ਐਡਬੀ</string>
-    <string name="settings_su_disable">ਬੰਦ ਹੈ</string>
-
-
-
-
-
-
-    <string name="superuser_access">ਸੁਪਰਯੂਜ਼ਰ ਐਕਸੈਸ</string>
 
 
     <string name="superuser_notification">ਸੁਪਰਯੂਜ਼ਰ ਸੂਚਨਾ</string>
-    <string name="settings_su_reauth_title">ਅਪਗ੍ਰੇਡ ਹੋਣ ਤੋਂ ਬਾਅਦ ਪ੍ਰਮਾਣਿਕਤਾ</string>
-    <string name="settings_su_reauth_summary">ਇੱਕ ਐਪ ਦੇ ਅਪਡੇਟ ਹੋਣ ਤੋਂ ਬਾਅਦ ਸੁਪਰਯੂਜ਼ਰ ਆਗਿਆ ਪ੍ਰਮਾਣਿਤ ਕਰੋ</string>
     <string name="settings_customization">ਕਸਟਮਾਈਜੇਸ਼ਨ</string>
     <string name="setting_add_shortcut_summary">ਐਪ ਨੂੰ ਲੁਕਾਉਣ ਤੋਂ ਬਾਅਦ ਨਾਮ ਅਤੇ ਆਈਕਾਨ ਨੂੰ ਪਛਾਣਨਾ ਮੁਸ਼ਕਲ ਹੈ, ਤਾਂ ਹੋਮ ਸਕ੍ਰੀਨ ਵਿਚ ਇਕ ਸੁੰਦਰ ਸ਼ਾਰਟਕੱਟ ਸ਼ਾਮਲ ਕਰੋ</string>
     <string name="settings_doh_title">DNS ਉੱਤੇ HTTPS</string>

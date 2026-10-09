@@ -134,22 +134,9 @@
     <string name="settings_app_name_hint">புதிய பெயர்</string>
     <string name="settings_app_name_helper">பயன்பாடு இந்த பெயருக்கு மீண்டும் தொகுக்கப்படும்</string>
     <string name="settings_app_name_error">தவறான வடிவம்</string>
-    <string name="settings_su_app_adb">பயன்பாடுகள் மற்றும் ADB</string>
-    <string name="settings_su_app">பயன்பாடுகள் மட்டும்</string>
-    <string name="settings_su_adb">ADB மட்டும்</string>
-    <string name="settings_su_disable">முடக்கப்பட்டது</string>
-
-
-
-
-
-
-    <string name="superuser_access">சூப்பர் யூசர் அணுகல்</string>
 
 
     <string name="superuser_notification">சூப்பர் யூசர் அறிவிப்பு</string>
-    <string name="settings_su_reauth_title">மேம்படுத்தப்பட்ட பிறகு மீண்டும் அங்கீகரிக்கவும்</string>
-    <string name="settings_su_reauth_summary">பயன்பாட்டு மேம்படுத்தல்களுக்குப் பிறகு சூப்பர் யூசர் அனுமதிகளை மீண்டும் அங்கீகரிக்கவும்</string>
 
 
     <string name="settings_customization">தனிப்பயனாக்கம்</string>

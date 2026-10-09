@@ -171,22 +171,9 @@
     <string name="settings_app_name_hint">新的名稱</string>
     <string name="settings_app_name_helper">應用程式將以此名稱重新封裝</string>
     <string name="settings_app_name_error">無效的格式</string>
-    <string name="settings_su_app_adb">應用程式及 ADB</string>
-    <string name="settings_su_app">僅限應用程式</string>
-    <string name="settings_su_adb">僅限 ADB</string>
-    <string name="settings_su_disable">停用</string>
-
-
-
-
-
-
-    <string name="superuser_access">超級使用者存取權限</string>
 
 
     <string name="superuser_notification">超級使用者通知</string>
-    <string name="settings_su_reauth_title">更新後重新驗證</string>
-    <string name="settings_su_reauth_summary">應用程式更新後，重新驗證超級使用者的要求</string>
     <string name="settings_su_auth_title">使用者驗證</string>
     <string name="settings_su_auth_summary">超級使用者請求時需要驗證身分</string>
     <string name="settings_su_auth_insecure">裝置尚未設定任何驗證方式</string>
