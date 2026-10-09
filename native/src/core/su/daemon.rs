@@ -53,8 +53,7 @@ impl SuInfo {
     fn allow(uid: i32) -> SuInfo {
         let settings = RootSettings {
             policy: SuPolicy::Allow,
-            log: false,
-            notify: false,
+            ..Default::default()
         };
         SuInfo {
             uid,
@@ -64,14 +63,8 @@ impl SuInfo {
     }
 
     fn deny(uid: i32) -> SuInfo {
-        let settings = RootSettings {
-            policy: SuPolicy::Deny,
-            log: false,
-            notify: false,
-        };
         SuInfo {
             uid,
-            settings,
             ..Default::default()
         }
     }

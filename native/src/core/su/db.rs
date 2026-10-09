@@ -12,21 +12,11 @@ impl Default for SuPolicy {
     }
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Default)]
 pub struct RootSettings {
     pub policy: SuPolicy,
     pub log: bool,
     pub notify: bool,
-}
-
-impl Default for RootSettings {
-    fn default() -> Self {
-        RootSettings {
-            policy: SuPolicy::Deny,
-            log: true,
-            notify: true,
-        }
-    }
 }
 
 impl SqlTable for RootSettings {
