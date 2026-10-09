@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.core.data.magiskdb
 
+import android.os.Process.FIRST_APPLICATION_UID
 import com.topjohnwu.magisk.core.AppContext
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.model.su.SuPolicy
@@ -15,16 +16,17 @@ class PolicyDao : MagiskDB() {
     }
 
     suspend fun delete(uid: Int) {
-        val query = "DELETE FROM ${Table.POLICY} WHERE uid=$uid"
+        val query = "DELETE FROM ${Table.POLICY} WHERE uid=${normalizeUid(uid)}"
         exec(query)
     }
 
     suspend fun fetch(uid: Int): SuPolicy? {
-        val query = "$SELECT_QUERY FROM ${Table.POLICY} WHERE uid=$uid LIMIT 1"
+        val query = "$SELECT_QUERY FROM ${Table.POLICY} WHERE uid=${normalizeUid(uid)} LIMIT 1"
         return exec(query, ::toPolicy).firstOrNull()
     }
 
     suspend fun update(policy: SuPolicy) {
+        policy.uid = normalizeUid(policy.uid)
         val map = policy.toMap()
         if (!Const.Version.atLeast_25_0()) {
             // Put in package_name for old database
@@ -35,7 +37,8 @@ class PolicyDao : MagiskDB() {
     }
 
     suspend fun fetchAll(): List<SuPolicy> {
-        val query = "$SELECT_QUERY FROM ${Table.POLICY} WHERE uid/100000=${Const.USER_ID} OR uid < 10000"
+        val query = "$SELECT_QUERY FROM ${Table.POLICY} WHERE uid/100000=${Const.USER_ID} " +
+                "OR uid < $FIRST_APPLICATION_UID"
         return exec(query, ::toPolicy).filterNotNull()
     }
 
@@ -57,4 +60,16 @@ class PolicyDao : MagiskDB() {
         return policy
     }
 
+    companion object {
+        // If appId < FIRST_APPLICATION_UID, use appId as UID
+        fun normalizeUid(uid: Int): Int {
+            val appId = uid % 100000
+            return if (appId < FIRST_APPLICATION_UID) appId else uid
+        }
+
+        // Revert normalizeUid
+        fun denormalizeUid(uid: Int): Int {
+            return if (uid < FIRST_APPLICATION_UID) (uid + Const.USER_ID * 100000) else uid
+        }
+    }
 }

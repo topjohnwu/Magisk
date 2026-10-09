@@ -3,7 +3,7 @@ package com.topjohnwu.magisk.core.model.su
 import com.topjohnwu.magisk.core.data.magiskdb.MagiskDB
 
 class SuPolicy(
-    val uid: Int,
+    var uid: Int,
     var policy: Int = DENY,
     var remain: Long = -1L,
     var logging: Boolean = true,

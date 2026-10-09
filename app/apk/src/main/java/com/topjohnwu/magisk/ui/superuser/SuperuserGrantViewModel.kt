@@ -246,7 +246,7 @@ class SuperuserGrantViewModel(
                         firstInstallTime = pkg?.firstInstallTime ?: 0L,
                         lastUpdateTime = pkg?.lastUpdateTime ?: 0L,
                     )
-                    val policy = policies[appInfo.uid]
+                    val policy = policies[PolicyDao.normalizeUid(appInfo.uid)]
                     val isGranted = policy != null && policy.policy >= SuPolicy.ALLOW
                     SuGrantAppState(
                         info = suAppInfo,

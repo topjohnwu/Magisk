@@ -27,7 +27,7 @@ import kotlinx.coroutines.withContext
 import java.util.Locale
 
 data class PolicyItem(
-    val policy: SuPolicy,
+    var policy: SuPolicy,
     val packageName: String,
     val isSharedUid: Boolean,
     val icon: Drawable,
@@ -78,7 +78,7 @@ class SuperuserViewModel(
             for (policy in db.fetchAll()) {
                 val pkgs =
                     if (policy.uid == Process.SYSTEM_UID) arrayOf("android")
-                    else pm.getPackagesForUid(policy.uid)
+                    else pm.getPackagesForUid(PolicyDao.denormalizeUid(policy.uid))
                 if (pkgs == null) {
                     db.delete(policy.uid)
                     continue
