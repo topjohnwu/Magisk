@@ -20,7 +20,12 @@ fun TerminalEmulator.appendOnMain(bytes: ByteArray, len: Int) {
 }
 
 fun TerminalEmulator.appendLineOnMain(line: String) {
-    val bytes = "$line\r\n".toByteArray(Charsets.UTF_8)
+    val text = if (line.startsWith('\r')) {
+        "\r\u001b[2K${line.substring(1)}"
+    } else {
+        "\r\u001b[2K$line\r\n"
+    }
+    val bytes = text.toByteArray(Charsets.UTF_8)
     appendOnMain(bytes, bytes.size)
 }
 

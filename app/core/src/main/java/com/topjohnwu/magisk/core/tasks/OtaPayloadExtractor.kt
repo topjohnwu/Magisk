@@ -124,9 +124,7 @@ class OtaPayloadExtractor(
 
             val count = partition.operations.size
             partition.operations.forEachIndexed { index, operation ->
-                if (index % 5 == 0 || index == count - 1) {
-                    console.add("- Downloading ${index + 1}/$count")
-                }
+                console.add("\r- Downloading ${index + 1}/$count")
                 processOperation(outChannel, operation, channel, dataBase, manifest.block_size ?: 4096)
             }
 

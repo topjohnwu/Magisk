@@ -21,6 +21,7 @@ import com.topjohnwu.magisk.core.utils.DummyList
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.openFd
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
+import com.topjohnwu.magisk.core.utils.ProgressInputStream
 import com.topjohnwu.magisk.core.utils.RootUtils
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils
@@ -219,6 +220,38 @@ abstract class MagiskInstallImpl protected constructor(
         return processInput(input)
     }
 
+    private fun PatchFileClassifier.openProgressStream(): InputStream {
+        val max = size
+        val total = max.toFloat() / 1048576
+        var prevBytes = 0L
+        var prevTime = 0L
+        var smoothedSpeed = -1f
+        return ProgressInputStream(openStream()) { bytes ->
+            val now = System.currentTimeMillis()
+            val dt = now - prevTime
+            if (prevTime == 0L || dt <= 0) {
+                prevBytes = bytes
+                prevTime = now
+                return@ProgressInputStream
+            }
+            val instantSpeed = (bytes - prevBytes).toFloat() * 1000 / dt / 1048576
+            smoothedSpeed = if (smoothedSpeed < 0f) {
+                instantSpeed
+            } else {
+                0.3f * instantSpeed + 0.7f * smoothedSpeed
+            }
+            prevBytes = bytes
+            prevTime = now
+            val progress = bytes.toFloat() / 1048576
+            if (max > 0) {
+                val pct = bytes * 100 / max
+                console.add("\r%.2f / %.2f MB (%d%%) - %.2f MB/s".format(progress, total, pct, smoothedSpeed))
+            } else {
+                console.add("\r%.2f MB / ?? - %.2f MB/s".format(progress, smoothedSpeed))
+            }
+        }
+    }
+
     private suspend fun processInput(input: DataChannel): Boolean {
         try {
             input.use {
@@ -226,13 +259,13 @@ abstract class MagiskInstallImpl protected constructor(
                     logs.add("Input type: ${file.type}, payload: ${file.entryPath ?: "<input>"}")
                     return when (file.type) {
                         PatchFileClassifier.Type.Tar -> {
-                            processWholeFile(file.openStream(), "tar") { out ->
+                            processWholeFile(file.openProgressStream(), "tar") { out ->
                                 TarProcessor(installDir, out, console, logs)
                             }
                         }
                         PatchFileClassifier.Type.RecoveryGpt -> {
                             file.entryPath?.let { console.add("- Processing $it") }
-                            processWholeFile(file.openStream(), "bin") { out ->
+                            processWholeFile(file.openProgressStream(), "bin") { out ->
                                 RecoveryGptProcessor(installDir, out, console, logs)
                             }
                         }
@@ -297,6 +330,7 @@ abstract class MagiskInstallImpl protected constructor(
             patcher.finish(newBoot)
             newBoot.delete()
         } catch (e: IOException) {
+            patcher.close()
             console.add("! Failed to output to $outFile")
             outFile.delete()
             Timber.e(e)

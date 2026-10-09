@@ -62,7 +62,9 @@ class FlashViewModel : BaseViewModel() {
         override fun onAddElement(e: String?) {
             e ?: return
             emulator?.appendLineOnMain(e)
-            logItems.add(e)
+            if (!e.startsWith('\r')) {
+                logItems.add(e)
+            }
         }
     }
 
