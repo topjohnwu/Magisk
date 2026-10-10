@@ -1,5 +1,6 @@
 #include <string>
 #include <vector>
+#include <cstdlib>
 #include <sys/wait.h>
 
 #include <consts.hpp>
@@ -295,21 +296,46 @@ void install_module(Utf8CStr file) {
         access(bbpath(), X_OK) ||
         access(DATABIN "/util_functions.sh", F_OK))
         abort(stderr, "Incomplete Magisk install");
-    if (access(file.c_str(), F_OK))
-        abort(stderr, "'%s' does not exist", file.c_str());
 
-    char *zip = realpath(file.c_str(), nullptr);
+    char *zip;
+    bool temp_zip = file == "-";
+    if (temp_zip) {
+        char path[] = DATABIN "/module.XXXXXX";
+        int fd = mkstemp(path);
+        char buf[4096];
+        ssize_t len;
+        while ((len = xread(STDIN_FILENO, buf, sizeof(buf))) > 0) {
+            if (xwrite(fd, buf, len) != len) {
+                close(fd);
+                unlink(path);
+                abort(stderr, "Failed to resolve temporary file");
+            }
+        }
+        close(fd);
+        if (len < 0)
+            unlink(path);
+        zip = strdup(path);
+    } else {
+        if (access(file.c_str(), F_OK))
+            abort(stderr, "'%s' does not exist", file.c_str());
+        zip = realpath(file.c_str(), nullptr);
+    }
+    if (!zip)
+        abort(stderr, "Failed to resolve module ZIP path");
+
     setenv("OUTFD", "1", 1);
     setenv("ZIPFILE", zip, 1);
     setenv("ASH_STANDALONE", "1", 1);
     setenv("MAGISKTMP", get_magisk_tmp(), 0);
-    free(zip);
 
     int fd = xopen("/dev/null", O_RDONLY);
     xdup2(fd, STDERR_FILENO);
     close(fd);
 
-    const char *argv[] = { BBEXEC_CMD, "-c", install_module_script, nullptr };
-    execve(argv[0], (char **) argv, environ);
-    abort(stdout, "Failed to execute BusyBox shell");
+    exec_t exec {};
+    int status = exec_command_sync(exec, BBEXEC_CMD, "-c", install_module_script);
+    if (temp_zip)
+        unlink(zip);
+    free(zip);
+    exit(status);
 }

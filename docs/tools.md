@@ -256,7 +256,8 @@ Options:
    -V                        print running daemon version code
    --list                    list all available applets
    --remove-modules [-n]     remove all modules, reboot if -n is not provided
-   --install-module ZIP      install a module zip file
+   --install-module ZIP|-    install a module zip file, or read it from stdin
+                             after the option terminator
 
 Advanced Options (Internal APIs):
    --daemon                  manually start magisk daemon
