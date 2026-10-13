@@ -50,7 +50,7 @@ class LogViewModel(
         _uiState.update { it.copy(loading = true) }
         withContext(Dispatchers.Default) {
             magiskLogRaw = repo.fetchMagiskLogs()
-            val suLogs = repo.fetchSuLogs()
+            val suLogs = if (Info.env.isActive) repo.fetchSuLogs() else emptyList()
             val entries = MagiskLogParser.parse(magiskLogRaw)
             _uiState.update { it.copy(
                 loading = false,

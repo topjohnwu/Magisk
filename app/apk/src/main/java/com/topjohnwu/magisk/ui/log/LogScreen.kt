@@ -69,6 +69,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
+import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.ktx.timeDateFormat
 import com.topjohnwu.magisk.core.ktx.toTime
 import com.topjohnwu.magisk.core.model.su.SuLog
@@ -85,11 +86,13 @@ fun LogScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
+    val hasRoot = Info.env.isActive
     val tabTitles = listOf(
         stringResource(CoreR.string.superuser),
         stringResource(CoreR.string.magisk)
     )
     val pagerState = rememberPagerState(pageCount = { tabTitles.size })
+    val isMagiskLogPage = !hasRoot || pagerState.currentPage == 1
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val saveMagiskLog = rememberExternalStoragePermissionLauncher {
         viewModel.saveMagiskLog()
@@ -112,7 +115,7 @@ fun LogScreen(
                 TopAppBar(
                     title = { Text(stringResource(CoreR.string.logs)) },
                     actions = {
-                        if (pagerState.currentPage == 1) {
+                        if (isMagiskLogPage) {
                             IconButton(onClick = saveMagiskLog) {
                                 Icon(
                                     imageVector = Icons.Default.Download,
@@ -122,8 +125,8 @@ fun LogScreen(
                         }
                         IconButton(
                             onClick = {
-                                if (pagerState.currentPage == 0) viewModel.clearLog()
-                                else viewModel.clearMagiskLog()
+                                if (isMagiskLogPage) viewModel.clearMagiskLog()
+                                else viewModel.clearLog()
                             }
                         ) {
                             Icon(
@@ -138,20 +141,22 @@ fun LogScreen(
                     ),
                     scrollBehavior = scrollBehavior
                 )
-                PrimaryTabRow(
-                    selectedTabIndex = pagerState.currentPage,
-                    containerColor = Color.Transparent,
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .widthIn(max = 960.dp)
-                        .fillMaxWidth()
-                ) {
-                    tabTitles.forEachIndexed { index, title ->
-                        Tab(
-                            selected = pagerState.currentPage == index,
-                            onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
-                            text = { Text(title) }
-                        )
+                if (hasRoot) {
+                    PrimaryTabRow(
+                        selectedTabIndex = pagerState.currentPage,
+                        containerColor = Color.Transparent,
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .widthIn(max = 960.dp)
+                            .fillMaxWidth()
+                    ) {
+                        tabTitles.forEachIndexed { index, title ->
+                            Tab(
+                                selected = pagerState.currentPage == index,
+                                onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
+                                text = { Text(title) }
+                            )
+                        }
                     }
                 }
             }
@@ -166,6 +171,12 @@ fun LogScreen(
             ) {
                 CircularProgressIndicator()
             }
+        } else if (!hasRoot) {
+            MagiskLogTab(
+                entries = uiState.magiskLogEntries,
+                nestedScrollConnection = scrollBehavior.nestedScrollConnection,
+                modifier = Modifier.padding(padding)
+            )
         } else {
             HorizontalPager(
                 state = pagerState,
