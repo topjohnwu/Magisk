@@ -38,8 +38,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
@@ -300,45 +298,46 @@ private fun SuLogCard(
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
     ) {
-        ListItem(
-            leadingContent = {
-                Image(
-                    painter = rememberDrawablePainter(icon),
-                    contentDescription = log.appName,
-                    modifier = Modifier.size(40.dp)
-                )
-            },
-            headlineContent = {
-                Text(
-                    text = log.appName,
-                    style = MaterialTheme.typography.titleMedium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            },
-            supportingContent = {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                painter = rememberDrawablePainter(icon),
+                contentDescription = log.appName,
+                modifier = Modifier.size(40.dp)
+            )
+            Spacer(Modifier.width(16.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = log.appName,
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.weight(1f, fill = false),
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    SuActionBadge(allowed = allowed)
+                }
+                Spacer(Modifier.height(2.dp))
                 Text(
                     text = uidPidText,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
                 )
-            },
-            trailingContent = {
-                Column(horizontalAlignment = Alignment.End) {
-                    Text(
-                        text = log.time.toTime(timeDateFormat),
-                        style = MaterialTheme.typography.labelSmall.copy(fontFamily = FontFamily.Monospace),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1,
-                    )
-                    Spacer(Modifier.height(4.dp))
-                    SuActionBadge(allowed = allowed)
-                }
-            },
-            colors = ListItemDefaults.colors(containerColor = Color.Transparent)
-        )
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    text = log.time.toTime(timeDateFormat),
+                    style = MaterialTheme.typography.labelSmall.copy(fontFamily = FontFamily.Monospace),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
 
         if (details.isNotEmpty()) {
             HorizontalDivider(
