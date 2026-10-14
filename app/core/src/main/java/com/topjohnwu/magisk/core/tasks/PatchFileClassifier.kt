@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.core.tasks
 import com.topjohnwu.magisk.core.utils.DataChannel
 import com.topjohnwu.magisk.core.utils.ZipChannel
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
+import org.apache.commons.compress.archivers.zip.ZipMethod
 import java.io.Closeable
 import java.io.IOException
 import java.io.InputStream
@@ -62,6 +63,11 @@ class PatchFileClassifier @Throws(IOException::class) constructor(
     /** Decompressed size of the payload. */
     val size: Long get() = entry?.size ?: channel.size()
 
+    /** Raw (compressed) size of the payload in the source channel. */
+    val rawSize: Long get() = entry?.let {
+        if (it.method == ZipMethod.DEFLATED.code) it.compressedSize else it.size
+    } ?: channel.size()
+
     /**
      * Path of the payload within (nested) zip archives, null if the input itself is the payload.
      */
@@ -82,9 +88,9 @@ class PatchFileClassifier @Throws(IOException::class) constructor(
      * The caller is responsible for closing the returned stream.
      */
     @Throws(IOException::class)
-    fun openStream(): InputStream {
-        val entry = entry ?: return channel.stream()
-        return zips.last().openStream(entry)
+    fun openStream(rawWrapper: (InputStream) -> InputStream = { it }): InputStream {
+        val entry = entry ?: return rawWrapper(channel.stream())
+        return zips.last().openStream(entry, rawWrapper)
     }
 
     override fun close() {

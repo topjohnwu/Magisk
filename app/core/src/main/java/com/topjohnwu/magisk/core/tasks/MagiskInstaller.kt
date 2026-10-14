@@ -215,33 +215,35 @@ abstract class MagiskInstallImpl protected constructor(
     }
 
     private fun PatchFileClassifier.openProgressStream(): InputStream {
-        val max = size
+        val max = rawSize
         val total = max.toFloat() / 1048576
         var prevBytes = 0L
         var prevTime = 0L
         var smoothedSpeed = -1f
-        return ProgressInputStream(openStream()) { bytes ->
-            val now = System.currentTimeMillis()
-            val dt = now - prevTime
-            if (prevTime == 0L || dt <= 0) {
+        return openStream { raw ->
+            ProgressInputStream(raw) { bytes ->
+                val now = System.currentTimeMillis()
+                val dt = now - prevTime
+                if (prevTime == 0L || dt <= 0) {
+                    prevBytes = bytes
+                    prevTime = now
+                    return@ProgressInputStream
+                }
+                val instantSpeed = (bytes - prevBytes).toFloat() * 1000 / dt / 1048576
+                smoothedSpeed = if (smoothedSpeed < 0f) {
+                    instantSpeed
+                } else {
+                    0.3f * instantSpeed + 0.7f * smoothedSpeed
+                }
                 prevBytes = bytes
                 prevTime = now
-                return@ProgressInputStream
-            }
-            val instantSpeed = (bytes - prevBytes).toFloat() * 1000 / dt / 1048576
-            smoothedSpeed = if (smoothedSpeed < 0f) {
-                instantSpeed
-            } else {
-                0.3f * instantSpeed + 0.7f * smoothedSpeed
-            }
-            prevBytes = bytes
-            prevTime = now
-            val progress = bytes.toFloat() / 1048576
-            if (max > 0) {
-                val pct = bytes * 100 / max
-                console.add("\r%.2f / %.2f MB (%d%%) - %.2f MB/s".format(progress, total, pct, smoothedSpeed))
-            } else {
-                console.add("\r%.2f MB / ?? - %.2f MB/s".format(progress, smoothedSpeed))
+                val progress = bytes.toFloat() / 1048576
+                if (max > 0) {
+                    val pct = bytes * 100 / max
+                    console.add("\r%.2f / %.2f MB (%d%%) - %.2f MB/s".format(progress, total, pct, smoothedSpeed))
+                } else {
+                    console.add("\r%.2f MB / ?? - %.2f MB/s".format(progress, smoothedSpeed))
+                }
             }
         }
     }

@@ -56,21 +56,15 @@ class ZipChannel(private val source: DataChannel) : Closeable {
      * The caller is responsible for closing the returned stream.
      */
     @Throws(IOException::class)
-    fun openStream(entry: ZipArchiveEntry): InputStream {
+    fun openStream(
+        entry: ZipArchiveEntry,
+        rawWrapper: (InputStream) -> InputStream = { it }
+    ): InputStream {
         return when (entry.method) {
-            ZipMethod.STORED.code -> source.stream(dataOffset(entry), entry.size)
+            ZipMethod.STORED.code -> rawWrapper(source.stream(dataOffset(entry), entry.size))
             ZipMethod.DEFLATED.code -> {
-                val inflater = Inflater(true)
-                val raw = source.stream(dataOffset(entry), entry.compressedSize)
-                object : InflaterInputStream(raw, inflater, BUFFER_SIZE) {
-                    override fun close() {
-                        try {
-                            super.close()
-                        } finally {
-                            inflater.end()
-                        }
-                    }
-                }
+                val raw = rawWrapper(source.stream(dataOffset(entry), entry.compressedSize))
+                InflaterInputStream(raw, Inflater(true), BUFFER_SIZE)
             }
             else -> throw IOException("Unsupported compression method ${entry.method}: ${entry.name}")
         }
