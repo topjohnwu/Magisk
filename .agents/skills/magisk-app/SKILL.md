@@ -28,7 +28,9 @@ Multi-module Gradle project structure:
 
 - **Target Modules:** All active app development occurs in `:core` and `:apk`.
 - **Language & UI:** Written in Kotlin/Java. **Prefer Kotlin for all new code.** Uses Jetpack Compose for UI (prefer over View XML).
-- **String Resources:** Default strings in `core/src/main/res/values/strings.xml` and `stub-res/src/main/res/values/strings.xml`. Translations go in `values-[lang]/strings.xml`.
+- **String Resources:**
+  - Default strings live in `core/src/main/res/values/strings.xml` and `stub-res/src/main/res/values/strings.xml`. Translations live in `values-[lang]/strings.xml`.
+  - Whenever updating an existing string in a way that significantly changes its meaning, **always create a new string resource key** (and remove the old key across all `values*/strings.xml` files if unused) so existing translations do not go out of sync; falling back to untranslated default text is preferred over displaying an incorrect translation.
 - **Data Stack:** Room, KSP, Wire (Protocol Buffers), Moshi.
 
 ## 4. Workflows & Verification
