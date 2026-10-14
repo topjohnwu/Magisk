@@ -133,15 +133,15 @@ impl Verifier {
                 key.verify_prehash(hash.as_ref(), &sig).log()
             }
             VerifyingKey::SHA256withECDSA(key) => {
-                let sig = P256Signature::from_slice(signature)?;
+                let sig = P256Signature::from_der(signature)?;
                 key.verify_prehash(hash.as_ref(), &sig).log()
             }
             VerifyingKey::SHA384withECDSA(key) => {
-                let sig = P384Signature::from_slice(signature)?;
+                let sig = P384Signature::from_der(signature)?;
                 key.verify_prehash(hash.as_ref(), &sig).log()
             }
             VerifyingKey::SHA521withECDSA(key) => {
-                let sig = P521Signature::from_slice(signature)?;
+                let sig = P521Signature::from_der(signature)?;
                 key.verify_prehash(hash.as_ref(), &sig).log()
             }
         }
@@ -199,15 +199,15 @@ impl Signer {
             }
             SigningKey::SHA256withECDSA(key) => {
                 let sig: P256Signature = key.sign_prehash(hash.as_ref())?;
-                sig.to_vec()
+                sig.to_der().as_bytes().to_vec()
             }
             SigningKey::SHA384withECDSA(key) => {
                 let sig: P384Signature = key.sign_prehash(hash.as_ref())?;
-                sig.to_vec()
+                sig.to_der().as_bytes().to_vec()
             }
             SigningKey::SHA521withECDSA(key) => {
                 let sig: P521Signature = key.sign_prehash(hash.as_ref())?;
-                sig.to_vec()
+                sig.to_der().as_bytes().to_vec()
             }
         };
         Ok(v)
