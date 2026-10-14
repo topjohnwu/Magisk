@@ -22,6 +22,7 @@ import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.openFd
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.core.utils.ProgressInputStream
+import com.topjohnwu.magisk.core.utils.ProgressOutputStream
 import com.topjohnwu.magisk.core.utils.RootUtils
 import com.topjohnwu.magisk.core.utils.UsbBlockDevice
 import com.topjohnwu.superuser.Shell
@@ -214,37 +215,47 @@ abstract class MagiskInstallImpl protected constructor(
         return processInput(input, usbDeviceName)
     }
 
-    private fun PatchFileClassifier.openProgressStream(): InputStream {
-        val max = rawSize
-        val total = max.toFloat() / 1048576
-        var prevBytes = 0L
-        var prevTime = 0L
-        var smoothedSpeed = -1f
-        return openStream { raw ->
-            ProgressInputStream(raw) { bytes ->
-                val now = System.currentTimeMillis()
-                val dt = now - prevTime
-                if (prevTime == 0L || dt <= 0) {
-                    prevBytes = bytes
-                    prevTime = now
-                    return@ProgressInputStream
-                }
-                val instantSpeed = (bytes - prevBytes).toFloat() * 1000 / dt / 1048576
-                smoothedSpeed = if (smoothedSpeed < 0f) {
-                    instantSpeed
-                } else {
-                    0.3f * instantSpeed + 0.7f * smoothedSpeed
-                }
-                prevBytes = bytes
-                prevTime = now
-                val progress = bytes.toFloat() / 1048576
-                if (max > 0) {
-                    val pct = bytes * 100 / max
-                    console.add("\r%.2f / %.2f MB (%d%%) - %.2f MB/s".format(progress, total, pct, smoothedSpeed))
-                } else {
-                    console.add("\r%.2f MB / ?? - %.2f MB/s".format(progress, smoothedSpeed))
-                }
+    private class SpeedTracker {
+        var bytes = 0L
+            private set
+        private var prevBytes = 0L
+        private var prevTime = 0L
+        private var smoothedSpeed = -1f
+
+        val mb get() = bytes.toFloat() / 1048576
+
+        fun speed(now: Long): Float {
+            if (prevTime == 0L || now - prevTime > 2000) {
+                return 0f
             }
+            return maxOf(0f, smoothedSpeed)
+        }
+
+        fun update(newBytes: Long): Boolean {
+            if (newBytes == bytes) return false
+            bytes = newBytes
+            val now = System.currentTimeMillis()
+            val dt = now - prevTime
+            if (prevTime == 0L || dt <= 0) {
+                prevBytes = newBytes
+                prevTime = now
+                return false
+            }
+            val instantSpeed = (newBytes - prevBytes).toFloat() * 1000 / dt / 1048576
+            smoothedSpeed = if (smoothedSpeed < 0f) {
+                instantSpeed
+            } else {
+                0.3f * instantSpeed + 0.7f * smoothedSpeed
+            }
+            prevBytes = newBytes
+            prevTime = now
+            return true
+        }
+
+        fun reset() {
+            prevBytes = bytes
+            prevTime = 0L
+            smoothedSpeed = -1f
         }
     }
 
@@ -259,7 +270,7 @@ abstract class MagiskInstallImpl protected constructor(
                     }
                     return when (file.type) {
                         PatchFileClassifier.Type.Tar -> {
-                            processWholeFile(file.openProgressStream(), "tar") { out ->
+                            processWholeFile(file, "tar") { out ->
                                 TarProcessor(installDir, out, console, logs)
                             }
                         }
@@ -268,7 +279,7 @@ abstract class MagiskInstallImpl protected constructor(
                             if (usbDeviceName != null) {
                                 processUsbRecovery(file, usbDeviceName)
                             } else {
-                                processWholeFile(file.openProgressStream(), "bin") { out ->
+                                processWholeFile(file, "bin") { out ->
                                     RecoveryGptProcessor(installDir, out, console, logs)
                                 }
                             }
@@ -296,15 +307,42 @@ abstract class MagiskInstallImpl protected constructor(
     }
 
     private suspend fun runWholeFilePatcher(
-        input: InputStream,
-        outStream: OutputStream,
+        file: PatchFileClassifier,
+        rawOut: OutputStream,
         outputLabel: String,
         createPatcher: (OutputStream) -> WholeFilePatcher
     ): Boolean {
+        val max = file.rawSize
+        val total = max.toFloat() / 1048576
+        val readTracker = SpeedTracker()
+        val writeTracker = SpeedTracker()
+
+        fun emitProgress() {
+            val now = System.currentTimeMillis()
+            val readSpeed = readTracker.speed(now)
+            val writeSpeed = writeTracker.speed(now)
+            val readInfo = if (max > 0) {
+                val pct = readTracker.bytes * 100 / max
+                "%.2f / %.2f MB (%d%%) - %.2f MB/s".format(readTracker.mb, total, pct, readSpeed)
+            } else {
+                "%.2f MB / ?? - %.2f MB/s".format(readTracker.mb, readSpeed)
+            }
+            val writeInfo = "%.2f MB - %.2f MB/s".format(writeTracker.mb, writeSpeed)
+            console.add("\rRead : $readInfo\nWrite: $writeInfo")
+        }
+
+        val outStream = ProgressOutputStream(rawOut) { bytes ->
+            if (writeTracker.update(bytes)) emitProgress()
+        }
         val patcher = createPatcher(outStream)
 
         // Process input file
         try {
+            val input = file.openStream { raw ->
+                ProgressInputStream(raw) { bytes ->
+                    if (readTracker.update(bytes)) emitProgress()
+                }
+            }
             targetImage = patcher.start(input)
         } catch (e: IOException) {
             patcher.close()
@@ -323,13 +361,18 @@ abstract class MagiskInstallImpl protected constructor(
             return false
         }
 
+        readTracker.reset()
+        writeTracker.reset()
+
         // Output file
         try {
             val newBoot = installDir.getChildFile("new-boot.img")
             patcher.finish(newBoot)
             newBoot.delete()
+            outStream.close()
         } catch (e: IOException) {
             patcher.close()
+            runCatching { outStream.close() }
             console.add("! Failed to output to $outputLabel")
             Timber.e(e)
             return false
@@ -344,13 +387,13 @@ abstract class MagiskInstallImpl protected constructor(
     // Patch the boot image in a whole file (e.g. tar archive), and output a new file
     // with all the original contents and the patched boot image
     private suspend fun processWholeFile(
-        input: InputStream,
+        file: PatchFileClassifier,
         ext: String,
         createPatcher: (OutputStream) -> WholeFilePatcher
     ): Boolean {
         val outFile = MediaStoreUtils.getFile("$destName.$ext")
         val outStream = outFile.uri.outputStream().buffered(1024 * 1024)
-        if (!runWholeFilePatcher(input, outStream, outFile.toString(), createPatcher)) {
+        if (!runWholeFilePatcher(file, outStream, outFile.toString(), createPatcher)) {
             outFile.delete()
             return false
         }
@@ -365,7 +408,7 @@ abstract class MagiskInstallImpl protected constructor(
             Timber.e(e)
             return false
         }
-        if (!runWholeFilePatcher(file.openProgressStream(), outStream, usbDeviceName) { out ->
+        if (!runWholeFilePatcher(file, outStream, usbDeviceName) { out ->
             RecoveryGptProcessor(installDir, out, console, logs)
         }) {
             return false

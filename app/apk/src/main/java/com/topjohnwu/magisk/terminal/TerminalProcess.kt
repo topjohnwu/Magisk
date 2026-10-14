@@ -20,13 +20,24 @@ fun TerminalEmulator.appendOnMain(bytes: ByteArray, len: Int) {
 }
 
 fun TerminalEmulator.appendLineOnMain(line: String) {
-    val text = if (line.startsWith('\r')) {
-        "\r\u001b[2K${line.substring(1)}"
-    } else {
-        "\r\u001b[2K$line\r\n"
+    mainHandler.post {
+        val clear = if (inPlaceNewlines > 0) {
+            "\r\u001b[${inPlaceNewlines}A\u001b[J"
+        } else {
+            "\r\u001b[2K"
+        }
+        val text = if (line.startsWith('\r')) {
+            val content = line.substring(1)
+            inPlaceNewlines = content.count { it == '\n' }
+            "$clear${content.replace("\n", "\r\n")}"
+        } else {
+            inPlaceNewlines = 0
+            "$clear$line\r\n"
+        }
+        val bytes = text.toByteArray(Charsets.UTF_8)
+        append(bytes, bytes.size)
+        onScreenUpdate?.invoke()
     }
-    val bytes = text.toByteArray(Charsets.UTF_8)
-    appendOnMain(bytes, bytes.size)
 }
 
 /**

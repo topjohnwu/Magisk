@@ -133,6 +133,7 @@ class TerminalEmulator(
 
     var onCopyToClipboard: ((String) -> Unit)? = null
     var onScreenUpdate: (() -> Unit)? = null
+    internal var inPlaceNewlines = 0
 
     private var mArgIndex = 0
     private val mArgs = IntArray(MAX_ESCAPE_PARAMETERS)
@@ -1559,6 +1560,7 @@ class TerminalEmulator(
 
         mUtf8Index = 0
         mUtf8ToFollow = 0
+        inPlaceNewlines = 0
 
         mColors.reset()
     }
