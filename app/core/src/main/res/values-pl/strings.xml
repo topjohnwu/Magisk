@@ -44,7 +44,6 @@
     <string name="install_inactive_slot">Zainstaluj w nieaktywnym slocie (po OTA)</string>
     <string name="install_inactive_slot_msg">Po ponownym uruchomieniu twoje urządzenie zostanie ZMUSZONE do rozruchu z aktualnie nieaktywnego slotu!\nUżywaj tej opcji tylko po ukończeniu aktualizacji OTA.\nKontynuować?</string>
     <string name="setup_title">Dodatkowa konfiguracja</string>
-    <string name="select_patch_file">Wybierz i załataj plik</string>
     <string name="patch_file_msg">Wybierz obraz raw (*.img) lub plik tar ODIN (*.tar) lub payload.bin (*.bin)</string>
     <string name="reboot_delay_toast">Ponowne uruchomienie za 5 sekund…</string>
     <string name="flash_screen_title">Instalacja</string>

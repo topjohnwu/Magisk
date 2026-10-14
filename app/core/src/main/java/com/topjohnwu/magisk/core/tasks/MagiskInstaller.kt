@@ -23,6 +23,7 @@ import com.topjohnwu.magisk.core.utils.MediaStoreUtils.openFd
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.core.utils.ProgressInputStream
 import com.topjohnwu.magisk.core.utils.RootUtils
+import com.topjohnwu.magisk.core.utils.UsbBlockDevice
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils
 import com.topjohnwu.superuser.internal.UiThreadHandler
@@ -198,26 +199,19 @@ abstract class MagiskInstallImpl protected constructor(
     private suspend fun InputStream.copyAndCloseOut(out: OutputStream) =
         out.use { copyAll(it, 1024 * 1024) }
 
-    private suspend fun processFile(uri: Uri): Boolean {
+    private suspend fun processFile(uri: Uri, usbDeviceName: String? = null): Boolean {
         val input = try {
-            DataChannel.File(ParcelFileDescriptor.AutoCloseInputStream(uri.openFd()).channel)
+            if (uri.scheme.equals("https", ignoreCase = true) || uri.scheme.equals("http", ignoreCase = true)) {
+                DataChannel.Http(ServiceLocator.okhttp, uri.toString())
+            } else {
+                DataChannel.File(ParcelFileDescriptor.AutoCloseInputStream(uri.openFd()).channel)
+            }
         } catch (e: IOException) {
-            console.add("! Process error")
+            console.add("! Error: " + (e.message ?: "Process error"))
             Timber.e(e)
             return false
         }
-        return processInput(input)
-    }
-
-    private suspend fun processUrl(url: String): Boolean {
-        val input = try {
-            DataChannel.Http(ServiceLocator.okhttp, url)
-        } catch (e: IOException) {
-            console.add("! Error: " + e.message)
-            Timber.e(e)
-            return false
-        }
-        return processInput(input)
+        return processInput(input, usbDeviceName)
     }
 
     private fun PatchFileClassifier.openProgressStream(): InputStream {
@@ -252,11 +246,15 @@ abstract class MagiskInstallImpl protected constructor(
         }
     }
 
-    private suspend fun processInput(input: DataChannel): Boolean {
+    private suspend fun processInput(input: DataChannel, usbDeviceName: String? = null): Boolean {
         try {
             input.use {
                 PatchFileClassifier(input).use { file ->
                     logs.add("Input type: ${file.type}, payload: ${file.entryPath ?: "<input>"}")
+                    if (usbDeviceName != null && file.type != PatchFileClassifier.Type.RecoveryGpt) {
+                        console.add("! Selected file is not a recovery disk image")
+                        return false
+                    }
                     return when (file.type) {
                         PatchFileClassifier.Type.Tar -> {
                             processWholeFile(file.openProgressStream(), "tar") { out ->
@@ -265,8 +263,12 @@ abstract class MagiskInstallImpl protected constructor(
                         }
                         PatchFileClassifier.Type.RecoveryGpt -> {
                             file.entryPath?.let { console.add("- Processing $it") }
-                            processWholeFile(file.openProgressStream(), "bin") { out ->
-                                RecoveryGptProcessor(installDir, out, console, logs)
+                            if (usbDeviceName != null) {
+                                processUsbRecovery(file, usbDeviceName)
+                            } else {
+                                processWholeFile(file.openProgressStream(), "bin") { out ->
+                                    RecoveryGptProcessor(installDir, out, console, logs)
+                                }
                             }
                         }
                         PatchFileClassifier.Type.PayloadBin -> extractAndProcessImage { out ->
@@ -291,15 +293,12 @@ abstract class MagiskInstallImpl protected constructor(
         }
     }
 
-    // Patch the boot image in a whole file (e.g. tar archive), and output a new file
-    // with all the original contents and the patched boot image
-    private suspend fun processWholeFile(
+    private suspend fun runWholeFilePatcher(
         input: InputStream,
-        ext: String,
+        outStream: OutputStream,
+        outputLabel: String,
         createPatcher: (OutputStream) -> WholeFilePatcher
     ): Boolean {
-        val outFile = MediaStoreUtils.getFile("$destName.$ext")
-        val outStream = outFile.uri.outputStream().buffered(1024 * 1024)
         val patcher = createPatcher(outStream)
 
         // Process input file
@@ -308,7 +307,6 @@ abstract class MagiskInstallImpl protected constructor(
         } catch (e: IOException) {
             patcher.close()
             runCatching { outStream.close() }
-            outFile.delete()
             if (e is TarProcessor.NoBootException)
                 console.add("! No boot image found")
             console.add("! Process error")
@@ -320,7 +318,6 @@ abstract class MagiskInstallImpl protected constructor(
         if (!patchBoot()) {
             patcher.close()
             runCatching { outStream.close() }
-            outFile.delete()
             return false
         }
 
@@ -331,16 +328,55 @@ abstract class MagiskInstallImpl protected constructor(
             newBoot.delete()
         } catch (e: IOException) {
             patcher.close()
-            console.add("! Failed to output to $outFile")
-            outFile.delete()
+            console.add("! Failed to output to $outputLabel")
             Timber.e(e)
             return false
         } finally {
             patcher.close()
-            outStream.close()
+            runCatching { outStream.close() }
         }
 
+        return true
+    }
+
+    // Patch the boot image in a whole file (e.g. tar archive), and output a new file
+    // with all the original contents and the patched boot image
+    private suspend fun processWholeFile(
+        input: InputStream,
+        ext: String,
+        createPatcher: (OutputStream) -> WholeFilePatcher
+    ): Boolean {
+        val outFile = MediaStoreUtils.getFile("$destName.$ext")
+        val outStream = outFile.uri.outputStream().buffered(1024 * 1024)
+        if (!runWholeFilePatcher(input, outStream, outFile.toString(), createPatcher)) {
+            outFile.delete()
+            return false
+        }
         return onOutputWritten(outFile)
+    }
+
+    private suspend fun processUsbRecovery(file: PatchFileClassifier, usbDeviceName: String): Boolean {
+        val outStream = try {
+            UsbBlockDevice.open(context, usbDeviceName, file.size, console, logs)
+        } catch (e: IOException) {
+            console.add("! " + (e.message ?: "Failed to open USB drive"))
+            Timber.e(e)
+            return false
+        }
+        if (!runWholeFilePatcher(file.openProgressStream(), outStream, usbDeviceName) { out ->
+            RecoveryGptProcessor(installDir, out, console, logs)
+        }) {
+            return false
+        }
+
+        console.add("")
+        console.add("****************************")
+        console.add(" Recovery image flashed to USB ")
+        console.add("****************************")
+
+        targetImage.delete()
+        "cp_readlink $installDir".sh()
+        return true
     }
 
     // Extract the boot image from the input, and output the patched boot image
@@ -430,9 +466,8 @@ abstract class MagiskInstallImpl protected constructor(
     private fun Array<String>.sh() = shell.newJob().add(*this).to(console, logs).exec()
     private fun String.fsh() = ShellUtils.fastCmd(shell, this)
 
-    protected suspend fun patchFile(file: Uri) = extractFiles() && processFile(file)
-
-    protected suspend fun patchFile(url: String) = extractFiles() && processUrl(url)
+    protected suspend fun patchFile(file: Uri, usbDeviceName: String? = null) =
+        extractFiles() && processFile(file, usbDeviceName)
 
     protected suspend fun direct() = findImage() && extractFiles() && patchBoot() && flashBoot()
 
@@ -495,18 +530,11 @@ class MagiskInstaller {
 
     class Patch(
         private val uri: Uri,
+        private val usbDeviceName: String? = null,
         console: MutableList<String>,
         logs: MutableList<String>
     ) : ConsoleInstaller(console, logs) {
-        override suspend fun operations() = patchFile(uri)
-    }
-
-    class Download(
-        private val url: String,
-        console: MutableList<String>,
-        logs: MutableList<String>
-    ) : ConsoleInstaller(console, logs) {
-        override suspend fun operations() = patchFile(url)
+        override suspend fun operations() = patchFile(uri, usbDeviceName)
     }
 
     class SecondSlot(

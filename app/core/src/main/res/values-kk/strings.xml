@@ -44,7 +44,6 @@
     <string name="install_inactive_slot">Белсенді емес слотқа орнату (OTA-дан кейін)</string>
     <string name="install_inactive_slot_msg">Құрылғыңыз белсенді емес слотқа МӘЖБҮРЛІ ТҮРДЕ қайта жүктеледі!\nБұл тәсілді тек OTA жаңартуынан кейін қолданыңыз.\nЖалғастырасыз ба?</string>
     <string name="setup_title">Қосымша баптау</string>
-    <string name="select_patch_file">Файл таңдап, патчтау</string>
     <string name="patch_file_msg">Жад бөлімінің бейнесін (*.img), ODIN мұрағатын (*.tar) немесе payload.bin (*.bin) файлын таңдаңыз</string>
     <string name="reboot_delay_toast">5 секундтан кейін қайта жүктеледі…</string>
     <string name="flash_screen_title">Орнату</string>

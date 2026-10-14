@@ -155,6 +155,7 @@ class MainActivity : ComponentActivity(), SplashScreenHost {
                                         if (vm.flashAction.isEmpty()) {
                                             vm.flashAction = key.action
                                             vm.flashUri = key.additionalData?.toUri()
+                                            vm.usbDevice = key.usbDevice
                                             vm.startFlashing()
                                         }
                                     }

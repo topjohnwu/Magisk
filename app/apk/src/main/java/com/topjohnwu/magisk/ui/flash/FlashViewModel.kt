@@ -48,6 +48,7 @@ class FlashViewModel : BaseViewModel() {
 
     var flashAction: String = ""
     var flashUri: Uri? = null
+    var usbDevice: String? = null
 
     private var emulator: TerminalEmulator? = null
     private val emulatorReady = CompletableDeferred<TerminalEmulator>()
@@ -73,6 +74,7 @@ class FlashViewModel : BaseViewModel() {
     fun startFlashing() {
         val action = flashAction
         val uri = flashUri
+        val usb = usbDevice
 
         viewModelScope.launch {
             val emu = emulatorReady.await()
@@ -105,14 +107,7 @@ class FlashViewModel : BaseViewModel() {
                     uri ?: return@launch
                     _showReboot.value = false
                     onResult(withContext(Dispatchers.IO) {
-                        MagiskInstaller.Patch(uri, outItems, logItems).exec()
-                    })
-                }
-                Const.Value.DOWNLOAD -> {
-                    uri ?: return@launch
-                    _showReboot.value = false
-                    onResult(withContext(Dispatchers.IO) {
-                        MagiskInstaller.Download(uri.toString(), outItems, logItems).exec()
+                        MagiskInstaller.Patch(uri, usb, outItems, logItems).exec()
                     })
                 }
             }

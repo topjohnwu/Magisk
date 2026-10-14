@@ -43,7 +43,6 @@
     <string name="install_inactive_slot">Installi ebaaktiivsesse lahtrisse (pärast üle-õhu uuendust)</string>
     <string name="install_inactive_slot_msg">Pärast taaskäivitust SUNNITAKSE sinu seade käivituma praegusesse ebaaktiivsesse lahtrisse!\nKasuta seda valikut vaid peale üle-õhu uuenduse teostamist.\nJätkad?</string>
     <string name="setup_title">Lisaseadistus</string>
-    <string name="select_patch_file">Vali ja paika fail</string>
     <string name="patch_file_msg">Vali toortõmmis (*.img) või ODIN tar-fail (*.tar)</string>
     <string name="reboot_delay_toast">Taaskäivitamine 5 sekundi pärast…</string>
     <string name="flash_screen_title">Installimine</string>

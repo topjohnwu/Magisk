@@ -44,7 +44,6 @@
     <string name="install_inactive_slot">Įdiegti į antrąją vietą (po OTA naujinimo)</string>
     <string name="install_inactive_slot_msg">Jūsų įremginys bus PRIVERSTAS pasileisti į dabartinę neaktyvią vietą po paleidimo iš naujo!\nNaudokite šią parinktį, kai OTA naujinimas yra baigtas.\nTęsti?</string>
     <string name="setup_title">Išplėstinė sąranka</string>
-    <string name="select_patch_file">Pasirinkite ir taisykite failą</string>
     <string name="patch_file_msg">Pasirinkite vaizdo failą (*.img) arba ODIN archyvą (*.tar)</string>
     <string name="reboot_delay_toast">Paleidžiama iš naujo po 5 sekundžių…</string>
     <string name="flash_screen_title">Įdiegimas</string>

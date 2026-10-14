@@ -41,7 +41,6 @@
     <string name="install_inactive_slot">Instalar na ralura inactiva (darréu del OTA)</string>
     <string name="install_inactive_slot_msg">¡El preséu va arrincar OBLIGATORIAMENTE na ralura inactiva dempués de reaniciar!\nUsa esta opción namás dempués d\'acabar l\'anovamientu per OTA.\n¿Quies siguir?</string>
     <string name="setup_title">Configuración adicional</string>
-    <string name="select_patch_file">Seleicionar y parchiar un ficheru</string>
     <string name="patch_file_msg">Seleiciona una imaxe en bruto (*.img), un archivu d\'ODIN (*.tar) o un ficheru payload.bin (*.bin)</string>
     <string name="reboot_delay_toast">Reaniciando en 5 segundos…</string>
     <string name="flash_screen_title">Instalación</string>

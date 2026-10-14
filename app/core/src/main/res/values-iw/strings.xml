@@ -43,7 +43,6 @@
     <string name="install_inactive_slot">התקנה לסלוט לא פעיל (לאחר OTA)</string>
     <string name="install_inactive_slot_msg">ההתקן שלך ייאלץ אתחול לסלוט הלא פעיל הנוכחי שלך לאחר הפעלה מחדש!\nיש להשתמש באפשרות זו רק לאחר ביצוע OTA בלבד.\nלהמשיך?</string>
     <string name="setup_title">התקנה נוספת</string>
-    <string name="select_patch_file">בחירה והתקנת קובץ</string>
     <string name="patch_file_msg">בחירת קובץ גולמי (*.img) או ODIN tarfile (*.tar) או payload.bin (*.bin)</string>
     <string name="reboot_delay_toast">מאתחל בעוד 5 שניות…</string>
     <string name="flash_screen_title">התקנה</string>

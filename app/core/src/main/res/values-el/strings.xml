@@ -44,7 +44,6 @@
     <string name="install_inactive_slot">Εγκατάσταση στο ανενεργό Slot (Μετά από OTA)</string>
     <string name="install_inactive_slot_msg">Η συσκευή σας θα αναγκαστεί να εκκινήσει στο τρέχον ανενεργό Slot μετά από επανεκκίνηση!\nΧρησιμοποιήστε αυτήν την επιλογή μόνο αφού ολοκληρωθεί το OTA.\nΣυνέχεια;</string>
     <string name="setup_title">Πρόσθετη εγκατάσταση</string>
-    <string name="select_patch_file">Επέλεξε και κάνε Patch ένα αρχείο</string>
     <string name="patch_file_msg">Επέλεξε μία raw εικόνα (*.img) ή ένα ODIN tarfile (*.tar)</string>
     <string name="reboot_delay_toast">Επανεκκίνηση σε 5 δευτερόλεπτα…</string>
     <string name="flash_screen_title">Εγκατάσταση</string>

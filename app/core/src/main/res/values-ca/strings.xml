@@ -42,7 +42,6 @@
     <string name="install_inactive_slot">Instal·la a la ranura inactiva (Després d\'una OTA)</string>
     <string name="install_inactive_slot_msg">El teu dispositiu serà FORÇAT a arrancar en l\'actual ranura inactiva després del reinici!\nUtilitza aquesta opció NOMÉS quan l\'OTA s\'hagi fet.\nContinuar?</string>
     <string name="setup_title">Instal·lació addicional</string>
-    <string name="select_patch_file">Selecciona i arranja un arxiu</string>
     <string name="patch_file_msg">Selecciona una imatge crua (*.img) o un ODIN tarfile (*.tar)</string>
     <string name="reboot_delay_toast">Reinici en 5 segons…</string>
     <string name="flash_screen_title">Instal·lació</string>

@@ -42,7 +42,6 @@
     <string name="install_inactive_slot">செயலற்ற ஸ்லாட்டுக்கு நிறுவவும் (OTA க்குப் பிறகு)</string>
     <string name="install_inactive_slot_msg">மறுதொடக்கம் செய்தபின் தற்போதைய செயலற்ற ஸ்லாட்டுக்கு துவக்க உங்கள் சாதனம் கட்டாயப்படுத்தப்படும்!\nOTA முடிந்தபின் மட்டுமே இந்த விருப்பத்தைப் பயன்படுத்தவும்.\nதொடரவா?</string>
     <string name="setup_title">கூடுதல் அமைப்பு</string>
-    <string name="select_patch_file">ஒரு கோப்பைத் தேர்ந்தெடுத்து ஒட்டவும்</string>
     <string name="patch_file_msg">மூல படம் (* .img) அல்லது ODIN டார்ஃபைல் (* .tar) ஐத் தேர்ந்தெடுக்கவும்</string>
     <string name="reboot_delay_toast">5 வினாடிகளில் மீண்டும் துவக்குகிறது…</string>
     <string name="flash_screen_title">நிறுவல்</string>

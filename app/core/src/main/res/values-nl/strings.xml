@@ -41,7 +41,6 @@
     <string name="install_inactive_slot">Installeren in inactieve sleuf (na OTA)</string>
     <string name="install_inactive_slot_msg">Je apparaat wordt GEDWONGEN opgestart in de huidige inactieve sleuf na het herstarten!\nGebruik deze optie alleen NA het installeren van een OTA-update.\nWil je doorgaan?</string>
     <string name="setup_title">Installatie afronden</string>
-    <string name="select_patch_file">Kies en patch een bestand</string>
     <string name="patch_file_msg">Kies een schijfkopie (*.img) of ODIN-tarbestand (*.tar)</string>
     <string name="reboot_delay_toast">Je apparaat wordt over 5 seconden herstart…</string>
     <string name="flash_screen_title">Installatie</string>

@@ -19,6 +19,7 @@ sealed interface Route : NavKey, Parcelable {
     data class Flash(
         val action: String,
         val additionalData: String? = null,
+        val usbDevice: String? = null,
     ) : Route
 
     @Parcelize
