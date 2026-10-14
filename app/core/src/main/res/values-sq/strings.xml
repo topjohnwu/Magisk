@@ -38,7 +38,6 @@
     <string name="manager_download_install">Shtypni për të shkarkuar dhe instaluar</string>
     <string name="direct_install">Instalim direkt (I rekomanduar)</string>    <string name="install_inactive_slot">Instalo në slotin joaktiv (Pas OTA)</string>    <string name="install_inactive_slot_msg">Pajisja juaj do të DETYROHET të ndizet në slotin aktual joaktiv pas rinisjes!\nPërdoreni këtë opsion vetëm pasi të ketë përfunduar OTA.\nVazhdoni?</string>
     <string name="setup_title">Konfigurim shtesë</string>
-    <string name="patch_file_msg">Zgjidhni një imazh raw (*.img), një ODIN tarfile (*.tar) ose një payload.bin (*.bin)</string>
     <string name="reboot_delay_toast">Duke u rinisur pas 5 sekondave…</string>
     <string name="flash_screen_title">Instalimi</string>
 

@@ -40,7 +40,6 @@
     <string name="install_inactive_slot">ਨਾ-ਸਰਗਰਮ ਸਲਾਟ ਵਿੱਚ ਇੰਸਟਾਲ ਕਰੋ (OTA ਤੋਂ ਬਾਅਦ)</string>
     <string name="install_inactive_slot_msg">ਤੁਹਾਡੀ ਡਿਵਾਈਸ ਨੂੰ ਮੁੜ ਚਾਲੂ ਹੋਣ ਤੋਂ ਬਾਅਦ ਮੌਜੂਦਾ ਨਿਸ਼ਕਿਰਿਆ ਨੰਬਰ ਤੇ ਬੂਟ ਕਰਨ ਲਈ ਮਜਬੂਰ ਕੀਤਾ ਜਾਏਗਾ!\n OTA ਪੂਰਾ ਹੋਣ ਤੋਂ ਬਾਅਦ ਹੀ ਇਸ ਵਿਕਲਪ ਦੀ ਵਰਤੋਂ ਕਰੋ।\n ਜਾਰੀ ਰੱਖਣਾ ਹੈ?</string>
     <string name="setup_title">ਅਤਿਰਿਕਤ ਸੈਟਅਪ</string>
-    <string name="patch_file_msg">ਇੱਕ ਰੋ ਛੱਞੀ ਨੂੰ (* .img) ਜਾਂ ਇੱਕ Odin tarfile (* .tar) ਦੀ ਚੋਣ ਕਰੋ</string>
     <string name="reboot_delay_toast">5 ਸਕਿੰਟਾਂ ਵਿੱਚ ਰੀਬੂਟ ਹੋ ਰਿਹਾ ਹੈ …</string>
     <string name="flash_screen_title">ਇੰਸਟਾਲੇਸ਼ਨ</string>
 

@@ -42,7 +42,6 @@
     <string name="install_inactive_slot">Installer til inaktiv plass (etter OTA)</string>
     <string name="install_inactive_slot_msg">Din enhet vil bli tvunget til å starte opp i inaktiv plass etter omstart!\nKun bruk dette etter at OTA er ferdig.\Fortsett?</string>
     <string name="setup_title">Ytterligere oppsett</string>
-    <string name="patch_file_msg">Velg et rå-avtrykk (*.img) eller en ODIN-tjæreballfil (*.tar)</string>
     <string name="reboot_delay_toast">Starter på ny om 5 sek …</string>
     <string name="flash_screen_title">Installasjon</string>
 

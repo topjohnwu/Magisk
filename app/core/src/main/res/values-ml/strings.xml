@@ -44,7 +44,6 @@
     <string name="install_inactive_slot">നിഷ്ക്രിയ സ്ലോട്ടിലേക്ക് ഇൻസ്‌റ്റാൾ ചെയ്യുക (OTA-ന് ശേഷം)</string>
     <string name="install_inactive_slot_msg">റീബൂട്ടിന് ശേഷം നിങ്ങളുടെ ഉപകരണം നിലവിലെ നിഷ്‌ക്രിയ സ്ലോട്ടിലേക്ക് ബൂട്ട് ചെയ്യാൻ നിർബന്ധിതരാകും!\nOTA പൂർത്തിയാക്കിയതിന് ശേഷം മാത്രം ഈ ഓപ്ഷൻ ഉപയോഗിക്കുക.\nതുടരണോ?</string>
     <string name="setup_title">അധിക സജ്ജീകരണം</string>
-    <string name="patch_file_msg">ഒരു റോ ഇമേജ് (*.img) അല്ലെങ്കിൽ ഒരു ODIN ടാർ ഫയൽ (*.tar) തിരഞ്ഞെടുക്കുക</string>
     <string name="reboot_delay_toast">5 സെക്കൻഡിൽ റീബൂട്ട് ചെയ്യുന്നു…</string>
     <string name="flash_screen_title">ഇൻസ്റ്റലേഷൻ</string>
 

@@ -43,7 +43,6 @@
     <string name="install_inactive_slot">Instalar no slot inativo (após o OTA)</string>
     <string name="install_inactive_slot_msg">O seu dispositivo será FORÇADO a inicializar no slot inativo atual após um reinício!\nSó use esta opção após a conclusão do OTA.\nDeseja continuar?</string>
     <string name="setup_title">Configuração adicional</string>
-    <string name="patch_file_msg">Selecione um ficheiro de imagem (*.img) ou um ficheiro tar (*.tar) ou um ficheiro payload.bin (*.bin)</string>
     <string name="reboot_delay_toast">A reiniciar em 5 segundos…</string>
     <string name="flash_screen_title">Instalação</string>
 

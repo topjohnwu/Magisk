@@ -43,7 +43,6 @@
     <string name="install_inactive_slot">비활성 슬롯에 설치 (OTA 이후)</string>
     <string name="install_inactive_slot_msg">기기를 다시 시작한 후에는 현재 비활성 상태인 슬롯으로 강제로 부팅됩니다!\nOTA 업데이트 후에만 이 옵션을 사용하십시오.\n계속하시겠습니까?</string>
     <string name="setup_title">추가 설정</string>
-    <string name="patch_file_msg">raw 이미지 (*.img) 또는 ODIN tar 파일 (*.tar) 선택</string>
     <string name="reboot_delay_toast">5초 후 다시 시작합니다…</string>
     <string name="flash_screen_title">설치과정</string>
 

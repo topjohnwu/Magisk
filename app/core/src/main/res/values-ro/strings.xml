@@ -44,7 +44,6 @@
     <string name="install_inactive_slot">Instalează în slotul inactiv (După OTA)</string>
     <string name="install_inactive_slot_msg">Dispozitivul va fi FORȚAT să booteze în slotul actual inactiv după repornire!\nFolosește această opțiune numai după terminarea OTA.\nContinui?</string>
     <string name="setup_title">Configurare suplimentară</string>
-    <string name="patch_file_msg">Selectează o imagine brută (*.img) sau un fișier tar ODIN (*.tar)</string>
     <string name="reboot_delay_toast">Repornire în 5 secunde…</string>
     <string name="flash_screen_title">Instalare</string>
 

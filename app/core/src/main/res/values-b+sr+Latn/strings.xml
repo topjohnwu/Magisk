@@ -39,7 +39,6 @@
     <string name="manager_download_install">Pritisni da preuzmeš i instaliraš</string>
     <string name="direct_install">Direktna instalacija (Preporučeno)</string>    <string name="install_inactive_slot">Instalacija na neaktivan slot (Nakon OTA)</string>    <string name="install_inactive_slot_msg">Vaš uređaj će biti FORSIRAN da se pokrene na trenutno neaktivnom slotu nakon ponovnog pokretanja!\nKoristite opciju samo kad se OTA završi.\nNastavi?</string>
     <string name="setup_title">Dodatne postavke</string>
-    <string name="patch_file_msg">Izaberi sliku (*.img) ili ODIN tarfile (*.tar) ili payload.bin (*.bin)</string>
     <string name="download_dialog_title">Unesi URL slike</string>
     <string name="download_dialog_msg">Potpuna OTA slika ili fabrička slika</string>
     <string name="reboot_delay_toast">Ponovo pokretanje za 5 sekundi…</string>

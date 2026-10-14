@@ -38,7 +38,6 @@
     <string name="manager_download_install">اضغط للتنزيل والتثبيت</string>
     <string name="direct_install">التثبيت المباشر (موصى به)</string>    <string name="install_inactive_slot">التثبيت على الفتحة غير النشطة (بعد OTA)</string>    <string name="install_inactive_slot_msg">سيُجبَر جهازك على الإقلاع من الفتحة غير النشطة الحالية بعد إعادة التشغيل!\nاستخدم هذا الخيار فقط بعد اكتمال تحديث OTA.\nهل تريد المتابعة؟</string>
     <string name="setup_title">إعداد إضافي</string>
-    <string name="patch_file_msg">حدد ملف خام (‎*.img) أو ملف ODIN tar (‎*.tar) أو ملف payload.bin (‎*.bin)</string>
     <string name="download_dialog_title">أدخل رابط الملف</string>
     <string name="download_dialog_msg">ملف OTA كاملة أو ملف المصنع</string>
     <string name="reboot_delay_toast">إعادة التشغيل خلال 5 ثوانٍ…</string>

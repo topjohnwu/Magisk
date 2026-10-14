@@ -44,7 +44,6 @@
     <string name="install_inactive_slot">دایبگرە بۆ خانەی ناچالاک(پاش OTA)</string>
     <string name="install_inactive_slot_msg">ئێستا ئامێرەکەت دەچێتە خانە ناچالاکەکە، ئەمە بەکاربهێنە تەنها دوای ئەپدەیت کردن لە ڕێگەی OTA، بەردەوام دەبیت؟</string>
     <string name="setup_title">ڕێکخستنی زیاتر</string>
-    <string name="patch_file_msg">تکایە فایلێکی Tar یان img یان payload.bin هەڵبژێرە</string>
     <string name="reboot_delay_toast">ڕێستارت کردنەوە لە ماوەی ٥ چرکە…</string>
     <string name="flash_screen_title">ڕێکخستن</string>
 

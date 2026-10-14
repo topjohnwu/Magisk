@@ -41,7 +41,6 @@
     <string name="install_inactive_slot">غیر فعال سلاٹ میں انسٹال کریں (OTA کے بعد)</string>
     <string name="install_inactive_slot_msg">ریبوٹ کے بعد آپ کا آلہ زبردستی موجودہ غیر فعال سلاٹ میں بوٹ ہو جائے گا!\nیہ آپشن صرف OTA مکمل ہونے کے بعد استعمال کریں۔\nجاری رکھیں؟</string>
     <string name="setup_title">اضافی سیٹ اپ</string>
-    <string name="patch_file_msg">ایک خام امیج (*.img) یا ایک ODIN ٹار فائل (*.tar) یا ایک payload.bin (*.bin) منتخب کریں</string>
     <string name="reboot_delay_toast">5 سیکنڈ میں ریبوٹ ہو رہا ہے…</string>
     <string name="flash_screen_title">انسٹالیشن</string>
 

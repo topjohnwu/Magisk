@@ -43,7 +43,6 @@
     <string name="install_inactive_slot">Inactive slot par install karo (OTA ke baad)</string>
     <string name="install_inactive_slot_msg">Reboot ke baad device ko inactive slot se boot karna padega!\nSirf tab use karo jab OTA complete ho chuka ho.\nAage badhna hai?</string>
     <string name="setup_title">Extra setup</string>
-    <string name="patch_file_msg">Raw image (*.img), ODIN tar file (*.tar), ya payload.bin (*.bin) select karo</string>
     <string name="reboot_delay_toast">Phone 5 second mein reboot hoga…</string>
     <string name="flash_screen_title">Installation ho rahi hai</string>
 

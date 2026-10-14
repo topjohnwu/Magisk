@@ -46,8 +46,8 @@
     <string name="install_inactive_slot_msg">Your device will be FORCED to boot to the current inactive slot after a reboot!\nOnly use this option after OTA is done.\nContinue?</string>
     <string name="setup_title">Additional setup</string>
     <string name="patch_image">Patch firmware / image</string>
+    <string name="patch_image_msg">Supported file formats and outputs:\n• <b>Boot / recovery image (.img)</b>: patches boot, init_boot, or recovery and outputs a patched .img\n• <b>OTA / factory package (.zip, payload.bin)</b>: extracts the target image and outputs a patched .img\n• <b>Odin firmware (.tar)</b>: patches the image inside and outputs a patched .tar\n• <b>Googlebook recovery image (.bin, .zip)</b>: outputs a patched .bin or flashes to a USB drive</string>
     <string name="select_from_storage">Select from storage</string>
-    <string name="patch_file_msg">Select a raw image (*.img) or an ODIN tarfile (*.tar) or a payload.bin (*.bin)</string>
     <string name="download_dialog_title">Enter image URL</string>
     <string name="download_dialog_msg">Full OTA image or factory image</string>
     <string name="download_googlebook_recovery_image">Download latest Googlebook recovery image</string>

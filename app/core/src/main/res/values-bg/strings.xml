@@ -44,7 +44,6 @@
     <string name="install_inactive_slot">Инсталиране в неактивен дял (след OTA)</string>
     <string name="install_inactive_slot_msg">Устройство ЗАДЪЛЖИТЕЛНО ще зареди от текущия неактивен дял при следващия рестарт.\nИзползвайте само при приключила инсталация на OTA.\nПродължаване?</string>
     <string name="setup_title">Допълнителни настройки</string>
-    <string name="patch_file_msg">Изберете образ (*.img) или архив на ODIN (*.tar)</string>
     <string name="reboot_delay_toast">Рестартиране след 5 секунди…</string>
     <string name="flash_screen_title">Инсталиране</string>
 

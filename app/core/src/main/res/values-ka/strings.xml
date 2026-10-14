@@ -42,7 +42,6 @@
     <string name="install_inactive_slot">არააქტიურ სლოტში დაყენება (სისტემის განახლების შემდეგ)</string>
     <string name="install_inactive_slot_msg">თქვენი მოწყობილობა გადაიტვირთება არააქატიურ სლოტში!\nგამოიყენეთ ეს ოფცია მხოლოდ სისტემის განახლების დროს.\nგავაგრძელოთ?</string>
     <string name="setup_title">დამატებითი ინსტალაცია</string>
-    <string name="patch_file_msg">აირჩიეთ (*.img) ფაილი ან ODIN tarfile-ი (*.tar)</string>
     <string name="reboot_delay_toast">გადატვირთვა 5 წამში…</string>
     <string name="flash_screen_title">ინსტალაცია</string>
 

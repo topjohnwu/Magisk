@@ -44,7 +44,6 @@
     <string name="install_inactive_slot">Telepítés inaktív slot-ba (OTA után)</string>
     <string name="install_inactive_slot_msg">Eszközöd újraindítás után KÉNYSZERÍTVE az aktuális inaktív slot-ból indulásra!\nEzt az opciót csak az OTA befejezése után használd.\nFolytatod?</string>
     <string name="setup_title">További beállítások</string>
-    <string name="patch_file_msg">Válassz ki egy raw image-et (*.img) vagy egy ODIN tar fájlt (*.tar)</string>
     <string name="reboot_delay_toast">Újraindítás 5 másodpercen belül…</string>
     <string name="flash_screen_title">Telepítés</string>
 

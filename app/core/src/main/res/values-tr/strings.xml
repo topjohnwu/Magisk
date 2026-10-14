@@ -38,7 +38,6 @@
     <string name="manager_download_install">İndirmek ve yüklemek için dokunun</string>
     <string name="direct_install">Doğrudan kurulum (Önerilen)</string>    <string name="install_inactive_slot">Etkin olmayan slota kur (OTA\'dan sonra)</string>    <string name="install_inactive_slot_msg">Cihazınız yeniden başlatıldıktan sonra mevcut etkin olmayan slottan başlatılmaya ZORLANACAK!\nBu seçeneği yalnızca OTA işlemi bittikten sonra kullanın.\nDevam edilsin mi?</string>
     <string name="setup_title">Ek kurulum</string>
-    <string name="patch_file_msg">Bir ham imaj (*.img), ODIN tar dosyası (*.tar) veya payload.bin (*.bin) seçin</string>
     <string name="reboot_delay_toast">5 saniye içinde yeniden başlatılıyor…</string>
     <string name="flash_screen_title">Kurulum</string>
 

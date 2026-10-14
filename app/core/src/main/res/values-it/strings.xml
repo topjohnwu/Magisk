@@ -38,7 +38,6 @@
     <string name="manager_download_install">Apri questa notifica per scaricare e installare</string>
     <string name="direct_install">Installazione diretta (raccomandata)</string>    <string name="install_inactive_slot">Installa nello slot inattivo (dopo un aggiornamento OTA)</string>    <string name="install_inactive_slot_msg">Questo dispositivo verrà FORZATO ad avviarsi usando lo slot inattivo!\nUsa questo metodo solo dopo che un aggiornamento OTA è stato installato.\nVuoi continuare?</string>
     <string name="setup_title">Configurazione aggiuntiva</string>
-    <string name="patch_file_msg">Seleziona un\'immagine in formato .img, un file .tar di ODIN o un file payload.bin</string>
     <string name="download_dialog_title">Inserisci l\'URL dell\'immagine</string>
     <string name="download_dialog_msg">Immagine OTA completa o immagine di fabbrica</string>
     <string name="reboot_delay_toast">Riavvio fra 5 secondi…</string>

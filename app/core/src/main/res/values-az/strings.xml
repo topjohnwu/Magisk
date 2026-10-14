@@ -44,7 +44,6 @@
     <string name="install_inactive_slot">Aktiv olmayan Slot\'a quraşdır (OTA\'dan sonra)</string>
     <string name="install_inactive_slot_msg">Cihazınız yenidən başladıqdan sonra aktiv olmayan slotda başlamağa MƏCBUR ediləcək!\nBu seçimi ancaq OTA bitdikdən sonra tətbiq edin.\nDavam edilsin?</string>
     <string name="setup_title">Əlavə Sazlamalar</string>
-    <string name="patch_file_msg">(*.img) yaxud ODIN (*.tar) seç</string>
     <string name="reboot_delay_toast">5 saniyəyə yenidən başlayacaq…</string>
     <string name="flash_screen_title">Quraşdırılma</string>
 

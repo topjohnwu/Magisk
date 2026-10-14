@@ -53,12 +53,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import android.graphics.Typeface
+import android.text.Spanned
+import android.text.style.StyleSpan
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -380,22 +388,81 @@ fun PatchComposableDialog(
         onConfirm = submit,
         dismissText = stringResource(android.R.string.cancel),
         onDismiss = onDismiss,
+        scrollable = true,
     ) {
         Column(
-            modifier = Modifier.padding(top = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            val resources = LocalResources.current
+            val boldColor = MaterialTheme.colorScheme.onSurface
+            val lines = remember(resources, boldColor) {
+                val cs = resources.getText(CoreR.string.patch_image_msg)
+                val full = buildAnnotatedString {
+                    append(cs.toString())
+                    if (cs is Spanned) {
+                        for (span in cs.getSpans(0, cs.length, StyleSpan::class.java)) {
+                            if (span.style == Typeface.BOLD || span.style == Typeface.BOLD_ITALIC) {
+                                addStyle(
+                                    SpanStyle(fontWeight = FontWeight.SemiBold, color = boldColor),
+                                    cs.getSpanStart(span),
+                                    cs.getSpanEnd(span)
+                                )
+                            }
+                        }
+                    }
+                }
+                buildList {
+                    var start = 0
+                    while (start <= full.length) {
+                        val end = full.indexOf('\n', start).let { if (it == -1) full.length else it }
+                        add(full.subSequence(start, end))
+                        start = end + 1
+                    }
+                }
+            }
+
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                lines.forEach { line ->
+                    if (line.startsWith("• ")) {
+                        Row(modifier = Modifier.fillMaxWidth()) {
+                            Text(
+                                text = "•",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(start = 4.dp, end = 8.dp)
+                            )
+                            Text(
+                                text = line.subSequence(2, line.length),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    } else if (line.isNotEmpty()) {
+                        Text(
+                            text = line,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+
+            HorizontalDivider(
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+            )
+
             Column(modifier = Modifier.selectableGroup()) {
                 if (candidate != null) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .clip(RoundedCornerShape(12.dp))
                             .selectable(
                                 selected = source == PatchSource.CANDIDATE,
                                 onClick = { source = PatchSource.CANDIDATE },
                                 role = Role.RadioButton
                             )
-                            .padding(vertical = 4.dp),
+                            .padding(vertical = 10.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         RadioButton(
@@ -423,6 +490,7 @@ fun PatchComposableDialog(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
                         .selectable(
                             selected = source == PatchSource.FILE,
                             onClick = {
@@ -432,7 +500,7 @@ fun PatchComposableDialog(
                             },
                             role = Role.RadioButton
                         )
-                        .padding(vertical = 4.dp),
+                        .padding(vertical = 10.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     RadioButton(
@@ -449,24 +517,26 @@ fun PatchComposableDialog(
                         val fileName = remember(localFileUri) {
                             localFileUri?.let { runCatching { it.displayName }.getOrNull() }
                         }
-                        Text(
-                            text = if (!fileName.isNullOrEmpty()) fileName
-                            else stringResource(CoreR.string.patch_file_msg),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        if (!fileName.isNullOrEmpty()) {
+                            Text(
+                                text = fileName,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
                 }
 
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
                         .selectable(
                             selected = source == PatchSource.URL,
                             onClick = { source = PatchSource.URL },
                             role = Role.RadioButton
                         )
-                        .padding(vertical = 4.dp),
+                        .padding(vertical = 10.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     RadioButton(
@@ -480,33 +550,31 @@ fun PatchComposableDialog(
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 }
-            }
 
-            if (source == PatchSource.URL) {
-                OutlinedTextField(
-                    value = url,
-                    onValueChange = {
-                        url = it
-                        isUrlError = false
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text(stringResource(CoreR.string.download_dialog_msg)) },
-                    isError = isUrlError,
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Uri,
-                        imeAction = ImeAction.Done
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = { submit() }
-                    )
-                )
-                if (isUrlError) {
-                    Text(
-                        text = stringResource(CoreR.string.download_dialog_title),
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                if (source == PatchSource.URL) {
+                    OutlinedTextField(
+                        value = url,
+                        onValueChange = {
+                            url = it
+                            isUrlError = false
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 4.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        label = { Text(stringResource(CoreR.string.download_dialog_msg)) },
+                        isError = isUrlError,
+                        supportingText = if (isUrlError) {
+                            { Text(stringResource(CoreR.string.download_dialog_title)) }
+                        } else null,
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Uri,
+                            imeAction = ImeAction.Done
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = { submit() }
+                        )
                     )
                 }
             }
@@ -524,6 +592,7 @@ fun PatchComposableDialog(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .clip(RoundedCornerShape(12.dp))
                             .selectable(
                                 selected = selectedUsb == null,
                                 onClick = {
@@ -532,7 +601,7 @@ fun PatchComposableDialog(
                                 },
                                 role = Role.RadioButton
                             )
-                            .padding(vertical = 4.dp),
+                            .padding(vertical = 10.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         RadioButton(
@@ -551,6 +620,7 @@ fun PatchComposableDialog(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
+                                .clip(RoundedCornerShape(12.dp))
                                 .selectable(
                                     selected = selectedUsb == device.deviceName,
                                     onClick = {
@@ -559,7 +629,7 @@ fun PatchComposableDialog(
                                     },
                                     role = Role.RadioButton
                                 )
-                                .padding(vertical = 4.dp),
+                                .padding(vertical = 10.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             RadioButton(
