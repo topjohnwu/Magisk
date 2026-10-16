@@ -78,12 +78,6 @@ Before proceeding, please acknowledge that:
 - Installing Magisk **WILL** trip your Knox Warranty Bit, this action is not reversible in any way.
 - Installing Magisk for the first time **REQUIRES** a full data wipe (this is **NOT** counting the data wipe when unlocking bootloader). Please make a backup of your data.
 
-### Flashing Tools
-
-- [Samsung Odin3](https://dl2018.sammobile.com/Odin.zip) (Windows only) (requires [Samsung USB Drivers](https://developer.samsung.com/android-usb-driver))
-- [Samsung Odin4](https://forum.xda-developers.com/t/official-samsung-odin-v4-1-2-1-dc05e3ea-for-linux.4453423/) (Linux only)
-- [Heimdall](https://www.glassechidna.com.au/heimdall/) (or [Grimler's fork](https://git.sr.ht/~grimler/Heimdall))
-
 ### Requirements
 
 To verify whether or not Magisk can be installed in your Samsung device, you first must check the OEM Lock and KnoxGuard (RMM) status. To do so, go to `Settings` -> `Device Care` -> `Maintenance Mode` and enable it, then boot your device in Download mode with its key combo.
@@ -114,11 +108,7 @@ Having KnoxGuard active will prevent you from installing/running Magisk regardle
 
 ### Instructions
 
-- Download the latest firmware package for your device, you can use one of the tools below to download it directly from Samsung servers:
-  - [SamFirm.NET](https://github.com/jesec/SamFirm.NET), [samfirm.js](https://github.com/jesec/samfirm.js)
-  - [Frija](https://forum.xda-developers.com/s10-plus/how-to/tool-frija-samsung-firmware-downloader-t3910594)
-  - [Samloader](https://forum.xda-developers.com/s10-plus/how-to/tool-samloader-samfirm-frija-replacement-t4105929)
-  - [Bifrost](https://forum.xda-developers.com/t/tool-samsung-samsung-firmware-downloader.4240719/)
+- Use [samloader-rs](https://github.com/topjohnwu/samloader-rs) to download the latest firmware package for your device directly from Samsung servers.
 - Unzip the firmware and copy the `AP` tar file to your device. It is normally named as `AP_[device_model_sw_ver].tar.md5`
 - Press the **Install** button in the Magisk card
 - If your device does **NOT** have boot ramdisk, check the **"Recovery Mode"** option
@@ -126,19 +116,19 @@ Having KnoxGuard active will prevent you from installing/running Magisk regardle
 - Start the installation, and copy the patched tar file to your PC using ADB:<br>
   `adb pull /sdcard/Download/magisk_patched_[random_strings].tar`<br>
   **DO NOT USE MTP** as it is known to corrupt large files.
-- Reboot to download mode. Open Odin on your PC, and flash `magisk_patched.tar` as `AP`, together with `BL`, `CP`, and `CSC` (**NOT** `HOME_CSC` because we want to **wipe data**) from the original firmware.
-- Your device should reboot automatically once Odin finished flashing. **Agree to do a factory reset if asked.**
+- Reboot to download mode. Use `samloader` on your PC to flash `magisk_patched_[random_strings].tar` as `AP`, together with `BL`, `CP`, and `CSC` (**NOT** `HOME_CSC` because we want to **wipe data**) from the original firmware.
+- Your device should reboot automatically once `samloader` finished flashing. **Agree to do a factory reset if asked.**
 - If your device does **NOT** have boot ramdisk, reboot to recovery now to enable Magisk (reason stated in [Magisk in Recovery](#magisk-in-recovery)).
 - Install the Magisk app you've already downloaded and launch the app. It should show a dialog asking for additional setup.
 - Let the app do its job and automatically reboot the device. Voila!
 
 ### Upgrading the OS
 
-Once you have rooted your Samsung device, you can no longer upgrade your Android OS through OTA. To upgrade your device's OS, you have to manually download the new firmware zip file and go through the same `AP` patching process written in the previous section. **The only difference here is in the Odin flashing step: do NOT use the `CSC` tar, but instead use the `HOME_CSC` tar as we are performing an upgrade, not the initial install**.
+Once you have rooted your Samsung device, you can no longer upgrade your Android OS through OTA. To upgrade your device's OS, you have to manually download the new firmware zip file and go through the same `AP` patching process written in the previous section. **The only difference here is in the flashing step: do NOT use the `CSC` tar, but instead use the `HOME_CSC` tar as we are performing an upgrade, not the initial install**.
 
 ### Important Notes
 
-- **Never, ever** try to restore either `boot`, `init_boot`, `recovery`, or `vbmeta` partitions back to stock! You can brick your device by doing so, and the only way to recover from this is to do a full Odin restore with data wipe.
+- **Never, ever** try to restore either `boot`, `init_boot`, `recovery`, or `vbmeta` partitions back to stock! You can brick your device by doing so, and the only way to recover from this is to do a full firmware restore with data wipe.
 - To upgrade your device with a new firmware, **NEVER** directly use the stock `AP` tar file with reasons mentioned above. **Always** patch `AP` in the Magisk app and use that instead.
 
 ## Custom Recovery
