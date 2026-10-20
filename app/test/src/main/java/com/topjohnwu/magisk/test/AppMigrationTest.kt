@@ -64,7 +64,7 @@ class AppMigrationTest {
 
         // Trigger the test to run migration
         val pfd = uiAutomation.executeShellCommand(
-            "am instrument -w --user 0 -e class .Environment#$method " +
+            "am instrument -w --user current -e class .Environment#$method " +
                 "$pkg.test/${AppTestRunner::class.java.name}"
         )
         val output = AutoCloseInputStream(pfd).reader().use { it.readText() }

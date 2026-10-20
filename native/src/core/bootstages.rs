@@ -11,7 +11,7 @@ use crate::mount::{clean_mounts, setup_preinit_dir};
 use crate::resetprop::get_prop;
 use crate::selinux::restorecon;
 use base::const_format::concatcp;
-use base::{BufReadExt, FsPathBuilder, ResultExt, cstr, error, info};
+use base::{BufReadExt, FsPathBuilder, ResultExt, Utf8CStrBuf, cstr, error, info};
 use bitflags::bitflags;
 use nix::fcntl::OFlag;
 use std::io::BufReader;
@@ -36,6 +36,7 @@ impl MagiskD {
         let mut buf = cstr::buf::default();
 
         for user in self.get_users() {
+            buf.clear();
             buf.append_path(APP_DATA_DIR)
                 .append_path_fmt(user)
                 .append_path(APP_PACKAGE_NAME)
