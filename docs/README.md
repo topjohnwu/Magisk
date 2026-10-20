@@ -3,6 +3,7 @@
 ## Users
 
 - [Installation Instructions](install.md)
+- [OTA Upgrade Guides](ota.md)
 - [Frequently Asked Questions](faq.md)
 - [Magisk Changelog](changes.md)
 

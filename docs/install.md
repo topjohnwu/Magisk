@@ -84,6 +84,10 @@ As a summary, after installing Magisk in recovery **(starting from power off)**:
    - **Note:** Your data will **NOT** be wiped, as Magisk automatically removes the factory reset step from the recovery image during patching.
 6. The USB drive will reflash the device, and once complete, Magisk will be installed.
 
+### System Updates
+
+Googlebooks support seamless A/B system updates, allowing you to apply official OTA updates while preserving Magisk without reflashing from a USB drive. Follow the [OTA Upgrade Guides](ota.md) to install system updates and retain root access.
+
 ## Samsung Devices
 
 Before proceeding, please acknowledge that:

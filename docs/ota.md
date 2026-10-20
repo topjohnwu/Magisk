@@ -10,7 +10,7 @@ Magisk does not modify read-only partitions by default, which makes applying off
 
 <p align="center"><img src="images/disable_auto_ota.png" width="250"/></p>
 
-- When an OTA is available, first go to (Magisk app → Uninstall → Restore Images). **Do not reboot or you will have Magisk uninstalled.** This will restore partitions modified by Magisk back to stock from backups made at install in order to pass pre-OTA block verifications. **Note:** Restoring the boot image is unnecessary for Pixel devices, as Google's servers will automatically serve a full OTA if any partition has been modified.
+- When an OTA is available, first go to (Magisk app → Uninstall → Restore Images). **Do not reboot or you will have Magisk uninstalled.** This will restore partitions modified by Magisk back to stock from backups made at install in order to pass pre-OTA block verifications. **Note:** Restoring the boot image is unnecessary for Pixel devices and Googlebooks, as Google's servers will automatically serve a full OTA if any partition has been modified.
 
 <p align="center"><img src="images/restore_img.png" width="300"/></p>
 
