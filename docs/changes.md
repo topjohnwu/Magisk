@@ -1,4 +1,4 @@
-# Magisk Changelog
+Samsung A-135MMagisk Changelog
 
 ### v31.0 (2026.9.4)
 
