@@ -44,7 +44,7 @@ ensure_android_cli() {
 # $2 = component
 am_instrument() {
   set +x
-  local out=$(adb shell am instrument -w --user 0 -e class "$1" "$2")
+  local out=$(adb shell am instrument -w --user current -e class "$1" "$2")
   echo "$out"
   if grep -q 'OK (' <<< "$out"; then
     set -x
@@ -60,10 +60,10 @@ run_setup() {
   adb shell 'PATH=$PATH:/debug_ramdisk magisk -v'
 
   # Install the Magisk app
-  adb install -r -g $apk
+  adb install --user current -r -g $apk
 
   # Install the test app
-  adb install -r -g out/test.apk
+  adb install --user current -r -g out/test.apk
 
   local app='com.topjohnwu.magisk.test/com.topjohnwu.magisk.test.AppTestRunner'
 

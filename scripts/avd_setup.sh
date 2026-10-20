@@ -51,7 +51,7 @@ if [ -z "$FIRST_STAGE" ]; then
   fi
 fi
 
-pm install -r -g $(pwd)/magisk.apk
+pm install --user current -r -g $(pwd)/magisk.apk
 
 # Stop zygote (and previous setup if exists)
 magisk --stop 2>/dev/null

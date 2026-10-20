@@ -506,14 +506,18 @@ impl MagiskD {
             while let Some(e) = app_data_dir.read()? {
                 if e.is_dir()
                     && let Ok(user) = e.name().parse::<i32>()
-                    && user >= 0
                 {
-                    users.push(user);
+                    if self.is_headless && user == 0 {
+                        continue;
+                    }
+                    if user >= 0 {
+                        users.push(user);
+                    }
                 }
             }
             Ok(())
         }();
-        if !users.contains(&0) {
+        if users.is_empty() {
             users.push(0);
         }
         users.sort_unstable();

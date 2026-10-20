@@ -70,9 +70,7 @@ impl Extra<'_> {
 }
 
 impl MagiskD {
-    fn exec_cmd(&self, user: i32, mgr_pkg: &str, action: &'static str, extras: &[Extra]) {
-        let user = user.to_string();
-
+    fn exec_cmd(&self, user: &str, mgr_pkg: &str, action: &'static str, extras: &[Extra]) {
         let provider = format!("content://{mgr_pkg}.provider");
         let mut cmd = app_process();
         cmd.args([
@@ -82,7 +80,7 @@ impl MagiskD {
             "--uri",
             &provider,
             "--user",
-            &user,
+            user,
             "--method",
             action,
         ]);
@@ -164,13 +162,14 @@ impl MagiskD {
                 value: Bool(info.settings.log),
             },
         ];
-        if to_app_id(info.eval_uid) < AID_APP_START {
-            for user in self.get_users() {
-                self.exec_cmd(user, &info.mgr_pkg, "notify", &extras);
-            }
+        let user_id;
+        let user = if to_app_id(info.eval_uid) < AID_APP_START {
+            "current"
         } else {
-            self.exec_cmd(to_user_id(info.eval_uid), &info.mgr_pkg, "notify", &extras);
-        }
+            user_id = to_user_id(info.eval_uid).to_string();
+            &user_id
+        };
+        self.exec_cmd(user, &info.mgr_pkg, "notify", &extras);
     }
 
     pub(super) fn notify_app(&self, cred: &UCred, info: &SuInfo, request: &SuRequest) {

@@ -322,8 +322,8 @@ app_test_main() {
   for apk in "${apks[@]}"; do
     # Cleanup
     adb shell pm uninstall com.topjohnwu.magisk || true
-    adb install -r -g $apk
-    adb install -r -g out/test.apk
+    adb install --user current -r -g $apk
+    adb install --user current -r -g out/test.apk
     am_instrument '.AppTest' $app
   done
 }
