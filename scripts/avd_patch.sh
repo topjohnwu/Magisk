@@ -2,7 +2,7 @@
 #   AVD MagiskInit Setup
 #####################################################################
 #
-# Support API level: 23 - 36
+# Support API level: 24 - 36
 #
 # With an emulator booted and accessible via ADB, usage:
 # ./build.py patch --avd path/to/booted/avd-image/ramdisk.img
@@ -15,7 +15,7 @@
 #####################################################################
 # AVD Init Configurations:
 #
-# rootfs w/o early mount: API 23 - 25
+# rootfs w/o early mount: API 24 - 25
 # rootfs with early mount: API 26 - 27
 # Legacy system-as-root: API 28
 # 2 stage init: API 29 - 35

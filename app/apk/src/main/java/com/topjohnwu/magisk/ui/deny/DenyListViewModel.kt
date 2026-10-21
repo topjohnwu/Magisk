@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.ui.deny
 
-import android.annotation.SuppressLint
 import android.content.pm.PackageManager.MATCH_UNINSTALLED_PACKAGES
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.arch.AsyncLoadViewModel
@@ -179,7 +178,6 @@ class DenyListViewModel : AsyncLoadViewModel() {
         }
     }
 
-    @SuppressLint("InlinedApi")
     override suspend fun doLoadWork() {
         _loading.value = true
         val apps = withContext(Dispatchers.Default) {

@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.zip.InflaterInputStream;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 import javax.crypto.Cipher;
@@ -158,11 +157,7 @@ public class DownloadActivity extends Activity {
         } else {
             File apk = new File(getCodeCacheDir(), "res.apk");
             try (var out = new ZipOutputStream(new FileOutputStream(apk))) {
-                // AndroidManifest.xml is required on Android 6-, and directory support is broken on Android 9-10
-                out.putNextEntry(new ZipEntry("AndroidManifest.xml"));
-                try (var stubApk = new ZipFile(getPackageCodePath())) {
-                    APKInstall.transfer(stubApk.getInputStream(stubApk.getEntry("AndroidManifest.xml")), out);
-                }
+                // Directory support is broken on Android 9-10
                 out.putNextEntry(new ZipEntry("resources.arsc"));
                 decryptResources(out);
             }

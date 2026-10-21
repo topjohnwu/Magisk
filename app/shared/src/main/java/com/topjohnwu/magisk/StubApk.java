@@ -26,14 +26,8 @@ public class StubApk {
 
     private static File getDynDir(ApplicationInfo info) {
         if (dynDir == null) {
-            final String dataDir;
-            if (SDK_INT >= Build.VERSION_CODES.N) {
-                // Use device protected path to allow directBootAware
-                dataDir = info.deviceProtectedDataDir;
-            } else {
-                dataDir = info.dataDir;
-            }
-            dynDir = new File(dataDir, "dyn");
+            // Use device protected path to allow directBootAware
+            dynDir = new File(info.deviceProtectedDataDir, "dyn");
             dynDir.mkdirs();
         }
         return dynDir;

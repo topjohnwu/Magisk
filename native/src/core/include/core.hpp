@@ -15,7 +15,6 @@
 #define to_user_id(uid) (uid / AID_USER_OFFSET)
 
 #define SDK_INT      (MagiskD::Get().sdk_int())
-#define APP_DATA_DIR (SDK_INT >= 24 ? "/data/user_de" : "/data/user")
 
 inline int connect_daemon(RequestCode req) {
     return connect_daemon(req, false);

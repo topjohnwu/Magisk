@@ -1,4 +1,4 @@
-use crate::consts::{APP_PACKAGE_NAME, MAGISK_VER_CODE};
+use crate::consts::{APP_DATA_DIR, APP_PACKAGE_NAME, MAGISK_VER_CODE};
 use crate::daemon::{AID_APP_END, AID_APP_START, AID_USER_OFFSET, MagiskD, to_app_id};
 use crate::ffi::{DbEntryKey, get_magisk_tmp, install_apk, uninstall_pkg};
 use base::WalkResult::{Abort, Continue, Skip};
@@ -227,9 +227,9 @@ impl TrackedFile {
 }
 
 impl ManagerInfo {
-    fn check_dyn(&mut self, daemon: &MagiskD, user: i32, pkg: &str) -> Status {
+    fn check_dyn(&mut self, user: i32, pkg: &str) -> Status {
         let apk = cstr::buf::default()
-            .join_path(daemon.app_data_dir())
+            .join_path(APP_DATA_DIR)
             .join_path_fmt(user)
             .join_path(pkg)
             .join_path("dyn")
@@ -349,7 +349,7 @@ impl ManagerInfo {
                 return (-1, "");
             }
             // dyn APK is still the same
-            if file.path.starts_with(daemon.app_data_dir().as_str()) {
+            if file.path.starts_with(APP_DATA_DIR) {
                 return (
                     user * AID_USER_OFFSET + self.repackaged_app_id,
                     &self.repackaged_pkg,
@@ -358,7 +358,7 @@ impl ManagerInfo {
             // stub APK is still the same
             if !self.repackaged_pkg.is_empty() {
                 return if matches!(
-                    self.check_dyn(daemon, user, self.repackaged_pkg.clone().as_str()),
+                    self.check_dyn(user, self.repackaged_pkg.clone().as_str()),
                     Status::Installed
                 ) {
                     (
@@ -381,7 +381,7 @@ impl ManagerInfo {
         if !db_pkg.is_empty() {
             match self.check_stub(user, &db_pkg) {
                 Status::Installed => {
-                    return if matches!(self.check_dyn(daemon, user, &db_pkg), Status::Installed) {
+                    return if matches!(self.check_dyn(user, &db_pkg), Status::Installed) {
                         (
                             user * AID_USER_OFFSET + self.repackaged_app_id,
                             &self.repackaged_pkg,
@@ -430,7 +430,7 @@ impl ManagerInfo {
 impl MagiskD {
     fn get_package_uid(&self, user: i32, pkg: &str) -> i32 {
         let path = cstr::buf::default()
-            .join_path(self.app_data_dir())
+            .join_path(APP_DATA_DIR)
             .join_path_fmt(user)
             .join_path(pkg);
         path.get_attr()
@@ -483,7 +483,7 @@ impl MagiskD {
     pub fn get_app_no_list(&self) -> BitSet {
         let mut list = BitSet::new();
         let _ = || -> LoggedResult<()> {
-            let mut app_data_dir = Directory::open(self.app_data_dir())?;
+            let mut app_data_dir = Directory::open(cstr!(APP_DATA_DIR))?;
             // For each user
             loop {
                 let entry = match app_data_dir.read()? {
@@ -512,7 +512,7 @@ impl MagiskD {
     pub fn get_users(&self) -> Vec<i32> {
         let mut users = Vec::new();
         let _ = || -> LoggedResult<()> {
-            let mut app_data_dir = Directory::open(self.app_data_dir())?;
+            let mut app_data_dir = Directory::open(cstr!(APP_DATA_DIR))?;
             while let Some(e) = app_data_dir.read()? {
                 if e.is_dir()
                     && let Ok(user) = e.name().parse::<i32>()

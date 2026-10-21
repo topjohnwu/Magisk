@@ -2,7 +2,7 @@
 #   AVD Magisk Setup
 #####################################################################
 #
-# Support API level: 23 - 36
+# Support API level: 24 - 36
 #
 # For developing Magisk, just use:
 # ./build.py emulator

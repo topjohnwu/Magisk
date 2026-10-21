@@ -6,7 +6,6 @@ import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.ktx.cachedFile
-import com.topjohnwu.magisk.core.ktx.deviceProtectedContext
 import com.topjohnwu.magisk.core.ktx.writeTo
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
@@ -30,7 +29,7 @@ class ShellInit : Shell.Initializer() {
                     return true
                 val jar = JarFile(StubApk.current(context))
                 val bb = jar.getJarEntry("lib/${Const.CPU_ABI}/libbusybox.so")
-                localBB = context.deviceProtectedContext.cachedFile("busybox")
+                localBB = context.createDeviceProtectedStorageContext().cachedFile("busybox")
                 localBB.delete()
                 runBlocking {
                     jar.getInputStream(bb).writeTo(localBB, dispatcher = Dispatchers.Unconfined)

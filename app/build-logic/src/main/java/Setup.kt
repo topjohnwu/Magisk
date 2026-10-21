@@ -52,7 +52,7 @@ fun Project.setupCommon() {
         ndkVersion = "30.0.15729638"
 
         defaultConfig.apply {
-            minSdk = 23
+            minSdk = 24
         }
 
         compileOptions.apply {
@@ -280,7 +280,6 @@ fun Project.setupMainApk() {
 
         defaultConfig {
             applicationId = "com.topjohnwu.magisk"
-            vectorDrawables.useSupportLibrary = true
             versionName = Config.version
             versionCode = Config.versionCode
             ndk {

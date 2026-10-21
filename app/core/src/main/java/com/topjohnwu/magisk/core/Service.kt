@@ -3,7 +3,6 @@ package com.topjohnwu.magisk.core
 import android.app.Notification
 import android.content.Intent
 import android.os.Build
-import androidx.core.app.ServiceCompat
 import androidx.core.content.IntentCompat
 import com.topjohnwu.magisk.core.base.BaseService
 import com.topjohnwu.magisk.core.download.DownloadEngine
@@ -34,6 +33,6 @@ class Service : BaseService(), DownloadSession {
     }
 
     override fun onDownloadComplete() {
-        ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
+        stopForeground(STOP_FOREGROUND_REMOVE)
     }
 }

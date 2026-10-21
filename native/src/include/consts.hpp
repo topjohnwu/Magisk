@@ -1,6 +1,7 @@
 #pragma once
 
 #define JAVA_PACKAGE_NAME "com.topjohnwu.magisk"
+#define APP_DATA_DIR    "/data/user_de"
 #define SECURE_DIR      "/data/adb"
 #define MODULEROOT      SECURE_DIR "/modules"
 #define DATABIN         SECURE_DIR "/magisk"

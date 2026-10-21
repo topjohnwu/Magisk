@@ -1,10 +1,9 @@
 package com.topjohnwu.magisk.ui.superuser
 
-import android.annotation.SuppressLint
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager.MATCH_UNINSTALLED_PACKAGES
 import android.graphics.drawable.Drawable
-import androidx.core.os.ProcessCompat
+import android.os.Process
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.arch.AsyncLoadViewModel
 import com.topjohnwu.magisk.core.AppContext
@@ -186,7 +185,6 @@ class SuperuserGrantViewModel(
         }
     }
 
-    @SuppressLint("InlinedApi")
     override suspend fun doLoadWork() {
         if (_allApps.value.isNotEmpty()) return
         _loading.value = true
@@ -234,7 +232,7 @@ class SuperuserGrantViewModel(
                     val label = appInfo.getLabel(pm)
                     val icon = runCatching { appInfo.loadIcon(pm) }.getOrDefault(pm.defaultActivityIcon)
                     val isSystemApp = (appInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0
-                    val isApp = ProcessCompat.isApplicationUid(appInfo.uid)
+                    val isApp = Process.isApplicationUid(appInfo.uid)
                     val suAppInfo = SuGrantAppInfo(
                         label = label,
                         packageName = appInfo.packageName,
