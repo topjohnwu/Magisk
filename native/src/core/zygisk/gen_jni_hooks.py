@@ -370,25 +370,6 @@ fas_c = ForkApp(
     ],
 )
 
-fas_samsung_m = ForkApp(
-    "samsung_m",
-    [
-        uid,
-        gid,
-        gids,
-        runtime_flags,
-        rlimits,
-        mount_external,
-        se_info,
-        Anon(jint),
-        Anon(jint),
-        nice_name,
-        fds_to_close,
-        instruction_set,
-        app_data_dir,
-    ],
-)
-
 fas_samsung_n = ForkApp(
     "samsung_n",
     [
@@ -718,7 +699,6 @@ with open("jni_hooks.hpp", "w") as f:
                 fas_samsung_p,
                 fas_samsung_o,
                 fas_samsung_n,
-                fas_samsung_m,
             ],
         )
     )

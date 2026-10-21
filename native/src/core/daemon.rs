@@ -78,14 +78,6 @@ impl MagiskD {
         self.sdk_int
     }
 
-    pub fn app_data_dir(&self) -> &'static Utf8CStr {
-        if self.sdk_int >= 24 {
-            cstr!("/data/user_de")
-        } else {
-            cstr!("/data/user")
-        }
-    }
-
     fn handle_request_sync(&self, mut client: UnixStream, code: RequestCode) {
         match code {
             RequestCode::CHECK_VERSION => {

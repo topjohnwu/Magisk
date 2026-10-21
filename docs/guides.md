@@ -182,7 +182,7 @@ The `customize.sh` script runs in Magisk's BusyBox `ash` shell with "Standalone 
 - `ZIPFILE` (path): your module's installation zip
 - `ARCH` (string): the CPU architecture of the device. Value is either `arm`, `arm64`, `x86`, `x64`, or `riscv64`
 - `IS64BIT` (bool): `true` if `$ARCH` is either `arm64`, `x64`, or `riscv64`
-- `API` (int): the API level (Android version) of the device (e.g. `23` for Android 6.0)
+- `API` (int): the API level (Android version) of the device (e.g. `24` for Android 7.0)
 
 ##### Functions
 

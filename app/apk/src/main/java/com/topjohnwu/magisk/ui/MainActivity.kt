@@ -263,7 +263,6 @@ class MainActivity : ComponentActivity(), SplashScreenHost {
         }
     }
 
-    @SuppressLint("InlinedApi")
     override fun showInvalidStateMessage() {
         showInvalidState.value = true
     }

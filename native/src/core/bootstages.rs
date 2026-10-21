@@ -1,4 +1,4 @@
-use crate::consts::{APP_PACKAGE_NAME, BBPATH, DATABIN, MODULEROOT, SECURE_DIR};
+use crate::consts::{APP_DATA_DIR, APP_PACKAGE_NAME, BBPATH, DATABIN, MODULEROOT, SECURE_DIR};
 use crate::daemon::MagiskD;
 use crate::db::MultiuserMode;
 use crate::ffi::{
@@ -36,7 +36,7 @@ impl MagiskD {
         let mut buf = cstr::buf::default();
 
         for user in self.get_users() {
-            buf.append_path(self.app_data_dir())
+            buf.append_path(APP_DATA_DIR)
                 .append_path_fmt(user)
                 .append_path(APP_PACKAGE_NAME)
                 .append_path("install");
@@ -118,14 +118,9 @@ impl MagiskD {
         self.preserve_stub_apk();
 
         // Check secure dir
-        let secure_dir = cstr!(SECURE_DIR);
-        if !secure_dir.exists() {
-            if self.sdk_int < 24 {
-                secure_dir.mkdir(0o700).log_ok();
-            } else {
-                error!("* {} is not present, abort", SECURE_DIR);
-                return true;
-            }
+        if !cstr!(SECURE_DIR).exists() {
+            error!("* {} is not present, abort", SECURE_DIR);
+            return true;
         }
 
         self.prune_su_access();

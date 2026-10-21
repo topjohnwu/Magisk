@@ -48,7 +48,7 @@ import java.io.InputStream
  * the session to make sure all download operations can be completed without the operating system
  * killing the session.
  *
- * For API 23 - 33, we use a foreground service as a session.
+ * For API 24 - 33, we use a foreground service as a session.
  * For API 34 and higher, we use user-initiated job services as a session.
  */
 class DownloadEngine(session: DownloadSession) : DownloadSession by session, DownloadNotifier {

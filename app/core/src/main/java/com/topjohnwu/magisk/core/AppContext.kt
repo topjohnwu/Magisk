@@ -7,7 +7,6 @@ import android.content.ComponentCallbacks2
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.res.Configuration
-import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
 import android.system.Os
@@ -112,14 +111,6 @@ object AppContext : ContextWrapper(null),
             GlobalScope.launch(Dispatchers.IO) {
                 ProfileInstaller.writeProfile(this@AppContext)
             }
-        }
-    }
-
-    override fun createDeviceProtectedStorageContext(): Context {
-        return if (SDK_INT >= Build.VERSION_CODES.N) {
-            super.createDeviceProtectedStorageContext()
-        } else {
-            this
         }
     }
 

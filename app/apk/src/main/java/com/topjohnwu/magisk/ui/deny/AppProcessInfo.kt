@@ -12,7 +12,7 @@ import android.content.pm.PackageManager.MATCH_DISABLED_COMPONENTS
 import android.content.pm.PackageManager.MATCH_UNINSTALLED_PACKAGES
 import android.content.pm.ServiceInfo
 import android.graphics.drawable.Drawable
-import androidx.core.os.ProcessCompat
+import android.os.Process
 import com.topjohnwu.magisk.core.ktx.getLabel
 import java.util.Locale
 import java.util.TreeSet
@@ -58,7 +58,7 @@ class AppProcessInfo(
 
     fun isSystemApp() = info.flags and ApplicationInfo.FLAG_SYSTEM != 0
 
-    fun isApp() = packageName == WEBVIEW_ZYGOTE_MAGIC || ProcessCompat.isApplicationUid(info.uid)
+    fun isApp() = packageName == WEBVIEW_ZYGOTE_MAGIC || Process.isApplicationUid(info.uid)
 
     private fun createProcess(name: String, pkg: String = info.packageName) =
         ProcessInfo(name, pkg, denyList.any { it.process == name && it.packageName == pkg })

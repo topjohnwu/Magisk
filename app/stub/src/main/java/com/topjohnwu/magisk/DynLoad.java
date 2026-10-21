@@ -118,7 +118,6 @@ public class DynLoad {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q)
             replaceClassLoader(context);
 
-        // noinspection InlinedApi
         int flags = PackageManager.GET_ACTIVITIES | PackageManager.GET_SERVICES
                 | PackageManager.GET_PROVIDERS | PackageManager.GET_RECEIVERS
                 | PackageManager.MATCH_DIRECT_BOOT_AWARE | PackageManager.MATCH_DISABLED_COMPONENTS
@@ -196,7 +195,7 @@ public class DynLoad {
             mcl.set(loadedApk, new DelegateClassLoader());
         } catch (Exception e) {
             // Actually impossible as this method is only called on API < 29,
-            // and API 23 - 28 do not restrict access to these fields.
+            // and API 24 - 28 do not restrict access to these fields.
             Log.e(DynLoad.class.getSimpleName(), "", e);
         }
     }

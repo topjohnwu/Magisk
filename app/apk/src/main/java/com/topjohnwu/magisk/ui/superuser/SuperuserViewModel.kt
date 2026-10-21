@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.ui.superuser
 
-import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.MATCH_UNINSTALLED_PACKAGES
 import android.graphics.drawable.Drawable
@@ -63,7 +62,6 @@ class SuperuserViewModel(
     private val _uiState = MutableStateFlow(UiState())
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
-    @SuppressLint("InlinedApi")
     override suspend fun doLoadWork() {
         if (!Info.showSuperUser) {
             _uiState.update { it.copy(loading = false) }

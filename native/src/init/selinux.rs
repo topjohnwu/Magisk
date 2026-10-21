@@ -15,12 +15,10 @@ use std::time::Duration;
 const MOCK_VERSION: &Utf8CStr = cstr!(concatcp!(SELINUXMOCK, "/version"));
 const MOCK_LOAD: &Utf8CStr = cstr!(concatcp!(SELINUXMOCK, "/load"));
 const MOCK_ENFORCE: &Utf8CStr = cstr!(concatcp!(SELINUXMOCK, "/enforce"));
-const MOCK_REQPROT: &Utf8CStr = cstr!(concatcp!(SELINUXMOCK, "/checkreqprot"));
 
 const SELINUX_MNT: &str = "/sys/fs/selinux";
 const SELINUX_ENFORCE: &Utf8CStr = cstr!(concatcp!(SELINUX_MNT, "/enforce"));
 const SELINUX_LOAD: &Utf8CStr = cstr!(concatcp!(SELINUX_MNT, "/load"));
-const SELINUX_REQPROT: &Utf8CStr = cstr!(concatcp!(SELINUX_MNT, "/checkreqprot"));
 
 enum SePatchStrategy {
     // 2SI, Android 10+
@@ -32,7 +30,7 @@ enum SePatchStrategy {
     // selinuxfs is mounted in init.cpp. Errors when mounting selinuxfs is ignored,
     // which means that we can directly mount selinuxfs ourselves and hijack nodes in it.
     SelinuxFs,
-    // Dynamic patching, Android 6.0 - 7.1
+    // Dynamic patching, Android 7.0 - 7.1
     // selinuxfs is mounted in libselinux's selinux_android_load_policy(). Errors when
     // mounting selinuxfs is fatal, which means we need to block init's control flow after
     // it mounted selinuxfs for us, then we can hijack nodes in it.
@@ -43,9 +41,9 @@ enum SePatchStrategy {
 //
 // We need to make sure the actual init process is blocked until sepolicy is loaded,
 // or else restorecon will fail and re-exec won't change context, causing boot failure.
-// We (ab)use the fact that init either reads the enforce node, or writes the checkreqprot
-// node, and because both has been replaced with FIFO files, init will block until we
-// handle it, effectively hijacking its control flow until the patched sepolicy is loaded.
+// We (ab)use the fact that init reads the enforce node, and because it has been replaced
+// with our FIFO file, init will block until we write something into the pipe, effectively
+// hijacking its control flow until the patched sepolicy is loaded.
 
 fn mock_fifo(target: &Utf8CStr, mock: &Utf8CStr) -> LoggedResult<()> {
     debug!("Hijack [{}]", target);
@@ -69,7 +67,6 @@ impl MagiskInit {
         cstr!("/init").unmount().ok();
         SELINUX_LOAD.unmount().log_ok();
         SELINUX_ENFORCE.unmount().ok();
-        SELINUX_REQPROT.unmount().ok();
 
         let mut sepol = SePolicy::from_file(MOCK_LOAD);
         sepol.magisk_rules();
@@ -186,25 +183,16 @@ impl MagiskInit {
 
         // Step 2: wait for selinuxfs to be mounted (only for LEGACY)
 
-        let wait = Duration::from_millis(100);
-
         if matches!(strat, SePatchStrategy::Legacy) {
+            let wait = Duration::from_millis(100);
             // Busy wait until selinuxfs is mounted
             while !SELINUX_ENFORCE.exists() {
                 // Retry every 100ms
                 sleep(wait);
             }
 
-            // On Android 6.0, init does not call security_getenforce() first; instead it directly
-            // call security_setenforce() after security_load_policy(). What's even worse, it opens
-            // the enforce node with O_RDWR, which will not block when opening FIFO files.
-            // As a workaround, we do not mock the enforce node, and block init with mocking
-            // checkreqprot instead.
-            // Android 7.0 - 7.1 doesn't have this issue, but for simplicity, let's just use the
-            // same blocking strategy for both since it also works just fine.
-
             mock_file(SELINUX_LOAD, MOCK_LOAD)?;
-            mock_fifo(SELINUX_REQPROT, MOCK_REQPROT)?;
+            mock_fifo(SELINUX_ENFORCE, MOCK_ENFORCE)?;
 
             // This will unblock init at selinux_android_load_policy() -> set_policy_index().
             drop(MOCK_VERSION.open(OFlag::O_WRONLY)?);
@@ -241,7 +229,7 @@ impl MagiskInit {
                 // Write ack to restore preload.so's control flow
                 ack_fd.write_all("0".as_bytes())?;
             }
-            SePatchStrategy::SelinuxFs => {
+            SePatchStrategy::SelinuxFs | SePatchStrategy::Legacy => {
                 // This open will block until init calls security_getenforce().
                 let mut mock_enforce = MOCK_ENFORCE.open(OFlag::O_WRONLY)?;
 
@@ -253,29 +241,6 @@ impl MagiskInit {
                     .open(OFlag::O_RDONLY)?
                     .read_to_end(&mut data)?;
                 mock_enforce.write_all(&data)?;
-            }
-            SePatchStrategy::Legacy => {
-                let mut sz = 0_usize;
-                // Busy wait until sepolicy is fully written.
-                loop {
-                    let attr = MOCK_LOAD.get_attr()?;
-                    if sz != 0 && sz == attr.st.st_size as usize {
-                        break;
-                    }
-                    sz = attr.st.st_size as usize;
-                    // Check every 100ms
-                    sleep(wait);
-                }
-
-                self.cleanup_and_load(&rules);
-
-                // init is blocked on checkreqprot, write to the real node first, then
-                // unblock init by opening the mock FIFO.
-                SELINUX_REQPROT
-                    .open(OFlag::O_WRONLY)?
-                    .write_all("0".as_bytes())?;
-                let mut v = vec![];
-                MOCK_REQPROT.open(OFlag::O_RDONLY)?.read_to_end(&mut v)?;
             }
         }
 
