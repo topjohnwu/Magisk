@@ -37,7 +37,6 @@ android {
 }
 
 dependencies {
-    api(project(":shared"))
     coreLibraryDesugaring(libs.jdk.libs)
 
     api(libs.timber)

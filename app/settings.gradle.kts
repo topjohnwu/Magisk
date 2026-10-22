@@ -31,4 +31,4 @@ pluginManagement {
 }
 
 rootProject.name = "Magisk"
-include(":apk", ":core", ":shared", ":test")
+include(":apk", ":core", ":test")
