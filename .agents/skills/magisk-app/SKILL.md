@@ -1,6 +1,6 @@
 ---
 name: magisk-app
-description: Guidelines, architecture, development conventions, and build workflows for the Magisk Android application (app/ subproject). Use when working on, modifying, building, or testing code in app/ or any of its submodules (:core, :apk, :shared, :stub, :stub-res, :test, :build-logic).
+description: Guidelines, architecture, development conventions, and build workflows for the Magisk Android application (app/ subproject). Use when working on, modifying, building, or testing code in app/ or any of its submodules (:core, :apk, :test, :build-logic).
 ---
 
 # Magisk App Subproject Guidelines
@@ -18,9 +18,6 @@ Guidelines and workflows for developing and building the Android application in 
 Multi-module Gradle project structure:
 - **`:apk`** (`apk/`): Main Magisk app (modern Jetpack Compose UI). Primary target for UI and application features.
 - **`:core`** (`core/`): Core domain logic, resources, Room DB, services. Primary target for core feature development.
-- **`:shared`** (`shared/`): Shared utilities and common data structures.
-- **`:stub`** (`stub/`): Lightweight stub app loader for hidden installs.
-- **`:stub-res`** (`stub-res/`): Stub-specific Android resources.
 - **`:test`** (`test/`): Application testing target.
 - **`:build-logic`** (`build-logic/`): Custom Gradle plugins and build logic.
 
@@ -29,7 +26,7 @@ Multi-module Gradle project structure:
 - **Target Modules:** All active app development occurs in `:core` and `:apk`.
 - **Language & UI:** Written in Kotlin/Java. **Prefer Kotlin for all new code.** Uses Jetpack Compose for UI (prefer over View XML).
 - **String Resources:**
-  - Default strings live in `core/src/main/res/values/strings.xml` and `stub-res/src/main/res/values/strings.xml`. Translations live in `values-[lang]/strings.xml`.
+  - Default strings live in `core/src/main/res/values/strings.xml`. Translations live in `values-[lang]/strings.xml`.
   - Whenever updating an existing string in a way that significantly changes its meaning, **always create a new string resource key** (and remove the old key across all `values*/strings.xml` files if unused) so existing translations do not go out of sync; falling back to untranslated default text is preferred over displaying an incorrect translation.
 - **Data Stack:** Room, KSP, Wire (Protocol Buffers), Moshi.
 
@@ -37,12 +34,10 @@ Multi-module Gradle project structure:
 
 ### From `app/` directory (prefixed with `../scripts/env.py`):
 - **Build App (`:apk` Debug):** `../scripts/env.py ./gradlew :apk:assembleDebug`
-- **Build Stub APK:** `../scripts/env.py ./gradlew :stub:assembleDebug`
 - **Run Lint:** `../scripts/env.py ./gradlew lint` (or `../scripts/env.py ./gradlew :apk:lintDebug`)
 - **Run Unit Tests:** `../scripts/env.py ./gradlew test`
 - **Clean Artifacts:** `../scripts/env.py ./gradlew clean`
 
 ### From repository root (via `build.py`):
 - **Build App (`:apk`):** `./build.py app`
-- **Build Stub App:** `./build.py stub`
 - **Run App Tests:** `./build.py test`
