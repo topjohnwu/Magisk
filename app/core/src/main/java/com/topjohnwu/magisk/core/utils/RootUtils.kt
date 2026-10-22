@@ -19,12 +19,9 @@ import timber.log.Timber
 import java.io.File
 import java.util.concurrent.locks.AbstractQueuedSynchronizer
 
-class RootUtils(stub: Any?) : RootService() {
+class RootUtils : RootService() {
 
-    private val className: String = stub?.javaClass?.name ?: javaClass.name
     private lateinit var am: ActivityManager
-
-    constructor() : this(null)
 
     init {
         Timber.plant(object : Timber.DebugTree() {
@@ -39,7 +36,7 @@ class RootUtils(stub: Any?) : RootService() {
     }
 
     override fun getComponentName(): ComponentName {
-        return ComponentName(packageName, className)
+        return ComponentName(packageName, javaClass.name)
     }
 
     override fun onBind(intent: Intent): IBinder {

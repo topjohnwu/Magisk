@@ -1,5 +1,0 @@
-<resources>
-    <string name="upgrade_msg">Actualiza a la versión completa de Magisk para finalizar la instalación. ¿Descargar e instalar?</string>
-    <string name="no_internet_msg">Sin conexión disponible</string>
-    <string name="dling">Descargando...</string>
-</resources>
