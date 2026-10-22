@@ -6,8 +6,8 @@
 
 using namespace std;
 
-#define DB_VERSION     12
-#define DB_VERSION_STR "12"
+#define DB_VERSION     13
+#define DB_VERSION_STR "13"
 
 // SQLite APIs
 
@@ -211,11 +211,6 @@ sqlite3 *open_and_init_db() {
                 "CREATE TABLE IF NOT EXISTS settings "
                 "(key TEXT, value INT, PRIMARY KEY(key))");
     };
-    auto create_strings = [&] {
-        return sql_exec_impl(db.get(),
-                "CREATE TABLE IF NOT EXISTS strings "
-                "(key TEXT, value TEXT, PRIMARY KEY(key))");
-    };
     auto create_denylist = [&] {
         return sql_exec_impl(db.get(),
                 "CREATE TABLE IF NOT EXISTS denylist "
@@ -232,11 +227,11 @@ sqlite3 *open_and_init_db() {
     // 10: remove table `logs`
     // 11: remove table `hidelist` and create table `denylist` (same data structure)
     // 12: rebuild table `policies` to drop column `package_name`
+    // 13: remove table `strings`
 
     if (/* 0, 1, 2, 3, 4, 5, 6 */ ver <= 6) {
         sql_chk_log(create_policy);
         sql_chk_log(create_settings);
-        sql_chk_log(create_strings);
         sql_chk_log(create_denylist);
 
         // Directly jump to latest
@@ -293,6 +288,11 @@ sqlite3 *open_and_init_db() {
                 "DROP TABLE policies_tmp;"
                 "COMMIT;");
         ver = 12;
+        upgrade = true;
+    }
+    if (ver == 12) {
+        sql_chk_log(sql_exec_impl, db.get(), "DROP TABLE IF EXISTS strings;");
+        ver = 13;
         upgrade = true;
     }
 

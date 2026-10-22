@@ -90,7 +90,6 @@ pub mod ffi {
         DenylistConfig,
         ZygiskConfig,
         BootloopCount,
-        SuManager,
     }
 
     #[repr(i32)]
