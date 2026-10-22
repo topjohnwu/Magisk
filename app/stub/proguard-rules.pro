@@ -20,13 +20,4 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--obfuscationdictionary ../dict.txt
--classobfuscationdictionary ../dict.txt
--packageobfuscationdictionary ../dict.txt
-
-# Excessive obfuscation
--repackageclasses
--allowaccessmodification
--keepclassmembers class com.topjohnwu.magisk.dummy.* { <init>(); }
 -keepclassmembers class com.topjohnwu.magisk.DownloadActivity { <init>(); }
--keepclassmembers class com.topjohnwu.magisk.StubRootService { <init>(); }

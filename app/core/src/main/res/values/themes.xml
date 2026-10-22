@@ -4,5 +4,4 @@
         <item name="windowSplashScreenBackground">@color/splash_background</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_magisk_padded</item>
     </style>
-    <style name="StubSplashTheme" parent="SplashTheme"/>
 </resources>

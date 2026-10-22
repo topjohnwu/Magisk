@@ -3,7 +3,6 @@ package com.topjohnwu.magisk.core.utils
 import android.annotation.SuppressLint
 import android.app.LocaleConfig
 import android.app.LocaleManager
-import android.content.ContextWrapper
 import android.content.Intent
 import android.content.res.Resources
 import android.net.Uri
@@ -11,12 +10,10 @@ import android.os.Build
 import android.os.LocaleList
 import android.provider.Settings
 import androidx.annotation.RequiresApi
-import com.topjohnwu.magisk.core.AppApkPath
 import com.topjohnwu.magisk.core.AppContext
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.R
 import com.topjohnwu.magisk.core.base.relaunch
-import com.topjohnwu.magisk.core.isRunningAsStub
 import org.xmlpull.v1.XmlPullParser
 import java.util.Locale
 
@@ -91,7 +88,7 @@ interface LocaleSetting {
             names.add(AppContext.getString(R.string.system_default))
             tags.add("")
 
-            if ((Build.VERSION.SDK_INT == 34 && !isRunningAsStub) || Build.VERSION.SDK_INT >= 35) {
+            if (Build.VERSION.SDK_INT >= 34) {
                 // Use platform LocaleConfig parser
                 val config = localeConfig
                 val list = config.supportedLocales ?: LocaleList.getEmptyLocaleList()
@@ -124,22 +121,11 @@ interface LocaleSetting {
 
         @get:RequiresApi(34)
         val localeConfig: LocaleConfig by lazy {
-            val context = if (isRunningAsStub) {
-                val pkgInfo = AppContext.packageManager.getPackageArchiveInfo(AppApkPath, 0)!!
-                object : ContextWrapper(AppContext) {
-                    override fun getApplicationInfo() = pkgInfo.applicationInfo
-                }
-            } else {
-                AppContext
-            }
-            LocaleConfig.fromContextIgnoringOverride(context)
+            LocaleConfig.fromContextIgnoringOverride(AppContext)
         }
 
-        private val localeManagerUsable get() =
-            if (isRunningAsStub) Build.VERSION.SDK_INT >= 35 else Build.VERSION.SDK_INT >= 33
-
         val useLocaleManager by lazy {
-            localeManagerUsable &&
+            Build.VERSION.SDK_INT >= 33 &&
                     localeSettingsIntent.resolveActivity(AppContext.packageManager) != null
         }
 

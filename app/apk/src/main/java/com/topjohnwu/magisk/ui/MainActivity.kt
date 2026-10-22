@@ -238,8 +238,6 @@ class MainActivity : ComponentActivity(), SplashScreenHost {
         }
     }
 
-    override fun showInvalidStateMessage() {}
-
     private fun showUnsupportedMessage() {
         val messages = mutableListOf<Pair<Int, Int>>()
 

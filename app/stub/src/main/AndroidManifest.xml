@@ -3,11 +3,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission
-        android:name="com.android.launcher.permission.INSTALL_SHORTCUT"
-        android:maxSdkVersion="25" />
-
     <application tools:ignore="MissingApplicationIcon">
+        <activity
+            android:name=".DownloadActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
