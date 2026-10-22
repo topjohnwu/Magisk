@@ -1,4 +1,4 @@
-use crate::consts::{APP_DATA_DIR, APP_PACKAGE_NAME, MAGISK_VER_CODE};
+use crate::consts::{APP_DATA_DIR, APP_PACKAGE_NAME, MAGISK_VER_CODE, TRUSTED_CERT};
 use crate::daemon::{AID_APP_END, AID_APP_START, AID_USER_OFFSET, MagiskD, to_app_id};
 use crate::ffi::{DbEntryKey, get_magisk_tmp, install_apk, uninstall_pkg};
 use base::WalkResult::{Abort, Continue, Skip};
@@ -169,6 +169,16 @@ fn find_apk_path(pkg: &str) -> LoggedResult<Utf8CString> {
     Ok(buf)
 }
 
+fn get_package_uid(user: i32, pkg: &str) -> i32 {
+    let path = cstr::buf::default()
+        .join_path(APP_DATA_DIR)
+        .join_path_fmt(user)
+        .join_path(pkg);
+    path.get_attr()
+        .map(|attr| attr.st.st_uid as i32)
+        .unwrap_or(-1)
+}
+
 enum Status {
     Installed,
     NotInstalled,
@@ -177,7 +187,6 @@ enum Status {
 
 pub struct ManagerInfo {
     stub_apk_fd: Option<File>,
-    trusted_cert: Vec<u8>,
     repackaged_app_id: i32,
     repackaged_pkg: String,
     repackaged_cert: Vec<u8>,
@@ -188,7 +197,6 @@ impl Default for ManagerInfo {
     fn default() -> Self {
         ManagerInfo {
             stub_apk_fd: None,
-            trusted_cert: Vec::new(),
             repackaged_app_id: -1,
             repackaged_pkg: String::new(),
             repackaged_cert: Vec::new(),
@@ -248,7 +256,7 @@ impl ManagerInfo {
             }
         };
 
-        if cert.is_empty() || cert != self.trusted_cert {
+        if cert.is_empty() || (!TRUSTED_CERT.is_empty() && cert != TRUSTED_CERT) {
             error!("pkg: dyn APK signature mismatch: {}", apk);
             #[cfg(all(feature = "check-signature", not(debug_assertions)))]
             {
@@ -295,7 +303,7 @@ impl ManagerInfo {
             Err(_) => return Status::NotInstalled,
         };
 
-        if cert.is_empty() || cert != self.trusted_cert {
+        if cert.is_empty() || (!TRUSTED_CERT.is_empty() && cert != TRUSTED_CERT) {
             error!("pkg: APK signature mismatch: {}", apk);
             #[cfg(all(feature = "check-signature", not(debug_assertions)))]
             {
@@ -370,7 +378,7 @@ impl ManagerInfo {
                 };
             }
             // orig APK is still the same
-            let uid = daemon.get_package_uid(user, APP_PACKAGE_NAME);
+            let uid = get_package_uid(user, APP_PACKAGE_NAME);
             return if uid < 0 {
                 (-1, "")
             } else {
@@ -405,7 +413,7 @@ impl ManagerInfo {
 
         match self.check_orig(user) {
             Status::Installed => {
-                let uid = daemon.get_package_uid(user, APP_PACKAGE_NAME);
+                let uid = get_package_uid(user, APP_PACKAGE_NAME);
                 return if uid < 0 {
                     (-1, "")
                 } else {
@@ -428,30 +436,12 @@ impl ManagerInfo {
 }
 
 impl MagiskD {
-    fn get_package_uid(&self, user: i32, pkg: &str) -> i32 {
-        let path = cstr::buf::default()
-            .join_path(APP_DATA_DIR)
-            .join_path_fmt(user)
-            .join_path(pkg);
-        path.get_attr()
-            .map(|attr| attr.st.st_uid as i32)
-            .unwrap_or(-1)
-    }
-
     pub fn preserve_stub_apk(&self) {
         let mut info = self.manager_info.lock();
-
         let apk = cstr::buf::default()
             .join_path(get_magisk_tmp())
             .join_path("stub.apk");
-
-        if let Ok(mut fd) = apk.open(OFlag::O_RDONLY | OFlag::O_CLOEXEC) {
-            info.trusted_cert = read_certificate(&mut fd, MAGISK_VER_CODE);
-            // Seek the fd back to start
-            fd.seek(SeekFrom::Start(0)).log_ok();
-            info.stub_apk_fd = Some(fd);
-        }
-
+        info.stub_apk_fd = apk.open(OFlag::O_RDONLY | OFlag::O_CLOEXEC).ok();
         apk.remove().log_ok();
     }
 

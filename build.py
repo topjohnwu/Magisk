@@ -5,6 +5,7 @@ import glob
 import os
 import re
 import shutil
+import ssl
 import stat
 import subprocess
 import sys
@@ -278,8 +279,29 @@ def dump_flags_native():
     native_gen_path.mkdir(mode=0o755, parents=True, exist_ok=True)
     write_if_diff(native_gen_path / "flags.h", flag_txt)
 
+    cert = b""
+    if "keyStore" in config:
+        ensure_jdk()
+        pem = cmd_out(
+            [
+                "keytool",
+                "-exportcert",
+                "-rfc",
+                "-keystore",
+                config["keyStore"],
+                "-storepass",
+                config["keyStorePass"],
+                "-alias",
+                config["keyAlias"],
+            ]
+        )
+        if pem:
+            cert = ssl.PEM_cert_to_DER_cert(pem)
+
+    cert_hex = ", ".join(f"0x{b:02x}" for b in cert)
     rust_flag_txt = f'pub const MAGISK_VERSION: &str = "{config["version"]}";\n'
     rust_flag_txt += f'pub const MAGISK_VER_CODE: i32 = {config["versionCode"]};\n'
+    rust_flag_txt += f"pub const TRUSTED_CERT: &[u8] = &[{cert_hex}];\n"
     write_if_diff(native_gen_path / "flags.rs", rust_flag_txt)
 
 
