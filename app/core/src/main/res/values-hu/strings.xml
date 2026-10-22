@@ -179,7 +179,6 @@
     <string name="flashing">Flashing…</string>
     <string name="done">Kész!</string>
     <string name="failure">Nem sikerült!</string>
-    <string name="hide_app_title">A Magisk app elrejtése…</string>
     <string name="open_link_failed_toast">Nem található alkalmazás a link megnyitásához</string>
     <string name="complete_uninstall">Teljes eltávolítás</string>
     <string name="restore_img">Image-ek visszaállítása</string>

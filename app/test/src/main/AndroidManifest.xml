@@ -16,8 +16,4 @@
         android:name="com.topjohnwu.magisk.test.AppTestRunner"
         android:targetPackage="com.topjohnwu.magisk" />
 
-    <instrumentation
-        android:name="com.topjohnwu.magisk.test.TestRunner"
-        android:targetPackage="com.topjohnwu.magisk.test" />
-
 </manifest>

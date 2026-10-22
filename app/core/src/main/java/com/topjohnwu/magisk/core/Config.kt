@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.core
 
-import android.os.Bundle
 import androidx.core.content.edit
 import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.model.ColorMode
@@ -11,7 +10,6 @@ import kotlinx.coroutines.GlobalScope
 
 object Config : PreferenceConfig, DBConfig {
 
-    override val stringDB get() = ServiceLocator.stringDB
     override val settingsDB get() = ServiceLocator.settingsDB
     override val context get() = ServiceLocator.deContext
     @OptIn(kotlinx.coroutines.DelicateCoroutinesApi::class)
@@ -24,8 +22,6 @@ object Config : PreferenceConfig, DBConfig {
         const val SU_BIOMETRIC = "su_biometric"
         const val ZYGISK = "zygisk"
         const val BOOTLOOP = "bootloop"
-        const val SU_MANAGER = "requester"
-        const val KEYSTORE = "keystore"
 
         // prefs
         const val SU_NOTIFICATION = "su_notification"
@@ -41,8 +37,6 @@ object Config : PreferenceConfig, DBConfig {
         const val THEME_ORDINAL = "theme_ordinal"
         const val DOH = "doh"
         const val RAND_NAME = "rand_name"
-
-        val NO_MIGRATION = emptySet<String>()
     }
 
     object OldValue {
@@ -119,8 +113,6 @@ object Config : PreferenceConfig, DBConfig {
         }
 
     var zygisk by dbSettings(Key.ZYGISK, Info.isEmulator)
-    var suManager by dbStrings(Key.SU_MANAGER, "", true)
-    var keyStoreRaw by dbStrings(Key.KEYSTORE, "", true)
     var suNotification by preferenceStrInt(Key.SU_NOTIFICATION, Value.NOTIFICATION_TOAST)
     var suMntNamespaceMode by dbSettings(Key.SU_MNT_NS, Value.NAMESPACE_MODE_REQUESTER)
     var suMultiuserMode by dbSettings(Key.SU_MULTIUSER_MODE, Value.MULTIUSER_MODE_OWNER_ONLY)
@@ -135,39 +127,7 @@ object Config : PreferenceConfig, DBConfig {
     private const val SU_FINGERPRINT = "su_fingerprint"
     private const val UPDATE_CHANNEL = "update_channel"
 
-    fun toBundle(): Bundle {
-        val map = prefs.all - Key.NO_MIGRATION
-        return Bundle().apply {
-            for ((key, value) in map) {
-                when (value) {
-                    is String -> putString(key, value)
-                    is Int -> putInt(key, value)
-                    is Boolean -> putBoolean(key, value)
-                }
-            }
-        }
-    }
-
-    @Suppress("DEPRECATION")
-    private fun fromBundle(bundle: Bundle) {
-        val keys = bundle.keySet().apply { removeAll(Key.NO_MIGRATION) }
-        prefs.edit {
-            for (key in keys) {
-                when (val value = bundle.get(key)) {
-                    is String -> putString(key, value)
-                    is Int -> putInt(key, value)
-                    is Boolean -> putBoolean(key, value)
-                }
-            }
-        }
-    }
-
-    fun init(bundle: Bundle?) {
-        // Only try to load prefs when fresh install
-        if (bundle != null && prefs.all.isEmpty()) {
-            fromBundle(bundle)
-        }
-
+    fun init() {
         prefs.edit {
             // Migrate su_fingerprint
             if (prefs.getBoolean(SU_FINGERPRINT, false))

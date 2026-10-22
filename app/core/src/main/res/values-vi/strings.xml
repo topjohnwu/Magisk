@@ -179,7 +179,6 @@
     <string name="flashing">Đang cài…</string>
     <string name="done">Xong!</string>
     <string name="failure">Thất bại!</string>
-    <string name="hide_app_title">Đang ẩn ứng dụng Magisk…</string>
     <string name="open_link_failed_toast">Không tìm thấy ứng dụng nào để mở liên kết</string>
     <string name="complete_uninstall">Hoàn thành Gỡ cài đặt</string>
     <string name="restore_img">Khôi phục đĩa ảnh boot (boot image)</string>

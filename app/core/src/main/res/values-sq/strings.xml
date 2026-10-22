@@ -203,7 +203,6 @@
     <string name="flashing">Duke u flash-uar…</string>    <string name="done">U krye!</string>
     <string name="done_action">U krye veprimi i %1$s</string>
     <string name="failure">Dështoi!</string>
-    <string name="hide_app_title">Duke fshehur aplikacionin Magisk…</string>
     <string name="open_link_failed_toast">Nuk u gjet asnjë aplikacion për të hapur lidhjen</string>
     <string name="complete_uninstall">Çinstalim i plotë</string>
     <string name="restore_img">Rikthe imazhet</string>

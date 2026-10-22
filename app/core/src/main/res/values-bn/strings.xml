@@ -178,7 +178,6 @@
     <string name="flashing">ঝলকানি…</string>
     <string name="done">সম্পন্ন!</string>
     <string name="failure">ব্যর্থ হয়েছে!</string>
-    <string name="hide_app_title">ম্যাজিস্ক অ্যাপটি লুকিয়ে রাখছে…</string>
     <string name="open_link_failed_toast">লিঙ্ক খোলার জন্য কোনো অ্যাপ পাওয়া যায়নি</string>
     <string name="complete_uninstall">সম্পূর্ণ আনইনস্টল করুন</string>
     <string name="restore_img">ছবি পুনরুদ্ধার করুন</string>

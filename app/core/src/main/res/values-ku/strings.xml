@@ -192,7 +192,6 @@
     <string name="flashing">فلاش کردن</string>    <string name="done">تەواو!</string>
     <string name="done_action">کارکردنی %1$s تەواو بوو</string>
     <string name="failure">Failed!</string>
-    <string name="hide_app_title">شاردنەوەی ئەپی ماجیسک…</string>
     <string name="open_link_failed_toast">هیچ ئەپێک تییە تا لینکەکەی پێ بکرێتەوە</string>
     <string name="complete_uninstall">سڕینەوەی تەواوی</string>
     <string name="restore_img">هێنانەوەی img</string>

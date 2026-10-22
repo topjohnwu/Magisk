@@ -49,6 +49,5 @@ open class MagiskDB {
     object Table {
         const val POLICY = "policies"
         const val SETTINGS = "settings"
-        const val STRINGS = "strings"
     }
 }

@@ -189,7 +189,6 @@
     <string name="flashing">Установка…</string>
     <string name="done">Завершено!</string>
     <string name="failure">Ошибка!</string>
-    <string name="hide_app_title">Скрытие приложения Magisk…</string>
     <string name="open_link_failed_toast">Приложения для открытия ссылки не найдены</string>
     <string name="complete_uninstall">Полное удаление</string>
     <string name="restore_img">Восстановить разделы</string>

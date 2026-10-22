@@ -43,7 +43,6 @@ dependencies {
 
     api(libs.timber)
     api(libs.markwon.core)
-    implementation(libs.bcpkix)
     implementation(libs.commons.compress)
     implementation(libs.xz)
     implementation(libs.wire.runtime)

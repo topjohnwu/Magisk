@@ -183,7 +183,6 @@
     <string name="flashing">Flashlanır...</string>
     <string name="done">Bitdi!</string>
     <string name="failure">Alınmadı!</string>
-    <string name="hide_app_title">Magisk tətbiqi gizlədilir…</string>
     <string name="open_link_failed_toast">Keçidi açaçaq tətbiq yoxdur</string>
     <string name="complete_uninstall">Tamamilə sil</string>
     <string name="restore_img">Nüsxələri Bərpa et</string>

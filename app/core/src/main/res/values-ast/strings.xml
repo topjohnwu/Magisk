@@ -178,7 +178,6 @@
     <string name="flashing">Flaxando…</string>    <string name="done">¡Fecho!</string>
     <string name="done_action">Completóse l\'aición de: %1$s</string>
     <string name="failure">¡Falló!</string>
-    <string name="hide_app_title">Escondiendo l\'aplicación Magisk…</string>
     <string name="open_link_failed_toast">Nun s\'atopó nenguna aplicación p\'abrir l\'enllaz</string>
     <string name="complete_uninstall">Desinstalar dafechu</string>
     <string name="restore_img">Restaurar les imáxenes</string>

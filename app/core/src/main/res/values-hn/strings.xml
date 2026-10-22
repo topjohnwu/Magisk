@@ -190,7 +190,6 @@
     <string name="flashing">Flash ho raha hai…</string>    <string name="done">Ho gaya!</string>
     <string name="done_action">%1$s ka action complete ho gaya</string>
     <string name="failure">Fail ho gaya!</string>
-    <string name="hide_app_title">Magisk app ko chhupa rahe hain…</string>
     <string name="open_link_failed_toast">Link kholne ke liye koi app nahi mila</string>
     <string name="complete_uninstall">Sab kuch uninstall karo</string>
     <string name="restore_img">Images restore karo</string>

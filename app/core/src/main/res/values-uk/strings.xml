@@ -207,7 +207,6 @@
     <string name="flashing">Прошивання…</string>    <string name="done">Готово!</string>
     <string name="done_action">Дію %1$s виконано</string>
     <string name="failure">Не вдалося!</string>
-    <string name="hide_app_title">Ховання застосунку Magisk…</string>
     <string name="open_link_failed_toast">Не знайдено застосунку для відкриття посилання</string>
     <string name="complete_uninstall">Повне видалення</string>
     <string name="restore_img">Відновити розділи</string>

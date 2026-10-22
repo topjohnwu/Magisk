@@ -190,7 +190,6 @@
     <string name="flashing">ر حال فلش کردن…</string>    <string name="done">تمام!</string>
     <string name="done_action">انجام عملیات %1$s به پایان رسید</string>
     <string name="failure">ناموفق</string>
-    <string name="hide_app_title">در حال مخفی کردن برنامه Magisk…</string>
     <string name="open_link_failed_toast">هیچ برنامه ای برای باز کردن لینک یافت نشد</string>
     <string name="complete_uninstall">کامل کردن حذف</string>
     <string name="restore_img">بازیابی تصاویر</string>

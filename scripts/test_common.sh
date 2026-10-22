@@ -81,22 +81,8 @@ print_apks() {
 
 run_tests() {
   local pkg='com.topjohnwu.magisk.test'
-  local self="$pkg/$pkg.TestRunner"
   local app="$pkg/$pkg.AppTestRunner"
-  local stub="repackaged.$pkg/$pkg.AppTestRunner"
 
   # Run app tests
   am_instrument '.SmokeTest,.IntegrationTest' $app
-
-  # Test app hiding
-  am_instrument '.AppMigrationTest#testAppHide' $self
-
-  # Make sure it still works
-  am_instrument '.SmokeTest' $stub
-
-  # Test app restore
-  am_instrument '.AppMigrationTest#testAppRestore' $self
-
-  # Make sure it still works
-  am_instrument '.SmokeTest' $app
 }

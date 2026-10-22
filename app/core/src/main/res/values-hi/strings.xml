@@ -179,7 +179,6 @@
     <string name="flashing">फ़्लैश हो रहा है...</string>
     <string name="done">सफल हुआ!</string>
     <string name="failure">असफल हुआ !</string>
-    <string name="hide_app_title">मैजिस्क ऐप अब छिप रहा है…</string>
     <string name="open_link_failed_toast">लिंक खोलने के लिए कोई एप्लिकेशन नहीं मिला</string>
     <string name="complete_uninstall">पूर्ण रूप से अनइंस्टॉल करें</string>
     <string name="restore_img">इमेज रिस्टोर करें</string>

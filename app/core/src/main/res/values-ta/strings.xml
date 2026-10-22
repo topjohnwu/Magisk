@@ -165,7 +165,6 @@
     <string name="flashing">ஏற்றுகிறது…</string>
     <string name="done">முடிந்தது!</string>
     <string name="failure">தோல்வி!</string>
-    <string name="hide_app_title">மேஜிஸ்க் பயன்பாட்டை மறைக்கிறது…</string>
     <string name="open_link_failed_toast">இணைப்பைத் திறக்க எந்த பயன்பாடும் கிடைக்கவில்லை</string>
     <string name="complete_uninstall">நிறுவல் நீக்குதல்</string>
     <string name="restore_img">படங்களை மீட்டமை</string>

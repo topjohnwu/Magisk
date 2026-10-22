@@ -206,7 +206,6 @@
     <string name="done">Selesai!</string>
     <string name="done_action">Aksi %1$s selesai</string>
     <string name="failure">Gagal!</string>
-    <string name="hide_app_title">Menyembunyikan aplikasi Magisk…</string>
     <string name="open_link_failed_toast">Tidak ditemukan aplikasi untuk membuka tautan</string>
     <string name="complete_uninstall">Pencopotan penuh</string>
     <string name="restore_img">Pulihkan image</string>

@@ -174,7 +174,6 @@
     <string name="flashing">Välgutamine…</string>
     <string name="done">Valmis!</string>
     <string name="failure">Ebaõnnestus</string>
-    <string name="hide_app_title">Magiski rakenduse peitmine…</string>
     <string name="open_link_failed_toast">Lingi avamiseks sobivat rakendust ei leitud.</string>
     <string name="complete_uninstall">Täielik eemaldus</string>
     <string name="restore_img">Taasta tõmmised</string>

@@ -182,7 +182,6 @@
     <string name="flashing">書込中…</string>
     <string name="done">完了！</string>
     <string name="failure">失敗！</string>
-    <string name="hide_app_title">Magisk アプリを隠しています…</string>
     <string name="open_link_failed_toast">このリンクを開けるアプリがありません</string>
     <string name="complete_uninstall">完全にアンインストール</string>
     <string name="restore_img">イメージのリストア</string>

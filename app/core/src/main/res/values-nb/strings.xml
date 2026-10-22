@@ -165,7 +165,6 @@
     <string name="flashing">Innbrenner …</string>
     <string name="done">Ferdig!</string>
     <string name="failure">Mislykket!</string>
-    <string name="hide_app_title">Skjuler Magisk-programmet …</string>
     <string name="open_link_failed_toast">Ingen programmer kunne åpne lenken</string>
     <string name="complete_uninstall">Fullfør avinstallasjon</string>
     <string name="restore_img">Gjenopprett avtrykk</string>

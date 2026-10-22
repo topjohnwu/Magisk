@@ -203,7 +203,6 @@
     <string name="flashing">Yazılıyor…</string>    <string name="done">Tamamlandı!</string>
     <string name="done_action">%1$s işlemi tamamlandı</string>
     <string name="failure">Başarısız!</string>
-    <string name="hide_app_title">Magisk uygulaması gizleniyor…</string>
     <string name="open_link_failed_toast">Bağlantıyı açacak uygulama bulunamadı</string>
     <string name="complete_uninstall">Tamamen kaldır</string>
     <string name="restore_img">İmajları geri yükle</string>

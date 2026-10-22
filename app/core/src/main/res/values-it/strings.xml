@@ -209,7 +209,6 @@
     <string name="flashing">Flash in corso…</string>    <string name="done">Completato!</string>
     <string name="done_action">Azione di %1$s completata</string>
     <string name="failure">Fallito</string>
-    <string name="hide_app_title">Sto nascondendo l\'app di Magisk…</string>
     <string name="open_link_failed_toast">Nessuna app disponibile per aprire il link</string>
     <string name="complete_uninstall">Disinstalla completamente</string>
     <string name="restore_img">Ripristina immagini</string>
