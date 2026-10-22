@@ -176,7 +176,7 @@ impl MagiskD {
             let cfg = self.get_db_settings()?;
 
             // Check multiuser settings
-            let eval_uid = match cfg.multiuser_mode {
+            let mut eval_uid = match cfg.multiuser_mode {
                 MultiuserMode::OwnerOnly => {
                     if to_user_id(uid) != 0 {
                         return Ok(Arc::new(SuInfo::deny(uid)));
@@ -186,6 +186,9 @@ impl MagiskD {
                 MultiuserMode::OwnerManaged => to_app_id(uid),
                 _ => uid,
             };
+            if to_app_id(eval_uid) < AID_APP_START {
+                eval_uid = to_app_id(eval_uid);
+            }
 
             let mut settings = RootSettings::default();
             self.get_root_settings(eval_uid, &mut settings)?;

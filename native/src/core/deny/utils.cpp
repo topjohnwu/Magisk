@@ -50,7 +50,9 @@ static void collect_users(vector<int> &users) {
         return;
     dirent *entry;
     while ((entry = xreaddir(data_dir.get()))) {
-        users.emplace_back(parse_int(entry->d_name));
+        int u = parse_int(entry->d_name);
+        if (u >= 0)
+            users.emplace_back(u);
     }
 }
 

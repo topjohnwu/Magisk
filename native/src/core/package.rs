@@ -9,7 +9,6 @@ use base::{
 };
 use bit_set::BitSet;
 use nix::fcntl::OFlag;
-use std::collections::BTreeMap;
 use std::fs::File;
 use std::io;
 use std::io::{Cursor, Read, Seek, SeekFrom};
@@ -191,7 +190,7 @@ enum Status {
 
 #[derive(Default)]
 pub struct ManagerInfo {
-    tracked_files: BTreeMap<i32, TrackedFile>,
+    tracked_file: TrackedFile,
 }
 
 #[derive(Default)]
@@ -224,7 +223,7 @@ impl TrackedFile {
 }
 
 impl ManagerInfo {
-    fn check_orig(&mut self, user: i32) -> Status {
+    fn check_orig(&mut self) -> Status {
         let Some(apk) = find_apk_path() else {
             return Status::NotInstalled;
         };
@@ -243,16 +242,14 @@ impl ManagerInfo {
             }
         }
 
-        self.tracked_files.insert(user, TrackedFile::new(apk));
+        self.tracked_file = TrackedFile::new(apk);
         Status::Installed
     }
 
     fn get_manager(&mut self, user: i32) -> (i32, &str) {
-        if let Some(file) = self.tracked_files.get(&user)
-            && file.is_same()
-        {
+        if self.tracked_file.is_same() {
             // no APK
-            if &file.path == PACKAGES_XML {
+            if &self.tracked_file.path == PACKAGES_XML {
                 return (-1, "");
             }
             // orig APK is still the same
@@ -264,7 +261,7 @@ impl ManagerInfo {
             };
         }
 
-        match self.check_orig(user) {
+        match self.check_orig() {
             Status::Installed => {
                 let uid = get_package_uid(user);
                 return if uid < 0 {
@@ -279,8 +276,7 @@ impl ManagerInfo {
         }
 
         // If we cannot find any manager, track packages.xml for new package installs
-        self.tracked_files
-            .insert(user, TrackedFile::new(PACKAGES_XML.into()));
+        self.tracked_file = TrackedFile::new(PACKAGES_XML.into());
 
         (-1, "")
     }

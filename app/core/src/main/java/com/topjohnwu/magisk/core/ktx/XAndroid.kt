@@ -108,13 +108,13 @@ fun PackageManager.getPackageInfo(uid: Int, pid: Int): PackageInfo? {
         // Try to find package name from PID
         val proc = RootUtils.getAppProcess(pid)
         if (proc == null) {
-            if (uid == Process.SHELL_UID) {
+            if (PolicyDao.normalizeUid(uid) == Process.SHELL_UID) {
                 // It is possible that some apps installed are sharing UID with shell.
                 // We will not be able to find a package from the active process list,
                 // because the client is forked from ADB shell, not any app process.
                 return getPackageInfo("com.android.shell", flag)
             }
-        } else if (uid == proc.uid) {
+        } else if (PolicyDao.normalizeUid(uid) == PolicyDao.normalizeUid(proc.uid)) {
             return getPackageInfo(proc.pkgList[0], flag)
         }
 
