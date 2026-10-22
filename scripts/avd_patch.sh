@@ -56,7 +56,6 @@ API=$(getprop ro.build.version.sdk)
 cat config
 
 ./magiskboot compress=xz magisk magisk.xz
-./magiskboot compress=xz stub.apk stub.xz
 ./magiskboot compress=xz init-ld init-ld.xz
 
 ./magiskboot cpio ramdisk.cpio \
@@ -64,7 +63,6 @@ cat config
 "mkdir 0750 overlay.d" \
 "mkdir 0750 overlay.d/sbin" \
 "add 0644 overlay.d/sbin/magisk.xz magisk.xz" \
-"add 0644 overlay.d/sbin/stub.xz stub.xz" \
 "add 0644 overlay.d/sbin/init-ld.xz init-ld.xz" \
 "patch" \
 "backup ramdisk.cpio.orig" \

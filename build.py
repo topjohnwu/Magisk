@@ -664,11 +664,6 @@ def push_files(files: list[Path], push_apk: bool = False):
         to_push = list(files)
 
         with ZipFile(apk) as zf:
-            # Extract stub.apk
-            stub = tmp / "stub.apk"
-            stub.write_bytes(zf.read("assets/stub.apk"))
-            to_push.append(stub)
-
             # Extract assets/*.sh
             for name in zf.namelist():
                 if name.startswith("assets/") and name.endswith(".sh") and name.count("/") == 1:

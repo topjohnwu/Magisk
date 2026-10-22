@@ -116,8 +116,6 @@ impl MagiskD {
         setup_logfile();
         info!("** post-fs-data mode running");
 
-        self.preserve_stub_apk();
-
         // Check secure dir
         if !cstr!(SECURE_DIR).exists() {
             error!("* {} is not present, abort", SECURE_DIR);
@@ -190,7 +188,6 @@ impl MagiskD {
         }
 
         setup_preinit_dir();
-        self.ensure_manager();
         if self.zygisk_enabled.load(Ordering::Relaxed) {
             self.zygisk.lock().reset(true);
         }

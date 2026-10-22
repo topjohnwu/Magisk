@@ -1,6 +1,5 @@
 use crate::consts::{APP_DATA_DIR, APP_PACKAGE_NAME, MAGISK_VER_CODE, TRUSTED_CERT};
 use crate::daemon::{AID_APP_END, AID_APP_START, MagiskD, to_app_id};
-use crate::ffi::{get_magisk_tmp, install_apk};
 #[cfg(all(feature = "check-signature", not(debug_assertions)))]
 use crate::ffi::uninstall_pkg;
 use base::WalkResult::{Abort, Continue, Skip};
@@ -192,7 +191,6 @@ enum Status {
 
 #[derive(Default)]
 pub struct ManagerInfo {
-    stub_apk_fd: Option<File>,
     tracked_files: BTreeMap<i32, TrackedFile>,
 }
 
@@ -249,42 +247,12 @@ impl ManagerInfo {
         Status::Installed
     }
 
-    fn install_stub(&mut self) {
-        if let Some(ref mut stub_fd) = self.stub_apk_fd {
-            // Copy the stub APK
-            let tmp_apk = cstr!("/data/stub.apk");
-            let result = || -> LoggedResult<()> {
-                {
-                    let mut tmp_apk_file = tmp_apk.create(
-                        OFlag::O_WRONLY | OFlag::O_CREAT | OFlag::O_TRUNC | OFlag::O_CLOEXEC,
-                        0o600,
-                    )?;
-                    io::copy(stub_fd, &mut tmp_apk_file)?;
-                }
-                // Seek the fd back to start
-                stub_fd.seek(SeekFrom::Start(0))?;
-                Ok(())
-            }();
-            if result.is_ok() {
-                install_apk(tmp_apk);
-            }
-        }
-    }
-
-    fn get_manager(
-        &mut self,
-        daemon: &MagiskD,
-        user: i32,
-        #[allow(unused_mut)] mut install: bool,
-    ) -> (i32, &str) {
+    fn get_manager(&mut self, user: i32) -> (i32, &str) {
         if let Some(file) = self.tracked_files.get(&user)
             && file.is_same()
         {
             // no APK
             if &file.path == PACKAGES_XML {
-                if install && !daemon.is_emulator {
-                    self.install_stub();
-                }
                 return (-1, "");
             }
             // orig APK is still the same
@@ -306,7 +274,7 @@ impl ManagerInfo {
                 };
             }
             #[cfg(all(feature = "check-signature", not(debug_assertions)))]
-            Status::CertMismatch => install = true,
+            Status::CertMismatch => {}
             Status::NotInstalled => {}
         }
 
@@ -314,44 +282,21 @@ impl ManagerInfo {
         self.tracked_files
             .insert(user, TrackedFile::new(PACKAGES_XML.into()));
 
-        if install && !daemon.is_emulator {
-            self.install_stub();
-        }
         (-1, "")
     }
 }
 
 impl MagiskD {
-    pub fn preserve_stub_apk(&self) {
-        let mut info = self.manager_info.lock();
-        let apk = cstr::buf::default()
-            .join_path(get_magisk_tmp())
-            .join_path("stub.apk");
-        info.stub_apk_fd = apk.open(OFlag::O_RDONLY | OFlag::O_CLOEXEC).ok();
-        apk.remove().log_ok();
-    }
-
     pub fn get_manager_uid(&self, user: i32) -> i32 {
         let mut info = self.manager_info.lock();
-        let (uid, _) = info.get_manager(self, user, false);
+        let (uid, _) = info.get_manager(user);
         uid
     }
 
-    pub fn get_manager(&self, user: i32, install: bool) -> (i32, String) {
+    pub fn get_manager(&self, user: i32) -> (i32, String) {
         let mut info = self.manager_info.lock();
-        let (uid, pkg) = info.get_manager(self, user, install);
+        let (uid, pkg) = info.get_manager(user);
         (uid, pkg.to_string())
-    }
-
-    pub fn ensure_manager(&self) {
-        let mut info = self.manager_info.lock();
-        for user in self.get_users() {
-            let (_, pkg) = info.get_manager(self, user, false);
-            if !pkg.is_empty() {
-                return;
-            }
-        }
-        let _ = info.get_manager(self, 0, true);
     }
 
     // app_id = app_no + AID_APP_START

@@ -114,7 +114,7 @@ mkdir /data/adb/modules 2>/dev/null
 mkdir /data/adb/post-fs-data.d 2>/dev/null
 mkdir /data/adb/service.d 2>/dev/null
 
-MAGISK_FILES="magisk magiskpolicy stub.apk"
+MAGISK_FILES="magisk magiskpolicy"
 if [ -e /system/bin/linker ] && [ -e /system/bin/linker64 ]; then
   MAGISK_FILES="$MAGISK_FILES magisk32"
 fi

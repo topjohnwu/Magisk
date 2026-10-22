@@ -233,7 +233,6 @@ static void recreate_sbin(const char *mirror, bool use_bind_mount) {
 
 static void extract_files(bool sbin) {
     const char *magisk_xz = sbin ? "/sbin/magisk.xz" : "magisk.xz";
-    const char *stub_xz = sbin ? "/sbin/stub.xz" : "stub.xz";
     const char *init_ld_xz = sbin ? "/sbin/init-ld.xz" : "init-ld.xz";
 
     if (access(magisk_xz, F_OK) == 0) {
@@ -241,13 +240,6 @@ static void extract_files(bool sbin) {
         unlink(magisk_xz);
         int fd = xopen("magisk", O_WRONLY | O_CREAT, 0755);
         unxz(fd, magisk);
-        close(fd);
-    }
-    if (access(stub_xz, F_OK) == 0) {
-        mmap_data stub(stub_xz);
-        unlink(stub_xz);
-        int fd = xopen("stub.apk", O_WRONLY | O_CREAT, 0);
-        unxz(fd, stub);
         close(fd);
     }
     if (access(init_ld_xz, F_OK) == 0) {
