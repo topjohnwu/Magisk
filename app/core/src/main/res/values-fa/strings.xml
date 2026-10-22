@@ -123,10 +123,6 @@
     <string name="settings_dark_mode_dark">همیشه تاریک</string>
     <string name="settings_download_path_title">مسیر دانلود</string>
     <string name="settings_download_path_message">فایل ها در %1$s ذخیره خواهند شد.</string>
-    <string name="settings_hide_app_title">مخفی کردن برنامه Magisk</string>
-    <string name="settings_hide_app_summary">نصب یک برنامه پروکسی با شناسه بسته تصادفی و برچسب سفارشی</string>
-    <string name="settings_restore_app_title">بازگردانی برنامه Magisk</string>
-    <string name="settings_restore_app_summary">آشکار کردن برنامه و بازگرداندن APK اصلی</string>
     <string name="language">زبان</string>
     <string name="system_default">(پیش فرض سیستم)</string>
     <string name="settings_check_update_title">چک کردن بروز رسانی ها</string>
@@ -145,11 +141,6 @@
     <string name="settings_hosts_title">نصب بدون حذف یا تغییر در فایل ها</string>
     <string name="settings_hosts_summary">نصب بدون حذف یا تغییر در فایل ها رای ساپورت از برنامه های Adblock</string>
     <string name="settings_hosts_toast">ماژول نصب بدون حذف یا تغییر در فایل ها اضافه شد</string>
-    <string name="settings_app_name_hint">اسم جدید</string>
-    <string name="settings_app_name_helper">برنامه به این نام تغییر خواهد کرد</string>
-    <string name="settings_app_name_error">فرمت نامعتبر</string>
-
-
     <string name="superuser_notification">اعلان روت</string>
 
 
@@ -159,7 +150,6 @@
     <string name="settings_su_restrict_title">محدود کردن دسترسی روت</string>
     <string name="settings_su_restrict_summary">به طور پیش‌فرض برنامه‌های Superuser جدید را محدود می‌کند. هشدار: این کار بیشتر برنامه‌ها را از کار می‌اندازد. فقط اگر دقیقاً می‌دانید چه می‌کنید آن را فعال کنید.</string>
     <string name="settings_customization">سفارشی سازی</string>
-    <string name="setting_add_shortcut_summary">اضافه کردن یک میانبر زیبا را در صفحه اصلی در صورت شناسایی نام و نماد پس از پنهان کردن برنامه</string>
     <string name="settings_doh_title">DNS روی HTTPS</string>
     <string name="settings_doh_description">دور زدن مسمومیت DNS در برخی کشورها</string>
     <string name="settings_random_name_title">تغییر تصادفی نام خروجی</string>
@@ -218,15 +208,9 @@
     <string name="unsupport_system_app_msg">اجرای این برنامه به عنوان برنامه سیستمی پشتیبانی نمی‌شود. لطفاً آن را به برنامه کاربری بازگردانید.</string>
     <string name="unsupport_other_su_msg">یک باینری "su" غیر از Magisk شناسایی شد. لطفاً هر راهکار روت دیگری را حذف کنید و/یا Magisk را دوباره نصب کنید.</string>
     <string name="unsupport_external_storage_msg">Magisk روی حافظه خارجی نصب شده است. لطفاً برنامه را به حافظه داخلی منتقل کنید.</string>
-    <string name="unsupport_nonroot_stub_msg">برنامه مخفی Magisk نمی‌تواند ادامه دهد زیرا دسترسی روت از بین رفته است. لطفاً APK اصلی را بازگردانید.</string>
-    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">برای فعال کردن این قابلیت ، اجازه دسترسی به حافظه بدهید</string>
     <string name="post_notifications_denied">برای فعال‌سازی این قابلیت، مجوز اعلان‌ها را بدهید</string>
     <string name="install_unknown_denied">برای فعال‌سازی این قابلیت، «نصب برنامه‌های ناشناخته» را مجاز کنید</string>
-    <string name="add_shortcut_title">اضافه کردن میانبر را به صفحه</string>
-    <string name="add_shortcut_msg">بعد از مخفی کردن این برنامه، ممکن است نام و آیکون آن سخت قابل شناسایی شود. آیا می‌خواهید یک میانبر زیبا به صفحه اصلی اضافه کنید؟</string>
     <string name="app_not_found">هیچ برنامه‌ای برای انجام این عملیات یافت نشد</string>
     <string name="reboot_apply_change">برای اعمال تغییرات، دستگاه را دوباره راه‌اندازی کنید</string>
-    <string name="restore_app_confirmation">این کار برنامه مخفی شده را به نسخه اصلی بازمی‌گرداند. آیا واقعاً می‌خواهید این کار را انجام دهید؟</string>
-
 </resources>

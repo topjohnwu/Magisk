@@ -124,10 +124,6 @@
     <string name="settings_dark_mode_dark">Всегда тёмный</string>
     <string name="settings_download_path_title">Папка для загрузок</string>
     <string name="settings_download_path_message">Файлы будут загружаться в %1$s</string>
-    <string name="settings_hide_app_title">Скрытие приложения Magisk</string>
-    <string name="settings_hide_app_summary">Пересобрать приложение Magisk с другим названием и случайным именем пакета</string>
-    <string name="settings_restore_app_title">Восстановление приложения Magisk</string>
-    <string name="settings_restore_app_summary">Восстановить приложение Magisk к исходному состоянию</string>
     <string name="language">Язык</string>
     <string name="system_default">По умолчанию</string>
     <string name="settings_check_update_title">Проверка обновлений</string>
@@ -145,11 +141,6 @@
     <string name="settings_hosts_title">Внесистемный hosts файл</string>
     <string name="settings_hosts_summary">Поддержка внесистемного hosts файла для приложений, блокирующих рекламу</string>
     <string name="settings_hosts_toast">Модуль для внесистемного hosts файла установлен</string>
-    <string name="settings_app_name_hint">Введите имя</string>
-    <string name="settings_app_name_helper">Приложение будет пересобрано с этим именем</string>
-    <string name="settings_app_name_error">Некорректный формат</string>
-
-
     <string name="superuser_notification">Уведомления суперпользователя</string>
 
     <string name="settings_su_auth_title">Аутентификация пользователя</string>
@@ -157,7 +148,6 @@
     <string name="settings_su_auth_insecure">На устройстве не настроен метод аутентификации</string>
 
     <string name="settings_customization">Персонализация</string>
-    <string name="setting_add_shortcut_summary">Добавить ярлык на рабочий стол для удобного восприятия приложения после его скрытия</string>
     <string name="settings_doh_title">DNS поверх HTTPS</string>
     <string name="settings_doh_description">Активировать DoH (используйте при проблемах с подключением к сети)</string>
     <string name="settings_random_name_title">Случайное имя образа</string>
@@ -217,15 +207,9 @@
     <string name="unsupport_system_app_msg">Запуск приложения в качестве системного невозможен. Пожалуйста, переустановите его как пользовательское.</string>
     <string name="unsupport_other_su_msg">Обнаружен неподдерживаемый бинарный файл \"su\". Пожалуйста, удалите сторонний провайдер Root-прав и/или переустановите Magisk.</string>
     <string name="unsupport_external_storage_msg">Приложение установлено во внешнее хранилище. Пожалуйста, переустановите его во внутреннее хранилище.</string>
-    <string name="unsupport_nonroot_stub_msg">Пересобранное для скрытия приложение Magisk не может дальше работать, поскольку Root-права недоступны. Пожалуйста, восстановите приложение к исходному состоянию.</string>
-    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Предоставьте разрешение на доступ к хранилищу</string>
     <string name="post_notifications_denied">Предоставьте разрешение на отправку уведомлений</string>
     <string name="install_unknown_denied">Предоставьте разрешение на "Установку из неизвестных источников"</string>
-    <string name="add_shortcut_title">Добавление ярлыка</string>
-    <string name="add_shortcut_msg">После скрытия приложения Magisk его название и иконка могут быть неудобны для восприятия. Хотите создать ярлык на рабочем столе?</string>
     <string name="app_not_found">Приложение для обработки этого действия не найдено</string>
     <string name="reboot_apply_change">Перезагрузите устройство для применения изменений</string>
-    <string name="restore_app_confirmation">Это действие восстановит пересобранное для скрытия приложение к исходному состоянию. Вы действительно хотите продолжить?</string>
-
 </resources>

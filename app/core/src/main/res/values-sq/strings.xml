@@ -129,10 +129,6 @@
     <string name="settings_dark_mode_dark">Gjithmonë e errët</string>
     <string name="settings_download_path_title">Shtegu i shkarkimit</string>
     <string name="settings_download_path_message">Skedarët do të ruhen në %1$s</string>
-    <string name="settings_hide_app_title">Fshih aplikacionin Magisk</string>
-    <string name="settings_hide_app_summary">Instalo një aplikacion proxy me një ID pakete të rastësishme dhe emër të personalizuar</string>
-    <string name="settings_restore_app_title">Rikthe aplikacionin Magisk</string>
-    <string name="settings_restore_app_summary">Shfaq aplikacionin dhe rikthe APK-në origjinale</string>
     <string name="language">Gjuha</string>
     <string name="system_default">(E paracaktuar e sistemit)</string>
     <string name="settings_check_update_title">Kontrollo për përditësime</string>
@@ -151,11 +147,6 @@
     <string name="settings_hosts_title">Hosts pa sistem (Systemless)</string>
     <string name="settings_hosts_summary">Mbështetje për skedarët hosts për aplikacionet e bllokimit të reklamave</string>
     <string name="settings_hosts_toast">U shtua moduli systemless hosts</string>
-    <string name="settings_app_name_hint">Emri i ri</string>
-    <string name="settings_app_name_helper">Aplikacioni do të ri-paketohet me këtë emër</string>
-    <string name="settings_app_name_error">Format i pavlefshëm</string>
-
-
     <string name="superuser_notification">Njoftimet e Superpërdoruesit</string>
 
 
@@ -172,7 +163,6 @@
     <string name="color_mode_monet_system">Monet (Sistemi)</string>
     <string name="color_mode_monet_light">Monet (E hapur)</string>
     <string name="color_mode_monet_dark">Monet (E errët)</string>
-    <string name="setting_add_shortcut_summary">Shto një shkurtore në ekranin kryesor në rast se emri dhe ikona janë të vështira për t\'u njohur pas fshehjes së aplikacionit</string>
     <string name="settings_doh_title">DNS mbi HTTPS (DoH)</string>
     <string name="settings_doh_description">Zgjidhje për helmimin e DNS në disa vende</string>
     <string name="settings_random_name_title">Emër i rastësishëm i daljes</string>
@@ -231,15 +221,9 @@
     <string name="unsupport_system_app_msg">Ekzekutimi i këtij aplikacioni si aplikacion sistemi nuk mbështetet. Ju lutemi kthejeni aplikacionin në një aplikacion përdoruesi.</string>
     <string name="unsupport_other_su_msg">Është zbuluar një binar \"su\" që nuk është nga Magisk. Ju lutemi hiqni çdo zgjidhje tjetër root dhe/ose ri-instaloni Magisk.</string>
     <string name="unsupport_external_storage_msg">Magisk është i instaluar në hapësirën e jashtme. Ju lutemi kalojeni aplikacionin në hapësirën e brendshme.</string>
-    <string name="unsupport_nonroot_stub_msg">Aplikacioni i fshehur Magisk nuk mund të vazhdojë të punojë sepse root u humb. Ju lutemi rikthejeni APK-në origjinale.</string>
-    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Jepni lejen e ruajtjes (storage) për të aktivizuar këtë funksion</string>
     <string name="post_notifications_denied">Jepni lejen e njoftimeve për të aktivizuar këtë funksion</string>
     <string name="install_unknown_denied">Lejoni \"Instalimin e aplikacioneve të panjohura\" për të aktivizuar këtë funksion</string>
-    <string name="add_shortcut_title">Shto shkurtore në ekranin kryesor</string>
-    <string name="add_shortcut_msg">Pas fshehjes së këtij aplikacioni, emri dhe ikona e tij mund të bëhen të vështira për t\'u njohur. Dëshironi të shtoni një shkurtore në ekranin kryesor?</string>
     <string name="app_not_found">Nuk u gjet asnjë aplikacion për të kryer këtë veprim</string>
     <string name="reboot_apply_change">Rinisni pajisjen për të aplikuar ndryshimet</string>
-    <string name="restore_app_confirmation">Kjo do të rikthejë aplikacionin e fshehur në aplikacionin origjinal. Jeni të sigurt që dëshironi ta bëni këtë?</string>
-
 </resources>

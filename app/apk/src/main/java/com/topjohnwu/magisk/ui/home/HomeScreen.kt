@@ -35,8 +35,6 @@ import androidx.compose.material.icons.filled.PowerSettingsNew
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.material.icons.filled.Security
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -50,7 +48,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -86,7 +83,6 @@ import com.topjohnwu.magisk.core.download.DownloadEngine
 import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.core.ktx.reboot
 import com.topjohnwu.magisk.core.ktx.toast
-import com.topjohnwu.magisk.core.tasks.AppMigration
 import com.topjohnwu.magisk.core.tasks.MagiskInstaller
 import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.ui.component.AdaptiveColumns
@@ -117,8 +113,6 @@ fun HomeScreen(
     var showUninstallDialog by rememberSaveable { mutableStateOf(false) }
     var showManagerDialog by rememberSaveable { mutableStateOf(false) }
     var showEnvFixDialog by rememberSaveable { mutableStateOf(false) }
-    var showHideDialog by rememberSaveable { mutableStateOf(false) }
-    var showRestoreDialog by rememberSaveable { mutableStateOf(false) }
     var showInstallDialog by rememberSaveable { mutableStateOf(false) }
     var envFixCode by remember { mutableIntStateOf(0) }
 
@@ -139,13 +133,6 @@ fun HomeScreen(
             envFixCode = uiState.envFixCode
             showEnvFixDialog = true
             viewModel.onEnvFixConsumed()
-        }
-    }
-    LaunchedEffect(uiState.showHideRestore) {
-        if (uiState.showHideRestore) {
-            val hidden = context.packageName != BuildConfig.APP_PACKAGE_NAME
-            if (hidden) showRestoreDialog = true else showHideDialog = true
-            viewModel.onHideRestoreConsumed()
         }
     }
 
@@ -217,34 +204,6 @@ fun HomeScreen(
         )
     }
 
-    if (showHideDialog) {
-        HideAppDialog(
-            onDismiss = { showHideDialog = false },
-            onConfirm = { name ->
-                showHideDialog = false
-                scope.launch {
-                    loadingDialog.withLoading {
-                        AppMigration.patchAndHide(context, name)
-                    }
-                }
-            }
-        )
-    }
-
-    if (showRestoreDialog) {
-        RestoreAppDialog(
-            onDismiss = { showRestoreDialog = false },
-            onConfirm = {
-                showRestoreDialog = false
-                scope.launch {
-                    loadingDialog.withLoading {
-                        AppMigration.restoreApp(context)
-                    }
-                }
-            }
-        )
-    }
-
     val scrollState = rememberScrollState()
 
     Scaffold(
@@ -298,9 +257,7 @@ fun HomeScreen(
                     version = uiState.managerInstalledVersion,
                     remoteVersion = uiState.managerRemoteVersion,
                     progress = uiState.managerProgress,
-                    isHidden = context.packageName != BuildConfig.APP_PACKAGE_NAME,
                     onManagerPressed = viewModel::onManagerPressed,
-                    onHideRestorePressed = viewModel::onHideRestorePressed,
                 )
             },
             second = {
@@ -572,9 +529,7 @@ private fun AppCard(
     version: String,
     remoteVersion: String,
     progress: Int,
-    isHidden: Boolean,
     onManagerPressed: () -> Unit,
-    onHideRestorePressed: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val actionLabel = when (state) {
@@ -612,27 +567,11 @@ private fun AppCard(
                     )
                 }
 
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    if (Info.env.isActive) {
-                        val hideRestoreIcon = if (isHidden) Icons.Default.Visibility else Icons.Default.VisibilityOff
-                        IconButton(onClick = onHideRestorePressed) {
-                            Icon(
-                                imageVector = hideRestoreIcon,
-                                contentDescription = stringResource(
-                                    if (isHidden) CoreR.string.settings_restore_app_title else CoreR.string.settings_hide_app_title
-                                ),
-                                modifier = Modifier.size(20.dp),
-                            )
-                        }
-                    }
-
-                    if (actionLabel != null) {
-                        Spacer(Modifier.width(4.dp))
-                        InstallButton(
-                            label = actionLabel,
-                            onClick = onManagerPressed,
-                        )
-                    }
+                if (actionLabel != null) {
+                    InstallButton(
+                        label = actionLabel,
+                        onClick = onManagerPressed,
+                    )
                 }
             }
 
@@ -946,56 +885,5 @@ private fun EnvFixComposableDialog(
                 if (needsFullFix) CoreR.string.env_full_fix_msg else CoreR.string.env_fix_msg
             )
         )
-    }
-}
-
-@Composable
-private fun HideAppDialog(
-    onDismiss: () -> Unit,
-    onConfirm: (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val defaultName = stringResource(CoreR.string.settings)
-    var appName by rememberSaveable { mutableStateOf(defaultName) }
-    val isError = appName.length > AppMigration.MAX_LABEL_LENGTH || appName.isBlank()
-
-    MagiskDialog(
-        modifier = modifier,
-        onDismissRequest = onDismiss,
-        title = stringResource(CoreR.string.settings_hide_app_title),
-        confirmText = stringResource(android.R.string.ok),
-        onConfirm = { if (!isError) onConfirm(appName) },
-        confirmEnabled = !isError,
-        dismissText = stringResource(android.R.string.cancel),
-        onDismiss = onDismiss,
-    ) {
-        Column(modifier = Modifier.padding(top = 8.dp)) {
-            OutlinedTextField(
-                value = appName,
-                onValueChange = { appName = it },
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text(stringResource(CoreR.string.settings_app_name_hint)) },
-                isError = isError
-            )
-        }
-    }
-}
-
-@Composable
-private fun RestoreAppDialog(
-    onDismiss: () -> Unit,
-    onConfirm: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    MagiskDialog(
-        modifier = modifier,
-        onDismissRequest = onDismiss,
-        title = stringResource(CoreR.string.settings_restore_app_title),
-        confirmText = stringResource(android.R.string.ok),
-        onConfirm = onConfirm,
-        dismissText = stringResource(android.R.string.cancel),
-        onDismiss = onDismiss,
-    ) {
-        Text(text = stringResource(CoreR.string.restore_app_confirmation))
     }
 }

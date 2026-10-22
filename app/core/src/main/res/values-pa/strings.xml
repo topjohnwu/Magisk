@@ -122,14 +122,8 @@
     <string name="settings_hosts_title">Systemless ਹੋਸਟ</string>
     <string name="settings_hosts_summary">Adblock ਐਪਸ ਲਈ Systemless ਹੋਸਟ ਦੀ ਸਹਿਯੋਗ</string>
     <string name="settings_hosts_toast">Systemless ਹੋਸਟ ਮੋਡੀਊਲ ਸ਼ਾਮਲ ਕੀਤਾ ਗਿਆ</string>
-    <string name="settings_app_name_hint">ਨਵਾਂ ਨਾਮ</string>
-    <string name="settings_app_name_helper">ਇਸ ਨਾਮ ਨਾਲ ਐਪ ਦੁਬਾਰਾ ਇੰਸਟਾਲ ਕੀਤਾ ਜਾਵੇਗਾ</string>
-    <string name="settings_app_name_error">ਗਲਤ ਫਾਰਮੈਟ</string>
-
-
     <string name="superuser_notification">ਸੁਪਰਯੂਜ਼ਰ ਸੂਚਨਾ</string>
     <string name="settings_customization">ਕਸਟਮਾਈਜੇਸ਼ਨ</string>
-    <string name="setting_add_shortcut_summary">ਐਪ ਨੂੰ ਲੁਕਾਉਣ ਤੋਂ ਬਾਅਦ ਨਾਮ ਅਤੇ ਆਈਕਾਨ ਨੂੰ ਪਛਾਣਨਾ ਮੁਸ਼ਕਲ ਹੈ, ਤਾਂ ਹੋਮ ਸਕ੍ਰੀਨ ਵਿਚ ਇਕ ਸੁੰਦਰ ਸ਼ਾਰਟਕੱਟ ਸ਼ਾਮਲ ਕਰੋ</string>
     <string name="settings_doh_title">DNS ਉੱਤੇ HTTPS</string>
     <string name="settings_doh_description">ਕੁਝ ਦੇਸ਼ਾਂ ਵਿੱਚ ਚੱਲ ਰਹੇ DNS ਵਿਸ਼ਾਕਤਤਾ ਦਾ ਹੱਲ</string>
 
@@ -177,7 +171,6 @@
     <string name="setup_msg">ਵਾਤਾਵਰਣ ਸੈਟਅਪ ਚੱਲ ਰਿਹਾ ਹੈ …</string>
     <string name="unsupport_magisk_title">ਗ਼ੈਰ ਮੈਜਿਸਕ ਵਰਜਨ</string>
     <string name="external_rw_permission_denied">ਇਸ ਦੀ ਵਰਤੋਂ ਕਰਨ ਲਈ ਸਟੋਰੇਜ ਦੀ ਆਗਿਆ ਦਿਓ</string>
-    <string name="add_shortcut_title">ਹੋਮਸਕ੍ਰੀਨ \'ਤੇ ਸ਼ਾਰਟਕੱਟ ਸ਼ਾਮਲ ਕਰੋ</string>
     <string name="app_not_found">ਇਸ ਐਕਸ਼ਨ ਨੂੰ ਸੰਭਾਲਣ ਲਈ ਕੋਈ ਐਪਲੀਕੇਸ਼ਨ ਨਹੀਂ ਮਿਲੀ</string>
 
 </resources>

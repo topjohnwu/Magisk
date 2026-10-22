@@ -123,10 +123,6 @@
     <string name="settings_dark_mode_dark">Hamesha dark theme</string>
     <string name="settings_download_path_title">Download path</string>
     <string name="settings_download_path_message">Files yahan save hongi: %1$s</string>
-    <string name="settings_hide_app_title">Magisk app ko hide karo</string>
-    <string name="settings_hide_app_summary">Magisk app ka name aur package ID change kro</string>
-    <string name="settings_restore_app_title">Magisk app ko unhide karo</string>
-    <string name="settings_restore_app_summary">App ko unhide karo aur original APK wapas lao</string>
     <string name="language">Language</string>
     <string name="system_default">(System ki default)</string>
     <string name="settings_check_update_title">Updates check karo</string>
@@ -145,11 +141,6 @@
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Ad-blocking apps ke liye systemless hosts support</string>
     <string name="settings_hosts_toast">Systemless hosts module add kar diya gaya</string>
-    <string name="settings_app_name_hint">Naya naam</string>
-    <string name="settings_app_name_helper">App is naam ke saath repack hoga</string>
-    <string name="settings_app_name_error">Naam ka format galat hai</string>
-
-
     <string name="superuser_notification">ROOT notification</string>
 
 
@@ -159,7 +150,6 @@
     <string name="settings_su_restrict_title">Root access ko limit karo</string>
     <string name="settings_su_restrict_summary">Nayeapps ko ROOT access maangne se block karega. Warning: Isse zyada tarr apps kaam karna band kar denge. Sirf tab enable karo jab aapko pata ho aap kya kar rahe ho.</string>
     <string name="settings_customization">Customization</string>
-    <string name="setting_add_shortcut_summary">Agar app hide karne ke baad uska naam ya icon samajhne mein dikkat ho rahi ho, toh home screen pe ek shortcut add kar lo</string>
     <string name="settings_doh_title">DNS over HTTPS</string>
     <string name="settings_doh_description">DNS poisoning se bachne ke liye (kuch countries mein zaroori padti hai)</string>
     <string name="settings_random_name_title">Output file ka naam random karo</string>
@@ -218,15 +208,9 @@
     <string name="unsupport_system_app_msg">App ko system app bana ke chalana supported nahi hai. Please app ko wapas user app bana do.</string>
     <string name="unsupport_other_su_msg">Pehle doosri root method hatao ya Magisk dobara install karo.</string>
     <string name="unsupport_external_storage_msg">Magisk external storage pe installed hai. App ko internal storage mein move karo.</string>
-    <string name="unsupport_nonroot_stub_msg">Hidden Magisk app ab kaam nahi karega kyunki root chala gaya hai. Please original APK restore karo.</string>
-    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Iss feature ko enable karne ke liye storage permission allow karo</string>
     <string name="post_notifications_denied">Is feature ke liye notifications permission allow karo</string>
     <string name="install_unknown_denied">\"Install unknown apps\" ki permission allow karo taaki ye feature kaam kar sakey</string>
-    <string name="add_shortcut_title">Shortcut home screen pe add karo</string>
-    <string name="add_shortcut_msg">App ko hide karne ke baad agar uska icon ya naam pehchanna mushkil ho, toh ek shortcut home screen pe add kar lein?</string>
     <string name="app_not_found">Is action ko handle karne ke liye koi app nahi mila</string>
     <string name="reboot_apply_change">Changes apply karne ke liye reboot krna zaroori hai</string>
-    <string name="restore_app_confirmation">Ye action hidden app ko original version mein wapas laayega. Kya aap sach mein ye karna chahte ho?</string>
-
 </resources>

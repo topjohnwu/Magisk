@@ -113,10 +113,6 @@
     <string name="settings_dark_mode_dark">Sempre fosc</string>
     <string name="settings_download_path_title">Directori de baixades</string>
     <string name="settings_download_path_message">Els arxius es desaran a %1$s</string>
-    <string name="settings_hide_app_title">Amagar Magisk Manager</string>
-    <string name="settings_hide_app_summary">Torna a empaquetar Magisk Manager amb un nom de paquet a l\'atzar</string>
-    <string name="settings_restore_app_title">Restaurar Magisk Manager</string>
-    <string name="settings_restore_app_summary">Restaura Magisk Manager amb el nom de paquet original</string>
     <string name="language">Idioma</string>
     <string name="system_default">(Idioma del sistema)</string>
     <string name="settings_check_update_title">Comprovar Actualitzacions</string>
@@ -129,16 +125,10 @@
     <string name="settings_hosts_title">Systemless Hosts</string>
     <string name="settings_hosts_summary">Suport per aplicacions tipus Adblock fora de la partició del sistema</string>
     <string name="settings_hosts_toast">Agregat el mòdul Systemless Hosts</string>
-    <string name="settings_app_name_hint">Nou nom</string>
-    <string name="settings_app_name_helper">Es refarà l\'aplicació amb aquest nom</string>
-    <string name="settings_app_name_error">Format invàlid</string>
-
-
     <string name="superuser_notification">Notificació de superusuari</string>
 
 
     <string name="settings_customization">Personalització</string>
-    <string name="setting_add_shortcut_summary">Afegeix una bonica drecera a la pantalla d\'inici en cas que el nom i la icona siguin difícils de reconèixer després d\'amagar l\'aplicació.</string>
     <string name="settings_doh_title">DNS sobre HTTPS</string>
     <string name="settings_doh_description">Solució per enverinament de DNS en algunes nacions</string>
 
@@ -189,8 +179,6 @@
     <string name="unsupport_magisk_title">Versió de Magisk incompatible</string>
     <string name="unsupport_magisk_msg">Aquesta versió de Magisk Manager no suporta versions de Magisk més petites que la %1$s.\n\nL\'aplicació es comportarà com si Magisk no estigués instal·lat, si us plau actualitzi Magisk com més aviat millor.</string>
     <string name="external_rw_permission_denied">Ha de donar permís d\'emmagatzematge per activar aquesta funcionalitat</string>
-    <string name="add_shortcut_title">Afegeix una drecera a la pantalla d\'inici</string>
-    <string name="add_shortcut_msg">Després d\'amagar Magisk Manager, el seu nom i icona poden ser difícils de reconèixer. Vols afegir una bonica drecera a la teva pantalla d\'inici?</string>
     <string name="app_not_found">No s\'ha trobat una aplicació per emprar aquesta acció</string>
 
 </resources>

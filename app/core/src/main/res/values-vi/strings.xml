@@ -119,10 +119,6 @@
     <string name="settings_dark_mode_dark">Luôn tối</string>
     <string name="settings_download_path_title">Đường dẫn tải xuống</string>
     <string name="settings_download_path_message">Các tệp sẽ được lưu vào %1$s</string>
-    <string name="settings_hide_app_title">Ẩn ứng dụng Magisk</string>
-    <string name="settings_hide_app_summary">Cài đặt ứng dụng proxy với ID gói ngẫu nhiên và nhãn ứng dụng tùy chỉnh</string>
-    <string name="settings_restore_app_title">Khôi phục ứng dụng Magisk</string>
-    <string name="settings_restore_app_summary">Bỏ ẩn ứng dụng và khôi phục nó về APK ban đầu</string>
     <string name="language">Ngôn ngữ</string>
     <string name="system_default">(Mặc định hệ thống)</string>
     <string name="settings_check_update_title">Kiểm tra cập nhật</string>
@@ -140,16 +136,10 @@
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Hỗ trợ systemless hosts cho các ứng dụng chặn quảng cáo</string>
     <string name="settings_hosts_toast">Đã thêm mô-đun systemless hosts</string>
-    <string name="settings_app_name_hint">Tên mới</string>
-    <string name="settings_app_name_helper">Ứng dụng sẽ được đóng gói lại với tên này</string>
-    <string name="settings_app_name_error">Định dạng không hợp lệ</string>
-
-
     <string name="superuser_notification">Thông báo của Superuser</string>
 
 
     <string name="settings_customization">Tùy biến</string>
-    <string name="setting_add_shortcut_summary">Thêm một phím tắt đẹp vào màn hình trong trường hợp khó tìm ra tên và biểu tượng sau khi ẩn ứng dụng</string>
     <string name="settings_doh_title">DNS over HTTPS</string>
     <string name="settings_doh_description">Workaround DNS poisoning in some nations</string>
 
@@ -206,14 +196,8 @@
     <string name="unsupport_system_app_msg">Không hỗ trợ chạy ứng dụng này dưới dạng ứng dụng hệ thống. Vui lòng hoàn nguyên ứng dụng về ứng dụng người dùng.</string>
     <string name="unsupport_other_su_msg">Một lệnh \"su\" không thuộc về Magisk được phát hiện. Vui lòng gỡ bỏ bất kì phương pháp root khác và/hoặc cài đặt lại Magisk.</string>
     <string name="unsupport_external_storage_msg">Magisk được cài đặt vào bộ nhớ ngoài. Vui lòng chuyển ứng dụng vào bộ nhớ trong.</string>
-    <string name="unsupport_nonroot_stub_msg">Ứng dụng không thể tiếp tục hoạt động ở trạng thái ẩn vì mất quyền root. Vui lòng khôi phục nó trở lại APK ban đầu.</string>
-    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Cấp quyền lưu trữ để bật chức năng này</string>
     <string name="install_unknown_denied">Cho phép "cài đặt ứng dụng không rõ nguồn gốc" để bật chức năng này</string>
-    <string name="add_shortcut_title">Thêm lối tắt vào màn hình chính</string>
-    <string name="add_shortcut_msg">Sau khi ẩn ứng dụng này, tên và biểu tượng của nó có thể trở nên khó nhận ra. Bạn có muốn thêm một phím tắt đẹp vào màn hình chính không?</string>
     <string name="app_not_found">Không tìm thấy ứng dụng nào để xử lý hành động này</string>
     <string name="reboot_apply_change">Khởi động lại để áp dụng các thay đổi</string>
-    <string name="restore_app_confirmation">Điều này sẽ khôi phục ứng dụng ẩn về nguyên bản. Bạn chắc chắn muốn làm điều này chứ?</string>
-
 </resources>

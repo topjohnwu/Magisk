@@ -124,10 +124,6 @@
     <string name="settings_dark_mode_dark">Zawsze ciemny</string>
     <string name="settings_download_path_title">Ścieżka pobierania plików</string>
     <string name="settings_download_path_message">Pliki zostaną zapisane do %1$s</string>
-    <string name="settings_hide_app_title">Ukryj aplikację Magisk</string>
-    <string name="settings_hide_app_summary">Zainstaluj aplikację proxy z losowym ID pakietu i własną etykietą</string>
-    <string name="settings_restore_app_title">Przywróć aplikację Magisk</string>
-    <string name="settings_restore_app_summary">Przestań ukrywać aplikację i przywróć oryginalny plik APK</string>
     <string name="language">Język</string>
     <string name="system_default">(Domyślny systemowy)</string>
     <string name="settings_check_update_title">Sprawdzanie aktualizacji</string>
@@ -145,11 +141,6 @@
     <string name="settings_hosts_title">Hosty Systemless</string>
     <string name="settings_hosts_summary">Wsparcie hostów Systemless dla aplikacji blokujących reklamy</string>
     <string name="settings_hosts_toast">Dodano moduł hostów Systemless</string>
-    <string name="settings_app_name_hint">Nowa nazwa</string>
-    <string name="settings_app_name_helper">Aplikacja zostanie przepakowana z tą nazwą</string>
-    <string name="settings_app_name_error">Nieprawidłowy format</string>
-
-
     <string name="superuser_notification">Powiadomienia Superusera</string>
 
 
@@ -157,7 +148,6 @@
     <string name="settings_su_auth_summary">Pytaj o uwierzytelnienie użytkownika podczas żądań Superusera</string>
     <string name="settings_su_auth_insecure">Nie skonfigurowano żadnej metody uwierzytelniania na tym urządzeniu</string>
     <string name="settings_customization">Personalizacja</string>
-    <string name="setting_add_shortcut_summary">Umieść ładny skrót na ekranie głównym na wypadek, gdyby nazwa i ikona były trudne do rozpoznania po ukryciu aplikacji</string>
     <string name="settings_doh_title">DNS over HTTPS</string>
     <string name="settings_doh_description">Zapobiegaj zatruwaniu DNS (DNS poisoning) w niektórych krajach</string>
 
@@ -215,15 +205,9 @@
     <string name="unsupport_system_app_msg">Uruchomienie tej aplikacji jako aplikacja systemowa nie jest obsługiwane. Przywróć aplikację do stanu aplikacji użytkownika.</string>
     <string name="unsupport_other_su_msg">Wykryto plik binarny \"su\" nie należący do Magisk. Usuń wszelkie konkurencyjne rozwiązania root i/lub zainstaluj ponownie Magisk.</string>
     <string name="unsupport_external_storage_msg">Magisk jest zainstalowany w pamięci zewnętrznej. Przenieś aplikację do pamięci wewnętrznej.</string>
-    <string name="unsupport_nonroot_stub_msg">Ukryta aplikacja Magisk nie może dłużej działać, ponieważ uprawnienia roota zostały utracone. Przywróć oryginalny plik APK.</string>
-    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Zezwól na dostęp do pamięci, aby włączyć tę funkcję</string>
     <string name="post_notifications_denied">Zezwól na otrzymywanie powiadomień, aby włączyć tę funkcję</string>
     <string name="install_unknown_denied">Zezwól na \"Instaluj z nieznanych źródeł\", aby włączyć tę funkcję</string>
-    <string name="add_shortcut_title">Utwórz skrót na ekranie głównym</string>
-    <string name="add_shortcut_msg">Po ukryciu tej aplikacji, jej nazwa i ikona może być trudna do rozpoznania. Czy chcesz dodać ładny skrót na ekranie głównym?</string>
     <string name="app_not_found">Nie znaleziono aplikacji do wykonania tej czynności</string>
     <string name="reboot_apply_change">Uruchom ponownie, aby zastosować zmiany</string>
-    <string name="restore_app_confirmation">Spowoduje to przywrócenie ukrytej aplikacji z powrotem do stanu oryginalnej aplikacji. Czy na pewno chcesz to zrobić?</string>
-
 </resources>

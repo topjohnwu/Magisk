@@ -117,10 +117,6 @@
     <string name="settings_dark_mode_dark">다크 모드</string>
     <string name="settings_download_path_title">다운로드 위치</string>
     <string name="settings_download_path_message">파일이 %1$s에 저장됩니다</string>
-    <string name="settings_hide_app_title">Magisk 앱 숨기기</string>
-    <string name="settings_hide_app_summary">무작위 패키지명과 사용자 지정 앱 이름으로 Magisk 프록시 앱을 설치합니다.</string>
-    <string name="settings_restore_app_title">Magisk 앱 복원</string>
-    <string name="settings_restore_app_summary">앱 숨기기를 해제하고 원래 APK로 복원합니다.</string>
     <string name="language">언어</string>
     <string name="system_default">(시스템 기본값)</string>
     <string name="settings_check_update_title">업데이트 확인</string>
@@ -138,16 +134,10 @@
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">광고 차단 앱에서 사용하는 systemless hosts를 지원합니다.</string>
     <string name="settings_hosts_toast">Systemless hosts 모듈 추가됨</string>
-    <string name="settings_app_name_hint">새 이름</string>
-    <string name="settings_app_name_helper">이 이름으로 앱을 다시 패키징합니다.</string>
-    <string name="settings_app_name_error">올바르지 않은 형식</string>
-
-
     <string name="superuser_notification">슈퍼유저 알림</string>
 
 
     <string name="settings_customization">커스터마이즈</string>
-    <string name="setting_add_shortcut_summary">앱을 숨긴 후 아이콘과 이름을 알아보기 힘들 경우를 위해 알아보기 쉬운 바로가기를 홈 화면에 추가합니다.</string>
     <string name="settings_doh_title">DNS over HTTPS</string>
     <string name="settings_doh_description">일부 국가에 존재하는 DNS 포이즈닝을 해결합니다.</string>
 
@@ -204,14 +194,8 @@
     <string name="unsupport_system_app_msg">해당 앱을 시스템 앱으로 실행하는 것은 지원되지 않습니다. 앱을 일반 사용자 앱으로 실행해 주세요.</string>
     <string name="unsupport_other_su_msg">Magisk으로 부터 설치되지 않은 \"su\" 바이너리가 감지되었습니다. 다른 루팅 방법을 제거하거나, Magisk 를 다시 설치해주세요.</string>
     <string name="unsupport_external_storage_msg">Magisk 가 외부 저장소에 설치되어 있습니다. Magisk 를 내부 저장소에 설치 해주세요.</string>
-    <string name="unsupport_nonroot_stub_msg">이 숨겨진 Magisk 앱은 루트 권한이 손실되어 사용할 수 없습니다. 원래 APK 를 복원하거나 재설치 해주세요.</string>
-    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">해당 기능을 사용하려면 저장소 권한을 허용해 주십시오.</string>
     <string name="install_unknown_denied">이 기능을 활성화 하려면 "출처를 알 수 없는 앱 설치"를 허용해주세요.</string>
-    <string name="add_shortcut_title">홈 화면에 바로가기 추가</string>
-    <string name="add_shortcut_msg">앱을 숨긴 후 아이콘과 이름을 알아보기 힘들 경우를 위해 알아보기 쉬운 바로가기를 홈 화면에 추가합니다.</string>
     <string name="app_not_found">해당 작업을 처리할 어플리케이션이 없습니다.</string>
     <string name="reboot_apply_change">변경 사항을 적용하려면 재부팅하세요.</string>
-    <string name="restore_app_confirmation">정말로 실행하시겠습니까? 숨겨진 앱이 원본 앱으로 복원됩니다.</string>
-
 </resources>

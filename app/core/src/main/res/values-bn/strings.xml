@@ -118,10 +118,6 @@
     <string name="settings_dark_mode_dark">সবসময় অন্ধকার</string>
     <string name="settings_download_path_title">পাথ ডাউনলোড করুন</string>
     <string name="settings_download_path_message">ফাইলগুলি %1$s এ সংরক্ষণ করা হবে৷</string>
-    <string name="settings_hide_app_title">ম্যাজিস্ক অ্যাপটি লুকান</string>
-    <string name="settings_hide_app_summary">একটি র্যান্ডম প্যাকেজ আইডি এবং কাস্টম অ্যাপ লেব সহ একটি প্রক্সি অ্যাপ ইনস্টল করুনl</string>
-    <string name="settings_restore_app_title">ম্যাজিস্ক অ্যাপটি পুনরুদ্ধার করুন</string>
-    <string name="settings_restore_app_summary">অ্যাপটি আড়াল করুন এবং আসলটি পুনরুদ্ধার করুন</string>
     <string name="language">ভাষা</string>
     <string name="system_default">(সিস্টেমের ডিফল্ট)</string>
     <string name="settings_check_update_title">আপডেট চেক করুন</string>
@@ -139,16 +135,10 @@
     <string name="settings_hosts_title">সিস্টেমহীন হোস্ট</string>
     <string name="settings_hosts_summary">বিজ্ঞাপন ব্লকিং অ্যাপের জন্য সিস্টেমলেস হোস্ট</string>
     <string name="settings_hosts_toast">সিস্টেমহীন হোস্ট মডিউল যোগ করা হয়েছে</string>
-    <string name="settings_app_name_hint">নতুন নাম</string>
-    <string name="settings_app_name_helper">অ্যাপটি এই নামের সাথে পুনরায় প্যাকেজ করা হবে</string>
-    <string name="settings_app_name_error">ভুল ফরম্যাট</string>
-
-
     <string name="superuser_notification">সুপার ইউজার বিজ্ঞপ্তি</string>
 
 
     <string name="settings_customization">কাস্টমাইজেশন</string>
-    <string name="setting_add_shortcut_summary">অ্যাপটি লুকানোর পরে নাম এবং আইকন সনাক্ত করা কঠিন হলে হোম স্ক্রিনে একটি সুন্দর শর্টকাট যোগ করুন</string>
     <string name="settings_doh_title">HTTPS এর উপর ডিএনএস</string>
     <string name="settings_doh_description">কিছু দেশে ডিএনএস বিষক্রিয়ার সমাধান</string>
 
@@ -205,15 +195,9 @@
     <string name="unsupport_system_app_msg">এই অ্যাপটিকে একটি সিস্টেম অ্যাপ হিসেবে চালানো সমর্থিত নয়। অনুগ্রহ করে অ্যাপটিকে একটি ব্যবহারকারী অ্যাপে ফিরিয়ে দিন।</string>
     <string name="unsupport_other_su_msg">ম্যাজিস্ক থেকে নয় একটি \"su\" বাইনারি সনাক্ত করা হয়েছে। অনুগ্রহ করে কোনো প্রতিযোগী রুট সমাধান সরান এবং/অথবা ম্যাজিস্ক পুনরায় ইনস্টল করুন।</string>
     <string name="unsupport_external_storage_msg">ম্যাজিস্ক বহিরাগত স্টোরেজ ইনস্টল করা হয়। অনুগ্রহ করে অ্যাপটিকে অভ্যন্তরীণ সঞ্চয়স্থানে সরান৷</string>
-    <string name="unsupport_nonroot_stub_msg">লুকানো ম্যাজিস্ক অ্যাপটি কাজ চালিয়ে যেতে পারে না কারণ রুট হারিয়ে গেছে। অনুগ্রহ করে আসল APK পুনরুদ্ধার করুন।</string>
-    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">এই কার্যকারিতা সক্ষম করতে স্টোরেজ অনুমতি দিন</string>
     <string name="post_notifications_denied">নোটিফিকেশন এর অনোমতি দিন</string>
     <string name="install_unknown_denied">এই কার্যকারিতা সক্ষম করতে "অজানা অ্যাপগুলি ইনস্টল করুন" এর অনুমতি দিন</string>
-    <string name="add_shortcut_title">হোম স্ক্রিনে শর্টকাট যোগ করুন</string>
-    <string name="add_shortcut_msg">এই অ্যাপটি লুকানোর পরে, এর নাম এবং আইকন চিনতে অসুবিধা হতে পারে। আপনি কি হোম স্ক্রিনে একটি সুন্দর শর্টকাট যোগ করতে চান?</string>
     <string name="app_not_found">এই ক্রিয়াটি পরিচালনা করার জন্য কোনো অ্যাপ পাওয়া যায়নি</string>
     <string name="reboot_apply_change">পরিবর্তনগুলি প্রয়োগ করতে রিবুট করুন</string>
-    <string name="restore_app_confirmation">এটি লুকানো অ্যাপটিকে মূল অ্যাপে ফিরিয়ে আনবে। আপনি কি সত্যিই এটি করতে চান?</string>
-
 </resources>

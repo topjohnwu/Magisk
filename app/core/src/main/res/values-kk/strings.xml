@@ -125,10 +125,6 @@
     <string name="settings_dark_mode_dark">Әрдайым қараңғы</string>
     <string name="settings_download_path_title">Жүктеу бумасы</string>
     <string name="settings_download_path_message">Файлдар %1$s бумасына сақталады</string>
-    <string name="settings_hide_app_title">Magisk қолданбасын жасыру</string>
-    <string name="settings_hide_app_summary">Қолданба атауын өзгертіп, кездейсоқ десте атауы бар APK файлын құрастыру</string>
-    <string name="settings_restore_app_title">Magisk қолданбасын қалпына келтіру</string>
-    <string name="settings_restore_app_summary">Қолданбаны жасырын күйден шығарып, түпнұсқа APK орнату</string>
     <string name="language">Тіл</string>
     <string name="system_default">(Жүйедегідей)</string>
     <string name="settings_check_update_title">Жаңартуды тексеру</string>
@@ -146,11 +142,6 @@
     <string name="settings_hosts_title">Жүйеден тыс hosts</string>
     <string name="settings_hosts_summary">Жарнама өшіретін қолданбалар үшін /system бөлімінен тыс hosts файлын қолдану</string>
     <string name="settings_hosts_toast">Жүйеден тыс hosts модулі қосылды</string>
-    <string name="settings_app_name_hint">Жаңа атау</string>
-    <string name="settings_app_name_helper">Қолданбаның қайта құрылған нұсқасы осы атауға ие болады</string>
-    <string name="settings_app_name_error">Жарамсыз пішім</string>
-
-
     <string name="superuser_notification">Superuser мәлімдемесі</string>
 
 
@@ -158,7 +149,6 @@
     <string name="settings_su_auth_summary">Superuser құқығына сұраным келгенде қолданушының құпиясөзін не биометриялық дерегін сұрау</string>
     <string name="settings_su_auth_insecure">Бұл құрылғыда аутентификация әдісі орнатылмаған</string>
     <string name="settings_customization">Сыртқы көрініс</string>
-    <string name="setting_add_shortcut_summary">Жасырылған қолданбаны табу қиын болса, бастапқы экранға ыңғайлы таңбаша қосуға болады</string>
     <string name="settings_doh_title">HTTPS арқылы DNS</string>
     <string name="settings_doh_description">Кейбір елдерде қолданылатын жалған DNS-тен қорғау</string>
 
@@ -216,15 +206,9 @@
     <string name="unsupport_system_app_msg">Бұл қолданба жүйе қолданбасы ретінде жұмыс істей алмайды. Оны қалыпты қолданба ретінде қайта орнатыңыз.</string>
     <string name="unsupport_other_su_msg">Magisk өзге бағдарламаға тиесілі \"su\" файлын анықтады. Қайшы келетін root қолданбасын жойып, Magisk-ті қайта орнатыңыз.</string>
     <string name="unsupport_external_storage_msg">Magisk қолданбасы сыртқы жадқа орнатылды. Қолданбаны ішкі жадқа жылжытыңыз.</string>
-    <string name="unsupport_nonroot_stub_msg">Root құқығы жоғалғандықтан, жасырылған Magisk қолданбасы жұмыс істей алмайды. Түпнұсқа APK файлын орнатыңыз.</string>
-    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Мүмкіндікті қолдану үшін құрылғы жадына рұқсат беріңіз</string>
     <string name="post_notifications_denied">Мүмкіндікті қолдану үшін мәлімдеме жіберуге рұқсат беріңіз</string>
     <string name="install_unknown_denied">Мүмкіндікті қолдану үшін "белгісіз қолданбаларды орнатуға" рұқсат беріңіз</string>
-    <string name="add_shortcut_title">Бастапқы экранға таңбаша қосу</string>
-    <string name="add_shortcut_msg">Қолданба жасырылғаннан кейін, оның атауы мен таңбашасын тану қиын болуы мүмкін. Бастапқы экранға ыңғайлы таңбаша қосу керек пе?</string>
     <string name="app_not_found">Бұл әрекетті орындай алатын қолданба табылмады</string>
     <string name="reboot_apply_change">Өзгерістерді қолдану үшін құрылғыны қайта қосыңыз</string>
-    <string name="restore_app_confirmation">Сөйтсеңіз, жасырын қолданба түпнұсқа қолданбаға айналады. Мұны істеу керек екеніне сенімдісіз бе?</string>
-
 </resources>

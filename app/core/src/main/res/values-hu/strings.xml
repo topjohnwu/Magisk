@@ -119,10 +119,6 @@
     <string name="settings_dark_mode_dark">Mindig sötét</string>
     <string name="settings_download_path_title">Letöltési útvonal</string>
     <string name="settings_download_path_message">A fájlok a következő helyre kerülnek: %1$s</string>
-    <string name="settings_hide_app_title">A Magisk app elrejtése</string>
-    <string name="settings_hide_app_summary">Telepíts egy proxyalkalmazást véletlenszerű csomagazonosítóval és egyéni alkalmazáscímkével</string>
-    <string name="settings_restore_app_title">A Magisk app visszaállítása</string>
-    <string name="settings_restore_app_summary">Oldja fel az app elrejtését, és állítsa vissza az eredeti APK-t</string>
     <string name="language">Nyelv</string>
     <string name="system_default">(Rendszer nyelve)</string>
     <string name="settings_check_update_title">Frissítések ellenőrzése</string>
@@ -140,16 +136,10 @@
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Systemless hosts támogatás a hirdetésblokkoló alkalmazásokhoz</string>
     <string name="settings_hosts_toast">Systemless hosts modul hozzáadva</string>
-    <string name="settings_app_name_hint">Új név</string>
-    <string name="settings_app_name_helper">Az alkalmazás ezzel a névvel lesz újracsomagolva</string>
-    <string name="settings_app_name_error">Érvénytelen formátum</string>
-
-
     <string name="superuser_notification">Superuser értesítés</string>
 
 
     <string name="settings_customization">Testreszabás</string>
-    <string name="setting_add_shortcut_summary">Adjon hozzá egy szép parancsikont a kezdőképernyőhöz arra az esetre, ha a nevet és az ikont nehéz felismerni az alkalmazás elrejtése után</string>
     <string name="settings_doh_title">DNS HTTPS-en keresztül</string>
     <string name="settings_doh_description">Megoldás DNS-mérgezés esetén egyes országokban</string>
 
@@ -206,14 +196,8 @@
     <string name="unsupport_system_app_msg">Az alkalmazás rendszeralkalmazásként való futtatása nem támogatott. Állítsd vissza az alkalmazást felhasználói alkalmazássá.</string>
     <string name="unsupport_other_su_msg">Nem a Magisktől származó \"su\" binárist észleltünk. Távolíts el minden konkurens gyökérmegoldást, és/vagy telepítsd újra a Magisk-et.</string>
     <string name="unsupport_external_storage_msg">A Magisk külső tárhelyre van telepítve. Helyezd át az alkalmazást a belső tárhelyre.</string>
-    <string name="unsupport_nonroot_stub_msg">A rejtett Magisk alkalmazás nem tud tovább működni, mert a root elveszett. Kérjük állítsd vissza az eredeti APK-t.</string>
-    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Adj tárhely engedélyt a funkció használatához</string>
     <string name="install_unknown_denied">Engedélyezd az "Ismeretlen alkalmazások telepítése" lehetőséget a funkció használatához</string>
-    <string name="add_shortcut_title">Parancsikon hozzáadása a kezdőképernyőhöz</string>
-    <string name="add_shortcut_msg">Az alkalmazás elrejtése után nehéz lehet felismerni a nevét és ikonját. Szeretnél egy szép parancsikont hozzáadni a kezdőképernyőhöz?</string>
     <string name="app_not_found">Nem található alkalmazás ennek a műveletnek a kezelésére</string>
     <string name="reboot_apply_change">A változtatások alkalmazásához indítsd újra</string>
-    <string name="restore_app_confirmation">Ezzel visszaállítod a rejtett alkalmazást az eredeti alkalmazásra. Tényleg ezt akarod csinálni?</string>
-
 </resources>

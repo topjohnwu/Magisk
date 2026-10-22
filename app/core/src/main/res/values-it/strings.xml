@@ -133,10 +133,6 @@
     <string name="settings_dark_mode_dark">Scuro</string>
     <string name="settings_download_path_title">Percorso di download</string>
     <string name="settings_download_path_message">I file verranno salvati in %1$s</string>
-    <string name="settings_hide_app_title">Nascondi l\'app di Magisk</string>
-    <string name="settings_hide_app_summary">Installa un\'app \"proxy\" con un ID pacchetto casuale e un nome personalizzato</string>
-    <string name="settings_restore_app_title">Ripristina l\'app di Magisk</string>
-    <string name="settings_restore_app_summary">Rendi l\'app nuovamente rilevabile e ripristina l\'APK originale</string>
     <string name="language">Lingua</string>
     <string name="system_default">(Sistema)</string>
     <string name="settings_check_update_title">Controlla aggiornamenti</string>
@@ -155,11 +151,6 @@
     <string name="settings_hosts_title">File hosts systemless</string>
     <string name="settings_hosts_summary">Supporto al file hosts systemless per le app che bloccano le pubblicità</string>
     <string name="settings_hosts_toast">Aggiunto modulo per il supporto al file hosts systemless</string>
-    <string name="settings_app_name_hint">Nuovo nome</string>
-    <string name="settings_app_name_helper">L\'app sarà ricreata con questo nome</string>
-    <string name="settings_app_name_error">Formato non valido</string>
-
-
     <string name="superuser_notification">Notifica di accesso root</string>
 
 
@@ -176,7 +167,6 @@
     <string name="color_mode_monet_system">Monet (Sistema)</string>
     <string name="color_mode_monet_light">Monet (Chiaro)</string>
     <string name="color_mode_monet_dark">Monet (Scuro)</string>
-    <string name="setting_add_shortcut_summary">Aggiungi un collegamento alla schermata iniziale se il nome e l\'icona sono difficili da riconoscere dopo aver nascosto l\'app</string>
     <string name="settings_doh_title">DNS over HTTPS</string>
     <string name="settings_doh_description">Aggira il DNS poisoning in alcune nazioni</string>
     <string name="settings_random_name_title">Genera un nome casuale per l\’output</string>
@@ -237,15 +227,9 @@
     <string name="unsupport_system_app_msg">L\'esecuzione di quest\'app come app di sistema non è supportata. Reinstallala come applicazione utente.</string>
     <string name="unsupport_other_su_msg">È stato rilevato un binario \"su\" che non appartiene a Magisk. Rimuovi qualsiasi altro sistema di root e/o reinstalla Magisk.</string>
     <string name="unsupport_external_storage_msg">Magisk è installato nella memoria esterna. Sposta l\'app nella memoria interna.</string>
-    <string name="unsupport_nonroot_stub_msg">Dal momento che i permessi di root sono stati persi, l\'app di Magisk nascosta non può più funzionare. Ripristina l\'APK originale.</string>
-    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Consenti l\'accesso alla memoria del dispositivo per abilitare questa opzione</string>
     <string name="post_notifications_denied">Consenti l\'invio di notifiche per abilitare questa opzione</string>
     <string name="install_unknown_denied">Consenti l\'installazione di app sconosciute per abilitare questa funzionalità</string>
-    <string name="add_shortcut_title">Aggiungi collegamento alla schermata iniziale</string>
-    <string name="add_shortcut_msg">Dopo aver nascosto quest\'app, il suo nome e la sua icona potrebbero diventare difficili da riconoscere. Vuoi aggiungere una scorciatoia alla schermata principale?</string>
     <string name="app_not_found">Non è stata trovata un\'app per gestire questa azione</string>
     <string name="reboot_apply_change">Riavvia per applicare le modifiche</string>
-    <string name="restore_app_confirmation">L\'app nascosta verrà sostituita con la versione originale. Sei sicuro di voler continuare?</string>
-
 </resources>

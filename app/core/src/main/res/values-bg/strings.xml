@@ -121,10 +121,6 @@
     <string name="settings_dark_mode_dark">Винаги тъмно</string>
     <string name="settings_download_path_title">Папка за изтегляния</string>
     <string name="settings_download_path_message">Файловете ще бъдат запазвани в %1$s</string>
-    <string name="settings_hide_app_title">Скриване на приложението на Magisk</string>
-    <string name="settings_hide_app_summary">Инсталира междинно приложение с произволен идестификатор и име</string>
-    <string name="settings_restore_app_title">Възстановяване на приложението на Magisk</string>
-    <string name="settings_restore_app_summary">Показва и възстановява оригиналното приложение</string>
     <string name="language">Език</string>
     <string name="system_default">(Според системата)</string>
     <string name="settings_check_update_title">Проверка за обновяване</string>
@@ -142,16 +138,10 @@
     <string name="settings_hosts_title">Безсистемни хостове</string>
     <string name="settings_hosts_summary">Поддръжка на безсистемни хостове, ползвани от приложения за спиране на реклами</string>
     <string name="settings_hosts_toast">Модулът за безсистемни хостове е добавен</string>
-    <string name="settings_app_name_hint">Ново име</string>
-    <string name="settings_app_name_helper">Приложението ще бъде пакетирано с това име</string>
-    <string name="settings_app_name_error">Форматът е недействителен</string>
-
-
     <string name="superuser_notification">Известие за суперпотребителя</string>
 
 
     <string name="settings_customization">Приспособяване</string>
-    <string name="setting_add_shortcut_summary">Добавя красив пряк път на началния екран ако името или текущата икона на скритото приложение са трудни за разпознаване</string>
     <string name="settings_doh_title">DNS през HTTPS</string>
     <string name="settings_doh_description">Заобикаля „отравянето“ на DNS в някои държави</string>
 
@@ -209,15 +199,9 @@
     <string name="unsupport_system_app_msg">Приложението не се поддържа да работи като системно. Върнете го като потребителско.</string>
     <string name="unsupport_other_su_msg">Намерен е двоичен файл „su“, който не е от Magisk. Премахнете всички други решения за достъп до правата на суперпотребителя и/или инсталирайте Magisk отново.</string>
     <string name="unsupport_external_storage_msg">Magisk е инсталиран във външно хранилище. Преместете приложението във вътрешното хранилище.</string>
-    <string name="unsupport_nonroot_stub_msg">Скритото приложение на Magisk не може да продължи да работи, защото достъпът до правата на суперпотребителя е загубен. Възстановете оригиналното приложение.</string>
-    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">За да използвате нази възможност, разрешете достъп до хранилището</string>
     <string name="post_notifications_denied">За да използвате нази възможност, разрешете достъп до известията</string>
     <string name="install_unknown_denied">За да използвате тази възможност, разрешете „инсталиране на неизвестни приложения“</string>
-    <string name="add_shortcut_title">Добавяне на пряк път на началния екран</string>
-    <string name="add_shortcut_msg">След скриване на приложението името или икона може да станат трудни за разпознаване. Желаете ли да бъде добаве красив пряк път на началния екран?</string>
     <string name="app_not_found">Не е намерено приложение, което да извърши действието</string>
     <string name="reboot_apply_change">Рестартиране за прилагане на промените</string>
-    <string name="restore_app_confirmation">По този начин ще възстановите скритото приложение в първоначалното му състояние. Това ли желаете да бъде направено?</string>
-
 </resources>

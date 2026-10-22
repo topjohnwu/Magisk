@@ -129,10 +129,6 @@
     <string name="settings_dark_mode_dark">Her zaman koyu</string>
     <string name="settings_download_path_title">İndirme yolu</string>
     <string name="settings_download_path_message">Dosyalar %1$s konumuna kaydedilecek</string>
-    <string name="settings_hide_app_title">Magisk uygulamasını gizle</string>
-    <string name="settings_hide_app_summary">Rastgele bir paket kimliği ve özel uygulama etiketiyle bir proxy uygulama yükleyin</string>
-    <string name="settings_restore_app_title">Magisk uygulamasını geri yükle</string>
-    <string name="settings_restore_app_summary">Uygulamayı görünür yapın ve orijinal APK\'yı geri yükleyin</string>
     <string name="language">Dil</string>
     <string name="system_default">(Sistem varsayılanı)</string>
     <string name="settings_check_update_title">Güncellemeleri kontrol et</string>
@@ -151,11 +147,6 @@
     <string name="settings_hosts_title">Sistemsiz (Systemless) hosts</string>
     <string name="settings_hosts_summary">Reklam engelleme uygulamaları için sistemsiz hosts desteği</string>
     <string name="settings_hosts_toast">Sistemsiz hosts modülü eklendi</string>
-    <string name="settings_app_name_hint">Yeni isim</string>
-    <string name="settings_app_name_helper">Uygulama bu isimle yeniden paketlenecek</string>
-    <string name="settings_app_name_error">Geçersiz biçim</string>
-
-
     <string name="superuser_notification">Süper Kullanıcı bildirimi</string>
 
 
@@ -172,7 +163,6 @@
     <string name="color_mode_monet_system">Monet (Sistem)</string>
     <string name="color_mode_monet_light">Monet (Açık)</string>
     <string name="color_mode_monet_dark">Monet (Koyu)</string>
-    <string name="setting_add_shortcut_summary">Uygulamayı gizledikten sonra adının ve simgesinin tanınması zorlaşması ihtimaline karşı ana ekrana güzel bir kısayol ekleyin</string>
     <string name="settings_doh_title">HTTPS üzerinden DNS (DoH)</string>
     <string name="settings_doh_description">Bazı ülkelerdeki DNS zehirlenmesine karşı geçici çözüm</string>
     <string name="settings_random_name_title">Çıktı adını rastgele yap</string>
@@ -231,15 +221,9 @@
     <string name="unsupport_system_app_msg">Bu uygulamayı bir sistem uygulaması olarak çalıştırmak desteklenmez. Lütfen uygulamayı kullanıcı uygulamasına dönüştürün.</string>
     <string name="unsupport_other_su_msg">Magisk\'e ait olmayan bir \"su\" ikili dosyası algılandı. Lütfen rakip root çözümlerini kaldırın ve/veya Magisk\'i yeniden yükleyin.</string>
     <string name="unsupport_external_storage_msg">Magisk harici depolamaya yüklenmiş. Lütfen uygulamayı dahili depolamaya taşıyın.</string>
-    <string name="unsupport_nonroot_stub_msg">Root izni kaybedildiği için gizli Magisk uygulaması çalışmaya devam edemiyor. Lütfen orijinal APK\'yı geri yükleyin.</string>
-    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Bu işlevi etkinleştirmek için depolama izni verin</string>
     <string name="post_notifications_denied">Bu işlevi etkinleştirmek için bildirim izni verin</string>
     <string name="install_unknown_denied">Bu işlevi etkinleştirmek için \"Bilinmeyen uygulamaları yükle\" iznini verin</string>
-    <string name="add_shortcut_title">Ana ekrana kısayol ekle</string>
-    <string name="add_shortcut_msg">Bu uygulama gizlendikten sonra adının ve simgesinin tanınması zorlaşabilir. Ana ekrana şık bir kısayol eklemek ister misiniz?</string>
     <string name="app_not_found">Bu işlemi gerçekleştirecek uygulama bulunamadı</string>
     <string name="reboot_apply_change">Değişiklikleri uygulamak için yeniden başlat</string>
-    <string name="restore_app_confirmation">Bu işlem, gizli uygulamayı orijinal uygulamaya dönüştürecektir. Bunu gerçekten yapmak istiyor musunuz?</string>
-
 </resources>

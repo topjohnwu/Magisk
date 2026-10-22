@@ -125,10 +125,6 @@
     <string name="settings_dark_mode_dark">Mereu întunecat</string>
     <string name="settings_download_path_title">Cale de descărcare</string>
     <string name="settings_download_path_message">Fișierele vor fi salvate în %1$s</string>
-    <string name="settings_hide_app_title">Ascunde aplicația Magisk</string>
-    <string name="settings_hide_app_summary">Instalează o aplicație proxy cu ID aleatoriu pentru pachet și etichetă personalizată pentru aplicație</string>
-    <string name="settings_restore_app_title">Restaurează aplicația Magisk</string>
-    <string name="settings_restore_app_summary">Dezvăluie aplicația și restaurează APK-ul original</string>
     <string name="language">Limbă</string>
     <string name="system_default">(Implicită a sistemului)</string>
     <string name="settings_check_update_title">Caută actualizări</string>
@@ -146,11 +142,6 @@
     <string name="settings_hosts_title">Fișier hosts în afara partiției system</string>
     <string name="settings_hosts_summary">Suport pentru fișierul hosts în afara partiției system, în cazul aplicațiilor care blochează reclame</string>
     <string name="settings_hosts_toast">Modulul pentru fișierul hosts în afara partiției system, adăugat</string>
-    <string name="settings_app_name_hint">Nume nou</string>
-    <string name="settings_app_name_helper">Aplicația va fi reîmpachetată cu acest nume</string>
-    <string name="settings_app_name_error">Format nevalid</string>
-
-
     <string name="superuser_notification">Notificare de superutilizator</string>
 
 
@@ -158,7 +149,6 @@
     <string name="settings_su_auth_summary">Cere autentificarea utilizatorului în timpul cererilor de superutilizator</string>
     <string name="settings_su_auth_insecure">Nu este configurată nicio metodă de autentificare pe dispozitiv</string>
     <string name="settings_customization">Personalizare</string>
-    <string name="setting_add_shortcut_summary">Adaugă o comandă rapidă frumoasă în ecranul de pornire în cazul în care numele și pictograma sunt dificil de recunoscut după ascunderea aplicației</string>
     <string name="settings_doh_title">DNS prin HTTPS</string>
     <string name="settings_doh_description">Soluție ocolitoare pentru poisoningul DNS în anumite țări</string>
     <string name="settings_random_name_title">Randomizează numele ieșirii</string>
@@ -218,15 +208,9 @@
     <string name="unsupport_system_app_msg">Rularea acestei aplicații ca aplicație de sistem nu este suportată. Te rugăm să readuci aplicația într-o aplicație de utilizator.</string>
     <string name="unsupport_other_su_msg">A fost detectat un binar „su” care nu provine de la Magisk. Te rugăm să elimini orice soluție root concurentă și/sau să reinstalezi Magisk.</string>
     <string name="unsupport_external_storage_msg">Magisk este instalat în spațiul de stocare extern. Te rugăm să muți aplicația în spațiul de stocare intern.</string>
-    <string name="unsupport_nonroot_stub_msg">Aplicația Magisk ascunsă nu poate continua să funcționeze deoarece rootul a fost pierdut. Te rugăm să restaurezi APK-ul original.</string>
-    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Acordă permisiunea de stocare pentru a activa această funcționalitate</string>
     <string name="post_notifications_denied">Acordă permisiunea de notificări pentru a activa această funcționalitate</string>
     <string name="install_unknown_denied">Permite „instalarea de aplicații necunoscute” pentru a activa această funcționalitate</string>
-    <string name="add_shortcut_title">Adaugă comandă rapidă pe ecranul de pornire</string>
-    <string name="add_shortcut_msg">După ascunderea acestei aplicații, numele și pictograma acesteia ar putea deveni dificil de recunoscut. Vrei să adaugi o comandă rapidă frumoasă pe ecranul de pornire?</string>
     <string name="app_not_found">Nu s-a găsit nicio aplicație care să gestioneze această acțiune</string>
     <string name="reboot_apply_change">Repornește pentru a aplica modificările</string>
-    <string name="restore_app_confirmation">Acest lucru va restaura aplicația ascunsă în aplicația originală. Sigur vrei să faci asta?</string>
-
 </resources>

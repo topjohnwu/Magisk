@@ -130,10 +130,6 @@
     <string name="settings_dark_mode_dark">Selalu gelap</string>
     <string name="settings_download_path_title">Lokasi unduhan</string>
     <string name="settings_download_path_message">Berkas akan disimpan ke %1$s</string>
-    <string name="settings_hide_app_title">Sembunyikan aplikasi Magisk</string>
-    <string name="settings_hide_app_summary">Pasang aplikasi proxy dengan ID paket acak dan label aplikasi khusus</string>
-    <string name="settings_restore_app_title">Pulihkan aplikasi Magisk</string>
-    <string name="settings_restore_app_summary">Tampilkan kembali aplikasi dan pulihkan APK asli</string>
     <string name="language">Bahasa</string>
     <string name="system_default">(Sistem)</string>
     <string name="settings_check_update_title">Periksa pembaruan</string>
@@ -152,9 +148,6 @@
     <string name="settings_hosts_title">Hosts systemless</string>
     <string name="settings_hosts_summary">Dukungan hosts systemless untuk aplikasi pemblokir iklan</string>
     <string name="settings_hosts_toast">Menambahkan modul hosts systemless</string>
-    <string name="settings_app_name_hint">Nama baru</string>
-    <string name="settings_app_name_helper">Aplikasi akan dikemas ulang dengan nama tersebut</string>
-    <string name="settings_app_name_error">Format tidak valid</string>
     <string name="superuser_notification">Notifikasi superuser</string>
     <string name="settings_su_auth_title">Otentikasi pengguna</string>
     <string name="settings_su_auth_summary">Minta otentikasi pengguna selama permintaan superuser</string>
@@ -169,7 +162,6 @@
     <string name="color_mode_monet_system">Monet (Sistem)</string>
     <string name="color_mode_monet_light">Monet (Terang)</string>
     <string name="color_mode_monet_dark">Monet (Gelap)</string>
-    <string name="setting_add_shortcut_summary">Tambahkan pintasan yang menarik ke layar utama jika nama dan ikon sulit dikenali setelah menyembunyikan aplikasi</string>
     <string name="settings_doh_title">DNS melalui HTTPS</string>
     <string name="settings_doh_description">Solusi mengatasi masalah DNS di beberapa negara</string>
     <string name="settings_random_name_title">Acak nama output</string>
@@ -232,16 +224,10 @@
     <string name="unsupport_system_app_msg">Menjalankan aplikasi ini sebagai aplikasi sistem tidak didukung. Harap kembalikan ke aplikasi pengguna.</string>
     <string name="unsupport_other_su_msg">Sebuah biner \"su\" bukan berasal dari Magisk telah terdeteksi. Harap hapus solusi root yang bersaing dan/atau pasang ulang Magisk.</string>
     <string name="unsupport_external_storage_msg">Magisk dipasang ke penyimpanan eksternal. Harap pindahkan aplikasi ke penyimpanan internal.</string>
-    <string name="unsupport_nonroot_stub_msg">Aplikasi Magisk yang tersembunyi tidak dapat berfungsi lagi karena akses root hilang. Harap pulihkan APK asli.</string>
-    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Berikan izin penyimpanan untuk mengaktifkan fungsi ini</string>
     <string name="post_notifications_denied">Berikan izin notifikasi untuk mengaktifkan fungsi ini</string>
     <string name="install_unknown_denied">Izinkan \"Instal aplikasi tidak dikenal\" untuk mengaktifkan fungsi ini</string>
-    <string name="add_shortcut_title">Tambahkan pintasan ke layar utama</string>
-    <string name="add_shortcut_msg">Setelah menyembunyikan aplikasi ini, nama dan ikonnya mungkin sulit dikenali. Apakah Anda ingin menambahkan pintasan ke layar utama?</string>
     <string name="app_not_found">Tidak ditemukan aplikasi untuk menangani tindakan ini</string>
     <string name="reboot_apply_change">Mulai ulang untuk menerapkan perubahan</string>
-    <string name="restore_app_confirmation">Ini akan mengembalikan aplikasi yang tersembunyi ke aslinya. Apakah Anda benar-benar ingin melakukan ini?</string>
-
 </resources>
 

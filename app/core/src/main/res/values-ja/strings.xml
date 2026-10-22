@@ -119,10 +119,6 @@
     <string name="settings_dark_mode_dark">ダークモード</string>
     <string name="settings_download_path_title">ファイルの保存場所</string>
     <string name="settings_download_path_message">ファイルは %1$s に保存されます</string>
-    <string name="settings_hide_app_title">Magisk アプリを隠す</string>
-    <string name="settings_hide_app_summary">ランダムなパッケージ ID と任意のアプリ名のプロキシアプリをインストールします</string>
-    <string name="settings_restore_app_title">Magisk アプリを復元する</string>
-    <string name="settings_restore_app_summary">隠すのを止めて、元の APK をインストールします</string>
     <string name="language">言語 (Language)</string>
     <string name="system_default">(システム標準)</string>
     <string name="settings_check_update_title">更新をチェック</string>
@@ -140,11 +136,6 @@
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">広告ブロックアプリのための Systemless hosts サポートを有効化します</string>
     <string name="settings_hosts_toast">Systemless hosts モジュールを追加しました</string>
-    <string name="settings_app_name_hint">アプリ名</string>
-    <string name="settings_app_name_helper">プロキシアプリはこのアプリ名でインストールされます</string>
-    <string name="settings_app_name_error">不正な形式</string>
-
-
     <string name="superuser_notification">スーパーユーザー通知</string>
 
 
@@ -152,7 +143,6 @@
     <string name="settings_su_auth_summary">スーパーユーザー権限の要求でユーザー認証を行ないます</string>
     <string name="settings_su_auth_insecure">端末の認証方法が設定されていません</string>
     <string name="settings_customization">カスタマイズ</string>
-    <string name="setting_add_shortcut_summary">アプリを隠した後に見つけられなくなったときは、ここでホーム画面にショートカットを追加できます</string>
     <string name="settings_doh_title">DNS over HTTPS</string>
     <string name="settings_doh_description">一部の国で DNS キャッシュポイズニングから守ります</string>
 
@@ -209,15 +199,9 @@
     <string name="unsupport_system_app_msg">このアプリをシステムアプリとして起動することはサポートされていません。ユーザーアプリに戻してください。</string>
     <string name="unsupport_other_su_msg">Magisk 以外の \"su\" バイナリが検出されました。競合する root 権限取得ソフトを削除し、Magisk をインストールし直してください。</string>
     <string name="unsupport_external_storage_msg">Magisk が外部ストレージにインストールされています。内部ストレージに移動してください。</string>
-    <string name="unsupport_nonroot_stub_msg">root 権限が失われたため､隠し Magisk アプリが動作できなくなりました。元の APK を復元してください。</string>
-    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">この機能を有効にするにはストレージ権限を許可してください</string>
     <string name="post_notifications_denied">この機能を有効化するには権限を許可してください</string>
     <string name="install_unknown_denied">この機能を有効化するには、不明なソースからのインストールを許可してください</string>
-    <string name="add_shortcut_title">ホーム画面にショートカットを追加</string>
-    <string name="add_shortcut_msg">アプリを隠すと、アプリ名やアイコンが判別しにくいことがあります。分かりやすいようホーム画面にショートカットを追加しますか？</string>
     <string name="app_not_found">このアクションを扱えるアプリがありません</string>
     <string name="reboot_apply_change">再起動して変更を適用</string>
-    <string name="restore_app_confirmation">隠しアプリを元のアプリへと戻します。続行しますか?</string>
-
 </resources>

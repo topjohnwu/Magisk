@@ -113,10 +113,6 @@
     <string name="settings_dark_mode_dark">Alltid mørk</string>
     <string name="settings_download_path_title">Nedlastingssti</string>
     <string name="settings_download_path_message">Filer vil lagres i %1$s</string>
-    <string name="settings_hide_app_title">Skjul Magisk-programmet</string>
-    <string name="settings_hide_app_summary">Installer et mellomtjenerprogram med tilfeldig pakke-ID og egendefinert program-etikett</string>
-    <string name="settings_restore_app_title">Gjenopprett Magisk-programmet</string>
-    <string name="settings_restore_app_summary">Opphev skjuling av programmet og gjenopprett det tilbake til opprinnelig APK</string>
     <string name="language">Språk</string>
     <string name="system_default">(Systemforvalg)</string>
     <string name="settings_check_update_title">Finn nye versjoner</string>
@@ -129,16 +125,10 @@
     <string name="settings_hosts_title">Systemløs vertsfil</string>
     <string name="settings_hosts_summary">Systemløs vertsfilstøtte for reklameblokkeringsprogrammer</string>
     <string name="settings_hosts_toast">La til modul for systemløs vertsfil</string>
-    <string name="settings_app_name_hint">Nytt navn</string>
-    <string name="settings_app_name_helper">Programmet vil bli ompakket til dette navnet</string>
-    <string name="settings_app_name_error">Ugyldig format</string>
-
-
     <string name="superuser_notification">Superbruker-merknad</string>
 
 
     <string name="settings_customization">Tilpasning</string>
-    <string name="setting_add_shortcut_summary">Legg til fin snarvei på hjemmeskjermen i fall navnet og ikonet er vanskelig å gjenkjenne etter skjuling av programmet</string>
     <string name="settings_doh_title">DNS over HTTPS</string>
     <string name="settings_doh_description">Unngåelse av DNS-forgiftelse i noen land</string>
 
@@ -192,11 +182,7 @@
     <string name="unsupport_system_app_msg">Kjøring av dette programmet som systemprogram støttes ikke. Gjør om programmet til et brukerprogram igjen.</string>
     <string name="unsupport_other_su_msg">En \"su\"-kommando som ikke tilhører Magisk ble oppdaget. Fjern dette andre ustøttede opphavet.</string>
     <string name="unsupport_external_storage_msg">Magisk er installert på eksternlagring. Flytt det til internlagring.</string>
-    <string name="unsupport_nonroot_stub_msg">Programmet kan ikke fortsette å fungere i skjult tilstand siden rot-tilgang gikk tapt. Gjenopprett det tilbake til opprinnelig APK.</string>
-    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Innvilg lagringstilgang for å skru på denne funksjonaliteten</string>
-    <string name="add_shortcut_title">Legg til snarvei på hjemmeskjermen</string>
-    <string name="add_shortcut_msg">Etter å ha skjult programmet kan det vli vanskelig å gjenkjenne navn og ikon. Legg til fin snarvei på hjemmeskjermen?</string>
     <string name="app_not_found">Ingen programmer kan håndtere denne forespørselen</string>
 
 </resources>
