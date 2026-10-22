@@ -61,7 +61,7 @@ class OnlineModuleSubject(
     override val autoLaunch: Boolean,
     override val notifyId: Int = Notifications.nextId(),
 ) : Subject.Module() {
-    override fun pendingIntent(context: Context) = FlashUtils.installIntent(context, file)
+    override fun pendingIntent(context: Context) = FlashUtils.installIntent(context, file, notifyId)
 }
 
 class ModuleViewModel : AsyncLoadViewModel() {
