@@ -15,9 +15,6 @@
    private static ** getDebugMetadataAnnotation(...) return null;
 }
 
-# Stub
--keep class com.topjohnwu.magisk.core.App { <init>(java.lang.Object); }
-
 # Strip Timber verbose and debug logging
 -assumenosideeffects class timber.log.Timber$Tree {
   public void v(**);

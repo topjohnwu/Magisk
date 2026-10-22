@@ -35,10 +35,9 @@ For Magisk app crashes, record and upload the logcat when the crash occurs.
 
 ## Translation Contributions
 
-Default string resources for the Magisk app and its stub APK are located here:
+Default string resources for the Magisk app are located here:
 
 - `app/core/src/main/res/values/strings.xml`
-- `app/stub/src/main/res/values/strings.xml`
 
 Translate each and place them in the respective locations (`[module]/src/main/res/values-[lang]/strings.xml`).
 

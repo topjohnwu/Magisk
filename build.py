@@ -378,18 +378,6 @@ def build_app():
     mv(source, target)
     header(f"Output: {target}")
 
-    # Stub building is directly integrated into the main app
-    # build process. Copy the stub APK into output directory.
-    source = Path("app", "core", "build", build_type, "assets", "stub.apk")
-    target = config["outdir"] / f"stub-{build_type}.apk"
-    cp(source, target)
-
-
-def build_stub():
-    header("* Building the stub app")
-    apk = build_apk(":stub")
-    header(f"Output: {apk}")
-
 
 def build_test():
     old_release = args.release
@@ -840,8 +828,6 @@ def parse_args():
 
     app_parser = subparsers.add_parser("app", help="build the Magisk app")
 
-    stub_parser = subparsers.add_parser("stub", help="build the stub app")
-
     test_parser = subparsers.add_parser("test", help="build the test app")
 
     clean_parser = subparsers.add_parser("clean", help="cleanup")
@@ -904,7 +890,6 @@ def parse_args():
     rustup_parser.set_defaults(func=setup_rustup)
     gen_parser.set_defaults(func=gen_ide)
     app_parser.set_defaults(func=build_app)
-    stub_parser.set_defaults(func=build_stub)
     test_parser.set_defaults(func=build_test)
     emu_parser.set_defaults(func=setup_avd)
     patch_parser.set_defaults(func=patch)
