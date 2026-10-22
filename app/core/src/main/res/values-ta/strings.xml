@@ -113,10 +113,6 @@
     <string name="settings_dark_mode_dark">எப்போதும் இருண்டது</string>
     <string name="settings_download_path_title">பதிவிறக்க இடம்</string>
     <string name="settings_download_path_message">%1$s ல் கோப்புகள் சேமிக்கப்படும்</string>
-    <string name="settings_hide_app_title">மேஜிஸ்க் செயலியை மறைக்கவும்</string>
-    <string name="settings_hide_app_summary">சீரற்ற தொகுப்பு ஐடி மற்றும் தனிப்பயன் பயன்பாட்டு லேபிளுடன் ப்ராக்ஸி பயன்பாட்டை நிறுவவும்</string>
-    <string name="settings_restore_app_title">மேஜிஸ்க் பயன்பாட்டை மீட்டமை</string>
-    <string name="settings_restore_app_summary">பயன்பாட்டை மறைத்து, அசல் APK க்கு மீண்டும் மீட்டமைக்கவும்</string>
     <string name="language">மொழி</string>
     <string name="system_default">(தொலைபேசியின் இயல்புநிலை)</string>
     <string name="settings_check_update_title">புதுப்பிப்புகளைச் சரிபார்க்கவும்</string>
@@ -129,16 +125,10 @@
     <string name="settings_hosts_title">கணினி இல்லாத ஹோஸ்ட்கள்</string>
     <string name="settings_hosts_summary">கணினி இல்லாத ஹோஸ்ட்கள் Adblock பயன்பாடுகளுக்கு ஆதரவளிக்கின்றன</string>
     <string name="settings_hosts_toast">கணினி இல்லாத ஹோஸ்ட்கள் தொகுதி சேர்க்கப்பட்டது</string>
-    <string name="settings_app_name_hint">புதிய பெயர்</string>
-    <string name="settings_app_name_helper">பயன்பாடு இந்த பெயருக்கு மீண்டும் தொகுக்கப்படும்</string>
-    <string name="settings_app_name_error">தவறான வடிவம்</string>
-
-
     <string name="superuser_notification">சூப்பர் யூசர் அறிவிப்பு</string>
 
 
     <string name="settings_customization">தனிப்பயனாக்கம்</string>
-    <string name="setting_add_shortcut_summary">பயன்பாட்டை மறைத்தபின் பெயர் மற்றும் ஐகான் அடையாளம் காண கடினமாக இருந்தால் முகப்புத் திரையில் அழகான குறுக்குவழியைச் சேர்க்கவும்</string>
     <string name="settings_doh_title">HTTPS வழியாக டி.என்.எஸ்</string>
     <string name="settings_doh_description">சில நாடுகளில் டி.என்.எஸ் பணிபுரியும்</string>
 
@@ -189,8 +179,6 @@
     <string name="unsupport_magisk_title">ஆதரிக்கப்படாத மேஜிஸ்க் பதிப்பு</string>
     <string name="unsupport_magisk_msg">பயன்பாட்டின் இந்த பதிப்பு மேஜிஸ்க் பதிப்பை %1$s ஐ விடக் குறைவாக ஆதரிக்காது.</string>
     <string name="external_rw_permission_denied">இந்த செயல்பாட்டை இயக்க சேமிப்பக அனுமதி வழங்கவும்</string>
-    <string name="add_shortcut_title">முகப்புத் திரையில் குறுக்குவழியைச் சேர்க்கவும்</string>
-    <string name="add_shortcut_msg">இந்த பயன்பாட்டை மறைத்த பிறகு, அதன் பெயர் மற்றும் ஐகானை அடையாளம் காண்பது கடினமாகிவிடும். முகப்புத் திரையில் அழகான குறுக்குவழியைச் சேர்க்க விரும்புகிறீர்களா??</string>
     <string name="app_not_found">இந்த செயலைக் கையாள எந்த பயன்பாடும் கிடைக்கவில்லை</string>
 
 </resources>

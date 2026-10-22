@@ -121,10 +121,6 @@
     <string name="settings_dark_mode_dark">Visada tamsi</string>
     <string name="settings_download_path_title">Atsisiuntimo kelias</string>
     <string name="settings_download_path_message">Failai bus išsaugoti %1$s</string>
-    <string name="settings_hide_app_title">Slėpti Magisk programėlę</string>
-    <string name="settings_hide_app_summary">Įdiegti įgaliotąją programėlę su atsitiktiniu paketo ID ir kitu pavadinimu</string>
-    <string name="settings_restore_app_title">Atkurti Magisk programėlę</string>
-    <string name="settings_restore_app_summary">Atkurti programėlę ir originalų APK</string>
     <string name="language">Kalba</string>
     <string name="system_default">(Sistemos numatytoji)</string>
     <string name="settings_check_update_title">Naujinimų tikrinimas</string>
@@ -142,16 +138,10 @@
     <string name="settings_hosts_title">Basisteminis hosts</string>
     <string name="settings_hosts_summary">Basisteminis hosts palaiko reklamų blokatorių programėlėms</string>
     <string name="settings_hosts_toast">Pridėtas besisteminio hosts modulis</string>
-    <string name="settings_app_name_hint">Naujas pavadinimas</string>
-    <string name="settings_app_name_helper">Programėlė bus perpakuota su šiuo pavadinimu</string>
-    <string name="settings_app_name_error">Netinkamas formatas</string>
-
-
     <string name="superuser_notification">Supernaudotojo pranešimas</string>
 
 
     <string name="settings_customization">Tinkinimas</string>
-    <string name="setting_add_shortcut_summary">Pridėti nuorodą į pagrindinį ekraną, jei po programėlės paslėpimo yra sunku atpažinti jos pavadinimą ir piktogramą</string>
     <string name="settings_doh_title">DNS virš HTTPS</string>
     <string name="settings_doh_description">Aktyvinti DoH (naudokite, jei kyla problemų jungiantis prie tinklo</string>
 
@@ -209,15 +199,9 @@
     <string name="unsupport_system_app_msg">Šios programėlės vykdymas kaip sistemos programėlės yra nepalaikomas. Nustatykite ją atgal į naudotojo programėlę.</string>
     <string name="unsupport_other_su_msg">Aptiktas dvejetainis failas \"su\" ne iš Magisk. Pašalinkite pašalinį root teisių tiekėją ir/arba iš naujo įdiekite Magisk.</string>
     <string name="unsupport_external_storage_msg">Magisk yra įdiegtas išorinėje saugykloje. Perkelkite programėlę į vidinę saugyklą.</string>
-    <string name="unsupport_nonroot_stub_msg">Paslėpta Magisk programėlė negali tęsti darbo, nes root teisės buvo prarastos. Atkurkite originalų APk.</string>
-    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Suteikti prieigą prie saugyklos</string>
     <string name="post_notifications_denied">Suteikti prieigą prie pranešimų</string>
     <string name="install_unknown_denied">Suteikti prieigą prie įdiegimo iš nežinomų šaltinių</string>
-    <string name="add_shortcut_title">Pridėti nuorodą į pagrindinį ekraną</string>
-    <string name="add_shortcut_msg">Po šios programėlės paslėpimo jos pavadinimas, piktograma gali būti sunkiai atpažįstamos. Norite pridėti nuorodą į pagrindinį ekraną?</string>
     <string name="app_not_found">Nerasta programėlė, galinti atlikti šį veiksmą</string>
     <string name="reboot_apply_change">Paleiskite iš naujo, kad pritaikytumėte pakeitimus</string>
-    <string name="restore_app_confirmation">Šis veiksmas atkurs paslėptą programėlę į originalią būseną. Tikrai norite tai padaryti?</string>
-
 </resources>

@@ -120,11 +120,6 @@
     <string name="settings_hosts_title">Systeemloze hosts</string>
     <string name="settings_hosts_summary">Systeemloze hosts-ondersteuning voor advertentieblokkeringsapps.</string>
     <string name="settings_hosts_toast">De systeemloze hosts-module is toegevoegd</string>
-    <string name="settings_app_name_hint">Nieuwe naam</string>
-    <string name="settings_app_name_helper">De app wordt opnieuw ingepakt onder deze naam</string>
-    <string name="settings_app_name_error">Onjuiste opmaak</string>
-
-
     <string name="superuser_notification">Superusermelding</string>
     <string name="settings_customization">Aanpassingen</string>
 
@@ -172,7 +167,6 @@
     <string name="setup_msg">Bezig met toepassen van omgevingsinstellingen…</string>
     <string name="unsupport_magisk_title">Niet-ondersteunde Magisk-versie</string>
     <string name="external_rw_permission_denied">Verleen het opslagrecht om deze functie gebruiken</string>
-    <string name="add_shortcut_title">Snelkoppeling maken op startscherm</string>
     <string name="app_not_found">Er is geen app op je apparaat die deze handeling kan uitvoeren</string>
 
 </resources>

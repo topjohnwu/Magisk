@@ -117,10 +117,6 @@
     <string name="settings_dark_mode_dark">Always Dark</string>
     <string name="settings_download_path_title">Download path</string>
     <string name="settings_download_path_message">Files will be saved to %1$s</string>
-    <string name="settings_hide_app_title">Hide the Magisk app</string>
-    <string name="settings_hide_app_summary">Install a proxy app with a random package ID and custom app label</string>
-    <string name="settings_restore_app_title">Restore the Magisk app</string>
-    <string name="settings_restore_app_summary">Unhide the app and restore the original APK</string>
     <string name="language">Language</string>
     <string name="system_default">(System Default)</string>
     <string name="settings_check_update_title">Check Updates</string>
@@ -138,16 +134,10 @@
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Systemless hosts support for ad blocking apps</string>
     <string name="settings_hosts_toast">Added systemless hosts module</string>
-    <string name="settings_app_name_hint">New name</string>
-    <string name="settings_app_name_helper">App will be repackaged with this name</string>
-    <string name="settings_app_name_error">Invalid format</string>
-
-
     <string name="superuser_notification">Superuser Notification</string>
 
 
     <string name="settings_customization">Customization</string>
-    <string name="setting_add_shortcut_summary">Add a pretty shortcut to the home screen in case the name and icon are difficult to recognize after hiding the app</string>
     <string name="settings_doh_title">DNS over HTTPS</string>
     <string name="settings_doh_description">Workaround DNS poisoning in some nations</string>
 
@@ -204,14 +194,8 @@
     <string name="unsupport_system_app_msg">Running this app as a system app is not supported. Please revert the app to a user app.</string>
     <string name="unsupport_other_su_msg">A \"su\" binary not from Magisk has been detected. Please remove any competing root solution and/or reinstall Magisk.</string>
     <string name="unsupport_external_storage_msg">Magisk is installed to external storage. Please move the app to internal storage.</string>
-    <string name="unsupport_nonroot_stub_msg">The hidden Magisk app cannot continue to work because root was lost. Please restore the original APK.</string>
-    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Grant storage permission to enable this functionality</string>
     <string name="install_unknown_denied">Allow "install unknown apps" to enable this functionality</string>
-    <string name="add_shortcut_title">Add shortcut to home screen</string>
-    <string name="add_shortcut_msg">After hiding this app, its name and icon might become difficult to recognize. Do you want to add a pretty shortcut to the home screen?</string>
     <string name="app_not_found">No app found to handle this action</string>
     <string name="reboot_apply_change">Reboot to apply changes</string>
-    <string name="restore_app_confirmation">This will restore the hidden app back to the original app. Do you really want to do this?</string>
-
 </resources>

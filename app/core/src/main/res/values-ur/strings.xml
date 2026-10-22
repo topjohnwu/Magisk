@@ -115,10 +115,6 @@
     <string name="settings_dark_mode_dark">ہمیشہ ڈارک</string>
     <string name="settings_download_path_title">ڈاؤن لوڈ کا راستہ</string>
     <string name="settings_download_path_message">فائلیں %1$s میں محفوظ کی جائیں گی</string>
-    <string name="settings_hide_app_title">Magisk ایپ کو چھپائیں</string>
-    <string name="settings_hide_app_summary">ایک رینڈم پیکیج ID اور کسٹم ایپ لیبل کے ساتھ ایک پراکسی ایپ انسٹال کریں</string>
-    <string name="settings_restore_app_title">Magisk ایپ کو بحال کریں</string>
-    <string name="settings_restore_app_summary">ایپ کو ان ہائیڈ کریں اور اصل APK کو بحال کریں</string>
     <string name="language">زبان</string>
     <string name="system_default">(سسٹم ڈیفالٹ)</string>
     <string name="settings_check_update_title">اپ ڈیٹس چیک کریں</string>
@@ -136,11 +132,6 @@
     <string name="settings_hosts_title">سسٹم لیس ہوسٹس</string>
     <string name="settings_hosts_summary">ایڈ بلاکنگ ایپس کے لیے سسٹم لیس ہوسٹس سپورٹ</string>
     <string name="settings_hosts_toast">سسٹم لیس ہوسٹس ماڈیول شامل کیا گیا</string>
-    <string name="settings_app_name_hint">نیا نام</string>
-    <string name="settings_app_name_helper">ایپ کو اس نام سے دوبارہ پیک کیا جائے گا</string>
-    <string name="settings_app_name_error">غلط فارمیٹ</string>
-
-
     <string name="superuser_notification">سپر یوزر اطلاع</string>
 
 
@@ -148,7 +139,6 @@
     <string name="settings_su_auth_summary">سپر یوزر کی درخواستوں کے دوران صارف کی تصدیق طلب کریں</string>
     <string name="settings_su_auth_insecure">آلے پر کوئی تصدیقی طریقہ کار تشکیل نہیں دیا گیا ہے</string>
     <string name="settings_customization">حسب ضرورت سازی</string>
-    <string name="setting_add_shortcut_summary">اگر ایپ کو چھپانے کے بعد اس کا نام اور آئیکن پہچاننا مشکل ہو جائے تو ہوم اسکرین پر ایک خوبصورت شارٹ کٹ شامل کریں</string>
     <string name="settings_doh_title">HTTPS پر DNS</string>
     <string name="settings_doh_description">بعض ممالک میں DNS زہر آلودگی کا حل</string>
     <string name="settings_random_name_title">بے ترتیب آؤٹ پٹ نام</string>
@@ -203,15 +193,9 @@
     <string name="unsupport_system_app_msg">سسٹم ایپ کے طور پر اس ایپ کو چلانا تعاون یافتہ نہیں ہے۔ براہ کرم ایپ کو صارف ایپ میں واپس کریں۔</string>
     <string name="unsupport_other_su_msg">Magisk کے علاوہ کسی اور "su" بائنری کا پتہ چلا ہے۔ براہ کرم کسی بھی مسابقتی روٹ حل کو ہٹا دیں اور/یا Magisk کو دوبارہ انسٹال کریں۔</string>
     <string name="unsupport_external_storage_msg">Magisk بیرونی اسٹوریج پر انسٹال ہے۔ براہ کرم ایپ کو اندرونی اسٹوریج میں منتقل کریں۔</string>
-    <string name="unsupport_nonroot_stub_msg">چھپی ہوئی Magisk ایپ کام جاری نہیں رکھ سکتی کیونکہ روٹ ختم ہو گیا ہے۔ براہ کرم اصل APK کو بحال کریں۔</string>
-    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">اس فعالیت کو فعال کرنے کے لیے اسٹوریج کی اجازت دیں</string>
     <string name="post_notifications_denied">اس فعالیت کو فعال کرنے کے لیے اطلاعات کی اجازت دیں</string>
     <string name="install_unknown_denied">اس فعالیت کو فعال کرنے کے لیے "نامعلوم ایپس انسٹال کریں" کی اجازت دیں</string>
-    <string name="add_shortcut_title">ہوم اسکرین پر شارٹ کٹ شامل کریں</string>
-    <string name="add_shortcut_msg">اس ایپ کو چھپانے کے بعد، اس کا نام اور آئیکن پہچاننا مشکل ہو سکتا ہے۔ کیا آپ ہوم اسکرین پر ایک خوبصورت شارٹ کٹ شامل کرنا چاہتے ہیں؟</string>
     <string name="app_not_found">اس عمل کو سنبھالنے کے لیے کوئی ایپ نہیں ملی</string>
     <string name="reboot_apply_change">تبدیلیاں لاگو کرنے کے لیے ریبوٹ کریں</string>
-    <string name="restore_app_confirmation">یہ چھپی ہوئی ایپ کو اصل ایپ میں بحال کردے گا۔ کیا آپ واقعی ایسا کرنا چاہتے ہیں؟</string>
-
 </resources>

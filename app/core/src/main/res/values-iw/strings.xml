@@ -124,10 +124,6 @@
     <string name="settings_dark_mode_dark">תמיד כהה</string>
     <string name="settings_download_path_title">נתיב הורדה</string>
     <string name="settings_download_path_message">הקבצים ישמרו אל %1$s</string>
-    <string name="settings_hide_app_title">הסתרת היישום Magisk</string>
-    <string name="settings_hide_app_summary">התקנת יישום מתווך עם מזהה חבילה אקראי ותווית שם מותאמת אישית</string>
-    <string name="settings_restore_app_title">שיחזור היישום Magisk</string>
-    <string name="settings_restore_app_summary">ביטול הסתרת היישום ושיחזור אל ה-APK המקורי</string>
     <string name="language">שפה</string>
     <string name="system_default">(ברירת מחדל מערכת)</string>
     <string name="settings_check_update_title">בדיקת עדכונים</string>
@@ -145,11 +141,6 @@
     <string name="settings_hosts_title">hosts חסרי מערכת</string>
     <string name="settings_hosts_summary">hosts חסרי מערכת תומכים ביישומים חוסמי פרסומות</string>
     <string name="settings_hosts_toast">הוספת מודול hosts חסרי מערכת</string>
-    <string name="settings_app_name_hint">שם חדש</string>
-    <string name="settings_app_name_helper">היישום יארז מחדש בשם זה</string>
-    <string name="settings_app_name_error">פורמט לא חוקי</string>
-
-
     <string name="superuser_notification">התראות משתמש על</string>
 
 
@@ -157,7 +148,6 @@
     <string name="settings_su_auth_summary">בקשת אימות משתמש במהלך בקשות משתמש על</string>
     <string name="settings_su_auth_insecure">לא מוגדרת שיטת אימות בהתקן</string>
     <string name="settings_customization">התאמה אישית</string>
-    <string name="setting_add_shortcut_summary">הוספת קיצור דרך יפה במסך הבית למקרה שקשה לזהות את השם ואת הסמל לאחר הסתרת היישום</string>
     <string name="settings_doh_title">DNS על HTTPS</string>
     <string name="settings_doh_description">עקיפת DNS מורעל במדינות מסוימות</string>
     <string name="settings_random_name_title">שם פלט אקראי</string>
@@ -216,15 +206,9 @@
     <string name="unsupport_system_app_msg">הפעלת יישום זה כיישום מערכת אינה נתמך. נא להשיב את היישום כיישום משתמש.</string>
     <string name="unsupport_other_su_msg">התגלתה פקודת \"su\" שאינה שייכת ליישום Magisk נא להסיר את הפקודה שאינה נתמכת.</string>
     <string name="unsupport_external_storage_msg">Magisk מותקן באחסון החיצוני. נא להעביר את היישום לאחסון הפנימי.</string>
-    <string name="unsupport_nonroot_stub_msg">היישום אינו יכול להמשיך לעבוד במצב הנסתר מכיוון שגישת הRoot אבדה. נא לשחזר אותו חזרה ל-APK המקורי.</string>
-    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">הענת הרשאת אחסון להפעלת פונקציה זו</string>
     <string name="post_notifications_denied">הענקת הרשאה להתראות כדי להפעיל פונקציה זו</string>
     <string name="install_unknown_denied">יש לאפשר "התקנה ממקורות לא ידועים" בכדי להפעיל פונקציה זו</string>
-    <string name="add_shortcut_title">הוספת קיצור דרך למסך הבית</string>
-    <string name="add_shortcut_msg">לאחר הסתרת היישום הזה, השם והסמליל שלה עשויים להיות קשים לזיהוי. האם ברצונך להוסיף קיצור דרך יפה למסך הבית?</string>
     <string name="app_not_found">לא נמצא יישום לטיפול בפעולה זו</string>
     <string name="reboot_apply_change">ייש להפעיל מחדש כדי להחיל שינויים</string>
-    <string name="restore_app_confirmation">פעולה זו תשחזר את היישום המוסתר חזרה ליישום המקורי. האם בוודאות ברצונך לעשות את זה?</string>
-
 </resources>

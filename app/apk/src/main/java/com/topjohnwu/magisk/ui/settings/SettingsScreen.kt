@@ -32,12 +32,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.model.ColorMode
 import com.topjohnwu.magisk.core.utils.LocaleSetting
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
@@ -176,18 +174,6 @@ private fun CustomizationSection(
                 ThemeState.colorMode = newMode.value
             }
         )
-
-        if (isRunningAsStub && ShortcutManagerCompat.isRequestPinShortcutSupported(context)) {
-            HorizontalDivider(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
-            )
-            SettingsArrow(
-                title = stringResource(CoreR.string.add_shortcut_title),
-                summary = stringResource(CoreR.string.setting_add_shortcut_summary),
-                onClick = { viewModel.requestAddShortcut() }
-            )
-        }
     }
 }
 

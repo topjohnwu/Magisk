@@ -117,10 +117,6 @@
     <string name="settings_dark_mode_dark">Alati tume</string>
     <string name="settings_download_path_title">Allalaadimise failitee</string>
     <string name="settings_download_path_message">Failid salvestatakse kausta %1$s</string>
-    <string name="settings_hide_app_title">Peida Magiski rakendus</string>
-    <string name="settings_hide_app_summary">Paigalda juhusliku paketi-ID ja kohandatud nimega puhverrakendus</string>
-    <string name="settings_restore_app_title">Taasta Magiski rakendus</string>
-    <string name="settings_restore_app_summary">Too rakendus peidust välja, taastades originaalse APK</string>
     <string name="language">Keel</string>
     <string name="system_default">(Süsteemi vaikesäte)</string>
     <string name="settings_check_update_title">Kontrolli uuendusi</string>
@@ -138,16 +134,10 @@
     <string name="settings_hosts_title">Süsteemivaba hosts</string>
     <string name="settings_hosts_summary">Süsteemivaba hosts-tugi reklaamiblokeerijatest rakendustele</string>
     <string name="settings_hosts_toast">Süsteemivaba hostsi moodul lisatud</string>
-    <string name="settings_app_name_hint">Uus nimi</string>
-    <string name="settings_app_name_helper">Rakendus taaspakitakse selle nimega</string>
-    <string name="settings_app_name_error">Sobimatu vorming</string>
-
-
     <string name="superuser_notification">Superkasutaja teavitus</string>
 
 
     <string name="settings_customization">Kohandamine</string>
-    <string name="setting_add_shortcut_summary">Lisa avakuvale ilus otsetee juhuks, kui nime ja ikooni on pärast rakenduse peitmist raske tuvastada</string>
     <string name="settings_doh_title">DNS üle HTTPSi</string>
     <string name="settings_doh_description">Väldi mõnes riigis DNSi mürgitamist</string>
 
@@ -201,13 +191,7 @@
     <string name="unsupport_system_app_msg">Selle rakenduse käitamine süsteemirakendusena ei ole toetatud. Palun taasta see kasutajarakenduseks.</string>
     <string name="unsupport_other_su_msg">Tuvastati \"su\"-binaar, mida ei installinud Magisk. Palun eemalda mistahes konkureeriv juurkasutaja paigaldus ja/või taasinstalli Magisk.</string>
     <string name="unsupport_external_storage_msg">Magisk on paigaldatud välismällu. Palun liiguta rakendus sisemällu.</string>
-    <string name="unsupport_nonroot_stub_msg">Peidetud Magiski rakendus ei saa enam töötada, kuna juurkasutaja on kadunud. Palun taasta originaalne APK.</string>
-    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Selle funktsionaalsuse lubamiseks anna mäluruumi haldamise luba</string>
-    <string name="add_shortcut_title">Lisa avakuvale otsetee</string>
-    <string name="add_shortcut_msg">Pärast selle rakenduse peitmist võib selle nimi ja ikoon olla raskesti tuvastatav. Kas soovid avakuvale lisada ilusa otsetee?</string>
     <string name="app_not_found">Selle tegevuse teostamiseks ei leitud ühtegi rakendust</string>
     <string name="reboot_apply_change">Muudatuste rakendamiseks taaskäivita</string>
-    <string name="restore_app_confirmation">See taastab peidetud rakenduse uuesti originaalseks rakenduseks. Kas soovid tõesti seda teha?</string>
-
 </resources>

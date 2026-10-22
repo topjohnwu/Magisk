@@ -103,10 +103,6 @@
     <string name="settings_dark_mode_dark">Заўсёды цёмны</string>
     <string name="settings_download_path_title">Каталог спамповак</string>
     <string name="settings_download_path_message">Файлы будуць спампоўвацца ў %1$s</string>
-    <string name="settings_hide_app_title">Схаваць праграму Magisk</string>
-    <string name="settings_hide_app_summary">Усталяваць проксі-праграму з выпадковым ідэнтыфікатарам пакунка і адвольным значком</string>
-    <string name="settings_restore_app_title">Аднавіць праграму Magisk</string>
-    <string name="settings_restore_app_summary">Вярнуць праграму да зыходнага стану</string>
     <string name="language">Мова</string>
     <string name="system_default">(Сістэмная)</string>
     <string name="settings_check_update_title">Правяраць на абнаўленні</string>
@@ -119,16 +115,10 @@
     <string name="settings_hosts_title">Пазасістэмны файл hosts</string>
     <string name="settings_hosts_summary">Падтрымка пазасістэмнага файла hosts для праграм, якія блакуюць рэкламу</string>
     <string name="settings_hosts_toast">Дададзены модуль пазасістэмнага файла hosts</string>
-    <string name="settings_app_name_hint">Новая назва</string>
-    <string name="settings_app_name_helper">Праграма будзе перапакаваная з гэтай назвай</string>
-    <string name="settings_app_name_error">Хібны фармат</string>
-
-
     <string name="superuser_notification">Апавяшчэнне суперкарыстальніка</string>
 
 
     <string name="settings_customization">Персаналізацыя</string>
-    <string name="setting_add_shortcut_summary">Дадаць на хатні экран прыгожы цэтлік на той выпадак, калі пасля хавання праграмы будзе цяжка разглядзець значок і назву</string>
     <string name="settings_doh_title">DNS паверх HTTPS</string>
     <string name="settings_doh_description">Абыходны шлях для DNS у некаторых краінах</string>
     <string name="multiuser_mode">Шматкарыстальніцкі рэжым</string>
@@ -178,10 +168,6 @@
     <string name="unsupport_system_app_msg">Гэтую праграму немагчыма запусціць як сістэмную. Калі ласка, вярніце праграму да стану карыстальніцкай.</string>
     <string name="unsupport_other_su_msg">Выяўлены загад \"su\", які не належыць Magisk. Калі ласка, выдаліце іншы кліент.</string>
     <string name="unsupport_external_storage_msg">Праграма Magisk усталяваная ў вонкавым сховішчы. Калі ласка, перамясціце яе ва ўнітарнае сховішча.</string>
-    <string name="unsupport_nonroot_stub_msg">Праграма не можа працягваць працу ў схаваным стане, бо root-доступ быў страчаны. Вярніце праграму да зыходнага стану.</string>
-    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Дайце доступ да сховішча, каб уключыць гэтую функцыю</string>
-    <string name="add_shortcut_title">Дадаць цэтлік на хатні экран</string>
-    <string name="add_shortcut_msg">Пасля хавання праграмы значок і назву можа быць цяжка знайсці. Хочаце дадаць цэтлік на хатні экран?</string>
     <string name="app_not_found">Не знойдзена праграм для апрацоўкі гэтага дзеяння</string>
 </resources>

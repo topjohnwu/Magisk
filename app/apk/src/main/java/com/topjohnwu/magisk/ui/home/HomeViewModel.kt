@@ -37,7 +37,6 @@ class HomeViewModel(
         val managerProgress: Int = 0,
         val showUninstall: Boolean = false,
         val showManagerInstall: Boolean = false,
-        val showHideRestore: Boolean = false,
         val envFixCode: Int = 0,
         val magiskState: State = computeMagiskState(),
         val magiskInstalledVersion: String = computeMagiskInstalledVersion(),
@@ -132,14 +131,6 @@ class HomeViewModel(
 
     fun onManagerInstallConsumed() {
         _uiState.update { it.copy(showManagerInstall = false) }
-    }
-
-    fun onHideRestorePressed() {
-        _uiState.update { it.copy(showHideRestore = true) }
-    }
-
-    fun onHideRestoreConsumed() {
-        _uiState.update { it.copy(showHideRestore = false) }
     }
 
     fun onEnvFixConsumed() {

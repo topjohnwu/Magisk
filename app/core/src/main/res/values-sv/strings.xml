@@ -112,10 +112,6 @@
     <string name="settings_dark_mode_dark">Alltid mörk</string>
     <string name="settings_download_path_title">Nedladdningsmapp</string>
     <string name="settings_download_path_message">Filer kommer att spara till %1$s</string>
-    <string name="settings_hide_app_title">Göm Magisk-appen</string>
-    <string name="settings_hide_app_summary">Installera en proxy-app med ett slumpmässigt paket-ID och appnamn</string>
-    <string name="settings_restore_app_title">Återställ Magisk-appen</string>
-    <string name="settings_restore_app_summary">Ta bort proxy-appen och återställ den ursprungliga APK filen</string>
     <string name="language">Språk</string>
     <string name="system_default">(Följ systeminställningar)</string>
     <string name="settings_check_update_title">Kontrollera uppdateringar</string>
@@ -128,16 +124,10 @@
     <string name="settings_hosts_title">Systemfri hosts</string>
     <string name="settings_hosts_summary">Stöd för Adblock-appar med systemfri hosts-fil</string>
     <string name="settings_hosts_toast">Lagt till modul för systemfri hosts-fil</string>
-    <string name="settings_app_name_hint">Nytt namn</string>
-    <string name="settings_app_name_helper">Appen kommer att pacakas om till detta namn</string>
-    <string name="settings_app_name_error">Ogiltigt format</string>
-
-
     <string name="superuser_notification">Superuser-avisering</string>
 
 
     <string name="settings_customization">Anpassning</string>
-    <string name="setting_add_shortcut_summary">Lägg till en snygg genväg på startskärmen om namnet och ikonen är svåra att känna igen efter att appen har döljts</string>
     <string name="settings_doh_title">DNS över HTTPS</string>
     <string name="settings_doh_description">Lösning för DNS-förgiftning i vissa länder</string>
 
@@ -189,7 +179,5 @@
     <string name="unsupport_magisk_title">Magisk-versionen stöds ej</string>
     <string name="unsupport_magisk_msg">Denna version utav appen stödjer inte Magisk-versioner lägre än 1$s.\n\nAppen kommer att bete sig som att Magisk inte är installerat. Vänligen uppgradera din Magisk-version så snart som möjligt.</string>
     <string name="external_rw_permission_denied">Tillåt tillgång till externt lagrinsmedia för att aktievera denna funktion</string>
-    <string name="add_shortcut_title">Lägg till genväg på hemskärmen</string>
-    <string name="add_shortcut_msg">Efter att appen dolts så kan ikonen och namnet vara svårt att känna igen. Vill du lägga till en snygg genväg till din hemskärm?</string>
     <string name="app_not_found">Ingen applikation hittades för att hantera den här åtgärden</string>
 </resources>

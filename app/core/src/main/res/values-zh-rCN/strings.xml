@@ -139,10 +139,6 @@
     <string name="settings_dark_mode_dark">深色模式</string>
     <string name="settings_download_path_title">下载路径</string>
     <string name="settings_download_path_message">文件将保存到 %1$s</string>
-    <string name="settings_hide_app_title">隐藏 Magisk 应用</string>
-    <string name="settings_hide_app_summary">安装具有随机包名和自定义应用名称的代理应用</string>
-    <string name="settings_restore_app_title">还原 Magisk 应用</string>
-    <string name="settings_restore_app_summary">取消隐藏，恢复到原始应用</string>
     <string name="language">语言</string>
     <string name="system_default">系统默认</string>
     <string name="settings_check_update_title">检查更新</string>
@@ -161,11 +157,6 @@
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">为广告屏蔽应用提供 Systemless hosts 支持</string>
     <string name="settings_hosts_toast">已添加 systemless hosts 模块</string>
-    <string name="settings_app_name_hint">新的应用名称</string>
-    <string name="settings_app_name_helper">将使用新名称重新安装本应用</string>
-    <string name="settings_app_name_error">无效输入</string>
-
-
     <string name="superuser_notification">超级用户通知</string>
 
 
@@ -182,7 +173,6 @@
     <string name="color_mode_monet_system">跟随系统（动态取色）</string>
     <string name="color_mode_monet_light">浅色主题（动态取色）</string>
     <string name="color_mode_monet_dark">深色主题（动态取色）</string>
-    <string name="setting_add_shortcut_summary">在隐藏后难以识别名称和图标的情况下，添加快捷方式到桌面</string>
     <string name="settings_doh_title">安全 DNS（DoH）</string>
     <string name="settings_doh_description">解决某些地区的 DNS 污染问题</string>
     <string name="settings_random_name_title">随机文件名</string>
@@ -246,14 +236,9 @@
     <string name="unsupport_system_app_msg">Magisk 不支持安装为系统应用，请还原为用户应用。</string>
     <string name="unsupport_other_su_msg">检测到不属于 Magisk 的 su 文件，请删除其他超级用户程序。</string>
     <string name="unsupport_external_storage_msg">不支持将 Magisk 安装到外置存储卡，请将应用移动回内部存储空间。</string>
-    <string name="unsupport_nonroot_stub_msg">超级用户权限丢失，应用无法在隐藏状态下继续工作，请恢复到原始 Magisk 应用。</string>
-    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">允许访问存储空间以使用此功能</string>
     <string name="post_notifications_denied">允许发送通知以使用此功能</string>
     <string name="install_unknown_denied">允许安装未知应用以使用此功能</string>
-    <string name="add_shortcut_title">添加快捷方式到桌面</string>
-    <string name="add_shortcut_msg">隐藏后应用的名字和图标可能难以识别。需要在桌面上添加具有原始名称和图标的快捷方式吗？</string>
     <string name="app_not_found">找不到可处理此操作的应用</string>
     <string name="reboot_apply_change">重启后生效</string>
-    <string name="restore_app_confirmation">即将把隐藏的 Magisk 应用恢复回原始应用，是否继续？</string>
 </resources>

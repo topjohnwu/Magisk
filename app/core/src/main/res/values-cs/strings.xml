@@ -129,10 +129,6 @@
     <string name="settings_dark_mode_dark">Tmavý</string>
     <string name="settings_download_path_title">Složka pro stahování</string>
     <string name="settings_download_path_message">Soubory budou uloženy do %1$s.</string>
-    <string name="settings_hide_app_title">Skrýt aplikaci Magisk</string>
-    <string name="settings_hide_app_summary">Skryje aplikaci náhodným ID balíčku a vlastním názvem aplikace</string>
-    <string name="settings_restore_app_title">Obnovit aplikaci Magisk</string>
-    <string name="settings_restore_app_summary">Obnoví aplikaci zpět do původního APK</string>
     <string name="language">Jazyk</string>
     <string name="system_default">(výchozí dle systému)</string>
     <string name="settings_check_update_title">Zkontrolovat aktualizace</string>
@@ -151,11 +147,6 @@
     <string name="settings_hosts_title">Nesystémoví hostitelé</string>
     <string name="settings_hosts_summary">Přidá modul pro podporu nesystémových hostitelů v aplikaci AdBlock</string>
     <string name="settings_hosts_toast">Modul nesystémových hostitelů přidán</string>
-    <string name="settings_app_name_hint">Nový název</string>
-    <string name="settings_app_name_helper">Název aplikace bude nahrazen tímto názvem</string>
-    <string name="settings_app_name_error">Neplatný formát</string>
-
-
     <string name="superuser_notification">Oznámení SuperUsera</string>
 
 
@@ -172,7 +163,6 @@
     <string name="color_mode_monet_system">Monet (Dle systému)</string>
     <string name="color_mode_monet_light">Monet (Světlý)</string>
     <string name="color_mode_monet_dark">Monet (Tmavý)</string>
-    <string name="setting_add_shortcut_summary">Přidá odkaz na domovskou obrazovku v případě, že se po skrytí aplikace její název a ikona těžko rozpoznávají</string>
     <string name="settings_doh_title">DNS přes HTTPS</string>
     <string name="settings_doh_description">Vyřeší problém s otrávením DNS v některých zemích</string>
     <string name="settings_random_name_title">Vytvářet náhodný výstupní název</string>
@@ -231,15 +221,9 @@
     <string name="unsupport_system_app_msg">Spuštění této aplikace jako systémové, není podporováno. Změňte prosím aplikaci zpět na uživatelskou.</string>
     <string name="unsupport_other_su_msg">Byl detekován binární soubor \"su\", který nepochází z Magisk. Odeberte jakékoli konkurenční ROOT řešení a/nebo přeinstalujte Magisk.</string>
     <string name="unsupport_external_storage_msg">Magisk je nainstalován na externím úložišti. Přesuňte prosím aplikaci do interního úložiště.</string>
-    <string name="unsupport_nonroot_stub_msg">Skrytá aplikace Magisk nemůže dále fungovat, protože byl ztracen ROOT. Obnovte prosím původní soubor APK.</string>
-    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Pro povolení této funkce, povolte oprávnění pro přístup k úložišti</string>
     <string name="post_notifications_denied">Pro povolení této funkce, povolte oznámení</string>
     <string name="install_unknown_denied">Pro povolení této funkce, povolte "instalovat aplikace z neznámých zdrojů"</string>
-    <string name="add_shortcut_title">Přidat zástupce na domovskou obrazovku</string>
-    <string name="add_shortcut_msg">Po skrytí této aplikace může být obtížné rozpoznat její název a ikonu. Chcete přidat na domovskou obrazovku hezkého zástupce?</string>
     <string name="app_not_found">Nebyla nalezena žádná aplikace, která by tuto akci provedla</string>
     <string name="reboot_apply_change">Pro použití změn restartujte zařízení</string>
-    <string name="restore_app_confirmation">Tímto skrytou aplikaci obnovíte zpět na původní aplikaci. Opravdu to chcete udělat?</string>
-
 </resources>

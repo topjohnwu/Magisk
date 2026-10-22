@@ -122,10 +122,6 @@
     <string name="settings_dark_mode_system">Predeterminado del sistema</string>
     <string name="settings_download_path_title">Ruta de descarga</string>
     <string name="settings_download_path_message">Los archivos serán guardados en la siguiente ruta:\n%1$s</string>
-    <string name="settings_hide_app_title">Ocultar la app de Magisk</string>
-    <string name="settings_hide_app_summary">Instalar una versión proxy de la app con un nombre de paquete aleatorio y una etiqueta personalizada</string>
-    <string name="settings_restore_app_title">Restaurar la app</string>
-    <string name="settings_restore_app_summary">Desoculta la app y la reemplaza por la original</string>
     <string name="language">Idioma</string>
     <string name="system_default">Predeterminado del sistema</string>
     <string name="settings_check_update_title">Buscar actualizaciones</string>
@@ -143,11 +139,6 @@
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Prepara al archivo hosts para que los bloqueadores de anuncios puedan modificarlo sin alterar el sistema</string>
     <string name="settings_hosts_toast">El módulo se instaló correctamente, reinicia para aplicar los cambios.</string>
-    <string name="settings_app_name_hint">Nuevo nombre de la app</string>
-    <string name="settings_app_name_helper">La app de Magisk será reempaquetada con este nombre</string>
-    <string name="settings_app_name_error">El nombre es inválido</string>
-
-
     <string name="superuser_notification">Notificación de superusuario</string>
 
 
@@ -155,7 +146,6 @@
     <string name="settings_su_auth_summary">Preguntar por la autenticación de usuario durante las peticiones de Superusuario</string>
     <string name="settings_su_auth_insecure">No hay método de autenticación configurado en el dispositivo</string>
     <string name="settings_customization">Personalización</string>
-    <string name="setting_add_shortcut_summary">Añade un atajo a la app con el ícono de Magisk a la pantalla de inicio en caso de que te resulte difícil reconocerla tras haberle cambiado el nombre y el ícono</string>
     <string name="settings_doh_title">DNS sobre HTTPS</string>
     <string name="settings_doh_description">Proporciona una solución alternativa (workaround) contra el envenenamiento de DNS en algunos países</string>
     <string name="multiuser_mode">Modo multiusuario</string>
@@ -211,15 +201,9 @@
     <string name="unsupport_system_app_msg">La ejecución de esta app como app del sistema no está soportada. Por favor, vuelve a instalarla como usuario</string>
     <string name="unsupport_other_su_msg">Se detectó un binario \"su\" ajeno a Magisk. Por favor, desinstala cualquier solución root de la competencia y/o reinstala Magisk</string>
     <string name="unsupport_external_storage_msg">La app de Magisk está instalada en un almacenamiento externo, por favor, muévela al almacenamiento interno.</string>
-    <string name="unsupport_nonroot_stub_msg">La app de Magisk oculta no puede seguir funcionando porque se perdió el acceso root. Por favor, restaura el APK original</string>
-    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Permite el acceso al almacenamiento para activar esta funcionalidad</string>
     <string name="post_notifications_denied">Permite mostrar notificaciones para activar esta funcionalidad</string>
     <string name="install_unknown_denied">Permite la instalación de apps desconocidas para activar esta funcionalidad</string>
-    <string name="add_shortcut_title">Añadir un atajo a la pantalla de inicio</string>
-    <string name="add_shortcut_msg">Añade un atajo a la app con el ícono de Magisk a la pantalla de inicio en caso de que te resulte difícil reconocerla tras haberle cambiado el nombre y el ícono</string>
     <string name="app_not_found">No se encontró ninguna app que pueda realizar esta acción</string>
     <string name="reboot_apply_change">Reinicia para aplicar los cambios</string>
-    <string name="restore_app_confirmation">Se restaurará la app oculta de vuelta a la original. ¿Quieres continuar?</string>
-
 </resources>

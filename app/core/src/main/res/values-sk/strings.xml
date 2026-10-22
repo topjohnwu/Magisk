@@ -125,10 +125,6 @@
     <string name="settings_dark_mode_dark">Vždy tmavý</string>
     <string name="settings_download_path_title">Cesta na sťahovanie</string>
     <string name="settings_download_path_message">Súbory budú uložené do %1$s</string>
-    <string name="settings_hide_app_title">Skryť aplikáciu Magisk</string>
-    <string name="settings_hide_app_summary">Inštalovať proxy aplikáciu s náhodným ID balíčka a vlastným názvom aplikácie</string>
-    <string name="settings_restore_app_title">Obnoviť aplikáciu Magisk</string>
-    <string name="settings_restore_app_summary">Odkryť aplikáciu a obnoviť pôvodný súbor APK</string>
     <string name="language">Jazyk</string>
     <string name="system_default">(Predvolený systémom)</string>
     <string name="settings_check_update_title">Kontrolovať aktualizácie</string>
@@ -146,11 +142,6 @@
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Podpora pre aplikácie na blokovanie reklamy so systemless hosts</string>
     <string name="settings_hosts_toast">Pridaný modul systemless hosts</string>
-    <string name="settings_app_name_hint">Nový názov</string>
-    <string name="settings_app_name_helper">Aplikácia bude prebalená s týmto názvom</string>
-    <string name="settings_app_name_error">Neplatný formát</string>
-
-
     <string name="superuser_notification">Upozornenia Superužívateľa</string>
 
 
@@ -158,7 +149,6 @@
     <string name="settings_su_auth_summary">Žiadosť o overenie používateľa počas požiadaviek Superužívateľa</string>
     <string name="settings_su_auth_insecure">V zariadení nie je nakonfigurovaná žiadna metóda overovania</string>
     <string name="settings_customization">Prispôsobenie</string>
-    <string name="setting_add_shortcut_summary">V prípade, že sa po skrytí apky názov a ikona ťažko rozpoznávajú, pridať na domovskú obrazovku odkaz</string>
     <string name="settings_doh_title">DNS over HTTPS</string>
     <string name="settings_doh_description">Riešenie otravy DNS v niektorých krajinách</string>
     <string name="settings_random_name_title">Náhodný názov výstupu</string>
@@ -218,15 +208,9 @@
     <string name="unsupport_system_app_msg">Spustenie tejto apky ako systémovej nie je podporované. Preveďte apku na používateľskú.</string>
     <string name="unsupport_other_su_msg">Bol nájdený binárny súbor \"su\", ktorý nie je pre Magisk. Odstráňte, prosím, konkurenčné root spôsoby a/alebo preinštalujte Magisk.</string>
     <string name="unsupport_external_storage_msg">Magisk je nainštalovaný na externom úložisku. Prosím, presuňte apku na interné úložisko.</string>
-    <string name="unsupport_nonroot_stub_msg">Skrytá aplikácia Magisk nemôže pokračovať v práci, lebo root sa stratil. Prosím, obnovte ju z pôvodného súboru APK.</string>
-    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Udeľte povolenie na zapnutie tejto funkcie</string>
     <string name="post_notifications_denied">Udeľte upozorneniam povolenie na zapnutie tejto funkcie</string>
     <string name="install_unknown_denied">Povoľte "inštaláciu neznámych aplikácii" na povolenie tejto funkcie</string>
-    <string name="add_shortcut_title">Pridať odkaz na domovskú obrazovku</string>
-    <string name="add_shortcut_msg">Po skrytí tejto aplikácie sa jej názov a ikona môžu stať ťažko rozoznateľnými. Chcete pridať krajší odkaz na domovskú obrazovku?</string>
     <string name="app_not_found">Nenašla sa žiadna aplikácia, ktorá dokáže spracovať túto akciu</string>
     <string name="reboot_apply_change">Reštartovať počítač, aby sa použili zmeny</string>
-    <string name="restore_app_confirmation">Týmto obnovíte skrytú aplikáciu späť na pôvodnú aplikáciu. Naozaj to chcete urobiť?</string>
-
 </resources>

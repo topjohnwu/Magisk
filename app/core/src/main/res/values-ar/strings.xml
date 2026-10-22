@@ -133,10 +133,6 @@
     <string name="settings_dark_mode_dark">داكن دائمًا</string>
     <string name="settings_download_path_title">مسار التنزيل</string>
     <string name="settings_download_path_message">سيتم حفظ الملفات في %1$s</string>
-    <string name="settings_hide_app_title">إخفاء تطبيق Magisk</string>
-    <string name="settings_hide_app_summary">تثبيت تطبيق وسيط برقم حزمة عشوائي واسم مخصص</string>
-    <string name="settings_restore_app_title">استعادة تطبيق Magisk</string>
-    <string name="settings_restore_app_summary">إظهار التطبيق واستعادة ملف APK الأصلي</string>
     <string name="language">اللغة</string>
     <string name="system_default">(افتراضي النظام)</string>
     <string name="settings_check_update_title">التحقق من التحديثات</string>
@@ -155,11 +151,6 @@
     <string name="settings_hosts_title">ملفات Hosts بدون نظام</string>
     <string name="settings_hosts_summary">دعم ملفات hosts بدون نظام لتطبيقات حجب الإعلانات</string>
     <string name="settings_hosts_toast">تمت تثبيت إضافة ملفات hosts بدون نظام</string>
-    <string name="settings_app_name_hint">الاسم الجديد</string>
-    <string name="settings_app_name_helper">سيتم إعادة تعبئة التطبيق بهذا الاسم</string>
-    <string name="settings_app_name_error">صيغة غير صالحة</string>
-
-
     <string name="superuser_notification">إشعار صلاحية الروت</string>
 
 
@@ -176,7 +167,6 @@
     <string name="color_mode_monet_system">Monet (النظام)</string>
     <string name="color_mode_monet_light">Monet (فاتح)</string>
     <string name="color_mode_monet_dark">Monet (داكن)</string>
-    <string name="setting_add_shortcut_summary">إضافة اختصار واضح على الشاشة الرئيسية في حال أصبح اسم التطبيق وأيقونته صعبَي التمييز بعد الإخفاء</string>
     <string name="settings_doh_title">DNS عبر HTTPS</string>
     <string name="settings_doh_description">حل بديل لتسمم DNS في بعض الدول</string>
     <string name="settings_random_name_title">جعل اسم الملف الناتج عشوائي</string>
@@ -235,14 +225,9 @@
     <string name="unsupport_system_app_msg">تشغيل هذا التطبيق كتطبيق نظام غير مدعوم. يرجى إعادته إلى تطبيق مستخدم عادي.</string>
     <string name="unsupport_other_su_msg">تم اكتشاف ملف ثنائي «su» لا ينتمي إلى Magisk. يرجى إزالة أي برنامج مدير روت أخر و/أو إعادة تثبيت Magisk.</string>
     <string name="unsupport_external_storage_msg">تم تثبيت Magisk على تخزين خارجي. يرجى نقل التطبيق إلى التخزين الداخلي.</string>
-    <string name="unsupport_nonroot_stub_msg">لا يستطيع تطبيق Magisk المخفي الاستمرار في العمل لأن الوصول للروت فُقد. يرجى استعادة ملف APK الأصلي.</string>
-    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">امنح إذن التخزين لتفعيل هذه الميزة</string>
     <string name="post_notifications_denied">امنح إذن الإشعارات لتفعيل هذه الميزة</string>
     <string name="install_unknown_denied">اسمح بـ«تثبيت تطبيقات غير معروفة» لتفعيل هذه الميزة</string>
-    <string name="add_shortcut_title">إضافة اختصار إلى الشاشة الرئيسية</string>
-    <string name="add_shortcut_msg">بعد إخفاء التطبيق، قد يصبح اسمه وأيقونته صعبَي التمييز. هل تريد إضافة اختصار واضح إلى الشاشة الرئيسية؟</string>
     <string name="app_not_found">لا يوجد تطبيق للتعامل مع هذا الإجراء</string>
     <string name="reboot_apply_change">أعد التشغيل لتطبيق التغييرات</string>
-    <string name="restore_app_confirmation">سيتم استعادة التطبيق المخفي إلى حالته الأصلية. هل أنت متأكد؟</string>
 </resources>

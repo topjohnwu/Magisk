@@ -119,10 +119,6 @@
     <string name="settings_dark_mode_dark">डार्क मोड</string>
     <string name="settings_download_path_title">डाउनलोड पथ</string>
     <string name="settings_download_path_message">फ़ाइलों को %1$s में सहेजा जाएगा</string>
-    <string name="settings_hide_app_title">मैजिस्क ऐप को छिपाएं</string>
-    <string name="settings_hide_app_summary">रैंडम पैकेज आईडी और कस्टम ऐप लेबल के साथ प्रॉक्सी ऐप इंस्टॉल करें</string>
-    <string name="settings_restore_app_title">मैजिस्क ऐप को पुनर्स्थापित करें</string>
-    <string name="settings_restore_app_summary">ऐप को उनहीदे करें और मूल एपीके को पुनर्स्थापित करें</string>
     <string name="language">भाषा</string>
     <string name="system_default">(सिस्टम डिफ़ॉल्ट)</string>
     <string name="settings_check_update_title">अपडेट जांचें</string>
@@ -140,16 +136,10 @@
     <string name="settings_hosts_title">सिस्टमलेस होस्ट</string>
     <string name="settings_hosts_summary">विज्ञापन ब्लॉक ऐप्स के लिए सिस्टमलेस होस्ट समर्थन:</string>
     <string name="settings_hosts_toast">सिस्टमलेस होस्ट मॉड्यूल जोड़ा गया</string>
-    <string name="settings_app_name_hint">नया नाम</string>
-    <string name="settings_app_name_helper">इस नाम से ऐप को फिर से इंस्टॉल किया जाएगा</string>
-    <string name="settings_app_name_error">अवैध प्रारूप</string>
-
-
     <string name="superuser_notification">सुपरयूज़र सूचना</string>
 
 
     <string name="settings_customization">कस्टमाईजेशन</string>
-    <string name="setting_add_shortcut_summary">ऐप को छिपाने के बाद नाम और आइकन को पहचानना मुश्किल है, तो होम स्क्रीन में एक सुंदर शॉर्टकट जोड़ें</string>
     <string name="settings_doh_title">HTTPS पर DNS</string>
     <string name="settings_doh_description">कुछ राष्ट्रों में चल रही DNS विषाक्तता का समाधान</string>
 
@@ -206,14 +196,8 @@
     <string name="unsupport_system_app_msg">इस ऐप को सिस्टम ऐप के रूप में चलाना समर्थित नहीं है। कृपया ऐप को उपयोगकर्ता ऐप पर वापस लाएं।</string>
     <string name="unsupport_other_su_msg">एक \"su\" बाइनरी का पता चला है जो मैजिस्क से नहीं है। कृपया कोई प्रतिस्पर्धी मूल समाधान निकालें और/या मैजिस्क को फिर से स्थापित करें।</string>
     <string name="unsupport_external_storage_msg">मैजिस्क बाहरी संग्रहण में स्थापित है। कृपया ऐप को इंटरनल स्टोरेज में ले जाएं।</string>
-    <string name="unsupport_nonroot_stub_msg">छिपा हुआ मैजिक ऐप काम करना जारी नहीं रख सकता क्योंकि रूट खो गया था। कृपया मूल APK को पुनर्स्थापित करें।</string>
-    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">इसका उपयोग करने के लिए स्टोरेज अनुमति प्रदान करें</string>
     <string name="install_unknown_denied">इस कार्यक्षमता को सक्षम करने के लिए "अज्ञात ऐप्स इंस्टॉल करें" की अनुमति दें</string>
-    <string name="add_shortcut_title">होम स्क्रीन पर शॉर्टकट जोड़ें</string>
-    <string name="add_shortcut_msg">इस ऐप को छिपाने के बाद इसका नाम और आइकन पहचानना मुश्किल हो सकता है। क्या आप होम स्क्रीन पर एक सुंदर शॉर्टकट जोड़ना चाहते हैं?</string>
     <string name="app_not_found">इस एक्शन को संभालने के लिए कोई एप्लिकेशन नहीं मिली</string>
     <string name="reboot_apply_change">परिवर्तन लागू करने के लिए रीबूट करें</string>
-    <string name="restore_app_confirmation">यह छिपे हुए ऐप को मूल ऐप पर वापस बहाल कर देगा। क्या आप वाकई ऐसा करना चाहते हैं?</string>
-
 </resources>

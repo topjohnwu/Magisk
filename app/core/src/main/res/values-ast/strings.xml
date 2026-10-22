@@ -116,10 +116,6 @@
     <string name="settings_dark_mode_dark">Escuridá</string>
     <string name="settings_download_path_title">Camín de les descargues</string>
     <string name="settings_download_path_message">Los ficheros van guardase en «%1$s»</string>
-    <string name="settings_hide_app_title">Esconder Magisk</string>
-    <string name="settings_hide_app_summary">Instala una aplicación intermedia con una ID y una etiqueta al debalu</string>
-    <string name="settings_restore_app_title">Restaurar el mou visible</string>
-    <string name="settings_restore_app_summary">Fai que l\'aplicación orixinal vuelva ser visible</string>
     <string name="language">Llingua</string>
     <string name="system_default">(Lo predeterminao)</string>
     <string name="settings_check_update_title">Comprobación d\'anovamientos</string>
@@ -137,11 +133,6 @@
     <string name="settings_hosts_title">Módulu «Systemless Hosts»</string>
     <string name="settings_hosts_summary">Un módulu pa les aplicaciones que bloquien anuncios</string>
     <string name="settings_hosts_toast">Amestóse\'l módulu «Systemless Hosts»</string>
-    <string name="settings_app_name_hint">Nome nuevu</string>
-    <string name="settings_app_name_helper">L\'aplicación va volver empaquetase con esti nome</string>
-    <string name="settings_app_name_error">El formatu nun ye válidu</string>
-
-
     <string name="superuser_notification">Avisu de superusuariu</string>
 
 
@@ -149,7 +140,6 @@
     <string name="settings_su_auth_summary">Pide l\'autenticación demientres les solicitúes de superusuariu</string>
     <string name="settings_su_auth_insecure">Nun se configuró nengún métodu d\'autenticación nel preséu</string>
     <string name="settings_customization">Personalización</string>
-    <string name="setting_add_shortcut_summary">Amiesta un atayu a la pantalla d\'aniciu en casu de que\'l nome y l\'iconu seyan difíciles de reconocer dempués d\'esconder l\'aplicación</string>
     <string name="settings_doh_title">DNS per HTTPS</string>
     <string name="settings_doh_description">Una igua alternativa pal envelenamientu de DNS en dalgunos países</string>
     <string name="settings_random_name_title">Nome de la salida aleatoriu</string>
@@ -206,14 +196,9 @@
     <string name="unsupport_system_app_msg">Esta aplicación nun se pue executar nel espaciu del sistema. Volvi instalala mas nel espaciu del usuariu.</string>
     <string name="unsupport_other_su_msg">Detectóse un binariu «su» que nun ye de Magisk. Quita cualesquier solución de root y/o volvi instalar Magisk.</string>
     <string name="unsupport_external_storage_msg">Magisk ta instaláu nel almacenamientu esternu. Movi l\'aplicación al almacenamientu internu, por favor.</string>
-    <string name="unsupport_nonroot_stub_msg">Magisk nun pue siguir funcionando nel mou escondíu darréu que se perdió\'l root. Restaura\'l mou visible de l\'aplicación.</string>
-    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Concede\'l permisu d\'almacenamientu p\'activar esta funcionalidá</string>
     <string name="post_notifications_denied">Concede\'l permisu de los avisos p\'activar esta función</string>
     <string name="install_unknown_denied">Permite la instalación d\'aplicaciones desconocíes p\'activar esta funcionalidá</string>
-    <string name="add_shortcut_title">Amestar un atayu a la pantalla d\'aniciu</string>
-    <string name="add_shortcut_msg">Dempués d\'esconder esta aplicación, el so nome ya iconu van ser difíciles de reconocer. ¿Quies amestar un atayu a la pantalla d\'aniciu?</string>
     <string name="app_not_found">Nun s\'atopó nenguna aplicación pa remanar esta aición</string>
     <string name="reboot_apply_change">Reanicia p\'aplicar los cambeos</string>
-    <string name="restore_app_confirmation">Esta aición va restaurar l\'aplicación orixinal y desanicia la intermedia. ¿De xuru que quies facelo?</string>
 </resources>

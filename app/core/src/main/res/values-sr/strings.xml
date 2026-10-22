@@ -134,10 +134,6 @@
     <string name="settings_dark_mode_dark">Увек тамно</string>
     <string name="settings_download_path_title">Путања за преузимање</string>
     <string name="settings_download_path_message">Фајлови ће бити сачувани на %1$s</string>
-    <string name="settings_hide_app_title">Сакриј Magisk апл.</string>
-    <string name="settings_hide_app_summary">Инсталирај proxy апликацију са насумичним ID-јем пакета и прилагођеном лабелом</string>
-    <string name="settings_restore_app_title">Поврати Magisk апл.</string>
-    <string name="settings_restore_app_summary">Откриј апл. и поврати оригинални APK</string>
     <string name="language">Језик</string>
     <string name="system_default">(Подразумевано системски)</string>
     <string name="settings_check_update_title">Провери ажурирања</string>
@@ -156,11 +152,6 @@
     <string name="settings_hosts_title">Безсистемски домаћини (hosts)</string>
     <string name="settings_hosts_summary">Подршка безсистемских домаћина за апликације блокирања реклама</string>
     <string name="settings_hosts_toast">Модул безсистемских домаћина додат</string>
-    <string name="settings_app_name_hint">Ново име</string>
-    <string name="settings_app_name_helper">Апл. ће бити спакована под овим именом</string>
-    <string name="settings_app_name_error">Невалидан формат</string>
-
-
     <string name="superuser_notification">Нотификације супер-корисника</string>
 
 
@@ -177,7 +168,6 @@
     <string name="color_mode_monet_system">Monet (Системско)</string>
     <string name="color_mode_monet_light">Monet (Светло)</string>
     <string name="color_mode_monet_dark">Monet (Тамно)</string>
-    <string name="setting_add_shortcut_summary">Додај лепу пречицу на почетни екран у случају да се име и иконица не препознају лако након скривања апликације</string>
     <string name="settings_doh_title">DNS преко HTTPS-а</string>
     <string name="settings_doh_description">Заобилазно решење DNS тровања у неким нацијама</string>
     <string name="settings_random_name_title">Насумично име на излазу</string>
@@ -236,14 +226,9 @@
     <string name="unsupport_system_app_msg">Покретање апликације као системске није подржано. Молимо поставите апликацију да буде корисничка.</string>
     <string name="unsupport_other_su_msg">Детектован \"su\" binary који није Magisk-ов. Молимо уклоните конкурентно коренско решење и/или реинсталирајте Magisk.</string>
     <string name="unsupport_external_storage_msg">Magisk је инсталиран на екстерно складиште. Молимо померите апл. у интерно складиште.</string>
-    <string name="unsupport_nonroot_stub_msg">Скривена Magisk апликација не може наставити са радом јер је корен изгубљен. Молимо повратите оригинални APK.</string>
-    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Дозволите пермисију за складиште да бисте омогућили ову функционалност</string>
     <string name="post_notifications_denied">Дозволите пермисију за нотификације да бисте омогућили ову функционалност</string>
     <string name="install_unknown_denied">Дозволите \"инсталирање непознатих апликација\" да бисте омогућили ову функционалност</string>
-    <string name="add_shortcut_title">Додај пречицу на почетни екран</string>
-    <string name="add_shortcut_msg">Након скривања апликације, њено име и иконицу ћете тешко препознати. Желите ли додати лепу пречицу на почетни екран?</string>
     <string name="app_not_found">Није пронађена апликација за ову акцију</string>
     <string name="reboot_apply_change">Поново покрени да примениш измене</string>
-    <string name="restore_app_confirmation">Ово ће вратити скривену апликацију на оригиналну. Да ли стварно то желите?</string>
 </resources>

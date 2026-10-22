@@ -119,10 +119,6 @@
     <string name="settings_dark_mode_dark">എപ്പോഴും ഡാർക്ക്</string>
     <string name="settings_download_path_title">ഡൗൺലോഡ് സ്ഥലം</string>
     <string name="settings_download_path_message">ഫയലുകൾ %1$s-ലേക്ക് സേവ് ചെയ്യപ്പെടും</string>
-    <string name="settings_hide_app_title">മജിസ്‌ക് ആപ്പ് മറയ്ക്കുക</string>
-    <string name="settings_hide_app_summary">ക്രമരഹിതമായ പാക്കേജ് ഐഡിയും ഇഷ്‌ടാനുസൃത ആപ്പ് ലേബലും ഉള്ള ഒരു പ്രോക്‌സി ആപ്പ് ഇൻസ്‌റ്റാൾ ചെയ്യുക</string>
-    <string name="settings_restore_app_title">മജിസ്‌ക് ആപ്പ് പുനഃസ്ഥാപിക്കുക</string>
-    <string name="settings_restore_app_summary">ആപ്പ് മറച്ചത് മാറ്റി യഥാർത്ഥ APK പുനഃസ്ഥാപിക്കുക</string>
     <string name="language">ഭാഷ</string>
     <string name="system_default">(സിസ്റ്റം ക്രമാനുസാരം)</string>
     <string name="settings_check_update_title">അപ്ഡേറ്റുകൾക്കായി നോക്കുക</string>
@@ -140,16 +136,10 @@
     <string name="settings_hosts_title">സിസ്റ്റംലെസ്സ് ഹോസ്റ്റ്</string>
     <string name="settings_hosts_summary">പരസ്യം തടയുന്ന ആപ്പുകൾക്കായി സിസ്റ്റംലെസ്സ് ഹോസ്റ്റ്</string>
     <string name="settings_hosts_toast">സിസ്റ്റംലെസ്സ് ഹോസ്റ്റ് മൊഡ്യൂൾ ചേർത്തു</string>
-    <string name="settings_app_name_hint">പുതിയ പേര്</string>
-    <string name="settings_app_name_helper">ആപ്പ് ഈ പേരിൽ വീണ്ടും പാക്ക് ചെയ്യും</string>
-    <string name="settings_app_name_error">അസാധുവായ ഫോർമാറ്റ്</string>
-
-
     <string name="superuser_notification">സൂപ്പർയൂസർ അറിയിപ്പ്</string>
 
 
     <string name="settings_customization">കസ്റ്റമയിസേഷൻ</string>
-    <string name="setting_add_shortcut_summary">ആപ്പ് മറച്ചതിന് ശേഷം പേരും ഐക്കണും തിരിച്ചറിയാൻ പ്രയാസമാണെങ്കിൽ ഹോം സ്‌ക്രീനിലേക്ക് മനോഹരമായ ഒരു ഷോർട്ട്ക്കട് ചേർക്കുക</string>
     <string name="settings_doh_title">DNS ഓവർ HTTPS</string>
     <string name="settings_doh_description">ചില രാജ്യങ്ങളിലെ DNS പോയ്സണിങിന് പരിഹാരം</string>
 
@@ -206,15 +196,9 @@
     <string name="unsupport_system_app_msg">ഒരു സിസ്റ്റം ആപ്പായി ഈ ആപ്പ് പ്രവർത്തിപ്പിക്കുന്നത് സാധ്യമല്ല. ഒരു യൂസർ ആപ്പിലേക്ക് ആപ്പ് പുനഃസ്ഥാപിക്കുക.</string>
     <string name="unsupport_other_su_msg">മജിസ്‌ക്-ൽ നിന്ന് അല്ലാത്ത ഒരു \"su\" ബൈനറി കണ്ടെത്തി. അധിക റൂട്ട് സൊല്യൂഷൻ നീക്കം ചെയ്യുക കൂടാതെ/അല്ലെങ്കിൽ മാജിസ്ക് വീണ്ടും ഇൻസ്റ്റാൾ ചെയ്യുക.</string>
     <string name="unsupport_external_storage_msg">മജിസ്‌ക് ഇക്സ്റ്റർനൽ സ്റ്റോറേജിൽ ഇൻസ്റ്റാൾ ചെയ്തിരിക്കുകയാണ്. ആപ്പ് ഇൻറ്റർനൽ സ്റ്റോറേജിലെക് നീക്കുക.</string>
-    <string name="unsupport_nonroot_stub_msg">റൂട്ട് നഷ്‌ടമായതിനാൽ മറഞ്ഞിരിക്കുന്ന മജിസ്‌ക് ആപ്പിന് തുടർന്നും പ്രവർത്തിക്കാനാകില്ല. യഥാർത്ഥ APK പുനഃസ്ഥാപിക്കുക.</string>
-    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">ഈ പ്രവർത്തനം പ്രവർത്തനക്ഷമമാക്കാൻ സ്റ്റോറജ് ​​അനുമതി നൽകുക</string>
     <string name="post_notifications_denied">ഈ പ്രവർത്തനം പ്രവർത്തനക്ഷമമാക്കാൻ അറിയിപ്പ്‌ അനുമതി നൽകുക</string>
     <string name="install_unknown_denied">ഈ പ്രവർത്തനം പ്രവർത്തനക്ഷമമാക്കാൻ "install unknown apps" അനുവദിക്കുക</string>
-    <string name="add_shortcut_title">ഹോം സ്ക്രീനിലേക്ക് ഷോർട്ട്കട്ട് ചേർക്കുക</string>
-    <string name="add_shortcut_msg">ഈ ആപ്പ് മറച്ചതിന് ശേഷം, അതിന്റെ പേരും ഐക്കണും തിരിച്ചറിയാൻ ബുദ്ധിമുട്ടായേക്കാം. ഹോം സ്‌ക്രീനിലേക്ക് മനോഹരമായ ഒരു ഷോർറ്റ്കറ്റ ചേർക്കാൻ നിങ്ങൾ ആഗ്രഹിക്കുന്നുണ്ടോ?</string>
     <string name="app_not_found">ഈ പ്രവർത്തനം കൈകാര്യം ചെയ്യാൻ ഒരു ആപ്പും കണ്ടെത്തിയില്ല</string>
     <string name="reboot_apply_change">മാറ്റങ്ങൾ പ്രയോഗിക്കാൻ റീബൂട്ട് ചെയ്യുക</string>
-    <string name="restore_app_confirmation">ഇത് മറച്ച ആപ്പിനെ യഥാർത്ഥ ആപ്പിലേക്ക് തിരികെ കൊണ്ടുവരും. നിങ്ങൾ ശരിക്കും ഇത് ചെയ്യാൻ ആഗ്രഹിക്കുന്നുണ്ടോ?</string>
-
 </resources>

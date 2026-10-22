@@ -113,10 +113,6 @@
     <string name="settings_dark_mode_dark">მუქი თემა</string>
     <string name="settings_download_path_title">გადმოწერის ლოკაცია</string>
     <string name="settings_download_path_message">ფაილები შეინახება %1$s-ში</string>
-    <string name="settings_hide_app_title">Magisk-ის აპის დამალვა</string>
-    <string name="settings_hide_app_summary">დაყენდეს ამოუცნობელი აპი შემთხვევითი პაკეტის ID-ით და განსხვავებული სახელით</string>
-    <string name="settings_restore_app_title">Magisk-ის აპის დაბრუნება</string>
-    <string name="settings_restore_app_summary">აპის თავდაპირველ მდგომარეობაზე დაბრუნება</string>
     <string name="language">ენა</string>
     <string name="system_default">(სისტემის რჩეული)</string>
     <string name="settings_check_update_title">განახლებების შემოწმება</string>
@@ -129,16 +125,10 @@
     <string name="settings_hosts_title">გარესისტემური ჰოსტები</string>
     <string name="settings_hosts_summary">გარესისტემური ჰოსტები Adblock-ებისთვის</string>
     <string name="settings_hosts_toast">გარესისტემური ჰოსტების მოდული დამატებულია</string>
-    <string name="settings_app_name_hint">ახალი სახელი</string>
-    <string name="settings_app_name_helper">პროგრამას ეს პაკეტის სახელი ექნება</string>
-    <string name="settings_app_name_error">არასწორი ფორმატი</string>
-
-
     <string name="superuser_notification">სუპერმომხმარებლის შეტყობინება</string>
      <!-- TODO: tapjacking has no direct translation; must make something up later -->
 
     <string name="settings_customization">პერსონალიზაცია</string>
-    <string name="setting_add_shortcut_summary">ლამაზი ხატულის დამატება საწყისს ეკრანზე, იმ შემთხვევაში თუ აპის ამოცნობა არის რთული დამალვის შემდეგ</string>
     <string name="settings_doh_title">DNS HTTPS-ზე</string>
     <string name="settings_doh_description">DNS-ის ლიმიტების მოხსნა კონკრეტულ სახელმწიფოებში</string>
 
@@ -188,8 +178,6 @@
     <string name="unsupport_magisk_title">შეუთავსებელი Magisk-ის ვერსია</string>
     <string name="unsupport_magisk_msg">ეს აპის ვერსია შეუთავსებსლია Magisk-ის %1$s-ზე ნაკლებ ვერსიებთან.\n\nაპს ეგონება, რომ Magisk-ი არაა დაყენებული, გთხოვთ გაანხალოთ Magisk-ი დროულად.</string>
     <string name="external_rw_permission_denied">დართეთ მეხსიერებასთან წვდომის ნებართვა ამ ფუნქციის გამოსაყნებლად</string>
-    <string name="add_shortcut_title">ხატულის დამატება საწყისს ეკრანზე</string>
-    <string name="add_shortcut_msg">აპის დამალვის შემდეგ, მისი ნახატი და სახელი შეიძლება ამოუცნობი გახდეს. გნებავთ ხატულის დამატება ასწყისს ეკრანზე?</string>
     <string name="app_not_found">ამ ფუნქციის შესასრულებლად აპი ვერ მოიძებნა</string>
 
 </resources>

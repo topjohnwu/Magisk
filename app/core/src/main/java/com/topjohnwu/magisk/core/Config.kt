@@ -39,11 +39,10 @@ object Config : PreferenceConfig, DBConfig {
         const val DOWNLOAD_DIR = "download_dir"
         const val SAFETY = "safety_notice"
         const val THEME_ORDINAL = "theme_ordinal"
-        const val ASKED_HOME = "asked_home"
         const val DOH = "doh"
         const val RAND_NAME = "rand_name"
 
-        val NO_MIGRATION = setOf(ASKED_HOME)
+        val NO_MIGRATION = emptySet<String>()
     }
 
     object OldValue {
@@ -85,7 +84,6 @@ object Config : PreferenceConfig, DBConfig {
     @JvmField var recovery = false
     var denyList = false
 
-    var askedHome by preference(Key.ASKED_HOME, false)
     var bootloop by dbSettings(Key.BOOTLOOP, 0)
 
     var safetyNotice by preference(Key.SAFETY, true)

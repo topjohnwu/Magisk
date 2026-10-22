@@ -133,10 +133,6 @@
     <string name="settings_dark_mode_dark">Завжди темний</string>
     <string name="settings_download_path_title">Шлях завантаження</string>
     <string name="settings_download_path_message">Файли зберігатимуться в %1$s</string>
-    <string name="settings_hide_app_title">Сховати застосунок Magisk</string>
-    <string name="settings_hide_app_summary">Встановити проксі-застосунок з довільним ID пакунку та назвою</string>
-    <string name="settings_restore_app_title">Відновити застосунок Magisk</string>
-    <string name="settings_restore_app_summary">Відновити застосунок з оригінального APK та показати його</string>
     <string name="language">Мова</string>
     <string name="system_default">(системна)</string>
     <string name="settings_check_update_title">Перевіряти оновлення</string>
@@ -155,11 +151,6 @@
     <string name="settings_hosts_title">Позасистемні хости</string>
     <string name="settings_hosts_summary">Підтримка позасистемних хостів для застосунків блокування реклами</string>
     <string name="settings_hosts_toast">Додано модуль позасистемних хостів</string>
-    <string name="settings_app_name_hint">Нове ім\’я</string>
-    <string name="settings_app_name_helper">Застосунок буде перезібрано з цим ім\’ям</string>
-    <string name="settings_app_name_error">Неправильний формат</string>
-
-
     <string name="superuser_notification">Сповіщення суперкористувача</string>
 
 
@@ -176,7 +167,6 @@
     <string name="color_mode_monet_system">Monet (системний)</string>
     <string name="color_mode_monet_light">Monet (світлий)</string>
     <string name="color_mode_monet_dark">Monet (темний)</string>
-    <string name="setting_add_shortcut_summary">Додати ярлик на домашній екран для зручного сприйняття застосунку після його приховування</string>
     <string name="settings_doh_title">DNS поверх HTTPS</string>
     <string name="settings_doh_description">Відключити DoH (при нестабільному підключенні)</string>
     <string name="settings_random_name_title">Робити випадковим ім\’я вихідного файлу</string>
@@ -235,14 +225,9 @@
     <string name="unsupport_system_app_msg">Запуск цього застосунку як системний застосунок не підтримується. Будь ласка, перевстановіть цей застосунок, щоб він був як звичайний застосунок, який встановлений користувачем.</string>
     <string name="unsupport_other_su_msg">Виявлено команду \"su\", яка не належить до Magisk. Будь ласка, видаліть інші непідтримувані su.</string>
     <string name="unsupport_external_storage_msg">Magisk встановлено на зовнішнє сховище. Будь ласка, перемістіть застосунок на внутрішнє сховище.</string>
-    <string name="unsupport_nonroot_stub_msg">Застосунок не може продовжувати працювати в прихованому режимі, тому що втрачено root. Будь ласка, відновіть оригінальний застосунок з APK.</string>
-    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Надайте доступ до сховища, щоб увімкнути цей функціонал</string>
     <string name="post_notifications_denied">Надайте дозвіл на сповіщення, щоб увімкнути цей функціонал</string>
     <string name="install_unknown_denied">Дозвольте \"Встановлення невідомих застосунків\", щоб увімкнути цей функціонал</string>
-    <string name="add_shortcut_title">Ярлик на домашньому екрані</string>
-    <string name="add_shortcut_msg">Після приховування цього застосунку, його значок та ім\’я будуть іншими, тому застосунок буде важко впізнати. Хочете додати ярлик на домашній екран?</string>
     <string name="app_not_found">Не знайдено застосунок, який повинен опрацювати цю дію</string>
     <string name="reboot_apply_change">Перезавантажити, щоб застосувати зміни</string>
-    <string name="restore_app_confirmation">Це відновить прихований застосунок до оригінального. Ви справді бажаєте це зробити?</string>
 </resources>
