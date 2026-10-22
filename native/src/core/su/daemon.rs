@@ -30,7 +30,6 @@ impl Default for SuRequest {
 pub struct SuInfo {
     pub(super) uid: i32,
     pub(super) eval_uid: i32,
-    pub(super) mgr_pkg: String,
     pub(super) settings: RootSettings,
     cfg: DbSettings,
     timestamp: Instant,
@@ -41,7 +40,6 @@ impl Default for SuInfo {
         SuInfo {
             uid: -1,
             eval_uid: -1,
-            mgr_pkg: Default::default(),
             settings: Default::default(),
             cfg: Default::default(),
             timestamp: Instant::now(),
@@ -193,20 +191,21 @@ impl MagiskD {
             let mut settings = RootSettings::default();
             self.get_root_settings(eval_uid, &mut settings)?;
 
-            let (mut mgr_uid, mut mgr_pkg) = self.get_manager(to_user_id(eval_uid));
-            if mgr_pkg.is_empty() && to_app_id(eval_uid) < AID_APP_START {
+            let mut mgr_uid = self.get_manager_uid(to_user_id(eval_uid));
+            if mgr_uid < 0 && to_app_id(eval_uid) < AID_APP_START {
                 for user in self.get_users() {
-                    let (id, pkg) = self.get_manager(user);
-                    if !pkg.is_empty() {
-                        mgr_uid = id;
-                        mgr_pkg = pkg;
+                    mgr_uid = self.get_manager_uid(user);
+                    if mgr_uid >= 0 {
                         break;
                     }
                 }
             }
 
-            // If it's the manager, allow it silently
-            if to_app_id(uid) == to_app_id(mgr_uid) {
+            if mgr_uid < 0 {
+                settings.log = false;
+                settings.notify = false;
+            } else if to_app_id(uid) == to_app_id(mgr_uid) {
+                // If it's the manager, allow it silently
                 return Ok(Arc::new(SuInfo::allow(uid)));
             }
 
@@ -214,7 +213,6 @@ impl MagiskD {
             Ok(Arc::new(SuInfo {
                 uid,
                 eval_uid,
-                mgr_pkg,
                 settings,
                 cfg,
                 timestamp: Instant::now(),
