@@ -1,17 +1,9 @@
 package com.topjohnwu.magisk.core.utils
 
 import android.content.Context
-import com.topjohnwu.magisk.StubApk
-import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.core.isRunningAsStub
-import com.topjohnwu.magisk.core.ktx.cachedFile
-import com.topjohnwu.magisk.core.ktx.writeTo
 import com.topjohnwu.superuser.Shell
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
 import java.io.File
-import java.util.jar.JarFile
 
 class ShellInit : Shell.Initializer() {
     override fun onInit(context: Context, shell: Shell): Boolean {
@@ -23,21 +15,7 @@ class ShellInit : Shell.Initializer() {
         shell.newJob().apply {
             add("export ASH_STANDALONE=1")
 
-            val localBB: File
-            if (isRunningAsStub) {
-                if (!shell.isRoot)
-                    return true
-                val jar = JarFile(StubApk.current(context))
-                val bb = jar.getJarEntry("lib/${Const.CPU_ABI}/libbusybox.so")
-                localBB = context.createDeviceProtectedStorageContext().cachedFile("busybox")
-                localBB.delete()
-                runBlocking {
-                    jar.getInputStream(bb).writeTo(localBB, dispatcher = Dispatchers.Unconfined)
-                }
-                localBB.setExecutable(true)
-            } else {
-                localBB = File(context.applicationInfo.nativeLibraryDir, "libbusybox.so")
-            }
+            val localBB = File(context.applicationInfo.nativeLibraryDir, "libbusybox.so")
 
             if (shell.isRoot) {
                 add("export MAGISKTMP=\$(magisk --path)")

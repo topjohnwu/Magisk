@@ -6,9 +6,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.Lifecycle
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.JobService
-import com.topjohnwu.magisk.core.R
 import com.topjohnwu.magisk.core.di.ServiceLocator
-import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.utils.RootUtils
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.magisk.view.Shortcuts
@@ -18,7 +16,6 @@ interface SplashScreenHost : IActivityExtension {
     val splashController: SplashController<*>
 
     fun onCreateUi(savedInstanceState: Bundle?)
-    fun showInvalidStateMessage()
 }
 
 class SplashController<T>(private val activity: T)
@@ -30,39 +27,23 @@ class SplashController<T>(private val activity: T)
 
     private var shouldCreateUiOnResume = false
 
-    fun preOnCreate() {
-        if (isRunningAsStub && !splashShown) {
-            // Manually apply splash theme for stub
-            activity.theme.applyStyle(R.style.StubSplashTheme, true)
-        }
-    }
+    fun preOnCreate() {}
 
     fun onCreate(savedInstanceState: Bundle?) {
-        if (!isRunningAsStub) {
-            val splashScreen = activity.installSplashScreen()
-            splashScreen.setKeepOnScreenCondition { !splashShown }
-        }
+        val splashScreen = activity.installSplashScreen()
+        splashScreen.setKeepOnScreenCondition { !splashShown }
 
         if (splashShown) {
             doCreateUi(savedInstanceState)
         } else {
             Shell.getShell(Shell.EXECUTOR) {
-                if (isRunningAsStub && !it.isRoot) {
-                    activity.showInvalidStateMessage()
-                    return@getShell
-                }
                 activity.initializeApp()
                 activity.runOnUiThread {
                     splashShown = true
-                    if (isRunningAsStub) {
-                        // Re-launch main activity without splash theme
-                        activity.relaunch()
+                    if (activity.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+                        doCreateUi(savedInstanceState)
                     } else {
-                        if (activity.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
-                            doCreateUi(savedInstanceState)
-                        } else {
-                            shouldCreateUiOnResume = true
-                        }
+                        shouldCreateUiOnResume = true
                     }
                 }
             }

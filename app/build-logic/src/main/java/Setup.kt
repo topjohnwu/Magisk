@@ -262,8 +262,7 @@ fun Project.setupAppCommon() {
                 // Always add a transformation to set comments on the APK
                 this.transformations.add {
                     it.eocdComment = ("version=${Config.version}\n" +
-                            "versionCode=${Config.versionCode}\n" +
-                            "stubVersion=${Config.stubVersion}\n").toByteArray()
+                            "versionCode=${Config.versionCode}\n").toByteArray()
                 }
             }
 

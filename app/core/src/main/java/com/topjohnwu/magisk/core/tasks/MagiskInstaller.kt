@@ -6,14 +6,12 @@ import android.os.Process
 import android.system.Os
 import androidx.annotation.WorkerThread
 import androidx.core.os.postDelayed
-import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.AppApkPath
 import com.topjohnwu.magisk.core.BuildConfig
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.di.ServiceLocator
-import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.ktx.copyAll
 import com.topjohnwu.magisk.core.ktx.writeTo
 import com.topjohnwu.magisk.core.utils.DataChannel
@@ -32,7 +30,6 @@ import com.topjohnwu.superuser.nio.ExtendedFile
 import com.topjohnwu.superuser.nio.FileSystemManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.apache.commons.compress.archivers.zip.ZipFile
 import timber.log.Timber
 import java.io.Closeable
 import java.io.File
@@ -126,47 +123,24 @@ abstract class MagiskInstallImpl protected constructor(
 
         try {
             // Extract binaries
-            if (isRunningAsStub) {
-                ZipFile.builder().setFile(StubApk.current(context)).get().use { zf ->
-                    zf.entries.asSequence().filter {
-                        !it.isDirectory && it.name.startsWith("lib/${Const.CPU_ABI}/")
-                    }.forEach {
-                        val n = it.name.substring(it.name.lastIndexOf('/') + 1)
-                        val name = n.substring(3, n.length - 3)
-                        val dest = File(installDir, name)
-                        zf.getInputStream(it).writeTo(dest)
-                        dest.setExecutable(true)
-                    }
+            val info = context.applicationInfo
+            val libs = File(info.nativeLibraryDir).listFiles { _, name ->
+                name.startsWith("lib") && name.endsWith(".so")
+            } ?: emptyArray()
 
-                    val abi32 = Const.CPU_ABI_32
-                    if (Process.is64Bit() && abi32 != null) {
-                        val entry = zf.getEntry("lib/$abi32/libmagisk.so")
-                        if (entry != null) {
-                            val magisk32 = File(installDir, "magisk32")
-                            zf.getInputStream(entry).writeTo(magisk32)
-                        }
-                    }
-                }
-            } else {
-                val info = context.applicationInfo
-                val libs = File(info.nativeLibraryDir).listFiles { _, name ->
-                    name.startsWith("lib") && name.endsWith(".so")
-                } ?: emptyArray()
+            for (lib in libs) {
+                val name = lib.name.substring(3, lib.name.length - 3)
+                Os.symlink(lib.path, "$installDir/$name")
+            }
 
-                for (lib in libs) {
-                    val name = lib.name.substring(3, lib.name.length - 3)
-                    Os.symlink(lib.path, "$installDir/$name")
-                }
-
-                // Also extract magisk32 on 64-bit devices that supports 32-bit
-                val abi32 = Const.CPU_ABI_32
-                if (Process.is64Bit() && abi32 != null) {
-                    val name = "lib/$abi32/libmagisk.so"
-                    val entry = javaClass.classLoader!!.getResourceAsStream(name)
-                    if (entry != null) {
-                        val magisk32 = File(installDir, "magisk32")
-                        entry.writeTo(magisk32)
-                    }
+            // Also extract magisk32 on 64-bit devices that supports 32-bit
+            val abi32 = Const.CPU_ABI_32
+            if (Process.is64Bit() && abi32 != null) {
+                val name = "lib/$abi32/libmagisk.so"
+                val entry = javaClass.classLoader!!.getResourceAsStream(name)
+                if (entry != null) {
+                    val magisk32 = File(installDir, "magisk32")
+                    entry.writeTo(magisk32)
                 }
             }
 

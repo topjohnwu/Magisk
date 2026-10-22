@@ -11,8 +11,6 @@ import androidx.core.content.getSystemService
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.R
-import com.topjohnwu.magisk.core.isRunningAsStub
-import com.topjohnwu.magisk.core.ktx.getBitmap
 
 object Shortcuts {
 
@@ -23,16 +21,7 @@ object Shortcuts {
         }
     }
 
-    private fun Context.getIcon(id: Int): Icon {
-        return if (isRunningAsStub) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                Icon.createWithAdaptiveBitmap(getBitmap(id))
-            else
-                Icon.createWithBitmap(getBitmap(id))
-        } else {
-            Icon.createWithResource(this, id)
-        }
-    }
+    private fun Context.getIcon(id: Int): Icon = Icon.createWithResource(this, id)
 
     @RequiresApi(api = 25)
     private fun getShortCuts(context: Context): List<ShortcutInfo> {
