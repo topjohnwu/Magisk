@@ -69,7 +69,6 @@ bool read_vector(int fd, std::vector<T> &vec) {
 }
 
 // Scripting
-void install_apk(Utf8CStr apk);
 void uninstall_pkg(Utf8CStr pkg);
 void exec_common_scripts(Utf8CStr stage);
 void exec_module_scripts(Utf8CStr stage, const rust::Vec<ModuleInfo> &module_list);
