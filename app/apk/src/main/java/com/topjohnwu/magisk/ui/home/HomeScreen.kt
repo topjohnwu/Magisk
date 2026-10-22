@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -87,6 +88,7 @@ import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.ui.component.AdaptiveColumns
 import com.topjohnwu.magisk.ui.component.MagiskDialog
 import com.topjohnwu.magisk.ui.component.MarkdownTextAsync
+import com.topjohnwu.magisk.ui.component.onlyHorizontal
 import com.topjohnwu.magisk.ui.component.rememberLoadingDialog
 import com.topjohnwu.magisk.ui.component.verticalScrollbar
 import com.topjohnwu.magisk.ui.install.InstallDialog
@@ -228,10 +230,22 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
-                .padding(padding)
-                .verticalScrollbar(scrollState, contentPadding = PaddingValues(vertical = 12.dp))
+                .consumeWindowInsets(padding)
+                .padding(padding.onlyHorizontal())
+                .verticalScrollbar(
+                    scrollState,
+                    contentPadding = PaddingValues(
+                        top = padding.calculateTopPadding() + 12.dp,
+                        bottom = padding.calculateBottomPadding() + 12.dp,
+                    ),
+                )
                 .verticalScroll(scrollState)
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .padding(
+                    start = 16.dp,
+                    top = padding.calculateTopPadding() + 12.dp,
+                    end = 16.dp,
+                    bottom = padding.calculateBottomPadding() + 12.dp,
+                ),
             spacing = 12.dp,
             first = {
                 if (uiState.isNoticeVisible) {

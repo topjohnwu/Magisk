@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.ui.settings
 import android.os.Build
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -46,6 +47,7 @@ import com.topjohnwu.magisk.ui.component.SettingsArrow
 import com.topjohnwu.magisk.ui.component.SettingsDropdown
 import com.topjohnwu.magisk.ui.component.SettingsSwitch
 import com.topjohnwu.magisk.ui.component.SmallTitle
+import com.topjohnwu.magisk.ui.component.onlyHorizontal
 import com.topjohnwu.magisk.ui.component.verticalScrollbar
 import com.topjohnwu.magisk.core.R as CoreR
 
@@ -74,10 +76,22 @@ fun SettingsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
-                .padding(padding)
-                .verticalScrollbar(scrollState, contentPadding = PaddingValues(vertical = 12.dp))
+                .consumeWindowInsets(padding)
+                .padding(padding.onlyHorizontal())
+                .verticalScrollbar(
+                    scrollState,
+                    contentPadding = PaddingValues(
+                        top = padding.calculateTopPadding() + 12.dp,
+                        bottom = padding.calculateBottomPadding() + 12.dp,
+                    ),
+                )
                 .verticalScroll(scrollState)
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .padding(
+                    start = 16.dp,
+                    top = padding.calculateTopPadding() + 12.dp,
+                    end = 16.dp,
+                    bottom = padding.calculateBottomPadding() + 12.dp,
+                ),
             spacing = 16.dp,
             first = {
                 Column { CustomizationSection(viewModel = viewModel) }
@@ -524,6 +538,7 @@ private fun UpdateChannelUrlDialog(
         },
         dismissText = stringResource(android.R.string.cancel),
         onDismiss = onDismiss,
+        scrollable = true,
     ) {
         Column(modifier = Modifier.padding(top = 8.dp)) {
             OutlinedTextField(
@@ -554,6 +569,7 @@ private fun DownloadPathDialog(
         },
         dismissText = stringResource(android.R.string.cancel),
         onDismiss = onDismiss,
+        scrollable = true,
     ) {
         Column {
             Text(

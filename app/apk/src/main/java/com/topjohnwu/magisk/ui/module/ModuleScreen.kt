@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -80,6 +81,7 @@ import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.ui.component.ConfirmResult
 import com.topjohnwu.magisk.ui.component.MagiskDialog
 import com.topjohnwu.magisk.ui.component.MarkdownTextAsync
+import com.topjohnwu.magisk.ui.component.onlyHorizontal
 import com.topjohnwu.magisk.ui.component.rememberConfirmDialog
 import com.topjohnwu.magisk.ui.component.verticalScrollbar
 import com.topjohnwu.magisk.utils.textHolder
@@ -226,9 +228,21 @@ fun ModuleScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
-                .padding(padding)
-                .verticalScrollbar(gridState, contentPadding = PaddingValues(top = 4.dp, bottom = 80.dp)),
-            contentPadding = PaddingValues(start = 12.dp, top = 16.dp, end = 12.dp, bottom = 92.dp),
+                .consumeWindowInsets(padding)
+                .padding(padding.onlyHorizontal())
+                .verticalScrollbar(
+                    gridState,
+                    contentPadding = PaddingValues(
+                        top = padding.calculateTopPadding() + 4.dp,
+                        bottom = padding.calculateBottomPadding() + 80.dp,
+                    ),
+                ),
+            contentPadding = PaddingValues(
+                start = 12.dp,
+                top = padding.calculateTopPadding() + 16.dp,
+                end = 12.dp,
+                bottom = padding.calculateBottomPadding() + 92.dp,
+            ),
             verticalItemSpacing = 8.dp,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {

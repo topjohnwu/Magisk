@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -37,6 +38,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.topjohnwu.magisk.ui.component.onlyHorizontal
 import com.topjohnwu.magisk.ui.component.verticalScrollbar
 import com.topjohnwu.magisk.ui.navigation.LocalNavigator
 import com.topjohnwu.magisk.ui.navigation.Route
@@ -134,9 +136,21 @@ fun SuperuserScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
-                .padding(padding)
-                .verticalScrollbar(gridState, contentPadding = PaddingValues(top = 4.dp, bottom = 80.dp)),
-            contentPadding = PaddingValues(start = 12.dp, top = 16.dp, end = 12.dp, bottom = 92.dp),
+                .consumeWindowInsets(padding)
+                .padding(padding.onlyHorizontal())
+                .verticalScrollbar(
+                    gridState,
+                    contentPadding = PaddingValues(
+                        top = padding.calculateTopPadding() + 4.dp,
+                        bottom = padding.calculateBottomPadding() + 80.dp,
+                    ),
+                ),
+            contentPadding = PaddingValues(
+                start = 12.dp,
+                top = padding.calculateTopPadding() + 16.dp,
+                end = 12.dp,
+                bottom = padding.calculateBottomPadding() + 92.dp,
+            ),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
