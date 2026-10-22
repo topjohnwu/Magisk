@@ -36,7 +36,7 @@
     <application
         android:name=".App"
         android:allowBackup="false"
-        android:enableOnBackInvokedCallback="false"
+        android:enableOnBackInvokedCallback="true"
         android:icon="@drawable/ic_launcher"
         android:label="Magisk"
         android:requestLegacyExternalStorage="true"

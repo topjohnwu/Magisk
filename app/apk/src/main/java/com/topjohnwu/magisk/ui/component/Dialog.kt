@@ -40,6 +40,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -80,6 +81,42 @@ data class DialogVisuals(
     val dismiss: String? = null,
 )
 
+private class ConfirmDialogState(
+    visible: Boolean = false,
+    visuals: DialogVisuals = DialogVisuals(),
+) {
+    var visible by mutableStateOf(visible)
+    var visuals by mutableStateOf(visuals)
+    // Whether the dialog was shown by awaitConfirm
+    var awaiting = false
+
+    companion object {
+        /**
+         * Restores the dialog with its content after a configuration change. A dialog shown by
+         * awaitConfirm is not restored: the coroutine waiting for its result does not survive,
+         * so confirming it would do nothing. Callers that need it show it again.
+         */
+        val Saver = listSaver<ConfirmDialogState, Any?>(
+            save = {
+                val v = it.visuals
+                listOf(it.visible && !it.awaiting, v.title, v.content, v.markdown, v.confirm, v.dismiss)
+            },
+            restore = {
+                ConfirmDialogState(
+                    visible = it[0] as Boolean,
+                    visuals = DialogVisuals(
+                        title = it[1] as String,
+                        content = it[2] as String?,
+                        markdown = it[3] as Boolean,
+                        confirm = it[4] as String?,
+                        dismiss = it[5] as String?,
+                    ),
+                )
+            }
+        )
+    }
+}
+
 interface LoadingDialogHandle {
     suspend fun <R> withLoading(block: suspend () -> R): R
 }
@@ -119,14 +156,11 @@ private class LoadingDialogHandleImpl(
 }
 
 private class ConfirmDialogHandleImpl(
-    private val visible: MutableState<Boolean>,
+    private val state: ConfirmDialogState,
     private val coroutineScope: CoroutineScope,
     private val callback: ConfirmCallback,
     private val resultChannel: Channel<ConfirmResult>
 ) : ConfirmDialogHandle {
-
-    var visuals by mutableStateOf(DialogVisuals())
-        private set
 
     private var awaitContinuation: CancellableContinuation<ConfirmResult>? = null
 
@@ -140,7 +174,7 @@ private class ConfirmDialogHandleImpl(
                         if (it.isActive) it.resume(result)
                     }
                 }
-                .onEach { visible.value = false }
+                .onEach { state.visible = false }
                 .collect { result ->
                     when (result) {
                         ConfirmResult.Confirmed -> callback.onConfirm?.invoke()
@@ -158,8 +192,9 @@ private class ConfirmDialogHandleImpl(
         dismiss: String?
     ) {
         coroutineScope.launch {
-            visuals = DialogVisuals(title, content, markdown, confirm, dismiss)
-            visible.value = true
+            state.visuals = DialogVisuals(title, content, markdown, confirm, dismiss)
+            state.awaiting = false
+            state.visible = true
         }
     }
 
@@ -171,12 +206,13 @@ private class ConfirmDialogHandleImpl(
         dismiss: String?
     ): ConfirmResult {
         coroutineScope.launch {
-            visuals = DialogVisuals(title, content, markdown, confirm, dismiss)
-            visible.value = true
+            state.visuals = DialogVisuals(title, content, markdown, confirm, dismiss)
+            state.awaiting = true
+            state.visible = true
         }
         return suspendCancellableCoroutine { cont ->
             awaitContinuation = cont.apply {
-                invokeOnCancellation { visible.value = false }
+                invokeOnCancellation { state.visible = false }
             }
         }
     }
@@ -220,23 +256,23 @@ fun rememberConfirmDialog(
 
 @Composable
 fun rememberConfirmDialog(callback: ConfirmCallback): ConfirmDialogHandle {
-    val visible = rememberSaveable { mutableStateOf(false) }
+    val state = rememberSaveable(saver = ConfirmDialogState.Saver) { ConfirmDialogState() }
     val scope = rememberCoroutineScope()
     val resultChannel = remember { Channel<ConfirmResult>() }
 
     val handle = remember {
-        ConfirmDialogHandleImpl(visible, scope, callback, resultChannel)
+        ConfirmDialogHandleImpl(state, scope, callback, resultChannel)
     }
 
-    if (visible.value) {
+    if (state.visible) {
         ConfirmDialogContent(
-            visuals = handle.visuals,
+            visuals = state.visuals,
             confirm = {
-                visible.value = false
+                state.visible = false
                 scope.launch { resultChannel.send(ConfirmResult.Confirmed) }
             },
             dismiss = {
-                visible.value = false
+                state.visible = false
                 scope.launch { resultChannel.send(ConfirmResult.Canceled) }
             }
         )
@@ -389,8 +425,8 @@ fun MagiskDialog(
 @Composable
 fun MagiskDialog(
     onDismissRequest: () -> Unit,
-    title: String? = null,
     modifier: Modifier = Modifier,
+    title: String? = null,
     dismissOnClickOutside: Boolean = true,
     dismissOnBackPress: Boolean = true,
     confirmText: String? = null,

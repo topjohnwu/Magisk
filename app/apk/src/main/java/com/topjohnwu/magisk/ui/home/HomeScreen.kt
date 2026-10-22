@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.ui.home
 
-import android.content.Intent
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
@@ -90,9 +89,10 @@ import com.topjohnwu.magisk.ui.component.MagiskDialog
 import com.topjohnwu.magisk.ui.component.MarkdownTextAsync
 import com.topjohnwu.magisk.ui.component.rememberLoadingDialog
 import com.topjohnwu.magisk.ui.component.verticalScrollbar
-import com.topjohnwu.magisk.ui.flash.FlashUtils
 import com.topjohnwu.magisk.ui.install.InstallDialog
 import com.topjohnwu.magisk.ui.install.InstallViewModel
+import com.topjohnwu.magisk.ui.navigation.LocalNavigator
+import com.topjohnwu.magisk.ui.navigation.Route
 import kotlinx.coroutines.launch
 import java.io.File
 import com.topjohnwu.magisk.core.R as CoreR
@@ -106,6 +106,7 @@ fun HomeScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val navigator = LocalNavigator.current
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val scope = rememberCoroutineScope()
     val loadingDialog = rememberLoadingDialog()
@@ -141,12 +142,7 @@ fun HomeScreen(
             onDismiss = { showUninstallDialog = false },
             onCompleteUninstall = {
                 showUninstallDialog = false
-                val intent = Intent(context, context.javaClass).apply {
-                    action = FlashUtils.INTENT_FLASH
-                    putExtra(FlashUtils.EXTRA_FLASH_ACTION, Const.Value.UNINSTALL)
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                }
-                context.startActivity(intent)
+                navigator.push(Route.Flash(Const.Value.UNINSTALL))
             },
             onRestoreImage = {
                 showUninstallDialog = false
