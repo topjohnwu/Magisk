@@ -98,6 +98,9 @@ impl MagiskD {
             MultiuserMode::OwnerManaged => uid = to_app_id(uid),
             _ => {}
         }
+        if to_app_id(uid) < AID_APP_START {
+            uid = to_app_id(uid);
+        }
 
         let mut granted = false;
         let mut output_fn =

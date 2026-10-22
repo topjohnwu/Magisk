@@ -178,13 +178,17 @@ impl MagiskD {
         setup_logfile();
         info!("** boot-complete triggered");
 
-        // Reset the bootloop counter once we have boot-complete
-        self.set_db_setting(DbEntryKey::BootloopCount, 0).log_ok();
-
         // At this point it's safe to create the folder
         let secure_dir = cstr!(SECURE_DIR);
         if !secure_dir.exists() {
             secure_dir.mkdir(0o700).log_ok();
+        }
+
+        // Reset the bootloop counter once we have boot-complete
+        self.set_db_setting(DbEntryKey::BootloopCount, 0).log_ok();
+        if self.is_headless {
+            self.set_db_setting(DbEntryKey::SuMultiuserMode, MultiuserMode::User as i32)
+                .log_ok();
         }
 
         setup_preinit_dir();
