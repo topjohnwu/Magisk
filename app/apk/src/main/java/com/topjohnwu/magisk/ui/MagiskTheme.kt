@@ -1,8 +1,13 @@
 package com.topjohnwu.magisk.ui
 
 import android.annotation.SuppressLint
+import android.content.res.Configuration
+import android.content.res.Resources
 import android.os.Build
+import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.LocalActivity
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ColorScheme
@@ -12,19 +17,17 @@ import androidx.compose.material3.Typography
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.view.WindowCompat
 import com.google.android.material.color.utilities.DynamicColor
 import com.google.android.material.color.utilities.Hct
 import com.google.android.material.color.utilities.MaterialDynamicColors
@@ -98,6 +101,30 @@ val MagiskAccentColor = Color(0xFF00AF9C)
 
 object ThemeState {
     var colorMode by mutableIntStateOf(Config.colorMode)
+}
+
+// Same values as androidx.activity's internal DefaultLightScrim / DefaultDarkScrim
+private val LightScrim = android.graphics.Color.argb(0xe6, 0xFF, 0xFF, 0xFF)
+private val DarkScrim = android.graphics.Color.argb(0x80, 0x1b, 0x1b, 0x1b)
+
+/**
+ * Enable edge-to-edge with system bar appearance derived from the app's color mode
+ * instead of the system's night mode.
+ */
+fun ComponentActivity.applySystemBarStyle() {
+    val isDark = { res: Resources ->
+        val nightMode = res.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+        ColorMode.fromValue(ThemeState.colorMode).isDark(nightMode == Configuration.UI_MODE_NIGHT_YES)
+    }
+    enableEdgeToEdge(
+        statusBarStyle = SystemBarStyle.auto(
+            android.graphics.Color.TRANSPARENT, android.graphics.Color.TRANSPARENT, isDark
+        ),
+        navigationBarStyle = SystemBarStyle.auto(LightScrim, DarkScrim, isDark),
+    )
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        window.isNavigationBarContrastEnforced = false
+    }
 }
 
 val MagiskShapes = Shapes(
@@ -198,14 +225,10 @@ fun MagiskTheme(
         else -> dynamicColorScheme(MagiskAccentColor, isDark = false)
     }
 
-    val activity = LocalActivity.current
-    val view = LocalView.current
-    if (!view.isInEditMode && activity != null) {
-        SideEffect {
-            val window = activity.window
-            val controller = WindowCompat.getInsetsController(window, view)
-            controller.isAppearanceLightStatusBars = !isDarkTheme
-            controller.isAppearanceLightNavigationBars = !isDarkTheme
+    val activity = LocalActivity.current as? ComponentActivity
+    if (activity != null) {
+        LaunchedEffect(activity, isDarkTheme) {
+            activity.applySystemBarStyle()
         }
     }
 

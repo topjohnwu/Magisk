@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -73,6 +74,7 @@ import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.ktx.timeDateFormat
 import com.topjohnwu.magisk.core.ktx.toTime
 import com.topjohnwu.magisk.core.model.su.SuLog
+import com.topjohnwu.magisk.ui.component.onlyHorizontal
 import com.topjohnwu.magisk.ui.component.rememberExternalStoragePermissionLauncher
 import com.topjohnwu.magisk.ui.component.verticalScrollbar
 import kotlinx.coroutines.launch
@@ -175,14 +177,17 @@ fun LogScreen(
             MagiskLogTab(
                 entries = uiState.magiskLogEntries,
                 nestedScrollConnection = scrollBehavior.nestedScrollConnection,
-                modifier = Modifier.padding(padding)
+                contentPadding = padding,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .consumeWindowInsets(padding),
             )
         } else {
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(padding),
+                    .consumeWindowInsets(padding),
                 beyondViewportPageCount = 0,
             ) { page ->
                 val isCurrentLogPage = pagerState.currentPage == page
@@ -208,11 +213,13 @@ fun LogScreen(
                     when (page) {
                         0 -> SuLogTab(
                             logs = uiState.suLogs,
-                            nestedScrollConnection = scrollBehavior.nestedScrollConnection
+                            nestedScrollConnection = scrollBehavior.nestedScrollConnection,
+                            contentPadding = padding,
                         )
                         1 -> MagiskLogTab(
                             entries = uiState.magiskLogEntries,
-                            nestedScrollConnection = scrollBehavior.nestedScrollConnection
+                            nestedScrollConnection = scrollBehavior.nestedScrollConnection,
+                            contentPadding = padding,
                         )
                     }
                 }
@@ -225,7 +232,8 @@ fun LogScreen(
 private fun SuLogTab(
     logs: List<SuLog>,
     nestedScrollConnection: NestedScrollConnection,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
     Column(modifier = modifier.fillMaxSize()) {
         if (logs.isEmpty()) {
@@ -233,6 +241,7 @@ private fun SuLogTab(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
+                    .padding(contentPadding)
                     .padding(horizontal = 16.dp),
                 contentAlignment = Alignment.Center
             ) {
@@ -251,8 +260,20 @@ private fun SuLogTab(
                 modifier = Modifier
                     .weight(1f)
                     .nestedScroll(nestedScrollConnection)
-                    .verticalScrollbar(gridState, contentPadding = PaddingValues(vertical = 12.dp)),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
+                    .padding(contentPadding.onlyHorizontal())
+                    .verticalScrollbar(
+                        gridState,
+                        contentPadding = PaddingValues(
+                            top = contentPadding.calculateTopPadding() + 12.dp,
+                            bottom = contentPadding.calculateBottomPadding() + 12.dp,
+                        ),
+                    ),
+                contentPadding = PaddingValues(
+                    start = 16.dp,
+                    top = contentPadding.calculateTopPadding() + 12.dp,
+                    end = 16.dp,
+                    bottom = contentPadding.calculateBottomPadding() + 12.dp,
+                ),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
             ) {
@@ -391,7 +412,8 @@ private fun SuActionBadge(
 private fun MagiskLogTab(
     entries: List<MagiskLogEntry>,
     nestedScrollConnection: NestedScrollConnection,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
     Column(modifier = modifier.fillMaxSize()) {
         if (entries.isEmpty()) {
@@ -399,6 +421,7 @@ private fun MagiskLogTab(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
+                    .padding(contentPadding)
                     .padding(horizontal = 16.dp),
                 contentAlignment = Alignment.Center
             ) {
@@ -417,8 +440,20 @@ private fun MagiskLogTab(
                     .weight(1f)
                     .fillMaxWidth()
                     .nestedScroll(nestedScrollConnection)
-                    .verticalScrollbar(listState, contentPadding = PaddingValues(vertical = 12.dp)),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
+                    .padding(contentPadding.onlyHorizontal())
+                    .verticalScrollbar(
+                        listState,
+                        contentPadding = PaddingValues(
+                            top = contentPadding.calculateTopPadding() + 12.dp,
+                            bottom = contentPadding.calculateBottomPadding() + 12.dp,
+                        ),
+                    ),
+                contentPadding = PaddingValues(
+                    start = 16.dp,
+                    top = contentPadding.calculateTopPadding() + 12.dp,
+                    end = 16.dp,
+                    bottom = contentPadding.calculateBottomPadding() + 12.dp,
+                ),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 // A log reads top to bottom, so keep one column but cap its width
                 horizontalAlignment = Alignment.CenterHorizontally,

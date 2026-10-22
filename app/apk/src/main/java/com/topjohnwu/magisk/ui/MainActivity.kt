@@ -11,7 +11,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.CancellationSignal
 import android.provider.OpenableColumns
-import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
@@ -83,6 +82,7 @@ class MainActivity : ComponentActivity(), SplashScreenHost {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        applySystemBarStyle()
         extension.onCreate(savedInstanceState)
         splashController.preOnCreate()
         super.onCreate(savedInstanceState)
@@ -113,8 +113,6 @@ class MainActivity : ComponentActivity(), SplashScreenHost {
                 Config.checkUpdate = it
             }
         }
-
-        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 
         val initialTab = getInitialTab(intent)
 

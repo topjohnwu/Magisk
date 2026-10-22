@@ -18,7 +18,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -149,11 +149,12 @@ fun InstallDialog(
             val scrollState = rememberScrollState()
             Scaffold(
                 modifier = if (fullScreen) modifier.fillMaxSize() else modifier
-                    .windowInsetsPadding(WindowInsets.systemBars)
+                    .windowInsetsPadding(WindowInsets.safeDrawing)
                     .padding(24.dp)
                     .widthIn(max = 560.dp)
                     .heightIn(max = 800.dp)
                     .clip(RoundedCornerShape(28.dp)),
+                contentWindowInsets = WindowInsets.safeDrawing,
                 containerColor = if (fullScreen) MaterialTheme.colorScheme.background
                     else MaterialTheme.colorScheme.surfaceContainerHigh,
                 topBar = {
