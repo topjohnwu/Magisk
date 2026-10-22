@@ -181,7 +181,6 @@
     <string name="flashing">Diegiama…</string>
     <string name="done">Baigta!</string>
     <string name="failure">Nepavyko!</string>
-    <string name="hide_app_title">Slepiama Magisk programėlė…</string>
     <string name="open_link_failed_toast">Nerasta programėlių nuorodos atidarymui</string>
     <string name="complete_uninstall">Visiškas pašalinimas</string>
     <string name="restore_img">Atkurti vaizdą</string>

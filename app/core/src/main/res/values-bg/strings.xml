@@ -181,7 +181,6 @@
     <string name="flashing">Инсталиране…</string>
     <string name="done">Готово!</string>
     <string name="failure">Грешка!</string>
-    <string name="hide_app_title">Скриване на приложението на Magisk…</string>
     <string name="open_link_failed_toast">Не е намерено приложение, с което препратката да бъде отворена</string>
     <string name="complete_uninstall">Премахване</string>
     <string name="restore_img">Възстановяване на образи</string>

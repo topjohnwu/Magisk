@@ -179,7 +179,6 @@
     <string name="flashing">Προγραμματισμός σε εξέλιξη</string>
     <string name="done">Ολοκληρώθηκε</string>
     <string name="failure">Αποτυχία</string>
-    <string name="hide_app_title">Απόκρυψη της εφαρμογής Magisk…</string>
     <string name="open_link_failed_toast">Δεν βρέθηκε εφαρμογή για άνοιγμα του συνδέσμου</string>
     <string name="complete_uninstall">Πλήρης απεγκατάσταση</string>
     <string name="restore_img">Επαναφορά Images</string>

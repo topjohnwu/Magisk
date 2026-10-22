@@ -175,7 +175,6 @@
     <string name="flashing">فلیش ہو رہا ہے…</string>
     <string name="done">ہو گیا!</string>
     <string name="failure">ناکام!</string>
-    <string name="hide_app_title">Magisk ایپ کو چھپایا جا رہا ہے…</string>
     <string name="open_link_failed_toast">لنک کھولنے کے لیے کوئی ایپ نہیں ملی</string>
     <string name="complete_uninstall">مکمل ان انسٹال</string>
     <string name="restore_img">تصاویر بحال کریں</string>

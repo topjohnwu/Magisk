@@ -188,7 +188,6 @@
     <string name="flashing">Орнатуда…</string>
     <string name="done">Дайын!</string>
     <string name="failure">Қате!</string>
-    <string name="hide_app_title">Magisk қолданбасын жасыруда…</string>
     <string name="open_link_failed_toast">Сілтемені аша алатын қолданба табылмады</string>
     <string name="complete_uninstall">Толығымен жою</string>
     <string name="restore_img">Жад бөлімдерін қалпына келтіру</string>

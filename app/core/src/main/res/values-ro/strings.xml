@@ -190,7 +190,6 @@
     <string name="flashing">Se scrie în memoria flash…</string>
     <string name="done">Terminat!</string>
     <string name="failure">Eșec!</string>
-    <string name="hide_app_title">Se ascunde aplicația Magisk…</string>
     <string name="open_link_failed_toast">Nu a fost găsită nicio aplicație pentru a deschide linkul</string>
     <string name="complete_uninstall">Finalizează dezinstalarea</string>
     <string name="restore_img">Restaurează imagini</string>

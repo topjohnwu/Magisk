@@ -164,7 +164,6 @@
     <string name="flashing">მიმდინარეობს ჩაშენება…</string>
     <string name="done">დასრულდა!</string>
     <string name="failure">ჩაიშალა</string>
-    <string name="hide_app_title">ვმალავთ Magisk-ის აპს…</string>
     <string name="open_link_failed_toast">ლინკის გამხსნელი აპლიკაცია ვერ მოიძებნა</string>
     <string name="complete_uninstall">დეინსტალაციის დასრულება</string>
     <string name="restore_img">სურათის აღდგენა</string>

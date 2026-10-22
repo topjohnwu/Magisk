@@ -208,7 +208,6 @@
     <string name="flashing">Флешовање…</string>    <string name="done">Завршено!</string>
     <string name="done_action">Покретање акције %1$s завршено</string>
     <string name="failure">Неуспешно!</string>
-    <string name="hide_app_title">Скривање Magisk апликације…</string>
     <string name="open_link_failed_toast">Није пронађена апликација за отварање линка</string>
     <string name="complete_uninstall">Комплетна деинсталација</string>
     <string name="restore_img">Поврати слике</string>

@@ -190,7 +190,6 @@
     <string name="flashing">Flashando…</string>    <string name="done">Concluído!</string>
     <string name="done_action">Ação de execução de %1$s concluída</string>
     <string name="failure">Falhou!</string>
-    <string name="hide_app_title">Ocultando o app do Magisk…</string>
     <string name="open_link_failed_toast">Nenhum app encontrado para abrir o link</string>
     <string name="complete_uninstall">Desinstalação completa</string>
     <string name="restore_img">Restaurar imagens</string>

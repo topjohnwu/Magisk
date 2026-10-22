@@ -203,7 +203,6 @@
     <string name="flashing">Flashuji…</string>    <string name="done">Dokončeno!</string>
     <string name="done_action">Akce %1$s byla dokončena</string>
     <string name="failure">Nepodařilo se!</string>
-    <string name="hide_app_title">Skrývám aplikaci Magisk…</string>
     <string name="open_link_failed_toast">Nebyla nalezena žádná aplikace pro otevření odkazu</string>
     <string name="complete_uninstall">Kompletní odinstalace</string>
     <string name="restore_img">Obnovit obrazy</string>

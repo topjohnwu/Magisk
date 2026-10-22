@@ -218,7 +218,6 @@
     <string name="flashing">正在刷入</string>    <string name="done">完成！</string>
     <string name="done_action">%1$s 操作运行完成</string>
     <string name="failure">失败</string>
-    <string name="hide_app_title">正在隐藏 Magisk 应用</string>
     <string name="open_link_failed_toast">找不到能打开此链接的应用</string>
     <string name="complete_uninstall">完全卸载</string>
     <string name="restore_img">还原原厂映像</string>

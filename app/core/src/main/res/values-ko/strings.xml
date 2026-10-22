@@ -177,7 +177,6 @@
     <string name="flashing">설치 중…</string>
     <string name="done">완료!</string>
     <string name="failure">실패!</string>
-    <string name="hide_app_title">Magisk 앱 숨기는 중…</string>
     <string name="open_link_failed_toast">링크를 열 수 있는 앱이 없습니다.</string>
     <string name="complete_uninstall">완전히 제거</string>
     <string name="restore_img">이미지 복구</string>

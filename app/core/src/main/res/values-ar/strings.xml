@@ -207,7 +207,6 @@
     <string name="flashing">جارٍ التثبيت…</string>    <string name="done">تم!</string>
     <string name="done_action">اكتمل تنفيذ إجراء %1$s</string>
     <string name="failure">فشل!</string>
-    <string name="hide_app_title">جارٍ إخفاء تطبيق Magisk…</string>
     <string name="open_link_failed_toast">لا يوجد تطبيق لفتح الرابط</string>
     <string name="complete_uninstall">إلغاء تثبيت كامل</string>
     <string name="restore_img">استعادة الملف</string>

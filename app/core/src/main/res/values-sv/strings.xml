@@ -165,7 +165,6 @@
     <string name="flashing">Flashar…</string>
     <string name="done">Färdig!</string>
     <string name="failure">Misslyckades!</string>
-    <string name="hide_app_title">Gömmer Magisk-appen…</string>
     <string name="open_link_failed_toast">Ingen app hittades som kan öppna länken link</string>
     <string name="complete_uninstall">Komplett avinstallation</string>
     <string name="restore_img">Återställ avbilder</string>

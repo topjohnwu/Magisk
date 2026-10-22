@@ -151,7 +151,6 @@
     <string name="flashing">Усталёўка…</string>
     <string name="done">Завершана!</string>
     <string name="failure">Не атрымалася</string>
-    <string name="hide_app_title">Хаванне праграмы Magisk…</string>
     <string name="open_link_failed_toast">Праграмы для адкрыцця спасылкі не знойдзена</string>
     <string name="complete_uninstall">Поўнае выдаленне</string>
     <string name="restore_img">Аднавіць раздзелы</string>

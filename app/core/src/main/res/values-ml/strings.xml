@@ -179,7 +179,6 @@
     <string name="flashing">ഫ്ലാഷ് ചെയ്യുന്നു...</string>
     <string name="done">ചെയ്തു!</string>
     <string name="failure">പരാജയപ്പെട്ടു!</string>
-    <string name="hide_app_title">മജിസ്‌ക് ആപ്പ് മറയ്ക്കുന്നു...</string>
     <string name="open_link_failed_toast">ലിങ്ക് തുറക്കാൻ ആപ്പൊന്നും കണ്ടെത്തിയില്ല</string>
     <string name="complete_uninstall">പൂർണ്ണമായും അൺഇൻസ്റ്റാൾ ചെയ്യുക</string>
     <string name="restore_img">ഇമേജുകൾ റിസ്റ്റോർ ചെയ്യുക</string>

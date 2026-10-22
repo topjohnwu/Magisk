@@ -5,13 +5,11 @@ import android.os.Build
 import androidx.annotation.Keep
 import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.topjohnwu.magisk.core.BuildConfig.APP_PACKAGE_NAME
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.download.DownloadNotifier
 import com.topjohnwu.magisk.core.download.DownloadProcessor
 import com.topjohnwu.magisk.core.ktx.cachedFile
 import com.topjohnwu.magisk.core.model.module.LocalModule
-import com.topjohnwu.magisk.core.tasks.AppMigration
 import com.topjohnwu.magisk.core.tasks.FlashZip
 import com.topjohnwu.magisk.core.tasks.MagiskInstaller
 import com.topjohnwu.magisk.core.utils.RootUtils
@@ -268,29 +266,5 @@ class Environment : TestCommon {
         setupInvalidZygiskModule(update)
         setupRemoveModule(root)
         setupUpgradeModule(root, update)
-    }
-
-    @Test
-    fun setupAppHide() {
-        runBlocking {
-            assertTrue(
-                "App hiding failed",
-                AppMigration.patchAndHide(
-                    context = appContext,
-                    label = "Settings",
-                    pkg = "repackaged.$APP_PACKAGE_NAME"
-                )
-            )
-        }
-    }
-
-    @Test
-    fun setupAppRestore() {
-        runBlocking {
-            assertTrue(
-                "App restoration failed",
-                AppMigration.restoreApp(appContext)
-            )
-        }
     }
 }

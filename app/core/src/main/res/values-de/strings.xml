@@ -187,7 +187,6 @@
     <string name="flashing">Flashen …</string>
     <string name="done">Fertig!</string>
     <string name="failure">Fehlgeschlagen</string>
-    <string name="hide_app_title">Magisk-App verstecken …</string>
     <string name="open_link_failed_toast">Keine App zum öffnen des Links gefunden</string>
     <string name="complete_uninstall">Vollständig deinstallieren</string>
     <string name="restore_img">Image wiederherstellen</string>
