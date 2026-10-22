@@ -224,6 +224,7 @@ pub mod ffi {
         fn get_db_setting(&self, key: DbEntryKey) -> i32;
         #[cxx_name = "set_db_setting"]
         fn set_db_setting_for_cxx(&self, key: DbEntryKey, value: i32) -> bool;
+        fn get_app_id(&self, pkg: &str) -> i32;
 
         #[Self = MagiskD]
         #[cxx_name = "Get"]

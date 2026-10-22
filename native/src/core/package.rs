@@ -3,6 +3,7 @@ use crate::daemon::{AID_APP_END, AID_APP_START, MagiskD, to_app_id};
 #[cfg(all(feature = "check-signature", not(debug_assertions)))]
 use crate::ffi::uninstall_pkg;
 use base::WalkResult::{Abort, Continue, Skip};
+use base::const_format::concatcp;
 use base::{
     BufReadExt, Directory, FsPathBuilder, LoggedResult, ReadExt, ResultExt, Utf8CStrBuf,
     Utf8CString, cstr, error, pre_order_walk,
@@ -47,7 +48,7 @@ macro_rules! bad_apk {
  * This method extracts the first certificate of the first signer
  * within the APK v2 signature block.
  */
-fn read_certificate(apk: &mut File, version: i32) -> Vec<u8> {
+fn read_certificate(apk: &mut File) -> Vec<u8> {
     let res = || -> io::Result<Vec<u8>> {
         let mut u32_val = 0u32;
         let mut u64_val = 0u64;
@@ -78,24 +79,22 @@ fn read_certificate(apk: &mut File, version: i32) -> Vec<u8> {
         apk.read_pod(&mut central_dir_off)?;
 
         // Code for parse APK comment to get version code
-        if version >= 0 {
-            let mut comment_sz = 0u16;
-            apk.read_pod(&mut comment_sz)?;
-            let mut comment = vec![0u8; comment_sz as usize];
-            apk.read_exact(&mut comment)?;
-            let mut comment = Cursor::new(&comment);
-            let mut apk_ver = 0;
-            comment.for_each_prop(|k, v| {
-                if k == "versionCode" {
-                    apk_ver = v.parse::<i32>().unwrap_or(0);
-                    false
-                } else {
-                    true
-                }
-            });
-            if version > apk_ver {
-                Err(bad_apk!("APK version too low"))?;
+        let mut comment_sz = 0u16;
+        apk.read_pod(&mut comment_sz)?;
+        let mut comment = vec![0u8; comment_sz as usize];
+        apk.read_exact(&mut comment)?;
+        let mut comment = Cursor::new(&comment);
+        let mut apk_ver = 0;
+        comment.for_each_prop(|k, v| {
+            if k == "versionCode" {
+                apk_ver = v.parse::<i32>().unwrap_or(0);
+                false
+            } else {
+                true
             }
+        });
+        if MAGISK_VER_CODE > apk_ver {
+            Err(bad_apk!("APK version too low"))?;
         }
 
         // Next, find the start of the APK signing block
@@ -154,15 +153,13 @@ fn find_apk_path() -> Option<Utf8CString> {
         if !e.is_dir() {
             return Ok(Skip);
         }
-        let name_bytes = e.name().as_bytes();
-        if name_bytes.starts_with(APP_PACKAGE_NAME.as_bytes())
-            && name_bytes.get(APP_PACKAGE_NAME.len()) == Some(&b'-')
-        {
+        let name = e.name();
+        if name.starts_with(concatcp!(APP_PACKAGE_NAME, "-")) {
             // Found the APK path, we can abort now
             buf.append_path(path).append_path("base.apk");
             return Ok(Abort);
         }
-        if name_bytes.starts_with(b"~~") {
+        if name.starts_with("~~") {
             return Ok(Continue);
         }
         Ok(Skip)
@@ -171,30 +168,18 @@ fn find_apk_path() -> Option<Utf8CString> {
     if buf.is_empty() { None } else { Some(buf) }
 }
 
-fn get_package_uid(user: i32) -> i32 {
+fn get_package_uid(user: i32, pkg: &str) -> i32 {
     let path = cstr::buf::default()
         .join_path(APP_DATA_DIR)
         .join_path_fmt(user)
-        .join_path(APP_PACKAGE_NAME);
+        .join_path(pkg);
     path.get_attr()
         .map(|attr| attr.st.st_uid as i32)
         .unwrap_or(-1)
 }
 
-enum Status {
-    Installed,
-    NotInstalled,
-    #[cfg(all(feature = "check-signature", not(debug_assertions)))]
-    CertMismatch,
-}
-
 #[derive(Default)]
-pub struct ManagerInfo {
-    tracked_file: TrackedFile,
-}
-
-#[derive(Default)]
-struct TrackedFile {
+pub struct TrackedFile {
     path: Utf8CString,
     timestamp: Duration,
 }
@@ -222,77 +207,49 @@ impl TrackedFile {
     }
 }
 
-impl ManagerInfo {
-    fn check_orig(&mut self) -> Status {
-        let Some(apk) = find_apk_path() else {
-            return Status::NotInstalled;
-        };
+fn check_apk(tracked: &mut TrackedFile) -> bool {
+    let Some(apk) = find_apk_path() else {
+        return false;
+    };
 
-        let cert = match apk.open(OFlag::O_RDONLY | OFlag::O_CLOEXEC) {
-            Ok(mut fd) => read_certificate(&mut fd, MAGISK_VER_CODE),
-            Err(_) => return Status::NotInstalled,
-        };
+    let cert = match apk.open(OFlag::O_RDONLY | OFlag::O_CLOEXEC) {
+        Ok(mut fd) => read_certificate(&mut fd),
+        Err(_) => return false,
+    };
 
-        if cert.is_empty() || (!TRUSTED_CERT.is_empty() && cert != TRUSTED_CERT) {
-            error!("pkg: APK signature mismatch: {}", apk);
-            #[cfg(all(feature = "check-signature", not(debug_assertions)))]
-            {
-                uninstall_pkg(cstr!(APP_PACKAGE_NAME));
-                return Status::CertMismatch;
-            }
+    if cert.is_empty() || (!TRUSTED_CERT.is_empty() && cert != TRUSTED_CERT) {
+        error!("pkg: APK signature mismatch: {}", apk);
+        #[cfg(all(feature = "check-signature", not(debug_assertions)))]
+        {
+            uninstall_pkg(cstr!(APP_PACKAGE_NAME));
+            return false;
         }
-
-        self.tracked_file = TrackedFile::new(apk);
-        Status::Installed
     }
 
-    fn get_manager(&mut self, user: i32) -> (i32, &str) {
-        if self.tracked_file.is_same() {
-            // no APK
-            if &self.tracked_file.path == PACKAGES_XML {
-                return (-1, "");
-            }
-            // orig APK is still the same
-            let uid = get_package_uid(user);
-            return if uid < 0 {
-                (-1, "")
-            } else {
-                (uid, APP_PACKAGE_NAME)
-            };
-        }
-
-        match self.check_orig() {
-            Status::Installed => {
-                let uid = get_package_uid(user);
-                return if uid < 0 {
-                    (-1, "")
-                } else {
-                    (uid, APP_PACKAGE_NAME)
-                };
-            }
-            #[cfg(all(feature = "check-signature", not(debug_assertions)))]
-            Status::CertMismatch => {}
-            Status::NotInstalled => {}
-        }
-
-        // If we cannot find any manager, track packages.xml for new package installs
-        self.tracked_file = TrackedFile::new(PACKAGES_XML.into());
-
-        (-1, "")
-    }
+    *tracked = TrackedFile::new(apk);
+    true
 }
 
 impl MagiskD {
     pub fn get_manager_uid(&self, user: i32) -> i32 {
-        let mut info = self.manager_info.lock();
-        let (uid, _) = info.get_manager(user);
-        uid
-    }
+        let mut tracked = self.manager_info.lock();
+        if tracked.is_same() {
+            return if &tracked.path == PACKAGES_XML {
+                // no APK
+                -1
+            } else {
+                // APK is still the same
+                get_package_uid(user, APP_PACKAGE_NAME)
+            };
+        }
 
-    pub fn get_manager(&self, user: i32) -> (i32, String) {
-        let mut info = self.manager_info.lock();
-        let (uid, pkg) = info.get_manager(user);
-        (uid, pkg.to_string())
+        if check_apk(&mut tracked) {
+            return get_package_uid(user, APP_PACKAGE_NAME);
+        }
+
+        // If we cannot find any manager, track packages.xml for new package installs
+        *tracked = TrackedFile::new(PACKAGES_XML.into());
+        -1
     }
 
     // app_id = app_no + AID_APP_START
@@ -350,6 +307,16 @@ impl MagiskD {
         users.sort_unstable();
         users.dedup();
         users
+    }
+
+    pub fn get_app_id(&self, pkg: &str) -> i32 {
+        for user in self.get_users() {
+            let uid = get_package_uid(user, pkg);
+            if uid >= 0 {
+                return to_app_id(uid);
+            }
+        }
+        0
     }
 }
 
