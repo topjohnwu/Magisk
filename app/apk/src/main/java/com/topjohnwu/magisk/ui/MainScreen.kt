@@ -10,11 +10,15 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
@@ -178,8 +182,11 @@ fun MainScreen(
             // In the rail header, keep the FAB slot even when the FAB is hidden so the rail
             // items don't jump on tab switches, and center the FAB in the collapsed rail.
             // Skip the slot if no tab has a FAB (no root).
+            // In bar mode, the scaffold places this slot at the end edge of the window without
+            // considering insets, so pad it to keep the FAB clear of side system bars and cutouts.
             Box(
-                if (isBar || !hasFabTab) Modifier
+                if (isBar) Modifier.windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.End))
+                else if (!hasFabTab) Modifier
                 else Modifier.padding(start = 20.dp).heightIn(min = 56.dp)
             ) {
                 AnimatedVisibility(
