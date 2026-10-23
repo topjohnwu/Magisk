@@ -38,6 +38,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.compose.dropUnlessResumed
 import com.topjohnwu.magisk.ui.component.onlyHorizontal
 import com.topjohnwu.magisk.ui.component.rememberBiometricAuth
 import com.topjohnwu.magisk.ui.component.verticalScrollbar
@@ -58,9 +59,11 @@ fun SuperuserScreen(
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val navigator = LocalNavigator.current
     val requireAuth = rememberBiometricAuth()
+    // Drop taps while a screen transition runs, so a quick second tap can't open another screen
+    val openGrant = dropUnlessResumed { navigator.push(Route.SuperuserGrant) }
 
     DisposableEffect(onRegisterFab) {
-        onRegisterFab?.invoke { navigator.push(Route.SuperuserGrant) }
+        onRegisterFab?.invoke(openGrant)
         onDispose {
             onRegisterFab?.invoke(null)
         }
@@ -77,7 +80,7 @@ fun SuperuserScreen(
         floatingActionButton = {
             if (onRegisterFab == null) {
                 FloatingActionButton(
-                    onClick = { navigator.push(Route.SuperuserGrant) },
+                    onClick = openGrant,
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     content = {
@@ -173,7 +176,7 @@ fun SuperuserScreen(
                             viewModel.togglePolicy(item)
                         }
                     },
-                    onDetail = { navigator.push(Route.SuperuserDetail(item.uid)) },
+                    onDetail = dropUnlessResumed { navigator.push(Route.SuperuserDetail(item.uid)) },
                     modifier = if (isLast && contentFocusRequester != null) {
                         Modifier.focusRequester(contentFocusRequester)
                     } else Modifier,

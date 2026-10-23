@@ -34,6 +34,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.compose.dropUnlessResumed
 import com.topjohnwu.magisk.core.utils.LocaleSetting
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.ui.component.AdaptiveColumns
@@ -79,7 +80,8 @@ fun SettingsScreen(
         onCreateHosts = viewModel::createHosts,
         onToggleZygisk = viewModel::toggleZygisk,
         onToggleDenyList = viewModel::toggleDenyList,
-        onNavigateToDenyList = viewModel::navigateToDenyList,
+        // Drop taps while a screen transition runs, so a quick second tap can't push again
+        onNavigateToDenyList = dropUnlessResumed { viewModel.navigateToDenyList() },
         onToggleSuAuth = { newValue ->
             requireAuth(force = true) {
                 viewModel.setSuAuth(newValue)

@@ -72,6 +72,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.compose.dropUnlessResumed
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.di.ServiceLocator
@@ -374,7 +375,11 @@ private fun ModuleCard(
                         if (item.showAction) {
                             FilledTonalButton(
                                 contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
-                                onClick = { viewModel.runAction(item.module.id, item.module.name) },
+                                // Drop taps while a screen transition runs, so a quick
+                                // second tap can't open another screen
+                                onClick = dropUnlessResumed {
+                                    viewModel.runAction(item.module.id, item.module.name)
+                                },
                             ) {
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
