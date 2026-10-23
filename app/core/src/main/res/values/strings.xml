@@ -237,4 +237,6 @@
     <string name="install_unknown_denied">Allow \"Install unknown apps\" to enable this functionality</string>
     <string name="app_not_found">No app found to handle this action</string>
     <string name="reboot_apply_change">Reboot to apply changes</string>
+    <string name="running_exit_title">Execution in progress</string>
+    <string name="running_exit_msg">Are you sure you want to exit? The running operation may not complete.</string>
 </resources>

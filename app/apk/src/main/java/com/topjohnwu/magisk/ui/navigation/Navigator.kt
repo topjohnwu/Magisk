@@ -1,23 +1,22 @@
 package com.topjohnwu.magisk.ui.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 
-class Navigator(initialKey: NavKey) {
-    val backStack: SnapshotStateList<NavKey> = mutableStateListOf(initialKey)
+class Navigator(val backStack: NavBackStack<NavKey>) {
+    constructor(vararg initialKeys: NavKey) : this(NavBackStack(*initialKeys))
 
     fun push(key: NavKey) {
         backStack.add(key)
     }
 
-    fun pop() {
-        backStack.removeLastOrNull()
+    fun pop(): Boolean {
+        return backStack.removeLastOrNull() != null
     }
 
     fun current(): NavKey? = backStack.lastOrNull()
@@ -26,20 +25,22 @@ class Navigator(initialKey: NavKey) {
         val Saver: Saver<Navigator, Any> = listSaver(
             save = { navigator -> navigator.backStack.toList() },
             restore = { savedList ->
-                val initialKey = savedList.firstOrNull() ?: Route.Main
-                Navigator(initialKey).also {
-                    it.backStack.clear()
-                    it.backStack.addAll(savedList)
+                val stack = NavBackStack<NavKey>()
+                if (savedList.isNotEmpty()) {
+                    stack.addAll(savedList)
+                } else {
+                    stack.add(Route.Main)
                 }
+                Navigator(stack)
             }
         )
     }
 }
 
 @Composable
-fun rememberNavigator(startRoute: NavKey): Navigator {
-    return rememberSaveable(startRoute, saver = Navigator.Saver) {
-        Navigator(startRoute)
+fun rememberNavigator(vararg startRoutes: NavKey = arrayOf(Route.Main)): Navigator {
+    return rememberSaveable(saver = Navigator.Saver) {
+        Navigator(*startRoutes)
     }
 }
 
