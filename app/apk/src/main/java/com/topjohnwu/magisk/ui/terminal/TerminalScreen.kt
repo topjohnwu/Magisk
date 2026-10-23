@@ -57,17 +57,17 @@ fun TerminalScreen(
     var transcriptRows by remember { mutableIntStateOf(0) }
     var maxUsedColumn by remember { mutableIntStateOf(0) }
 
+    // Re-read emulator state after new output or a resize, and redraw
+    fun refresh() {
+        transcriptRows = emulator.screen.activeTranscriptRows
+        maxUsedColumn = emulator.maxUsedColumn
+        topRow = if (scrolledToBottom) 0 else topRow.coerceAtLeast(-transcriptRows)
+        drawTrigger++
+    }
+
     DisposableEffect(emulator) {
-        fun syncState() {
-            transcriptRows = emulator.screen.activeTranscriptRows
-            maxUsedColumn = emulator.maxUsedColumn
-        }
-        syncState()
-        emulator.onScreenUpdate = {
-            if (scrolledToBottom) topRow = 0
-            syncState()
-            drawTrigger++
-        }
+        refresh()
+        emulator.onScreenUpdate = { refresh() }
         onDispose {
             emulator.onScreenUpdate = null
         }
@@ -88,6 +88,9 @@ fun TerminalScreen(
 
         LaunchedEffect(cols, rows) {
             emulator.resize(cols, rows, renderer.fontWidth.toInt(), renderer.fontLineSpacing)
+            // The emulator outlives this screen (e.g. across rotation), and the first frame was drawn
+            // before this resize, so redraw with the new geometry.
+            refresh()
             currentOnResized()
         }
 
