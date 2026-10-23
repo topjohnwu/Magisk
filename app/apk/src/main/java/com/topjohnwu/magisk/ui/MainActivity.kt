@@ -77,6 +77,8 @@ class MainActivity : ComponentActivity(), SplashScreenHost {
     override val splashController = SplashController(this)
 
     private val intentState = MutableStateFlow(0)
+    // A tab requested by a new intent while the activity is running (it's singleTask)
+    private val tabRequest = MutableStateFlow<Int?>(null)
     internal val showUnsupported = MutableStateFlow<List<Pair<Int, Int>>>(emptyList())
 
     override fun attachBaseContext(base: Context) {
@@ -116,7 +118,7 @@ class MainActivity : ComponentActivity(), SplashScreenHost {
             }
         }
 
-        val initialTab = getInitialTab(intent)
+        val initialTab = getRequestedTab(intent) ?: Tab.HOME.ordinal
 
         setContent {
             MagiskTheme {
@@ -150,8 +152,11 @@ class MainActivity : ComponentActivity(), SplashScreenHost {
                                     val superuserVm: SuperuserViewModel = viewModel(
                                         viewModelStoreOwner = this@MainActivity, factory = VMFactory
                                     )
+                                    val requestedTab by tabRequest.collectAsStateWithLifecycle()
                                     MainScreen(
                                         initialTab = initialTab,
+                                        requestedTab = requestedTab,
+                                        onTabRequestHandled = { tabRequest.value = null },
                                         superuserViewModel = superuserVm,
                                     )
                                 }
@@ -336,10 +341,11 @@ class MainActivity : ComponentActivity(), SplashScreenHost {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
+        getRequestedTab(intent)?.let { tabRequest.value = it }
         intentState.value += 1
     }
 
-    private fun getInitialTab(intent: Intent?): Int {
+    private fun getRequestedTab(intent: Intent?): Int? {
         val section = when {
             intent?.action == Intent.ACTION_APPLICATION_PREFERENCES -> Const.Nav.SETTINGS
             intent?.action == FlashUtils.INTENT_FLASH &&
@@ -347,10 +353,11 @@ class MainActivity : ComponentActivity(), SplashScreenHost {
             else -> intent?.getStringExtra(Const.Key.OPEN_SECTION)
         }
         return when (section) {
+            Const.Nav.HOME -> Tab.HOME.ordinal
             Const.Nav.SUPERUSER -> Tab.SUPERUSER.ordinal
             Const.Nav.MODULES -> Tab.MODULES.ordinal
             Const.Nav.SETTINGS -> Tab.SETTINGS.ordinal
-            else -> Tab.HOME.ordinal
+            else -> null
         }
     }
 
