@@ -72,6 +72,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.core.content.getSystemService
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.compose.dropUnlessResumed
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.BuildConfig
 import com.topjohnwu.magisk.core.Config
@@ -143,7 +144,8 @@ fun HomeScreen(
     if (showUninstallDialog) {
         UninstallComposableDialog(
             onDismiss = { showUninstallDialog = false },
-            onCompleteUninstall = {
+            // Drop taps while a screen transition runs, so a quick second tap can't push again
+            onCompleteUninstall = dropUnlessResumed {
                 showUninstallDialog = false
                 navigator.push(Route.Flash(Const.Value.UNINSTALL))
             },
