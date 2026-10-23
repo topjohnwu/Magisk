@@ -16,7 +16,11 @@ class Navigator(val backStack: NavBackStack<NavKey>) {
     }
 
     fun pop(): Boolean {
-        return backStack.removeLastOrNull() != null
+        // Never remove the root: NavDisplay requires a non-empty back stack, and a screen's
+        // back button stays clickable during its exit animation, so it can be tapped again
+        if (backStack.size <= 1) return false
+        backStack.removeAt(backStack.lastIndex)
+        return true
     }
 
     fun current(): NavKey? = backStack.lastOrNull()
