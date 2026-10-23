@@ -1,6 +1,6 @@
 package com.topjohnwu.magisk.ui.settings
 
-import android.os.Build
+import android.webkit.URLUtil
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -22,7 +22,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -30,17 +29,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.topjohnwu.magisk.core.Config
-import com.topjohnwu.magisk.core.Const
-import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.core.model.ColorMode
 import com.topjohnwu.magisk.core.utils.LocaleSetting
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
-import com.topjohnwu.magisk.ui.ThemeState
 import com.topjohnwu.magisk.ui.component.AdaptiveColumns
 import com.topjohnwu.magisk.ui.component.MagiskDialog
 import com.topjohnwu.magisk.ui.component.SettingsArrow
@@ -48,17 +43,87 @@ import com.topjohnwu.magisk.ui.component.SettingsDropdown
 import com.topjohnwu.magisk.ui.component.SettingsSwitch
 import com.topjohnwu.magisk.ui.component.SmallTitle
 import com.topjohnwu.magisk.ui.component.onlyHorizontal
+import com.topjohnwu.magisk.ui.component.rememberBiometricAuth
 import com.topjohnwu.magisk.ui.component.verticalScrollbar
 import com.topjohnwu.magisk.core.R as CoreR
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val requireAuth = rememberBiometricAuth()
+
+    LifecycleResumeEffect(viewModel) {
+        viewModel.refreshEnvironment()
+        onPauseOrDispose {}
+    }
+
+    SettingsContent(
+        uiState = uiState,
+        onOpenSystemLocale = {
+            context.startActivity(LocaleSetting.localeSettingsIntent)
+        },
+        onLanguageSelected = viewModel::setLanguage,
+        onColorModeSelected = viewModel::setColorMode,
+        onUpdateChannelSelected = viewModel::setUpdateChannel,
+        onOpenCustomUrlDialog = viewModel::openCustomChannelUrlDialog,
+        onSaveCustomUrl = viewModel::saveCustomChannelUrl,
+        onToggleDoh = viewModel::setDoh,
+        onToggleCheckUpdate = viewModel::setCheckUpdate,
+        onOpenDownloadPathDialog = viewModel::openDownloadPathDialog,
+        onSaveDownloadPath = viewModel::saveDownloadPath,
+        onToggleRandomPackageName = viewModel::setRandomPackageName,
+        onCreateHosts = viewModel::createHosts,
+        onToggleZygisk = viewModel::toggleZygisk,
+        onToggleDenyList = viewModel::toggleDenyList,
+        onNavigateToDenyList = viewModel::navigateToDenyList,
+        onToggleSuAuth = { newValue ->
+            requireAuth(force = true) {
+                viewModel.setSuAuth(newValue)
+            }
+        },
+        onMultiuserModeSelected = viewModel::setMultiuserMode,
+        onNamespaceModeSelected = viewModel::setNamespaceMode,
+        onNotificationModeSelected = viewModel::setNotificationMode,
+        onToggleSuRestrict = viewModel::setSuRestrict,
+        onDismissDialog = viewModel::dismissDialog,
+        modifier = modifier,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SettingsContent(
+    uiState: SettingsUiState,
+    onOpenSystemLocale: () -> Unit,
+    onLanguageSelected: (Int) -> Unit,
+    onColorModeSelected: (Int) -> Unit,
+    onUpdateChannelSelected: (Int) -> Unit,
+    onOpenCustomUrlDialog: () -> Unit,
+    onSaveCustomUrl: (String) -> Unit,
+    onToggleDoh: (Boolean) -> Unit,
+    onToggleCheckUpdate: (Boolean) -> Unit,
+    onOpenDownloadPathDialog: () -> Unit,
+    onSaveDownloadPath: (String) -> Unit,
+    onToggleRandomPackageName: (Boolean) -> Unit,
+    onCreateHosts: () -> Unit,
+    onToggleZygisk: (Boolean) -> Unit,
+    onToggleDenyList: (Boolean) -> Unit,
+    onNavigateToDenyList: () -> Unit,
+    onToggleSuAuth: (Boolean) -> Unit,
+    onMultiuserModeSelected: (Int) -> Unit,
+    onNamespaceModeSelected: (Int) -> Unit,
+    onNotificationModeSelected: (Int) -> Unit,
+    onToggleSuRestrict: (Boolean) -> Unit,
+    onDismissDialog: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val scrollState = rememberScrollState()
+
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -70,7 +135,6 @@ fun SettingsScreen(
     ) { padding ->
         // Without root, the Magisk and Superuser sections are hidden, so move the
         // App section to the second column to avoid leaving it empty.
-        val hasRootSections = Info.env.isActive || Info.showSuperUser
         // Each section emits a title and a card, so wrap them in a Column to keep them together
         AdaptiveColumns(
             modifier = Modifier
@@ -94,23 +158,85 @@ fun SettingsScreen(
                 ),
             spacing = 16.dp,
             first = {
-                Column { CustomizationSection(viewModel = viewModel) }
-                if (hasRootSections) {
-                    Column { AppSettingsSection() }
+                Column {
+                    CustomizationSection(
+                        uiState = uiState,
+                        onOpenSystemLocale = onOpenSystemLocale,
+                        onLanguageSelected = onLanguageSelected,
+                        onColorModeSelected = onColorModeSelected,
+                    )
+                }
+                if (uiState.hasRootSections) {
+                    Column {
+                        AppSettingsSection(
+                            uiState = uiState,
+                            onUpdateChannelSelected = onUpdateChannelSelected,
+                            onOpenCustomUrlDialog = onOpenCustomUrlDialog,
+                            onToggleDoh = onToggleDoh,
+                            onToggleCheckUpdate = onToggleCheckUpdate,
+                            onOpenDownloadPathDialog = onOpenDownloadPathDialog,
+                            onToggleRandomPackageName = onToggleRandomPackageName,
+                        )
+                    }
                 }
             },
             second = {
-                if (!hasRootSections) {
-                    Column { AppSettingsSection() }
+                if (!uiState.hasRootSections) {
+                    Column {
+                        AppSettingsSection(
+                            uiState = uiState,
+                            onUpdateChannelSelected = onUpdateChannelSelected,
+                            onOpenCustomUrlDialog = onOpenCustomUrlDialog,
+                            onToggleDoh = onToggleDoh,
+                            onToggleCheckUpdate = onToggleCheckUpdate,
+                            onOpenDownloadPathDialog = onOpenDownloadPathDialog,
+                            onToggleRandomPackageName = onToggleRandomPackageName,
+                        )
+                    }
                 }
-                if (Info.env.isActive) {
-                    Column { MagiskSection(viewModel = viewModel) }
+                if (uiState.isMagiskInstalled) {
+                    Column {
+                        MagiskSection(
+                            uiState = uiState,
+                            onCreateHosts = onCreateHosts,
+                            onToggleZygisk = onToggleZygisk,
+                            onToggleDenyList = onToggleDenyList,
+                            onNavigateToDenyList = onNavigateToDenyList,
+                        )
+                    }
                 }
-                if (Info.showSuperUser) {
-                    Column { SuperuserSection(viewModel = viewModel) }
+                if (uiState.isSuperUserAvailable) {
+                    Column {
+                        SuperuserSection(
+                            uiState = uiState,
+                            onToggleSuAuth = onToggleSuAuth,
+                            onMultiuserModeSelected = onMultiuserModeSelected,
+                            onNamespaceModeSelected = onNamespaceModeSelected,
+                            onNotificationModeSelected = onNotificationModeSelected,
+                            onToggleSuRestrict = onToggleSuRestrict,
+                        )
+                    }
                 }
             },
         )
+    }
+
+    when (val dialog = uiState.activeDialog) {
+        is SettingsDialog.CustomChannelUrl -> {
+            UpdateChannelUrlDialog(
+                initialUrl = dialog.initialUrl,
+                onConfirm = onSaveCustomUrl,
+                onDismiss = onDismissDialog,
+            )
+        }
+        is SettingsDialog.DownloadPath -> {
+            DownloadPathDialog(
+                initialPath = dialog.initialPath,
+                onConfirm = onSaveDownloadPath,
+                onDismiss = onDismissDialog,
+            )
+        }
+        null -> Unit
     }
 }
 
@@ -118,41 +244,32 @@ fun SettingsScreen(
 
 @Composable
 private fun CustomizationSection(
-    viewModel: SettingsViewModel,
+    uiState: SettingsUiState,
+    onOpenSystemLocale: () -> Unit,
+    onLanguageSelected: (Int) -> Unit,
+    onColorModeSelected: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
-
     SmallTitle(text = stringResource(CoreR.string.settings_customization))
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
     ) {
-        if (LocaleSetting.useLocaleManager) {
-            val locale = LocaleSetting.instance.appLocale
-            val summary = locale?.getDisplayName(locale) ?: stringResource(CoreR.string.system_default)
+        if (uiState.useLocaleManager) {
+            val appLocale = LocaleSetting.instance.appLocale
             SettingsArrow(
                 title = stringResource(CoreR.string.language),
-                summary = summary,
-                onClick = {
-                    context.startActivity(LocaleSetting.localeSettingsIntent)
-                }
+                summary = appLocale?.getDisplayName(appLocale)
+                    ?: stringResource(CoreR.string.system_default),
+                onClick = onOpenSystemLocale
             )
         } else {
-            val names = remember { LocaleSetting.available.names }
-            val tags = remember { LocaleSetting.available.tags }
-            var selectedIndex by remember {
-                mutableIntStateOf(tags.indexOf(Config.locale).coerceAtLeast(0))
-            }
             SettingsDropdown(
                 title = stringResource(CoreR.string.language),
-                items = names.toList(),
-                selectedIndex = selectedIndex,
-                onSelectedIndexChange = { index ->
-                    selectedIndex = index
-                    Config.locale = tags[index]
-                }
+                items = uiState.availableLanguages,
+                selectedIndex = uiState.selectedLanguageIndex,
+                onSelectedIndexChange = onLanguageSelected
             )
         }
 
@@ -162,31 +279,12 @@ private fun CustomizationSection(
         )
 
         // Color Mode
-        val isDynamicColorSupported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
-        val resources = LocalResources.current
-        val rawColorModeEntries = remember {
-            resources.getStringArray(CoreR.array.color_mode).toList()
-        }
-        val colorModeEntries = remember(isDynamicColorSupported) {
-            if (isDynamicColorSupported) {
-                rawColorModeEntries
-            } else {
-                rawColorModeEntries.drop(3)
-            }
-        }
-        var colorMode by remember { mutableIntStateOf(Config.colorMode) }
-        val selectedIndex = ColorMode.fromValue(colorMode).toUiIndex(isDynamicColorSupported)
-
+        val colorModes = stringArrayResource(CoreR.array.color_mode).asList()
         SettingsDropdown(
             title = stringResource(CoreR.string.settings_color_mode),
-            items = colorModeEntries,
-            selectedIndex = selectedIndex,
-            onSelectedIndexChange = { index ->
-                val newMode = ColorMode.fromUiIndex(index, isDynamicColorSupported)
-                colorMode = newMode.value
-                Config.colorMode = newMode.value
-                ThemeState.colorMode = newMode.value
-            }
+            items = if (uiState.isDynamicColorSupported) colorModes else colorModes.drop(3),
+            selectedIndex = uiState.selectedColorModeIndex,
+            onSelectedIndexChange = onColorModeSelected
         )
     }
 }
@@ -195,10 +293,15 @@ private fun CustomizationSection(
 
 @Composable
 private fun AppSettingsSection(
+    uiState: SettingsUiState,
+    onUpdateChannelSelected: (Int) -> Unit,
+    onOpenCustomUrlDialog: () -> Unit,
+    onToggleDoh: (Boolean) -> Unit,
+    onToggleCheckUpdate: (Boolean) -> Unit,
+    onOpenDownloadPathDialog: () -> Unit,
+    onToggleRandomPackageName: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val resources = LocalResources.current
-
     SmallTitle(text = stringResource(CoreR.string.home_app_title))
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -206,43 +309,23 @@ private fun AppSettingsSection(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
     ) {
         // Update Channel
-        val updateChannelEntries = remember {
-            resources.getStringArray(CoreR.array.update_channel).toList()
-        }
-        var updateChannel by remember {
-            mutableIntStateOf(Config.updateChannelIndex)
-        }
-        var showUrlDialog by remember { mutableStateOf(false) }
-
         SettingsDropdown(
             title = stringResource(CoreR.string.settings_update_channel_title),
-            items = updateChannelEntries,
-            selectedIndex = updateChannel,
-            onSelectedIndexChange = { index ->
-                updateChannel = index
-                Config.updateChannel = index
-                Info.resetUpdate()
-                if (index == Config.Value.CUSTOM_CHANNEL && Config.customChannelUrl.isBlank()) {
-                    showUrlDialog = true
-                }
-            }
+            items = stringArrayResource(CoreR.array.update_channel).asList(),
+            selectedIndex = uiState.selectedUpdateChannelIndex,
+            onSelectedIndexChange = onUpdateChannelSelected
         )
 
         // Update Channel URL (for custom channel)
-        if (updateChannel == Config.Value.CUSTOM_CHANNEL) {
+        if (uiState.isCustomChannel) {
             HorizontalDivider(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
             )
-            if (showUrlDialog) {
-                UpdateChannelUrlDialog(
-                    onDismiss = { showUrlDialog = false }
-                )
-            }
             SettingsArrow(
                 title = stringResource(CoreR.string.settings_update_custom),
-                summary = Config.customChannelUrl.ifBlank { null },
-                onClick = { showUrlDialog = true }
+                summary = uiState.customChannelUrl.ifBlank { null },
+                onClick = onOpenCustomUrlDialog
             )
         }
 
@@ -252,15 +335,11 @@ private fun AppSettingsSection(
         )
 
         // DoH Toggle
-        var doh by remember { mutableStateOf(Config.doh) }
         SettingsSwitch(
             title = stringResource(CoreR.string.settings_doh_title),
             summary = stringResource(CoreR.string.settings_doh_description),
-            checked = doh,
-            onCheckedChange = {
-                doh = it
-                Config.doh = it
-            }
+            checked = uiState.dohEnabled,
+            onCheckedChange = onToggleDoh
         )
 
         HorizontalDivider(
@@ -269,15 +348,11 @@ private fun AppSettingsSection(
         )
 
         // Update Checker
-        var checkUpdate by remember { mutableStateOf(Config.checkUpdate) }
         SettingsSwitch(
             title = stringResource(CoreR.string.settings_check_update_title),
             summary = stringResource(CoreR.string.settings_check_update_summary),
-            checked = checkUpdate,
-            onCheckedChange = { newValue ->
-                checkUpdate = newValue
-                Config.checkUpdate = newValue
-            }
+            checked = uiState.checkUpdateEnabled,
+            onCheckedChange = onToggleCheckUpdate
         )
 
         HorizontalDivider(
@@ -286,18 +361,10 @@ private fun AppSettingsSection(
         )
 
         // Download Path
-        var showDownloadDialog by remember { mutableStateOf(false) }
-        if (showDownloadDialog) {
-            DownloadPathDialog(
-                onDismiss = { showDownloadDialog = false }
-            )
-        }
         SettingsArrow(
             title = stringResource(CoreR.string.settings_download_path_title),
-            summary = MediaStoreUtils.fullPath(Config.downloadDir),
-            onClick = {
-                showDownloadDialog = true
-            }
+            summary = uiState.downloadPathDisplay,
+            onClick = onOpenDownloadPathDialog
         )
 
         HorizontalDivider(
@@ -306,15 +373,11 @@ private fun AppSettingsSection(
         )
 
         // Random Package Name
-        var randName by remember { mutableStateOf(Config.randName) }
         SettingsSwitch(
             title = stringResource(CoreR.string.settings_random_name_title),
             summary = stringResource(CoreR.string.settings_random_name_description),
-            checked = randName,
-            onCheckedChange = {
-                randName = it
-                Config.randName = it
-            }
+            checked = uiState.randomPackageNameEnabled,
+            onCheckedChange = onToggleRandomPackageName
         )
     }
 }
@@ -323,7 +386,11 @@ private fun AppSettingsSection(
 
 @Composable
 private fun MagiskSection(
-    viewModel: SettingsViewModel,
+    uiState: SettingsUiState,
+    onCreateHosts: () -> Unit,
+    onToggleZygisk: (Boolean) -> Unit,
+    onToggleDenyList: (Boolean) -> Unit,
+    onNavigateToDenyList: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     SmallTitle(text = stringResource(CoreR.string.magisk))
@@ -336,29 +403,24 @@ private fun MagiskSection(
         SettingsArrow(
             title = stringResource(CoreR.string.settings_hosts_title),
             summary = stringResource(CoreR.string.settings_hosts_summary),
-            onClick = { viewModel.createHosts() }
+            onClick = onCreateHosts
         )
 
-        if (Const.Version.atLeast_24_0()) {
+        if (uiState.isZygiskSupported) {
             HorizontalDivider(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
             )
 
             // Zygisk
-            var zygisk by remember { mutableStateOf(Config.zygisk) }
             SettingsSwitch(
                 title = stringResource(CoreR.string.zygisk),
                 summary = stringResource(
-                    if (zygisk != Info.isZygiskEnabled) CoreR.string.reboot_apply_change
+                    if (uiState.isZygiskPendingReboot) CoreR.string.reboot_apply_change
                     else CoreR.string.settings_zygisk_summary
                 ),
-                checked = zygisk,
-                onCheckedChange = {
-                    zygisk = it
-                    Config.zygisk = it
-                    viewModel.notifyZygiskChange()
-                }
+                checked = uiState.zygiskEnabled,
+                onCheckedChange = onToggleZygisk
             )
 
             HorizontalDivider(
@@ -367,12 +429,11 @@ private fun MagiskSection(
             )
 
             // DenyList
-            val denyListEnabled by viewModel.denyListEnabled.collectAsStateWithLifecycle()
             SettingsSwitch(
                 title = stringResource(CoreR.string.settings_denylist_title),
                 summary = stringResource(CoreR.string.settings_denylist_summary),
-                checked = denyListEnabled,
-                onCheckedChange = { viewModel.toggleDenyList(it) }
+                checked = uiState.denyListEnabled,
+                onCheckedChange = onToggleDenyList
             )
 
             HorizontalDivider(
@@ -384,7 +445,7 @@ private fun MagiskSection(
             SettingsArrow(
                 title = stringResource(CoreR.string.settings_denylist_config_title),
                 summary = stringResource(CoreR.string.settings_denylist_config_summary),
-                onClick = { viewModel.navigateToDenyList() }
+                onClick = onNavigateToDenyList
             )
         }
     }
@@ -394,86 +455,63 @@ private fun MagiskSection(
 
 @Composable
 private fun SuperuserSection(
-    viewModel: SettingsViewModel,
+    uiState: SettingsUiState,
+    onToggleSuAuth: (Boolean) -> Unit,
+    onMultiuserModeSelected: (Int) -> Unit,
+    onNamespaceModeSelected: (Int) -> Unit,
+    onNotificationModeSelected: (Int) -> Unit,
+    onToggleSuRestrict: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val resources = LocalResources.current
-
     SmallTitle(text = stringResource(CoreR.string.superuser))
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
     ) {
-
         // Authentication
-        var suAuth by remember { mutableStateOf(Config.suAuth) }
         SettingsSwitch(
             title = stringResource(CoreR.string.settings_su_auth_title),
             summary = stringResource(
-                if (Info.isDeviceSecure) CoreR.string.settings_su_auth_summary
+                if (uiState.isDeviceSecure) CoreR.string.settings_su_auth_summary
                 else CoreR.string.settings_su_auth_insecure
             ),
-            checked = suAuth,
-            enabled = Info.isDeviceSecure,
-            onCheckedChange = { newValue ->
-                viewModel.withAuth {
-                    suAuth = newValue
-                    Config.suAuth = newValue
-                }
-            }
+            checked = uiState.suAuthEnabled,
+            enabled = uiState.isDeviceSecure,
+            onCheckedChange = onToggleSuAuth
         )
+
+        if (uiState.isMultiuserSupported) {
+            HorizontalDivider(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+            )
+
+            // Multiuser Mode
+            val multiuserSummaries = stringArrayResource(CoreR.array.multiuser_summary)
+            SettingsDropdown(
+                title = stringResource(CoreR.string.multiuser_mode),
+                summary = multiuserSummaries.getOrElse(uiState.selectedMultiuserModeIndex) { "" },
+                items = stringArrayResource(CoreR.array.multiuser_mode).asList(),
+                selectedIndex = uiState.selectedMultiuserModeIndex,
+                enabled = uiState.isMultiuserEditable,
+                onSelectedIndexChange = onMultiuserModeSelected
+            )
+        }
 
         HorizontalDivider(
             modifier = Modifier.padding(horizontal = 16.dp),
             color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
         )
 
-
-        if (!Info.isHeadlessSystemUser) {
-            // Multiuser Mode
-            val multiuserEntries = remember {
-                resources.getStringArray(CoreR.array.multiuser_mode).toList()
-            }
-            val multiuserDescriptions = remember {
-                resources.getStringArray(CoreR.array.multiuser_summary).toList()
-            }
-            var multiuserMode by remember { mutableIntStateOf(Config.suMultiuserMode) }
-            SettingsDropdown(
-                title = stringResource(CoreR.string.multiuser_mode),
-                summary = multiuserDescriptions.getOrElse(multiuserMode) { "" },
-                items = multiuserEntries,
-                selectedIndex = multiuserMode,
-                enabled = Const.USER_ID == 0,
-                onSelectedIndexChange = {
-                    multiuserMode = it
-                    Config.suMultiuserMode = it
-                }
-            )
-
-            HorizontalDivider(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
-            )
-        }
-
         // Mount Namespace Mode
-        val namespaceEntries = remember {
-            resources.getStringArray(CoreR.array.namespace).toList()
-        }
-        val namespaceDescriptions = remember {
-            resources.getStringArray(CoreR.array.namespace_summary).toList()
-        }
-        var mntNamespaceMode by remember { mutableIntStateOf(Config.suMntNamespaceMode) }
+        val namespaceSummaries = stringArrayResource(CoreR.array.namespace_summary)
         SettingsDropdown(
             title = stringResource(CoreR.string.mount_namespace_mode),
-            summary = namespaceDescriptions.getOrElse(mntNamespaceMode) { "" },
-            items = namespaceEntries,
-            selectedIndex = mntNamespaceMode,
-            onSelectedIndexChange = {
-                mntNamespaceMode = it
-                Config.suMntNamespaceMode = it
-            }
+            summary = namespaceSummaries.getOrElse(uiState.selectedNamespaceModeIndex) { "" },
+            items = stringArrayResource(CoreR.array.namespace).asList(),
+            selectedIndex = uiState.selectedNamespaceModeIndex,
+            onSelectedIndexChange = onNamespaceModeSelected
         )
 
         HorizontalDivider(
@@ -482,36 +520,24 @@ private fun SuperuserSection(
         )
 
         // SU Notification
-        val notifEntries = remember {
-            resources.getStringArray(CoreR.array.su_notification).toList()
-        }
-        var suNotification by remember { mutableIntStateOf(Config.suNotification) }
         SettingsDropdown(
             title = stringResource(CoreR.string.superuser_notification),
-            items = notifEntries,
-            selectedIndex = suNotification,
-            onSelectedIndexChange = {
-                suNotification = it
-                Config.suNotification = it
-            }
+            items = stringArrayResource(CoreR.array.su_notification).asList(),
+            selectedIndex = uiState.selectedNotificationModeIndex,
+            onSelectedIndexChange = onNotificationModeSelected
         )
 
-
         // Restrict (version >= 30.1)
-        if (Const.Version.atLeast_30_1()) {
+        if (uiState.isSuRestrictSupported) {
             HorizontalDivider(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
             )
-            var restrict by remember { mutableStateOf(Config.suRestrict) }
             SettingsSwitch(
                 title = stringResource(CoreR.string.settings_su_restrict_title),
                 summary = stringResource(CoreR.string.settings_su_restrict_summary),
-                checked = restrict,
-                onCheckedChange = {
-                    restrict = it
-                    Config.suRestrict = it
-                }
+                checked = uiState.suRestrictEnabled,
+                onCheckedChange = onToggleSuRestrict
             )
         }
     }
@@ -521,20 +547,29 @@ private fun SuperuserSection(
 
 @Composable
 private fun UpdateChannelUrlDialog(
+    initialUrl: String,
+    onConfirm: (String) -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var url by rememberSaveable { mutableStateOf(Config.customChannelUrl) }
+    var url by rememberSaveable(initialUrl) { mutableStateOf(initialUrl) }
+    val isValidUrl = remember(url) {
+        url.isBlank() || (
+            (url.startsWith("http://", ignoreCase = true) || url.startsWith("https://", ignoreCase = true)) &&
+            URLUtil.isValidUrl(url)
+        )
+    }
 
     MagiskDialog(
         modifier = modifier,
         onDismissRequest = onDismiss,
         title = stringResource(CoreR.string.settings_update_custom_msg),
         confirmText = stringResource(android.R.string.ok),
+        confirmEnabled = isValidUrl,
         onConfirm = {
-            Config.customChannelUrl = url
-            Info.resetUpdate()
-            onDismiss()
+            if (isValidUrl) {
+                onConfirm(url)
+            }
         },
         dismissText = stringResource(android.R.string.cancel),
         onDismiss = onDismiss,
@@ -544,6 +579,7 @@ private fun UpdateChannelUrlDialog(
             OutlinedTextField(
                 value = url,
                 onValueChange = { url = it },
+                isError = !isValidUrl,
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -553,10 +589,12 @@ private fun UpdateChannelUrlDialog(
 
 @Composable
 private fun DownloadPathDialog(
+    initialPath: String,
+    onConfirm: (String) -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var path by rememberSaveable { mutableStateOf(Config.downloadDir) }
+    var path by rememberSaveable(initialPath) { mutableStateOf(initialPath) }
 
     MagiskDialog(
         modifier = modifier,
@@ -564,8 +602,7 @@ private fun DownloadPathDialog(
         title = stringResource(CoreR.string.settings_download_path_title),
         confirmText = stringResource(android.R.string.ok),
         onConfirm = {
-            Config.downloadDir = path
-            onDismiss()
+            onConfirm(path.trim())
         },
         dismissText = stringResource(android.R.string.cancel),
         onDismiss = onDismiss,

@@ -83,8 +83,6 @@ class SuperuserGrantViewModel(
     private val _sortReverse = MutableStateFlow(false)
     val sortReverse: StateFlow<Boolean> = _sortReverse.asStateFlow()
 
-    var authenticate: (onSuccess: () -> Unit) -> Unit = { it() }
-
     val filteredApps: StateFlow<List<SuGrantAppState>> = combine(
         _allApps, _query, _showSystem, _showOS, _sortBy, _sortReverse
     ) { args ->
@@ -136,52 +134,44 @@ class SuperuserGrantViewModel(
 
     fun toggleGrant(app: SuGrantAppState) {
         val willGrant = !app.isGranted
-        fun updateState() {
-            _allApps.update { apps ->
-                apps.map { current ->
-                    if (current.info.uid == app.info.uid) {
-                        current.copy(isGranted = willGrant)
-                    } else {
-                        current
-                    }
+        _allApps.update { apps ->
+            apps.map { current ->
+                if (current.info.uid == app.info.uid) {
+                    current.copy(isGranted = willGrant)
+                } else {
+                    current
                 }
-            }
-            viewModelScope.launch {
-                try {
-                    withContext(Dispatchers.IO) {
-                        if (willGrant) {
-                            val existing = policyDB.fetch(app.info.uid)
-                            val suPolicy = existing ?: SuPolicy(app.info.uid)
-                            suPolicy.policy = if (Config.suRestrict) SuPolicy.RESTRICT else SuPolicy.ALLOW
-                            suPolicy.remain = 0L
-                            policyDB.update(suPolicy)
-                        } else {
-                            policyDB.delete(app.info.uid)
-                        }
-                    }
-                } catch (e: Exception) {
-                    if (e is CancellationException) throw e
-                    Timber.e(e)
-                    _allApps.update { apps ->
-                        apps.map { current ->
-                            if (current.info.uid == app.info.uid && current.isGranted == willGrant) {
-                                current.copy(isGranted = !willGrant)
-                            } else {
-                                current
-                            }
-                        }
-                    }
-                    return@launch
-                }
-
-                SuEvents.notifyPolicyChanged()
             }
         }
+        viewModelScope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    if (willGrant) {
+                        val existing = policyDB.fetch(app.info.uid)
+                        val suPolicy = existing ?: SuPolicy(app.info.uid)
+                        suPolicy.policy = if (Config.suRestrict) SuPolicy.RESTRICT else SuPolicy.ALLOW
+                        suPolicy.remain = 0L
+                        policyDB.update(suPolicy)
+                    } else {
+                        policyDB.delete(app.info.uid)
+                    }
+                }
+            } catch (e: Exception) {
+                if (e is CancellationException) throw e
+                Timber.e(e)
+                _allApps.update { apps ->
+                    apps.map { current ->
+                        if (current.info.uid == app.info.uid && current.isGranted == willGrant) {
+                            current.copy(isGranted = !willGrant)
+                        } else {
+                            current
+                        }
+                    }
+                }
+                return@launch
+            }
 
-        if (Config.suAuth) {
-            authenticate { updateState() }
-        } else {
-            updateState()
+            SuEvents.notifyPolicyChanged()
         }
     }
 

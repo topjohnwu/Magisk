@@ -46,8 +46,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
+import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.ui.component.ConfirmResult
 import com.topjohnwu.magisk.ui.component.SettingsSwitch
+import com.topjohnwu.magisk.ui.component.rememberBiometricAuth
 import com.topjohnwu.magisk.ui.component.rememberConfirmDialog
 import com.topjohnwu.magisk.ui.component.verticalScrollbar
 import kotlinx.coroutines.launch
@@ -60,7 +62,6 @@ fun SuperuserDetailScreen(
     viewModel: SuperuserViewModel,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    onAuthenticate: ((onSuccess: () -> Unit) -> Unit)? = null,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val items = uiState.policies.filter { it.policy.uid == uid }
@@ -68,6 +69,7 @@ fun SuperuserDetailScreen(
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val scrollState = rememberScrollState()
     val scope = rememberCoroutineScope()
+    val requireAuth = rememberBiometricAuth()
     val revokeDialog = rememberConfirmDialog()
     val revokeTitle = stringResource(CoreR.string.su_revoke_title)
     val revokeMsg = item?.let { stringResource(CoreR.string.su_revoke_msg, it.appName) } ?: ""
@@ -76,11 +78,6 @@ fun SuperuserDetailScreen(
         viewModel.refreshSuRestrict()
         if (uiState.policies.isEmpty()) {
             viewModel.startLoading()
-        }
-    }
-    LaunchedEffect(onAuthenticate) {
-        if (onAuthenticate != null) {
-            viewModel.authenticate = onAuthenticate
         }
     }
 
@@ -180,7 +177,11 @@ fun SuperuserDetailScreen(
                     SettingsSwitch(
                         title = stringResource(CoreR.string.settings_su_restrict_title),
                         checked = item.isRestricted,
-                        onCheckedChange = { viewModel.toggleRestrict(item) }
+                        onCheckedChange = {
+                            requireAuth {
+                                viewModel.toggleRestrict(item)
+                            }
+                        }
                     )
                     HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
                 }
@@ -199,8 +200,8 @@ fun SuperuserDetailScreen(
 
             RevokeButton(
                 onClick = {
-                    if (viewModel.requiresAuth) {
-                        viewModel.authenticate { viewModel.performDelete(item, onBack) }
+                    if (Config.suAuth) {
+                        requireAuth { viewModel.performDelete(item, onBack) }
                     } else {
                         scope.launch {
                             val result = revokeDialog.awaitConfirm(
