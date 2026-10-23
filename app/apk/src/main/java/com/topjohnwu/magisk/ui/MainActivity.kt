@@ -13,8 +13,10 @@ import android.os.CancellationSignal
 import android.provider.OpenableColumns
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Box
+import androidx.compose.animation.AnimatedContentTransitionScope.SlideDirection
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -118,7 +120,7 @@ class MainActivity : ComponentActivity(), SplashScreenHost {
 
         setContent {
             MagiskTheme {
-                Box(modifier = Modifier.fillMaxSize()) {
+                Surface(modifier = Modifier.fillMaxSize()) {
                     val navigator = rememberNavigator(Route.Main)
                     CompositionLocalProvider(LocalNavigator provides navigator) {
                         HandleFlashIntent(navigator)
@@ -130,6 +132,19 @@ class MainActivity : ComponentActivity(), SplashScreenHost {
                                 rememberSaveableStateHolderNavEntryDecorator(),
                                 rememberViewModelStoreNavEntryDecorator<Any>()
                             ),
+                            // Start/End follow the layout direction, so RTL slides the other way
+                            transitionSpec = {
+                                slideIntoContainer(SlideDirection.Start) togetherWith
+                                    slideOutOfContainer(SlideDirection.Start)
+                            },
+                            popTransitionSpec = {
+                                slideIntoContainer(SlideDirection.End) togetherWith
+                                    slideOutOfContainer(SlideDirection.End)
+                            },
+                            predictivePopTransitionSpec = {
+                                slideIntoContainer(SlideDirection.End) togetherWith
+                                    slideOutOfContainer(SlideDirection.End)
+                            },
                             entryProvider = entryProvider {
                                 entry<Route.Main> {
                                     val superuserVm: SuperuserViewModel = viewModel(
