@@ -12,6 +12,10 @@ class Navigator(val backStack: NavBackStack<NavKey>) {
     constructor(vararg initialKeys: NavKey) : this(NavBackStack(*initialKeys))
 
     fun push(key: NavKey) {
+        // Ignore pushing the screen that is already on top (e.g. a double tap, or the same
+        // request delivered twice). Both copies would get the same content key, so they would
+        // share one ViewModel and saved state, and need two back presses to leave.
+        if (backStack.lastOrNull() == key) return
         backStack.add(key)
     }
 
