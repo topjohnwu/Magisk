@@ -45,6 +45,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
@@ -91,6 +92,8 @@ enum class Tab(val titleRes: Int, val iconRes: Int) {
 fun MainScreen(
     modifier: Modifier = Modifier,
     initialTab: Int = Tab.HOME.ordinal,
+    requestedTab: Int? = null,
+    onTabRequestHandled: () -> Unit = {},
     superuserViewModel: SuperuserViewModel? = null,
 ) {
     val navigator = LocalNavigator.current
@@ -106,6 +109,15 @@ fun MainScreen(
     }
     val initialPage = visibleTabs.indexOf(Tab.entries[initialTab]).coerceAtLeast(0)
     val pagerState = rememberPagerState(initialPage = initialPage, pageCount = { visibleTabs.size })
+
+    // Show a tab requested while the app is already running, e.g. by the system settings
+    val currentOnTabRequestHandled by rememberUpdatedState(onTabRequestHandled)
+    LaunchedEffect(requestedTab) {
+        if (requestedTab == null) return@LaunchedEffect
+        val page = visibleTabs.indexOf(Tab.entries[requestedTab])
+        if (page >= 0) pagerState.scrollToPage(page)
+        currentOnTabRequestHandled()
+    }
     val fabFocusRequester = remember { FocusRequester() }
     val navModulesFocusRequester = remember { FocusRequester() }
     val navSuperuserFocusRequester = remember { FocusRequester() }
