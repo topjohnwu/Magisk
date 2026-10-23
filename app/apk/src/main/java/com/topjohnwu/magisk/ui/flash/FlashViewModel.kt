@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.ui.flash
 
 import android.net.Uri
 import androidx.core.net.toFile
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.core.AppContext
@@ -34,11 +35,17 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
 
-class FlashViewModel : BaseViewModel() {
+class FlashViewModel(private val savedState: SavedStateHandle) : BaseViewModel() {
 
     enum class State {
         FLASHING, SUCCESS, FAILED
     }
+
+    /**
+     * Whether the job was started before the process died. The job and its output only lived
+     * in memory and are gone, so it must never run again: repeating it may not be safe.
+     */
+    val isInterrupted = savedState.get<Boolean>(KEY_STARTED) == true
 
     private val _flashState = MutableStateFlow(State.FLASHING)
     val flashState: StateFlow<State> = _flashState.asStateFlow()
@@ -79,6 +86,7 @@ class FlashViewModel : BaseViewModel() {
     // --- Actions ---
 
     fun startFlashing() {
+        savedState[KEY_STARTED] = true
         val action = flashAction
         val uri = flashUri
         val usb = usbDevice
@@ -207,4 +215,8 @@ class FlashViewModel : BaseViewModel() {
     }
 
     fun restartPressed() = reboot()
+
+    companion object {
+        private const val KEY_STARTED = "started"
+    }
 }

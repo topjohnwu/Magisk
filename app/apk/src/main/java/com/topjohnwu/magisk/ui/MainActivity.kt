@@ -162,6 +162,11 @@ class MainActivity : ComponentActivity(), SplashScreenHost {
                                 }
                                 entry<Route.Flash> { key ->
                                     val vm: FlashViewModel = viewModel(factory = VMFactory)
+                                    if (vm.isInterrupted) {
+                                        // Restored after process death: nothing is left to show
+                                        LeaveInterruptedScreen(navigator, key)
+                                        return@entry
+                                    }
                                     LaunchedEffect(key) {
                                         if (vm.flashAction.isEmpty()) {
                                             vm.flashAction = key.action
@@ -194,6 +199,11 @@ class MainActivity : ComponentActivity(), SplashScreenHost {
                                 }
                                 entry<Route.Action> { key ->
                                     val vm: ActionViewModel = viewModel(factory = VMFactory)
+                                    if (vm.isInterrupted) {
+                                        // Restored after process death: nothing is left to show
+                                        LeaveInterruptedScreen(navigator, key)
+                                        return@entry
+                                    }
                                     LaunchedEffect(key) {
                                         if (vm.actionId.isEmpty()) {
                                             vm.actionId = key.id
@@ -366,6 +376,17 @@ class MainActivity : ComponentActivity(), SplashScreenHost {
         if (messages.isNotEmpty()) {
             showUnsupported.value = messages
         }
+    }
+}
+
+/**
+ * Leave a flash or action screen restored after process death. Its job and output only lived
+ * in memory, and running the job again may not be safe, so there is nothing left to show.
+ */
+@Composable
+private fun LeaveInterruptedScreen(navigator: Navigator, key: Route) {
+    LaunchedEffect(key) {
+        if (navigator.current() == key) navigator.pop()
     }
 }
 

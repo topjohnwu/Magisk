@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.ui.module
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.core.ktx.timeFormatStandard
@@ -16,11 +17,17 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ActionViewModel : BaseViewModel() {
+class ActionViewModel(private val savedState: SavedStateHandle) : BaseViewModel() {
 
     enum class State {
         RUNNING, SUCCESS, FAILED
     }
+
+    /**
+     * Whether the action was started before the process died. The action and its output only
+     * lived in memory and are gone, so it must never run again: repeating it may not be safe.
+     */
+    val isInterrupted = savedState.get<Boolean>(KEY_STARTED) == true
 
     private val _actionState = MutableStateFlow(State.RUNNING)
     val actionState: StateFlow<State> = _actionState.asStateFlow()
@@ -44,6 +51,7 @@ class ActionViewModel : BaseViewModel() {
     }
 
     fun startRunAction() {
+        savedState[KEY_STARTED] = true
         viewModelScope.launch {
             // Start the command with the real terminal size
             terminalReady.await()
@@ -73,5 +81,9 @@ class ActionViewModel : BaseViewModel() {
             }
             showToast(file.toString())
         }
+    }
+
+    companion object {
+        private const val KEY_STARTED = "started"
     }
 }
