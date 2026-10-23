@@ -35,7 +35,6 @@ class SmokeTest : TestCommon {
             policy = SuPolicy.ALLOW,
             logging = false,
             notification = false,
-            remain = 0L
         )
         runBlocking {
             ServiceLocator.policyDB.update(policy)

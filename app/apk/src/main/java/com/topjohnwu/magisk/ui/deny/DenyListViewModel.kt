@@ -1,10 +1,12 @@
 package com.topjohnwu.magisk.ui.deny
 
 import android.content.pm.PackageManager.MATCH_UNINSTALLED_PACKAGES
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.arch.AsyncLoadViewModel
 import com.topjohnwu.magisk.core.AppContext
 import com.topjohnwu.magisk.core.ktx.concurrentMap
+import com.topjohnwu.magisk.ui.component.AppSortBy
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,8 +21,7 @@ import kotlinx.coroutines.flow.toCollection
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
 
-enum class SortBy { NAME, PACKAGE_NAME, INSTALL_TIME, UPDATE_TIME }
-
+@Immutable
 data class DenyProcessState(
     val process: ProcessInfo,
     val isEnabled: Boolean = process.isEnabled,
@@ -29,6 +30,7 @@ data class DenyProcessState(
         if (process.isIsolated) "(isolated) ${process.name}*" else process.name
 }
 
+@Immutable
 data class DenyAppState(
     val info: AppProcessInfo,
     val processes: List<DenyProcessState> = info.processes.map { DenyProcessState(it) },
@@ -66,8 +68,8 @@ class DenyListViewModel : AsyncLoadViewModel() {
     private val _showOS = MutableStateFlow(false)
     val showOS: StateFlow<Boolean> = _showOS.asStateFlow()
 
-    private val _sortBy = MutableStateFlow(SortBy.NAME)
-    val sortBy: StateFlow<SortBy> = _sortBy.asStateFlow()
+    private val _sortBy = MutableStateFlow(AppSortBy.NAME)
+    val sortBy: StateFlow<AppSortBy> = _sortBy.asStateFlow()
 
     private val _sortReverse = MutableStateFlow(false)
     val sortReverse: StateFlow<Boolean> = _sortReverse.asStateFlow()
@@ -80,14 +82,14 @@ class DenyListViewModel : AsyncLoadViewModel() {
         val q = args[1] as String
         val showSys = args[2] as Boolean
         val showOS = args[3] as Boolean
-        val sort = args[4] as SortBy
+        val sort = args[4] as AppSortBy
         val reverse = args[5] as Boolean
 
         val filtered = apps.filter { app ->
             val passFilter = app.isChecked ||
                 app.initiallyChecked ||
-                ((showSys || !app.info.isSystemApp()) &&
-                ((showSys && showOS) || app.info.isApp()))
+                ((showSys || !app.info.isSystemApp) &&
+                ((showSys && showOS) || app.info.isApp))
             val passQuery = q.isBlank() ||
                 app.info.label.contains(q, true) ||
                 app.info.packageName.contains(q, true) ||
@@ -96,10 +98,10 @@ class DenyListViewModel : AsyncLoadViewModel() {
         }
 
         val secondary: Comparator<DenyAppState> = when (sort) {
-            SortBy.NAME -> compareBy(String.CASE_INSENSITIVE_ORDER) { it.info.label }
-            SortBy.PACKAGE_NAME -> compareBy(String.CASE_INSENSITIVE_ORDER) { it.info.packageName }
-            SortBy.INSTALL_TIME -> compareByDescending { it.info.firstInstallTime }
-            SortBy.UPDATE_TIME -> compareByDescending { it.info.lastUpdateTime }
+            AppSortBy.NAME -> compareBy(String.CASE_INSENSITIVE_ORDER) { it.info.label }
+            AppSortBy.PACKAGE_NAME -> compareBy(String.CASE_INSENSITIVE_ORDER) { it.info.packageName }
+            AppSortBy.INSTALL_TIME -> compareByDescending { it.info.firstInstallTime }
+            AppSortBy.UPDATE_TIME -> compareByDescending { it.info.lastUpdateTime }
         }
         val comparator = compareBy<DenyAppState> { !it.initiallyChecked }
             .then(if (reverse) secondary.reversed() else secondary)
@@ -112,7 +114,7 @@ class DenyListViewModel : AsyncLoadViewModel() {
         if (!v) _showOS.value = false
     }
     fun setShowOS(v: Boolean) { _showOS.value = v }
-    fun setSortBy(s: SortBy) { _sortBy.value = s }
+    fun setSortBy(s: AppSortBy) { _sortBy.value = s }
     fun toggleSortReverse() { _sortReverse.value = !_sortReverse.value }
 
     fun toggleExpanded(app: DenyAppState) {

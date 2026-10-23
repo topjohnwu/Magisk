@@ -28,21 +28,30 @@ class ActionViewModel : BaseViewModel() {
     var actionId: String = ""
     var actionName: String = ""
 
-    private var emulator: TerminalEmulator? = null
-    private val emulatorReady = CompletableDeferred<TerminalEmulator>()
+    val emulator = TerminalEmulator(
+        columns = 256,
+        rows = 40,
+        cellWidthPixels = 0,
+        cellHeightPixels = 0,
+        transcriptRows = null,
+    )
 
-    fun onEmulatorCreated(emu: TerminalEmulator) {
-        emulator = emu
-        emulatorReady.complete(emu)
+    private val terminalReady = CompletableDeferred<Unit>()
+
+    /** Called by the UI once the terminal has been sized to its viewport. */
+    fun onTerminalResized() {
+        terminalReady.complete(Unit)
     }
 
     fun startRunAction() {
         viewModelScope.launch {
-            val emu = emulatorReady.await()
-
+            // Start the command with the real terminal size
+            terminalReady.await()
+            val columns = emulator.mColumns
+            val rows = emulator.mRows
             val success = withContext(Dispatchers.IO) {
                 runSuCommand(
-                    emu,
+                    emulator, columns, rows,
                     "cd /data/adb/modules/$actionId && sh ./action.sh"
                 )
             }
@@ -59,12 +68,10 @@ class ActionViewModel : BaseViewModel() {
             )
             val file = MediaStoreUtils.getFile(name)
             file.uri.outputStream().bufferedWriter().use { writer ->
-                val transcript = emulator?.screen?.transcriptText
-                if (transcript != null) {
-                    writer.write(transcript)
-                }
+                val transcript = emulator.screen.transcriptText
+                writer.write(transcript)
             }
-            showSnackbar(file.toString())
+            showToast(file.toString())
         }
     }
 }

@@ -49,6 +49,7 @@ import com.topjohnwu.magisk.core.R as CoreR
 @Composable
 fun SuperuserScreen(
     viewModel: SuperuserViewModel,
+    isFabAtBottom: Boolean,
     modifier: Modifier = Modifier,
     onRegisterFab: (((() -> Unit)?) -> Unit)? = null,
     contentFocusRequester: FocusRequester? = null,
@@ -131,6 +132,9 @@ fun SuperuserScreen(
             return@Scaffold
         }
 
+        val listBottomPadding = padding.calculateBottomPadding() + if (isFabAtBottom) 92.dp else 12.dp
+        val scrollbarBottomPadding = padding.calculateBottomPadding() + if (isFabAtBottom) 80.dp else 12.dp
+
         val gridState = rememberLazyGridState()
         LazyVerticalGrid(
             columns = GridCells.Adaptive(320.dp),
@@ -144,21 +148,21 @@ fun SuperuserScreen(
                     gridState,
                     contentPadding = PaddingValues(
                         top = padding.calculateTopPadding() + 4.dp,
-                        bottom = padding.calculateBottomPadding() + 80.dp,
+                        bottom = scrollbarBottomPadding,
                     ),
                 ),
             contentPadding = PaddingValues(
                 start = 12.dp,
                 top = padding.calculateTopPadding() + 16.dp,
                 end = 12.dp,
-                bottom = padding.calculateBottomPadding() + 92.dp,
+                bottom = listBottomPadding,
             ),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             items(
                 items = uiState.policies,
-                key = { "${it.policy.uid}_${it.packageName}" },
+                key = { "${it.uid}_${it.packageName}" },
                 contentType = { "PolicyCard" }
             ) { item ->
                 val isLast = item == uiState.policies.lastOrNull()
@@ -169,7 +173,7 @@ fun SuperuserScreen(
                             viewModel.togglePolicy(item)
                         }
                     },
-                    onDetail = { navigator.push(Route.SuperuserDetail(item.policy.uid)) },
+                    onDetail = { navigator.push(Route.SuperuserDetail(item.uid)) },
                     modifier = if (isLast && contentFocusRequester != null) {
                         Modifier.focusRequester(contentFocusRequester)
                     } else Modifier,
@@ -187,9 +191,8 @@ private fun PolicyCard(
     modifier: Modifier = Modifier
 ) {
     SuperuserAppCard(
-        icon = item.icon,
-        title = item.title,
         packageName = item.packageName,
+        title = item.title,
         isSharedUid = item.isSharedUid,
         onClick = onDetail,
         contentDescription = item.appName,

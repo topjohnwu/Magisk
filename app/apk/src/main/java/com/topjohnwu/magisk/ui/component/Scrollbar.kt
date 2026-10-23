@@ -163,20 +163,21 @@ fun rememberScrollbarAdapter(state: ScrollableState): ScrollbarStateAdapter {
 
 @Composable
 fun rememberTerminalScrollbarAdapter(
-    activeTranscriptRows: Int,
-    topRow: Int,
+    activeTranscriptRowsProvider: () -> Int,
+    topRowProvider: () -> Int,
     visibleRows: Int,
     onScrollToRow: (Int) -> Unit
 ): ScrollbarStateAdapter {
     val currentOnScroll = rememberUpdatedState(onScrollToRow)
-    return remember(activeTranscriptRows, topRow, visibleRows) {
+    return remember(visibleRows) {
         object : ScrollbarStateAdapter {
             override val isScrollable: Boolean
-                get() = activeTranscriptRows > 0
+                get() = activeTranscriptRowsProvider() > 0
 
             override val thumbRatio: Float
                 get() {
-                    val totalRows = activeTranscriptRows + visibleRows
+                    val activeRows = activeTranscriptRowsProvider()
+                    val totalRows = activeRows + visibleRows
                     return if (totalRows > 0) {
                         (visibleRows.toFloat() / totalRows.toFloat()).coerceIn(0.08f, 1f)
                     } else 1f
@@ -184,14 +185,16 @@ fun rememberTerminalScrollbarAdapter(
 
             override val offsetRatio: Float
                 get() {
-                    return if (activeTranscriptRows > 0) {
-                        ((activeTranscriptRows + topRow).toFloat() / activeTranscriptRows.toFloat()).coerceIn(0f, 1f)
+                    val activeRows = activeTranscriptRowsProvider()
+                    return if (activeRows > 0) {
+                        ((activeRows + topRowProvider()).toFloat() / activeRows.toFloat()).coerceIn(0f, 1f)
                     } else 0f
                 }
 
             override suspend fun scrollTo(fraction: Float) {
-                if (activeTranscriptRows > 0) {
-                    val target = (-activeTranscriptRows * (1f - fraction.coerceIn(0f, 1f))).roundToInt().coerceIn(-activeTranscriptRows, 0)
+                val activeRows = activeTranscriptRowsProvider()
+                if (activeRows > 0) {
+                    val target = (-activeRows * (1f - fraction.coerceIn(0f, 1f))).roundToInt().coerceIn(-activeRows, 0)
                     currentOnScroll.value(target)
                 }
             }
@@ -201,19 +204,20 @@ fun rememberTerminalScrollbarAdapter(
 
 @Composable
 fun rememberTerminalHorizontalScrollbarAdapter(
-    scrollX: Float,
-    maxScrollX: Float,
+    scrollXProvider: () -> Float,
+    maxScrollXProvider: () -> Float,
     viewportWidth: Float,
     onScrollToX: (Float) -> Unit,
 ): ScrollbarStateAdapter {
     val currentOnScroll = rememberUpdatedState(onScrollToX)
-    return remember(scrollX, maxScrollX, viewportWidth) {
+    return remember(viewportWidth) {
         object : ScrollbarStateAdapter {
             override val isScrollable: Boolean
-                get() = maxScrollX > 0f
+                get() = maxScrollXProvider() > 0f
 
             override val thumbRatio: Float
                 get() {
+                    val maxScrollX = maxScrollXProvider()
                     val totalWidth = viewportWidth + maxScrollX
                     return if (totalWidth > 0f) {
                         (viewportWidth / totalWidth).coerceIn(0.08f, 1f)
@@ -222,12 +226,14 @@ fun rememberTerminalHorizontalScrollbarAdapter(
 
             override val offsetRatio: Float
                 get() {
+                    val maxScrollX = maxScrollXProvider()
                     return if (maxScrollX > 0f) {
-                        (scrollX / maxScrollX).coerceIn(0f, 1f)
+                        (scrollXProvider() / maxScrollX).coerceIn(0f, 1f)
                     } else 0f
                 }
 
             override suspend fun scrollTo(fraction: Float) {
+                val maxScrollX = maxScrollXProvider()
                 if (maxScrollX > 0f) {
                     currentOnScroll.value(fraction.coerceIn(0f, 1f) * maxScrollX)
                 }
@@ -279,8 +285,8 @@ fun Modifier.verticalScrollbar(
 }
 
 fun Modifier.terminalScrollbar(
-    activeTranscriptRows: Int,
-    topRow: Int,
+    activeTranscriptRowsProvider: () -> Int,
+    topRowProvider: () -> Int,
     visibleRows: Int,
     onScrollToRow: (Int) -> Unit,
     isScrollInProgress: Boolean = false,
@@ -288,8 +294,8 @@ fun Modifier.terminalScrollbar(
     thumbColor: Color? = null,
 ): Modifier = composed {
     val adapter = rememberTerminalScrollbarAdapter(
-        activeTranscriptRows = activeTranscriptRows,
-        topRow = topRow,
+        activeTranscriptRowsProvider = activeTranscriptRowsProvider,
+        topRowProvider = topRowProvider,
         visibleRows = visibleRows,
         onScrollToRow = onScrollToRow
     )
@@ -302,8 +308,8 @@ fun Modifier.terminalScrollbar(
 }
 
 fun Modifier.terminalHorizontalScrollbar(
-    scrollX: Float,
-    maxScrollX: Float,
+    scrollXProvider: () -> Float,
+    maxScrollXProvider: () -> Float,
     viewportWidth: Float,
     onScrollToX: (Float) -> Unit,
     isScrollInProgress: Boolean = false,
@@ -311,8 +317,8 @@ fun Modifier.terminalHorizontalScrollbar(
     thumbColor: Color? = null,
 ): Modifier = composed {
     val adapter = rememberTerminalHorizontalScrollbarAdapter(
-        scrollX = scrollX,
-        maxScrollX = maxScrollX,
+        scrollXProvider = scrollXProvider,
+        maxScrollXProvider = maxScrollXProvider,
         viewportWidth = viewportWidth,
         onScrollToX = onScrollToX,
     )

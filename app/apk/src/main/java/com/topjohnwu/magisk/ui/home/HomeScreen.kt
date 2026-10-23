@@ -1,8 +1,6 @@
 package com.topjohnwu.magisk.ui.home
 
 import android.os.Build
-import android.os.Handler
-import android.os.Looper
 import android.os.PowerManager
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -95,7 +93,10 @@ import com.topjohnwu.magisk.ui.install.InstallDialog
 import com.topjohnwu.magisk.ui.install.InstallViewModel
 import com.topjohnwu.magisk.ui.navigation.LocalNavigator
 import com.topjohnwu.magisk.ui.navigation.Route
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import com.topjohnwu.magisk.core.R as CoreR
 
@@ -193,9 +194,11 @@ fun HomeScreen(
                         Toast.LENGTH_LONG
                     )
                     if (success) {
-                        @Suppress("DEPRECATION")
-                        Handler(Looper.getMainLooper())
-                            .postDelayed({ reboot() }, 5000)
+                        // The reboot toast has been shown; don't let leaving this screen cancel it
+                        withContext(NonCancellable) {
+                            delay(5000)
+                            reboot()
+                        }
                     }
                 }
             }

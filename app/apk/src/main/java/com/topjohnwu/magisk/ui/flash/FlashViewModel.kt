@@ -50,19 +50,26 @@ class FlashViewModel : BaseViewModel() {
     var flashUri: Uri? = null
     var usbDevice: String? = null
 
-    private var emulator: TerminalEmulator? = null
-    private val emulatorReady = CompletableDeferred<TerminalEmulator>()
+    val emulator = TerminalEmulator(
+        columns = 256,
+        rows = 40,
+        cellWidthPixels = 0,
+        cellHeightPixels = 0,
+        transcriptRows = null,
+    )
 
-    fun onEmulatorCreated(emu: TerminalEmulator) {
-        emulator = emu
-        emulatorReady.complete(emu)
+    private val terminalReady = CompletableDeferred<Unit>()
+
+    /** Called by the UI once the terminal has been sized to its viewport. */
+    fun onTerminalResized() {
+        terminalReady.complete(Unit)
     }
 
     private val logItems = mutableListOf<String>().synchronized()
     private val outItems = object : CallbackList<String>() {
         override fun onAddElement(e: String?) {
             e ?: return
-            emulator?.appendLineOnMain(e)
+            emulator.appendLineOnMain(e)
             if (!e.startsWith('\r')) {
                 logItems.add(e)
             }
@@ -77,11 +84,10 @@ class FlashViewModel : BaseViewModel() {
         val usb = usbDevice
 
         viewModelScope.launch {
-            val emu = emulatorReady.await()
             when (action) {
                 Const.Value.FLASH_ZIP -> {
                     uri ?: return@launch
-                    flashZip(emu, uri)
+                    flashZip(emulator, uri)
                 }
                 Const.Value.UNINSTALL -> {
                     _showReboot.value = false
@@ -158,9 +164,13 @@ class FlashViewModel : BaseViewModel() {
 
         val (dir, zipFile, displayName) = prepResult
 
+        // Start the installer with the real terminal size
+        terminalReady.await()
+        val columns = emu.mColumns
+        val rows = emu.mRows
         val success = withContext(Dispatchers.IO) {
             runSuCommand(
-                emu,
+                emu, columns, rows,
                 "echo '- Installing $displayName'; " +
                 "sh $dir/update-binary dummy 1 '${zipFile.absolutePath}'; " +
                 "EXIT=\$?; " +
@@ -180,8 +190,8 @@ class FlashViewModel : BaseViewModel() {
             )
             val file = MediaStoreUtils.getFile(name)
             file.uri.outputStream().bufferedWriter().use { writer ->
-                val transcript = emulator?.screen?.transcriptText
-                if (flashAction == Const.Value.FLASH_ZIP && transcript != null) {
+                val transcript = emulator.screen.transcriptText
+                if (flashAction == Const.Value.FLASH_ZIP) {
                     writer.write(transcript)
                 } else {
                     synchronized(logItems) {
@@ -192,7 +202,7 @@ class FlashViewModel : BaseViewModel() {
                     }
                 }
             }
-            showSnackbar(file.toString())
+            showToast(file.toString())
         }
     }
 

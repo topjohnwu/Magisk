@@ -92,6 +92,7 @@ import com.topjohnwu.magisk.core.R as CoreR
 @Composable
 fun ModuleScreen(
     viewModel: ModuleViewModel,
+    isFabAtBottom: Boolean,
     modifier: Modifier = Modifier,
     onRegisterFab: (((() -> Unit)?) -> Unit)? = null,
     contentFocusRequester: FocusRequester? = null,
@@ -220,6 +221,9 @@ fun ModuleScreen(
             return@Scaffold
         }
 
+        val listBottomPadding = padding.calculateBottomPadding() + if (isFabAtBottom) 92.dp else 12.dp
+        val scrollbarBottomPadding = padding.calculateBottomPadding() + if (isFabAtBottom) 80.dp else 12.dp
+
         val gridState = rememberLazyStaggeredGridState()
         // Staggered, as cards expand; 360dp leaves room for the action buttons row
         LazyVerticalStaggeredGrid(
@@ -234,14 +238,14 @@ fun ModuleScreen(
                     gridState,
                     contentPadding = PaddingValues(
                         top = padding.calculateTopPadding() + 4.dp,
-                        bottom = padding.calculateBottomPadding() + 80.dp,
+                        bottom = scrollbarBottomPadding,
                     ),
                 ),
             contentPadding = PaddingValues(
                 start = 12.dp,
                 top = padding.calculateTopPadding() + 16.dp,
                 end = 12.dp,
-                bottom = padding.calculateBottomPadding() + 92.dp,
+                bottom = listBottomPadding,
             ),
             verticalItemSpacing = 8.dp,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
