@@ -42,6 +42,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.navigationevent.NavigationEventInfo
+import androidx.navigationevent.compose.NavigationBackHandler
+import androidx.navigationevent.compose.rememberNavigationEventState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -72,6 +75,15 @@ fun SuperuserGrantScreen(
     var showSortMenu by remember { mutableStateOf(false) }
     var showFilterMenu by remember { mutableStateOf(false) }
 
+    val searchBackState = rememberNavigationEventState(currentInfo = NavigationEventInfo.None)
+    NavigationBackHandler(
+        state = searchBackState,
+        isBackEnabled = query.isNotEmpty(),
+        onBackCompleted = {
+            viewModel.setQuery("")
+        }
+    )
+
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
         modifier = modifier,
@@ -79,7 +91,15 @@ fun SuperuserGrantScreen(
             TopAppBar(
                 title = { Text(stringResource(CoreR.string.superuser_grant)) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
+                    IconButton(
+                        onClick = {
+                            if (query.isNotEmpty()) {
+                                viewModel.setQuery("")
+                            } else {
+                                onBack()
+                            }
+                        }
+                    ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(CoreR.string.back),

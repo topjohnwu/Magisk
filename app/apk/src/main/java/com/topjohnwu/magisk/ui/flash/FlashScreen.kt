@@ -17,7 +17,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigationevent.NavigationEventInfo
+import androidx.navigationevent.compose.NavigationBackHandler
+import androidx.navigationevent.compose.rememberNavigationEventState
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.ui.component.rememberConfirmDialog
 import com.topjohnwu.magisk.ui.component.rememberExternalStoragePermissionLauncher
 import com.topjohnwu.magisk.ui.terminal.TerminalScreen
 import com.topjohnwu.magisk.core.R as CoreR
@@ -36,6 +40,26 @@ fun FlashScreen(
         viewModel.saveLog()
     }
 
+    val exitConfirmDialog = rememberConfirmDialog(onConfirm = onBack)
+    val exitTitle = stringResource(CoreR.string.running_exit_title)
+    val exitMessage = stringResource(CoreR.string.running_exit_msg)
+
+    val backState = rememberNavigationEventState(currentInfo = NavigationEventInfo.None)
+    NavigationBackHandler(
+        state = backState,
+        isBackEnabled = !finished,
+        onBackCompleted = {
+            if (!finished) {
+                exitConfirmDialog.showConfirm(
+                    title = exitTitle,
+                    content = exitMessage,
+                )
+            } else {
+                onBack()
+            }
+        }
+    )
+
     val statusText = when (flashState) {
         FlashViewModel.State.FLASHING -> stringResource(CoreR.string.flashing)
         FlashViewModel.State.SUCCESS -> stringResource(CoreR.string.done)
@@ -50,7 +74,16 @@ fun FlashScreen(
                 title = { Text("${stringResource(CoreR.string.flash_screen_title)} - $statusText") },
                 navigationIcon = {
                     IconButton(
-                        onClick = onBack
+                        onClick = {
+                            if (!finished) {
+                                exitConfirmDialog.showConfirm(
+                                    title = exitTitle,
+                                    content = exitMessage,
+                                )
+                            } else {
+                                onBack()
+                            }
+                        }
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,

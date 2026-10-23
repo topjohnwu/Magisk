@@ -47,7 +47,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.navigationevent.compose.LocalNavigationEventDispatcherOwner
+import androidx.navigationevent.compose.rememberNavigationEventDispatcherOwner
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -191,36 +194,39 @@ fun LogScreen(
                 beyondViewportPageCount = 0,
             ) { page ->
                 val isCurrentLogPage = pagerState.currentPage == page
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .focusProperties {
-                            onEnter = {
-                                if (!isCurrentLogPage) {
-                                    cancelFocusChange()
+                val childOwner = rememberNavigationEventDispatcherOwner(enabled = isCurrentLogPage)
+                CompositionLocalProvider(LocalNavigationEventDispatcherOwner provides childOwner) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .focusProperties {
+                                onEnter = {
+                                    if (!isCurrentLogPage) {
+                                        cancelFocusChange()
+                                    }
+                                }
+                                onExit = {
+                                    if (requestedFocusDirection == FocusDirection.Left ||
+                                        requestedFocusDirection == FocusDirection.Right
+                                    ) {
+                                        cancelFocusChange()
+                                    }
                                 }
                             }
-                            onExit = {
-                                if (requestedFocusDirection == FocusDirection.Left ||
-                                    requestedFocusDirection == FocusDirection.Right
-                                ) {
-                                    cancelFocusChange()
-                                }
-                            }
+                            .focusGroup()
+                    ) {
+                        when (page) {
+                            0 -> SuLogTab(
+                                logs = uiState.suLogs,
+                                nestedScrollConnection = scrollBehavior.nestedScrollConnection,
+                                contentPadding = padding,
+                            )
+                            1 -> MagiskLogTab(
+                                entries = uiState.magiskLogEntries,
+                                nestedScrollConnection = scrollBehavior.nestedScrollConnection,
+                                contentPadding = padding,
+                            )
                         }
-                        .focusGroup()
-                ) {
-                    when (page) {
-                        0 -> SuLogTab(
-                            logs = uiState.suLogs,
-                            nestedScrollConnection = scrollBehavior.nestedScrollConnection,
-                            contentPadding = padding,
-                        )
-                        1 -> MagiskLogTab(
-                            entries = uiState.magiskLogEntries,
-                            nestedScrollConnection = scrollBehavior.nestedScrollConnection,
-                            contentPadding = padding,
-                        )
                     }
                 }
             }
