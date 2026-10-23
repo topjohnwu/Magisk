@@ -88,7 +88,6 @@ fun MainScreen(
     modifier: Modifier = Modifier,
     initialTab: Int = Tab.HOME.ordinal,
     superuserViewModel: SuperuserViewModel? = null,
-    onAuthenticate: ((onSuccess: () -> Unit) -> Unit)? = null,
 ) {
     val navigator = LocalNavigator.current
     val scope = rememberCoroutineScope()
@@ -279,11 +278,6 @@ fun MainScreen(
                             } else {
                                 viewModel(factory = VMFactory)
                             }
-                        LaunchedEffect(onAuthenticate) {
-                            if (onAuthenticate != null) {
-                                vm.authenticate = onAuthenticate
-                            }
-                        }
                         LaunchedEffect(isCurrentPage) {
                             if (isCurrentPage) vm.startLoading()
                         }
@@ -315,11 +309,6 @@ fun MainScreen(
                     }
                     Tab.SETTINGS -> {
                         val vm: SettingsViewModel = viewModel(factory = VMFactory)
-                        LaunchedEffect(onAuthenticate) {
-                            if (onAuthenticate != null) {
-                                vm.authenticate = onAuthenticate
-                            }
-                        }
                         CollectNavEvents(vm, navigator)
                         SettingsScreen(vm)
                     }

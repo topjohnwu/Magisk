@@ -138,9 +138,6 @@ class MainActivity : ComponentActivity(), SplashScreenHost {
                                     MainScreen(
                                         initialTab = initialTab,
                                         superuserViewModel = superuserVm,
-                                        onAuthenticate = { action ->
-                                            extension.withAuthentication { if (it) action() }
-                                        }
                                     )
                                 }
                                 entry<Route.DenyList> { _ ->
@@ -164,26 +161,15 @@ class MainActivity : ComponentActivity(), SplashScreenHost {
                                     val vm: SuperuserViewModel = viewModel(
                                         viewModelStoreOwner = this@MainActivity, factory = VMFactory
                                     )
-                                    LaunchedEffect(Unit) {
-                                        vm.authenticate = { onSuccess ->
-                                            extension.withAuthentication { if (it) onSuccess() }
-                                        }
-                                    }
                                     SuperuserDetailScreen(
                                         uid = key.uid,
                                         viewModel = vm,
                                         onBack = { navigator.pop() },
-                                        onAuthenticate = { action ->
-                                            extension.withAuthentication { if (it) action() }
-                                        }
                                     )
                                 }
                                 entry<Route.SuperuserGrant> { _ ->
                                     val vm: SuperuserGrantViewModel = viewModel(factory = VMFactory)
                                     LaunchedEffect(Unit) {
-                                        vm.authenticate = { onSuccess ->
-                                            extension.withAuthentication { if (it) onSuccess() }
-                                        }
                                         vm.startLoading()
                                     }
                                     SuperuserGrantScreen(

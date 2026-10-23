@@ -44,8 +44,6 @@ class SuperuserViewModel(
     private val db: PolicyDao
 ) : AsyncLoadViewModel() {
 
-    var authenticate: (onSuccess: () -> Unit) -> Unit = { it() }
-
     init {
         @OptIn(FlowPreview::class)
         viewModelScope.launch {
@@ -163,24 +161,16 @@ class SuperuserViewModel(
     }
 
     fun updatePolicy(item: PolicyItem, newPolicy: Int) {
-        fun updateState() {
-            viewModelScope.launch {
-                item.policy.policy = newPolicy
-                db.update(item.policy)
-                _uiState.update { state ->
-                    state.copy(
-                        policies = state.policies.map {
-                            if (it.policy.uid == item.policy.uid) it.copy(policyValue = newPolicy) else it
-                        }
-                    )
-                }
+        viewModelScope.launch {
+            item.policy.policy = newPolicy
+            db.update(item.policy)
+            _uiState.update { state ->
+                state.copy(
+                    policies = state.policies.map {
+                        if (it.policy.uid == item.policy.uid) it.copy(policyValue = newPolicy) else it
+                    }
+                )
             }
-        }
-
-        if (Config.suAuth) {
-            authenticate { updateState() }
-        } else {
-            updateState()
         }
     }
 

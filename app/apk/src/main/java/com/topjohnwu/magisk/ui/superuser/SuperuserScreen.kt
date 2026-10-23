@@ -39,6 +39,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.topjohnwu.magisk.ui.component.onlyHorizontal
+import com.topjohnwu.magisk.ui.component.rememberBiometricAuth
 import com.topjohnwu.magisk.ui.component.verticalScrollbar
 import com.topjohnwu.magisk.ui.navigation.LocalNavigator
 import com.topjohnwu.magisk.ui.navigation.Route
@@ -55,6 +56,7 @@ fun SuperuserScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val navigator = LocalNavigator.current
+    val requireAuth = rememberBiometricAuth()
 
     DisposableEffect(onRegisterFab) {
         onRegisterFab?.invoke { navigator.push(Route.SuperuserGrant) }
@@ -162,7 +164,11 @@ fun SuperuserScreen(
                 val isLast = item == uiState.policies.lastOrNull()
                 PolicyCard(
                     item = item,
-                    onToggle = { viewModel.togglePolicy(item) },
+                    onToggle = {
+                        requireAuth {
+                            viewModel.togglePolicy(item)
+                        }
+                    },
                     onDetail = { navigator.push(Route.SuperuserDetail(item.policy.uid)) },
                     modifier = if (isLast && contentFocusRequester != null) {
                         Modifier.focusRequester(contentFocusRequester)

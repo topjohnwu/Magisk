@@ -53,6 +53,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.topjohnwu.magisk.ui.component.rememberBiometricAuth
 import com.topjohnwu.magisk.ui.component.verticalScrollbar
 import com.topjohnwu.magisk.core.R as CoreR
 
@@ -74,6 +75,7 @@ fun SuperuserGrantScreen(
 
     var showSortMenu by remember { mutableStateOf(false) }
     var showFilterMenu by remember { mutableStateOf(false) }
+    val requireAuth = rememberBiometricAuth()
 
     val searchBackState = rememberNavigationEventState(currentInfo = NavigationEventInfo.None)
     NavigationBackHandler(
@@ -235,7 +237,11 @@ fun SuperuserGrantScreen(
                     ) { app ->
                         SuGrantAppCard(
                             app = app,
-                            onToggle = { viewModel.toggleGrant(app) }
+                            onToggle = {
+                                requireAuth {
+                                    viewModel.toggleGrant(app)
+                                }
+                            }
                         )
                     }
                 }
