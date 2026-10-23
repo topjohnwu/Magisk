@@ -93,18 +93,18 @@ class LogViewModel(
                 ProcessBuilder("logcat", "-d").start()
                     .inputStream.reader().use { it.copyTo(file) }
             }
-            showSnackbar(logFile.toString())
+            showToast(logFile.toString())
         }
     }
 
     fun clearMagiskLog() = repo.clearMagiskLogs {
-        showSnackbar(R.string.logs_cleared)
+        showToast(R.string.logs_cleared)
         startLoading()
     }
 
     fun clearLog() = viewModelScope.launch {
         repo.clearLogs()
-        showSnackbar(R.string.logs_cleared)
+        showToast(R.string.logs_cleared)
         startLoading()
     }
 }

@@ -231,7 +231,9 @@ fun MainScreen(
         ) { page ->
             val isCurrentPage = pagerState.currentPage == page
             val childOwner = rememberNavigationEventDispatcherOwner(enabled = isCurrentPage)
-            CompositionLocalProvider(LocalNavigationEventDispatcherOwner provides childOwner) {
+            CompositionLocalProvider(
+                LocalNavigationEventDispatcherOwner provides childOwner,
+            ) {
                 val tab = visibleTabs[page]
                 Box(
                 modifier = Modifier
@@ -285,6 +287,7 @@ fun MainScreen(
                         SuperuserScreen(
                             viewModel = vm,
                             onRegisterFab = { superuserFabAction = it },
+                            isFabAtBottom = isBar,
                             contentFocusRequester = superuserContentFocusRequester,
                         )
                     }
@@ -304,6 +307,7 @@ fun MainScreen(
                         ModuleScreen(
                             viewModel = vm,
                             onRegisterFab = { moduleFabAction = it },
+                            isFabAtBottom = isBar,
                             contentFocusRequester = moduleContentFocusRequester,
                         )
                     }

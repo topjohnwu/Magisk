@@ -7,10 +7,6 @@ import kotlinx.coroutines.withContext
 
 open class MagiskDB {
 
-    class Literal(
-        val str: String
-    )
-
     suspend inline fun <R> exec(
         query: String,
         crossinline mapper: (Map<String, String>) -> R
@@ -39,7 +35,6 @@ open class MagiskDB {
             when (it) {
                 is Boolean -> if (it) "1" else "0"
                 is Number -> it.toString()
-                is Literal -> it.str
                 else -> "\"$it\""
             }
         }

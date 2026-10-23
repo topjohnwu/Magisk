@@ -14,11 +14,11 @@ abstract class BaseViewModel : ViewModel() {
     private val _navEvents = MutableSharedFlow<Route>(extraBufferCapacity = 1)
     val navEvents: SharedFlow<Route> = _navEvents
 
-    fun showSnackbar(@StringRes resId: Int) {
+    fun showToast(@StringRes resId: Int) {
         AppContext.toast(resId, Toast.LENGTH_SHORT)
     }
 
-    fun showSnackbar(msg: String) {
+    fun showToast(msg: String) {
         AppContext.toast(msg, Toast.LENGTH_SHORT)
     }
 

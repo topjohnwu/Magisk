@@ -118,10 +118,11 @@ fun FlashScreen(
         }
     ) { padding ->
         TerminalScreen(
+            emulator = viewModel.emulator,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
-            onEmulatorCreated = { viewModel.onEmulatorCreated(it) },
+            onResized = viewModel::onTerminalResized,
         )
     }
 }

@@ -1,7 +1,5 @@
 package com.topjohnwu.magisk.ui.superuser
 
-import android.graphics.drawable.Drawable
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,7 +27,7 @@ import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.drawablepainter.rememberDrawablePainter
+import com.topjohnwu.magisk.ui.component.AppIcon
 import com.topjohnwu.magisk.core.R as CoreR
 
 @Composable
@@ -50,9 +48,8 @@ internal fun SharedUidBadge(modifier: Modifier = Modifier) {
 
 @Composable
 fun SuperuserAppListItem(
-    icon: Drawable,
-    title: String,
     packageName: String,
+    title: String,
     isSharedUid: Boolean,
     modifier: Modifier = Modifier,
     contentDescription: String? = null,
@@ -61,8 +58,8 @@ fun SuperuserAppListItem(
     ListItem(
         modifier = modifier,
         leadingContent = {
-            Image(
-                painter = rememberDrawablePainter(icon),
+            AppIcon(
+                packageName = packageName,
                 contentDescription = null,
                 modifier = Modifier.size(40.dp)
             )
@@ -94,9 +91,8 @@ fun SuperuserAppListItem(
 
 @Composable
 fun SuperuserAppCard(
-    icon: Drawable,
-    title: String,
     packageName: String,
+    title: String,
     isSharedUid: Boolean,
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
@@ -110,9 +106,8 @@ fun SuperuserAppCard(
 ) {
     val itemContent = @Composable {
         SuperuserAppListItem(
-            icon = icon,
-            title = title,
             packageName = packageName,
+            title = title,
             isSharedUid = isSharedUid,
             contentDescription = contentDescription,
             trailingContent = trailingContent,

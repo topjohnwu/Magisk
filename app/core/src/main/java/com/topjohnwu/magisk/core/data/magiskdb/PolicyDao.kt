@@ -5,7 +5,7 @@ import com.topjohnwu.magisk.core.AppContext
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.model.su.SuPolicy
 
-private const val SELECT_QUERY = "SELECT (until - strftime(\"%s\", \"now\")) AS remain, *"
+private const val SELECT_QUERY = "SELECT *"
 
 class PolicyDao : MagiskDB() {
 
@@ -45,15 +45,6 @@ class PolicyDao : MagiskDB() {
     private fun toPolicy(map: Map<String, String>): SuPolicy? {
         val uid = map["uid"]?.toInt() ?: return null
         val policy = SuPolicy(uid)
-
-        map["until"]?.toLong()?.let { until ->
-            if (until <= 0) {
-                policy.remain = until
-            } else {
-                map["remain"]?.toLong()?.let { policy.remain = it }
-            }
-        }
-
         map["policy"]?.toInt()?.let { policy.policy = it }
         map["logging"]?.toInt()?.let { policy.logging = it != 0 }
         map["notification"]?.toInt()?.let { policy.notification = it != 0 }

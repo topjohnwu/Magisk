@@ -1,11 +1,8 @@
 package com.topjohnwu.magisk.core.model.su
 
-import com.topjohnwu.magisk.core.data.magiskdb.MagiskDB
-
 class SuPolicy(
     var uid: Int,
     var policy: Int = DENY,
-    var remain: Long = -1L,
     var logging: Boolean = true,
     var notification: Boolean = true,
 ) {
@@ -17,15 +14,11 @@ class SuPolicy(
     }
 
     fun toMap(): MutableMap<String, Any> {
-        val until = if (remain <= 0) {
-            remain
-        } else {
-            MagiskDB.Literal("(strftime(\"%s\", \"now\") + $remain)")
-        }
         return mutableMapOf(
             "uid" to uid,
             "policy" to policy,
-            "until" to until,
+            // Timed grants are no longer supported; all policies are permanent
+            "until" to 0,
             "logging" to logging,
             "notification" to notification
         )

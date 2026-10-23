@@ -183,7 +183,7 @@ class SettingsViewModel : BaseViewModel() {
             )
         }
         if (isMismatch) {
-            showSnackbar(CoreR.string.reboot_apply_change)
+            showToast(CoreR.string.reboot_apply_change)
         }
     }
 

@@ -2,8 +2,8 @@ package com.topjohnwu.magisk.ui.superuser
 
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager.MATCH_UNINSTALLED_PACKAGES
-import android.graphics.drawable.Drawable
 import android.os.Process
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.arch.AsyncLoadViewModel
 import com.topjohnwu.magisk.core.AppContext
@@ -14,6 +14,7 @@ import com.topjohnwu.magisk.core.ktx.concurrentMap
 import com.topjohnwu.magisk.core.ktx.getLabel
 import com.topjohnwu.magisk.core.model.su.SuPolicy
 import com.topjohnwu.magisk.core.su.SuEvents
+import com.topjohnwu.magisk.ui.component.AppSortBy
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,12 +32,10 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.Locale
 
-enum class SortBy { NAME, PACKAGE_NAME, INSTALL_TIME, UPDATE_TIME }
-
+@Immutable
 data class SuGrantAppInfo(
     val label: String,
     val packageName: String,
-    val icon: Drawable,
     val uid: Int,
     val isSystemApp: Boolean,
     val isApp: Boolean,
@@ -53,6 +52,7 @@ data class SuGrantAppInfo(
     }
 }
 
+@Immutable
 data class SuGrantAppState(
     val info: SuGrantAppInfo,
     val isGranted: Boolean,
@@ -77,8 +77,8 @@ class SuperuserGrantViewModel(
     private val _showOS = MutableStateFlow(false)
     val showOS: StateFlow<Boolean> = _showOS.asStateFlow()
 
-    private val _sortBy = MutableStateFlow(SortBy.NAME)
-    val sortBy: StateFlow<SortBy> = _sortBy.asStateFlow()
+    private val _sortBy = MutableStateFlow(AppSortBy.NAME)
+    val sortBy: StateFlow<AppSortBy> = _sortBy.asStateFlow()
 
     private val _sortReverse = MutableStateFlow(false)
     val sortReverse: StateFlow<Boolean> = _sortReverse.asStateFlow()
@@ -91,7 +91,7 @@ class SuperuserGrantViewModel(
         val q = args[1] as String
         val showSys = args[2] as Boolean
         val showOS = args[3] as Boolean
-        val sort = args[4] as SortBy
+        val sort = args[4] as AppSortBy
         val reverse = args[5] as Boolean
 
         val filtered = apps.filter { app ->
@@ -108,13 +108,13 @@ class SuperuserGrantViewModel(
         }
 
         val secondary: Comparator<SuGrantAppState> = when (sort) {
-            SortBy.NAME -> compareBy<SuGrantAppState, String>(String.CASE_INSENSITIVE_ORDER) { it.info.label }
+            AppSortBy.NAME -> compareBy<SuGrantAppState, String>(String.CASE_INSENSITIVE_ORDER) { it.info.label }
                 .thenBy { it.info.packageName }
-            SortBy.PACKAGE_NAME -> compareBy(String.CASE_INSENSITIVE_ORDER) { it.info.packageName }
-            SortBy.INSTALL_TIME -> compareByDescending<SuGrantAppState> { it.info.firstInstallTime }
+            AppSortBy.PACKAGE_NAME -> compareBy(String.CASE_INSENSITIVE_ORDER) { it.info.packageName }
+            AppSortBy.INSTALL_TIME -> compareByDescending<SuGrantAppState> { it.info.firstInstallTime }
                 .thenBy(String.CASE_INSENSITIVE_ORDER) { it.info.label }
                 .thenBy { it.info.packageName }
-            SortBy.UPDATE_TIME -> compareByDescending<SuGrantAppState> { it.info.lastUpdateTime }
+            AppSortBy.UPDATE_TIME -> compareByDescending<SuGrantAppState> { it.info.lastUpdateTime }
                 .thenBy(String.CASE_INSENSITIVE_ORDER) { it.info.label }
                 .thenBy { it.info.packageName }
         }
@@ -129,7 +129,7 @@ class SuperuserGrantViewModel(
         if (!v) _showOS.value = false
     }
     fun setShowOS(v: Boolean) { _showOS.value = v }
-    fun setSortBy(s: SortBy) { _sortBy.value = s }
+    fun setSortBy(s: AppSortBy) { _sortBy.value = s }
     fun toggleSortReverse() { _sortReverse.value = !_sortReverse.value }
 
     fun toggleGrant(app: SuGrantAppState) {
@@ -150,7 +150,6 @@ class SuperuserGrantViewModel(
                         val existing = policyDB.fetch(app.info.uid)
                         val suPolicy = existing ?: SuPolicy(app.info.uid)
                         suPolicy.policy = if (Config.suRestrict) SuPolicy.RESTRICT else SuPolicy.ALLOW
-                        suPolicy.remain = 0L
                         policyDB.update(suPolicy)
                     } else {
                         policyDB.delete(app.info.uid)
@@ -220,13 +219,11 @@ class SuperuserGrantViewModel(
                     }
                     val isSharedUid = pkg?.sharedUserId != null
                     val label = appInfo.getLabel(pm)
-                    val icon = runCatching { appInfo.loadIcon(pm) }.getOrDefault(pm.defaultActivityIcon)
                     val isSystemApp = (appInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0
                     val isApp = Process.isApplicationUid(appInfo.uid)
                     val suAppInfo = SuGrantAppInfo(
                         label = label,
                         packageName = appInfo.packageName,
-                        icon = icon,
                         uid = appInfo.uid,
                         isSystemApp = isSystemApp,
                         isApp = isApp,

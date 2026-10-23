@@ -1,8 +1,9 @@
 package com.topjohnwu.magisk.terminal
 
-import android.os.Handler
-import android.os.Looper
 import com.topjohnwu.superuser.Shell
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 private val busyboxPath: String by lazy {
@@ -10,17 +11,17 @@ private val busyboxPath: String by lazy {
         ?: "/data/adb/magisk/busybox"
 }
 
-private val mainHandler = Handler(Looper.getMainLooper())
+private val terminalScope = CoroutineScope(Dispatchers.Main.immediate)
 
 fun TerminalEmulator.appendOnMain(bytes: ByteArray, len: Int) {
-    mainHandler.post {
+    terminalScope.launch {
         append(bytes, len)
         onScreenUpdate?.invoke()
     }
 }
 
 fun TerminalEmulator.appendLineOnMain(line: String) {
-    mainHandler.post {
+    terminalScope.launch {
         val clear = if (inPlaceNewlines > 0) {
             "\r\u001b[${inPlaceNewlines}A\u001b[J"
         } else {
@@ -43,14 +44,13 @@ fun TerminalEmulator.appendLineOnMain(line: String) {
 /**
  * Run a command as root inside a PTY (via busybox script).
  * Reads raw bytes from the process and feeds them to the terminal emulator.
- * Must be called from a background thread.
+ * Must be called from a background thread. [columns] and [rows] should be read from the
+ * emulator on the main thread, after the terminal has been sized to its viewport.
  * Returns true if the process exits with code 0.
  */
-fun runSuCommand(emulator: TerminalEmulator, command: String): Boolean {
+fun runSuCommand(emulator: TerminalEmulator, columns: Int, rows: Int, command: String): Boolean {
     return try {
-        val cols = emulator.mColumns
-        val rows = emulator.mRows
-        val wrappedCmd = "export TERM=xterm-256color; stty cols $cols rows $rows 2>/dev/null; $command"
+        val wrappedCmd = "export TERM=xterm-256color; stty cols $columns rows $rows 2>/dev/null; $command"
         val escapedCmd = wrappedCmd.replace("'", "'\\''")
 
         val process = ProcessBuilder(
