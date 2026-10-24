@@ -253,7 +253,8 @@ fun ModuleScreen(
         ) {
             items(
                 items = uiState.modules,
-                key = { it.module.id },
+                // Module ids come from module.prop and can be duplicated, directory names can't
+                key = { it.module.base.name },
                 contentType = { "ModuleCard" }
             ) { item ->
                 val isLast = item == uiState.modules.lastOrNull()
@@ -285,7 +286,7 @@ private fun ModuleCard(
     val infoAlpha = if (!item.isRemoved && item.isEnabled && !item.showNotice) 1f else 0.5f
     val strikeThrough = if (item.isRemoved) TextDecoration.LineThrough else TextDecoration.None
     val colorScheme = MaterialTheme.colorScheme
-    var expanded by rememberSaveable(item.module.id) { mutableStateOf(false) }
+    var expanded by rememberSaveable(item.module.base.name) { mutableStateOf(false) }
     val hasDescription = item.module.description.isNotBlank()
 
     Card(

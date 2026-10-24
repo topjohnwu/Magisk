@@ -65,7 +65,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.io.IOException
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.resume
 
 sealed interface ConfirmResult {
@@ -642,7 +642,10 @@ fun MarkdownTextAsync(
     LaunchedEffect(Unit) {
         try {
             mdText = withContext(Dispatchers.IO) { getMarkdownText() }
-        } catch (e: IOException) {
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            // The text can come from a URL provided by a module, which can be malformed
             Timber.e(e)
             error = true
         }

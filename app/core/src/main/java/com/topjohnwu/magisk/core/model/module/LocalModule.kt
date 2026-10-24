@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.core.model.module
 
-import com.squareup.moshi.JsonDataException
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.utils.RootUtils
@@ -9,8 +8,8 @@ import com.topjohnwu.superuser.nio.ExtendedFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.io.IOException
 import java.util.Locale
+import kotlin.coroutines.cancellation.CancellationException
 
 data class LocalModule(
     val base: ExtendedFile,
@@ -110,9 +109,11 @@ data class LocalModule(
             updateInfo = OnlineModule(this, json)
             outdated = json.versionCode > versionCode
             return true
-        } catch (e: IOException) {
-            Timber.w(e)
-        } catch (e: JsonDataException) {
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            // The URL and the JSON come from the module, so anything can be wrong with them,
+            // e.g. a malformed URL makes Retrofit throw IllegalArgumentException
             Timber.w(e)
         }
 
