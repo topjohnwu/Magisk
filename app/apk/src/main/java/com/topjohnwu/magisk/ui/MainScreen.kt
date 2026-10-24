@@ -183,7 +183,8 @@ fun MainScreen(
                     icon = {
                         Icon(
                             imageVector = ImageVector.vectorResource(tab.iconRes),
-                            contentDescription = stringResource(tab.titleRes),
+                            // The label below already names the tab
+                            contentDescription = null,
                         )
                     },
                     label = { Text(stringResource(tab.titleRes)) },
