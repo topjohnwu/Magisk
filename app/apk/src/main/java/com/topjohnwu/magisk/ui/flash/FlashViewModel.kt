@@ -21,6 +21,7 @@ import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.terminal.TerminalEmulator
 import com.topjohnwu.magisk.terminal.appendLineOnMain
 import com.topjohnwu.magisk.terminal.runSuCommand
+import com.topjohnwu.magisk.terminal.shellQuoted
 import com.topjohnwu.superuser.CallbackList
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.CompletableDeferred
@@ -176,11 +177,14 @@ class FlashViewModel(private val savedState: SavedStateHandle) : BaseViewModel()
         terminalReady.await()
         val columns = emu.mColumns
         val rows = emu.mRows
+        // The name and path come from other apps, so never let the shell interpret them, and
+        // drop control characters from the name so it can't send escape sequences to the terminal
+        emu.appendLineOnMain("- Installing ${displayName.filterNot { it.isISOControl() }}")
         val success = withContext(Dispatchers.IO) {
             runSuCommand(
                 emu, columns, rows,
-                "echo '- Installing $displayName'; " +
-                "sh $dir/update-binary dummy 1 '${zipFile.absolutePath}'; " +
+                "sh ${File(dir, "update-binary").path.shellQuoted()} dummy 1 " +
+                "${zipFile.absolutePath.shellQuoted()}; " +
                 "EXIT=\$?; " +
                 "if [ \$EXIT -ne 0 ]; then echo '! Installation failed'; fi; " +
                 "exit \$EXIT"
