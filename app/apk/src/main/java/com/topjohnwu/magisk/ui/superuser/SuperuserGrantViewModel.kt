@@ -28,6 +28,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.toCollection
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.Locale
@@ -62,6 +64,8 @@ data class SuGrantAppState(
 class SuperuserGrantViewModel(
     private val policyDB: PolicyDao
 ) : AsyncLoadViewModel() {
+
+    private val writeLock = Mutex()
 
     private val _loading = MutableStateFlow(true)
     val loading: StateFlow<Boolean> = _loading.asStateFlow()
@@ -133,10 +137,14 @@ class SuperuserGrantViewModel(
     fun toggleSortReverse() { _sortReverse.value = !_sortReverse.value }
 
     fun toggleGrant(app: SuGrantAppState) {
-        val willGrant = !app.isGranted
+        // Toggle the current state rather than the one the UI captured: two quick taps can
+        // deliver the same item before it recomposes
+        val uid = app.info.uid
+        val target = _allApps.value.firstOrNull { it.info.uid == uid } ?: return
+        val willGrant = !target.isGranted
         _allApps.update { apps ->
             apps.map { current ->
-                if (current.info.uid == app.info.uid) {
+                if (current.info.uid == uid) {
                     current.copy(isGranted = willGrant)
                 } else {
                     current
@@ -145,14 +153,18 @@ class SuperuserGrantViewModel(
         }
         viewModelScope.launch {
             try {
-                withContext(Dispatchers.IO) {
-                    if (willGrant) {
-                        val existing = policyDB.fetch(app.info.uid)
-                        val suPolicy = existing ?: SuPolicy(app.info.uid)
-                        suPolicy.policy = if (Config.suRestrict) SuPolicy.RESTRICT else SuPolicy.ALLOW
-                        policyDB.update(suPolicy)
-                    } else {
-                        policyDB.delete(app.info.uid)
+                // Write in tap order: a grant takes two queries and a revoke one, so unordered
+                // writes could leave an app granted while it is shown as not granted
+                writeLock.withLock {
+                    withContext(Dispatchers.IO) {
+                        if (willGrant) {
+                            val existing = policyDB.fetch(uid)
+                            val suPolicy = existing ?: SuPolicy(uid)
+                            suPolicy.policy = if (Config.suRestrict) SuPolicy.RESTRICT else SuPolicy.ALLOW
+                            policyDB.update(suPolicy)
+                        } else {
+                            policyDB.delete(uid)
+                        }
                     }
                 }
             } catch (e: Exception) {
@@ -160,7 +172,7 @@ class SuperuserGrantViewModel(
                 Timber.e(e)
                 _allApps.update { apps ->
                     apps.map { current ->
-                        if (current.info.uid == app.info.uid && current.isGranted == willGrant) {
+                        if (current.info.uid == uid && current.isGranted == willGrant) {
                             current.copy(isGranted = !willGrant)
                         } else {
                             current
