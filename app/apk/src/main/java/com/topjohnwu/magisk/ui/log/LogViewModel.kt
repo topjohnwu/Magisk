@@ -47,7 +47,8 @@ class LogViewModel(
     private var magiskLogRaw = ""
 
     override suspend fun doLoadWork() {
-        _uiState.update { it.copy(loading = true) }
+        // Keep showing the current list while refreshing: loading is only true until the first
+        // load finishes, so a refresh doesn't swap the list for a spinner and lose its scroll
         withContext(Dispatchers.Default) {
             magiskLogRaw = repo.fetchMagiskLogs()
             val suLogs = if (Info.env.isActive) repo.fetchSuLogs() else emptyList()

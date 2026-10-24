@@ -75,7 +75,8 @@ class SuperuserViewModel(
             _uiState.update { it.copy(loading = false) }
             return
         }
-        _uiState.update { it.copy(loading = true) }
+        // Keep showing the current list while refreshing: loading is only true until the first
+        // load finishes, so a refresh doesn't swap the list for a spinner and lose its scroll
         writeLock.withLock {
             val loaded = withContext(Dispatchers.IO) {
                 db.deleteOutdated()

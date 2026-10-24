@@ -181,6 +181,9 @@ class DenyListViewModel : AsyncLoadViewModel() {
     }
 
     override suspend fun doLoadWork() {
+        // Scanning every app is slow and resets the list, so only do it once: this is called
+        // again whenever the screen is recreated, e.g. on rotation
+        if (_allApps.value.isNotEmpty()) return
         _loading.value = true
         val apps = withContext(Dispatchers.Default) {
             val pm = AppContext.packageManager
