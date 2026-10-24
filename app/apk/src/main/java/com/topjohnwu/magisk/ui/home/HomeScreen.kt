@@ -79,6 +79,7 @@ import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.download.DownloadEngine
 import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.core.ktx.reboot
+import com.topjohnwu.magisk.core.model.UpdateInfo
 import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.ui.component.AdaptiveColumns
 import com.topjohnwu.magisk.ui.component.LoadingDialog
@@ -106,10 +107,12 @@ fun HomeScreen(
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     var showUninstallDialog by rememberSaveable { mutableStateOf(false) }
-    var showManagerDialog by rememberSaveable { mutableStateOf(false) }
+    // Keep the update itself, so a restored dialog doesn't depend on Info.update, which is reset
+    // on connectivity changes and after process death
+    var managerUpdate by rememberSaveable { mutableStateOf<UpdateInfo?>(null) }
     var showEnvFixDialog by rememberSaveable { mutableStateOf(false) }
     var showInstallDialog by rememberSaveable { mutableStateOf(false) }
-    var envFixCode by remember { mutableIntStateOf(0) }
+    var envFixCode by rememberSaveable { mutableIntStateOf(0) }
 
     LaunchedEffect(uiState.showUninstall) {
         if (uiState.showUninstall) {
@@ -118,8 +121,8 @@ fun HomeScreen(
         }
     }
     LaunchedEffect(uiState.showManagerInstall) {
-        if (uiState.showManagerInstall) {
-            showManagerDialog = true
+        uiState.showManagerInstall?.let {
+            managerUpdate = it
             viewModel.onManagerInstallConsumed()
         }
     }
@@ -148,14 +151,15 @@ fun HomeScreen(
         )
     }
 
-    if (showManagerDialog) {
+    managerUpdate?.let { update ->
         ManagerInstallComposableDialog(
+            update = update,
             cacheDir = context.cacheDir,
-            onDismiss = { showManagerDialog = false },
+            onDismiss = { managerUpdate = null },
             onInstall = {
-                showManagerDialog = false
+                managerUpdate = null
                 (context as? MainActivity)?.let {
-                    DownloadEngine.startWithActivity(it, Subject.App())
+                    DownloadEngine.startWithActivity(it, Subject.App(update))
                 }
             }
         )
@@ -818,6 +822,7 @@ private fun UninstallComposableDialog(
 
 @Composable
 private fun ManagerInstallComposableDialog(
+    update: UpdateInfo,
     cacheDir: File,
     onDismiss: () -> Unit,
     onInstall: () -> Unit,
@@ -834,8 +839,8 @@ private fun ManagerInstallComposableDialog(
         scrollable = true,
     ) {
         MarkdownTextAsync {
-            val text = Info.update.note
-            File(cacheDir, "${Info.update.versionCode}.md").writeText(text)
+            val text = update.note
+            File(cacheDir, "${update.versionCode}.md").writeText(text)
             text
         }
     }

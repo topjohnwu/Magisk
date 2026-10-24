@@ -13,6 +13,7 @@ import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.ktx.await
 import com.topjohnwu.magisk.core.ktx.reboot
 import com.topjohnwu.magisk.core.ktx.toast
+import com.topjohnwu.magisk.core.model.UpdateInfo
 import com.topjohnwu.magisk.core.repository.NetworkService
 import com.topjohnwu.magisk.core.tasks.MagiskInstaller
 import com.topjohnwu.magisk.utils.asFlow
@@ -41,13 +42,17 @@ class HomeViewModel(
         val managerRemoteVersion: String = "",
         val managerProgress: Int = 0,
         val showUninstall: Boolean = false,
-        val showManagerInstall: Boolean = false,
+        // The update to show in the app install dialog, as one-shot event
+        val showManagerInstall: UpdateInfo? = null,
         val envFixCode: Int = 0,
         val showLoading: Boolean = false,
         val magiskState: State = computeMagiskState(),
         val magiskInstalledVersion: String = computeMagiskInstalledVersion(),
         val managerInstalledVersion: String = computeManagerInstalledVersion(),
     )
+
+    // Info.update is reset on every connectivity change, so keep the update that the UI shows
+    private var latestUpdate: UpdateInfo? = null
 
     private val _uiState = MutableStateFlow(UiState())
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
@@ -96,6 +101,7 @@ class HomeViewModel(
             )
         }
         Info.fetchUpdate(svc)?.apply {
+            latestUpdate = this
             val isDebug = Config.updateChannel == Config.Value.DEBUG_CHANNEL
             _uiState.update {
                 it.copy(
@@ -131,12 +137,13 @@ class HomeViewModel(
         when (_uiState.value.appState) {
             State.LOADING -> showToast(CoreR.string.loading)
             State.INVALID -> showToast(CoreR.string.no_connection)
-            else -> _uiState.update { it.copy(showManagerInstall = true) }
+            else -> latestUpdate?.let { info -> _uiState.update { it.copy(showManagerInstall = info) } }
+                ?: showToast(CoreR.string.no_connection)
         }
     }
 
     fun onManagerInstallConsumed() {
-        _uiState.update { it.copy(showManagerInstall = false) }
+        _uiState.update { it.copy(showManagerInstall = null) }
     }
 
     fun onEnvFixConsumed() {
