@@ -2,9 +2,14 @@
 
 ### Q: I installed a module and it bootlooped my device. Help!
 
-If you have USB debugging enabled in developer options, connect your phone to the PC. If your device is detected (check by `adb devices`), enter ADB shell and run the command `magisk --remove-modules`. This will remove all your modules and automatically reboot the device.
+Magisk includes built-in bootloop protection: if your device fails to finish booting (`boot_completed`) **twice in a row**, Magisk will automatically enter **Safe Mode** on the next boot, disabling all modules (by creating a `disable` file in each module folder) and disabling Zygisk so your device can boot normally.
 
-If unfortunately you do not have USB debugging enabled you can boot using the Safe Mode key combo to cause Magisk to create an empty file named 'disable' in modules directories which disables modules when next booted with Magisk. Most modern Android devices support such a special key combo at boot to enter system Safe Mode as an emergency option, but **please note** that Magisk's key combo detection occurs _earlier_ than system detection so the key combo timing indicated by many online guides may need to be altered to activate Magisk's Safe Mode. (It's possible to activate system Safe Mode but not Magisk Safe Mode and vice versa.)
+If your device is stuck before automatic bootloop detection can recover it, or you want to manually recover:
+
+- If you have USB debugging enabled in developer options, connect your phone to the PC. If your device is detected (check by `adb devices`), enter ADB shell and run the command `magisk --remove-modules`. This will remove all your modules and automatically reboot the device.
+- If your device can still boot into Android, you can also toggle **Safe Mode** directly from the Reboot menu (power icon) at the top of the Magisk app Home screen, then reboot.
+
+If you do not have USB debugging enabled and the device cannot boot, you can trigger Safe Mode manually using the hardware key combo at boot. Most modern Android devices support a special key combo at boot to enter system Safe Mode as an emergency option, but **please note** that Magisk's key combo detection occurs _earlier_ than system detection so the key combo timing indicated by many online guides may need to be altered to activate Magisk's Safe Mode. (It's possible to activate system Safe Mode but not Magisk Safe Mode and vice versa.)
 
 The following details should ensure that modules are properly disabled:
 
@@ -18,6 +23,8 @@ Magisk no longer handles root hiding. There are plenty of Magisk/Zygisk modules 
 
 ### Q: How to use Magisk in the emulator?
 
-With the emulator running and accessible via ADB, run `./build.py emulator <path to Magisk APK>` to temporarily install Magisk on to the emulator. The patch is not persistent, meaning Magisk will be lost after a reboot, so re-execute the script to emulate a reboot if required.
+With the emulator running and accessible via ADB, run `./build.py emulator [path to Magisk APK]` (or `./build.py emulator -b` to build and install from source) to temporarily start Magisk on the running emulator. This runtime setup is not persistent across cold reboots, so re-execute the command to emulate a reboot if required.
 
-The script is only tested on the official Android Virtual Device (AVD) shipped alongside Android Studio; other emulators may work, but the emulator must have SELinux enabled.
+For a persistent installation on an Android Virtual Device (AVD), you can patch its `ramdisk.img` directly on your host machine using `./build.py patch --avd <path/to/ramdisk.img> [output]`.
+
+These commands are tested on the official Android Virtual Device (AVD) shipped alongside Android Studio; other emulators may work, but the emulator must have SELinux enabled.

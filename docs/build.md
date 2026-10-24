@@ -15,28 +15,30 @@
   - (Optional on Windows): Run `pip install colorama` to install the `colorama` python package
 - Install Git:
   - On Unix, install git with your favorite package manager
-  - On Windows, download the install the latest Git version on the [official website](https://git-scm.com/download/win).<br>
+  - On Windows, download and install the latest Git version on the [official website](https://git-scm.com/download/win).<br>
     Make sure to **"Enable symbolic links"** during installation.
 - Install Android Studio and follow the instructions and go through the initial setup.
 - Set environment variable `ANDROID_HOME` to the Android SDK folder. This path can be found in Android Studio settings.
 - Setup JDK:
   - The recommended option is to set environment variable `ANDROID_STUDIO` to the path where your Android Studio is installed. The build script will automatically find and use the bundled JDK.
-  - You can also setup JDK 17 yourself, but this guide will not cover the instructions.
+  - You can also setup JDK 25 yourself, but this guide will not cover the instructions.
 - Clone sources: `git clone --recurse-submodules https://github.com/topjohnwu/Magisk.git`
 - Run `./build.py ndk` to let the script download and install NDK for you
 
 ## Building
 
 - To build everything and create the final Magisk APK, run `./build.py all`.
-- You can also build specific sub-components; call `build.py` to see your options. \
-  For each action, use `-h` to access help (e.g. `./build.py binary -h`)
+- You can also build specific sub-components; call `./build.py -h` to see all available actions. \
+  For each action, use `-h` to access help (e.g. `./build.py native -h`).
 - Configure the build by using `config.prop`. A sample `config.prop.sample` is provided.
+- If `sccache` or `ccache` is installed and available in your `PATH`, `build.py` will automatically use it to speed up C++ and Rust builds.
+- To run standalone tools (such as `./gradlew`, `cargo`, or `ndk-build`) with the same environment variables configured by `build.py`, prefix the command with `scripts/env.py` (e.g. `scripts/env.py ./gradlew :apk:assembleDebug`). You can also run `./build.py clippy` to lint Rust code or `./build.py cargo ...` to invoke Cargo directly against the native workspace.
 
 ## IDE Support
 
 - Kotlin, Java, C++, and C code in the project should be supported in Android Studio out of the box. This repository can be directly opened with Android Studio as a project.
 - For Rust development, see the next section.
-- Before working on any native code, build all native code first with `./build.py binary`, as some generated code is only created during the build process.
+- Before working on any native code, run `./build.py gen` (or build all native code with `./build.py native`), which generates build flags, C++/Rust FFI bindings, protobuf sources, and `native/compile_commands.json` for C/C++ language servers.
 
 ### Developing Rust
 
@@ -57,7 +59,7 @@ If you plan to use VSCode, you can then install the [rust-analyzer](https://mark
 
 ```bash
 rustup toolchain install nightly
-# Add some components that is also included in ONDK
+# Add some components that are also included in ONDK
 rustup +nightly component add rust-src clippy
 ```
 

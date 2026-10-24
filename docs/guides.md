@@ -113,6 +113,8 @@ Update JSON format:
 
 Please read the [Boot Scripts](#boot-scripts) section to understand the difference between `post-fs-data.sh` and `service.sh`. For most module developers, `service.sh` should be good enough if you just need to run a boot script. If you need to wait for boot completed, you can use `resetprop -w sys.boot_completed 0`.
 
+If your module includes an `action.sh` script, the Magisk app will display an **Action** button on the module's card in the Modules tab. Tapping it executes `action.sh` in the app's built-in console with BusyBox standalone mode enabled (`BOOTMODE=true`).
+
 In all scripts of your module, please use `MODDIR=${0%/*}` to get your module's base directory path; do **NOT** hardcode your module path in scripts.
 If Zygisk is enabled, the environment variable `ZYGISK_ENABLED` will be set to `1`.
 
@@ -124,7 +126,7 @@ If you place a file named `.replace` in any of the folders, instead of merging i
 
 If you want to replace files in `/vendor`, `/product`, or `/system_ext`, please place them under `system/vendor`, `system/product`, and `system/system_ext` respectively. Magisk will transparently handle whether these partitions are in a separate partition or not.
 
-If you want to remove a specific file or folder, please place a dummy character device with major number 0 and minor number 0 in the same path. For example, if you want to remove `/system/app/GoogleCamera`, you can `mknod GoogleCamera c 0 0` in `$MODDIR/system/app`.
+If you want to remove a specific file or folder, please place a dummy character device with major number 0 and minor number 0 in the same path. For example, if you want to remove `/system/app/GoogleCamera`, you can `mknod GoogleCamera c 0 0` in `$MODDIR/system/app` (or declare `/system/app/GoogleCamera` in the `REMOVE` variable in `customize.sh`; see [Customization](#customization)).
 
 #### Zygisk
 
@@ -245,7 +247,7 @@ The list above will result in the following dummy devices being created: `$MODPA
 In Magisk, you can run boot scripts in 2 different modes: **post-fs-data** and **late_start service** mode.
 
 - post-fs-data mode
-  - This stage is BLOCKING. The boot process is paused before execution is done, or 40 seconds have passed.
+  - This stage is BLOCKING. The boot process is paused before execution is done, or 40 seconds have passed (with `post-fs-data` scripts capped at 35 seconds so Magisk still has time to mount modules).
   - Scripts run before any modules are mounted. This allows a module developer to dynamically adjust their modules before it gets mounted.
   - This stage happens before Zygote is started, which pretty much means everything in Android
   - **WARNING:** using `setprop` will deadlock the boot process! Please use `resetprop -n <prop_name> <prop_value>` instead.
@@ -292,6 +294,7 @@ ramdisk
 │   │   ├── libfoo.ko      <--- These 2 files will be copied
 │   │   └── myscript.sh    <--- into Magisk's tmpfs directory
 │   ├── custom.rc          <--- This file will be injected into init.rc
+│   │                           because /custom.rc does not exist
 │   ├── res
 │   │   └── random.png     <--- This file will replace /res/random.png
 │   └── new_file           <--- This file will be ignored because

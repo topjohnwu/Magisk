@@ -17,23 +17,33 @@ MAGISKTMP=$(magisk --path)
 # Magisk internal stuffs
 INTERNALDIR=$MAGISKTMP/.magisk
 
-# /data/adb/modules will be bind mounted here.
-# The original folder is not used due to nosuid mount flag.
+# /data/adb/modules will be bind mounted here as read-only.
+# The original folder is not used directly due to the nosuid mount flag on /data.
 $INTERNALDIR/modules
 
 # The current Magisk installation config
 $INTERNALDIR/config
 
-# Partition mirrors
-# Each directory in this path will be mounted with the
-# partition of its directory name.
-# e.g. system, system_ext, vendor, data ...
-$INTERNALDIR/mirror
+# Symlink/mount to the pre-init storage directory
+# Used to persist custom sepolicy.rule across reboots so it can be read during pre-init
+$INTERNALDIR/preinit
 
-# Root directory patch files
+# Internal tmpfs workspace used for constructing magic mount trees
+$INTERNALDIR/worker
+
+# Internal BusyBox directory containing busybox and its applet symlinks
+$INTERNALDIR/busybox
+
+# Internal device nodes, pipes, and sockets (magiskd socket, preinit block device, log pipe)
+$INTERNALDIR/device
+
+# Root directory patch/overlay files
 # On system-as-root devices, / is not writable.
 # All pre-init patched files are stored here and bind mounted.
 $INTERNALDIR/rootdir
+
+# Isolated devpts mount for root shells (if supported by the kernel)
+$INTERNALDIR/pts
 ```
 
 ### Paths in `/data`
@@ -70,28 +80,34 @@ MAGISKDB=$SECURE_DIR/magisk.db
 # scripts, and magisk binaries. Used in supporting
 # module installation, addon.d, the Magisk app etc.
 DATABIN=$SECURE_DIR/magisk
-
 ```
 
 ## Magisk Booting Process
 
 ### Pre-Init
 
-`magiskinit` will replace `init` as the first program to run.
+`magiskinit` replaces `init` as the first program to run.
 
-- Early mount required partitions. On legacy system-as-root devices, we switch root to system; on 2SI devices, we patch the original `init` to redirect the 2nd stage init file to magiskinit and execute it to mount partitions for us.
-- Inject magisk services into `init.rc`
-- On devices using monolithic policy, load sepolicy from `/sepolicy`; otherwise we hijack nodes in selinuxfs with FIFO, set `LD_PRELOAD` to hook `security_load_policy` and assist hijacking on 2SI devices, and start a daemon to wait until init tries to load sepolicy.
-- Patch sepolicy rules. If we are using "hijack" method, load patched sepolicy into kernel, unblock init and exit daemon
-- Execute the original `init` to continue the boot process
+- Early mount required partitions (`sysfs`, `procfs`, `devtmpfs`, and the pre-init partition if available).
+- On legacy system-as-root devices, `magiskinit` switches root to `/system`. On 2-Stage Init (2SI) devices, `magiskinit` intercepts first-stage `init`'s root switch (`SwitchRoot`) to `/system` by bind-mounting `magiskinit` over `/system/bin/init` (using a `/sdcard` -> `/storage/self/primary` -> `/system/system/bin/init` symlink trick in ramfs, or falling back to hex-patching `/init` to redirect `/system/bin/init` to `/data/magiskinit`), allowing the original first-stage `init` to mount dynamic partitions for us before handing control back to `magiskinit` as the second-stage `init`.
+- Inject Magisk services into `init.rc` and apply any `overlay.d` root directory replacements/mounts.
+- Intercept and patch SELinux policy (incorporating built-in Magisk rules and any custom `sepolicy.rule` files from the pre-init partition) using one of three strategies depending on the device's architecture:
+  - **2SI (Android 10+)**: Sets `LD_PRELOAD` (`init-ld`) on `init` to hook `security_load_policy` and intercept policy loading directly in memory before it is written to the kernel.
+  - **Treble / Split Policy (Android 8.0–9.0)**: Mounts `selinuxfs` early and replaces `/sys/fs/selinux/load` and `/sys/fs/selinux/enforce` with custom nodes (using a FIFO to pause `init` until `magiskinit` finishes patching and loading the policy into the kernel).
+  - **Legacy (Android 7.0–7.1)**: Replaces `/selinux_version` (or `/sepolicy_version`) with a FIFO to pause `init` right after it mounts `selinuxfs`, then replaces `/sys/fs/selinux/load` and `/sys/fs/selinux/enforce` with custom nodes in the same way as the Treble strategy.
+- Restore the original `init` and execute it to continue the boot process.
 
 ### post-fs-data
 
-This triggers on `post-fs-data` when `/data` is decrypted and mounted. The daemon `magiskd` will be launched, post-fs-data scripts are executed, and module files are magic mounted.
+This triggers on `post-fs-data` when `/data` is decrypted and mounted. The daemon `magiskd` is launched, Safe Mode is evaluated (if the device failed to reach `boot-complete` twice in a row, or if Safe Mode was triggered via key combo or the Magisk app, all modules and Zygisk are disabled), `post-fs-data` scripts and module `system.prop` files are processed, and enabled module files are magic mounted.
 
 ### late_start
 
-Later in the booting process, the class `late_start` will be triggered, and Magisk "service" mode will be started. In this mode, service scripts are executed.
+Later in the booting process, the class `late_start` will be triggered, and Magisk "service" mode will be started. In this mode, general and module `service.sh` scripts are executed.
+
+### boot-complete
+
+When `sys.boot_completed=1` is triggered, Magisk resets the bootloop counter, mounts/symlinks the writable `preinit` storage directory for future module installations, and finalizes Zygisk state.
 
 ## Resetprop
 
@@ -99,15 +115,17 @@ Usually, system properties are designed to only be updated by `init` and read-on
 
 `resetprop` is implemented by distilling out the source code related to system properties from AOSP and patched to allow direct modification to property area, or `prop_area`, bypassing the need to go through `property_service`. Since we are bypassing `property_service`, there are a few caveats:
 
-- `on property:foo=bar` actions registered in `*.rc` scripts will not be triggered if property changes does not go through `property_service`. The default set property behavior of `resetprop` matches `setprop`, which **WILL** trigger events (implemented by first deleting the property then set it via `property_service`). There is a flag `-n` to disable it if you need this special behavior.
-- persist properties (props that starts with `persist.`, like `persist.sys.usb.config`) are stored in both `prop_area` and `/data/property`. By default, deleting props will **NOT** remove it from persistent storage, meaning the property will be restored after the next reboot; reading props will **NOT** read from persistent storage, as this is the behavior of `getprop`. With the flag `-p`, deleting props will remove the prop in **BOTH** `prop_area` and `/data/property`, and reading props will be read from **BOTH** `prop_area` and persistent storage.
+- `on property:foo=bar` actions registered in `*.rc` scripts will not be triggered if property changes do not go through `property_service`. For non-read-only properties, the default set property behavior of `resetprop` goes through `property_service` (matching `setprop`), which **WILL** trigger events. Modifying read-only (`ro.*`) properties or passing the `-n` flag bypasses `property_service` and modifies `prop_area` directly, which will **NOT** trigger property events.
+- persist properties (props that start with `persist.`, like `persist.sys.usb.config`) are stored in both `prop_area` and `/data/property`. By default, deleting props will **NOT** remove them from persistent storage, meaning the property will be restored after the next reboot; reading props will **NOT** read from persistent storage, as this is the behavior of `getprop`. With the flag `-p`, deleting props will remove the prop in **BOTH** `prop_area` and `/data/property`, and reading props will read from **BOTH** `prop_area` and persistent storage.
 
 ## SELinux Policies
 
-Magisk will patch the stock `sepolicy` to make sure root and Magisk operations can be done in a safe and secure way. The new domain `magisk` is effectively permissive, which is what `magiskd` and all root shell will run in. `magisk_file` is a new file type that is setup to be allowed to be accessed by every domain (unrestricted file context).
+Magisk patches the stock `sepolicy` to ensure root and Magisk operations can be performed safely and reliably:
 
-Before Android 8.0, all allowed su client domains are allowed to directly connect to `magiskd` and establish connection with the daemon to get a remote root shell. Magisk also have to relax some `ioctl` operations so root shells can function properly.
+- `magisk` (`u:r:magisk:s0`): An unconstrained, permissive domain that `magiskd` and all root shells run in.
+- `magisk_file` (`u:object_r:magisk_file:s0`): An unrestricted file type accessible by all domains, used to label Magisk sockets, binaries, and internal nodes.
+- `magisk_log_file` (`u:object_r:magisk_log_file:s0`): A specialized FIFO file type for the Magisk log pipe that all domains are allowed to write to, while only `zygote` (and `magisk`) can open and read.
+- Selected client domains (`zygote`, `shell`, `platform_app`, `system_app`, `priv_app`, `untrusted_app`, `untrusted_app_all`) are permitted to connect to `magisk` Unix stream sockets (used for `su`, `magisk`, and Zygisk IPC) and share file descriptors for root shell pseudo-terminals (`devpts`).
 
-After Android 8.0, to reduce relaxation of rules in Android's sandbox, a new SELinux model is deployed. The `magisk` binary is labelled with `magisk_exec` file type, and processes running as allowed su client domains executing the `magisk` binary (this includes the `su` command) will transit to `magisk_client` by using a `type_transition` rule. Rules strictly restrict that only `magisk` domain processes are allowed to attribute files to `magisk_exec`. Direct connection to sockets of `magiskd` are not allowed; the only way to access the daemon is through a `magisk_client` process. These changes allow us to keep the sandbox intact, and keep Magisk specific rules separated from the rest of the policies.
+The full set of built-in policy rules can be found in `native/src/sepolicy/rules.rs`.
 
-The full set of rules can be found in `sepolicy/rules.cpp`.

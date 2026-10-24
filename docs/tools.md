@@ -186,6 +186,7 @@ Options:
    --apply FILE      apply rules from FILE, read and parsed
                      line by line as policy statements
                      (multiple --apply are allowed)
+   --print-rules     print all rules in the loaded sepolicy
 
 If neither --load, --load-split, nor --compile-split is specified,
 it will load from current live policies (/sys/fs/selinux/policy)
@@ -194,7 +195,7 @@ One policy statement should be treated as one parameter;
 this means each policy statement should be enclosed in quotes.
 Multiple policy statements can be provided in a single command.
 
-Statements has a format of "<rule_name> [args...]".
+Statements have a format of "<rule_name> [args...]".
 Arguments labeled with (^) can accept one or more entries. Multiple
 entries consist of a space separated list enclosed in braces ({}).
 Arguments labeled with (*) are the same as (^), but additionally
@@ -208,6 +209,14 @@ allow s1 t2 class { all-permissions-of-class }
 allow s2 t1 class { all-permissions-of-class }
 allow s2 t2 class { all-permissions-of-class }
 
+Extended permissions (xperm) are 16-bit values (0x0000-0xFFFF) that provide
+fine-grained filtering on operations like ioctl. An xperm_set can be:
+  - A single hex value: 0x8910
+  - A brace-enclosed list of hex values and ranges: { 0x8910 0x8920-0x8926 }
+  - A complement (~) of a single value or list: ~0x8910, ~{ 0x8910 0x892A }
+  - Match-all (*): represents the full range 0x0000-0xFFFF
+  - Reset (0): clears all rules (allow, auditallow, dontaudit) for the target
+
 Supported policy statements:
 
 "allow *source_type *target_type *class *perm_set"
@@ -219,12 +228,9 @@ Supported policy statements:
 "auditallowxperm *source_type *target_type *class operation xperm_set"
 "dontauditxperm *source_type *target_type *class operation xperm_set"
 - The only supported operation is 'ioctl'
-- xperm_set format is either 'low-high', 'value', or '*'.
-  '*' will be treated as '0x0000-0xFFFF'.
-  All values should be written in hexadecimal.
 
-"permissive ^type"
-"enforce ^type"
+"permissive *type"
+"enforce *type"
 
 "typeattribute ^type ^attribute"
 
@@ -295,6 +301,7 @@ An applet of `magisk`, the MagiskSU entry point. Good old `su` command.
 Usage: su [options] [--] [user [argument...]]
 
 Options:
+  -c, --command COMMAND         Pass COMMAND to the invoked shell
   -s, --shell SHELL             Use SHELL instead of the default /system/bin/sh
   -i, --interactive             Force pseudo-terminal allocation when using -c
   -g, --group GROUP             Specify the primary group
@@ -304,6 +311,7 @@ Options:
   -Z, --context CONTEXT         Change SELinux context
   -t, --target PID              PID to take mount namespace from
                                 pid 0 means magisk global mount namespace
+  -M, --mount-master            Force run in the global mount namespace (same as -t 0)
   -d, --drop-cap                Drop all Linux capabilities
   -m, -p,
   --preserve-environment        Preserve the entire environment

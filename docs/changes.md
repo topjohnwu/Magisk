@@ -100,7 +100,7 @@
 - [App] Use user-initiated job instead of foreground services on Android 14
 - [App] Support Android 13+ built-in per-app language preferences
 - [App] Add `action.sh` support to allow modules to define an action triggered from UI
-- [MagiskBoot] Support spliting kernel images without decompression
+- [MagiskBoot] Support splitting kernel images without decompression
 - [MagiskBoot] Properly support vendor boot images
 - [MagiskBoot] Disable Samsung PROCA from kernel image
 
