@@ -9,6 +9,7 @@ import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.terminal.TerminalEmulator
 import com.topjohnwu.magisk.terminal.runSuCommand
+import com.topjohnwu.magisk.terminal.shellQuoted
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,7 +33,7 @@ class ActionViewModel(private val savedState: SavedStateHandle) : BaseViewModel(
     private val _actionState = MutableStateFlow(State.RUNNING)
     val actionState: StateFlow<State> = _actionState.asStateFlow()
 
-    var actionId: String = ""
+    var actionDir: String = ""
     var actionName: String = ""
 
     val emulator = TerminalEmulator(
@@ -60,7 +61,7 @@ class ActionViewModel(private val savedState: SavedStateHandle) : BaseViewModel(
             val success = withContext(Dispatchers.IO) {
                 runSuCommand(
                     emulator, columns, rows,
-                    "cd /data/adb/modules/$actionId && sh ./action.sh"
+                    "cd ${"/data/adb/modules/$actionDir".shellQuoted()} && sh ./action.sh"
                 )
             }
 

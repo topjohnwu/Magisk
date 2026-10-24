@@ -57,8 +57,13 @@ fun runSuCommand(emulator: TerminalEmulator, columns: Int, rows: Int, command: S
     // busybox script always exits with 0, so have the command write its exit code to a file
     val exitFile = File.createTempFile("exit", null, AppContext.cacheDir)
     return try {
-        val wrappedCmd = "export TERM=xterm-256color; stty cols $columns rows $rows 2>/dev/null; " +
+        // Run the command in busybox ash with standalone mode, like every other script in the
+        // context of Magisk. busybox script itself starts $SHELL, which su sets to /system/bin/sh.
+        // ASH_STANDALONE has to be set before ash starts: it is only read on startup.
+        val shellCmd = "export TERM=xterm-256color; " +
+            "stty cols $columns rows $rows 2>/dev/null; " +
             "($command); echo \$? > ${exitFile.path.shellQuoted()}"
+        val wrappedCmd = "ASH_STANDALONE=1 $busyboxPath sh -c ${shellCmd.shellQuoted()}"
 
         val process = ProcessBuilder(
             "su", "-c",

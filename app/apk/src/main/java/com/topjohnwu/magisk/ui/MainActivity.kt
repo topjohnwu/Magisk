@@ -210,8 +210,8 @@ class MainActivity : ComponentActivity(), SplashScreenHost {
                                         return@entry
                                     }
                                     LaunchedEffect(key) {
-                                        if (vm.actionId.isEmpty()) {
-                                            vm.actionId = key.id
+                                        if (vm.actionDir.isEmpty()) {
+                                            vm.actionDir = key.dir
                                             vm.actionName = key.name
                                             vm.startRunAction()
                                         }
