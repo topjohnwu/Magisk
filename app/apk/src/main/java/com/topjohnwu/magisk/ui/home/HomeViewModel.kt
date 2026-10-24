@@ -11,15 +11,20 @@ import com.topjohnwu.magisk.core.BuildConfig
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.ktx.await
+import com.topjohnwu.magisk.core.ktx.reboot
 import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.repository.NetworkService
+import com.topjohnwu.magisk.core.tasks.MagiskInstaller
 import com.topjohnwu.magisk.utils.asFlow
 import com.topjohnwu.superuser.Shell
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import com.topjohnwu.magisk.core.R as CoreR
 
 class HomeViewModel(
@@ -38,6 +43,7 @@ class HomeViewModel(
         val showUninstall: Boolean = false,
         val showManagerInstall: Boolean = false,
         val envFixCode: Int = 0,
+        val showLoading: Boolean = false,
         val magiskState: State = computeMagiskState(),
         val magiskInstalledVersion: String = computeMagiskInstalledVersion(),
         val managerInstalledVersion: String = computeManagerInstalledVersion(),
@@ -135,6 +141,42 @@ class HomeViewModel(
 
     fun onEnvFixConsumed() {
         _uiState.update { it.copy(envFixCode = 0) }
+    }
+
+    // Root operations run in the ViewModel, so a configuration change can't cancel them halfway
+    // and lose their result
+
+    fun restoreImages() {
+        viewModelScope.launch {
+            val success = withLoading { MagiskInstaller.Restore().exec() }
+            showToast(if (success) CoreR.string.restore_done else CoreR.string.restore_fail)
+        }
+    }
+
+    fun fixEnv() {
+        viewModelScope.launch {
+            val success = withLoading { MagiskInstaller.FixEnv().exec() }
+            AppContext.toast(
+                if (success) CoreR.string.reboot_delay_toast else CoreR.string.setup_fail,
+                Toast.LENGTH_LONG
+            )
+            if (success) {
+                // The reboot toast has been shown; don't let leaving the app cancel it
+                withContext(NonCancellable) {
+                    delay(5000)
+                    reboot()
+                }
+            }
+        }
+    }
+
+    private suspend fun <R> withLoading(block: suspend () -> R): R {
+        _uiState.update { it.copy(showLoading = true) }
+        try {
+            return block()
+        } finally {
+            _uiState.update { it.copy(showLoading = false) }
+        }
     }
 
     fun hideNotice() {
