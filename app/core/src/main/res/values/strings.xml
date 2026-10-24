@@ -89,6 +89,7 @@
     <string name="menuSaveLog">Save log</string>
     <string name="menuClearLog">Clear log</string>
     <string name="logs_cleared">Log successfully cleared</string>
+    <string name="log_save_failed">Failed to save the log</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Target UID: %1$d</string>
     <string name="target_pid">Target PID: %s</string>

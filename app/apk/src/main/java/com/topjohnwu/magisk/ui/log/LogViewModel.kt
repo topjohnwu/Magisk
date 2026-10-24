@@ -11,8 +11,6 @@ import com.topjohnwu.magisk.core.ktx.toTime
 import com.topjohnwu.magisk.core.model.su.SuLog
 import com.topjohnwu.magisk.core.repository.LogRepository
 import com.topjohnwu.magisk.core.su.SuEvents
-import com.topjohnwu.magisk.core.utils.MediaStoreUtils
-import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -63,38 +61,34 @@ class LogViewModel(
     }
 
     fun saveMagiskLog() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val filename = "magisk_log_%s.log".format(
-                System.currentTimeMillis().toTime(timeFormatStandard))
-            val logFile = MediaStoreUtils.getFile(filename)
-            logFile.uri.outputStream().bufferedWriter().use { file ->
-                file.write("---Detected Device Info---\n\n")
-                file.write("isAB=${Info.isAB}\n")
-                file.write("isSAR=${Info.isSAR}\n")
-                file.write("ramdisk=${Info.ramdisk}\n")
-                val uname = Os.uname()
-                file.write("kernel=${uname.sysname} ${uname.machine} ${uname.release} ${uname.version}\n")
+        val filename = "magisk_log_%s.log".format(
+            System.currentTimeMillis().toTime(timeFormatStandard))
+        saveLogFile(filename) { file ->
+            file.write("---Detected Device Info---\n\n")
+            file.write("isAB=${Info.isAB}\n")
+            file.write("isSAR=${Info.isSAR}\n")
+            file.write("ramdisk=${Info.ramdisk}\n")
+            val uname = Os.uname()
+            file.write("kernel=${uname.sysname} ${uname.machine} ${uname.release} ${uname.version}\n")
 
-                file.write("\n\n---System Properties---\n\n")
-                ProcessBuilder("getprop").start()
-                    .inputStream.reader().use { it.copyTo(file) }
+            file.write("\n\n---System Properties---\n\n")
+            ProcessBuilder("getprop").start()
+                .inputStream.reader().use { it.copyTo(file) }
 
-                file.write("\n\n---Environment Variables---\n\n")
-                System.getenv().forEach { (key, value) -> file.write("${key}=${value}\n") }
+            file.write("\n\n---Environment Variables---\n\n")
+            System.getenv().forEach { (key, value) -> file.write("${key}=${value}\n") }
 
-                file.write("\n\n---System MountInfo---\n\n")
-                FileInputStream("/proc/self/mountinfo").reader().use { it.copyTo(file) }
+            file.write("\n\n---System MountInfo---\n\n")
+            FileInputStream("/proc/self/mountinfo").reader().use { it.copyTo(file) }
 
-                file.write("\n---Magisk Logs---\n")
-                file.write("${Info.env.versionString} (${Info.env.versionCode})\n\n")
-                if (Info.env.isActive) file.write(magiskLogRaw)
+            file.write("\n---Magisk Logs---\n")
+            file.write("${Info.env.versionString} (${Info.env.versionCode})\n\n")
+            if (Info.env.isActive) file.write(magiskLogRaw)
 
-                file.write("\n---Manager Logs---\n")
-                file.write("${BuildConfig.APP_VERSION_NAME} (${BuildConfig.APP_VERSION_CODE})\n\n")
-                ProcessBuilder("logcat", "-d").start()
-                    .inputStream.reader().use { it.copyTo(file) }
-            }
-            showToast(logFile.toString())
+            file.write("\n---Manager Logs---\n")
+            file.write("${BuildConfig.APP_VERSION_NAME} (${BuildConfig.APP_VERSION_CODE})\n\n")
+            ProcessBuilder("logcat", "-d").start()
+                .inputStream.reader().use { it.copyTo(file) }
         }
     }
 

@@ -3,12 +3,21 @@ package com.topjohnwu.magisk.arch
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.core.AppContext
+import com.topjohnwu.magisk.core.R
 import com.topjohnwu.magisk.core.ktx.toast
+import com.topjohnwu.magisk.core.utils.MediaStoreUtils
+import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.ui.navigation.Route
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
+import timber.log.Timber
+import java.io.Writer
 
 abstract class BaseViewModel : ViewModel() {
 
@@ -27,5 +36,26 @@ abstract class BaseViewModel : ViewModel() {
 
     fun navigateTo(route: Route) {
         _navEvents.trySend(route)
+    }
+
+    /**
+     * Save a log to the download folder with [write], then show where it was saved. Saving can
+     * fail for many reasons (e.g. storage full, or the media store rejecting the file), so
+     * report failures instead of letting them crash the app.
+     */
+    protected fun saveLogFile(name: String, write: (Writer) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                // Names can contain parts like module names, which must not create directories
+                val file = MediaStoreUtils.getFile(name.replace('/', '_'))
+                file.uri.outputStream().bufferedWriter().use(write)
+                showToast(file.toString())
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Timber.e(e)
+                showToast(R.string.log_save_failed)
+            }
+        }
     }
 }
