@@ -112,7 +112,8 @@ class MainActivity : ComponentActivity(), SplashScreenHost {
     override fun onCreateUi(savedInstanceState: Bundle?) {
         showUnsupportedMessage()
 
-        if (Config.checkUpdate) {
+        // Only ask on startup, not every time the activity is recreated
+        if (savedInstanceState == null && Config.checkUpdate) {
             extension.withPermission(Manifest.permission.POST_NOTIFICATIONS) {
                 Config.checkUpdate = it
             }

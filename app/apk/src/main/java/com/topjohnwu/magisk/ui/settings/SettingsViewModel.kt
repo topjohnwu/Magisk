@@ -83,6 +83,8 @@ class SettingsViewModel : BaseViewModel() {
             isDeviceSecure = Info.isDeviceSecure,
             // Config.suAuth also depends on whether the device is secure
             suAuthEnabled = Config.suAuth,
+            // Turned off when the notification permission is denied on startup
+            checkUpdateEnabled = Config.checkUpdate,
         )
     }
 
