@@ -13,7 +13,6 @@ import androidx.annotation.RequiresApi
 import com.topjohnwu.magisk.core.AppContext
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.R
-import com.topjohnwu.magisk.core.base.relaunch
 import org.xmlpull.v1.XmlPullParser
 import java.util.Locale
 
@@ -47,7 +46,9 @@ interface LocaleSetting {
             appLocale = localeList?.get(0)
             LocaleList.setDefault(currentLocaleList)
             updateResource(AppContext.resources)
-            AppContext.foregroundActivity?.relaunch()
+            // Recreate instead of starting a new instance: MainActivity is singleTask, so
+            // starting it again would deliver the intent to this instance, which is then finished
+            AppContext.foregroundActivity?.recreate()
         }
 
         @Suppress("DEPRECATION")
