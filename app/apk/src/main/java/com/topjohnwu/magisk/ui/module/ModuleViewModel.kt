@@ -117,8 +117,8 @@ class ModuleViewModel : AsyncLoadViewModel() {
         navigateTo(Route.Flash(Const.Value.FLASH_ZIP, uri.toString()))
     }
 
-    fun runAction(id: String, name: String) {
-        navigateTo(Route.Action(id, name))
+    fun runAction(dir: String, name: String) {
+        navigateTo(Route.Action(dir, name))
     }
 
     fun toggleEnabled(item: ModuleItem) {

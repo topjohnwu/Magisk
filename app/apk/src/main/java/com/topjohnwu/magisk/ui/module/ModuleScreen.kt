@@ -379,7 +379,7 @@ private fun ModuleCard(
                                 // Drop taps while a screen transition runs, so a quick
                                 // second tap can't open another screen
                                 onClick = dropUnlessResumed {
-                                    viewModel.runAction(item.module.id, item.module.name)
+                                    viewModel.runAction(item.module.base.name, item.module.name)
                                 },
                             ) {
                                 Row(

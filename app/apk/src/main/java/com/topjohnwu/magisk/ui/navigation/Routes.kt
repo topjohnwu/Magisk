@@ -26,7 +26,8 @@ sealed interface Route : NavKey, Parcelable {
 
     @Parcelize
     data class Action(
-        val id: String,
+        // The module's directory name: unlike the id in module.prop, it is unique
+        val dir: String,
         val name: String,
     ) : Route
 }
