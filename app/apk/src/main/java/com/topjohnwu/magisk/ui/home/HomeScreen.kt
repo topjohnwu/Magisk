@@ -65,6 +65,9 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.toggleableState
+import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
@@ -332,6 +335,10 @@ private fun RebootButton(
                     )
                 }
                 DropdownMenuItem(
+                    // The check mark is the only sign of the safe mode state, so expose it
+                    modifier = if (isSafeMode) {
+                        Modifier.semantics { toggleableState = ToggleableState(safeModeEnabled >= 2) }
+                    } else Modifier,
                     text = {
                         Text(
                             text = stringResource(item.labelRes),

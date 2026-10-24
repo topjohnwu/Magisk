@@ -66,6 +66,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -327,7 +329,9 @@ private fun ModuleCard(
                     }
                     Switch(
                         checked = item.isEnabled,
-                        onCheckedChange = { viewModel.toggleEnabled(item) }
+                        onCheckedChange = { viewModel.toggleEnabled(item) },
+                        // The switch is its own node, so name the module it enables
+                        modifier = Modifier.semantics { contentDescription = item.module.name },
                     )
                 }
 
@@ -389,7 +393,7 @@ private fun ModuleCard(
                                     Icon(
                                         modifier = Modifier.size(18.dp),
                                         imageVector = Icons.Default.PlayArrow,
-                                        contentDescription = stringResource(CoreR.string.module_action)
+                                        contentDescription = null
                                     )
                                     Text(
                                         text = stringResource(CoreR.string.module_action),
@@ -424,7 +428,7 @@ private fun ModuleCard(
                             Icon(
                                 modifier = Modifier.size(18.dp),
                                 imageVector = Icons.Default.CloudUpload,
-                                contentDescription = stringResource(CoreR.string.update),
+                                contentDescription = null,
                             )
                             Text(
                                 text = stringResource(CoreR.string.update),

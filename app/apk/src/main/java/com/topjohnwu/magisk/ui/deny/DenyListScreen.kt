@@ -119,7 +119,7 @@ fun DenyListScreen(
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = null,
+                            contentDescription = stringResource(CoreR.string.back),
                         )
                     }
                 },
@@ -219,7 +219,7 @@ private fun SearchInput(
                 IconButton(onClick = { onQueryChange("") }) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = null,
+                        contentDescription = stringResource(CoreR.string.close),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
