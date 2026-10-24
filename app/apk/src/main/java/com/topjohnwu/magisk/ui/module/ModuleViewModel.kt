@@ -127,7 +127,7 @@ class ModuleViewModel : AsyncLoadViewModel() {
         _uiState.update { state ->
             state.copy(
                 modules = state.modules.map {
-                    if (it.module.id == item.module.id) it.copy(isEnabled = newEnabled) else it
+                    if (it.module.base.name == item.module.base.name) it.copy(isEnabled = newEnabled) else it
                 }
             )
         }
@@ -139,7 +139,7 @@ class ModuleViewModel : AsyncLoadViewModel() {
         _uiState.update { state ->
             state.copy(
                 modules = state.modules.map {
-                    if (it.module.id == item.module.id) it.copy(isRemoved = newRemoved) else it
+                    if (it.module.base.name == item.module.base.name) it.copy(isRemoved = newRemoved) else it
                 }
             )
         }
