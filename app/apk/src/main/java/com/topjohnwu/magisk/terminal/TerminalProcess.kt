@@ -43,6 +43,9 @@ fun TerminalEmulator.appendLineOnMain(line: String) {
     }
 }
 
+/** Quote a string as a single shell word, so it is never interpreted by the shell. */
+fun String.shellQuoted() = "'" + replace("'", "'\\''") + "'"
+
 /**
  * Run a command as root inside a PTY (via busybox script).
  * Reads raw bytes from the process and feeds them to the terminal emulator.
@@ -55,12 +58,11 @@ fun runSuCommand(emulator: TerminalEmulator, columns: Int, rows: Int, command: S
     val exitFile = File.createTempFile("exit", null, AppContext.cacheDir)
     return try {
         val wrappedCmd = "export TERM=xterm-256color; stty cols $columns rows $rows 2>/dev/null; " +
-            "($command); echo \$? > '${exitFile.path}'"
-        val escapedCmd = wrappedCmd.replace("'", "'\\''")
+            "($command); echo \$? > ${exitFile.path.shellQuoted()}"
 
         val process = ProcessBuilder(
             "su", "-c",
-            "$busyboxPath script -q -c '$escapedCmd' /dev/null"
+            "$busyboxPath script -q -c ${wrappedCmd.shellQuoted()} /dev/null"
         ).redirectErrorStream(true).start()
 
         process.outputStream.close()
