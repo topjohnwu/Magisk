@@ -301,9 +301,11 @@ fun PatchComposableDialog(
     showUsbDestination: Boolean = false,
 ) {
     val context = LocalContext.current
-    var source by rememberSaveable(candidate) {
-        mutableStateOf(if (candidate != null) PatchSource.CANDIDATE else PatchSource.FILE)
-    }
+    // The user's choice, defaulting to the downloadable image when there is one. Not keyed on the
+    // candidate: it is only found after the firmware search, which runs again after the process
+    // is recreated, and must not reset a choice made before that
+    var chosenSource by rememberSaveable { mutableStateOf<PatchSource?>(null) }
+    val source = chosenSource ?: if (candidate != null) PatchSource.CANDIDATE else PatchSource.FILE
     var localFileUri by rememberSaveable { mutableStateOf<Uri?>(null) }
     var pendingSubmitAfterPick by rememberSaveable { mutableStateOf(false) }
     var url by rememberSaveable { mutableStateOf("") }
@@ -358,7 +360,7 @@ fun PatchComposableDialog(
         pendingSubmitAfterPick = false
         if (uri != null) {
             localFileUri = uri
-            source = PatchSource.FILE
+            chosenSource = PatchSource.FILE
             if (shouldSubmit) {
                 confirmWithUri(uri)
             }
@@ -460,7 +462,7 @@ fun PatchComposableDialog(
                             .clip(RoundedCornerShape(12.dp))
                             .selectable(
                                 selected = source == PatchSource.CANDIDATE,
-                                onClick = { source = PatchSource.CANDIDATE },
+                                onClick = { chosenSource = PatchSource.CANDIDATE },
                                 role = Role.RadioButton
                             )
                             .padding(vertical = 10.dp),
@@ -495,7 +497,7 @@ fun PatchComposableDialog(
                         .selectable(
                             selected = source == PatchSource.FILE,
                             onClick = {
-                                source = PatchSource.FILE
+                                chosenSource = PatchSource.FILE
                                 pendingSubmitAfterPick = false
                                 localFilePicker.launch("*/*")
                             },
@@ -534,7 +536,7 @@ fun PatchComposableDialog(
                         .clip(RoundedCornerShape(12.dp))
                         .selectable(
                             selected = source == PatchSource.URL,
-                            onClick = { source = PatchSource.URL },
+                            onClick = { chosenSource = PatchSource.URL },
                             role = Role.RadioButton
                         )
                         .padding(vertical = 10.dp),

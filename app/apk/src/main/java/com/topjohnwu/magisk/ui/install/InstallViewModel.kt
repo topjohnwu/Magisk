@@ -102,21 +102,21 @@ class InstallViewModel(
         _uiState.update { it.copy(showPatchDialog = false) }
     }
 
+    // Also sets the method: it is only kept in memory, and the image may be picked after the
+    // process was recreated, e.g. if it was killed while the file picker was open
     fun onPatchSelected(uri: Uri, usbDeviceName: String? = null) {
         if (usbDeviceName != null) {
             viewModelScope.launch {
                 if (UsbBlockDevice.requestPermission(AppContext, usbDeviceName)) {
-                    _uiState.update { it.copy(patchUri = uri, usbDevice = usbDeviceName) }
-                    if (_uiState.value.method == Method.PATCH) {
-                        install()
+                    _uiState.update {
+                        it.copy(method = Method.PATCH, patchUri = uri, usbDevice = usbDeviceName)
                     }
+                    install()
                 }
             }
         } else {
-            _uiState.update { it.copy(patchUri = uri, usbDevice = null) }
-            if (_uiState.value.method == Method.PATCH) {
-                install()
-            }
+            _uiState.update { it.copy(method = Method.PATCH, patchUri = uri, usbDevice = null) }
+            install()
         }
     }
 
