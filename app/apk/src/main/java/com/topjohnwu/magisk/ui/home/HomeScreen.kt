@@ -2,7 +2,6 @@ package com.topjohnwu.magisk.ui.home
 
 import android.os.Build
 import android.os.PowerManager
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -57,7 +56,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -81,23 +79,17 @@ import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.download.DownloadEngine
 import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.core.ktx.reboot
-import com.topjohnwu.magisk.core.ktx.toast
-import com.topjohnwu.magisk.core.tasks.MagiskInstaller
 import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.ui.component.AdaptiveColumns
+import com.topjohnwu.magisk.ui.component.LoadingDialog
 import com.topjohnwu.magisk.ui.component.MagiskDialog
 import com.topjohnwu.magisk.ui.component.MarkdownTextAsync
 import com.topjohnwu.magisk.ui.component.onlyHorizontal
-import com.topjohnwu.magisk.ui.component.rememberLoadingDialog
 import com.topjohnwu.magisk.ui.component.verticalScrollbar
 import com.topjohnwu.magisk.ui.install.InstallDialog
 import com.topjohnwu.magisk.ui.install.InstallViewModel
 import com.topjohnwu.magisk.ui.navigation.LocalNavigator
 import com.topjohnwu.magisk.ui.navigation.Route
-import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.File
 import com.topjohnwu.magisk.core.R as CoreR
 
@@ -112,8 +104,6 @@ fun HomeScreen(
     val context = LocalContext.current
     val navigator = LocalNavigator.current
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-    val scope = rememberCoroutineScope()
-    val loadingDialog = rememberLoadingDialog()
 
     var showUninstallDialog by rememberSaveable { mutableStateOf(false) }
     var showManagerDialog by rememberSaveable { mutableStateOf(false) }
@@ -141,6 +131,8 @@ fun HomeScreen(
         }
     }
 
+    LoadingDialog(visible = uiState.showLoading)
+
     if (showUninstallDialog) {
         UninstallComposableDialog(
             onDismiss = { showUninstallDialog = false },
@@ -151,15 +143,7 @@ fun HomeScreen(
             },
             onRestoreImage = {
                 showUninstallDialog = false
-                scope.launch {
-                    val success = loadingDialog.withLoading {
-                        MagiskInstaller.Restore().exec()
-                    }
-                    context.toast(
-                        if (success) CoreR.string.restore_done else CoreR.string.restore_fail,
-                        Toast.LENGTH_SHORT
-                    )
-                }
+                viewModel.restoreImages()
             }
         )
     }
@@ -187,22 +171,7 @@ fun HomeScreen(
             },
             onFixEnv = {
                 showEnvFixDialog = false
-                scope.launch {
-                    val success = loadingDialog.withLoading {
-                        MagiskInstaller.FixEnv().exec()
-                    }
-                    context.toast(
-                        if (success) CoreR.string.reboot_delay_toast else CoreR.string.setup_fail,
-                        Toast.LENGTH_LONG
-                    )
-                    if (success) {
-                        // The reboot toast has been shown; don't let leaving this screen cancel it
-                        withContext(NonCancellable) {
-                            delay(5000)
-                            reboot()
-                        }
-                    }
-                }
+                viewModel.fixEnv()
             }
         )
     }

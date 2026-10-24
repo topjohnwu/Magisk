@@ -506,8 +506,13 @@ abstract class MagiskInstallImpl protected constructor(
         if (haveActiveSession.getAndSet(true))
             return false
 
-        val result = withContext(Dispatchers.IO) { operations() }
-        haveActiveSession.set(false)
+        // Always release the session: if the caller is cancelled, withContext throws once the
+        // operations finish, and a stuck session would make every later operation fail
+        val result = try {
+            withContext(Dispatchers.IO) { operations() }
+        } finally {
+            haveActiveSession.set(false)
+        }
         if (result)
             return true
 

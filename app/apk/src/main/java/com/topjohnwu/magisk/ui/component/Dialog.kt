@@ -34,7 +34,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -57,7 +56,6 @@ import com.topjohnwu.magisk.core.di.ServiceLocator
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.onEach
@@ -117,10 +115,6 @@ private class ConfirmDialogState(
     }
 }
 
-interface LoadingDialogHandle {
-    suspend fun <R> withLoading(block: suspend () -> R): R
-}
-
 interface ConfirmDialogHandle {
     fun showConfirm(
         title: String,
@@ -137,22 +131,6 @@ interface ConfirmDialogHandle {
         confirm: String? = null,
         dismiss: String? = null
     ): ConfirmResult
-}
-
-private class LoadingDialogHandleImpl(
-    private val visible: MutableState<Boolean>,
-    private val coroutineScope: CoroutineScope
-) : LoadingDialogHandle {
-    override suspend fun <R> withLoading(block: suspend () -> R): R {
-        return coroutineScope.async {
-            try {
-                visible.value = true
-                block()
-            } finally {
-                visible.value = false
-            }
-        }.await()
-    }
 }
 
 private class ConfirmDialogHandleImpl(
@@ -236,14 +214,6 @@ fun rememberConfirmCallback(
             override val onDismiss get() = currentOnDismiss
         }
     }
-}
-
-@Composable
-fun rememberLoadingDialog(): LoadingDialogHandle {
-    val visible = remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
-    LoadingDialog(visible = visible.value)
-    return remember { LoadingDialogHandleImpl(visible, scope) }
 }
 
 @Composable
