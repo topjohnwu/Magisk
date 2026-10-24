@@ -5,8 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.core.ktx.timeFormatStandard
 import com.topjohnwu.magisk.core.ktx.toTime
-import com.topjohnwu.magisk.core.utils.MediaStoreUtils
-import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.terminal.TerminalEmulator
 import com.topjohnwu.magisk.terminal.runSuCommand
 import com.topjohnwu.magisk.terminal.shellQuoted
@@ -70,18 +68,11 @@ class ActionViewModel(private val savedState: SavedStateHandle) : BaseViewModel(
     }
 
     fun saveLog() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val name = "%s_action_log_%s.log".format(
-                actionName,
-                System.currentTimeMillis().toTime(timeFormatStandard)
-            )
-            val file = MediaStoreUtils.getFile(name)
-            file.uri.outputStream().bufferedWriter().use { writer ->
-                val transcript = emulator.screen.transcriptText
-                writer.write(transcript)
-            }
-            showToast(file.toString())
-        }
+        val name = "%s_action_log_%s.log".format(
+            actionName,
+            System.currentTimeMillis().toTime(timeFormatStandard)
+        )
+        saveLogFile(name) { it.write(emulator.screen.transcriptText) }
     }
 
     companion object {

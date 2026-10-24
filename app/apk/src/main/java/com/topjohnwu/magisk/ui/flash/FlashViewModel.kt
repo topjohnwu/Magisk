@@ -14,10 +14,8 @@ import com.topjohnwu.magisk.core.ktx.timeFormatStandard
 import com.topjohnwu.magisk.core.ktx.toTime
 import com.topjohnwu.magisk.core.ktx.writeTo
 import com.topjohnwu.magisk.core.tasks.MagiskInstaller
-import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.displayName
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.inputStream
-import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.terminal.TerminalEmulator
 import com.topjohnwu.magisk.terminal.appendLineOnMain
 import com.topjohnwu.magisk.terminal.runSuCommand
@@ -196,25 +194,20 @@ class FlashViewModel(private val savedState: SavedStateHandle) : BaseViewModel()
     }
 
     fun saveLog() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val name = "magisk_install_log_%s.log".format(
-                System.currentTimeMillis().toTime(timeFormatStandard)
-            )
-            val file = MediaStoreUtils.getFile(name)
-            file.uri.outputStream().bufferedWriter().use { writer ->
-                val transcript = emulator.screen.transcriptText
-                if (flashAction == Const.Value.FLASH_ZIP) {
-                    writer.write(transcript)
-                } else {
-                    synchronized(logItems) {
-                        logItems.forEach {
-                            writer.write(it)
-                            writer.newLine()
-                        }
+        val name = "magisk_install_log_%s.log".format(
+            System.currentTimeMillis().toTime(timeFormatStandard)
+        )
+        saveLogFile(name) { writer ->
+            if (flashAction == Const.Value.FLASH_ZIP) {
+                writer.write(emulator.screen.transcriptText)
+            } else {
+                synchronized(logItems) {
+                    logItems.forEach {
+                        writer.write(it)
+                        writer.write("\n")
                     }
                 }
             }
-            showToast(file.toString())
         }
     }
 
