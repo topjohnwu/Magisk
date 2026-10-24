@@ -45,6 +45,7 @@ import com.topjohnwu.magisk.ui.component.SettingsSwitch
 import com.topjohnwu.magisk.ui.component.SmallTitle
 import com.topjohnwu.magisk.ui.component.onlyHorizontal
 import com.topjohnwu.magisk.ui.component.rememberBiometricAuth
+import com.topjohnwu.magisk.ui.component.rememberNotificationPermissionLauncher
 import com.topjohnwu.magisk.ui.component.verticalScrollbar
 import com.topjohnwu.magisk.core.R as CoreR
 
@@ -56,6 +57,7 @@ fun SettingsScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val requireAuth = rememberBiometricAuth()
+    val enableCheckUpdate = rememberNotificationPermissionLauncher { viewModel.setCheckUpdate(true) }
 
     LifecycleResumeEffect(viewModel) {
         viewModel.refreshEnvironment()
@@ -73,7 +75,10 @@ fun SettingsScreen(
         onOpenCustomUrlDialog = viewModel::openCustomChannelUrlDialog,
         onSaveCustomUrl = viewModel::saveCustomChannelUrl,
         onToggleDoh = viewModel::setDoh,
-        onToggleCheckUpdate = viewModel::setCheckUpdate,
+        // Update notifications need the notification permission
+        onToggleCheckUpdate = { enabled ->
+            if (enabled) enableCheckUpdate() else viewModel.setCheckUpdate(false)
+        },
         onOpenDownloadPathDialog = viewModel::openDownloadPathDialog,
         onSaveDownloadPath = viewModel::saveDownloadPath,
         onToggleRandomPackageName = viewModel::setRandomPackageName,
