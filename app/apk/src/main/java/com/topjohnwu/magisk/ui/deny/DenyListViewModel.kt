@@ -142,8 +142,7 @@ class DenyListViewModel : AsyncLoadViewModel() {
                             proc.copy(isEnabled = true)
                         } else {
                             if (proc.process.isIsolated && proc.isEnabled) {
-                                val (name, pkg) = proc.process
-                                Shell.cmd("magisk --denylist rm $pkg '$name'").submit()
+                                Shell.cmd(removeCommand(proc.process)).submit()
                             }
                             proc.copy(isEnabled = false)
                         }
@@ -158,9 +157,9 @@ class DenyListViewModel : AsyncLoadViewModel() {
 
     fun toggleProcess(app: DenyAppState, proc: DenyProcessState) {
         val newEnabled = !proc.isEnabled
-        val arg = if (newEnabled) "add" else "rm"
         val (name, pkg) = proc.process
-        Shell.cmd("magisk --denylist $arg $pkg '$name'").submit()
+        val cmd = if (newEnabled) "magisk --denylist add $pkg '$name'" else removeCommand(proc.process)
+        Shell.cmd(cmd).submit()
 
         _allApps.update { apps ->
             apps.map { currentApp ->
@@ -178,6 +177,16 @@ class DenyListViewModel : AsyncLoadViewModel() {
                 }
             }
         }
+    }
+
+    private fun removeCommand(proc: ProcessInfo): String {
+        if (!proc.isIsolated) return "magisk --denylist rm ${proc.packageName} '${proc.name}'"
+        // Isolated processes are matched by name prefix. Older versions of the app added one
+        // entry per isolated service (e.g. "com.foo:com.foo.Service") instead of the prefix
+        // itself, so remove every entry starting with the prefix.
+        return "magisk --denylist ls | while IFS='|' read -r pkg proc; do " +
+            "[ \"\$pkg\" = $ISOLATED_MAGIC ] && case \"\$proc\" in '${proc.name}'*) " +
+            "magisk --denylist rm $ISOLATED_MAGIC \"\$proc\";; esac; done"
     }
 
     override suspend fun doLoadWork() {
