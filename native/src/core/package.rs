@@ -18,6 +18,7 @@ use std::time::Duration;
 const EOCD_MAGIC: u32 = 0x06054B50;
 const APK_SIGNING_BLOCK_MAGIC: [u8; 16] = *b"APK Sig Block 42";
 const SIGNATURE_SCHEME_V2_MAGIC: u32 = 0x7109871A;
+const VERITY_PADDING_BLOCK_ID: u32 = 0x42726577;
 const PACKAGES_XML: &str = "/data/system/packages.xml";
 
 macro_rules! bad_apk {
@@ -98,7 +99,7 @@ fn read_certificate(apk: &mut File) -> Vec<u8> {
         }
 
         // Next, find the start of the APK signing block
-        apk.seek(SeekFrom::Start((central_dir_off - 24) as u64))?;
+        let seq_end = apk.seek(SeekFrom::Start((central_dir_off - 24) as u64))?;
         apk.read_pod(&mut u64_val)?; // u64_value = block_sz_
         let mut magic = [0u8; 16];
         apk.read_exact(&mut magic)?;
@@ -106,24 +107,42 @@ fn read_certificate(apk: &mut File) -> Vec<u8> {
             Err(bad_apk!("invalid signing block magic"))?;
         }
         let mut signing_blk_sz = 0u64;
-        apk.seek(SeekFrom::Current(
+        let mut cur = apk.seek(SeekFrom::Current(
             -(u64_val as i64) - (size_of_val(&signing_blk_sz) as i64),
         ))?;
         apk.read_pod(&mut signing_blk_sz)?;
+        cur += size_of_val(&signing_blk_sz) as u64;
         if signing_blk_sz != u64_val {
             Err(bad_apk!("invalid signing block size"))?;
         }
 
         // Finally, we are now at the beginning of the id-value pair sequence
+        let mut v2_cert: Option<Vec<u8>> = None;
         loop {
+            if cur == seq_end {
+                break match v2_cert {
+                    Some(cert) => Ok(cert),
+                    None => Err(bad_apk!("cannot find certificate")),
+                };
+            }
+
+            if cur > seq_end || seq_end - cur < 12 {
+                Err(bad_apk!("truncated id-value pair"))?;
+            }
+
             apk.read_pod(&mut u64_val)?; // id-value pair length
-            if u64_val == signing_blk_sz {
-                Err(bad_apk!("cannot find certificate"))?;
+            let pair_end = cur + (size_of_val(&u64_val) as u64) + u64_val;
+            if u64_val < 4 || pair_end > seq_end {
+                Err(bad_apk!("invalid id-value pair length"))?;
             }
 
             let mut id = 0u32;
             apk.read_pod(&mut id)?;
             if id == SIGNATURE_SCHEME_V2_MAGIC {
+                if v2_cert.is_some() {
+                    Err(bad_apk!("duplicate signature scheme v2 block"))?;
+                }
+
                 // Skip [signer sequence length] + [1st signer length] + [signed data length]
                 apk.seek(SeekFrom::Current((size_of_val(&u32_val) * 3) as i64))?;
 
@@ -133,15 +152,20 @@ fn read_certificate(apk: &mut File) -> Vec<u8> {
                 apk.seek(SeekFrom::Current(size_of_val(&u32_val) as i64))?; // cert sequence length
                 apk.read_pod(&mut u32_val)?; // 1st cert length
 
+                let here = apk.stream_position()?;
+                if here + u32_val as u64 > pair_end {
+                    Err(bad_apk!("invalid certificate length"))?;
+                }
                 let mut cert = vec![0; u32_val as usize];
                 apk.read_exact(cert.as_mut())?;
-                break Ok(cert);
-            } else {
+                v2_cert = Some(cert);
+            } else if id == VERITY_PADDING_BLOCK_ID {
                 // Skip this id-value pair
-                apk.seek(SeekFrom::Current(
-                    u64_val as i64 - (size_of_val(&id) as i64),
-                ))?;
+            } else {
+                Err(bad_apk!("unknown block id"))?;
             }
+
+            cur = apk.seek(SeekFrom::Start(pair_end))?;
         }
     }();
     res.log().unwrap_or(vec![])
