@@ -1,3 +1,4 @@
+
 # Installation
 
 If you already have Magisk installed, it is **strongly recommended** to upgrade directly via the Magisk app using its "Direct Install" method. The following tutorial is only for the initial installation.
