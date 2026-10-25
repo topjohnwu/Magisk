@@ -45,26 +45,25 @@
     <string name="install_inactive_slot">安装到未使用的槽位（OTA 后）</string>
     <string name="install_inactive_slot_msg">将在重启后强制切换到另一个槽位！注意只能在 OTA 更新完成后的重启之前使用。</string>
     <string name="setup_title">修复安装</string>
+    <string name="patch_image">修补固件或映像</string>
+    <string name="patch_image_msg">支持的文件格式与输出：\n• <b>引导/恢复映像（.img）</b>：对 boot、init_boot 或 recovery 分区进行修补，并输出修补后的 .img 文件\n• <b>OTA/出厂映像包（.zip, payload.bin）</b>：提取目标映像，并输出修补后的 .img 文件\n• <b>Odin 固件（.tar）</b>：修补其中包含的映像，并输出修补后的 .tar 文件\n• <b>Googlebook 恢复映像（.bin, .zip）</b>：输出修补后的 .bin 文件，或将其刷入 USB 闪存盘</string>
+    <string name="select_from_storage">从存储空间选择</string>
     <string name="download_dialog_title">输入映像链接</string>
     <string name="download_dialog_msg">完整 OTA 映像或者出厂映像</string>
+    <string name="download_googlebook_recovery_image">下载最新 Googlebook 恢复映像</string>
+    <string name="download_pixel_factory_image">下载最新 Pixel 出厂映像</string>
+    <string name="output_destination">输出目标</string>
+    <string name="save_to_file">保存到文件</string>
+    <string name="no_usb_drive_found">未检测到 USB 设备，请插入一个 USB 闪存盘。</string>
+    <string name="usb_overwrite_warning">所选 USB 设备上的所有数据都将被永久清除。</string>
     <string name="reboot_delay_toast">设备将在 5 秒后重启</string>
     <string name="flash_screen_title">安装</string>
 
     <!--Superuser-->
-
-
     <string name="deny">拒绝</string>
-
     <string name="restrict">受限</string>
     <string name="grant">允许</string>
     <string name="superuser_grant">授予超级用户权限</string>
-
-
-
-
-
-
-
     <string name="su_allow_toast">%1$s 已被授予超级用户权限</string>
     <string name="su_legacy_cmd">警告：检测到不支持的命令行</string>
     <string name="su_deny_toast">%1$s 已被拒绝超级用户权限</string>
@@ -90,6 +89,7 @@
     <string name="menuSaveLog">保存日志</string>
     <string name="menuClearLog">清空日志</string>
     <string name="logs_cleared">日志已清空</string>
+    <string name="log_save_failed">无法保存日志</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">目标 UID: %1$d</string>
     <string name="target_pid">挂载命名空间目标 PID: %s</string>
@@ -158,8 +158,6 @@
     <string name="settings_hosts_summary">为广告屏蔽应用提供 Systemless hosts 支持</string>
     <string name="settings_hosts_toast">已添加 systemless hosts 模块</string>
     <string name="superuser_notification">超级用户通知</string>
-
-
     <string name="settings_su_auth_title">身份验证</string>
     <string name="settings_su_auth_summary">对超级用户请求验证身份</string>
     <string name="settings_su_auth_insecure">设备未配置验证方式</string>
@@ -240,4 +238,6 @@
     <string name="install_unknown_denied">允许安装未知应用以使用此功能</string>
     <string name="app_not_found">找不到可处理此操作的应用</string>
     <string name="reboot_apply_change">重启后生效</string>
+    <string name="running_exit_title">正在执行中</string>
+    <string name="running_exit_msg">确定要退出吗？当前正在进行的操作可能无法完成。</string>
 </resources>
