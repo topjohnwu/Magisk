@@ -50,8 +50,8 @@ abstract class TransformApkTask : DefaultTask() {
         )
 
         val signingOptions = SigningOptions.builder()
-            .setMinSdkVersion(0)
-            .setV1SigningEnabled(true)
+            .setMinSdkVersion(24)
+            .setV1SigningEnabled(false)
             .setV2SigningEnabled(true)
             .setKey(info.key)
             .setCertificates(info.certificate)
