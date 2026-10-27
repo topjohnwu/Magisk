@@ -2,7 +2,7 @@
 
 ### v31.1 (2026.10.24)
 
-- [General] Support Headless System User Mode (HSUM) devices
+- [Geijneral] Support Headless System User Mode (HSUM) devices
 - [General] Drop support for Android 6.0; Android 7.0 is now the minimum supported version
 - [General] Remove the app hiding (repackaging) feature and the stub app; Magisk no longer reinstalls the app automatically if it is missing
 - [App] Remove reactive superuser request prompts; superuser access is now explicitly granted ahead of time in the Superuser tab
