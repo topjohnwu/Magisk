@@ -116,6 +116,10 @@ class IntegrationTest : TestCommon {
             "Module sepolicy.rule is not applied",
             Shell.cmd("magiskpolicy --print-rules | grep -q magisk_test").exec().isSuccess
         )
+        assertTrue(
+            "Type without attribute is not created",
+            Shell.cmd("echo -n u:object_r:magisk_test_no_attr:s0 > /sys/fs/selinux/context").exec().isSuccess
+        )
     }
 
     @Test
