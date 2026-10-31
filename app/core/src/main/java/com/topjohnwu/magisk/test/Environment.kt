@@ -141,6 +141,8 @@ class Environment : TestCommon {
 
         // Add sepolicy patch
         PrintStream(path.getChildFile("sepolicy.rule").newOutputStream()).use {
+            // A type without an attribute must not stop the boot.
+            it.println("type magisk_test_no_attr")
             it.println("type magisk_test domain")
         }
 
