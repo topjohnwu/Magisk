@@ -225,4 +225,25 @@
     <string name="install_unknown_denied">Bu işlevi etkinleştirmek için \"Bilinmeyen uygulamaları yükle\" iznini verin</string>
     <string name="app_not_found">Bu işlemi gerçekleştirecek uygulama bulunamadı</string>
     <string name="reboot_apply_change">Değişiklikleri uygulamak için yeniden başlat</string>
+
+    <!-- Missing translations added -->
+    <string name="not_installed">Yüklü Değil</string>
+    <string name="patch_image">Yazılım / görüntü yaması</string>
+    <string name="patch_image_msg">Desteklenen dosya biçimleri ve çıktılar:\n• <b>Önyükleme / kurtarma görüntüsü (.img)</b>: önyükleme, init_boot veya kurtarma bölümüne yama uygular ve yamalı bir .img çıktısı verir\n• <b>OTA / fabrika paketi (.zip, payload.bin)</b>: hedef görüntüyü çıkarır ve yamalı bir .img çıktısı verir\n• <b>Odin yazılımı (.tar)</b>: içindeki görüntüye yama uygular ve yamalı bir .tar çıktısı verir\n• <b>Googlebook kurtarma görüntüsü (.bin, .zip)</b>: yamalı bir .bin çıktısı verir veya USB sürücüye yazar</string>
+    <string name="select_from_storage">Depolamadan seç</string>
+    <string name="download_dialog_title">Görüntü URL\'sini girin</string>
+    <string name="download_dialog_msg">Tam OTA görüntüsü veya fabrika görüntüsü</string>
+    <string name="download_googlebook_recovery_image">En son Googlebook kurtarma görüntüsünü indir</string>
+    <string name="download_pixel_factory_image">En son Pixel fabrika görüntüsünü indir</string>
+    <string name="output_destination">Çıktı konumu</string>
+    <string name="save_to_file">Dosyaya kaydet</string>
+    <string name="no_usb_drive_found">USB sürücü algılanamadı. Bir USB bellek takın.</string>
+    <string name="usb_overwrite_warning">Seçilen USB sürücüdeki tüm veriler kalıcı olarak silinecek.</string>
+    <string name="superuser_grant">Süper Kullanıcı İzni Ver</string>
+    <string name="su_legacy_cmd">Uyarı: Desteklenmeyen komut satırı algılandı</string>
+    <string name="log_save_failed">Günlük kaydedilemedi</string>
+    <string name="granted">İzin Verildi</string>
+    <string name="denied">Reddedildi</string>
+    <string name="running_exit_title">İşlem devam ediyor</string>
+    <string name="running_exit_msg">Çıkmak istediğinizden emin misiniz? Devam eden işlem tamamlanmayabilir.</string>
 </resources>
