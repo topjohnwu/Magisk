@@ -126,7 +126,9 @@ object Notifications {
                 .setContentTitle(title)
                 .setContentText(text)
                 .setAutoCancel(true)
-                .setTimeoutAfter(SU_NOTIFICATION_TIMEOUT_MS)
+            // setTimeoutAfter requires API 26; only the O+ branch above can call it
+            if (SDK_INT >= Build.VERSION_CODES.O)
+                builder.setTimeoutAfter(SU_NOTIFICATION_TIMEOUT_MS)
             mgr.notify(nextId(), builder.build())
         }
     }
