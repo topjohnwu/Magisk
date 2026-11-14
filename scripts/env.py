@@ -22,13 +22,14 @@ __all__ = [
     "ensure_cargo",
     "ensure_jdk",
     "os_name",
+    "arch_name",
     "is_windows",
     "EXE_EXT",
     "no_color",
     "cpu_count",
 ]
 
-ondk_version = "r30.1"
+ondk_version = "r30.2"
 
 
 def color_print(code, msg):
@@ -170,6 +171,8 @@ if os_name != "linux" and os_name != "darwin":
     # It's possible we're using MSYS/Cygwin/MinGW, treat them all as Windows
     is_windows = True
     os_name = "windows"
+raw_arch = platform.machine().lower()
+arch_name = {"arm64": "aarch64", "amd64": "x86_64"}.get(raw_arch, raw_arch)
 EXE_EXT = ".exe" if is_windows else ""
 
 no_color = "NO_COLOR" in os.environ or not sys.stdout.isatty()
