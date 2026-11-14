@@ -226,9 +226,10 @@ fn is_raw_arm32(buf: &[u8]) -> bool {
     if sample.len() < 64 {
         return false;
     }
-    let words = sample.chunks_exact(4);
+    let (words, _) = sample.as_chunks::<4>();
     let count = words.len();
     let arm_cond_count = words
+        .iter()
         .filter(|chunk| {
             let top_nibble = chunk[3] >> 4;
             top_nibble == 0xE || top_nibble == 0xF

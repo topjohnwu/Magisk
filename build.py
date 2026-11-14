@@ -573,7 +573,7 @@ class ProgressStream:
 
 
 def setup_ndk():
-    url = f"https://github.com/topjohnwu/ondk/releases/download/{ondk_version}/ondk-{ondk_version}-{os_name}.tar.xz"
+    url = f"https://github.com/topjohnwu/ondk/releases/download/{ondk_version}/ondk-{ondk_version}-{os_name}-{arch_name}.tar.xz"
     ndk_archive = url.split("/")[-1]
     ondk_path = paths().ndk.parent / f"ondk-{ondk_version}"
 

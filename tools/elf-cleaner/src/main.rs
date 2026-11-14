@@ -57,18 +57,18 @@ fn process_elf(path: &str) -> anyhow::Result<()> {
             });
             // Remove unsupported flags
             for entry in entries.iter_mut() {
-                if let Dynamic::Integer { tag, val } = entry {
-                    if *tag == elf::DT_FLAGS_1 {
-                        let new_flags = *val & SUPPORTED_DT_FLAGS as u64;
-                        if new_flags != *val {
-                            println!(
-                                "Replacing unsupported DT_FLAGS_1 {:#x} with {:#x} in '{}'",
-                                *val, new_flags, path
-                            );
-                            *val = new_flags;
-                        }
-                        break;
+                if let Dynamic::Integer { tag, val } = entry
+                    && *tag == elf::DT_FLAGS_1
+                {
+                    let new_flags = *val & SUPPORTED_DT_FLAGS as u64;
+                    if new_flags != *val {
+                        println!(
+                            "Replacing unsupported DT_FLAGS_1 {:#x} with {:#x} in '{}'",
+                            *val, new_flags, path
+                        );
+                        *val = new_flags;
                     }
+                    break;
                 }
             }
         }
