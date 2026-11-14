@@ -212,7 +212,11 @@ impl MagiskD {
             }
             RequestCode::LATE_START => {
                 drop(client);
-                if state.contains(BootState::PostFsDataDone) && !state.contains(BootState::SafeMode)
+                // LATE_START can be requested more than once per boot,
+                // only run service scripts once
+                if state.contains(BootState::PostFsDataDone)
+                    && !state.contains(BootState::SafeMode)
+                    && !state.contains(BootState::LateStartDone)
                 {
                     self.late_start();
                     state.insert(BootState::LateStartDone);
