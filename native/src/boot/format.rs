@@ -16,6 +16,7 @@ impl FromStr for FileFormat {
             "lz4" => Ok(Self::LZ4),
             "lz4_legacy" => Ok(Self::LZ4_LEGACY),
             "lz4_lg" => Ok(Self::LZ4_LG),
+            "zstd" => Ok(Self::ZSTD),
             _ => Err(()),
         }
     }
@@ -38,6 +39,7 @@ impl FileFormat {
             Self::LZ4 => cstr!("lz4"),
             Self::LZ4_LEGACY => cstr!("lz4_legacy"),
             Self::LZ4_LG => cstr!("lz4_lg"),
+            Self::ZSTD => cstr!("zstd"),
             Self::DTB => cstr!("dtb"),
             Self::ZIMAGE => cstr!("zimage"),
             _ => cstr!("raw"),
@@ -54,6 +56,7 @@ impl FileFormat {
             Self::LZMA => "lzma",
             Self::BZIP2 => "bz2",
             Self::LZ4 | Self::LZ4_LEGACY | Self::LZ4_LG => "lz4",
+            Self::ZSTD => "zst",
             _ => "",
         }
     }
@@ -68,6 +71,7 @@ impl FileFormat {
                 | Self::LZ4
                 | Self::LZ4_LEGACY
                 | Self::LZ4_LG
+                | Self::ZSTD
         )
     }
 
@@ -80,6 +84,7 @@ impl FileFormat {
             Self::LZ4,
             Self::LZ4_LEGACY,
             Self::LZ4_LG,
+            Self::ZSTD,
         ]
         .map(|f| f.to_string())
         .join(" ")
@@ -106,6 +111,7 @@ const VENDOR_BOOT_MAGIC: &[u8] = b"VNDRBOOT";
 const GZIP2_MAGIC: &[u8] = b"\x1f\x9e";
 const LZOP_MAGIC: &[u8] = b"\x89LZO\x00\x0d\x0a\x1a\x0a";
 const XZ_MAGIC: &[u8] = b"\xfd7zXZ\x00";
+const ZSTD_MAGIC: &[u8] = b"\x28\xb5\x2f\xfd";
 const BZIP_MAGIC: &[u8] = b"BZh";
 const LZ41_MAGIC: &[u8] = b"\x03\x21\x4c\x18";
 const LZ42_MAGIC: &[u8] = b"\x04\x22\x4d\x18";
@@ -205,6 +211,8 @@ pub fn check_fmt(buf: &[u8]) -> FileFormat {
         FileFormat::LZ4
     } else if buf.starts_with(LZ4_LEG_MAGIC) {
         FileFormat::LZ4_LEGACY
+    } else if buf.starts_with(ZSTD_MAGIC) {
+        FileFormat::ZSTD
     } else if buf.starts_with(MTK_MAGIC) {
         FileFormat::MTK
     } else if buf.starts_with(DTB_MAGIC) {
@@ -265,4 +273,33 @@ pub fn detect_bcj_filter(buf: &[u8]) -> Option<FilterType> {
     }
 
     None
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn detects_zstd_magic() {
+        assert!(matches!(
+            check_fmt(b"\x28\xb5\x2f\xfd"),
+            FileFormat::ZSTD
+        ));
+    }
+
+    #[test]
+    fn parses_zstd_format() {
+        assert!(matches!(
+            FileFormat::from_str("zstd"),
+            Ok(FileFormat::ZSTD)
+        ));
+    }
+
+    #[test]
+    fn zstd_format_properties() {
+        let format = FileFormat::ZSTD;
+        assert_eq!(format.ext(), "zst");
+        assert!(format.is_compressed());
+        assert_eq!(format.to_string(), "zstd");
+    }
 }
