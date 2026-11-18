@@ -212,4 +212,47 @@
     <string name="install_unknown_denied">Permita a opção \"Instalar apps de fontes desconhecidas\" para ativar esta funcionalidade</string>
     <string name="app_not_found">Nenhum app encontrado para realizar esta ação</string>
     <string name="reboot_apply_change">Reinicie para aplicar as mudanças</string>
+
+    <!--Added translations (pt-BR)-->
+    <string name="not_installed">Não instalado</string>
+    <string name="reinstall">Reinstalar</string>
+    <string name="patch_image">Corrigir firmware / imagem</string>
+    <string name="patch_image_msg">Formatos de arquivo e saídas suportados:\n• <b>Imagem boot / recovery (.img)</b>: corrige boot, init_boot ou recovery e gera uma .img corrigida\n• <b>Pacote OTA / de fábrica (.zip, payload.bin)</b>: extrai a imagem de destino e gera uma .img corrigida\n• <b>Firmware Odin (.tar)</b>: corrige a imagem interna e gera um .tar corrigido\n• <b>Imagem de recuperação Googlebook (.bin, .zip)</b>: gera um .bin corrigido ou grava em uma unidade USB</string>
+    <string name="select_from_storage">Selecionar do armazenamento</string>
+    <string name="download_dialog_title">Insira o URL da imagem</string>
+    <string name="download_dialog_msg">Imagem OTA completa ou imagem de fábrica</string>
+    <string name="download_googlebook_recovery_image">Baixar a imagem de recuperação Googlebook mais recente</string>
+    <string name="download_pixel_factory_image">Baixar a imagem de fábrica Pixel mais recente</string>
+    <string name="output_destination">Destino de saída</string>
+    <string name="save_to_file">Salvar em arquivo</string>
+    <string name="no_usb_drive_found">Nenhuma unidade USB detectada. Insira uma unidade flash USB.</string>
+    <string name="usb_overwrite_warning">Todos os dados na unidade USB selecionada serão apagados permanentemente.</string>
+    <string name="superuser_grant">Conceder SuperUsuário</string>
+    <string name="su_legacy_cmd">Aviso: linha de comando não suportada detectada</string>
+    <string name="notification">Notificação</string>
+    <string name="back">Voltar</string>
+    <string name="log_save_failed">Falha ao salvar o registro</string>
+    <string name="granted">Permitido</string>
+    <string name="denied">Negado</string>
+    <string name="sort_by_name">Ordenar por nome</string>
+    <string name="sort_by_package_name">Ordenar por nome do pacote</string>
+    <string name="sort_by_install_time">Ordenar por data de instalação</string>
+    <string name="sort_by_update_time">Ordenar por data de atualização</string>
+    <string name="sort_reverse">Ordem inversa</string>
+    <string name="menu_sort">Ordenar</string>
+    <string name="settings_color_mode">Modo de cores</string>
+    <string name="color_mode_system">Sistema</string>
+    <string name="color_mode_light">Claro</string>
+    <string name="color_mode_dark">Escuro</string>
+    <string name="color_mode_monet_system">Monet (Sistema)</string>
+    <string name="color_mode_monet_light">Monet (Claro)</string>
+    <string name="color_mode_monet_dark">Monet (Escuro)</string>
+    <string name="su_notification_channel">Notificações de SuperUsuário</string>
+    <string name="su_notification_granted_title">SuperUsuário concedido</string>
+    <string name="su_notification_denied_title">SuperUsuário negado</string>
+    <string name="enabled">Ativado</string>
+    <string name="disabled">Desativado</string>
+    <string name="running_exit_title">Execução em andamento</string>
+    <string name="running_exit_msg">Tem certeza de que deseja sair? A operação em andamento pode não ser concluída.</string>
+
 </resources>
