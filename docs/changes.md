@@ -1,4 +1,5 @@
 # Magisk Changelog
+root panal 
 
 ### v31.1 (2026.10.24)
 
