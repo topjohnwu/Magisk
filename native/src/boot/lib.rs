@@ -42,6 +42,7 @@ pub mod ffi {
         LZ4,
         LZ4_LEGACY,
         LZ4_LG,
+        ZSTD,
         /* Unsupported compression */
         LZOP,
         /* Misc */

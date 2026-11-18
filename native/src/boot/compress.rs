@@ -41,7 +41,13 @@ macro_rules! finish_impl {
     )*}
 }
 
-finish_impl!(GzEncoder<W>, BzEncoder<W>, XzWriter<W>, LzmaWriter<W>);
+finish_impl!(
+    GzEncoder<W>,
+    BzEncoder<W>,
+    XzWriter<W>,
+    LzmaWriter<W>,
+    zstd::stream::write::Encoder<'static, W>
+);
 
 impl<W: Write> WriteFinish<W> for LZ4FrameEncoder<W> {
     fn finish(self: Box<Self>) -> std::io::Result<W> {
@@ -239,6 +245,7 @@ pub fn get_encoder<'a, W: Write + 'a>(
         }
         FileFormat::LZ4_LEGACY => Box::new(LZ4BlockEncoder::new(w, false)),
         FileFormat::LZ4_LG => Box::new(LZ4BlockEncoder::new(w, true)),
+        FileFormat::ZSTD => Box::new(zstd::stream::write::Encoder::new(w, 3)?),
         FileFormat::GZIP => Box::new(GzEncoder::new(w, GzCompression::best())),
         _ => unreachable!(),
     })
@@ -271,6 +278,7 @@ pub fn get_decoder<'a, R: Read + 'a>(
         FileFormat::BZIP2 => Box::new(BzDecoder::new(r)),
         FileFormat::LZ4 => Box::new(LZ4FrameDecoder::new(r)?),
         FileFormat::LZ4_LG | FileFormat::LZ4_LEGACY => Box::new(LZ4BlockDecoder::new(r)),
+        FileFormat::ZSTD => Box::new(zstd::stream::read::Decoder::new(r)?),
         FileFormat::GZIP => Box::new(MultiGzDecoder::new(r)),
         _ => unreachable!(),
     })
@@ -409,4 +417,28 @@ pub(crate) fn compress_cmd(
         infile.remove()?;
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn zstd_compress_decompress_roundtrip() {
+        let input = b"MagiskBoot ZSTD support test data";
+
+        let mut encoder = get_encoder(FileFormat::ZSTD, Vec::new()).unwrap();
+        encoder.write_all(input).unwrap();
+        let compressed = encoder.finish().unwrap();
+
+        assert!(compressed.starts_with(b"\x28\xb5\x2f\xfd"));
+
+        let mut decoder =
+            get_decoder(FileFormat::ZSTD, compressed.as_slice()).unwrap();
+
+        let mut decompressed = Vec::new();
+        decoder.read_to_end(&mut decompressed).unwrap();
+
+        assert_eq!(decompressed, input);
+    }
 }
