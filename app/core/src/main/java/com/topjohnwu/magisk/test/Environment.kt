@@ -141,6 +141,7 @@ class Environment : TestCommon {
 
         // Add sepolicy patch
         PrintStream(path.getChildFile("sepolicy.rule").newOutputStream()).use {
+            it.println("type magisk_test_no_attr")
             it.println("type magisk_test domain")
         }
 
