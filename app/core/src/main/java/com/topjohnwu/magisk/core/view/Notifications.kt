@@ -118,6 +118,7 @@ object Notifications {
             val builder = if (SDK_INT >= Build.VERSION_CODES.O) {
                 Notification.Builder(this, SU_CHANNEL)
                     .setSmallIcon(getBitmap(R.drawable.ic_magisk_outline).toIcon())
+                    .setTimeoutAfter(SU_NOTIFICATION_TIMEOUT_MS)
             } else {
                 Notification.Builder(this).setPriority(Notification.PRIORITY_HIGH)
                     .setSmallIcon(R.drawable.ic_magisk_outline)
@@ -126,9 +127,6 @@ object Notifications {
                 .setContentTitle(title)
                 .setContentText(text)
                 .setAutoCancel(true)
-            if (SDK_INT >= Build.VERSION_CODES.O) {
-                builder.setTimeoutAfter(SU_NOTIFICATION_TIMEOUT_MS)
-            }
             mgr.notify(nextId(), builder.build())
         }
     }
