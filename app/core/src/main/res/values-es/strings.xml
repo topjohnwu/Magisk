@@ -16,9 +16,11 @@
     <string name="loading">Cargando…</string>
     <string name="update">Actualizar</string>
     <string name="not_available">No disponible</string>
+    <string name="not_installed">No instalado</string>
     <string name="hide">Ocultar</string>
     <string name="home_package">Nombre de paquete:</string>
     <string name="home_app_title">App</string>
+    <string name="reinstall">Reinstalar</string>
     <string name="home_notice_content">Descarga Magisk únicamente desde la página oficial de GitHub. ¡Las descargas desde fuentes desconocidas pueden ser maliciosas!</string>
     <string name="home_support_title">Apóyanos</string>
     <string name="home_follow_title">Síguenos</string>
@@ -43,6 +45,17 @@
     <string name="install_inactive_slot">Instalar en el slot inactivo (tras una OTA)</string>
     <string name="install_inactive_slot_msg">Tu dispositivo será forzado a bootear en el slot inactivo actual después de un reinicio\nUsa esta opción solo después de que la actualización OTA se complete.\n¿Quieres continuar?</string>
     <string name="setup_title">Configuración adicional</string>
+    <string name="patch_image">Parchear firmware / imagen</string>
+    <string name="patch_image_msg">Formatos de archivo compatibles y resultado:\n• <b>Imagen boot / recovery (.img)</b>: parchea boot, init_boot o recovery y genera un .img parcheado\n• <b>Paquete OTA / de fábrica (.zip, payload.bin)</b>: extrae la imagen de destino y genera un .img parcheado\n• <b>Firmware de Odin (.tar)</b>: parchea la imagen que contiene y genera un .tar parcheado\n• <b>Imagen recovery de Googlebook (.bin, .zip)</b>: genera un .bin parcheado o lo flashea en una unidad USB</string>
+    <string name="select_from_storage">Seleccionar desde el almacenamiento</string>
+    <string name="download_dialog_title">Ingresa la URL de la imagen</string>
+    <string name="download_dialog_msg">Imagen OTA completa o imagen de fábrica</string>
+    <string name="download_googlebook_recovery_image">Descargar la última imagen recovery de Googlebook</string>
+    <string name="download_pixel_factory_image">Descargar la última imagen de fábrica de Pixel</string>
+    <string name="output_destination">Destino de salida</string>
+    <string name="save_to_file">Guardar en un archivo</string>
+    <string name="no_usb_drive_found">No se detectó ninguna unidad USB. Inserta una memoria USB.</string>
+    <string name="usb_overwrite_warning">Se borrarán de forma permanente todos los datos de la unidad USB seleccionada.</string>
     <string name="reboot_delay_toast">Reiniciando en 5 segundos…</string>
     <string name="flash_screen_title">Instalación</string>
 
@@ -50,8 +63,10 @@
 
 
     <string name="deny">Denegar</string>
+    <string name="restrict">Restringir</string>
 
     <string name="grant">Conceder</string>
+    <string name="superuser_grant">Conceder privilegios de superusuario</string>
 
 
 
@@ -60,6 +75,7 @@
 
 
     <string name="su_allow_toast">Le concediste privilegios de superusuario a %1$s</string>
+    <string name="su_legacy_cmd">Advertencia: se detectó una línea de comandos no compatible</string>
     <string name="su_deny_toast">Le denegaste privilegios de superusuario a %1$s</string>
     <string name="su_snack_grant">Privilegios de superusuario para %1$s concedidos</string>
     <string name="su_snack_deny">Privilegios de superusuario para %1$s denegados</string>
@@ -70,7 +86,9 @@
     <string name="su_revoke_title">Revocar privilegios</string>
     <string name="su_revoke_msg">Confirma para revocarle los privilegios de superusuario a %1$s</string>
     <string name="toast">Mensaje emergente</string>
+    <string name="notification">Notificación</string>
     <string name="none">Ninguno</string>
+    <string name="back">Atrás</string>
     <string name="superuser_toggle_notification">Notificaciones</string>
     <string name="superuser_toggle_revoke">Revocar</string>
     <string name="superuser_policy_none">Ninguna app ha solicitado privilegios de superusuario aún.</string>
@@ -81,11 +99,14 @@
     <string name="menuSaveLog">Guardar registro</string>
     <string name="menuClearLog">Limpiar registro</string>
     <string name="logs_cleared">Registros limpiados correctamente</string>
+    <string name="log_save_failed">No se pudo guardar el registro</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Objetivo UID: %1$d</string>
     <string name="target_pid">Montar ns objetivo PID: %s</string>
     <string name="selinux_context">Contexto SELinux: %s</string>
     <string name="supp_group">Grupo suplementario: %s</string>
+    <string name="granted">Concedido</string>
+    <string name="denied">Denegado</string>
 
     <!--SafetyNet/PlayIntegrity-->
 
@@ -93,6 +114,12 @@
     <string name="show_system_app">Mostrar apps del sistema</string>
     <string name="show_os_app">Mostrar apps del sistema operativo</string>
     <string name="hide_filter_hint">Nombre de la app o del paquete</string>
+    <string name="sort_by_name">Ordenar por nombre</string>
+    <string name="sort_by_package_name">Ordenar por nombre de paquete</string>
+    <string name="sort_by_install_time">Ordenar por fecha de instalación</string>
+    <string name="sort_by_update_time">Ordenar por fecha de actualización</string>
+    <string name="sort_reverse">Orden inverso</string>
+    <string name="menu_sort">Ordenar</string>
     <string name="hide_search">Buscar</string>
 
     <!--Módulos-->
@@ -102,8 +129,10 @@
     <string name="reboot_bootloader">Modo Bootloader</string>
     <string name="reboot_download">Modo Download</string>
     <string name="reboot_edl">Modo EDL</string>
+    <string name="reboot_safe_mode">Modo seguro</string>
     <string name="module_version_author">Versión %1$s, por %2$s</string>
     <string name="module_state_remove">Desinstalar</string>
+    <string name="module_action">Acción</string>
     <string name="module_state_restore">Reinstalar</string>
     <string name="module_action_install_external">Instalar desde almacenamiento</string>
     <string name="update_available">Actualización disponible</string>
@@ -129,6 +158,7 @@
     <string name="settings_update_channel_title">Canal de actualización</string>
     <string name="settings_update_stable">Estable</string>
     <string name="settings_update_beta">Beta</string>
+    <string name="settings_update_debug">Depuración</string>
     <string name="settings_update_custom">Personalizado</string>
     <string name="settings_update_custom_msg">Ingresa la URL del canal personalizado</string>
     <string name="settings_zygisk_summary">Ejecuta Magisk en el proceso Zygote de Android</string>
@@ -145,9 +175,20 @@
     <string name="settings_su_auth_title">Autenticación de usuario</string>
     <string name="settings_su_auth_summary">Preguntar por la autenticación de usuario durante las peticiones de Superusuario</string>
     <string name="settings_su_auth_insecure">No hay método de autenticación configurado en el dispositivo</string>
+    <string name="settings_su_restrict_title">Restringir las capacidades de root</string>
+    <string name="settings_su_restrict_summary">Restringirá por defecto las nuevas apps de superusuario. Advertencia: esto hará que la mayoría de las apps dejen de funcionar. No lo actives a menos que sepas lo que haces.</string>
     <string name="settings_customization">Personalización</string>
+    <string name="settings_color_mode">Modo de color</string>
+    <string name="color_mode_system">Sistema</string>
+    <string name="color_mode_light">Claro</string>
+    <string name="color_mode_dark">Oscuro</string>
+    <string name="color_mode_monet_system">Monet (sistema)</string>
+    <string name="color_mode_monet_light">Monet (claro)</string>
+    <string name="color_mode_monet_dark">Monet (oscuro)</string>
     <string name="settings_doh_title">DNS sobre HTTPS</string>
     <string name="settings_doh_description">Proporciona una solución alternativa (workaround) contra el envenenamiento de DNS en algunos países</string>
+    <string name="settings_random_name_title">Nombre de salida aleatorio</string>
+    <string name="settings_random_name_description">Usa un nombre aleatorio para las imágenes y los archivos tar parcheados y así evitar que se detecten</string>
     <string name="multiuser_mode">Modo multiusuario</string>
     <string name="settings_owner_only">Propietario del dispositivo</string>
     <string name="settings_owner_manage">Administrado por el propietario del dispositivo</string>
@@ -167,21 +208,28 @@
     <string name="update_channel">Actualizaciones de Magisk</string>
     <string name="progress_channel">Notificaciones de progreso</string>
     <string name="updated_channel">Actualización finalizada</string>
+    <string name="su_notification_channel">Notificaciones de superusuario</string>
     <string name="download_complete">Descarga finalizada</string>
     <string name="download_file_error">Ocurrió un error en la descarga</string>
     <string name="magisk_update_title">¡Actualización de Magisk disponible!</string>
     <string name="updated_title">Se actualizó Magisk</string>
     <string name="updated_text">Pulsa para abrir la app</string>
+    <string name="su_notification_granted_title">Superusuario concedido</string>
+    <string name="su_notification_denied_title">Superusuario denegado</string>
 
     <!--Alertas y diálogos-->
     <string name="yes">Sí</string>
     <string name="no">No</string>
+    <string name="enabled">Habilitado</string>
+    <string name="disabled">Deshabilitado</string>
     <string name="repo_install_title">Instalar %1$s %2$s(%3$d)</string>
     <string name="download">Descargar</string>
     <string name="reboot">Reiniciar</string>
+    <string name="close">Cerrar</string>
     <string name="release_notes">Notas de lanzamiento</string>
     <string name="flashing">Flasheando…</string>
     <string name="done">¡Listo!</string>
+    <string name="done_action">Se ha ejecutado la acción de %1$s</string>
     <string name="failure">¡Ocurrió un error!</string>
     <string name="open_link_failed_toast">No se encontró ninguna app que pueda abrir este enlace</string>
     <string name="complete_uninstall">Desinstalación completa</string>
@@ -205,4 +253,6 @@
     <string name="install_unknown_denied">Permite la instalación de apps desconocidas para activar esta funcionalidad</string>
     <string name="app_not_found">No se encontró ninguna app que pueda realizar esta acción</string>
     <string name="reboot_apply_change">Reinicia para aplicar los cambios</string>
+    <string name="running_exit_title">Ejecución en curso</string>
+    <string name="running_exit_msg">¿Seguro que quieres salir? Puede que la operación en curso no termine.</string>
 </resources>
