@@ -15,6 +15,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedContentTransitionScope.SlideDirection
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -45,6 +46,7 @@ import com.topjohnwu.magisk.core.base.SplashScreenHost
 import com.topjohnwu.magisk.core.wrap
 import com.topjohnwu.magisk.ui.component.ConfirmResult
 import com.topjohnwu.magisk.ui.component.rememberConfirmDialog
+import com.topjohnwu.magisk.ui.component.tvSafeArea
 import com.topjohnwu.magisk.ui.deny.DenyListScreen
 import com.topjohnwu.magisk.ui.deny.DenyListViewModel
 import com.topjohnwu.magisk.ui.flash.FlashScreen
@@ -125,6 +127,8 @@ class MainActivity : ComponentActivity(), SplashScreenHost {
             MagiskTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     val navigator = rememberNavigator(Route.Main)
+                    // Keep content inside the TV title-safe area; no-op on phones and tablets
+                    Box(modifier = Modifier.fillMaxSize().tvSafeArea()) {
                     CompositionLocalProvider(LocalNavigator provides navigator) {
                         HandleFlashIntent(navigator)
 
@@ -221,6 +225,7 @@ class MainActivity : ComponentActivity(), SplashScreenHost {
                                 }
                             }
                         )
+                    }
                     }
                     MainActivityDialogs(
                         unsupportedMessages = showUnsupported.collectAsStateWithLifecycle().value,

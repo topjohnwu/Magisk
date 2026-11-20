@@ -82,6 +82,7 @@ import com.topjohnwu.magisk.core.download.DownloadEngine
 import com.topjohnwu.magisk.core.model.module.OnlineModule
 import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.ui.component.ConfirmResult
+import com.topjohnwu.magisk.ui.component.launchSafely
 import com.topjohnwu.magisk.ui.component.MagiskDialog
 import com.topjohnwu.magisk.ui.component.MarkdownTextAsync
 import com.topjohnwu.magisk.ui.component.onlyHorizontal
@@ -132,7 +133,7 @@ fun ModuleScreen(
     }
 
     DisposableEffect(onRegisterFab) {
-        onRegisterFab?.invoke { filePicker.launch("application/zip") }
+        onRegisterFab?.invoke { filePicker.launchSafely(context, "application/zip") }
         onDispose {
             onRegisterFab?.invoke(null)
         }
@@ -169,7 +170,7 @@ fun ModuleScreen(
         floatingActionButton = {
             if (onRegisterFab == null) {
                 FloatingActionButton(
-                    onClick = { filePicker.launch("application/zip") },
+                    onClick = { filePicker.launchSafely(context, "application/zip") },
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     content = {

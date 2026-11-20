@@ -36,6 +36,7 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.withFrameNanos
 import androidx.navigationevent.NavigationEventInfo
 import androidx.navigationevent.compose.LocalNavigationEventDispatcherOwner
 import androidx.navigationevent.compose.NavigationBackHandler
@@ -125,6 +126,17 @@ fun MainScreen(
     val superuserContentFocusRequester = remember { FocusRequester() }
     var moduleFabAction by remember { mutableStateOf<(() -> Unit)?>(null) }
     var superuserFabAction by remember { mutableStateOf<(() -> Unit)?>(null) }
+    // One requester per nav item, so focus can be put back on the nav after the page it was
+    // in goes away (D-pad / TV: otherwise focus is lost and the next key press does nothing)
+    val tabFocusRequesters = remember(visibleTabs) {
+        visibleTabs.map { tab ->
+            when (tab) {
+                Tab.MODULES -> navModulesFocusRequester
+                Tab.SUPERUSER -> navSuperuserFocusRequester
+                else -> FocusRequester()
+            }
+        }
+    }
     val isModulesTab = visibleTabs.getOrNull(pagerState.currentPage) == Tab.MODULES
     val isSuperuserTab = visibleTabs.getOrNull(pagerState.currentPage) == Tab.SUPERUSER
 
@@ -137,9 +149,22 @@ fun MainScreen(
         onBackCompleted = {
             scope.launch {
                 pagerState.animateScrollToPage(homePageIndex)
+                if (Info.isTv) {
+                    // The focused content just left composition; don't leave focus nowhere
+                    runCatching { tabFocusRequesters[homePageIndex].requestFocus() }
+                }
             }
         }
     )
+
+    // On TV nothing is focused at start, and the first D-pad press is easily swallowed.
+    // Start on the nav item of the current tab so the remote works right away.
+    if (Info.isTv) {
+        LaunchedEffect(Unit) {
+            withFrameNanos { }
+            runCatching { tabFocusRequesters[pagerState.currentPage].requestFocus() }
+        }
+    }
 
     // The collapsed rail needs 520dp (44dp top space, 96dp FAB header, 5 items, 44dp bottom) to
     // show every item. In shorter windows use the bar, like the library does below 480dp.
@@ -170,11 +195,7 @@ fun MainScreen(
                     selected = pagerState.currentPage == index,
                     onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
                     modifier = Modifier
-                        .then(
-                            if (isModulesItem) Modifier.focusRequester(navModulesFocusRequester)
-                            else if (isSuperuserItem) Modifier.focusRequester(navSuperuserFocusRequester)
-                            else Modifier
-                        )
+                        .focusRequester(tabFocusRequesters[index])
                         .focusProperties {
                             if (isBar && ((isModulesTab && isModulesItem) || (isSuperuserTab && isSuperuserItem))) {
                                 up = fabFocusRequester
