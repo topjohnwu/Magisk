@@ -3,6 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:installLocation="internalOnly">
 
+    <!-- Android TV / leanback: no touchscreen needed, and the app also stays installable on phones -->
+    <uses-feature
+        android:name="android.hardware.touchscreen"
+        android:required="false" />
+    <uses-feature
+        android:name="android.software.leanback"
+        android:required="false" />
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
@@ -36,6 +44,7 @@
     <application
         android:name=".App"
         android:allowBackup="false"
+        android:banner="@drawable/ic_banner"
         android:enableOnBackInvokedCallback="true"
         android:icon="@drawable/ic_launcher"
         android:label="Magisk"

@@ -1,6 +1,9 @@
 package com.topjohnwu.magisk.core
 
 import android.app.KeyguardManager
+import android.app.UiModeManager
+import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.os.Build
 import androidx.lifecycle.MutableLiveData
 import com.topjohnwu.magisk.core.ktx.getProperty
@@ -54,6 +57,14 @@ object Info {
         Build.DEVICE.contains("vsoc")
             || getProperty("ro.kernel.qemu", "0") == "1"
             || getProperty("ro.boot.qemu", "0") == "1"
+
+    /** Android TV / leanback device, driven by a remote (D-pad) rather than a touchscreen */
+    val isTv: Boolean by lazy {
+        val uiMode = AppContext.getSystemService(UiModeManager::class.java)
+        uiMode?.currentModeType == Configuration.UI_MODE_TYPE_TELEVISION ||
+            AppContext.packageManager.hasSystemFeature(PackageManager.FEATURE_LEANBACK) ||
+            !AppContext.packageManager.hasSystemFeature(PackageManager.FEATURE_TOUCHSCREEN)
+    }
 
     val isGooglebook get() =
         AppContext.packageManager.hasSystemFeature("com.google.desktop.gms")

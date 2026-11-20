@@ -6,12 +6,18 @@
         <activity
             android:name=".ui.MainActivity"
             android:exported="true"
+            android:banner="@drawable/ic_banner"
             android:launchMode="singleTask"
             android:theme="@style/SplashTheme"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <!-- Shows the app (with its banner) on the Android TV home screen -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.APPLICATION_PREFERENCES" />
