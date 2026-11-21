@@ -92,6 +92,9 @@ impl SePolicy {
             allow(svcmgr, [proc], ["process"], ["getattr"]);
             allow(["domain"], [proc], ["binder"], ["call", "transfer"]);
 
+            // Let logd get root process attr
+            allow("logd", [proc], ["process"], ["getattr"]);
+
             // Other common IPC
             allow(["domain"], [proc], ["process"], ["sigchld"]);
             allow(["domain"], [proc], ["fd"], ["use"]);
