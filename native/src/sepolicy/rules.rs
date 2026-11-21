@@ -93,7 +93,7 @@ impl SePolicy {
             allow(["domain"], [proc], ["binder"], ["call", "transfer"]);
 
             // Let logd get root process attr
-            allow("logd", [proc], ["process"], ["getattr"]);
+            allow(["logd"], [proc], ["process"], ["getattr"]);
 
             // Other common IPC
             allow(["domain"], [proc], ["process"], ["sigchld"]);
