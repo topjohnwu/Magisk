@@ -250,4 +250,5 @@
     <string name="wear_root_restricted">Restricted root</string>
     <string name="wear_root_none">No root</string>
     <string name="wear_su_logs">Superuser logs</string>
+    <string name="wear_grant_granted">Granted · %1$s</string>
 </resources>

@@ -136,7 +136,12 @@ class SuperuserGrantViewModel(
     fun setSortBy(s: AppSortBy) { _sortBy.value = s }
     fun toggleSortReverse() { _sortReverse.value = !_sortReverse.value }
 
-    fun toggleGrant(app: SuGrantAppState) {
+    /**
+     * Grants root to [app], or takes back a grant made here. A grant is [restricted] root,
+     * decided when this is called: the write happens later, and must not pick up a change of
+     * the setting made in between.
+     */
+    fun toggleGrant(app: SuGrantAppState, restricted: Boolean = Config.suRestrict) {
         // Toggle the current state rather than the one the UI captured: two quick taps can
         // deliver the same item before it recomposes
         val uid = app.info.uid
@@ -160,7 +165,7 @@ class SuperuserGrantViewModel(
                         if (willGrant) {
                             val existing = policyDB.fetch(uid)
                             val suPolicy = existing ?: SuPolicy(uid)
-                            suPolicy.policy = if (Config.suRestrict) SuPolicy.RESTRICT else SuPolicy.ALLOW
+                            suPolicy.policy = if (restricted) SuPolicy.RESTRICT else SuPolicy.ALLOW
                             policyDB.update(suPolicy)
                         } else {
                             policyDB.delete(uid)
