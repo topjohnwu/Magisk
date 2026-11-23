@@ -3,8 +3,12 @@ package com.topjohnwu.magisk.wear.nav
 import android.net.Uri
 import android.os.Parcelable
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -57,6 +61,13 @@ class WearNavigator(val backStack: NavBackStack<NavKey>) {
     // See setPickResult for how a result reaches its caller.
     private val pickResults = mutableStateMapOf<FileKind, Uri>()
 
+    // Back handlers of the screens that currently refuse to be dismissed, latest last, see
+    // BlockDismiss. Not saved: the screens block again when they are composed after a restore.
+    private val dismissBlockers = mutableStateListOf<DismissBlocker>()
+
+    /** Whether the current screen may be swiped away or left with back. */
+    val isDismissEnabled: Boolean get() = dismissBlockers.isEmpty()
+
     fun navigate(key: NavKey) {
         // Ignore pushing the screen that is already on top (e.g. a double tap, or the same
         // request delivered twice). Both copies would get the same content key, so they would
@@ -95,6 +106,26 @@ class WearNavigator(val backStack: NavBackStack<NavKey>) {
 
     fun consumePickResult(kind: FileKind): Uri? = pickResults.remove(kind)
 
+    /**
+     * Handle back from NavDisplay: pop, or while dismissal is blocked, let the latest
+     * [BlockDismiss] handle it instead. Screens leave themselves with [pop].
+     */
+    fun back() {
+        val blocker = dismissBlockers.lastOrNull()
+        if (blocker != null) blocker.onBack() else pop()
+    }
+
+    internal fun addDismissBlocker(blocker: DismissBlocker) {
+        dismissBlockers.add(blocker)
+    }
+
+    internal fun removeDismissBlocker(blocker: DismissBlocker) {
+        dismissBlockers.remove(blocker)
+    }
+
+    // Compared by identity, so each BlockDismiss removes exactly its own entry
+    internal class DismissBlocker(val onBack: () -> Unit)
+
     companion object {
         val Saver: Saver<WearNavigator, Any> = listSaver(
             save = { navigator -> navigator.backStack.toList() },
@@ -121,6 +152,28 @@ fun rememberWearNavigator(vararg startRoutes: NavKey = arrayOf(Route.Main)): Wea
 /** For composables that navigate without being a screen, e.g. the file picker. */
 val LocalWearNavigator = staticCompositionLocalOf<WearNavigator> {
     error("LocalWearNavigator not provided")
+}
+
+/**
+ * While [blocked], the screen can't be swiped away, and back calls [onBlockedBack] instead of
+ * leaving it, e.g. to ask for confirmation; the screen then leaves with [WearNavigator.pop].
+ * Back reaches it through the NavDisplay's onBack ([WearNavigator.back]), so it doesn't depend
+ * on the order of back handlers. If several screens block at once, the latest one gets back.
+ * The block ends when [blocked] turns false or this leaves the composition.
+ */
+@Composable
+fun BlockDismiss(
+    blocked: Boolean,
+    onBlockedBack: () -> Unit,
+    navigator: WearNavigator = LocalWearNavigator.current,
+) {
+    val currentOnBlockedBack by rememberUpdatedState(onBlockedBack)
+    if (!blocked) return
+    DisposableEffect(navigator) {
+        val blocker = WearNavigator.DismissBlocker { currentOnBlockedBack() }
+        navigator.addDismissBlocker(blocker)
+        onDispose { navigator.removeDismissBlocker(blocker) }
+    }
 }
 
 @Composable

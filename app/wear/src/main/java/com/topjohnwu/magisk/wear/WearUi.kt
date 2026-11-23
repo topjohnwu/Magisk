@@ -30,6 +30,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
@@ -48,6 +49,8 @@ import com.topjohnwu.magisk.ui.flash.FlashUtils
 import com.topjohnwu.magisk.ui.flash.queryDisplayName
 import com.topjohnwu.magisk.ui.flash.sanitizeDisplayName
 import com.topjohnwu.magisk.ui.log.LogViewModel
+import com.topjohnwu.magisk.ui.module.ActionViewModel
+import com.topjohnwu.magisk.ui.module.ModuleViewModel
 import com.topjohnwu.magisk.ui.navigation.Route
 import com.topjohnwu.magisk.ui.superuser.SuperuserGrantViewModel
 import com.topjohnwu.magisk.ui.superuser.SuperuserViewModel
@@ -55,6 +58,9 @@ import com.topjohnwu.magisk.ui.unsupportedMessages
 import com.topjohnwu.magisk.wear.files.PickScreen
 import com.topjohnwu.magisk.wear.home.HomeScreen
 import com.topjohnwu.magisk.wear.log.LogScreen
+import com.topjohnwu.magisk.wear.module.ActionScreen
+import com.topjohnwu.magisk.wear.module.ModuleDetailScreen
+import com.topjohnwu.magisk.wear.module.ModulesScreen
 import com.topjohnwu.magisk.wear.nav.LocalWearNavigator
 import com.topjohnwu.magisk.wear.nav.WearNavigator
 import com.topjohnwu.magisk.wear.nav.WearRoute
@@ -104,18 +110,29 @@ class WearUi(
             WearTheme {
                 AppScaffold(timeText = { TimeText() }) {
                     val navigator = rememberWearNavigator(Route.Main)
+                    // See ModulesScreen; kept with the activity-scoped ModuleViewModel
+                    val moduleLoadedStates = rememberSaveable { HashMap<String, Int>() }
                     CompositionLocalProvider(LocalWearNavigator provides navigator) {
                         HandleFlashIntent(navigator)
 
                         NavDisplay(
                             backStack = navigator.backStack,
-                            onBack = { navigator.pop() },
+                            // A screen that blocks dismissal gets back instead, see BlockDismiss
+                            onBack = { navigator.back() },
                             entryDecorators = listOf(
                                 rememberSaveableStateHolderNavEntryDecorator(),
                                 rememberViewModelStoreNavEntryDecorator<Any>()
                             ),
                             // Swipe-to-dismiss, and predictive back from API 36
-                            sceneStrategies = listOf(rememberSwipeDismissableSceneStrategy()),
+                            sceneStrategies = listOf(
+                                rememberSwipeDismissableSceneStrategy(
+                                    // From API 36 the swipe is predictive back, and turning it off
+                                    // swallows back entirely; leave it on there, so a blocked
+                                    // swipe reaches onBack, which hands it to the blocking screen
+                                    isUserSwipeEnabled = navigator.isDismissEnabled ||
+                                        Build.VERSION.SDK_INT > Build.VERSION_CODES.VANILLA_ICE_CREAM
+                                )
+                            ),
                             entryProvider = entryProvider {
                                 entry<Route.Main> { HomeScreen(navigator) }
                                 entry<Route.DenyList> {
@@ -139,7 +156,24 @@ class WearUi(
                                     }
                                     GrantScreen(vm)
                                 }
-                                entry<Route.Action> { key -> Placeholder(key.name) }
+                                entry<Route.Action> { key ->
+                                    val vm: ActionViewModel = viewModel(factory = VMFactory)
+                                    if (vm.isInterrupted) {
+                                        // Restored after process death: nothing is left to show
+                                        LeaveInterruptedScreen(navigator, key)
+                                        return@entry
+                                    }
+                                    LaunchedEffect(key) {
+                                        if (vm.actionDir.isEmpty()) {
+                                            vm.actionDir = key.dir
+                                            vm.actionName = key.name
+                                            vm.startRunAction()
+                                        }
+                                    }
+                                    ActionScreen(vm, actionName = key.name, onLeave = {
+                                        if (navigator.current() == key) navigator.pop()
+                                    })
+                                }
                                 entry<WearRoute.Superuser> {
                                     val vm: SuperuserViewModel = viewModel(
                                         viewModelStoreOwner = activity, factory = VMFactory
@@ -151,9 +185,19 @@ class WearUi(
                                     LogScreen(vm)
                                 }
                                 entry<WearRoute.Modules> {
-                                    Placeholder(stringResource(CoreR.string.modules))
+                                    // Owned by the activity, so the list and its details share one
+                                    // copy of the modules, like the phone app
+                                    val vm: ModuleViewModel = viewModel(
+                                        viewModelStoreOwner = activity, factory = VMFactory
+                                    )
+                                    ModulesScreen(vm, navigator, moduleLoadedStates)
                                 }
-                                entry<WearRoute.ModuleDetail> { key -> Placeholder(key.dir) }
+                                entry<WearRoute.ModuleDetail> { key ->
+                                    val vm: ModuleViewModel = viewModel(
+                                        viewModelStoreOwner = activity, factory = VMFactory
+                                    )
+                                    ModuleDetailScreen(key.dir, vm, navigator)
+                                }
                                 entry<WearRoute.Install> {
                                     Placeholder(stringResource(CoreR.string.install))
                                 }
@@ -260,6 +304,14 @@ class WearUi(
     /** Called by the activity after it got a new intent. */
     fun onNewIntent() {
         intentState.value += 1
+    }
+}
+
+/** Leaves the screen of [key], if it is still on top. */
+@Composable
+private fun LeaveInterruptedScreen(navigator: WearNavigator, key: NavKey) {
+    LaunchedEffect(key) {
+        if (navigator.current() == key) navigator.pop()
     }
 }
 

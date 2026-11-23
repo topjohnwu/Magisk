@@ -224,4 +224,12 @@
     <string name="wear_log_today">Dziś</string>
     <string name="wear_log_yesterday">Wczoraj</string>
     <string name="wear_log_clear_msg">Usunąć wszystkie wpisy z logu %1$s?</string>
+    <string name="wear_module_active">Aktywny</string>
+    <string name="wear_module_disabled">Wyłączony</string>
+    <string name="wear_module_removed">Usunięty po restarcie</string>
+    <string name="wear_module_enabled">Włączony</string>
+    <string name="wear_module_reboot">Uruchom ponownie</string>
+    <string name="wear_module_run_action">Uruchom akcję</string>
+    <string name="wear_module_remove">Usuń moduł</string>
+    <string name="wear_action_running">Trwa…</string>
 </resources>
