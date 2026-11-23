@@ -213,4 +213,7 @@
 
     <!--Wear OS-->
     <string name="wear_pick_empty">Brak pasujących plików w folderze Download</string>
+    <string name="wear_home_running">Działa</string>
+    <string name="wear_home_installed_code">Zainstalowany · %1$d</string>
+    <string name="wear_home_uninstall">Odinstaluj</string>
 </resources>

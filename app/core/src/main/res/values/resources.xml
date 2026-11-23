@@ -8,6 +8,9 @@
     <string name="shared_uid" translatable="false">SharedUID</string>
     <string name="empty" translatable="false"/>
 
+    <!-- Wear OS -->
+    <string name="wear_home_status_item" translatable="false">%1$s: %2$s</string>
+
     <string name="paypal" translatable="false">PayPal</string>
     <string name="patreon" translatable="false">Patreon</string>
     <string name="twitter" translatable="false">Twitter</string>

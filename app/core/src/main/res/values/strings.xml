@@ -243,4 +243,7 @@
 
     <!--Wear OS-->
     <string name="wear_pick_empty">No matching files in the Download folder</string>
+    <string name="wear_home_running">Running</string>
+    <string name="wear_home_installed_code">Installed · %1$d</string>
+    <string name="wear_home_uninstall">Uninstall</string>
 </resources>

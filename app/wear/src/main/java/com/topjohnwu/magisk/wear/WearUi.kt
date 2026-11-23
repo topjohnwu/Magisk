@@ -10,7 +10,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -30,17 +29,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
-import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
-import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import androidx.wear.compose.material3.AlertDialog
 import androidx.wear.compose.material3.AlertDialogDefaults
 import androidx.wear.compose.material3.AppScaffold
-import androidx.wear.compose.material3.Button
-import androidx.wear.compose.material3.ListHeader
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.TimeText
@@ -54,6 +48,7 @@ import com.topjohnwu.magisk.ui.flash.sanitizeDisplayName
 import com.topjohnwu.magisk.ui.navigation.Route
 import com.topjohnwu.magisk.ui.unsupportedMessages
 import com.topjohnwu.magisk.wear.files.PickScreen
+import com.topjohnwu.magisk.wear.home.HomeScreen
 import com.topjohnwu.magisk.wear.nav.LocalWearNavigator
 import com.topjohnwu.magisk.wear.nav.WearNavigator
 import com.topjohnwu.magisk.wear.nav.WearRoute
@@ -113,7 +108,7 @@ class WearUi(
                             // Swipe-to-dismiss, and predictive back from API 36
                             sceneStrategies = listOf(rememberSwipeDismissableSceneStrategy()),
                             entryProvider = entryProvider {
-                                entry<Route.Main> { MainPlaceholder(navigator) }
+                                entry<Route.Main> { HomeScreen(navigator) }
                                 entry<Route.DenyList> {
                                     Placeholder(stringResource(CoreR.string.denylist))
                                 }
@@ -257,36 +252,6 @@ private fun Placeholder(title: String) {
             contentAlignment = Alignment.Center,
         ) {
             Text(title, textAlign = TextAlign.Center)
-        }
-    }
-}
-
-/** Stands in for the home screen: only reaches the other screens. */
-@Composable
-private fun MainPlaceholder(navigator: WearNavigator) {
-    val destinations: List<Pair<Int, NavKey>> = listOf(
-        CoreR.string.superuser to WearRoute.Superuser,
-        CoreR.string.modules to WearRoute.Modules,
-        CoreR.string.logs to WearRoute.Logs,
-        CoreR.string.settings to WearRoute.Settings,
-        CoreR.string.install to WearRoute.Install,
-    )
-    val state = rememberTransformingLazyColumnState()
-    ScreenScaffold(state) { contentPadding ->
-        TransformingLazyColumn(state = state, contentPadding = contentPadding) {
-            item {
-                ListHeader { Text(stringResource(CoreR.string.section_home)) }
-            }
-            destinations.forEach { (title, key) ->
-                item {
-                    Button(
-                        onClick = { navigator.navigate(key) },
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        Text(stringResource(title))
-                    }
-                }
-            }
         }
     }
 }
