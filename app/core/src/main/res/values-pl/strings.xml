@@ -216,4 +216,8 @@
     <string name="wear_home_running">Działa</string>
     <string name="wear_home_installed_code">Zainstalowany · %1$d</string>
     <string name="wear_home_uninstall">Odinstaluj</string>
+    <string name="wear_root_full">Pełny root</string>
+    <string name="wear_root_restricted">Ograniczony root</string>
+    <string name="wear_root_none">Bez roota</string>
+    <string name="wear_su_logs">Logi su</string>
 </resources>

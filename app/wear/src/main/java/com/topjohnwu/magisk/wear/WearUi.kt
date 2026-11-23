@@ -28,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
@@ -39,6 +40,7 @@ import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.TimeText
 import androidx.wear.compose.navigation3.rememberSwipeDismissableSceneStrategy
+import com.topjohnwu.magisk.arch.VMFactory
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.base.ActivityExtension
@@ -46,6 +48,7 @@ import com.topjohnwu.magisk.ui.flash.FlashUtils
 import com.topjohnwu.magisk.ui.flash.queryDisplayName
 import com.topjohnwu.magisk.ui.flash.sanitizeDisplayName
 import com.topjohnwu.magisk.ui.navigation.Route
+import com.topjohnwu.magisk.ui.superuser.SuperuserViewModel
 import com.topjohnwu.magisk.ui.unsupportedMessages
 import com.topjohnwu.magisk.wear.files.PickScreen
 import com.topjohnwu.magisk.wear.home.HomeScreen
@@ -53,6 +56,8 @@ import com.topjohnwu.magisk.wear.nav.LocalWearNavigator
 import com.topjohnwu.magisk.wear.nav.WearNavigator
 import com.topjohnwu.magisk.wear.nav.WearRoute
 import com.topjohnwu.magisk.wear.nav.rememberWearNavigator
+import com.topjohnwu.magisk.wear.superuser.SuperuserDetailScreen
+import com.topjohnwu.magisk.wear.superuser.SuperuserScreen
 import com.topjohnwu.magisk.wear.theme.WearTheme
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -115,15 +120,23 @@ class WearUi(
                                 entry<Route.Flash> {
                                     Placeholder(stringResource(CoreR.string.flash_screen_title))
                                 }
-                                entry<Route.SuperuserDetail> {
-                                    Placeholder(stringResource(CoreR.string.superuser))
+                                entry<Route.SuperuserDetail> { key ->
+                                    // Owned by the activity, so the list and its details share one
+                                    // copy of the policies, like the phone app
+                                    val vm: SuperuserViewModel = viewModel(
+                                        viewModelStoreOwner = activity, factory = VMFactory
+                                    )
+                                    SuperuserDetailScreen(key.uid, vm, navigator)
                                 }
                                 entry<Route.SuperuserGrant> {
                                     Placeholder(stringResource(CoreR.string.superuser_grant))
                                 }
                                 entry<Route.Action> { key -> Placeholder(key.name) }
                                 entry<WearRoute.Superuser> {
-                                    Placeholder(stringResource(CoreR.string.superuser))
+                                    val vm: SuperuserViewModel = viewModel(
+                                        viewModelStoreOwner = activity, factory = VMFactory
+                                    )
+                                    SuperuserScreen(vm, navigator)
                                 }
                                 entry<WearRoute.Logs> {
                                     Placeholder(stringResource(CoreR.string.logs))

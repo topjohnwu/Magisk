@@ -246,4 +246,8 @@
     <string name="wear_home_running">Running</string>
     <string name="wear_home_installed_code">Installed · %1$d</string>
     <string name="wear_home_uninstall">Uninstall</string>
+    <string name="wear_root_full">Full root</string>
+    <string name="wear_root_restricted">Restricted root</string>
+    <string name="wear_root_none">No root</string>
+    <string name="wear_su_logs">Superuser logs</string>
 </resources>
