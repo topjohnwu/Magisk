@@ -51,6 +51,7 @@ libsu-nio = { module = "com.github.topjohnwu.libsu:nio", version.ref = "libsu" }
 # Compose
 activity-compose = { module = "androidx.activity:activity-compose", version = "1.13.0" }
 accompanist-drawablepainter = { module = "com.google.accompanist:accompanist-drawablepainter", version = "0.37.3" }
+compose-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "compose-ui" }
 compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose-ui" }
 compose-animation = { module = "androidx.compose.animation:animation", version.ref = "compose-ui" }
 compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose-ui" }
@@ -60,6 +61,9 @@ compose-material3 = { module = "androidx.compose.material3:material3", version.r
 compose-material3-adaptive-navigation-suite = { module = "androidx.compose.material3:material3-adaptive-navigation-suite", version.ref = "compose-m3" }
 window-core = { module = "androidx.window:window-core", version = "1.5.0" }
 compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version = "1.7.8" }
+lifecycle-livedata-core = { module = "androidx.lifecycle:lifecycle-livedata-core", version.ref = "lifecycle" }
+lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel", version.ref = "lifecycle" }
+lifecycle-viewmodel-savedstate = { module = "androidx.lifecycle:lifecycle-viewmodel-savedstate", version.ref = "lifecycle" }
 lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
 lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycle" }

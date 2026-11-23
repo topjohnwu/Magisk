@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.ui.component
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
@@ -21,13 +20,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.topjohnwu.magisk.core.R as CoreR
-
-enum class AppSortBy(@StringRes val labelRes: Int) {
-    NAME(CoreR.string.sort_by_name),
-    PACKAGE_NAME(CoreR.string.sort_by_package_name),
-    INSTALL_TIME(CoreR.string.sort_by_install_time),
-    UPDATE_TIME(CoreR.string.sort_by_update_time);
-}
 
 @Composable
 fun AppSortFilterActions(

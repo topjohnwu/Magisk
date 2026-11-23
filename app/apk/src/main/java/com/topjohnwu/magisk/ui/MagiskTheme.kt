@@ -18,9 +18,6 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
@@ -32,7 +29,6 @@ import com.google.android.material.color.utilities.DynamicColor
 import com.google.android.material.color.utilities.Hct
 import com.google.android.material.color.utilities.MaterialDynamicColors
 import com.google.android.material.color.utilities.SchemeTonalSpot
-import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.model.ColorMode
 
 @SuppressLint("RestrictedApi")
@@ -98,10 +94,6 @@ fun dynamicColorScheme(
 }
 
 val MagiskAccentColor = Color(0xFF00AF9C)
-
-object ThemeState {
-    var colorMode by mutableIntStateOf(Config.colorMode)
-}
 
 // Same values as androidx.activity's internal DefaultLightScrim / DefaultDarkScrim
 private val LightScrim = android.graphics.Color.argb(0xe6, 0xFF, 0xFF, 0xFF)
