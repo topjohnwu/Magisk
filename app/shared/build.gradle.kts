@@ -23,5 +23,8 @@ dependencies {
     api(libs.lifecycle.livedata.core)
     api(libs.compose.runtime)
     api(libs.navigation3.runtime)
+    implementation(libs.activity.compose)
     implementation(libs.core.ktx)
+
+    testImplementation(libs.junit)
 }
