@@ -35,6 +35,7 @@ dependencies {
     implementation(libs.wear.compose.foundation)
     implementation(libs.wear.compose.material3)
     implementation(libs.wear.compose.navigation3)
+    implementation(libs.wear.input)
 
     // Navigation3
     implementation(libs.navigation3.runtime)

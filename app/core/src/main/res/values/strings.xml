@@ -269,4 +269,5 @@
     <string name="wear_restore_sha1">Backup SHA1</string>
     <string name="wear_restore_no_backup">No boot image backup</string>
     <string name="wear_restore_hold">Hold to restore</string>
+    <string name="wear_settings_updates">Updates</string>
 </resources>

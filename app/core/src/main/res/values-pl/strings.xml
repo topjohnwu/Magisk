@@ -239,4 +239,5 @@
     <string name="wear_restore_sha1">SHA1 kopii</string>
     <string name="wear_restore_no_backup">Brak kopii obrazu boot</string>
     <string name="wear_restore_hold">Przytrzymaj, aby przywrócić</string>
+    <string name="wear_settings_updates">Aktualizacje</string>
 </resources>

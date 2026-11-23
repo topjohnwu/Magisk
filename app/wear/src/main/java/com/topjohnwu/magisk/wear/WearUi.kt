@@ -3,14 +3,12 @@ package com.topjohnwu.magisk.wear
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -20,12 +18,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -37,7 +32,6 @@ import androidx.navigation3.ui.NavDisplay
 import androidx.wear.compose.material3.AlertDialog
 import androidx.wear.compose.material3.AlertDialogDefaults
 import androidx.wear.compose.material3.AppScaffold
-import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.TimeText
 import androidx.wear.compose.navigation3.rememberSwipeDismissableSceneStrategy
@@ -45,6 +39,7 @@ import com.topjohnwu.magisk.arch.VMFactory
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.base.ActivityExtension
+import com.topjohnwu.magisk.ui.deny.DenyListViewModel
 import com.topjohnwu.magisk.ui.flash.FlashUtils
 import com.topjohnwu.magisk.ui.flash.FlashViewModel
 import com.topjohnwu.magisk.ui.flash.queryDisplayName
@@ -55,6 +50,7 @@ import com.topjohnwu.magisk.ui.log.LogViewModel
 import com.topjohnwu.magisk.ui.module.ActionViewModel
 import com.topjohnwu.magisk.ui.module.ModuleViewModel
 import com.topjohnwu.magisk.ui.navigation.Route
+import com.topjohnwu.magisk.ui.settings.SettingsViewModel
 import com.topjohnwu.magisk.ui.superuser.SuperuserGrantViewModel
 import com.topjohnwu.magisk.ui.superuser.SuperuserViewModel
 import com.topjohnwu.magisk.ui.unsupportedMessages
@@ -71,6 +67,8 @@ import com.topjohnwu.magisk.wear.nav.LocalWearNavigator
 import com.topjohnwu.magisk.wear.nav.WearNavigator
 import com.topjohnwu.magisk.wear.nav.WearRoute
 import com.topjohnwu.magisk.wear.nav.rememberWearNavigator
+import com.topjohnwu.magisk.wear.settings.DenyListScreen
+import com.topjohnwu.magisk.wear.settings.SettingsScreen
 import com.topjohnwu.magisk.wear.superuser.GrantScreen
 import com.topjohnwu.magisk.wear.superuser.SuperuserDetailScreen
 import com.topjohnwu.magisk.wear.superuser.SuperuserScreen
@@ -120,6 +118,7 @@ class WearUi(
                     val moduleLoadedStates = rememberSaveable { HashMap<String, Int>() }
                     CompositionLocalProvider(LocalWearNavigator provides navigator) {
                         HandleFlashIntent(navigator)
+                        HandleSettingsIntent(navigator)
 
                         NavDisplay(
                             backStack = navigator.backStack,
@@ -149,7 +148,9 @@ class WearUi(
                                     HomeScreen(navigator, vm)
                                 }
                                 entry<Route.DenyList> {
-                                    Placeholder(stringResource(CoreR.string.denylist))
+                                    val vm: DenyListViewModel = viewModel(factory = VMFactory)
+                                    LaunchedEffect(Unit) { vm.startLoading() }
+                                    DenyListScreen(vm)
                                 }
                                 entry<Route.Flash> { key ->
                                     val vm: FlashViewModel = viewModel(factory = VMFactory)
@@ -232,7 +233,8 @@ class WearUi(
                                     InstallScreen(vm, navigator)
                                 }
                                 entry<WearRoute.Settings> {
-                                    Placeholder(stringResource(CoreR.string.settings))
+                                    val vm: SettingsViewModel = viewModel(factory = VMFactory)
+                                    SettingsScreen(vm, navigator)
                                 }
                                 entry<WearRoute.Pick> { key -> PickScreen(key.kind, navigator) }
                                 entry<WearRoute.Restore> { key ->
@@ -323,6 +325,19 @@ class WearUi(
         )
     }
 
+    /** Opens the settings when the system asks for the app's preferences, like the phone app. */
+    @Composable
+    private fun HandleSettingsIntent(navigator: WearNavigator) {
+        val intentVersion by intentState.collectAsStateWithLifecycle()
+
+        LaunchedEffect(intentVersion) {
+            val currentIntent = activity.intent ?: return@LaunchedEffect
+            if (currentIntent.action != Intent.ACTION_APPLICATION_PREFERENCES) return@LaunchedEffect
+            currentIntent.action = null
+            navigator.navigate(WearRoute.Settings)
+        }
+    }
+
     /** A confirmation shown by [HandleFlashIntent], completed with the user's answer. */
     private class ConfirmRequest(val content: String) {
         val result = CompletableDeferred<Boolean>()
@@ -345,21 +360,6 @@ class WearUi(
 private fun LeaveInterruptedScreen(navigator: WearNavigator, key: NavKey) {
     LaunchedEffect(key) {
         if (navigator.current() == key) navigator.pop()
-    }
-}
-
-/** Stands in for a screen that is not implemented yet. */
-@Composable
-private fun Placeholder(title: String) {
-    ScreenScaffold { contentPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(contentPadding),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(title, textAlign = TextAlign.Center)
-        }
     }
 }
 
