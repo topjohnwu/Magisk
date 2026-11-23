@@ -221,4 +221,7 @@
     <string name="wear_root_none">Bez roota</string>
     <string name="wear_su_logs">Logi su</string>
     <string name="wear_grant_granted">Przyznano · %1$s</string>
+    <string name="wear_log_today">Dziś</string>
+    <string name="wear_log_yesterday">Wczoraj</string>
+    <string name="wear_log_clear_msg">Usunąć wszystkie wpisy z logu %1$s?</string>
 </resources>

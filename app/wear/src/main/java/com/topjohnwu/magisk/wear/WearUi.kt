@@ -47,12 +47,14 @@ import com.topjohnwu.magisk.core.base.ActivityExtension
 import com.topjohnwu.magisk.ui.flash.FlashUtils
 import com.topjohnwu.magisk.ui.flash.queryDisplayName
 import com.topjohnwu.magisk.ui.flash.sanitizeDisplayName
+import com.topjohnwu.magisk.ui.log.LogViewModel
 import com.topjohnwu.magisk.ui.navigation.Route
 import com.topjohnwu.magisk.ui.superuser.SuperuserGrantViewModel
 import com.topjohnwu.magisk.ui.superuser.SuperuserViewModel
 import com.topjohnwu.magisk.ui.unsupportedMessages
 import com.topjohnwu.magisk.wear.files.PickScreen
 import com.topjohnwu.magisk.wear.home.HomeScreen
+import com.topjohnwu.magisk.wear.log.LogScreen
 import com.topjohnwu.magisk.wear.nav.LocalWearNavigator
 import com.topjohnwu.magisk.wear.nav.WearNavigator
 import com.topjohnwu.magisk.wear.nav.WearRoute
@@ -145,7 +147,8 @@ class WearUi(
                                     SuperuserScreen(vm, navigator)
                                 }
                                 entry<WearRoute.Logs> {
-                                    Placeholder(stringResource(CoreR.string.logs))
+                                    val vm: LogViewModel = viewModel(factory = VMFactory)
+                                    LogScreen(vm)
                                 }
                                 entry<WearRoute.Modules> {
                                     Placeholder(stringResource(CoreR.string.modules))

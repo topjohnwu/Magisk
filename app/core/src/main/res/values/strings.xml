@@ -251,4 +251,7 @@
     <string name="wear_root_none">No root</string>
     <string name="wear_su_logs">Superuser logs</string>
     <string name="wear_grant_granted">Granted · %1$s</string>
+    <string name="wear_log_today">Today</string>
+    <string name="wear_log_yesterday">Yesterday</string>
+    <string name="wear_log_clear_msg">Delete all entries of the %1$s log?</string>
 </resources>

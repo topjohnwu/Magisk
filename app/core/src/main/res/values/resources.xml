@@ -10,6 +10,8 @@
 
     <!-- Wear OS -->
     <string name="wear_home_status_item" translatable="false">%1$s: %2$s</string>
+    <string name="wear_log_su" translatable="false">su</string>
+    <string name="wear_log_su_result" translatable="false">%1$s · %2$s</string>
 
     <string name="paypal" translatable="false">PayPal</string>
     <string name="patreon" translatable="false">Patreon</string>

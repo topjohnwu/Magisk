@@ -14,6 +14,8 @@ private val WearColorScheme = ColorScheme(
     primaryContainer = Color(0xFF00504A),
     onPrimary = Color(0xFF00382F),
     onPrimaryContainer = Color(0xFF9FF2E3),
+    // Denied requests and destructive actions
+    error = Color(0xFFFFB4AB),
     // A black background keeps OLED pixels off and blends with the bezel
     background = Color.Black,
 )
