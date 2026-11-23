@@ -262,4 +262,11 @@
     <string name="wear_module_run_action">Run action</string>
     <string name="wear_module_remove">Remove module</string>
     <string name="wear_action_running">Running…</string>
+    <string name="wear_install_direct_msg">Patch the boot image of this device and flash it now?</string>
+    <string name="wear_flash_keep_charging">Keep the watch on the charger</string>
+    <string name="wear_flash_wait">Wait until it finishes</string>
+    <string name="wear_restore_msg">Flashes back the stock boot image saved when Magisk was installed. Magisk is gone after a reboot.</string>
+    <string name="wear_restore_sha1">Backup SHA1</string>
+    <string name="wear_restore_no_backup">No boot image backup</string>
+    <string name="wear_restore_hold">Hold to restore</string>
 </resources>

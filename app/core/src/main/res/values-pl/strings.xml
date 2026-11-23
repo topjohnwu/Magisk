@@ -232,4 +232,11 @@
     <string name="wear_module_run_action">Uruchom akcję</string>
     <string name="wear_module_remove">Usuń moduł</string>
     <string name="wear_action_running">Trwa…</string>
+    <string name="wear_install_direct_msg">Załatać obraz boot tego urządzenia i od razu go wgrać?</string>
+    <string name="wear_flash_keep_charging">Nie zdejmuj z ładowarki</string>
+    <string name="wear_flash_wait">Poczekaj, aż się skończy</string>
+    <string name="wear_restore_msg">Wgrywa z powrotem stockowy obraz boot zapisany przy instalacji Magiska. Po ponownym uruchomieniu Magiska już nie będzie.</string>
+    <string name="wear_restore_sha1">SHA1 kopii</string>
+    <string name="wear_restore_no_backup">Brak kopii obrazu boot</string>
+    <string name="wear_restore_hold">Przytrzymaj, aby przywrócić</string>
 </resources>
