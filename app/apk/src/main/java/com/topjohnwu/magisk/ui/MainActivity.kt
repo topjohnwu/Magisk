@@ -79,7 +79,7 @@ class MainActivity : ComponentActivity(), SplashScreenHost {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        if (useWearUi()) wearUi = WearUi(this) else applySystemBarStyle()
+        if (useWearUi()) wearUi = WearUi(this, extension) else applySystemBarStyle()
         extension.onCreate(savedInstanceState)
         splashController.preOnCreate()
         super.onCreate(savedInstanceState)
@@ -291,6 +291,10 @@ class MainActivity : ComponentActivity(), SplashScreenHost {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
+        wearUi?.let {
+            it.onNewIntent()
+            return
+        }
         getRequestedTab(intent)?.let { tabRequest.value = it }
         intentState.value += 1
     }

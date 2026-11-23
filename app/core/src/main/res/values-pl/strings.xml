@@ -44,6 +44,7 @@
     <string name="install_inactive_slot">Zainstaluj w nieaktywnym slocie (po OTA)</string>
     <string name="install_inactive_slot_msg">Po ponownym uruchomieniu twoje urządzenie zostanie ZMUSZONE do rozruchu z aktualnie nieaktywnego slotu!\nUżywaj tej opcji tylko po ukończeniu aktualizacji OTA.\nKontynuować?</string>
     <string name="setup_title">Dodatkowa konfiguracja</string>
+    <string name="select_from_storage">Wybierz z pamięci</string>
     <string name="reboot_delay_toast">Ponowne uruchomienie za 5 sekund…</string>
     <string name="flash_screen_title">Instalacja</string>
 
@@ -209,4 +210,7 @@
     <string name="install_unknown_denied">Zezwól na \"Instaluj z nieznanych źródeł\", aby włączyć tę funkcję</string>
     <string name="app_not_found">Nie znaleziono aplikacji do wykonania tej czynności</string>
     <string name="reboot_apply_change">Uruchom ponownie, aby zastosować zmiany</string>
+
+    <!--Wear OS-->
+    <string name="wear_pick_empty">Brak pasujących plików w folderze Download</string>
 </resources>

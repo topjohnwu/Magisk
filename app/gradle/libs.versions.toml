@@ -76,6 +76,7 @@ navigationevent-compose = { module = "androidx.navigationevent:navigationevent-c
 # Wear OS
 wear-compose-foundation = { module = "androidx.wear.compose:compose-foundation", version.ref = "wear-compose" }
 wear-compose-material3 = { module = "androidx.wear.compose:compose-material3", version.ref = "wear-compose" }
+wear-compose-navigation3 = { module = "androidx.wear.compose:compose-navigation3", version.ref = "wear-compose" }
 
 # For build-logic
 android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "android" }

@@ -34,6 +34,12 @@ dependencies {
     // Wear OS
     implementation(libs.wear.compose.foundation)
     implementation(libs.wear.compose.material3)
+    implementation(libs.wear.compose.navigation3)
+
+    // Navigation3
+    implementation(libs.navigation3.runtime)
+    implementation(libs.navigation3.ui)
+    implementation(libs.lifecycle.viewmodel.navigation3)
 
     testImplementation(libs.junit)
 }
