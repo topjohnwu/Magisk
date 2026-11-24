@@ -16,9 +16,11 @@
     <string name="loading">טוען…</string>
     <string name="update">עדכון</string>
     <string name="not_available">לא זמין</string>
+    <string name="not_installed">לא מותקן</string>
     <string name="hide">הסתרה</string>
     <string name="home_package">חבילה</string>
     <string name="home_app_title">יישום</string>
+    <string name="reinstall">התקנה מחדש</string>
     <string name="home_notice_content">יש להוריד את Magisk רק מהדף הרשמי של GitHub. קבצים ממקורות לא ידועים יכולים להיות זדוניים!</string>
     <string name="home_support_title">תמיכה בנו</string>
     <string name="home_follow_title">עקבו אחרינו</string>
@@ -43,23 +45,27 @@
     <string name="install_inactive_slot">התקנה לסלוט לא פעיל (לאחר OTA)</string>
     <string name="install_inactive_slot_msg">ההתקן שלך ייאלץ אתחול לסלוט הלא פעיל הנוכחי שלך לאחר הפעלה מחדש!\nיש להשתמש באפשרות זו רק לאחר ביצוע OTA בלבד.\nלהמשיך?</string>
     <string name="setup_title">התקנה נוספת</string>
+    <string name="patch_image">תיקון קושחה / קובץ תמונה</string>
+    <string name="patch_image_msg">פורמטים נתמכים ופלט:\n• <b>תמונת Boot / Recovery (.img)</b>: מתקן את boot, init_boot או recovery ומפיק קובץ img מתוקן\n• <b>חבילת OTA / חבילת יצרן (.zip, payload.bin)</b>: מחלץ את התמונה הנדרשת ומפיק קובץ img מתוקן\n• <b>קושחת Odin (.tar)</b>: מתקן את התמונה שבתוכה ומפיק קובץ tar מתוקן\n• <b>תמונת Recovery של Googlebook (.bin, .zip)</b>: מפיק קובץ bin מתוקן או צורב לכונן USB</string>
+    <string name="select_from_storage">בחירה מהאחסון</string>
+    <string name="download_dialog_title">הזנת כתובת התמונה</string>
+    <string name="download_dialog_msg">תמונת OTA מלאה או תמונת יצרן</string>
+    <string name="download_googlebook_recovery_image">הורדת תמונת ה-Recovery העדכנית של Googlebook</string>
+    <string name="download_pixel_factory_image">הורדת תמונת היצרן העדכנית של Pixel</string>
+    <string name="output_destination">יעד הפלט</string>
+    <string name="save_to_file">שמירה לקובץ</string>
+    <string name="no_usb_drive_found">לא זוהה כונן USB. נא לחבר כונן הבזק USB.</string>
+    <string name="usb_overwrite_warning">כל הנתונים בכונן ה-USB שנבחר יימחקו לצמיתות.</string>
     <string name="reboot_delay_toast">מאתחל בעוד 5 שניות…</string>
     <string name="flash_screen_title">התקנה</string>
 
     <!--Superuser-->
-
-
     <string name="deny">דחייה</string>
-
+    <string name="restrict">הגבלה</string>
     <string name="grant">הענקה</string>
-
-
-
-
-
-
-
+    <string name="superuser_grant">הענקת הרשאות משתמש על</string>
     <string name="su_allow_toast">%1$s קיבל הרשאות משתמש על</string>
+    <string name="su_legacy_cmd">אזהרה: זוהתה שורת פקודה שאינה נתמכת</string>
     <string name="su_deny_toast">%1$s נשללו הרשאות משתמש על</string>
     <string name="su_snack_grant">הרשאות משתמש על עבור %1$s הוענקו</string>
     <string name="su_snack_deny">הרשאות משתמש על עבור %1$s נשללו</string>
@@ -69,8 +75,10 @@
     <string name="su_snack_log_off">Log עבור %1$s מושבת</string>
     <string name="su_revoke_title">להסיר?</string>
     <string name="su_revoke_msg">נא לאשר שלילת הרשאות עבור %1$s?</string>
-    <string name="toast">התראה</string>
+    <string name="toast">הודעה קופצת</string>
+    <string name="notification">התראה</string>
     <string name="none">ללא</string>
+    <string name="back">חזרה</string>
     <string name="superuser_toggle_notification">התראות</string>
     <string name="superuser_toggle_revoke">הסרה</string>
     <string name="superuser_policy_none">טרם נתבקשו הרשאות משתמש על על ידי יישומים</string>
@@ -81,18 +89,25 @@
     <string name="menuSaveLog">שמירת Log</string>
     <string name="menuClearLog">ניקוי Log כעת</string>
     <string name="logs_cleared">Log נוקה בהצלחה</string>
+    <string name="log_save_failed">שמירת ה-Log נכשלה</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">יעד UID: %1$d</string>
     <string name="target_pid">מציב ns יעד PID: %s</string>
     <string name="selinux_context">הקשר SELinux: %s</string>
     <string name="supp_group">קבוצה משלימה: %s</string>
-
-    <!--SafetyNet-->
+    <string name="granted">הוענק</string>
+    <string name="denied">נדחה</string>
 
     <!--MagiskHide-->
     <string name="show_system_app">הצגת יישומי מערכת</string>
     <string name="show_os_app">הצגת יישומי מערכת הפעלה</string>
     <string name="hide_filter_hint">סינון לפי שם</string>
+    <string name="sort_by_name">מיון לפי שם</string>
+    <string name="sort_by_package_name">מיון לפי שם חבילה</string>
+    <string name="sort_by_install_time">מיון לפי זמן התקנה</string>
+    <string name="sort_by_update_time">מיון לפי זמן עדכון</string>
+    <string name="sort_reverse">סדר הפוך</string>
+    <string name="menu_sort">מיון</string>
     <string name="hide_search">חיפוש</string>
 
     <!--Module-->
@@ -131,6 +146,7 @@
     <string name="settings_update_channel_title">ערוץ עדכון</string>
     <string name="settings_update_stable">יציב</string>
     <string name="settings_update_beta">בטא</string>
+    <string name="settings_update_debug">ניפוי באגים</string>
     <string name="settings_update_custom">מותאם אישית</string>
     <string name="settings_update_custom_msg">הזנת כתובת מותאמת אישית</string>
     <string name="settings_zygisk_summary">הפעל חלקים של Magisk בדמון zygote</string>
@@ -142,12 +158,19 @@
     <string name="settings_hosts_summary">hosts חסרי מערכת תומכים ביישומים חוסמי פרסומות</string>
     <string name="settings_hosts_toast">הוספת מודול hosts חסרי מערכת</string>
     <string name="superuser_notification">התראות משתמש על</string>
-
-
     <string name="settings_su_auth_title">אימות משתמש</string>
     <string name="settings_su_auth_summary">בקשת אימות משתמש במהלך בקשות משתמש על</string>
     <string name="settings_su_auth_insecure">לא מוגדרת שיטת אימות בהתקן</string>
+    <string name="settings_su_restrict_title">הגבלת יכולות Root</string>
+    <string name="settings_su_restrict_summary">יישומים חדשים שיבקשו הרשאות משתמש על יוגבלו כברירת מחדל. אזהרה: הגדרה זו תשבש את פעולתם של רוב היישומים. אין להפעיל אותה אלא אם כן ברור לך מה המשמעות.</string>
     <string name="settings_customization">התאמה אישית</string>
+    <string name="settings_color_mode">מצב צבע</string>
+    <string name="color_mode_system">בהתאם למערכת</string>
+    <string name="color_mode_light">בהיר</string>
+    <string name="color_mode_dark">כהה</string>
+    <string name="color_mode_monet_system">Monet (בהתאם למערכת)</string>
+    <string name="color_mode_monet_light">Monet (בהיר)</string>
+    <string name="color_mode_monet_dark">Monet (כהה)</string>
     <string name="settings_doh_title">DNS על HTTPS</string>
     <string name="settings_doh_description">עקיפת DNS מורעל במדינות מסוימות</string>
     <string name="settings_random_name_title">שם פלט אקראי</string>
@@ -171,21 +194,27 @@
     <string name="update_channel">עדכוני Magisk</string>
     <string name="progress_channel">התראות התקדמות</string>
     <string name="updated_channel">העדכון הושלם</string>
+    <string name="su_notification_channel">התראות משתמש על</string>
     <string name="download_complete">ההורדה הושלמה</string>
     <string name="download_file_error">שגיאה בהורדת קובץ</string>
     <string name="magisk_update_title">עדכון Magisk זמין!</string>
     <string name="updated_title">עדכון Magisk</string>
     <string name="updated_text">הקשה כדי לפתוח יישום</string>
+    <string name="su_notification_granted_title">הוענקו הרשאות משתמש על</string>
+    <string name="su_notification_denied_title">נדחו הרשאות משתמש על</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">כן</string>
     <string name="no">לא</string>
+    <string name="enabled">מופעל</string>
+    <string name="disabled">מושבת</string>
     <string name="repo_install_title">מתקין %1$s %2$s(%3$d)</string>
     <string name="download">הורדה</string>
     <string name="reboot">הפעלה מחדש</string>
     <string name="close">סגירה</string>
     <string name="release_notes">הערות שחרור</string>
-    <string name="flashing">צורב…</string>    <string name="done">בוצע!</string>
+    <string name="flashing">צורב…</string>
+    <string name="done">בוצע!</string>
     <string name="done_action">בוצעה ריצת פעולה של %1$s</string>
     <string name="failure">נכשל!</string>
     <string name="open_link_failed_toast">לא נמצאו יישומים לפתיחת קישור זה</string>
@@ -210,4 +239,6 @@
     <string name="install_unknown_denied">יש לאפשר "התקנה ממקורות לא ידועים" בכדי להפעיל פונקציה זו</string>
     <string name="app_not_found">לא נמצא יישום לטיפול בפעולה זו</string>
     <string name="reboot_apply_change">ייש להפעיל מחדש כדי להחיל שינויים</string>
+    <string name="running_exit_title">פעולה מתבצעת</string>
+    <string name="running_exit_msg">לצאת בכל זאת? ייתכן שהפעולה הנוכחית לא תושלם.</string>
 </resources>
