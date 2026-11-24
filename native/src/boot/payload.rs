@@ -115,6 +115,21 @@ pub fn extract_boot_from_payload(
     let mut curr_data_offset: u64 = 0;
 
     for operation in operations.iter() {
+        if matches!(operation.type_pb, Type::ZERO) {
+            for ext in operation.dst_extents.iter() {
+                let out_seek = ext
+                    .start_block
+                    .ok_or_else(|| bad_payload!("start block not found"))?
+                    * block_size;
+                let num_blocks = ext
+                    .num_blocks
+                    .ok_or_else(|| bad_payload!("num blocks not found"))?;
+                out_file.seek(SeekFrom::Start(out_seek))?;
+                out_file.write_zeros((num_blocks * block_size) as usize)?;
+            }
+            continue;
+        }
+
         let data_len = operation
             .data_length
             .ok_or_else(|| bad_payload!("data length not found"))? as usize;
@@ -146,19 +161,6 @@ pub fn extract_boot_from_payload(
             Type::REPLACE => {
                 out_file.seek(SeekFrom::Start(out_offset))?;
                 out_file.write_all(data)?;
-            }
-            Type::ZERO => {
-                for ext in operation.dst_extents.iter() {
-                    let out_seek = ext
-                        .start_block
-                        .ok_or_else(|| bad_payload!("start block not found"))?
-                        * block_size;
-                    let num_blocks = ext
-                        .num_blocks
-                        .ok_or_else(|| bad_payload!("num blocks not found"))?;
-                    out_file.seek(SeekFrom::Start(out_seek))?;
-                    out_file.write_zeros(num_blocks as usize)?;
-                }
             }
             Type::REPLACE_BZ | Type::REPLACE_XZ => {
                 out_file.seek(SeekFrom::Start(out_offset))?;
