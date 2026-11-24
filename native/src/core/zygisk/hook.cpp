@@ -1,6 +1,7 @@
 #include <sys/mman.h>
 #include <sys/mount.h>
 #include <sys/resource.h>
+#include <sys/system_properties.h>
 #include <dlfcn.h>
 #include <unwind.h>
 #include <span>
@@ -381,10 +382,14 @@ void HookContext::post_native_bridge_load(void *handle) {
         return;
 
     // Reload the real native bridge if necessary
-    auto nb = get_prop(NBPROP);
+    // Use libc: get_prop() maps our own copy of the property area and names it with a string
+    // in this library. That mapping stays in apps after we unload, and kernels without the 5.17
+    // anon VMA name code keep only a pointer to the name, so it then reads as garbage in maps.
+    char buf[PROP_VALUE_MAX];
+    string_view nb(buf, __system_property_get(NBPROP, buf));
     auto len = sizeof(ZYGISKLDR) - 1;
     if (nb.size() > len) {
-        arg.load_native_bridge(nb.c_str() + len, arg.callbacks);
+        arg.load_native_bridge(nb.data() + len, arg.callbacks);
     }
     runtime_callbacks = arg.callbacks;
     // NOTE: do NOT hook the zygote JNI methods here. The native bridge loads before the runtime
