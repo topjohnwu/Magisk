@@ -41,3 +41,4 @@ flate2 = { workspace = true, features = ["zlib-rs"] }
 bzip2 = { workspace = true }
 lz4 = { workspace = true }
 lzma-rust2 = { workspace = true, features = ["xz", "std", "encoder", "optimization"] }
+zstd = { workspace = true }
