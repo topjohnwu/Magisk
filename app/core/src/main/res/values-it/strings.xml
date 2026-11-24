@@ -3,12 +3,12 @@
     <!--Sections-->
     <string name="modules">Moduli</string>
     <string name="superuser">Accesso root</string>
-    <string name="logs">Registro eventi</string>
+    <string name="logs">Logs</string> 
     <string name="settings">Impostazioni</string>
     <string name="install">Installa</string>
     <string name="section_home">Home</string>
     <string name="section_theme">Temi</string>
-    <string name="denylist">Lista di blocco</string>
+    <string name="denylist">App bloccate</string> 
 
     <!--Home-->
     <string name="no_connection">Connessione non disponibile</string>
@@ -16,48 +16,56 @@
     <string name="loading">Caricamento…</string>
     <string name="update">Aggiorna</string>
     <string name="not_available">N/D</string>
-    <string name="hide">Nascondi</string>    <string name="home_package">Pacchetto</string>
-    <string name="home_app_title">App</string>    <string name="reinstall">Reinstalla</string>
-    <string name="home_notice_content">Scarica Magisk SOLTANTO dalla pagina GitHub ufficiale. I file provenienti da fonti sconosciute possono essere dannosi!</string>
-    <string name="home_support_title">Supportaci</string>
+    <string name="not_installed">Non installato</string>
+    <string name="hide">Nascondi</string>    
+    <string name="home_package">Pacchetto</string>
+    <string name="home_app_title">App</string>    
+    <string name="reinstall">Reinstalla</string>
+    <string name="home_notice_content">Scarica Magisk SOLTANTO dalla pagina GitHub ufficiale. I file provenienti da fonti sconosciute possono essere dannos!</string>
+    <string name="home_support_title">Sostienici</string>
     <string name="home_follow_title">Seguici</string>
     <string name="home_item_source">Codice sorgente</string>
-    <string name="home_support_content">Magisk è, e sempre sarà, gratuito ed open source. Puoi comunque mostrarci il tuo apprezzamento facendo una donazione.</string>    <string name="home_installed_version">Installata</string>
+    <string name="home_support_content">Magisk è, e sempre sarà, gratuito ed open source. Puoi comunque mostrarci il tuo apprezzamento facendo una donazione.</string>    
+    <string name="home_installed_version">Installata</string>
     <string name="home_latest_version">Ultima</string>
-    <string name="invalid_update_channel">Canale di aggiornamento non valido</string>    <string name="uninstall_magisk_title">Disinstalla Magisk</string>
+    <string name="invalid_update_channel">Canale di aggiornamento non valido</string>    
+    <string name="uninstall_magisk_title">Disinstalla Magisk</string>
     <string name="uninstall_magisk_msg">Tutti i moduli verranno disabilitati/rimossi!\nIl root verrà rimosso!\nGli spazi di archiviazione interni decriptati tramite l\'uso di Magisk verranno nuovamente criptati!</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Mantieni crittografia forzata</string>
     <string name="keep_dm_verity">Mantieni AVB 2.0/dm-verity</string>
-    <string name="recovery_mode">Modalità recovery</string>
+    <string name="recovery_mode">Recovery</string>
     <string name="install_options_title">Opzioni</string>
     <string name="install_method_title">Metodo</string>
     <string name="install_next">Avanti</string>
     <string name="install_start">Andiamo!</string>
-    <string name="manager_download_install">Apri questa notifica per scaricare e installare</string>
-    <string name="direct_install">Installazione diretta (raccomandata)</string>    <string name="install_inactive_slot">Installa nello slot inattivo (dopo un aggiornamento OTA)</string>    <string name="install_inactive_slot_msg">Questo dispositivo verrà FORZATO ad avviarsi usando lo slot inattivo!\nUsa questo metodo solo dopo che un aggiornamento OTA è stato installato.\nVuoi continuare?</string>
+    <string name="manager_download_install">Premi per scaricare e installare</string>
+    <string name="direct_install">Installazione diretta (raccomandata)</string>    
+    <string name="install_inactive_slot">Installa nello slot inattivo (dopo un aggiornamento OTA)</string>    
+    <string name="install_inactive_slot_msg">Questo dispositivo verrà FORZATO ad avviarsi usando lo slot inattivo!\nUsa questo metodo solo dopo che un aggiornamento OTA è stato installato.\nVuoi continuare?</string>
     <string name="setup_title">Configurazione aggiuntiva</string>
-    <string name="download_dialog_title">Inserisci l\'URL dell\'immagine</string>
-    <string name="download_dialog_msg">Immagine OTA completa o immagine di fabbrica</string>
-    <string name="reboot_delay_toast">Riavvio fra 5 secondi…</string>
+    <string name="patch_image">Patch firmware / immagine</string>
+    <string name="patch_image_msg">Formati di file e output supportati:\n• <b>Immagine di boot / recovery (.img)</b>: patcha boot, init_boot o recovery e restituisce un file .img patchato (o modificato)\n• <b>Pacchetto OTA / firmware stock (.zip, payload.bin)</b>: estrae l'immagine di destinazione e restituisce un file .img patchato\n• <b>Firmware Odin (.tar)</b>: patcha l'immagine interna e restituisce un file .tar patchato\n• <b>Immagine di ripristino Googlebook (.bin, .zip)</b>: restituisce un file .bin patchato o esegue il flash su un'unità USB</string>
+    <string name="select_from_storage">Sfoglia...</string>
+    <string name="download_dialog_title">Inserisci l\'URL dell\'immagine</string> 
+    <string name="download_dialog_msg">Immagine OTA completa o pacchetto firmware stock</string>
+    <string name="download_googlebook_recovery_image">Scarica l'ultima immagine di ripristino per Chromebook</string>
+    <string name="download_pixel_factory_image">Scarica l'ultimo pacchetto firmware (factory image) per Pixel</string>
+    <string name="output_destination">Cartella di destinazione</string>
+    <string name="save_to_file">Salva su file</string>
+    <string name="no_usb_drive_found">Nessuna unità USB rilevata. Inserisci una chiavetta USB.</string>
+    <string name="usb_overwrite_warning">Tutti i dati presenti sull'unità USB selezionata verranno eliminati definitivamente.</string>
+    <string name="reboot_delay_toast">Riavvio fra 5 secondi…</string> 
     <string name="flash_screen_title">Installazione</string>
 
     <!--Superuser-->
-
-
     <string name="deny">Nega</string>
-
     <string name="restrict">Limita</string>
     <string name="grant">Consenti</string>
-
-
-
-
-
-
-
+    <string name="superuser_grant">Consenti permessi di root</string>
     <string name="su_allow_toast">%1$s ha ottenuto i permessi di root</string>
+    <string name="su_legacy_cmd">Avviso: Linea di comando non supportata rilevata</string>
     <string name="su_deny_toast">%1$s non ha ottenuto i permessi di root</string>
     <string name="su_snack_grant">%1$s potrà ottenere i permessi di root</string>
     <string name="su_snack_deny">%1$s non potrà più ottenere i permessi di root</string>
@@ -70,23 +78,21 @@
     <string name="toast">Toast</string>
     <string name="notification">Notifica</string>
     <string name="none">Nessuno</string>
-    <string name="su_notification_channel">Notifiche di accesso root</string>
-    <string name="su_notification_granted_title">Accesso root concesso</string>
-    <string name="su_notification_denied_title">Accesso root negato</string>
+    <string name="back">Indietro</string>
     <string name="superuser_toggle_notification">Notifiche</string>
     <string name="superuser_toggle_revoke">Revoca</string>
     <string name="superuser_policy_none">Nessuna app ha ancora chiesto i permessi di root.</string>
 
     <!--Logs-->
-    <string name="log_data_none">Non ci sono eventi, prova ad utilizzare un\'app che richiede i permessi di root.</string>
-    <string name="log_data_magisk_none">Il registro eventi di Magisk è vuoto, questo è davvero strano.</string>
-    <string name="menuSaveLog">Salva registro eventi</string>
-    <string name="menuClearLog">Svuota il registro eventi</string>
-    <string name="logs_cleared">Registro eventi svuotato correttamente.</string>    <string name="back">Indietro</string>    <string name="enabled">Abilitato</string>
-    <string name="disabled">Disabilitato</string>
+    <string name="log_data_none">Non ci sono logs, prova ad utilizzare un\'app che richiede i permessi di root.</string>
+    <string name="log_data_magisk_none">Il log di Magisk è vuoto, questo è davvero strano.</string>
+    <string name="menuSaveLog">Salva logs</string>
+    <string name="menuClearLog">Svuota logs</string>
+    <string name="logs_cleared">Logs svuotati correttamente.</string>
+    <string name="log_save_failed">Salvataggio dei logs non riuscito</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Target UID: %1$d</string>
-    <string name="target_pid">PID target: %s</string>
+    <string name="target_pid">Target PID: %s</string>
     <string name="selinux_context">Contesto SELinux: %s</string>
     <string name="supp_group">Gruppo supplementare: %s</string>
     <string name="granted">Concesso</string>
@@ -122,10 +128,10 @@
     <string name="suspend_text_zygisk">Modulo sospeso perché %1$s non è abilitato</string>
     <string name="zygisk_module_unloaded">Modulo Zygisk non caricato a causa di incompatibilità</string>
     <string name="module_empty">Nessun modulo installato</string>
+    <string name="confirm_install">Installare modulo %1$s?</string>
+    <string name="confirm_install_title">Conferma installazione</string>
 
     <!--Settings -->
-    <string name="confirm_install">Vuoi installare il modulo %1$s?</string>
-    <string name="confirm_install_title">Conferma installazione</string>
     <string name="settings_dark_mode_title">Impostazioni tema</string>
     <string name="settings_dark_mode_message">Seleziona il tema che si adatta meglio al tuo stile!</string>
     <string name="settings_dark_mode_light">Chiaro</string>
@@ -152,8 +158,6 @@
     <string name="settings_hosts_summary">Supporto al file hosts systemless per le app che bloccano le pubblicità</string>
     <string name="settings_hosts_toast">Aggiunto modulo per il supporto al file hosts systemless</string>
     <string name="superuser_notification">Notifica di accesso root</string>
-
-
     <string name="settings_su_auth_title">Autenticazione utente</string>
     <string name="settings_su_auth_summary">Richiedi l\'autenticazione dell\'utente per le richieste di accesso root</string>
     <string name="settings_su_auth_insecure">Sul dispositivo non è configurato alcun metodo di autenticazione</string>
@@ -171,7 +175,6 @@
     <string name="settings_doh_description">Aggira il DNS poisoning in alcune nazioni</string>
     <string name="settings_random_name_title">Genera un nome casuale per l\’output</string>
     <string name="settings_random_name_description">Rendi casuale il nome del file di output delle immagini con patch e dei file tar per evitarne il rilevamento</string>
-
     <string name="multiuser_mode">Modalità multiutente</string>
     <string name="settings_owner_only">Solo per il proprietario del dispositivo</string>
     <string name="settings_owner_manage">Gestito dal proprietario del dispositivo</string>
@@ -179,7 +182,6 @@
     <string name="owner_only_summary">Solo il proprietario possiede i permessi di root</string>
     <string name="owner_manage_summary">Solo il proprietario può gestire l\'accesso root e ricevere le richieste dalle app</string>
     <string name="user_independent_summary">Ogni utente ha le proprie regole di root indipendenti</string>
-
     <string name="mount_namespace_mode">Modalità mount namespace</string>
     <string name="settings_ns_global">Namespace globale</string>
     <string name="settings_ns_requester">Namespace ereditato</string>
@@ -192,21 +194,26 @@
     <string name="update_channel">Aggiornamenti di Magisk</string>
     <string name="progress_channel">Notifiche di avanzamento</string>
     <string name="updated_channel">Aggiornamento completato</string>
+    <string name="su_notification_channel">Notifiche root</string>
     <string name="download_complete">Download completato</string>
     <string name="download_file_error">Errore durante il download del file</string>
     <string name="magisk_update_title">È disponibile un aggiornamento di Magisk!</string>
     <string name="updated_title">Magisk è stato aggiornato</string>
     <string name="updated_text">Tocca per aprire l\'app</string>
+    <string name="su_notification_granted_title">Permessi di root concessi</string>
+    <string name="su_notification_denied_title">Permessi di root rifiutati</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">Sì</string>
     <string name="no">No</string>
+    <string name="enabled">Abilitato</string>
+    <string name="disabled">Disabilitatp</string>
     <string name="repo_install_title">Installazione di %1$s %2$s(%3$d)</string>
     <string name="download">Download</string>
     <string name="reboot">Riavvia</string>
     <string name="close">Chiudi</string>
     <string name="release_notes">Note di rilascio</string>
-    <string name="flashing">Flash in corso…</string>    <string name="done">Completato!</string>
+    <string name="flashing">Flash in corso…</string>    <string name="done">Fatto!</string>
     <string name="done_action">Azione di %1$s completata</string>
     <string name="failure">Fallito</string>
     <string name="open_link_failed_toast">Nessuna app disponibile per aprire il link</string>
@@ -231,4 +238,6 @@
     <string name="install_unknown_denied">Consenti l\'installazione di app sconosciute per abilitare questa funzionalità</string>
     <string name="app_not_found">Non è stata trovata un\'app per gestire questa azione</string>
     <string name="reboot_apply_change">Riavvia per applicare le modifiche</string>
+    <string name="running_exit_title">Esecuzione in corso</string>
+    <string name="running_exit_msg">Sei sicuro di uscire? L'operazione in esecuzione potrebbe non essere completata.</string>
 </resources>
