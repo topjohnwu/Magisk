@@ -108,7 +108,7 @@ void SePolicy::typeattribute(StrVec types, StrVec attrs) noexcept {
 void SePolicy::type(Str type, StrVec attrs) noexcept {
     expand(type, attrs, [this](auto name, auto attr) {
         print_rule("type", name, attr);
-        impl->add_type(name, TYPE_TYPE) && impl->add_typeattribute(name, attr);
+        impl->add_type(name, TYPE_TYPE) && (attr.empty() || impl->add_typeattribute(name, attr));
     });
 }
 
