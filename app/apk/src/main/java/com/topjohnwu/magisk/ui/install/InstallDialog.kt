@@ -86,6 +86,7 @@ import com.topjohnwu.magisk.ui.component.MagiskDialog
 import com.topjohnwu.magisk.ui.component.MarkdownText
 import com.topjohnwu.magisk.ui.component.SettingsArrow
 import com.topjohnwu.magisk.ui.component.SettingsSwitch
+import com.topjohnwu.magisk.ui.component.launchSafely
 import com.topjohnwu.magisk.ui.component.rememberConfirmDialog
 import com.topjohnwu.magisk.ui.component.verticalScrollbar
 import com.topjohnwu.magisk.core.R as CoreR
@@ -372,7 +373,8 @@ fun PatchComposableDialog(
             PatchSource.CANDIDATE -> candidate?.url?.toUri() ?: return@submit
             PatchSource.FILE -> localFileUri ?: run {
                 pendingSubmitAfterPick = true
-                localFilePicker.launch("*/*")
+                // No document picker (common on TVs): don't wait for a result that never comes
+                if (!localFilePicker.launchSafely(context, "*/*")) pendingSubmitAfterPick = false
                 return@submit
             }
             PatchSource.URL -> parseHttpsUrl(url.trim()) ?: run {
@@ -499,7 +501,7 @@ fun PatchComposableDialog(
                             onClick = {
                                 chosenSource = PatchSource.FILE
                                 pendingSubmitAfterPick = false
-                                localFilePicker.launch("*/*")
+                                localFilePicker.launchSafely(context, "*/*")
                             },
                             role = Role.RadioButton
                         )
