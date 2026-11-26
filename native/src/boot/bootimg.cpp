@@ -511,6 +511,9 @@ int unpack(Utf8CStr image, bool skip_decomp, bool hdr) {
             }
             close(fd);
         }
+    } else if (boot.flags[ZIMAGE_KERNEL]) {
+        // Keep the size_append trailer so repack writes the piggy back as-is
+        dump(boot.z_info->piggy.data(), boot.z_info->piggy.size(), KERNEL_FILE);
     } else {
         dump(boot.kernel, boot.hdr->kernel_size(), KERNEL_FILE);
     }
