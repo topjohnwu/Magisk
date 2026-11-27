@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The default value of splash_background is in :core -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingDefaultResource">
+    <!-- Black splash where the Wear UI is used, see useWearUi() -->
+    <color name="splash_background">@android:color/black</color>
+</resources>

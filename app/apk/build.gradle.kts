@@ -36,6 +36,7 @@ android {
 dependencies {
     implementation(project(":core"))
     implementation(project(":shared"))
+    implementation(project(":wear"))
     coreLibraryDesugaring(libs.jdk.libs)
 
     // Compose

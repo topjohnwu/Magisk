@@ -60,6 +60,8 @@ import com.topjohnwu.magisk.ui.superuser.SuperuserDetailScreen
 import com.topjohnwu.magisk.ui.superuser.SuperuserGrantScreen
 import com.topjohnwu.magisk.ui.superuser.SuperuserGrantViewModel
 import com.topjohnwu.magisk.ui.superuser.SuperuserViewModel
+import com.topjohnwu.magisk.wear.WearUi
+import com.topjohnwu.magisk.wear.useWearUi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -80,13 +82,15 @@ class MainActivity : ComponentActivity(), SplashScreenHost {
     // A tab requested by a new intent while the activity is running (it's singleTask)
     private val tabRequest = MutableStateFlow<Int?>(null)
     internal val showUnsupported = MutableStateFlow<List<Pair<Int, Int>>>(emptyList())
+    // Set in onCreate where the Wear OS UI replaces this one
+    private var wearUi: WearUi? = null
 
     override fun attachBaseContext(base: Context) {
         super.attachBaseContext(base.wrap())
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        applySystemBarStyle()
+        if (useWearUi()) wearUi = WearUi(this) else applySystemBarStyle()
         extension.onCreate(savedInstanceState)
         splashController.preOnCreate()
         super.onCreate(savedInstanceState)
@@ -110,6 +114,11 @@ class MainActivity : ComponentActivity(), SplashScreenHost {
 
     @SuppressLint("InlinedApi")
     override fun onCreateUi(savedInstanceState: Bundle?) {
+        wearUi?.let {
+            it.onCreateUi(savedInstanceState)
+            return
+        }
+
         showUnsupportedMessage()
 
         // Only ask on startup, not every time the activity is recreated

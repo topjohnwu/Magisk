@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Wear Compose requires API 25. It is only used where useWearUi() is true, which
+         includes that check, so it never runs on older releases. -->
+    <uses-sdk tools:overrideLibrary="androidx.wear.compose.foundation,androidx.wear.compose.material3,androidx.wear.compose.material.core" />
+
     <application android:localeConfig="@xml/locale_config">
         <activity
             android:name=".ui.MainActivity"
