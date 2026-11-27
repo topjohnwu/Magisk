@@ -35,6 +35,9 @@ jobs:
       - name: Build debug
         run: ./build.py -v all
 
+      - name: Run app unit tests
+        run: ./app/gradlew -p app testDebugUnitTest
+
       - name: Stop gradle daemon
         run: ./app/gradlew --stop
 
