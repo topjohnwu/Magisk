@@ -240,4 +240,34 @@
     <string name="reboot_apply_change">Reboot to apply changes</string>
     <string name="running_exit_title">Execution in progress</string>
     <string name="running_exit_msg">Are you sure you want to exit? The running operation may not complete.</string>
+
+    <!--Wear OS-->
+    <string name="wear_pick_empty">No matching files in the Download folder</string>
+    <string name="wear_home_running">Running</string>
+    <string name="wear_home_installed_code">Installed · %1$d</string>
+    <string name="wear_home_uninstall">Uninstall</string>
+    <string name="wear_root_full">Full root</string>
+    <string name="wear_root_restricted">Restricted root</string>
+    <string name="wear_root_none">No root</string>
+    <string name="wear_su_logs">Superuser logs</string>
+    <string name="wear_grant_granted">Granted · %1$s</string>
+    <string name="wear_log_today">Today</string>
+    <string name="wear_log_yesterday">Yesterday</string>
+    <string name="wear_log_clear_msg">Delete all entries of the %1$s log?</string>
+    <string name="wear_module_active">Active</string>
+    <string name="wear_module_disabled">Disabled</string>
+    <string name="wear_module_removed">Removed after reboot</string>
+    <string name="wear_module_enabled">Enabled</string>
+    <string name="wear_module_reboot">Reboot</string>
+    <string name="wear_module_run_action">Run action</string>
+    <string name="wear_module_remove">Remove module</string>
+    <string name="wear_action_running">Running…</string>
+    <string name="wear_install_direct_msg">Patch the boot image of this device and flash it now?</string>
+    <string name="wear_flash_keep_charging">Keep the watch on the charger</string>
+    <string name="wear_flash_wait">Wait until it finishes</string>
+    <string name="wear_restore_msg">Flashes back the stock boot image saved when Magisk was installed. Magisk is gone after a reboot.</string>
+    <string name="wear_restore_sha1">Backup SHA1</string>
+    <string name="wear_restore_no_backup">No boot image backup</string>
+    <string name="wear_restore_hold">Hold to restore</string>
+    <string name="wear_settings_updates">Updates</string>
 </resources>

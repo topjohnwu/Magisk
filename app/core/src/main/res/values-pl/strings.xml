@@ -44,6 +44,7 @@
     <string name="install_inactive_slot">Zainstaluj w nieaktywnym slocie (po OTA)</string>
     <string name="install_inactive_slot_msg">Po ponownym uruchomieniu twoje urządzenie zostanie ZMUSZONE do rozruchu z aktualnie nieaktywnego slotu!\nUżywaj tej opcji tylko po ukończeniu aktualizacji OTA.\nKontynuować?</string>
     <string name="setup_title">Dodatkowa konfiguracja</string>
+    <string name="select_from_storage">Wybierz z pamięci</string>
     <string name="reboot_delay_toast">Ponowne uruchomienie za 5 sekund…</string>
     <string name="flash_screen_title">Instalacja</string>
 
@@ -209,4 +210,34 @@
     <string name="install_unknown_denied">Zezwól na \"Instaluj z nieznanych źródeł\", aby włączyć tę funkcję</string>
     <string name="app_not_found">Nie znaleziono aplikacji do wykonania tej czynności</string>
     <string name="reboot_apply_change">Uruchom ponownie, aby zastosować zmiany</string>
+
+    <!--Wear OS-->
+    <string name="wear_pick_empty">Brak pasujących plików w folderze Download</string>
+    <string name="wear_home_running">Działa</string>
+    <string name="wear_home_installed_code">Zainstalowany · %1$d</string>
+    <string name="wear_home_uninstall">Odinstaluj</string>
+    <string name="wear_root_full">Pełny root</string>
+    <string name="wear_root_restricted">Ograniczony root</string>
+    <string name="wear_root_none">Bez roota</string>
+    <string name="wear_su_logs">Logi su</string>
+    <string name="wear_grant_granted">Przyznano · %1$s</string>
+    <string name="wear_log_today">Dziś</string>
+    <string name="wear_log_yesterday">Wczoraj</string>
+    <string name="wear_log_clear_msg">Usunąć wszystkie wpisy z logu %1$s?</string>
+    <string name="wear_module_active">Aktywny</string>
+    <string name="wear_module_disabled">Wyłączony</string>
+    <string name="wear_module_removed">Usunięty po restarcie</string>
+    <string name="wear_module_enabled">Włączony</string>
+    <string name="wear_module_reboot">Uruchom ponownie</string>
+    <string name="wear_module_run_action">Uruchom akcję</string>
+    <string name="wear_module_remove">Usuń moduł</string>
+    <string name="wear_action_running">Trwa…</string>
+    <string name="wear_install_direct_msg">Załatać obraz boot tego urządzenia i od razu go wgrać?</string>
+    <string name="wear_flash_keep_charging">Nie zdejmuj z ładowarki</string>
+    <string name="wear_flash_wait">Poczekaj, aż się skończy</string>
+    <string name="wear_restore_msg">Wgrywa z powrotem stockowy obraz boot zapisany przy instalacji Magiska. Po ponownym uruchomieniu Magiska już nie będzie.</string>
+    <string name="wear_restore_sha1">SHA1 kopii</string>
+    <string name="wear_restore_no_backup">Brak kopii obrazu boot</string>
+    <string name="wear_restore_hold">Przytrzymaj, aby przywrócić</string>
+    <string name="wear_settings_updates">Aktualizacje</string>
 </resources>

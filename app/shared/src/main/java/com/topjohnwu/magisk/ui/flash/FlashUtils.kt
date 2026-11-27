@@ -5,8 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import com.topjohnwu.magisk.core.Const
-import com.topjohnwu.magisk.core.cmp
-import com.topjohnwu.magisk.ui.MainActivity
+import com.topjohnwu.magisk.core.ktx.selfLaunchIntent
 import java.util.UUID
 
 object FlashUtils {
@@ -28,8 +27,8 @@ object FlashUtils {
      * own one-shot PendingIntent.
      */
     fun installIntent(context: Context, file: Uri, requestCode: Int): PendingIntent {
-        val intent = Intent(context, MainActivity::class.java).apply {
-            component = MainActivity::class.java.cmp(context.packageName)
+        val intent = Intent().apply {
+            component = context.selfLaunchIntent().component
             action = INTENT_FLASH
             putExtra(EXTRA_FLASH_ACTION, Const.Value.FLASH_ZIP)
             putExtra(EXTRA_FLASH_URI, file.toString())

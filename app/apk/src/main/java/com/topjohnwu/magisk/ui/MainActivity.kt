@@ -4,13 +4,9 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.content.pm.ApplicationInfo
 import android.content.res.Resources
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.CancellationSignal
-import android.provider.OpenableColumns
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedContentTransitionScope.SlideDirection
@@ -38,7 +34,6 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.VMFactory
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
-import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.base.ActivityExtension
 import com.topjohnwu.magisk.core.base.SplashController
 import com.topjohnwu.magisk.core.base.SplashScreenHost
@@ -50,6 +45,8 @@ import com.topjohnwu.magisk.ui.deny.DenyListViewModel
 import com.topjohnwu.magisk.ui.flash.FlashScreen
 import com.topjohnwu.magisk.ui.flash.FlashUtils
 import com.topjohnwu.magisk.ui.flash.FlashViewModel
+import com.topjohnwu.magisk.ui.flash.queryDisplayName
+import com.topjohnwu.magisk.ui.flash.sanitizeDisplayName
 import com.topjohnwu.magisk.ui.module.ActionScreen
 import com.topjohnwu.magisk.ui.module.ActionViewModel
 import com.topjohnwu.magisk.ui.navigation.LocalNavigator
@@ -60,16 +57,10 @@ import com.topjohnwu.magisk.ui.superuser.SuperuserDetailScreen
 import com.topjohnwu.magisk.ui.superuser.SuperuserGrantScreen
 import com.topjohnwu.magisk.ui.superuser.SuperuserGrantViewModel
 import com.topjohnwu.magisk.ui.superuser.SuperuserViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
+import com.topjohnwu.magisk.wear.WearUi
+import com.topjohnwu.magisk.wear.useWearUi
 import kotlinx.coroutines.flow.MutableStateFlow
-import java.io.File
-import kotlinx.coroutines.withTimeoutOrNull
 import com.topjohnwu.magisk.core.R as CoreR
-
-private const val MAX_DISPLAY_NAME_LENGTH = 100
-private const val DISPLAY_NAME_QUERY_TIMEOUT_MS = 3000L
 
 class MainActivity : ComponentActivity(), SplashScreenHost {
 
@@ -80,13 +71,15 @@ class MainActivity : ComponentActivity(), SplashScreenHost {
     // A tab requested by a new intent while the activity is running (it's singleTask)
     private val tabRequest = MutableStateFlow<Int?>(null)
     internal val showUnsupported = MutableStateFlow<List<Pair<Int, Int>>>(emptyList())
+    // Set in onCreate where the Wear OS UI replaces this one
+    private var wearUi: WearUi? = null
 
     override fun attachBaseContext(base: Context) {
         super.attachBaseContext(base.wrap())
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        applySystemBarStyle()
+        if (useWearUi()) wearUi = WearUi(this, extension) else applySystemBarStyle()
         extension.onCreate(savedInstanceState)
         splashController.preOnCreate()
         super.onCreate(savedInstanceState)
@@ -110,6 +103,11 @@ class MainActivity : ComponentActivity(), SplashScreenHost {
 
     @SuppressLint("InlinedApi")
     override fun onCreateUi(savedInstanceState: Bundle?) {
+        wearUi?.let {
+            it.onCreateUi(savedInstanceState)
+            return
+        }
+
         showUnsupportedMessage()
 
         // Only ask on startup, not every time the activity is recreated
@@ -284,55 +282,6 @@ class MainActivity : ComponentActivity(), SplashScreenHost {
         }
     }
 
-    /**
-     * Names from external apps are untrusted: drop control and formatting characters
-     * (e.g. bidi overrides that can reorder the text) and cap the length.
-     */
-    private fun String.sanitizeDisplayName(): String {
-        val sb = StringBuilder()
-        var count = 0
-        var i = 0
-        // Work on code points, so supplementary characters (e.g. invisible tag characters)
-        // are recognized and never split
-        while (i < length && count < MAX_DISPLAY_NAME_LENGTH) {
-            val cp = codePointAt(i)
-            i += Character.charCount(cp)
-            val type = Character.getType(cp)
-            if (Character.isISOControl(cp) || type == Character.FORMAT.toInt() ||
-                type == Character.SURROGATE.toInt()) continue
-            sb.appendCodePoint(cp)
-            count++
-        }
-        return sb.toString().trim()
-    }
-
-    /**
-     * Query the display name from the provider of an external URI. The provider is controlled
-     * by another app, so never block on it indefinitely: give up after a timeout and cancel it.
-     */
-    private suspend fun queryDisplayName(context: Context, uri: Uri): String? {
-        val signal = CancellationSignal()
-        // Not a child of the caller, so giving up doesn't have to wait for the provider
-        val query = CoroutineScope(Dispatchers.IO).async {
-            runCatching {
-                context.contentResolver.query(
-                    uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null, signal
-                )?.use { cursor ->
-                    val idx = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-                    if (cursor.moveToFirst() && idx >= 0) cursor.getString(idx) else null
-                }
-            }.getOrNull()
-        }
-        return try {
-            withTimeoutOrNull(DISPLAY_NAME_QUERY_TIMEOUT_MS) { query.await() }
-        } finally {
-            if (!query.isCompleted) {
-                signal.cancel()
-                query.cancel()
-            }
-        }
-    }
-
     private fun setHideOverlayWindows(hide: Boolean) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             window.setHideOverlayWindows(hide)
@@ -342,6 +291,10 @@ class MainActivity : ComponentActivity(), SplashScreenHost {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
+        wearUi?.let {
+            it.onNewIntent()
+            return
+        }
         getRequestedTab(intent)?.let { tabRequest.value = it }
         intentState.value += 1
     }
@@ -363,24 +316,7 @@ class MainActivity : ComponentActivity(), SplashScreenHost {
     }
 
     private fun showUnsupportedMessage() {
-        val messages = mutableListOf<Pair<Int, Int>>()
-
-        if (Info.env.isUnsupported) {
-            messages.add(CoreR.string.unsupport_magisk_title to CoreR.string.unsupport_magisk_msg)
-        }
-        if (!Info.isEmulator && Info.env.isActive && System.getenv("PATH")
-                ?.split(':')
-                ?.filterNot { File("$it/magisk").exists() }
-                ?.any { File("$it/su").exists() } == true) {
-            messages.add(CoreR.string.unsupport_general_title to CoreR.string.unsupport_other_su_msg)
-        }
-        if (applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM != 0) {
-            messages.add(CoreR.string.unsupport_general_title to CoreR.string.unsupport_system_app_msg)
-        }
-        if (applicationInfo.flags and ApplicationInfo.FLAG_EXTERNAL_STORAGE != 0) {
-            messages.add(CoreR.string.unsupport_general_title to CoreR.string.unsupport_external_storage_msg)
-        }
-
+        val messages = unsupportedMessages()
         if (messages.isNotEmpty()) {
             showUnsupported.value = messages
         }

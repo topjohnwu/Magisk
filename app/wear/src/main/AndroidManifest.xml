@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Also declared by :core; WearUi hides overlays while it asks to install a module -->
+    <uses-permission android:name="android.permission.HIDE_OVERLAY_WINDOWS" />
+
+</manifest>

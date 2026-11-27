@@ -13,6 +13,7 @@ compose-m3 = "1.4.0"
 navigation3 = "1.1.7"
 navigationevent = "1.1.2"
 wire = "7.0.3"
+wear-compose = "1.7.2"
 
 [libraries]
 commons-compress = { module = "org.apache.commons:commons-compress", version = "1.28.0" }
@@ -42,6 +43,7 @@ test-runner = { module = "androidx.test:runner", version = "1.7.0" }
 test-rules = { module = "androidx.test:rules", version = "1.7.0" }
 test-junit = { module = "androidx.test.ext:junit", version = "1.3.0" }
 test-uiautomator = { module = "androidx.test.uiautomator:uiautomator", version = "2.4.0" }
+junit = { module = "junit:junit", version = "4.13.2" }
 
 # topjohnwu
 libsu-core = { module = "com.github.topjohnwu.libsu:core", version.ref = "libsu" }
@@ -51,6 +53,7 @@ libsu-nio = { module = "com.github.topjohnwu.libsu:nio", version.ref = "libsu" }
 # Compose
 activity-compose = { module = "androidx.activity:activity-compose", version = "1.13.0" }
 accompanist-drawablepainter = { module = "com.google.accompanist:accompanist-drawablepainter", version = "0.37.3" }
+compose-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "compose-ui" }
 compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose-ui" }
 compose-animation = { module = "androidx.compose.animation:animation", version.ref = "compose-ui" }
 compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose-ui" }
@@ -60,12 +63,21 @@ compose-material3 = { module = "androidx.compose.material3:material3", version.r
 compose-material3-adaptive-navigation-suite = { module = "androidx.compose.material3:material3-adaptive-navigation-suite", version.ref = "compose-m3" }
 window-core = { module = "androidx.window:window-core", version = "1.5.0" }
 compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version = "1.7.8" }
+lifecycle-livedata-core = { module = "androidx.lifecycle:lifecycle-livedata-core", version.ref = "lifecycle" }
+lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel", version.ref = "lifecycle" }
+lifecycle-viewmodel-savedstate = { module = "androidx.lifecycle:lifecycle-viewmodel-savedstate", version.ref = "lifecycle" }
 lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
 lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycle" }
 navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "navigation3" }
 navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "navigation3" }
 navigationevent-compose = { module = "androidx.navigationevent:navigationevent-compose", version.ref = "navigationevent" }
+
+# Wear OS
+wear-compose-foundation = { module = "androidx.wear.compose:compose-foundation", version.ref = "wear-compose" }
+wear-compose-material3 = { module = "androidx.wear.compose:compose-material3", version.ref = "wear-compose" }
+wear-compose-navigation3 = { module = "androidx.wear.compose:compose-navigation3", version.ref = "wear-compose" }
+wear-input = { module = "androidx.wear:wear-input", version = "1.1.0" }
 
 # For build-logic
 android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "android" }
