@@ -1,11 +1,12 @@
 use crate::consts::{APPLET_NAMES, MAGISK_VER_CODE, MAGISK_VERSION, POST_FS_DATA_WAIT_TIME};
 use crate::daemon::connect_daemon;
 use crate::ffi::{RequestCode, denylist_cli, get_magisk_tmp, install_module, unlock_blocks};
+use crate::logging::android_logging;
 use crate::mount::find_preinit_device;
 use crate::selinux::restorecon;
 use crate::socket::{Decodable, Encodable};
 use argh::FromArgs;
-use base::{CmdArgs, EarlyExitExt, LoggedResult, Utf8CString, argh, clone_attr};
+use base::{CmdArgs, EarlyExitExt, LoggedResult, Utf8CString, argh, clone_attr, warn};
 use nix::poll::{PollFd, PollFlags, PollTimeout};
 use std::ffi::c_char;
 use std::os::fd::AsFd;
@@ -224,10 +225,14 @@ impl MagiskAction {
             PostFsData(_) => {
                 let fd = connect_daemon(RequestCode::POST_FS_DATA, true)?;
                 let mut pfd = [PollFd::new(fd.as_fd(), PollFlags::POLLIN)];
-                nix::poll::poll(
+                let ready = nix::poll::poll(
                     &mut pfd,
                     PollTimeout::try_from(POST_FS_DATA_WAIT_TIME * 1000)?,
                 )?;
+                if ready == 0 {
+                    android_logging();
+                    warn!("post-fs-data timed out after {POST_FS_DATA_WAIT_TIME} seconds");
+                }
             }
             Service(_) => {
                 let _ = connect_daemon(RequestCode::LATE_START, true)?;
